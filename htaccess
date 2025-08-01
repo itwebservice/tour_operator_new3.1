@@ -1,0 +1,16 @@
+RewriteEngine On
+
+Options +FollowSymLinks -MultiViews
+RewriteBase /theme-1_2-php/
+
+# Exclude existing files (like index.php, offer.php, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^([a-zA-Z0-9-]+)$ tour-details.php?slug=$1 [L,QSA]
+RewriteRule ^group-tour/([a-zA-Z0-9-]+)/?$ group-tour-detail.php?slug=$1 [L,QSA]
+<IfModule mod_headers.c>
+  <FilesMatch "\.(less)$">
+    Header set Access-Control-Allow-Origin "https://itoursdemo.co.in"
+  </FilesMatch>
+</IfModule>

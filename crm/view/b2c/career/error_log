@@ -1,0 +1,24 @@
+[14-Feb-2025 11:31:32 Asia/Kolkata] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'itourjh2_theme-1-php.b2c_career' doesn't exist in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php:85
+Stack trace:
+#0 /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php(85): mysqli_query(Object(mysqli), 'SELECT * FROM `...')
+#1 /home4/itourjh2/public_html/theme-1-php/crm/view/b2c/career/list_reflect.php(3): mysqlQuery('SELECT * FROM `...')
+#2 {main}
+  thrown in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php on line 85
+[14-Feb-2025 11:33:04 Asia/Kolkata] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'itourjh2_theme-1-php.b2c_career' doesn't exist in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php:85
+Stack trace:
+#0 /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php(85): mysqli_query(Object(mysqli), 'SELECT * FROM `...')
+#1 /home4/itourjh2/public_html/theme-1-php/crm/view/b2c/career/list_reflect.php(3): mysqlQuery('SELECT * FROM `...')
+#2 {main}
+  thrown in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php on line 85
+[14-Feb-2025 11:33:17 Asia/Kolkata] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'itourjh2_theme-1-php.b2c_career' doesn't exist in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php:85
+Stack trace:
+#0 /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php(85): mysqli_query(Object(mysqli), 'SELECT * FROM `...')
+#1 /home4/itourjh2/public_html/theme-1-php/crm/view/b2c/career/list_reflect.php(3): mysqlQuery('SELECT * FROM `...')
+#2 {main}
+  thrown in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php on line 85
+[14-Feb-2025 11:34:48 Asia/Kolkata] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'itourjh2_theme-1-php.b2c_career' doesn't exist in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php:85
+Stack trace:
+#0 /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php(85): mysqli_query(Object(mysqli), 'SELECT * FROM `...')
+#1 /home4/itourjh2/public_html/theme-1-php/crm/view/b2c/career/list_reflect.php(3): mysqlQuery('SELECT * FROM `...')
+#2 {main}
+  thrown in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php on line 85

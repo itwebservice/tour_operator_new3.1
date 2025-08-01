@@ -1,0 +1,1899 @@
+Array
+(
+    [order] => Array
+        (
+            [bookingId] => TJS102601527308
+            [amount] => 116921
+            [markup] => 0
+            [deliveryInfo] => Array
+                (
+                    [emails] => Array
+                        (
+                            [0] => prajakta.itweb@gmail.com
+                        )
+
+                    [contacts] => Array
+                        (
+                            [0] => +918600443667
+                        )
+
+                )
+
+            [status] => SUCCESS
+            [createdOn] => 2025-07-11T10:09:17.812
+            [isPassportConsentTaken] => 
+        )
+
+    [itemInfos] => Array
+        (
+            [AIR] => Array
+                (
+                    [tripInfos] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [sI] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [id] => 290965
+                                                    [fD] => Array
+                                                        (
+                                                            [aI] => Array
+                                                                (
+                                                                    [code] => AI
+                                                                    [name] => Air India
+                                                                    [isLcc] => 
+                                                                )
+
+                                                            [fN] => 2702
+                                                            [eT] => 32N
+                                                        )
+
+                                                    [stops] => 0
+                                                    [duration] => 135
+                                                    [da] => Array
+                                                        (
+                                                            [code] => DEL
+                                                            [name] => Delhi Indira Gandhi Intl
+                                                            [cityCode] => DEL
+                                                            [city] => Delhi
+                                                            [country] => India
+                                                            [countryCode] => IN
+                                                            [terminal] => Terminal 3
+                                                        )
+
+                                                    [aa] => Array
+                                                        (
+                                                            [code] => CCU
+                                                            [name] => Netaji Subhas Chandra Bose Intl
+                                                            [cityCode] => CCU
+                                                            [city] => Kolkata
+                                                            [country] => India
+                                                            [countryCode] => IN
+                                                        )
+
+                                                    [dt] => 2025-07-23T02:00
+                                                    [at] => 2025-07-23T04:15
+                                                    [iand] => 
+                                                    [isRs] => 
+                                                    [sN] => 0
+                                                    [bI] => Array
+                                                        (
+                                                            [tI] => Array
+                                                                (
+                                                                    [0] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 4905
+                                                                                            [TAF] => 1167
+                                                                                            [TF] => 6072
+                                                                                            [NF] => 6072
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 609
+                                                                                                    [OT] => 388
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 4905
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 152
+                                                                                            [AGST] => 609
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => E
+                                                                                    [fB] => EL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Mr
+                                                                            [pt] => ADULT
+                                                                            [fN] => Kamlesh
+                                                                            [lN] => Sharma
+                                                                            [ipct] => 
+                                                                        )
+
+                                                                    [1] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 4905
+                                                                                            [TAF] => 1167
+                                                                                            [TF] => 6072
+                                                                                            [NF] => 6072
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 609
+                                                                                                    [OT] => 388
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 4905
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 152
+                                                                                            [AGST] => 609
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => E
+                                                                                    [fB] => EL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Mrs
+                                                                            [pt] => ADULT
+                                                                            [fN] => Jigya
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [2] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 4905
+                                                                                            [TAF] => 1167
+                                                                                            [TF] => 6072
+                                                                                            [NF] => 6072
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 609
+                                                                                                    [OT] => 388
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 4905
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 152
+                                                                                            [AGST] => 609
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => E
+                                                                                    [fB] => EL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => ADULT
+                                                                            [fN] => Jaya
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [3] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 4415
+                                                                                            [TAF] => 1109
+                                                                                            [TF] => 5524
+                                                                                            [NF] => 5524
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 551
+                                                                                                    [OT] => 388
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 4415
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 152
+                                                                                            [AGST] => 551
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => E
+                                                                                    [fB] => EL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => CHILD
+                                                                            [fN] => Chiku
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [4] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 4415
+                                                                                            [TAF] => 1109
+                                                                                            [TF] => 5524
+                                                                                            [NF] => 5524
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 551
+                                                                                                    [OT] => 388
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 4415
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 152
+                                                                                            [AGST] => 551
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => E
+                                                                                    [fB] => EL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Master
+                                                                            [pt] => CHILD
+                                                                            [fN] => Rinku
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [5] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [TAF] => 491
+                                                                                            [TF] => 2991
+                                                                                            [NF] => 2991
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 321
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [YR] => 170
+                                                                                            [AGST] => 321
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 12KG
+                                                                                            [cB] => 0Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => E
+                                                                                    [fB] => EL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => INFANT
+                                                                            [fN] => Raj
+                                                                            [lN] => Sharma
+                                                                            [dob] => 2024-11-06
+                                                                        )
+
+                                                                    [6] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [TAF] => 491
+                                                                                            [TF] => 2991
+                                                                                            [NF] => 2991
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 321
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [YR] => 170
+                                                                                            [AGST] => 321
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 12KG
+                                                                                            [cB] => 0Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => E
+                                                                                    [fB] => EL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Master
+                                                                            [pt] => INFANT
+                                                                            [fN] => Monty
+                                                                            [lN] => Sharma
+                                                                            [dob] => 2024-05-21
+                                                                        )
+
+                                                                )
+
+                                                        )
+
+                                                    [ifo] => 
+                                                    [isbpo] => 
+                                                    [israa] => 1
+                                                    [sid] => 10
+                                                )
+
+                                        )
+
+                                )
+
+                            [1] => Array
+                                (
+                                    [sI] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [id] => 290966
+                                                    [fD] => Array
+                                                        (
+                                                            [aI] => Array
+                                                                (
+                                                                    [code] => AI
+                                                                    [name] => Air India
+                                                                    [isLcc] => 
+                                                                )
+
+                                                            [fN] => 2472
+                                                            [eT] => 32N
+                                                        )
+
+                                                    [stops] => 0
+                                                    [duration] => 180
+                                                    [da] => Array
+                                                        (
+                                                            [code] => CCU
+                                                            [name] => Netaji Subhas Chandra Bose Intl
+                                                            [cityCode] => CCU
+                                                            [city] => Kolkata
+                                                            [country] => India
+                                                            [countryCode] => IN
+                                                        )
+
+                                                    [aa] => Array
+                                                        (
+                                                            [code] => BOM
+                                                            [name] => Chhatrapati Shivaji
+                                                            [cityCode] => BOM
+                                                            [city] => Mumbai
+                                                            [country] => India
+                                                            [countryCode] => IN
+                                                            [terminal] => Terminal 2
+                                                        )
+
+                                                    [dt] => 2025-07-25T15:10
+                                                    [at] => 2025-07-25T18:10
+                                                    [iand] => 
+                                                    [isRs] => 
+                                                    [sN] => 0
+                                                    [bI] => Array
+                                                        (
+                                                            [tI] => Array
+                                                                (
+                                                                    [0] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5570
+                                                                                            [TAF] => 1944
+                                                                                            [TF] => 7514
+                                                                                            [NF] => 7514
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 689
+                                                                                                    [OT] => 1085
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5570
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 849
+                                                                                            [AGST] => 689
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDUI
+                                                                                )
+
+                                                                            [ti] => Mr
+                                                                            [pt] => ADULT
+                                                                            [fN] => Kamlesh
+                                                                            [lN] => Sharma
+                                                                            [ipct] => 
+                                                                        )
+
+                                                                    [1] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5570
+                                                                                            [TAF] => 1944
+                                                                                            [TF] => 7514
+                                                                                            [NF] => 7514
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 689
+                                                                                                    [OT] => 1085
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5570
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 849
+                                                                                            [AGST] => 689
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDUI
+                                                                                )
+
+                                                                            [ti] => Mrs
+                                                                            [pt] => ADULT
+                                                                            [fN] => Jigya
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [2] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5570
+                                                                                            [TAF] => 1944
+                                                                                            [TF] => 7514
+                                                                                            [NF] => 7514
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 689
+                                                                                                    [OT] => 1085
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5570
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 849
+                                                                                            [AGST] => 689
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDUI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => ADULT
+                                                                            [fN] => Jaya
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [3] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5013
+                                                                                            [TAF] => 1877
+                                                                                            [TF] => 6890
+                                                                                            [NF] => 6890
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 622
+                                                                                                    [OT] => 1085
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5013
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 849
+                                                                                            [AGST] => 622
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDUI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => CHILD
+                                                                            [fN] => Chiku
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [4] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5013
+                                                                                            [TAF] => 1877
+                                                                                            [TF] => 6890
+                                                                                            [NF] => 6890
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 622
+                                                                                                    [OT] => 1085
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5013
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 849
+                                                                                            [AGST] => 622
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDUI
+                                                                                )
+
+                                                                            [ti] => Master
+                                                                            [pt] => CHILD
+                                                                            [fN] => Rinku
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [5] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [TAF] => 491
+                                                                                            [TF] => 2991
+                                                                                            [NF] => 2991
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 321
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [YR] => 170
+                                                                                            [AGST] => 321
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 12KG
+                                                                                            [cB] => 0Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDUI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => INFANT
+                                                                            [fN] => Raj
+                                                                            [lN] => Sharma
+                                                                            [dob] => 2024-11-06
+                                                                        )
+
+                                                                    [6] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [TAF] => 491
+                                                                                            [TF] => 2991
+                                                                                            [NF] => 2991
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 321
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [YR] => 170
+                                                                                            [AGST] => 321
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 12KG
+                                                                                            [cB] => 0Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDUI
+                                                                                )
+
+                                                                            [ti] => Master
+                                                                            [pt] => INFANT
+                                                                            [fN] => Monty
+                                                                            [lN] => Sharma
+                                                                            [dob] => 2024-05-21
+                                                                        )
+
+                                                                )
+
+                                                        )
+
+                                                    [ifo] => 
+                                                    [isbpo] => 
+                                                    [sid] => 10
+                                                )
+
+                                        )
+
+                                )
+
+                            [2] => Array
+                                (
+                                    [sI] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [id] => 290967
+                                                    [fD] => Array
+                                                        (
+                                                            [aI] => Array
+                                                                (
+                                                                    [code] => AI
+                                                                    [name] => Air India
+                                                                    [isLcc] => 
+                                                                )
+
+                                                            [fN] => 2442
+                                                            [eT] => 32N
+                                                        )
+
+                                                    [stops] => 0
+                                                    [duration] => 135
+                                                    [da] => Array
+                                                        (
+                                                            [code] => BOM
+                                                            [name] => Chhatrapati Shivaji
+                                                            [cityCode] => BOM
+                                                            [city] => Mumbai
+                                                            [country] => India
+                                                            [countryCode] => IN
+                                                            [terminal] => Terminal 2
+                                                        )
+
+                                                    [aa] => Array
+                                                        (
+                                                            [code] => DEL
+                                                            [name] => Delhi Indira Gandhi Intl
+                                                            [cityCode] => DEL
+                                                            [city] => Delhi
+                                                            [country] => India
+                                                            [countryCode] => IN
+                                                            [terminal] => Terminal 3
+                                                        )
+
+                                                    [dt] => 2025-07-28T15:10
+                                                    [at] => 2025-07-28T17:25
+                                                    [iand] => 
+                                                    [isRs] => 
+                                                    [sN] => 0
+                                                    [bI] => Array
+                                                        (
+                                                            [tI] => Array
+                                                                (
+                                                                    [0] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5560
+                                                                                            [TAF] => 1367
+                                                                                            [TF] => 6927
+                                                                                            [NF] => 6927
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 688
+                                                                                                    [OT] => 509
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5560
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 273
+                                                                                            [AGST] => 688
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Mr
+                                                                            [pt] => ADULT
+                                                                            [fN] => Kamlesh
+                                                                            [lN] => Sharma
+                                                                            [ipct] => 
+                                                                        )
+
+                                                                    [1] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5560
+                                                                                            [TAF] => 1367
+                                                                                            [TF] => 6927
+                                                                                            [NF] => 6927
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 688
+                                                                                                    [OT] => 509
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5560
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 273
+                                                                                            [AGST] => 688
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Mrs
+                                                                            [pt] => ADULT
+                                                                            [fN] => Jigya
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [2] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5560
+                                                                                            [TAF] => 1367
+                                                                                            [TF] => 6927
+                                                                                            [NF] => 6927
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 688
+                                                                                                    [OT] => 509
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5560
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 273
+                                                                                            [AGST] => 688
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => ADULT
+                                                                            [fN] => Jaya
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [3] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5004
+                                                                                            [TAF] => 1300
+                                                                                            [TF] => 6304
+                                                                                            [NF] => 6304
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 621
+                                                                                                    [OT] => 509
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5004
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 273
+                                                                                            [AGST] => 621
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => CHILD
+                                                                            [fN] => Chiku
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [4] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [osi] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 5004
+                                                                                            [TAF] => 1300
+                                                                                            [TF] => 6304
+                                                                                            [NF] => 6304
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 621
+                                                                                                    [OT] => 509
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 5004
+                                                                                            [YR] => 170
+                                                                                            [UDF] => 273
+                                                                                            [AGST] => 621
+                                                                                            [OC] => 236
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 15KG
+                                                                                            [cB] => 7Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Master
+                                                                            [pt] => CHILD
+                                                                            [fN] => Rinku
+                                                                            [lN] => Sharma
+                                                                        )
+
+                                                                    [5] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [TAF] => 491
+                                                                                            [TF] => 2991
+                                                                                            [NF] => 2991
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 321
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [YR] => 170
+                                                                                            [AGST] => 321
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 12KG
+                                                                                            [cB] => 0Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Ms
+                                                                            [pt] => INFANT
+                                                                            [fN] => Raj
+                                                                            [lN] => Sharma
+                                                                            [dob] => 2024-11-06
+                                                                        )
+
+                                                                    [6] => Array
+                                                                        (
+                                                                            [ssrInfo] => Array
+                                                                                (
+                                                                                )
+
+                                                                            [fd] => Array
+                                                                                (
+                                                                                    [fC] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [TAF] => 491
+                                                                                            [TF] => 2991
+                                                                                            [NF] => 2991
+                                                                                        )
+
+                                                                                    [afC] => Array
+                                                                                        (
+                                                                                            [TAF] => Array
+                                                                                                (
+                                                                                                    [YR] => 170
+                                                                                                    [AGST] => 321
+                                                                                                )
+
+                                                                                        )
+
+                                                                                    [sfc] => Array
+                                                                                        (
+                                                                                            [BF] => 2500
+                                                                                            [YR] => 170
+                                                                                            [AGST] => 321
+                                                                                        )
+
+                                                                                    [bI] => Array
+                                                                                        (
+                                                                                            [iB] => 12KG
+                                                                                            [cB] => 0Kg
+                                                                                        )
+
+                                                                                    [rT] => 0
+                                                                                    [cc] => PREMIUM_ECONOMY
+                                                                                    [cB] => N
+                                                                                    [fB] => NL1PWDTI
+                                                                                )
+
+                                                                            [ti] => Master
+                                                                            [pt] => INFANT
+                                                                            [fN] => Monty
+                                                                            [lN] => Sharma
+                                                                            [dob] => 2024-05-21
+                                                                        )
+
+                                                                )
+
+                                                        )
+
+                                                    [ifo] => 
+                                                    [isbpo] => 
+                                                    [sid] => 10
+                                                )
+
+                                        )
+
+                                )
+
+                        )
+
+                    [travellerInfos] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [pnrDetails] => Array
+                                        (
+                                            [DEL-CCU] => TESTPNR
+                                            [CCU-BOM] => TESTPNR
+                                            [BOM-DEL] => TESTPNR
+                                        )
+
+                                    [ticketNumberDetails] => Array
+                                        (
+                                            [DEL-CCU] => 1111111111111
+                                            [CCU-BOM] => 1111111111111
+                                            [BOM-DEL] => 1111111111111
+                                        )
+
+                                    [checkinStatusMap] => Array
+                                        (
+                                            [CCU-BOM] => 
+                                            [BOM-DEL] => 
+                                            [DEL-CCU] => 
+                                        )
+
+                                    [fd] => Array
+                                        (
+                                            [fC] => Array
+                                                (
+                                                    [BF] => 4905
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 609
+                                                    [TAF] => 1167
+                                                    [TF] => 6072
+                                                    [OC] => 236
+                                                )
+
+                                            [sfc] => Array
+                                                (
+                                                    [BF] => 4905
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 609
+                                                    [OC] => 236
+                                                )
+
+                                            [bI] => Array
+                                                (
+                                                    [iB] => 15KG
+                                                    [cB] => 7Kg
+                                                )
+
+                                            [rT] => 0
+                                            [cc] => PREMIUM_ECONOMY
+                                            [cB] => E
+                                            [fB] => EL1PWDTI
+                                        )
+
+                                    [ti] => Mr
+                                    [pt] => ADULT
+                                    [fN] => Kamlesh
+                                    [lN] => Sharma
+                                    [ipct] => 
+                                )
+
+                            [1] => Array
+                                (
+                                    [pnrDetails] => Array
+                                        (
+                                            [DEL-CCU] => TESTPNR
+                                            [CCU-BOM] => TESTPNR
+                                            [BOM-DEL] => TESTPNR
+                                        )
+
+                                    [ticketNumberDetails] => Array
+                                        (
+                                            [DEL-CCU] => 1111111111111
+                                            [CCU-BOM] => 1111111111111
+                                            [BOM-DEL] => 1111111111111
+                                        )
+
+                                    [checkinStatusMap] => Array
+                                        (
+                                            [CCU-BOM] => 
+                                            [BOM-DEL] => 
+                                            [DEL-CCU] => 
+                                        )
+
+                                    [fd] => Array
+                                        (
+                                            [fC] => Array
+                                                (
+                                                    [BF] => 4905
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 609
+                                                    [TAF] => 1167
+                                                    [TF] => 6072
+                                                    [OC] => 236
+                                                )
+
+                                            [sfc] => Array
+                                                (
+                                                    [BF] => 4905
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 609
+                                                    [OC] => 236
+                                                )
+
+                                            [bI] => Array
+                                                (
+                                                    [iB] => 15KG
+                                                    [cB] => 7Kg
+                                                )
+
+                                            [rT] => 0
+                                            [cc] => PREMIUM_ECONOMY
+                                            [cB] => E
+                                            [fB] => EL1PWDTI
+                                        )
+
+                                    [ti] => Mrs
+                                    [pt] => ADULT
+                                    [fN] => Jigya
+                                    [lN] => Sharma
+                                )
+
+                            [2] => Array
+                                (
+                                    [pnrDetails] => Array
+                                        (
+                                            [DEL-CCU] => TESTPNR
+                                            [CCU-BOM] => TESTPNR
+                                            [BOM-DEL] => TESTPNR
+                                        )
+
+                                    [ticketNumberDetails] => Array
+                                        (
+                                            [DEL-CCU] => 1111111111111
+                                            [CCU-BOM] => 1111111111111
+                                            [BOM-DEL] => 1111111111111
+                                        )
+
+                                    [checkinStatusMap] => Array
+                                        (
+                                            [CCU-BOM] => 
+                                            [BOM-DEL] => 
+                                            [DEL-CCU] => 
+                                        )
+
+                                    [fd] => Array
+                                        (
+                                            [fC] => Array
+                                                (
+                                                    [BF] => 4905
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 609
+                                                    [TAF] => 1167
+                                                    [TF] => 6072
+                                                    [OC] => 236
+                                                )
+
+                                            [sfc] => Array
+                                                (
+                                                    [BF] => 4905
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 609
+                                                    [OC] => 236
+                                                )
+
+                                            [bI] => Array
+                                                (
+                                                    [iB] => 15KG
+                                                    [cB] => 7Kg
+                                                )
+
+                                            [rT] => 0
+                                            [cc] => PREMIUM_ECONOMY
+                                            [cB] => E
+                                            [fB] => EL1PWDTI
+                                        )
+
+                                    [ti] => Ms
+                                    [pt] => ADULT
+                                    [fN] => Jaya
+                                    [lN] => Sharma
+                                )
+
+                            [3] => Array
+                                (
+                                    [pnrDetails] => Array
+                                        (
+                                            [DEL-CCU] => TESTPNR
+                                            [CCU-BOM] => TESTPNR
+                                            [BOM-DEL] => TESTPNR
+                                        )
+
+                                    [ticketNumberDetails] => Array
+                                        (
+                                            [DEL-CCU] => 1111111111111
+                                            [CCU-BOM] => 1111111111111
+                                            [BOM-DEL] => 1111111111111
+                                        )
+
+                                    [checkinStatusMap] => Array
+                                        (
+                                            [CCU-BOM] => 
+                                            [BOM-DEL] => 
+                                            [DEL-CCU] => 
+                                        )
+
+                                    [fd] => Array
+                                        (
+                                            [fC] => Array
+                                                (
+                                                    [BF] => 4415
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 551
+                                                    [TAF] => 1109
+                                                    [TF] => 5524
+                                                    [OC] => 236
+                                                )
+
+                                            [sfc] => Array
+                                                (
+                                                    [BF] => 4415
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 551
+                                                    [OC] => 236
+                                                )
+
+                                            [bI] => Array
+                                                (
+                                                    [iB] => 15KG
+                                                    [cB] => 7Kg
+                                                )
+
+                                            [rT] => 0
+                                            [cc] => PREMIUM_ECONOMY
+                                            [cB] => E
+                                            [fB] => EL1PWDTI
+                                        )
+
+                                    [ti] => Ms
+                                    [pt] => CHILD
+                                    [fN] => Chiku
+                                    [lN] => Sharma
+                                )
+
+                            [4] => Array
+                                (
+                                    [pnrDetails] => Array
+                                        (
+                                            [DEL-CCU] => TESTPNR
+                                            [CCU-BOM] => TESTPNR
+                                            [BOM-DEL] => TESTPNR
+                                        )
+
+                                    [ticketNumberDetails] => Array
+                                        (
+                                            [DEL-CCU] => 1111111111111
+                                            [CCU-BOM] => 1111111111111
+                                            [BOM-DEL] => 1111111111111
+                                        )
+
+                                    [checkinStatusMap] => Array
+                                        (
+                                            [CCU-BOM] => 
+                                            [BOM-DEL] => 
+                                            [DEL-CCU] => 
+                                        )
+
+                                    [fd] => Array
+                                        (
+                                            [fC] => Array
+                                                (
+                                                    [BF] => 4415
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 551
+                                                    [TAF] => 1109
+                                                    [TF] => 5524
+                                                    [OC] => 236
+                                                )
+
+                                            [sfc] => Array
+                                                (
+                                                    [BF] => 4415
+                                                    [YR] => 170
+                                                    [UDF] => 152
+                                                    [AGST] => 551
+                                                    [OC] => 236
+                                                )
+
+                                            [bI] => Array
+                                                (
+                                                    [iB] => 15KG
+                                                    [cB] => 7Kg
+                                                )
+
+                                            [rT] => 0
+                                            [cc] => PREMIUM_ECONOMY
+                                            [cB] => E
+                                            [fB] => EL1PWDTI
+                                        )
+
+                                    [ti] => Master
+                                    [pt] => CHILD
+                                    [fN] => Rinku
+                                    [lN] => Sharma
+                                )
+
+                            [5] => Array
+                                (
+                                    [pnrDetails] => Array
+                                        (
+                                            [DEL-CCU] => TESTPNR
+                                            [CCU-BOM] => TESTPNR
+                                            [BOM-DEL] => TESTPNR
+                                        )
+
+                                    [ticketNumberDetails] => Array
+                                        (
+                                            [DEL-CCU] => 1111111111111
+                                            [CCU-BOM] => 1111111111111
+                                            [BOM-DEL] => 1111111111111
+                                        )
+
+                                    [checkinStatusMap] => Array
+                                        (
+                                            [CCU-BOM] => 
+                                            [BOM-DEL] => 
+                                            [DEL-CCU] => 
+                                        )
+
+                                    [fd] => Array
+                                        (
+                                            [fC] => Array
+                                                (
+                                                    [BF] => 2500
+                                                    [YR] => 170
+                                                    [AGST] => 321
+                                                    [TAF] => 491
+                                                    [TF] => 2991
+                                                )
+
+                                            [sfc] => Array
+                                                (
+                                                    [BF] => 2500
+                                                    [YR] => 170
+                                                    [AGST] => 321
+                                                )
+
+                                            [bI] => Array
+                                                (
+                                                    [iB] => 12KG
+                                                    [cB] => 0Kg
+                                                )
+
+                                            [rT] => 0
+                                            [cc] => PREMIUM_ECONOMY
+                                            [cB] => E
+                                            [fB] => EL1PWDTI
+                                        )
+
+                                    [ti] => Ms
+                                    [pt] => INFANT
+                                    [fN] => Raj
+                                    [lN] => Sharma
+                                    [dob] => 2024-11-06
+                                )
+
+                            [6] => Array
+                                (
+                                    [pnrDetails] => Array
+                                        (
+                                            [DEL-CCU] => TESTPNR
+                                            [CCU-BOM] => TESTPNR
+                                            [BOM-DEL] => TESTPNR
+                                        )
+
+                                    [ticketNumberDetails] => Array
+                                        (
+                                            [DEL-CCU] => 1111111111111
+                                            [CCU-BOM] => 1111111111111
+                                            [BOM-DEL] => 1111111111111
+                                        )
+
+                                    [checkinStatusMap] => Array
+                                        (
+                                            [CCU-BOM] => 
+                                            [BOM-DEL] => 
+                                            [DEL-CCU] => 
+                                        )
+
+                                    [fd] => Array
+                                        (
+                                            [fC] => Array
+                                                (
+                                                    [BF] => 2500
+                                                    [YR] => 170
+                                                    [AGST] => 321
+                                                    [TAF] => 491
+                                                    [TF] => 2991
+                                                )
+
+                                            [sfc] => Array
+                                                (
+                                                    [BF] => 2500
+                                                    [YR] => 170
+                                                    [AGST] => 321
+                                                )
+
+                                            [bI] => Array
+                                                (
+                                                    [iB] => 12KG
+                                                    [cB] => 0Kg
+                                                )
+
+                                            [rT] => 0
+                                            [cc] => PREMIUM_ECONOMY
+                                            [cB] => E
+                                            [fB] => EL1PWDTI
+                                        )
+
+                                    [ti] => Master
+                                    [pt] => INFANT
+                                    [fN] => Monty
+                                    [lN] => Sharma
+                                    [dob] => 2024-05-21
+                                )
+
+                        )
+
+                    [totalPriceInfo] => Array
+                        (
+                            [totalFareDetail] => Array
+                                (
+                                    [fC] => Array
+                                        (
+                                            [BF] => 91969
+                                            [TAF] => 24952
+                                            [TF] => 116921
+                                            [NF] => 116921
+                                        )
+
+                                    [afC] => Array
+                                        (
+                                            [TAF] => Array
+                                                (
+                                                    [YR] => 3570
+                                                    [AGST] => 11472
+                                                    [OT] => 9910
+                                                )
+
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [gstInfo] => Array
+        (
+        )
+
+    [isSotoBooking] => 
+    [status] => Array
+        (
+            [success] => 1
+            [httpStatus] => 200
+        )
+
+)

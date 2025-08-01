@@ -1,0 +1,235 @@
+[27-Mar-2025 23:42:53 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:43:03 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:44:28 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:44:37 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:44:42 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:47:11 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:32
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 32
+[27-Mar-2025 23:47:41 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:32
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 32
+[27-Mar-2025 23:52:37 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:32
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 32
+[27-Mar-2025 23:53:05 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:32
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 32
+[27-Mar-2025 18:24:17 UTC] PHP Parse error:  Unclosed '{' on line 30 does not match ')' in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 31
+[27-Mar-2025 18:24:20 UTC] PHP Parse error:  Unclosed '{' on line 30 does not match ')' in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 31
+[27-Mar-2025 23:56:20 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:56:33 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:58:16 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:58:21 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[27-Mar-2025 23:59:24 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:32
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 32
+[27-Mar-2025 23:59:31 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:32
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 32
+[28-Mar-2025 11:20:53 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:32
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 32
+[28-Mar-2025 11:23:43 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:27:01 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:27:05 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:27:13 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:31:54 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:31:55 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:32:02 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:32:05 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:32:09 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:37:04 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:37:08 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:37:12 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:38:00 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 11:38:56 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:35
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 35
+[28-Mar-2025 11:42:18 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:35
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 35
+[28-Mar-2025 11:43:18 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:35
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 35
+[28-Mar-2025 11:52:53 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:35
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 35
+[28-Mar-2025 11:52:55 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:35
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 35
+[28-Mar-2025 12:09:13 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[28-Mar-2025 12:10:41 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[28-Mar-2025 12:10:44 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[28-Mar-2025 12:20:02 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[28-Mar-2025 12:25:41 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[28-Mar-2025 12:25:45 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[28-Mar-2025 12:25:47 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:33
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 33
+[28-Mar-2025 12:26:45 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:26:49 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:26:52 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:27:32 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:28:39 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:30:48 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:31:37 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:32:57 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 12:33:09 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 13:56:56 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 13:57:03 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 14:00:00 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 14:01:06 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 14:01:12 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34
+[28-Mar-2025 08:36:17 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 2
+[28-Mar-2025 08:36:17 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 3
+[28-Mar-2025 08:36:17 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 5
+[28-Mar-2025 08:36:19 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 2
+[28-Mar-2025 08:36:19 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 3
+[28-Mar-2025 08:36:19 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 5
+[28-Mar-2025 08:36:21 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 2
+[28-Mar-2025 08:36:21 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 3
+[28-Mar-2025 08:36:21 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 5
+[28-Mar-2025 14:08:06 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: Unsupported operand types: string * float in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php:34
+Stack trace:
+#0 {main}
+  thrown in /home4/itourjh2/public_html/theme-1_2-php/view/tours/inc/tours_cost_load.php on line 34

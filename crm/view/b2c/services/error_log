@@ -1,0 +1,6 @@
+[14-Feb-2025 11:33:18 Asia/Kolkata] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'services' in 'field list' in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php:85
+Stack trace:
+#0 /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php(85): mysqli_query(Object(mysqli), 'SELECT services...')
+#1 /home4/itourjh2/public_html/theme-1-php/crm/view/b2c/services/index.php(5): mysqlQuery('SELECT services...')
+#2 {main}
+  thrown in /home4/itourjh2/public_html/theme-1-php/crm/model/app_settings/app_generic_functions.php on line 85

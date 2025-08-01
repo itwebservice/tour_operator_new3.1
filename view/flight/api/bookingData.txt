@@ -1,0 +1,13 @@
+Array
+(
+    [bookingId] => TJS102601527308
+    [paymentInfos] => Array
+        (
+            [0] => Array
+                (
+                    [amount] => 116921
+                )
+
+        )
+
+)
