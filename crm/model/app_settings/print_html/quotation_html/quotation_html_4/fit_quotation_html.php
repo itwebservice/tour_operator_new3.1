@@ -1066,6 +1066,7 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
       <!-- Bank Detail -->
       <div class="col-md-12 constingBankingPanel BankingPanel">
         <h3 class="costBankTitle text-center">BANK DETAILS</h3>
+        <div class="row">
         <div class="col-md-4 text-center mg_bt_30" style="margin-top: 20px;">
           <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/bankName.png" class="img-responsive"></div>
           <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['bank_name'] != '') ? $sq_bank_branch['bank_name'] : $bank_name_setting  ?></h4>
@@ -1081,6 +1082,8 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
           <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_type'] != '') ? $sq_bank_branch['account_type'] : $acc_name  ?></h4>
           <p>A/C TYPE</p>
         </div>
+        </div>
+        <div class="row">
         <div class="col-md-4 text-center mg_bt_30" style="margin-top: 20px;">
           <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/accNumber.png" class="img-responsive"></div>
           <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_no'] != '') ? $sq_bank_branch['account_no'] : $bank_acc_no  ?></h4>
@@ -1095,6 +1098,7 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
           <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/code.png" class="img-responsive"></div>
           <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['swift_code'] != '') ? strtoupper($sq_bank_branch['swift_code']) :  strtoupper($bank_swift_code) ?></h4>
           <p>SWIFT CODE</p>
+        </div>
         </div>
         <?php if (check_qr()) { ?>
           <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px;">

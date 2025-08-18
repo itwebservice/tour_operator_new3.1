@@ -121,14 +121,14 @@ $tidio_chat = $moduleData->getB2cSettings('tidio_chat');
     <script src="<?php echo BASE_URL_B2C; ?>js2/less.js"></script>
     <script type="text/javascript" src="<?php echo BASE_URL_B2C ?>js2/jquery-3.4.1.min.js"></script>
 
-    <script>
-        <?= $google_analytics ?>
-    </script>
+    <!-- <script>
+       
+    </script> -->
 
     <script src="<?= $tidio_chat ?>" async></script>
 
     <!-- Javascript Page Loader -->
-
+ <?= $google_analytics ?>
 </head>
 
 <body onload="myLoader()">

@@ -62,7 +62,8 @@ textarea.form-control {
                       <td width="27px;" style="padding-right: 10px !important;"><input class="css-checkbox labelauty" id="chk_programd<?=$count?>" type="checkbox" checked style="display: none;"><label for="chk_programd1<?=$count?>" style="margin-top:55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>
                       <td width="20px;"><input maxlength="15" value="<?=$count?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled="" style="margin-top:35px;"></td>
                       <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction<?=$count?>-u" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" style="margin-top:35px;" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?=$row_itinerary['special_attraction']?>"></td>
-                      <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="day_program<?=$count?>-u" name="day_program" class="form-control" rows="3" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?=$row_itinerary['daywise_program']?></textarea></td>
+                      <td class="col-md-5 no-pad" style="padding-left: 5px !important;max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?=$count?>-u" name="day_program" class="form-control day_program" rows="3" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"  style="overflow:hidden;resize:none;height:900px;"  
+    rows="1"><?=$row_itinerary['daywise_program']?></textarea><span class="style_text" style="position: absolute !important; right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important; padding: 0px 14px !important; top: 0px !important;"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>
                       <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay<?=$count?>-u" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);"  style="margin-top:35px;"class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?=$row_itinerary['overnight_stay']?>"></td>
                       <td class="hidden"><input type="text" id="entry_id" name="entry_id" class="form-control" value="<?=$row_itinerary['entry_id']?>"></td>
                     </tr>
@@ -93,6 +94,43 @@ textarea.form-control {
 <script>
 $('#dest_ids1').select2();
 $('#itinerary_update_modal').modal('show');
+
+
+
+// data bold and underline
+
+
+$(document).on("click", ".style_text_b, .style_text_u", function() {
+        var wrapper = $(this).data("wrapper");
+
+        var textarea = $(this).parents('.style_text').siblings('.day_program')[0];
+        console.log(textarea);
+        // Ensure textarea exists and selectionStart/selectionEnd are supported
+        var start = textarea.selectionStart;
+        var end = textarea.selectionEnd;
+
+        // Get the selected text
+        var selectedText = textarea.value.substring(start, end);
+
+        // Wrap the selected text with the wrapper (e.g., ** for bold, __ for underline)
+        var wrappedText = wrapper + selectedText + wrapper;
+
+        // Insert the wrapped text back into the textarea
+        textarea.value = textarea.value.substring(0, start) + wrappedText + textarea.value.substring(end);
+
+        // Adjust the cursor position after wrapping
+        textarea.selectionStart = start;
+        textarea.selectionEnd = end + wrapper.length * 2;
+        var text = textarea.value;
+        var content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+        // Replace markdown-style underline (__text__) with <u> tags
+        content = content.replace(/__(.*?)__/g, '<u>$1</u>');
+        textarea.value = content;
+        //console.log(content);    
+    });
+
+    // 
 
 $('#itinerary_frm_update').validate({
     rules:{

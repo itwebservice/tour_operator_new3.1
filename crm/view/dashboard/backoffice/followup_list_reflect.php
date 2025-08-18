@@ -50,7 +50,11 @@ $to_date = $_POST['to_date'];
                 
                 
                 if($from_date==''){
-                    $sq_fquery = "select * from enquiry_master_entries where entry_id=(select max(entry_id) as entry_id from enquiry_master_entries where enquiry_id='$row[enquiry_id]') and followup_date between '$rightnow' and '$add7days'";
+
+                        $yesterday = date('Y-m-d', strtotime('-1 day'));
+                    
+                        $tomorrow  = date('Y-m-d 23:59:59', strtotime('+1 day'));
+                    $sq_fquery = "select * from enquiry_master_entries where entry_id=(select max(entry_id) as entry_id from enquiry_master_entries where enquiry_id='$row[enquiry_id]') and followup_date between '$yesterday' and '$tomorrow'";
                 }
                 else{
                     $from_date = get_datetime_db($from_date);

@@ -16,21 +16,63 @@ $rightnow = date('Y-m-d');
 
 $where = "status != 'Disabled' AND assigned_emp_id = '$emp_id'";
 
+// if ($from_date != '' && $to_date != '') {
+//     $from_date_db = get_datetime_db($from_date);
+//     $to_date_db = get_datetime_db($to_date);
+//     $where .= " AND enquiry_id IN (
+//         SELECT enquiry_id FROM enquiry_master_entries
+//         WHERE followup_date BETWEEN '$from_date_db' AND '$to_date_db'
+//         AND followup_status IN ('Active', 'In-Followup')
+//     )";
+// } else {
+
+//      $yesterday = date('Y-m-d', strtotime('-1 day'));
+                    
+//                         $tomorrow  = date('Y-m-d 23:59:59', strtotime('+1 day'));
+
+//     $where .= " AND enquiry_id IN (
+//         SELECT enquiry_id FROM enquiry_master_entries
+//         WHERE followup_date BETWEEN '$yesterday' AND '$tomorrow'
+//         AND followup_status IN ('Active', 'In-Followup')
+//     )";
+// }
+
+
 if ($from_date != '' && $to_date != '') {
     $from_date_db = get_datetime_db($from_date);
-    $to_date_db = get_datetime_db($to_date);
+    $to_date_db   = get_datetime_db($to_date);
     $where .= " AND enquiry_id IN (
-        SELECT enquiry_id FROM enquiry_master_entries
-        WHERE followup_date BETWEEN '$from_date_db' AND '$to_date_db'
-        AND followup_status IN ('Active', 'In-Followup')
+        SELECT enquiry_id
+        FROM enquiry_master_entries e1
+        WHERE e1.entry_id = (
+            SELECT e2.entry_id
+            FROM enquiry_master_entries e2
+            WHERE e2.enquiry_id = e1.enquiry_id
+              AND e2.followup_status != 'Dropped' AND e2.followup_status IN ('Active', 'In-Followup')
+            ORDER BY e2.entry_id DESC
+            LIMIT 1
+        )
+        AND e1.followup_date BETWEEN '$from_date_db' AND '$to_date_db'
     )";
 } else {
+    // Yesterday to Tomorrow
+    $yesterday = date('Y-m-d 00:00:00', strtotime('-1 day'));
+    $tomorrow  = date('Y-m-d 23:59:59', strtotime('+1 day'));
     $where .= " AND enquiry_id IN (
-        SELECT enquiry_id FROM enquiry_master_entries
-        WHERE followup_date = '$rightnow'
-        AND followup_status IN ('Active', 'In-Followup')
+        SELECT enquiry_id
+        FROM enquiry_master_entries e1
+        WHERE e1.entry_id = (
+            SELECT e2.entry_id
+            FROM enquiry_master_entries e2
+            WHERE e2.enquiry_id = e1.enquiry_id
+              AND e2.followup_status != 'Dropped' AND e2.followup_status IN ('Active', 'In-Followup')
+            ORDER BY e2.entry_id DESC
+            LIMIT 1
+        )
+        AND e1.followup_date BETWEEN '$yesterday' AND '$tomorrow'
     )";
 }
+
 
 // Count total
 $count_query = "SELECT COUNT(*) as total FROM enquiry_master WHERE $where";

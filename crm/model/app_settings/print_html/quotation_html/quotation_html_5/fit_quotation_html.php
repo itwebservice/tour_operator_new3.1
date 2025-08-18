@@ -80,9 +80,9 @@ if ($sq_emp_info['first_name'] == '') {
     padding: 8px;
 
   }
-  .footer-image {
+  /* .footer-image {
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
     left: 0;
     width: 100%;
     text-align: center;
@@ -90,7 +90,68 @@ if ($sq_emp_info['first_name'] == '') {
 
   .footer-image img {
     width: 100%;
+  } */
+  @media print {
+  section.pageSection img.pageBGImg {
+    max-height: 1150px !important;
+    height: auto !important;
   }
+}
+@media print {
+  section.pageSection {
+    position: relative !important;
+    overflow: visible !important;
+    background-color: white !important;
+    page-break-inside: avoid !important;
+  }
+
+  section.pageSection img.pageBGImg {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    z-index: -1 !important;
+    opacity: 0.05 !important;
+    pointer-events: none !important; 
+  }
+
+  .pageSectionInner {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+}
+@media print {
+  section.pageSection {
+    position: relative !important;
+    min-height: 100vh; /* Ensure full height */
+    padding-bottom: 150px !important; /* Reserve space for footer image */
+  }
+
+  .pageSectionInner {
+    position: relative !important;
+    z-index: 1;
+  }
+
+  .footer-image {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 0;
+  }
+
+  .footer-image img {
+    width: 100%;
+    min-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+
 </style>
 <!-- landingPage -->
 <section class="landingSec main_block">
@@ -171,19 +232,14 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
     <img src="<?= BASE_URL ?>images/quotation/p5/pageBGF.jpg" class="img-responsive pageBGImg">
 
     <section class="travelingDetails main_block mg_tp_30 pageSectionInner">
-      <?php
+     
+    
+    <?php 
       $checkPageEnd = 0;
-      if ($sq_hotel_count) {
-        $sq_package_type = mysqlQuery("select DISTINCT(package_type) from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' order by '$sq_costing[sort_order]'");
-        while ($row_hotel1 = mysqli_fetch_assoc($sq_package_type)) {
-
-          $sq_package_type1 = mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' and package_type='$row_hotel1[package_type]' order by package_type");
-      if ($checkPageEnd % 2 == 0 || $checkPageEnd == 0) {
-    $go = $checkPageEnd + 2;
-    $flag = 0;
-      
-      ?>
-       <?php if ($checkPageEnd == 0 && $sq_dest['link'] != '') { ?>
+      if ($checkPageEnd % 100 == 0 || $checkPageEnd == 0) {
+      $go = $checkPageEnd + 1;
+      $flag = 0;
+      if ($checkPageEnd == 0 && $sq_dest['link'] != '') { ?>
           <div class="vitinerary_div" style="margin-bottom:20px!important;">
             <h6>Destination Guide Video</h6>
             <img src="<?php echo BASE_URL . 'images/quotation/youtube-icon.png'; ?>" class="itinerary-img img-responsive"><br />
@@ -192,13 +248,22 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
       <?php }
       }
       ?>
+      <?php
+      if ($sq_hotel_count) {
+        $sq_package_type = mysqlQuery("select DISTINCT(package_type) from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' order by '$sq_costing[sort_order]'");
+        while ($row_hotel1 = mysqli_fetch_assoc($sq_package_type)) {
+
+          $sq_package_type1 = mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' and package_type='$row_hotel1[package_type]' order by package_type");
+     
+      ?>
+       
           <!-- Hotel -->
           <section class="transportDetailsPanel transportDetailsleft main_block mg_tp_10">
-         <div style="text-align: center;">
-            <div class="font-package" style="margin-bottom: 20px; margin-top: 20px;">
-                <?= strtoupper('PACKAGE TYPE') ?> - <?= strtoupper($row_hotel1['package_type']) ?>
+            <div style="text-align: center;">
+                <div class="font-package" style="margin-bottom: 20px; margin-top: 20px;">
+                    <?= strtoupper('PACKAGE TYPE') ?> - <?= strtoupper($row_hotel1['package_type']) ?>
+                </div>
             </div>
-        </div>
             <div class="travsportInfoBlock">
               <div class="transportIcon">
                 <img src="<?= BASE_URL ?>images/quotation/p4/TI_hotel.png" class="img-responsive">
@@ -1146,6 +1211,7 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
         <p>PREPARED BY : <?= $emp_name ?></p>
       </div>
     </div>
+    
   </section>
   <div class="footer-image">
       <img src="../../../../../images/quotation/botton-pdf-img.png" alt="Bottom Image" />

@@ -49,32 +49,81 @@ $offset = ($page - 1) * $limit;
                 }
 
                 // 2. Fetch latest entries for each enquiry
-                $latest_entries = [];
-                if (!empty($enquiry_ids)) {
-                    $enq_id_str = implode(",", $enquiry_ids);
-                    $filter = "AND followup_status IN ('Active', 'In-Followup')";
-                    if ($from_date != '') {
-                        $from_date_db = get_datetime_db($from_date);
-                        $to_date_db = get_datetime_db($to_date);
-                        $filter .= " AND followup_date BETWEEN '$from_date_db' AND '$to_date_db'";
-                    } 
+                // $latest_entries = [];
+                // if (!empty($enquiry_ids)) {
+                //     $enq_id_str = implode(",", $enquiry_ids);
+                //     $filter = "AND followup_status IN ('Active', 'In-Followup')";
+                //     if ($from_date != '') {
+                //         $from_date_db = get_datetime_db($from_date);
+                //         $to_date_db = get_datetime_db($to_date);
+                //         $filter .= " AND followup_date BETWEEN '$from_date_db' AND '$to_date_db'";
+                //     } else{
+
+                //         // bydefault last ,today and next day entries showing
+                //           $yesterday = date('Y-m-d', strtotime('-1 day'));
+                //         //   $tomorrow  = date('Y-m-d', strtotime('+1 day'));
+
+                //         $tomorrow  = date('Y-m-d 23:59:59', strtotime('+1 day'));
+
+                //           $filter .= " AND followup_date BETWEEN '$yesterday' AND '$tomorrow'";
+
+                //     }
                   
-                    $entry_query = "
-                        SELECT t1.*
-                        FROM enquiry_master_entries t1
-                        INNER JOIN (
-                            SELECT enquiry_id, MAX(entry_id) AS max_id 
-                            FROM enquiry_master_entries 
-                            WHERE enquiry_id IN ($enq_id_str) 
-                            $filter 
-                            GROUP BY enquiry_id
-                        ) t2 ON t1.enquiry_id = t2.enquiry_id AND t1.entry_id = t2.max_id
-                    ";
-                    $result = mysqlQuery($entry_query);
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        $latest_entries[$row['enquiry_id']] = $row;
-                    }
-                }
+                //     $entry_query = "
+                //         SELECT t1.*
+                //         FROM enquiry_master_entries t1
+                //         INNER JOIN (
+                //             SELECT enquiry_id, MAX(entry_id) AS max_id 
+                //             FROM enquiry_master_entries 
+                //             WHERE enquiry_id IN ($enq_id_str) 
+                //             $filter 
+                //             GROUP BY enquiry_id
+                //         ) t2 ON t1.enquiry_id = t2.enquiry_id AND t1.entry_id = t2.max_id
+                //     ";
+                //     $result = mysqlQuery($entry_query);
+                //     while ($row = mysqli_fetch_assoc($result)) {
+                //         $latest_entries[$row['enquiry_id']] = $row;
+                //     }
+                // }
+// new changes
+
+
+// 2. Fetch latest follow-up entry for each enquiry (respecting date filters)
+$latest_entries = [];
+if (!empty($enquiry_ids)) {
+    $enq_id_str = implode(",", $enquiry_ids);
+
+    // Date filter range
+    if ($from_date != '' && $to_date != '') {
+        $from_date_db = get_datetime_db($from_date);
+        $to_date_db   = get_datetime_db($to_date);
+    } else {
+        // Default yesterday → tomorrow
+        $from_date_db = date('Y-m-d 00:00:00', strtotime('-1 day'));
+        $to_date_db   = date('Y-m-d 23:59:59', strtotime('+1 day'));
+    }
+
+    // This ensures: only the latest follow-up per enquiry is checked against date range
+    $entry_query = "
+        SELECT t1.*
+        FROM enquiry_master_entries t1
+        INNER JOIN (
+            SELECT enquiry_id, MAX(entry_id) AS max_id
+            FROM enquiry_master_entries
+            WHERE enquiry_id IN ($enq_id_str)
+              AND followup_status != 'Dropped' AND followup_status IN ('Active', 'In-Followup')
+            GROUP BY enquiry_id
+        ) t2 
+          ON t1.enquiry_id = t2.enquiry_id 
+         AND t1.entry_id = t2.max_id
+        WHERE t1.followup_date BETWEEN '$from_date_db' AND '$to_date_db'
+    ";
+
+    $result = mysqlQuery($entry_query);
+    while ($row = mysqli_fetch_assoc($result)) {
+        $latest_entries[$row['enquiry_id']] = $row;
+    }
+}
 
                 // 3. Filter only valid enquiries
                 $valid_ids = array_keys($latest_entries);

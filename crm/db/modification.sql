@@ -15,6 +15,12 @@ alter table enquiry_master add column tour_name text not null;
 
 
 
+alter table b2c_settings add column services text not null;
+
+
+alter table b2c_settings add column about_us text not null;
+
+
 INSERT INTO b2c_generic_settings (question, answer, status) VALUES
 ('Do you want to activate live booking for Hotel service?', 'Yes', '1'),
 ('Do you want to activate live booking for Activity service?', 'Yes', '1'),

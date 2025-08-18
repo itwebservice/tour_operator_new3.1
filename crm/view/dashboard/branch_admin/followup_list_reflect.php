@@ -90,7 +90,13 @@ $branch_status1 = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['b
             if ($from_date_db && $to_date_db) {
                 $entries_query .= " AND followup_date BETWEEN '$from_date_db' AND '$to_date_db'";
             } else {
-                $entries_query .= " AND followup_date = '$rightnow'";
+
+
+                $yesterday = date('Y-m-d', strtotime('-1 day'));
+                    
+                        $tomorrow  = date('Y-m-d 23:59:59', strtotime('+1 day'));
+
+                $entries_query .= " AND followup_date BETWEEN '$yesterday'  AND '$tomorrow'";
             }
 
             $entries_result = mysqlQuery($entries_query);
@@ -182,7 +188,7 @@ $branch_status1 = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['b
         </table>
     </div> 
 </div>
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script> -->
 
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -192,7 +198,7 @@ $branch_status1 = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['b
       "pageLength": 10,
       "lengthChange": true,
       "ordering": true,
-      "searching": true
+      "searching": false
     });
   });
 </script>

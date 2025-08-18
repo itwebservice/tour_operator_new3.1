@@ -251,7 +251,7 @@ class ticket_save
 		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(payment_id) as max from ticket_payment_master"));
 		$payment_id = $sq_max['max'] + 1;
 
-		$sq_payment = mysqlQuery("insert into ticket_payment_master (payment_id, ticket_id, financial_year_id,branch_admin_id, payment_date, payment_amount, payment_mode, bank_name, transaction_id, bank_id, clearance_status,credit_charges,credit_card_details) values ('$payment_id', '$ticket_id', '$financial_year_id', '$branch_admin_id', '$payment_date', '$payment_amount', '$payment_mode', '$bank_name', '$transaction_id', '$bank_id', '$clearance_status','$credit_charges','$credit_card_details') ");
+		$sq_payment = mysqlQuery("insert into ticket_payment_master (payment_id, ticket_id, financial_year_id,branch_admin_id, payment_date, payment_amount, payment_mode, bank_name, transaction_id, bank_id, clearance_status,credit_charges,credit_card_details,currency_code) values ('$payment_id', '$ticket_id', '$financial_year_id', '$branch_admin_id', '$payment_date', '$payment_amount', '$payment_mode', '$bank_name', '$transaction_id', '$bank_id', '$clearance_status','$credit_charges','$credit_card_details','$currency_code') ");
 
 		if (!$sq_payment) {
 			$GLOBALS['flag'] = false;

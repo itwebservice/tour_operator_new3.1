@@ -1103,6 +1103,11 @@ function foo(tableID, quot_table_id, rowCounts) {
       "special_attaraction" + foo.counter
     );
     row.cells[3].childNodes[0].setAttribute("id", "day_program" + foo.counter);
+
+     row.cells[3].setAttribute("style", "position: relative !important;");
+    row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
+   );
+   
     row.cells[4].childNodes[0].setAttribute(
       "id",
       "overnight_stay" + foo.counter

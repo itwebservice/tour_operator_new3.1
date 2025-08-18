@@ -343,7 +343,7 @@ if($pass_entry_id!=''){
 					if($count=='1' || $count=='1u'){
 						?>
 						<div class="row mg_bt_20">
-							<div class="col-md-3">
+							<div class="col-md-3 hidden">
 								<select name="quotation_id" id="quotation_id" style="width:100%" onchange="get_quotation_details(this)" class="form-control">
 								<option value="">Select Quotation</option>
 								<?php

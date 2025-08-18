@@ -35,12 +35,12 @@ $username = "root";
 $password = "";
 
 
-$db_name = "tour_operator_new_2_2";
+$db_name = "tour_operator_new2.2";
 
 global $conn;
 $conn = new mysqli($servername, $username, $password, $db_name);
 
-define('BASE_URL', 'http://localhost/itoursdemo/crm/');
+define('BASE_URL', 'http://localhost/tour_operator_new2.2/crm/');
 // >>>>>>> Stashed changes
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");
