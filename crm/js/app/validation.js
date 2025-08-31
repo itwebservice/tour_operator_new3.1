@@ -4466,81 +4466,81 @@ function foo(tableID, quot_table_id, rowCounts) {
     });
 }
 
-function addRow(tableID, quot_table = "", itinerary = "") {
-  var table = document.getElementById(tableID);
-  var rowCount = table.rows.length;
-  var row = table.insertRow(rowCount);
+// function addRow(tableID, quot_table = "", itinerary = "") {
+//   var table = document.getElementById(tableID);
+//   var rowCount = table.rows.length;
+//   var row = table.insertRow(rowCount);
 
-  var colCount = table.rows[0].cells.length;
+//   var colCount = table.rows[0].cells.length;
 
-  $("#" + tableID)
-    .find(".app_select2")
-    .each(function () {
-      $(this).select2();
-      $(this).select2("destroy");
-    });
-  $("#" + tableID)
-    .find(".app_minselect2")
-    .each(function () {
-      $(this).select2({ minimumInputLength: 1 });
-      $(this).select2("destroy");
-    });
-  for (var i = 0; i < colCount; i++) {
-    var newcell = row.insertCell(i);
-    var val_data = table.rows[0].cells[i].childNodes[0].value;
+//   $("#" + tableID)
+//     .find(".app_select2")
+//     .each(function () {
+//       $(this).select2();
+//       $(this).select2("destroy");
+//     });
+//   $("#" + tableID)
+//     .find(".app_minselect2")
+//     .each(function () {
+//       $(this).select2({ minimumInputLength: 1 });
+//       $(this).select2("destroy");
+//     });
+//   for (var i = 0; i < colCount; i++) {
+//     var newcell = row.insertCell(i);
+//     var val_data = table.rows[0].cells[i].childNodes[0].value;
 
-    newcell.innerHTML = table.rows[0].cells[i].innerHTML;
-    newcell.childNodes[0].title =
-      table.rows[0].cells[i].childNodes[0].title != ""
-        ? table.rows[0].cells[i].childNodes[0].title
-        : table.rows[0].cells[i].childNodes[0].getAttribute(
-            "data-original-title"
-          );
+//     newcell.innerHTML = table.rows[0].cells[i].innerHTML;
+//     newcell.childNodes[0].title =
+//       table.rows[0].cells[i].childNodes[0].title != ""
+//         ? table.rows[0].cells[i].childNodes[0].title
+//         : table.rows[0].cells[i].childNodes[0].getAttribute(
+//             "data-original-title"
+//           );
 
-    $(newcell.childNodes[0]).tooltip({ placement: "bottom" });
-    $(newcell.childNodes[0]).click(function () {
-      $(".tooltip").remove();
-    });
-    switch (newcell.childNodes[0].type) {
-      case "text":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-        break;
+//     $(newcell.childNodes[0]).tooltip({ placement: "bottom" });
+//     $(newcell.childNodes[0]).click(function () {
+//       $(".tooltip").remove();
+//     });
+//     switch (newcell.childNodes[0].type) {
+//       case "text":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//         break;
 
-      case "number":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-        break;
-      case "hidden":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-        break;
-      case "checkbox":
-        newcell.childNodes[0].checked = true;
-        newcell.childNodes[0].disabled = false;
-        break;
-      case "select-one":
-        newcell.childNodes[0].selectedIndex = 0;
-        break;
-      case "textarea":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-    }
-  }
-  foo(tableID, quot_table, rowCount);
-}
+//       case "number":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//         break;
+//       case "hidden":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//         break;
+//       case "checkbox":
+//         newcell.childNodes[0].checked = true;
+//         newcell.childNodes[0].disabled = false;
+//         break;
+//       case "select-one":
+//         newcell.childNodes[0].selectedIndex = 0;
+//         break;
+//       case "textarea":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//     }
+//   }
+//   foo(tableID, quot_table, rowCount);
+// }
 
 function deleteRow(tableID) {
   try {
@@ -4574,3 +4574,62 @@ function deleteRow(tableID) {
 }
 
 /// **** Dynamic Table Entries ***********************//////////////////////////////
+function addRow(tableID, quot_table = "", itinerary = "") {
+    var table = document.getElementById(tableID);
+    var rowCount = table.rows.length; // index for new row
+    var row = table.insertRow(rowCount);
+
+    var colCount = table.rows[0].cells.length;
+
+    for (var i = 0; i < colCount; i++) {
+        var newcell = row.insertCell(i);
+        var oldCell = table.rows[table.rows.length - 2].cells[i]; // copy from last row
+        var oldInput = oldCell.querySelector("input, select, textarea");
+
+        // 🔹 If this column is Package Type, add class & hide
+        if (oldCell.classList.contains("package_type_td")) {
+            newcell.classList.add("package_type_td");
+            newcell.style.display = "none"; // hide column
+        }
+
+        if (!oldInput) {
+            newcell.innerHTML = oldCell.innerHTML;
+            continue;
+        }
+
+        var cloned = oldInput.cloneNode(true);
+
+        // 🔹 Generate unique ID/Name for new row
+        if (cloned.id) {
+            var baseId = cloned.id.replace(/[0-9]+$/, "");
+            cloned.id = baseId + rowCount;
+        }
+        if (cloned.name) {
+            var baseName = cloned.name.replace(/[0-9]+$/, "");
+            cloned.name = baseName + rowCount;
+        }
+
+        // reset values properly
+        if (cloned.tagName === "SELECT") {
+            cloned.value = "";
+            cloned.classList.add("app_select2");
+        } else if (["text","number","hidden","textarea"].includes(cloned.type)) {
+            cloned.value = "";
+        } else if (cloned.type === "checkbox") {
+            cloned.checked = false;
+            cloned.disabled = false;
+        }
+
+        newcell.appendChild(cloned);
+    }
+
+    // ✅ Initialize Select2 only for the new row selects
+    $(row).find('.app_select2').select2({ width: "100%" });
+
+    // ✅ Initialize datepicker for new row
+    $(row).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
+
+    // Update serial numbers or custom logic
+    foo(tableID, quot_table, rowCount);
+}
+

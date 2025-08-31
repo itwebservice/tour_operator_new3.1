@@ -1,3 +1,4 @@
+
 <form id="frm_tab3">
     <div class="app_panel">
 
@@ -202,28 +203,19 @@
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
+                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
                                             </div>
 
-                                            <div class="col-xs-6 mg_bt_20_sm_xs"
-                                                style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
-
-                                                <select id="package_type" name="package_type"
-                                                    class="form-control"
-                                                    style="width:160px; text-align-last:center; -moz-text-align-last:center; -ms-text-align-last:center;"
-                                                    title="Select Package Type" onchange="syncPackageType(this)">
+                                            <div class="col-xs-6  mg_bt_20_sm_xs" style="display: flex;align-items :flex-end;justify-content:flex-end; ">
+                                                <select id="package_type-1" name="package_type-1"
+                                                    class="form-control app_select2" style="width:160px ; margin-right:20px"
+                                                    title="Select Package Type">
                                                     <?php echo get_package_type_dropdown(); ?>
                                                 </select>
-
                                                 <button type="button" class="btn btn-excel btn-sm"
-                                                    onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
+                                                    onClick="addRow('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');"><i class="fa fa-plus"></i></button>
                                             </div>
                                         </div>
-
                                         <div class="row">
                                             <div class="col-xs-12">
                                                 <div class="table-responsive">
@@ -238,11 +230,14 @@
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td class="package_type_td" style="display:none"><select id="package_type-1" name="package_type-1"
-                                                                    class="form-control app_select2 package_type_select" style="width:160px"
+                                                            <td>
+                                                                <select id="package_type-1" name="package_type-1"
+                                                                    class="form-control app_select2 package_type" style="width:160px"
                                                                     title="Select Package Type">
                                                                     <?php echo get_package_type_dropdown(); ?>
-                                                                </select></td>
+                                                                </select>
+                                                            
+                                                            </td>
                                                             <td><select id="city_name1" name="city_name1"
                                                                     class="city_master_dropdown city_name1 form-control app_select2"
                                                                     style="width:160px" title="Select City Name">
@@ -1587,270 +1582,5 @@
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
-    }
-
-
-    function addHotelInfo(tableID, quot_table = "", itinerary = "") {
-        var base_url = $('#base_url').val();
-
-        var incl_arr = new Array();
-        var excl_arr = new Array();
-        var package_id_arr = new Array();
-
-        $('input[name="custom_package"]:checked').each(function() {
-
-            package_id_arr.push($(this).val());
-            var package_id = $(this).val();
-            //Incl & Excl
-            var table = document.getElementById("dynamic_table_incl" + package_id);
-            var rowCount = table.rows.length;
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                var inclusion = $('#inclusions' + package_id).val();
-                var exclusion = $('#exclusions' + package_id).val();
-
-                incl_arr.push(inclusion);
-                excl_arr.push(exclusion);
-            }
-
-        });
-        if (package_id_arr.length == 0) {
-            error_msg_alert('Please select at least one Package!');
-            return false;
-        }
-
-        var attraction_arr = new Array();
-        var program_arr = new Array();
-        var stay_arr = new Array();
-        var meal_plan_arr = new Array();
-        var package_p_id_arr = new Array();
-        var day_count_arr = new Array();
-        var count = 0;
-
-
-        for (var j = 0; j < package_id_arr.length; j++) {
-            var table = document.getElementById("dynamic_table_list_p_" + package_id_arr[j]);
-            var rowCount = table.rows.length;
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                if (row.cells[0].childNodes[0].checked) {
-
-                    count++;
-                    var attraction = row.cells[2].childNodes[0].value;
-                    var program = row.cells[3].childNodes[0].value;
-                    var stay = row.cells[4].childNodes[0].value;
-                    var meal_plan = row.cells[5].childNodes[0].value;
-                    var package_id1 = row.cells[7].childNodes[0].value;
-
-                    if (attraction == "") {
-                        error_msg_alert('Special Attraction is mandatory in row' + (i + 1));
-                        return false;
-                    }
-                    if (program == "") {
-                        error_msg_alert('Daywise program is mandatory in row' + (i + 1));
-                        return false;
-                    }
-                    if (stay == "") {
-                        error_msg_alert('Overnight Stay is mandatory in row' + (i + 1));
-                        return false;
-                    }
-
-                    var flag1 = validate_spattration(row.cells[2].childNodes[0].id);
-                    var flag2 = validate_dayprogram(row.cells[3].childNodes[0].id);
-                    var flag3 = validate_onstay(row.cells[4].childNodes[0].id);
-                    if (!flag1 || !flag2 || !flag3) {
-                        return false;
-                    }
-                    attraction_arr.push(attraction);
-                    program_arr.push(program);
-                    stay_arr.push(stay);
-                    meal_plan_arr.push(meal_plan);
-                    package_p_id_arr.push(package_id1);
-                }
-            }
-            day_count_arr.push(count);
-            count = 0;
-        }
-
-        var total_adult = $('#total_adult').val();
-        var total_children = $('#total_children').val();
-        var from_date = $('#from_date').val();
-        var to_date = $('#to_date').val();
-        var total_days = $('#total_days').val();
-
-
-        $.ajax({
-
-            type: 'post',
-
-            url: '../save/package_hotel_info.php',
-
-            data: {
-                package_id_arr: package_id_arr,
-                from_date: from_date
-            },
-
-            success: function(result) {
-                var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-                var hotel_arr = JSON.parse(result);
-
-                // Find current max row number (column 1 of existing rows)
-                var lastIndex = 0;
-                for (var r = 1; r < table.rows.length; r++) {
-                    var val = parseInt(table.rows[r].cells[1].childNodes[0].value);
-                    if (!isNaN(val) && val > lastIndex) {
-                        lastIndex = val;
-                    }
-                }
-
-                // Append new rows
-                for (var i = 0; i < hotel_arr.length; i++) {
-                    addRow('tbl_package_tour_quotation_dynamic_hotel');
-                    var rowIndex = table.rows.length - 1; // last added row
-                    var row = table.rows[rowIndex];
-
-                    row.cells[1].childNodes[0].value = ++lastIndex; // continuous numbering
-                    city_lzloading(row.cells[3].childNodes[0]);
-
-                    var newOption = $("<option selected='selected'></option>")
-                        .val(hotel_arr[i]['city_id'])
-                        .text(hotel_arr[i]['city_name']);
-                    $(row.cells[3].childNodes[0]).append(newOption).trigger('change.select2');
-
-                    $(row.cells[4].childNodes[0]).html(
-                        '<option value="' + hotel_arr[i]['hotel_id1'] + '">' + hotel_arr[i]['hotel_name'] + '</option>'
-                    );
-
-                    row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
-                    row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
-                    row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
-                    row.cells[9].childNodes[0].value = total_days;
-                    row.cells[10].childNodes[0].value = '';
-                    row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
-                    row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
-
-                    // initialize select2s and set defaults
-                    $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
-                    document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
-                    $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
-                    document.getElementById(row.cells[5].childNodes[0].id).selectedIndex = 0;
-                    $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
-
-                    calculate_total_nights(row.cells[7].childNodes[0].id);
-                }
-            }
-
-        });
-    }
-
-    // function addHotelInfo(tableID, quot_table = "", itinerary = "") {
-    //     var table = document.getElementById(tableID);
-    //     if (!table || !table.rows || table.rows.length === 0) return;
-
-    //     var totalRows = table.rows.length;   // includes header row
-    //     var dataRowCount = totalRows - 1;    // number of data rows (excludes header)
-
-    //     if (dataRowCount <= 0) return; // nothing to duplicate
-
-    //     // ✅ Snapshot all existing data rows (excluding header row)
-    //     var originalRows = [];
-    //     for (var i = 1; i < totalRows; i++) {
-    //         var srcRow = table.rows[i];
-    //         var rowData = [];
-
-    //         var inputs = srcRow.querySelectorAll("input, select, textarea");
-    //         for (var j = 0; j < inputs.length; j++) {
-    //             var inp = inputs[j];
-    //             rowData.push({
-    //                 tag: inp.tagName,
-    //                 type: inp.type,
-    //                 value: inp.value,
-    //                 checked: inp.type === "checkbox" ? inp.checked : null,
-    //                 html: inp.tagName === "SELECT" ? inp.innerHTML : null,
-    //                 classes: inp.className
-    //             });
-    //         }
-
-    //         originalRows.push({
-    //             rowHTML: srcRow.innerHTML, // clone row layout
-    //             data: rowData
-    //         });
-    //     }
-
-    //     // Helper: ensure unique id/name
-    //     function uniquify(el, newRowIndex, controlIndex) {
-    //         if (el.id) {
-    //             el.id = el.id.replace(/(__r\d+)?$/, "") + "__r" + newRowIndex;
-    //         } else {
-    //             el.id = tableID + "_r" + newRowIndex + "_c" + controlIndex;
-    //         }
-
-    //         if (el.name) {
-    //             el.name = el.name.replace(/(__r\d+)?$/, "") + "__r" + newRowIndex;
-    //         } else {
-    //             el.name = tableID + "_r" + newRowIndex + "_c" + controlIndex;
-    //         }
-    //     }
-
-    //     // ✅ Duplicate each stored row
-    //     for (var r = 0; r < originalRows.length; r++) {
-    //         var srcRow = table.rows[1 + r]; // original DOM row
-    //         var clone = srcRow.cloneNode(true);
-
-    //         // Remove plugin artifacts (select2, datepicker wrappers)
-    //         clone.querySelectorAll(".select2, .select2-container").forEach(n => n.remove());
-    //         clone.querySelectorAll(".ui-datepicker-trigger").forEach(n => n.remove());
-
-    //         // Reapply values from snapshot
-    //         var dstCtrls = clone.querySelectorAll("input, select, textarea");
-    //         var rowData = originalRows[r].data;
-
-    //         for (var j = 0; j < dstCtrls.length; j++) {
-    //             var dst = dstCtrls[j];
-    //             var d = rowData[j];
-
-    //             dst.className = d.classes; // restore classes
-
-    //             if (d.tag === "SELECT") {
-    //                 dst.innerHTML = d.html; // restore options
-    //                 dst.value = d.value;
-    //                 dst.classList.add("app_select2");
-    //             } else if (dst.type === "checkbox") {
-    //                 dst.checked = d.checked;
-    //                 dst.disabled = false;
-    //             } else {
-    //                 dst.value = d.value;
-    //                 if (!dst.classList.contains("form-control")) {
-    //                     dst.classList.add("form-control");
-    //                 }
-    //             }
-    //         }
-
-    //         // Append cloned row
-    //         (table.tBodies && table.tBodies[0] ? table.tBodies[0] : table).appendChild(clone);
-
-    //         // Get new row index
-    //         var newRowIndex = table.rows.length - 1;
-
-    //         // Uniquify IDs/names
-    //         var finalCtrls = clone.querySelectorAll("input, select, textarea");
-    //         for (var c = 0; c < finalCtrls.length; c++) {
-    //             uniquify(finalCtrls[c], newRowIndex, c);
-    //         }
-
-    //         // Re-init plugins
-    //         $(clone).find(".app_select2").select2({ width: "100%" });
-    //         $(clone).find(".app_datepicker").datepicker({ dateFormat: "dd-mm-yy" });
-    //     }
-
-    //     // Update numbering/indexing if needed
-    //     foo(tableID, quot_table, table.rows.length - 1);
-    // }
-
-    function syncPackageType(mainSelect) {
-        var selectedVal = $(mainSelect).val();
-
-        // Update all row selects (but skip the main one itself)
-        $(".package_type_select").not(mainSelect).val(selectedVal).trigger("change.select2");
     }
 </script>

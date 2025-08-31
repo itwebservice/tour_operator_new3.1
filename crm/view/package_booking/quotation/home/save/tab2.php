@@ -151,6 +151,7 @@ $('#frm_tab2').validate({
         var from_date = $('#from_date').val();
         var to_date = $('#to_date').val();
         var total_days = $('#total_days').val();
+      
 
         $.ajax({
 
@@ -336,4 +337,5 @@ $('#frm_tab2').validate({
     }
 
 });
+
 </script>
