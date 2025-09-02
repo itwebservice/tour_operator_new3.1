@@ -32,15 +32,15 @@ $localIP = getHostByName(getHostName());
 // Create connection
 $servername = "localhost";
 $username = "root";
-$password = "";
+$password = "Narottam@123";
 
 
-$db_name = "tour_operator_new2.2";
+$db_name = "tour_operator";
 
 global $conn;
 $conn = new mysqli($servername, $username, $password, $db_name);
 
-define('BASE_URL', 'http://localhost/tour_operator_new2.2/crm/');
+define('BASE_URL', 'http://localhost/itoursdemo/crm/');
 // >>>>>>> Stashed changes
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");

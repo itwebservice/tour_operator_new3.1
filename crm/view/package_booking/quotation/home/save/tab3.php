@@ -217,7 +217,7 @@
                                                     <?php echo get_package_type_dropdown(); ?>
                                                 </select>
 
-                                                <button type="button" class="btn btn-excel btn-sm"
+                                                <button type="button" id="addHotelInfobtnsubmit" class="btn btn-excel btn-sm"
                                                     onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
@@ -238,7 +238,7 @@
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td class="package_type_td" style="display:none"><select id="package_type-1" name="package_type-1"
+                                                            <td class="package_type_td" ><select id="package_type-1" name="package_type-1"
                                                                     class="form-control app_select2 package_type_select" style="width:160px"
                                                                     title="Select Package Type">
                                                                     <?php echo get_package_type_dropdown(); ?>
@@ -775,6 +775,9 @@
                                 'checked': false
                             });
                         }
+                        $(row.cells[0].childNodes[0]).prop('checked', true)/* .trigger('change') */; 
+                        $(row.cells[2].childNodes[0]).prop('disabled',true);
+                        hideHotelPackage(row.cells[2].childNodes[0].value);
                     }
                 }
                 //Tab-4 Per person costing
@@ -1704,6 +1707,7 @@
                 }
 
                 // Append new rows
+                var rowCopyFrom = table.rows;
                 for (var i = 0; i < hotel_arr.length; i++) {
                     addRow('tbl_package_tour_quotation_dynamic_hotel');
                     var rowIndex = table.rows.length - 1; // last added row
@@ -1715,29 +1719,41 @@
                     var newOption = $("<option selected='selected'></option>")
                         .val(hotel_arr[i]['city_id'])
                         .text(hotel_arr[i]['city_name']);
+                        
+                    // $(row.cells[0].childNodes[0]).prop('checked', true).trigger('change'); 
+                    $(row.cells[2].childNodes[0]).prop('disabled',true);
                     $(row.cells[3].childNodes[0]).append(newOption).trigger('change.select2');
 
                     $(row.cells[4].childNodes[0]).html(
                         '<option value="' + hotel_arr[i]['hotel_id1'] + '">' + hotel_arr[i]['hotel_name'] + '</option>'
                     );
 
+                    $('#' + row.cells[5].childNodes[0].id).val($('#'+table.rows[i].cells[5].childNodes[0].id).val().trim());
                     row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
                     row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
                     row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
-                    row.cells[9].childNodes[0].value = total_days;
-                    row.cells[10].childNodes[0].value = '';
+                    row.cells[9].childNodes[0].value = table.rows[i].cells[9].childNodes[0].value;
+                    row.cells[10].childNodes[0].value = table.rows[i].cells[10].childNodes[0].value;
+                    row.cells[11].childNodes[0].value = table.rows[i].cells[11].childNodes[0].value;
+                    $('#' + row.cells[16].childNodes[0].id).val(rowCopyFrom[i].cells[16].childNodes[0].value);
                     row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
                     row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
 
                     // initialize select2s and set defaults
                     $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
-                    document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
+                    if($('#package_type').val() != ''){
+                         $('#' + row.cells[2].childNodes[0].id).val($('#package_type').val());
+                    } else {
+                        document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
+                    }
+                    $('#' + row.cells[16].childNodes[0].id).select2().trigger("change");
                     $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
-                    document.getElementById(row.cells[5].childNodes[0].id).selectedIndex = 0;
                     $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
 
                     calculate_total_nights(row.cells[7].childNodes[0].id);
+                    var selectedPackagevalue = row.cells[2].childNodes[0].value;
                 }
+                hideHotelPackage(selectedPackagevalue);
             }
 
         });
@@ -1745,112 +1761,77 @@
 
     // function addHotelInfo(tableID, quot_table = "", itinerary = "") {
     //     var table = document.getElementById(tableID);
-    //     if (!table || !table.rows || table.rows.length === 0) return;
+    // var rowCount = table.rows.length;
 
-    //     var totalRows = table.rows.length;   // includes header row
-    //     var dataRowCount = totalRows - 1;    // number of data rows (excludes header)
-
-    //     if (dataRowCount <= 0) return; // nothing to duplicate
-
-    //     // ✅ Snapshot all existing data rows (excluding header row)
-    //     var originalRows = [];
-    //     for (var i = 1; i < totalRows; i++) {
-    //         var srcRow = table.rows[i];
-    //         var rowData = [];
-
-    //         var inputs = srcRow.querySelectorAll("input, select, textarea");
-    //         for (var j = 0; j < inputs.length; j++) {
-    //             var inp = inputs[j];
-    //             rowData.push({
-    //                 tag: inp.tagName,
-    //                 type: inp.type,
-    //                 value: inp.value,
-    //                 checked: inp.type === "checkbox" ? inp.checked : null,
-    //                 html: inp.tagName === "SELECT" ? inp.innerHTML : null,
-    //                 classes: inp.className
-    //             });
-    //         }
-
-    //         originalRows.push({
-    //             rowHTML: srcRow.innerHTML, // clone row layout
-    //             data: rowData
-    //         });
-    //     }
-
-    //     // Helper: ensure unique id/name
-    //     function uniquify(el, newRowIndex, controlIndex) {
-    //         if (el.id) {
-    //             el.id = el.id.replace(/(__r\d+)?$/, "") + "__r" + newRowIndex;
-    //         } else {
-    //             el.id = tableID + "_r" + newRowIndex + "_c" + controlIndex;
-    //         }
-
-    //         if (el.name) {
-    //             el.name = el.name.replace(/(__r\d+)?$/, "") + "__r" + newRowIndex;
-    //         } else {
-    //             el.name = tableID + "_r" + newRowIndex + "_c" + controlIndex;
-    //         }
-    //     }
-
-    //     // ✅ Duplicate each stored row
-    //     for (var r = 0; r < originalRows.length; r++) {
-    //         var srcRow = table.rows[1 + r]; // original DOM row
-    //         var clone = srcRow.cloneNode(true);
-
-    //         // Remove plugin artifacts (select2, datepicker wrappers)
-    //         clone.querySelectorAll(".select2, .select2-container").forEach(n => n.remove());
-    //         clone.querySelectorAll(".ui-datepicker-trigger").forEach(n => n.remove());
-
-    //         // Reapply values from snapshot
-    //         var dstCtrls = clone.querySelectorAll("input, select, textarea");
-    //         var rowData = originalRows[r].data;
-
-    //         for (var j = 0; j < dstCtrls.length; j++) {
-    //             var dst = dstCtrls[j];
-    //             var d = rowData[j];
-
-    //             dst.className = d.classes; // restore classes
-
-    //             if (d.tag === "SELECT") {
-    //                 dst.innerHTML = d.html; // restore options
-    //                 dst.value = d.value;
-    //                 dst.classList.add("app_select2");
-    //             } else if (dst.type === "checkbox") {
-    //                 dst.checked = d.checked;
-    //                 dst.disabled = false;
-    //             } else {
-    //                 dst.value = d.value;
-    //                 if (!dst.classList.contains("form-control")) {
-    //                     dst.classList.add("form-control");
-    //                 }
-    //             }
-    //         }
-
-    //         // Append cloned row
-    //         (table.tBodies && table.tBodies[0] ? table.tBodies[0] : table).appendChild(clone);
-
-    //         // Get new row index
-    //         var newRowIndex = table.rows.length - 1;
-
-    //         // Uniquify IDs/names
-    //         var finalCtrls = clone.querySelectorAll("input, select, textarea");
-    //         for (var c = 0; c < finalCtrls.length; c++) {
-    //             uniquify(finalCtrls[c], newRowIndex, c);
-    //         }
-
-    //         // Re-init plugins
-    //         $(clone).find(".app_select2").select2({ width: "100%" });
-    //         $(clone).find(".app_datepicker").datepicker({ dateFormat: "dd-mm-yy" });
-    //     }
-
-    //     // Update numbering/indexing if needed
-    //     foo(tableID, quot_table, table.rows.length - 1);
+    // // Collect current rows (skip header if any)
+    // var rowsToDuplicate = [];
+    // for (var i = 0; i < rowCount; i++) {
+    //     rowsToDuplicate.push(table.rows[i]);
     // }
+
+    // // Duplicate each row with its data
+    // rowsToDuplicate.forEach(function(oldRow) {
+    //     var newRow = table.insertRow(table.rows.length);
+
+    //     for (var i = 0; i < oldRow.cells.length; i++) {
+    //         var newCell = newRow.insertCell(i);
+    //         var oldCell = oldRow.cells[i];
+    //         var oldInput = oldCell.querySelector("input, select, textarea");
+
+    //         if (!oldInput) {
+    //             newCell.innerHTML = oldCell.innerHTML;
+    //             continue;
+    //         }
+
+    //         var cloned = oldInput.cloneNode(true);
+
+    //         // Generate unique IDs and names
+    //         if (cloned.id) {
+    //             var baseId = cloned.id.replace(/[0-9]+$/, "");
+    //             cloned.id = baseId + (table.rows.length - 1);
+    //         }
+    //         if (cloned.name) {
+    //             var baseName = cloned.name.replace(/[0-9]+$/, "");
+    //             cloned.name = baseName + (table.rows.length - 1);
+    //         }
+
+    //         // Copy values
+    //         if (cloned.tagName === "SELECT") {
+    //             cloned.value = oldInput.value;
+    //             cloned.classList.add("app_select2");
+    //         } else if (cloned.tagName === "TEXTAREA" || ["text", "number", "hidden"].includes(cloned.type)) {
+    //             cloned.value = oldInput.value;
+    //         } else if (cloned.type === "checkbox") {
+    //             cloned.checked = oldInput.checked; // ✅ copy actual checked state
+    //             cloned.readOnly = oldInput.readOnly;
+    //         }
+
+    //         newCell.appendChild(cloned);
+    //     }
+    // });
+
+    
+    // // Re-init select2 and datepicker
+    // $(table).find('.app_select2').select2({ width: "100%" });
+    // $(table).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
+    // }
+
+    function hideHotelPackage(pkgValue){
+        // var selectedVal = $('#package_type').val();
+        $('#package_type').find('option[value="' + pkgValue + '"]').remove();
+        $('#package_type').trigger('change');
+        if ($('#package_type').val() === null) {
+            $('#addHotelInfobtnsubmit').prop('disabled', true);
+        } 
+    }
 
     function syncPackageType(mainSelect) {
         var selectedVal = $(mainSelect).val();
+        // $(mainSelect).find('option[value="' + selectedVal + '"]').prop('disabled', true);
+        // $(mainSelect).find('option[value="' + selectedValue + '"]').css('display', 'none');
+        // return false;
 
         // Update all row selects (but skip the main one itself)
-        $(".package_type_select").not(mainSelect).val(selectedVal).trigger("change.select2");
+        //$(".package_type_select").not(mainSelect).val(selectedVal).trigger("change.select2");
     }
 </script>

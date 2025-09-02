@@ -4589,7 +4589,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         // 🔹 If this column is Package Type, add class & hide
         if (oldCell.classList.contains("package_type_td")) {
             newcell.classList.add("package_type_td");
-            newcell.style.display = "none"; // hide column
+            //newcell.style.display = "none"; // hide column
         }
 
         if (!oldInput) {
