@@ -615,8 +615,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 			email_option: 'Email Body',
 			options: selectedOptions
 		}, function(data) {
-
-            console.log(data,'email dataa')
+                console.log(data , 'emaillll');
 			if (data && data.trim() !== '') {
 				// Format the content for preview (with proper line breaks)
 				var formattedContent = data.replace(/\n/g, '<br>');
