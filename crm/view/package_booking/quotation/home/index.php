@@ -142,6 +142,97 @@ $financial_year_id = $_SESSION['financial_year_id'];
         </div>
     </div>
 </div>
+
+<!-- Actions Modal -->
+<div class="modal fade" id="actionsModal" tabindex="-1" role="dialog" aria-labelledby="actionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="actionsModalLabel">Quotation Actions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="quotation-info mb-3">
+                            <h6>Quotation Details:</h6>
+                            <p><strong>Quotation ID:</strong> <span id="modal_quotation_id"></span></p>
+                            <p><strong>Customer:</strong> <span id="modal_customer_name"></span></p>
+                            <p><strong>Package:</strong> <span id="modal_package_name"></span></p>
+                            <p><strong>Amount:</strong> <span id="modal_amount"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6>Available Actions:</h6>
+                        <div class="action-buttons-container">
+                            <!-- PDF Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Download Options</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_pdf_download" title="Download Quotation PDF">
+                                        <i class="fa fa-print"></i> PDF
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_word_download" title="Download Quotation Word">
+                                        <i class="fa fa-file-word-o"></i> Word
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Communication Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Communication</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_email_customer" title="Email Quotation to Customer">
+                                        <i class="fa fa-envelope-o"></i> Email Customer
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_whatsapp" title="WhatsApp Quotation to Customer">
+                                        <i class="fa fa-whatsapp"></i> WhatsApp
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_email_backoffice" title="Email Quotation to Backoffice">
+                                        <i class="fa fa-paper-plane-o"></i> Email Backoffice
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Management Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Management</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_update" title="Update Details">
+                                        <i class="fa fa-pencil-square-o"></i> Update
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" id="modal_clone" title="Create Copy of this Quotation">
+                                        <i class="fa fa-files-o"></i> Clone
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_view" title="View Details" target="_blank">
+                                        <i class="fa fa-eye"></i> View
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Hotel Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Hotel Management</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_hotel_request" title="Send Hotel Availability Request">
+                                        <i class="fa fa-paper-plane-o"></i> Hotel Request
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>
@@ -302,6 +393,111 @@ function save_modal() {
         $('#quot_save').button('reset');
     });
 }
+
+// Modal action functions
+function openActionsModal(quotationData) {
+    // Populate modal with quotation data
+    $('#modal_quotation_id').text(quotationData.quotation_id);
+    $('#modal_customer_name').text(quotationData.customer_name);
+    $('#modal_package_name').text(quotationData.package_name);
+    $('#modal_amount').text(quotationData.amount);
+    
+    // Store quotation data for use in modal actions
+    window.currentQuotationData = quotationData;
+    
+    // Show modal
+    $('#actionsModal').modal('show');
+}
+
+// Modal action handlers
+$(document).ready(function() {
+    // PDF Download
+    $('#modal_pdf_download').click(function() {
+        if (window.currentQuotationData) {
+            loadOtherPage(window.currentQuotationData.pdf_url);
+        }
+    });
+    
+    // Word Download
+    $('#modal_word_download').click(function() {
+        if (window.currentQuotationData) {
+            exportHTML(window.currentQuotationData.word_url);
+        }
+    });
+    
+    // Email Customer
+    $('#modal_email_customer').click(function() {
+        if (window.currentQuotationData) {
+            quotation_email_send('modal_email_customer', window.currentQuotationData.quotation_id, window.currentQuotationData.email_id, window.currentQuotationData.mobile_no);
+        }
+    });
+    
+    // WhatsApp
+    $('#modal_whatsapp').click(function() {
+        if (window.currentQuotationData) {
+            quotation_whatsapp(window.currentQuotationData.quotation_id);
+        }
+    });
+    
+    // Email Backoffice
+    $('#modal_email_backoffice').click(function() {
+        if (window.currentQuotationData) {
+            quotation_email_send_backoffice_modal(window.currentQuotationData.quotation_id);
+        }
+    });
+    
+    // Update
+    $('#modal_update').click(function() {
+        if (window.currentQuotationData) {
+            // Create and submit the update form
+            var form = $('<form>', {
+                'method': 'POST',
+                'action': 'update/index.php',
+                'style': 'display: inline-block'
+            });
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': 'quotation_id',
+                'value': window.currentQuotationData.quotation_id
+            }));
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': 'package_id',
+                'value': window.currentQuotationData.package_id
+            }));
+            $('body').append(form);
+            form.submit();
+        }
+    });
+    
+    // Clone
+    $('#modal_clone').click(function() {
+        if (window.currentQuotationData) {
+            quotation_clone(window.currentQuotationData.quotation_id);
+            $('#actionsModal').modal('hide');
+        }
+    });
+    
+    // View
+    $('#modal_view').click(function() {
+        if (window.currentQuotationData) {
+            window.open('quotation_view.php?quotation_id=' + window.currentQuotationData.quotation_id, '_blank');
+        }
+    });
+    
+    // Hotel Request
+    $('#modal_hotel_request').click(function() {
+        if (window.currentQuotationData) {
+            view_request(window.currentQuotationData.quotation_id);
+            $('#actionsModal').modal('hide');
+        }
+    });
+});
+
+// Function to add actions button to each row
+function addActionsButton(quotationData) {
+    return '<button class="btn btn-primary btn-sm" onclick="openActionsModal(' + JSON.stringify(quotationData).replace(/"/g, '&quot;') + ')" title="View All Actions"><i class="fa fa-cogs"></i> Actions</button>';
+}
 </script>
 <style>
     .action_width {
@@ -315,6 +511,45 @@ function save_modal() {
 
     .table-hover>tbody>tr.warning:hover {
         background-color: #faf2cc;
+    }
+    
+    /* Modal Styles */
+    .quotation-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #007bff;
+    }
+    
+    .quotation-info p {
+        margin-bottom: 5px;
+    }
+    
+    .action-group {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        background-color: #ffffff;
+    }
+    
+    .action-group h6 {
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .btn-group .btn {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .action-buttons-container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    #actionsModal .modal-body {
+        max-height: 500px;
+        overflow-y: auto;
     }
 </style>
 <?php

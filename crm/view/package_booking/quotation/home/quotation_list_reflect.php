@@ -495,6 +495,9 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 
 
 
+	// Create mail button that opens send_quotation modal
+	$mail_button = '<button class="btn btn-info btn-sm" onclick="quotation_email_send(\'btn_email_' . $count . '\', ' . $row_quotation['quotation_id'] . ', \'' . $row_quotation['email_id'] . '\', \'' . $row_quotation['mobile_no'] . '\')" title="' . $whatsapp_tooltip_change . '"><i class="fa fa-envelope-o"></i></button>';
+
 	$temp_arr = array("data" => array(
 		(int)(++$count),
 		get_quotation_id($row_quotation['quotation_id'], $year),
@@ -504,12 +507,7 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 		($row_quotation['costing_type'] == 2) ?
 			 $quotation_cost_p . '<br>' . $currency_amount : $quotation_cost . '<br>' . $currency_amount,
 		$emp_name,
-		$pdf_show . $email_show . '
-		<form  style="display:inline-block" action="update/index.php" id="frm_booking_' . $count . '" method="POST">
-		<input  style="display:inline-block" type="hidden" id="quotation_id" name="quotation_id" value="' . $row_quotation['quotation_id'] . '">
-		<input data-toggle="tooltip" style="display:inline-block" type="hidden" id="package_id" name="package_id" value="' . $row_quotation['package_id'] . '">' . $update_btn . '
-		</form>' . $copy_btn . $hotel_request1 . $email_show1 . '
-		<a data-toggle="tooltip" style="display:inline-block" href="quotation_view.php?quotation_id=' . $row_quotation['quotation_id'] . '" target="_BLANK" class="btn btn-info btn-sm" title="View Details"><i class="fa fa-eye"></i></a>'
+		$mail_button
 	), "bg" => $bg);
 	array_push($array_s, $temp_arr);
 }
