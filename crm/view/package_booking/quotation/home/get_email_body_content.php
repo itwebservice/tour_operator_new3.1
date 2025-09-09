@@ -11,9 +11,14 @@ $options = isset($_POST['options']) && !empty($_POST['options']) ? $_POST['optio
 error_log("Quotation ID: " . $quotation_id);
 error_log("Email Option: " . $email_option);
 error_log("Selected Options: " . print_r($options, true));
+error_log("Inclusions/Exclusions selected: " . (in_array('inclusion_exclusion', $options) ? 'YES' : 'NO'));
 
 // Get quotation details
-$sq_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id'"));
+$sq_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT *, 
+	COALESCE(is_sub_quotation, '0') as is_sub_quotation,
+	COALESCE(parent_quotation_id, '0') as parent_quotation_id,
+	COALESCE(quotation_display_id, '') as quotation_display_id
+	FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id'"));
 $sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master WHERE package_id = '{$sq_quotation['package_id']}'"));
 
 // Get costing details
@@ -66,7 +71,37 @@ $travel_cost = $sq_quotation['train_cost'] + $sq_quotation['flight_cost'] + $sq_
 $quotation_date = $sq_quotation['quotation_date'];
 $yr = explode("-", $quotation_date);
 $year = $yr[0];
-$quotation_id_display = get_quotation_id($sq_quotation['quotation_id'], $year);
+
+// Get quotation display ID (prefer quotation_display_id if available)
+$quotation_id_display = '';
+if (isset($sq_quotation['quotation_display_id']) && !empty($sq_quotation['quotation_display_id'])) {
+    $quotation_id_display = $sq_quotation['quotation_display_id'];
+} else {
+    // Fallback to generating from quotation_id
+    $quotation_id_display = get_quotation_id($sq_quotation['quotation_id'], $year);
+}
+
+// Check if this is a sub-quotation and format accordingly
+$is_sub_quotation = isset($sq_quotation['is_sub_quotation']) && $sq_quotation['is_sub_quotation'] == '1';
+if ($is_sub_quotation) {
+    // For sub-quotations, ensure proper version numbering
+    if (strpos($quotation_id_display, '.') === false) {
+        // If no version number exists, add it
+        $parent_quotation_id = isset($sq_quotation['parent_quotation_id']) ? $sq_quotation['parent_quotation_id'] : null;
+        if ($parent_quotation_id && $parent_quotation_id != '0') {
+            // Get parent quotation details
+            $parent_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_date FROM package_tour_quotation_master WHERE quotation_id='$parent_quotation_id'"));
+            if ($parent_quotation) {
+                $parent_year = explode("-", $parent_quotation['quotation_date'])[0];
+                $parent_id_display = get_quotation_id($parent_quotation_id, $parent_year);
+                
+                // Count existing sub-quotations for this parent
+                $sub_count = mysqli_num_rows(mysqlQuery("SELECT quotation_id FROM package_tour_quotation_master WHERE parent_quotation_id='$parent_quotation_id' AND quotation_id <= '{$sq_quotation['quotation_id']}'"));
+                $quotation_id_display = $parent_id_display . '.' . $sub_count;
+            }
+        }
+    }
+}
 
 $from_date = get_date_user($sq_quotation['from_date']);
 $to_date = get_date_user($sq_quotation['to_date']);
@@ -125,12 +160,57 @@ error_log("Itinerary count: " . $itinerary_count);
 
 // Get transportation details
 $transport_details = '';
-$sq_transport = mysqlQuery("SELECT * FROM package_tour_quotation_transport_entries2 WHERE quotation_id = '$quotation_id'");
+$sq_transport = mysqlQuery("SELECT t.*, v.vehicle_name as actual_vehicle_name FROM package_tour_quotation_transport_entries2 t 
+                           LEFT JOIN b2b_transfer_master v ON t.vehicle_name = v.entry_id 
+                           WHERE t.quotation_id = '$quotation_id'");
 $transport_count = 0;
 while ($row_transport = mysqli_fetch_assoc($sq_transport)) {
     $from_date_trans = get_date_user($row_transport['start_date']);
     $to_date_trans = get_date_user($row_transport['end_date']);
-    $transport_details .= "*{$row_transport['vehicle_name']}* *{$from_date_trans}*    *{$to_date_trans}*    *({$row_transport['vehicle_count']})*\n";
+    $vehicle_name = !empty($row_transport['actual_vehicle_name']) ? $row_transport['actual_vehicle_name'] : 'Vehicle ID: ' . $row_transport['vehicle_name'];
+    
+    // Get pickup location
+    $pickup = '';
+    if($row_transport['pickup_type'] == 'city'){
+        $row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[pickup]'"));
+        $pickup = $row['city_name'];
+    }
+    else if($row_transport['pickup_type'] == 'hotel'){
+        $row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[pickup]'"));
+        $pickup = $row['hotel_name'];
+    }
+    else{
+        $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[pickup]'"));
+        $airport_nam = clean($row['airport_name']);
+        $airport_code = clean($row['airport_code']);
+        $pickup = $airport_nam." (".$airport_code.")";
+    }
+    
+    // Get drop location
+    $drop = '';
+    if($row_transport['drop_type'] == 'city'){
+        $row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[drop]'"));
+        $drop = $row['city_name'];
+    }
+    else if($row_transport['drop_type'] == 'hotel'){
+        $row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[drop]'"));
+        $drop = $row['hotel_name'];
+    }
+    else{
+        $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[drop]'"));
+        $airport_nam = clean($row['airport_name']);
+        $airport_code = clean($row['airport_code']);
+        $drop = $airport_nam." (".$airport_code.")";
+    }
+    
+    // Get service duration
+    $service_duration = '';
+    if(!empty($row_transport['service_duration'])){
+        $row = mysqli_fetch_assoc(mysqlQuery("select duration from service_duration_master where entry_id='$row_transport[service_duration]'"));
+        $service_duration = $row['duration'];
+    }
+    
+    $transport_details .= "*{$vehicle_name}* *{$from_date_trans}*    *{$to_date_trans}*    *{$pickup} to {$drop}*    *{$service_duration}*    *({$row_transport['vehicle_count']})*\n";
     $transport_count++;
 }
 
@@ -204,11 +284,31 @@ if ($transport_count > 0) {
 
 // Inclusion/Exclusion - only show if selected
 if (in_array('inclusion_exclusion', $options)) {
+    error_log("Processing inclusions/exclusions...");
+    error_log("Inclusions data: " . (isset($sq_quotation['inclusions']) ? $sq_quotation['inclusions'] : 'NOT SET'));
+    error_log("Exclusions data: " . (isset($sq_quotation['exclusions']) ? $sq_quotation['exclusions'] : 'NOT SET'));
+    
     // Inclusions
     $email_content .= "✅  *Inclusions*\n";
     $email_content .= "-----------\n";
     if (!empty($sq_quotation['inclusions'])) {
-        $email_content .= $sq_quotation['inclusions'] . "\n\n";
+        // Remove HTML tags and clean up the text
+        $inclusions = $sq_quotation['inclusions'];
+        $inclusions = strip_tags($inclusions);
+        $inclusions = html_entity_decode($inclusions, ENT_QUOTES, 'UTF-8');
+        $inclusions = preg_replace('/\s+/', ' ', $inclusions); // Replace multiple spaces with single space
+        $inclusions = trim($inclusions);
+        
+        // Split by common separators and format as bullet points
+        $inclusions_list = preg_split('/(\.|;|,)/', $inclusions);
+        foreach ($inclusions_list as $inclusion) {
+            $inclusion = trim($inclusion);
+            // Only include meaningful items (at least 10 characters)
+            if (!empty($inclusion) && strlen($inclusion) > 10) {
+                $email_content .= "• " . $inclusion . "\n";
+            }
+        }
+        $email_content .= "\n";
     } else {
         $email_content .= "Inclusions will be provided upon confirmation.\n\n";
     }
@@ -217,23 +317,63 @@ if (in_array('inclusion_exclusion', $options)) {
     $email_content .= "❌  *Exclusions*\n";
     $email_content .= "-----------\n";
     if (!empty($sq_quotation['exclusions'])) {
-        $email_content .= $sq_quotation['exclusions'] . "\n\n";
+        // Remove HTML tags and clean up the text
+        $exclusions = $sq_quotation['exclusions'];
+        $exclusions = strip_tags($exclusions);
+        $exclusions = html_entity_decode($exclusions, ENT_QUOTES, 'UTF-8');
+        $exclusions = preg_replace('/\s+/', ' ', $exclusions); // Replace multiple spaces with single space
+        $exclusions = trim($exclusions);
+        
+        // Split by common separators and format as bullet points
+        $exclusions_list = preg_split('/(\.|;|,)/', $exclusions);
+        foreach ($exclusions_list as $exclusion) {
+            $exclusion = trim($exclusion);
+            // Only include meaningful items (at least 10 characters)
+            if (!empty($exclusion) && strlen($exclusion) > 10) {
+                $email_content .= "• " . $exclusion . "\n";
+            }
+        }
+        $email_content .= "\n";
     } else {
         $email_content .= "Exclusions will be provided upon confirmation.\n\n";
     }
+} else {
+    error_log("Inclusions/Exclusions NOT selected in options");
 }
 
 
 
 // Terms & Conditions - only show if selected
 if (in_array('terms_conditions', $options)) {
+    error_log("Processing terms and conditions...");
+    error_log("Terms data: " . (isset($terms_and_conditions_details) ? substr($terms_and_conditions_details, 0, 200) . '...' : 'NOT SET'));
+    
     $email_content .= "📌 *TERMS AND CONDITIONS*\n";
     $email_content .= "-----------\n";
     if (!empty($terms_and_conditions_details)) {
-        $email_content .= '<div style="margin-left:20px;">' . $terms_and_conditions_details . '</div>' . "\n";
+        // Format terms and conditions as a proper list
+        $terms = $terms_and_conditions_details;
+        
+        // Remove all HTML tags and clean up the text
+        $terms = strip_tags($terms);
+        $terms = html_entity_decode($terms, ENT_QUOTES, 'UTF-8');
+        $terms = preg_replace('/\s+/', ' ', $terms); // Replace multiple spaces with single space
+        $terms = trim($terms);
+        
+        // Split by common separators and format as bullet points
+        $terms_list = preg_split('/(\.|;|,)/', $terms);
+        foreach ($terms_list as $term) {
+            $term = trim($term);
+            if (!empty($term) && strlen($term) > 10) { // Only include meaningful terms
+                $email_content .= "• " . $term . "\n";
+            }
+        }
+        $email_content .= "\n";
     } else {
         $email_content .= "Standard terms and conditions apply. Details will be provided upon confirmation.\n";
     }
+} else {
+    error_log("Terms and conditions NOT selected in options");
 }
 
 

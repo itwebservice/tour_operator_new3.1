@@ -91,7 +91,11 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
 $email_id = $_POST['email_id'];
 $mobile_no = $_POST['mobile_no'];
 
-$query = "select * from package_tour_quotation_master where email_id = '$email_id'  and status='1'";
+$query = "select *, 
+	COALESCE(is_sub_quotation, '0') as is_sub_quotation,
+	COALESCE(parent_quotation_id, '0') as parent_quotation_id,
+	COALESCE(quotation_display_id, '') as quotation_display_id
+	from package_tour_quotation_master where email_id = '$email_id'  and status='1'";
 if ($role != 'Admin' && $role != 'Branch Admin') {
 	$query .= " and emp_id='$emp_id'";
 }
@@ -101,8 +105,16 @@ if ($branch_status == 'yes' && $role == 'Branch Admin') {
 if ($branch_admin_id != '' && $role == 'Branch Admin') {
 	$query .= " and branch_admin_id = '$branch_admin_id'";
 }
-$query .= ' ORDER BY `quotation_id` DESC';
+$query .= ' ORDER BY 
+	CASE WHEN COALESCE(is_sub_quotation, "0") = "0" THEN quotation_id ELSE COALESCE(parent_quotation_id, quotation_id) END ASC,
+	CASE WHEN COALESCE(is_sub_quotation, "0") = "1" THEN quotation_id ELSE 0 END ASC';
 $sq_query = mysqlQuery($query);
+
+// Debug: Log the query and check for errors
+if (!$sq_query) {
+    error_log("Modal Query Error: " . mysqli_error($GLOBALS['con']));
+    error_log("Query: " . $query);
+}
 
 // Get the first quotation details for the modal title
 $first_quotation = mysqli_fetch_assoc(mysqlQuery($query . ' LIMIT 1'));
@@ -120,6 +132,10 @@ if ($first_quotation) {
 
 // Reset the query for the main loop
 $sq_query = mysqlQuery($query);
+
+// Debug: Log the query and results
+error_log("Modal query: " . $query);
+$debug_count = 0;
 ?>
 <input type="hidden" id="whatsapp_switch" value="<?= $whatsapp_switch ?>">
 <div class="modal fade" id="quotation_send_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
@@ -150,7 +166,12 @@ $sq_query = mysqlQuery($query);
 								<?php
 								$quotation_cost = 0;
 								$count  = 1;
-								while ($row_tours = mysqli_fetch_assoc($sq_query)) {
+								
+								// Check if query was successful
+								if ($sq_query) {
+									while ($row_tours = mysqli_fetch_assoc($sq_query)) {
+										$debug_count++;
+										error_log("Quotation $debug_count: ID=" . $row_tours['quotation_id'] . ", Display ID=" . (isset($row_tours['quotation_display_id']) ? $row_tours['quotation_display_id'] : 'N/A') . ", Is Sub=" . (isset($row_tours['is_sub_quotation']) ? $row_tours['is_sub_quotation'] : 'N/A'));
 									$sq_tours_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$row_tours[package_id]'"));
 									$sq_cost = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$row_tours[quotation_id]'"));
 
@@ -218,11 +239,49 @@ $sq_query = mysqlQuery($query);
 									$quotation_date = $row_tours['quotation_date'];
 									$yr = explode("-", $quotation_date);
 									$year = $yr[0];
+									
+									// Check if this is a sub-quotation (handle missing fields gracefully)
+									$is_sub_quotation = false;
+									$parent_quotation_id = null;
+									
+									// Check if the fields exist in the database result
+									if (isset($row_tours['is_sub_quotation']) && $row_tours['is_sub_quotation'] == '1') {
+										$is_sub_quotation = true;
+										$parent_quotation_id = isset($row_tours['parent_quotation_id']) ? $row_tours['parent_quotation_id'] : null;
+									}
+									
+									// Debug: Log sub-quotation detection
+									if ($is_sub_quotation) {
+										error_log("Sub-quotation detected: " . $row_tours['quotation_id'] . " -> " . $quotation_id_display);
+									}
+									
+									// Get quotation display ID (prefer quotation_display_id if available)
+									$quotation_id_display = '';
+									$quotation_id_display_formatted = '';
+									
+									// Check if quotation_display_id exists and use it
+									if (isset($row_tours['quotation_display_id']) && !empty($row_tours['quotation_display_id'])) {
+										$quotation_id_display = $row_tours['quotation_display_id'];
+									} else {
+										// Fallback to generating from quotation_id
+										$quotation_id_display = get_quotation_id($row_tours['quotation_id'], $year);
+									}
+									
+									$quotation_id_display_formatted = $quotation_id_display;
+									
+									// Apply sub-quotation formatting if it's a sub-quotation
+									if ($is_sub_quotation) {
+										// Add indentation and styling for sub-quotations with enhanced visibility
+										$quotation_id_display_formatted = '<span class="sub-quotation-id-display">' . $quotation_id_display . '</span>';
+									} else {
+										// Main quotation styling
+										$quotation_id_display_formatted = '<span class="main-quotation-id-display">' . $quotation_id_display . '</span>';
+									}
 								?>
-									<tr>
+									<tr <?php echo $is_sub_quotation ? 'class="sub-quotation-row"' : ''; ?>>
 										<td><input type="checkbox" value="<?php echo $row_tours['quotation_id']; ?>" id="<?php echo $row_tours['quotation_id']; ?>" name="custom_package" class="custom_package" /></td>
 										<td><?php echo $count; ?></td>
-										<td><?php echo get_quotation_id($row_tours['quotation_id'], $year); ?></td>
+										<td><?php echo $quotation_id_display_formatted; ?></td>
 										<td><?= $quotation_cost_1 ?></td>
 										<td><?php echo get_date_user($row_tours['updated_at']); ?></td>
 										<td>
@@ -238,20 +297,33 @@ $sq_query = mysqlQuery($query);
     $title = $hotel_status['title'];
     ?>
     
-    <!-- PDF Download -->
-    <a data-toggle="tooltip" onclick="loadOtherPage('<?php echo $url1; ?>')" class="btn btn-info btn-sm" title="Download Quotation PDF">
-        <i class="fa fa-print"></i>
-    </a>
-
-    <!-- Word Download -->
-    <a data-toggle="tooltip" onclick="exportHTML('<?php echo $urldoc; ?>')" class="btn btn-info btn-sm" title="Download Quotation Word">
-        <i class="fa fa-file-word-o"></i>
-    </a>
+    <!-- Combined Download Button -->
+    <div class="btn-group download-btn-group">
+        <button type="button" class="btn btn-info btn-sm dropdown-toggle download-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Quotation">
+            <i class="fa fa-download"></i>
+        </button>
+        <div class="dropdown-menu download-dropdown">
+            <a class="dropdown-item download-option" href="javascript:void(0)" onclick="loadOtherPage('<?php echo $url1; ?>')">
+                <i class="fa fa-file-pdf-o pdf-icon"></i>
+                <span class="option-text">
+                    <strong>Download as PDF</strong>
+                    <small>Portable Document Format</small>
+                </span>
+            </a>
+            <a class="dropdown-item download-option" href="javascript:void(0)" onclick="exportHTML('<?php echo $urldoc; ?>')">
+                <i class="fa fa-file-word-o word-icon"></i>
+                <span class="option-text">
+                    <strong>Download as Word</strong>
+                    <small>Microsoft Word Document</small>
+                </span>
+            </a>
+        </div>
+    </div>
 
     <!-- WhatsApp Quotation -->
-    <button class="btn btn-info btn-sm" onclick="quotation_whatsapp(<?php echo $row_tours['quotation_id']; ?>)" title="What'sApp Quotation to customer" data-toggle="tooltip">
+    <!-- <button class="btn btn-info btn-sm" onclick="quotation_whatsapp(<?php echo $row_tours['quotation_id']; ?>)" title="What'sApp Quotation to customer" data-toggle="tooltip">
         <i class="fa fa-whatsapp"></i>
-    </button>
+    </button> -->
 
     <!-- Email to Customer -->
         <a data-toggle="tooltip" href="javascript:void(0)" 
@@ -299,15 +371,11 @@ $sq_query = mysqlQuery($query);
 $to_date = $row_tours['to_date'];
 $today = date('Y-m-d');
 
-// Default update button form
+// Edit button that creates a copy and opens edit screen
 $update_btn = '
-    <form style="display:inline-block" action="update/index.php" id="frm_booking_' . $count . '" method="POST">
-        <input type="hidden" id="quotation_id" name="quotation_id" value="' . $row_tours['quotation_id'] . '">
-        <input type="hidden" id="package_id" name="package_id" value="' . $row_tours['package_id'] . '">
-        <button data-toggle="tooltip" style="display:inline-block" class="btn btn-info btn-sm" title="Update Details">
-            <i class="fa fa-pencil-square-o"></i>
-        </button>
-    </form>';
+    <button data-toggle="tooltip" style="display:inline-block" class="btn btn-info btn-sm" onclick="editQuotationWithCopy(' . $row_tours['quotation_id'] . ')" title="Edit Quotation (Creates Copy)">
+        <i class="fa fa-pencil-square-o"></i>
+    </button>';
 
 // Hide if conditions not satisfied
 if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $role != 'Branch Admin') {
@@ -321,6 +389,10 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 
 									</tr>
 								<?php $count++;
+									}
+								} else {
+									// Show error message if query failed
+									echo '<tr><td colspan="6" class="text-center text-danger">Error loading quotations. Please try again.</td></tr>';
 								}
 								?>
 							</table>
@@ -330,7 +402,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 
 
 
-				<div class="row ">
+				<div class="row " style="display: none;">
 					<div class="col-md-12">
 						<div class="col-md-4 mg_tp_20">
 							<select name="email_option" id="email_option" class="form-control" style="width:100%">
@@ -377,28 +449,28 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
                             <div class="col-md-12">
                                 <!-- Checkbox Options -->
                                 <div class="form-group">
-                                    <label class="font-weight-bold">Select Content Options:</label>
-                                    <div class="row">
+                                    <label class="font-weight-bold mb-3" >Select Content Options:</label>
+                                    <div class="row email-options-row">
                                         <div class="col-md-3">
-                                            <div class="form-check">
+                                            <div class="form-check email-option-check">
                                                 <input class="form-check-input email-option" type="checkbox" id="emailPriceStructure" name="emailOptions[]" value="price_structure" checked>
                                                 <label class="form-check-label" for="emailPriceStructure">Price Structure</label>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <div class="form-check">
+                                            <div class="form-check email-option-check">
                                                 <input class="form-check-input email-option" type="checkbox" id="emailInclusionExclusion" name="emailOptions[]" value="inclusion_exclusion" checked>
                                                 <label class="form-check-label" for="emailInclusionExclusion">Inclusion/Exclusion</label>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <div class="form-check">
+                                            <div class="form-check email-option-check">
                                                 <input class="form-check-input email-option" type="checkbox" id="emailTermsConditions" name="emailOptions[]" value="terms_conditions" checked>
                                                 <label class="form-check-label" for="emailTermsConditions">Terms & Conditions</label>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <div class="form-check">
+                                            <div class="form-check email-option-check">
                                                 <input class="form-check-input email-option" type="checkbox" id="emailItinerary" name="emailOptions[]" value="itinerary" checked>
                                                 <label class="form-check-label" for="emailItinerary">Itinerary</label>
                                             </div>
@@ -408,13 +480,23 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 
                                 <!-- Action Buttons -->
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-primary" id="sendEmailBtn">Send Mail</button>
-                                    <button type="button" class="btn btn-info" id="copyEmailBtn">Copy Email</button>
+                                    <div class="row align-items-end">
+                                        <div class="col-md-12">
+                                            <div class="email-action-buttons">
+                                                <button type="button" class="btn" style="background-color: #009898;" id="sendEmailBtn">
+                                                    <i class="fa fa-paper-plane"></i> Send Email
+                                                </button>
+                                                <button type="button" class="btn"  style="background-color: #009898;"  id="copyEmailBtn">
+                                                    <i class="fa fa-copy"></i> Copy Email
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Email Preview -->
                                 <div class="form-group">
-                                    <label class="font-weight-bold text-primary">Email Preview:</label>
+                                    <label class="font-weight-bold" style="color: #009898;">Email Preview:</label>
                                     <div id="emailPreviewArea">
                                         <!-- Email preview will be loaded here -->
                                         <div class="p-3 text-center text-muted">
@@ -426,7 +508,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 
                                 <!-- Email Draft -->
                                 <div class="form-group">
-                                    <label class="font-weight-bold text-primary">Email Draft (Email Body Format):</label>
+                                    <label class="font-weight-bold" style="color: #009898;">Email Draft (Email Body Format):</label>
                                     <div id="emailDraftArea">
                                         <!-- Email draft will be loaded here -->
                                         <div class="p-3 text-center text-muted">
@@ -476,13 +558,13 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 
                                 <!-- Action Buttons for WhatsApp -->
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-success" id="sendWhatsappBtn">Send WhatsApp</button>
-                                    <button type="button" class="btn btn-info" id="copyWhatsappBtn">Copy WhatsApp</button>
+                                    <button type="button" class="btn" style="background-color: #009898;" id="sendWhatsappBtn">Send WhatsApp</button>
+                                    <button type="button" class="btn" style="background-color: #009898;" id="copyWhatsappBtn">Copy WhatsApp</button>
                                 </div>
 
                                 <!-- WhatsApp Preview -->
                                 <div class="form-group">
-                                    <label class="font-weight-bold text-success">WhatsApp Preview:</label>
+                                    <label class="font-weight-bold" style="color: #009898;">WhatsApp Preview:</label>
                                     <div id="whatsappPreviewArea">
                                         <!-- WhatsApp preview will be loaded here -->
                                         <div class="p-3 text-center text-muted">
@@ -494,7 +576,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 
                                 <!-- WhatsApp Draft -->
                                 <div class="form-group">
-                                    <label class="font-weight-bold text-success">WhatsApp Draft:</label>
+                                    <label class="font-weight-bold" style="color: #009898;">WhatsApp Draft:</label>
                                     <div id="whatsappDraftArea">
                                         <!-- WhatsApp draft will be loaded here -->
                                         <div class="p-3 text-center text-muted">
@@ -509,15 +591,17 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn" style="background-color: #009898;" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-	$('#quotation_send_modal').modal('show');
+	// Modal will be shown by the calling JavaScript function
 	$('#email_option').select2();
+	
+	// Simple table display without DataTables sorting
 
 	function select_all_check(id, custom_package) {
 		var checked = $('#' + id).is(':checked');
@@ -584,10 +668,18 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		// Show modal
 		$('#emailWhatsappModal').modal('show');
 		
+		// Debug: Check if checkboxes are available after modal is shown
+		setTimeout(function() {
+		}, 500);
+		
 		// Ensure proper tab state - Email tab active by default
         $('#email-tab').trigger('click').addClass('active').attr('aria-selected', 'true');
 
 		$('#whatsapp-tab').removeClass('active').attr('aria-selected', 'false');
+		
+		// Debug: Check checkboxes when modal is fully shown
+		$('#emailWhatsappModal').on('shown.bs.modal', function() {
+		});
 		$('#email-content').addClass('show active');
 		$('#whatsapp-content').removeClass('show active');
 		
@@ -595,6 +687,24 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		setTimeout(function() {
 			loadEmailContent(quotationData.quotation_id);
 		}, 300);
+		
+		// Set default email format to Email Body (no HTML support)
+		// $('#emailFormatSelect').val('body'); // Removed - only Email Body format supported
+		
+		// Add modal refresh on show event
+		$('#quotation_send_modal').on('shown.bs.modal', function() {
+			// Force reload the modal content
+			if (window.currentQuotationData) {
+				loadEmailContent(window.currentQuotationData.quotation_id);
+			}
+		});
+		
+		// Add event listeners for email option checkboxes
+		$('.email-option').on('change', function() {
+			updateContentPreview('email');
+		});
+		
+		// Email format dropdown removed - only Email Body format supported
 	}
 
 	// Function to load email content
@@ -603,24 +713,32 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		$('#emailPreviewArea').html('<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Loading email content...</div>');
 		$('#emailDraftArea').html('<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Loading email draft...</div>');
 
+		// Always use Email Body format (HTML format removed)
+		var format = 'body';
+		var emailOption = 'Email Body';
+
 		// Gather currently selected email options
 		var selectedOptions = [];
 		$('.email-option:checked').each(function() {
 			selectedOptions.push($(this).val());
 		});
 
-		// Load email body content (same as what gets sent)
+		// Load email content (Email Body format only)
 		$.post('get_email_body_content.php', {
 			quotation_id: quotation_id,
-			email_option: 'Email Body',
-			options: selectedOptions
+			email_option: emailOption,
+			options: selectedOptions,
+			format: format
 		}, function(data) {
-                console.log(data , 'emaillll');
 			if (data && data.trim() !== '') {
-				// Format the content for preview (with proper line breaks)
-				var formattedContent = data.replace(/\n/g, '<br>');
-				$('#emailPreviewArea').html(formattedContent);
-				$('#emailDraftArea').html(data);
+					// For Email Body format, show text content
+					var formattedContent = data.replace(/\n/g, '<br>');
+					$('#emailPreviewArea').html(formattedContent);
+					
+					var textDraft = '<div style="font-family: monospace; font-size: 12px; line-height: 1.4; background: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; white-space: pre-wrap;">';
+					textDraft += data;
+					textDraft += '</div>';
+					$('#emailDraftArea').html(textDraft);
 			} else {
 				$('#emailPreviewArea').html('<div class="p-3"><h5>Email Content Preview</h5><p class="text-muted">Email content will be displayed here based on your selections.</p></div>');
 				$('#emailDraftArea').html('<div class="p-3"><h5>Email Draft</h5><p class="text-muted">Email draft content will be displayed here.</p></div>');
@@ -653,7 +771,12 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 				// Format the content for WhatsApp preview (with proper line breaks)
 				var formattedContent = data.replace(/\n/g, '<br>');
 				$('#whatsappPreviewArea').html(formattedContent);
-				$('#whatsappDraftArea').html(data);
+				
+				// Format the WhatsApp draft with proper line breaks and styling
+				var draftContent = '<div style="font-family: monospace; font-size: 12px; line-height: 1.6; background: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; white-space: pre-wrap;">';
+				draftContent += data;
+				draftContent += '</div>';
+				$('#whatsappDraftArea').html(draftContent);
 			} else {
 				$('#whatsappPreviewArea').html('<div class="p-3"><h5>WhatsApp Content Preview</h5><p class="text-muted">WhatsApp content will be displayed here based on your selections.</p></div>');
 				$('#whatsappDraftArea').html('<div class="p-3"><h5>WhatsApp Draft</h5><p class="text-muted">WhatsApp draft content will be displayed here.</p></div>');
@@ -677,16 +800,26 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		
 		// Load content based on selected options
 		if (window.currentQuotationData) {
+			// Always use Email Body format (HTML format removed)
+			var emailOption = 'Email Body';
+			var format = 'body';
+			
 			$.post('get_email_body_content.php', {
 				quotation_id: window.currentQuotationData.quotation_id,
-				email_option: type === 'email' ? 'Email Body' : 'WhatsApp',
-				options: selectedOptions
+				email_option: type === 'email' ? emailOption : 'WhatsApp',
+				options: selectedOptions,
+				format: type === 'email' ? format : 'text'
 			}, function(data) {
 				if (data && data.trim() !== '') {
-					// Format the content for preview (with proper line breaks)
-					var formattedContent = data.replace(/\n/g, '<br>');
-					$(previewArea).html(formattedContent);
-					$(draftArea).html(data);
+						// For Email Body format or WhatsApp, show text content
+						var formattedContent = data.replace(/\n/g, '<br>');
+						$(previewArea).html(formattedContent);
+						
+					// Format draft with proper line breaks and styling
+					var textDraft = '<div style="font-family: monospace; font-size: 12px; line-height: 1.6; background: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; white-space: pre-wrap;">';
+						textDraft += data;
+						textDraft += '</div>';
+						$(draftArea).html(textDraft);
 				} else {
 					$(previewArea).html('<div class="p-3"><h5>Content Preview</h5><p class="text-muted">Content will be displayed here based on your selections.</p></div>');
 					$(draftArea).html('<div class="p-3"><h5>Draft</h5><p class="text-muted">Draft content will be displayed here.</p></div>');
@@ -698,30 +831,48 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		}
 	}
 
+	// Function removed - only Email Body format supported now
+
 	// Event handlers for the new modal
 	$(document).ready(function() {
-	// Send Email button
-	$('#sendEmailBtn').click(function() {
+	// Send Email button - use event delegation
+	$(document).on('click', '#sendEmailBtn', function() {
 		var selectedOptions = [];
 		$('input[name="emailOptions[]"]:checked').each(function() {
 			selectedOptions.push($(this).val());
 		});
 		
-		console.log('Selected Email Options:', selectedOptions);
+		// Always use Email Body format (HTML format removed)
+		var emailFormat = 'body';
+		var emailOption = 'Email Body';
+		
 		
 		// Call individual email send function
 		if (window.currentQuotationData) {
 			sendIndividualQuotationEmail(window.currentQuotationData.quotation_id, 
-				window.currentQuotationData.email_id, selectedOptions);
+				window.currentQuotationData.email_id, selectedOptions, emailOption);
 		}
 	});
 
 		// Copy Email button
 		$('#copyEmailBtn').click(function() {
 			var emailContent = $('#emailDraftArea').text();
-			navigator.clipboard.writeText(emailContent).then(function() {
-				alert('Email content copied to clipboard!');
-			});
+			if (emailContent && emailContent.trim() !== '') {
+				// Try modern clipboard API first
+				if (navigator.clipboard && window.isSecureContext) {
+					navigator.clipboard.writeText(emailContent).then(function() {
+						msg_alert('Email content copied to clipboard!');
+					}).catch(function(err) {
+						// Fallback for older browsers
+						fallbackCopyTextToClipboard(emailContent);
+					});
+				} else {
+					// Fallback for older browsers
+					fallbackCopyTextToClipboard(emailContent);
+				}
+			} else {
+				error_msg_alert('No email content to copy. Please wait for content to load.');
+			}
 		});
 
 	// Send WhatsApp button
@@ -731,7 +882,6 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 			selectedOptions.push($(this).val());
 		});
 		
-		console.log('Selected WhatsApp Options:', selectedOptions);
 		
 		if (window.currentQuotationData) {
 			sendIndividualQuotationWhatsApp(window.currentQuotationData.quotation_id, 
@@ -742,9 +892,22 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		// Copy WhatsApp button
 		$('#copyWhatsappBtn').click(function() {
 			var whatsappContent = $('#whatsappDraftArea').text();
-			navigator.clipboard.writeText(whatsappContent).then(function() {
-				alert('WhatsApp content copied to clipboard!');
-			});
+			if (whatsappContent && whatsappContent.trim() !== '') {
+				// Try modern clipboard API first
+				if (navigator.clipboard && window.isSecureContext) {
+					navigator.clipboard.writeText(whatsappContent).then(function() {
+						msg_alert('WhatsApp content copied to clipboard!');
+					}).catch(function(err) {
+						// Fallback for older browsers
+						fallbackCopyTextToClipboard(whatsappContent);
+					});
+				} else {
+					// Fallback for older browsers
+					fallbackCopyTextToClipboard(whatsappContent);
+				}
+			} else {
+				error_msg_alert('No WhatsApp content to copy. Please wait for content to load.');
+			}
 		});
 
 		// Checkbox change events for Email
@@ -788,29 +951,32 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 	});
 
 	// Function to send individual quotation email
-	function sendIndividualQuotationEmail(quotation_id, email_id, selectedOptions) {
+	function sendIndividualQuotationEmail(quotation_id, email_id, selectedOptions, emailOption) {
 		var base_url = $('#base_url').val();
+		if (!base_url) {
+			base_url = window.location.origin + '/itoursdemo/';
+		}
 		$('#sendEmailBtn').button('loading');
 		
-		console.log('Sending email with options:', selectedOptions);
+		// Prepare form data
+		var formData = {
+			quotation_id: quotation_id,
+			email_id: email_id,
+			email_option: emailOption || 'Email Body'
+		};
 		
 		$.ajax({
 			type: 'post',
 			url: base_url + 'controller/package_tour/quotation/quotation_email_send_individual.php',
-			data: {
-				quotation_id: quotation_id,
-				email_id: email_id,
-				email_option: 'Email Body',
-				options: selectedOptions
-			},
+			data: formData,
+			processData: true,
+			contentType: 'application/x-www-form-urlencoded',
 			success: function(message) {
-				console.log('Email sent successfully');
 				msg_alert(message);
 				$('#sendEmailBtn').button('reset');
 				$('#emailWhatsappModal').modal('hide');
 			},
-			error: function() {
-				console.log('Email sending failed');
+			error: function(xhr, status, error) {
 				error_msg_alert('Error sending email. Please try again.');
 				$('#sendEmailBtn').button('reset');
 			}
@@ -822,7 +988,6 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		var base_url = $('#base_url').val();
 		$('#sendWhatsappBtn').button('loading');
 		
-		console.log('Sending WhatsApp with options:', selectedOptions);
 		
 		$.ajax({
 			type: 'post',
@@ -833,17 +998,184 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 				options: selectedOptions
 			},
 			success: function(link) {
-				console.log('WhatsApp sent successfully');
 				$('#sendWhatsappBtn').button('reset');
 				window.open(link, '_blank');
 				$('#emailWhatsappModal').modal('hide');
 			},
 			error: function() {
-				console.log('WhatsApp sending failed');
 				error_msg_alert('Error sending WhatsApp. Please try again.');
 				$('#sendWhatsappBtn').button('reset');
 			}
 		});
+	}
+
+	// Fallback function for copying text to clipboard (for older browsers)
+	function fallbackCopyTextToClipboard(text) {
+		var textArea = document.createElement("textarea");
+		textArea.value = text;
+		
+		// Avoid scrolling to bottom
+		textArea.style.top = "0";
+		textArea.style.left = "0";
+		textArea.style.position = "fixed";
+		textArea.style.opacity = "0";
+		
+		document.body.appendChild(textArea);
+		textArea.focus();
+		textArea.select();
+		
+		try {
+			var successful = document.execCommand('copy');
+			if (successful) {
+				msg_alert('Content copied to clipboard!');
+			} else {
+				error_msg_alert('Unable to copy content. Please try manually selecting and copying the text.');
+			}
+		} catch (err) {
+			error_msg_alert('Unable to copy content. Please try manually selecting and copying the text.');
+		}
+		
+		document.body.removeChild(textArea);
+	}
+
+	// Function to create sub-quotation with version numbering
+	function createSubQuotation(quotation_id) {
+		var base_url = $('#base_url').val();
+		
+		// Show confirmation dialog
+		$('#vi_confirm_box').vi_confirm_box({
+			callback: function(data1) {
+				if (data1 == "yes") {
+					// Show loading state
+					msg_alert('Creating sub-quotation...');
+					
+					$.ajax({
+						type: 'post',
+						url: base_url + 'controller/package_tour/quotation/quotation_sub_create.php',
+						data: {
+							quotation_id: quotation_id
+						},
+						success: function(result) {
+							try {
+								var response = JSON.parse(result);
+								if (response.status === 'success') {
+									msg_alert(response.message);
+									// Refresh the quotation list
+									quotation_list_reflect();
+									// Close the modal
+									$('#quotation_send_modal').modal('hide');
+								} else {
+									error_msg_alert(response.message);
+								}
+							} catch (e) {
+								// Fallback for non-JSON response
+								msg_alert(result);
+								quotation_list_reflect();
+								$('#quotation_send_modal').modal('hide');
+							}
+						},
+						error: function() {
+							error_msg_alert('Error creating sub-quotation. Please try again.');
+						}
+					});
+				}
+			}
+		});
+	}
+
+	// Function to edit quotation by creating a copy first
+	function editQuotationWithCopy(quotation_id) {
+		var base_url = $('#base_url').val();
+		
+		// Show confirmation dialog
+		$('#vi_confirm_box').vi_confirm_box({
+			callback: function(data1) {
+				if (data1 == "yes") {
+					// Show loading state
+					msg_alert('Creating copy for editing...');
+					
+					$.ajax({
+						type: 'post',
+						url: base_url + 'controller/package_tour/quotation/quotation_sub_create.php',
+						data: {
+							quotation_id: quotation_id
+						},
+						success: function(result) {
+							try {
+								var response = JSON.parse(result);
+								if (response.status === 'success') {
+									// Close the modal first
+									$('#quotation_send_modal').modal('hide');
+									
+									// Create and submit the update form with the new quotation ID
+									var form = $('<form>', {
+										'method': 'POST',
+										'action': base_url + 'view/package_booking/quotation/home/update/index.php',
+										'style': 'display: inline-block'
+									});
+									form.append($('<input>', {
+										'type': 'hidden',
+										'name': 'quotation_id',
+										'value': response.quotation_id
+									}));
+									form.append($('<input>', {
+										'type': 'hidden',
+										'name': 'package_id',
+										'value': window.currentQuotationData ? window.currentQuotationData.package_id : ''
+									}));
+									$('body').append(form);
+									form.submit();
+								} else {
+									error_msg_alert(response.message);
+								}
+							} catch (e) {
+								// Fallback for non-JSON response - try to extract ID from text
+								var new_quotation_id = extractQuotationIdFromResult(result);
+								if (new_quotation_id) {
+									$('#quotation_send_modal').modal('hide');
+									var form = $('<form>', {
+										'method': 'POST',
+										'action': base_url + 'view/package_booking/quotation/home/update/index.php',
+										'style': 'display: inline-block'
+									});
+									form.append($('<input>', {
+										'type': 'hidden',
+										'name': 'quotation_id',
+										'value': new_quotation_id
+									}));
+									form.append($('<input>', {
+										'type': 'hidden',
+										'name': 'package_id',
+										'value': window.currentQuotationData ? window.currentQuotationData.package_id : ''
+									}));
+									$('body').append(form);
+									form.submit();
+								} else {
+									error_msg_alert('Error: Could not extract new quotation ID. Please try again.');
+								}
+							}
+						},
+						error: function() {
+							error_msg_alert('Error creating quotation copy. Please try again.');
+						}
+					});
+				}
+			}
+		});
+	}
+
+	// Helper function to extract quotation ID from the result message
+	function extractQuotationIdFromResult(result) {
+		// Try to extract quotation ID from the result message
+		// Look for patterns like "QTN/2025/12.1" or just the numeric ID
+		var match = result.match(/ID:\s*([A-Z0-9\/\.]+)/i);
+		if (match && match[1]) {
+			return match[1];
+		}
+		
+		// If that doesn't work, try to get the latest quotation ID from the database
+		// This is a fallback method
+		return null;
 	}
 </script>
 <script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/quotation.js"></script>
@@ -893,13 +1225,13 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     }
     
     #emailWhatsappModal .nav-tabs .nav-link.active {
-        background-color: #007bff;
+        background-color: #009898;
         color: white;
-        border-color: #007bff;
+        border-color: #009898;
     }
     
     #emailWhatsappModal .nav-tabs .nav-link:hover {
-        border-color: #007bff;
+        border-color: #009898;
     }
     
     #emailWhatsappModal .form-check {
@@ -983,7 +1315,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     }
     
     #emailWhatsappModal .modal-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #009898 0%, #009898 100%);
         color: white;
         border-bottom: none;
         padding: 15px 20px;
@@ -1014,6 +1346,109 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
     
+    /* Download dropdown styling */
+    .download-btn-group {
+        position: relative;
+    }
+    
+    .download-btn {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .download-btn:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.4);
+    }
+    
+    .download-btn:focus {
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+    }
+    
+    .download-btn .btn-text {
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .download-dropdown {
+        min-width: 200px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 0;
+        margin-top: 4px;
+        background: white;
+        overflow: hidden;
+    }
+    
+    .download-option {
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+        border: none;
+        text-decoration: none;
+        color: #495057;
+    }
+    
+    .download-option:hover {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        color: #007bff;
+        transform: translateX(4px);
+    }
+    
+    .download-option .pdf-icon {
+        color: #dc3545;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .download-option .word-icon {
+        color: #2b579a;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .option-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .option-text strong {
+        font-size: 13px;
+        font-weight: 600;
+        color: inherit;
+        margin: 0;
+    }
+    
+    .option-text small {
+        font-size: 11px;
+        color: #6c757d;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    .download-btn-group .dropdown-toggle::after {
+        margin-left: 6px;
+        border-top: 4px solid;
+        border-right: 4px solid transparent;
+        border-left: 4px solid transparent;
+        vertical-align: middle;
+    }
+    
     /* Enhanced tab styling */
     #emailWhatsappModal .nav-tabs {
         border-bottom: 2px solid #e9ecef;
@@ -1036,7 +1471,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     }
     
     #emailWhatsappModal .nav-tabs .nav-link.active {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        background: linear-gradient(135deg, #009898 0%, #009898 100%);
         color: white;
         border: none;
         box-shadow: 0 2px 4px rgba(0,123,255,0.3);
@@ -1062,9 +1497,49 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     
     /* Loading spinner styling */
     .fa-spinner {
-        color: #007bff;
+        color: #009898;
     }
     
+    /* Email Format Dropdown removed - only Email Body format supported */
+
+    /* Email Action Buttons Styling */
+    .email-action-buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .email-action-buttons .btn {
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 8px 16px;
+    }
+
+    .email-action-buttons .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Email Options Checkbox Styling */
+    .email-options-row {
+        margin-bottom: 0;
+    }
+
+    .email-option-check {
+        margin-bottom: 8px;
+        padding: 4px 0;
+    }
+
+    .email-option-check .form-check-input {
+        margin-right: 6px;
+    }
+
+    .email-option-check .form-check-label {
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+
     /* Content area scrollbar styling */
     #emailPreviewArea::-webkit-scrollbar,
     #whatsappPreviewArea::-webkit-scrollbar,
@@ -1094,5 +1569,62 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     #emailDraftArea::-webkit-scrollbar-thumb:hover,
     #whatsappDraftArea::-webkit-scrollbar-thumb:hover {
         background: #a8a8a8;
+    }
+    
+    /* Simple Sub-quotation ID Display Styling */
+    .sub-quotation-id-display {
+        /* margin-left: 25px; */
+        color: #000;
+        /* font-style: italic; */
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+    
+    .main-quotation-id-display {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    
+    /* Simple table row styling for sub-quotations */
+    .sub-quotation-row {
+        background-color: #f8f9fa;
+        border-left: 3px solid #007bff;
+    }
+    
+    /* Fix table alignment and margins */
+    #tbl_tour_list {
+        margin: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    #tbl_tour_list th,
+    #tbl_tour_list td {
+        padding: 8px 12px;
+        text-align: left;
+        vertical-align: middle;
+        border: 1px solid #ddd;
+    }
+    
+    #tbl_tour_list th {
+        background-color: #f5f5f5;
+        font-weight: bold;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        margin: 0;
+    }
+    
+    /* Ensure proper alignment for action buttons */
+    #tbl_tour_list td:last-child {
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    /* Fix button group alignment */
+    .btn-group {
+        display: inline-block;
+        vertical-align: middle;
     }
 </style>

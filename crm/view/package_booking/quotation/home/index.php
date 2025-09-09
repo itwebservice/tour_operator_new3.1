@@ -349,14 +349,26 @@ quotation_list_reflect();
     function quotation_email_send(btn_id, quotation_id, email_id, mobile_no) {
         $('#' + btn_id).button('loading');
         var base_url = $('#base_url').val();
+        
+        // Add timestamp to prevent caching
+        var timestamp = new Date().getTime();
+        
         $.post('send_quotation.php', {
             email_id: email_id,
-            mobile_no: mobile_no
+            mobile_no: mobile_no,
+            _t: timestamp
         }, function(data) {
+            console.log('Modal response:', data);
             $('#div_quotation_form').html(data);
             $('#' + btn_id).button('reset');
+            // Show the modal after content is loaded
+            $('#quotation_send_modal').modal('show');
+        }).fail(function(xhr, status, error) {
+            console.error('Error loading modal:', error);
+            console.error('Response text:', xhr.responseText);
+            $('#' + btn_id).button('reset');
+            error_msg_alert('Error loading quotation modal. Please try again.');
         });
-
     }
 
     function get_tour_typewise_packages(tour_type) {

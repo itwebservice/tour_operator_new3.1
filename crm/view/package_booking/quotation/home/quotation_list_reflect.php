@@ -46,7 +46,7 @@ if ($branch_id != "") {
 	$query .= " and branch_admin_id = '$branch_id'";
 }
 include "../../../../model/app_settings/branchwise_filteration.php";
-$query .= " order by quotation_id desc ";
+$query .= " order by quotation_id asc ";
 
 $count = 0;
 $quotation_cost = 0;
@@ -66,6 +66,15 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	$yr = explode("-", $quotation_date);
 	$year = $yr[0];
 	$sq_package_program = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id ='$row_quotation[package_id]'"));
+	
+	// Only show parent quotations on the list page
+	$is_sub_quotation = false;
+	$parent_quotation_id = null;
+	
+	// Check if this is a sub-quotation and skip it from list display
+	if (isset($row_quotation['is_sub_quotation']) && $row_quotation['is_sub_quotation'] == '1') {
+		continue; // Skip sub-quotations from list display
+	}
 
 
 
@@ -498,16 +507,36 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	// Create mail button that opens send_quotation modal
 	$mail_button = '<button class="btn btn-info btn-sm" onclick="quotation_email_send(\'btn_email_' . $count . '\', ' . $row_quotation['quotation_id'] . ', \'' . $row_quotation['email_id'] . '\', \'' . $row_quotation['mobile_no'] . '\')" title="' . $whatsapp_tooltip_change . '"><i class="fa fa-envelope-o"></i></button>';
 
+		// Check if this is a sub-quotation and skip it from list display (handle missing fields gracefully)
+		$is_sub_quotation = false;
+		if (isset($row_quotation['is_sub_quotation']) && $row_quotation['is_sub_quotation'] == '1') {
+			$is_sub_quotation = true;
+		}
+		
+		// Skip sub-quotations from main list display
+		if ($is_sub_quotation) {
+			continue;
+		}
+		
+		// Get quotation display ID (prefer quotation_display_id if available)
+		$quotation_id_display = '';
+		if (isset($row_quotation['quotation_display_id']) && !empty($row_quotation['quotation_display_id'])) {
+			$quotation_id_display = $row_quotation['quotation_display_id'];
+		} else {
+			// Fallback to generating from quotation_id
+			$quotation_id_display = get_quotation_id($row_quotation['quotation_id'], $year);
+		}
+
 	$temp_arr = array("data" => array(
 		(int)(++$count),
-		get_quotation_id($row_quotation['quotation_id'], $year),
+		$quotation_id_display,
 		$sq_package_program['package_name'],
 		$row_quotation['customer_name'] . $cust_user_name,
 		get_date_user($row_quotation['quotation_date']),
 		($row_quotation['costing_type'] == 2) ?
 			 $quotation_cost_p . '<br>' . $currency_amount : $quotation_cost . '<br>' . $currency_amount,
 		$emp_name,
-		$mail_button
+		$mail_button . ' ' . $copy_btn
 	), "bg" => $bg);
 	array_push($array_s, $temp_arr);
 }
