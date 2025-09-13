@@ -26,6 +26,15 @@ $special_attaraction_arr = isset($_POST['special_attaraction_arr']) ? $_POST['sp
 $overnight_stay_arr = isset($_POST['overnight_stay_arr']) ? $_POST['overnight_stay_arr'] : [];
 $meal_plan_arr = isset($_POST['meal_plan_arr']) ? $_POST['meal_plan_arr'] : [];
 
+// Debug logging for package tour save
+error_log("Package save debug - day_program_arr count: " . count($day_program_arr));
+error_log("Package save debug - special_attaraction_arr count: " . count($special_attaraction_arr));
+error_log("Package save debug - overnight_stay_arr count: " . count($overnight_stay_arr));
+error_log("Package save debug - meal_plan_arr count: " . count($meal_plan_arr));
+if(!empty($day_program_arr)) {
+    error_log("Package save debug - first day program: " . $day_program_arr[0]);
+}
+
 $city_name_arr = isset($_POST['city_name_arr'])?$_POST['city_name_arr'] : [];
 $hotel_name_arr = isset($_POST['hotel_name_arr']) ? $_POST['hotel_name_arr'] : [];
 $hotel_type_arr = isset($_POST['hotel_type_arr']) ? $_POST['hotel_type_arr'] : [];

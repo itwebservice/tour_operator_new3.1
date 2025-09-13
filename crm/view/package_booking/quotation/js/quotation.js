@@ -25,22 +25,41 @@ function total_days_reflect(offset = '') {
 	}
 	else{
 		$('#total_days' + offset).val(total_days);
+		
+		// Store nights for package filtering (only for main form, not other offsets)
+		if (offset === '') {
+			sessionStorage.setItem('selected_nights', total_days);
+			console.log('Stored nights in sessionStorage:', total_days);
+		}
 	}
 }
 
 function package_dynamic_reflect(dest_name) {
 	var dest_id = $('#' + dest_name).val();
 	var base_url = $('#base_url').val();
+	
+	// Get total_nights from multiple sources
+	var total_nights = $('#nights_filter').val() || sessionStorage.getItem('selected_nights') || $('#total_days').val() || $('#total_days12').val();
+
+	// Ensure total_nights is not null or undefined
+	if (!total_nights) {
+		total_nights = '';
+	}
+
+	var ajax_data = { 
+		dest_id: dest_id,
+		total_nights: total_nights
+	};
 
 	$.ajax({
 		type: 'post',
 		url: base_url + 'view/package_booking/quotation/inc/get_packages.php',
-		data: { dest_id: dest_id },
+		data: ajax_data,
 		success: function (result) {
 			$('#package_name_div').html(result);
 		},
 		error: function (result) {
-			console.log(result.responseText);
+			console.log('Package loading error:', result.responseText);
 		}
 	});
 }

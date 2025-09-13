@@ -138,10 +138,12 @@
                         onchange="total_passangers_calculate('12'); validate_balance(this.id)"
                         value="<?= $sq_quotation['total_adult'] ?>">
                 </div>
+       
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" id="total_infant12" name="total_infant12" placeholder="*Total Infant(s)"
-                        title="Total Infant(s)" onchange="total_passangers_calculate('12'); validate_balance(this.id)"
-                        value="<?= $sq_quotation['total_infant'] ?>">
+                    <input type="text" class="form-control" id="children_with_bed12" name="children_with_bed12"
+                        onchange="validate_balance(this.id);total_passangers_calculate('12');"
+                        placeholder="Child With Bed(s)" title="Child With Bed(s)"
+                        value="<?= $sq_quotation['children_with_bed'] ?>">
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" class="form-control" id="children_without_bed12" name="children_without_bed12"
@@ -150,11 +152,11 @@
                         value="<?= $sq_quotation['children_without_bed'] ?>">
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" class="form-control" id="children_with_bed12" name="children_with_bed12"
-                        onchange="validate_balance(this.id);total_passangers_calculate('12');"
-                        placeholder="Child With Bed(s)" title="Child With Bed(s)"
-                        value="<?= $sq_quotation['children_with_bed'] ?>">
+                    <input type="text" id="total_infant12" name="total_infant12" placeholder="*Total Infant(s)"
+                        title="Total Infant(s)" onchange="total_passangers_calculate('12'); validate_balance(this.id)"
+                        value="<?= $sq_quotation['total_infant'] ?>">
                 </div>
+              
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" id="total_passangers12" name="total_passangers12" placeholder="Total Member(s)"
                         title="Total Member(s)" disabled value="<?= $sq_quotation['total_passangers'] ?>">
@@ -237,6 +239,13 @@ $('#frm_tab_u_1').validate({
             error_msg_alert("Enter atleast adult count!");
             return false;
         }
+        
+        // Store selected nights for package filtering
+        var total_nights = $('#total_days12').val();
+        if (total_nights) {
+            sessionStorage.setItem('selected_nights', total_nights);
+        }
+        
         $('#tab1_head').addClass('done');
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');

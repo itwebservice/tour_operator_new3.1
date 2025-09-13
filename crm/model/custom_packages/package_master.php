@@ -30,8 +30,17 @@ class custom_package{
       $sq = mysqlQuery("insert into custom_package_master(package_id,dest_id, package_code, package_name, seo_slug,tour_theme,total_days, total_nights,adult_cost,child_cost,infant_cost,child_with,child_without,extra_bed,inclusions,exclusions, status,created_at,tour_type,currency_id,taxation,note,dest_image) values('$max_tour_id','$dest_id', '$package_code', '$package_name', '$seo_slug','$tour_theme', '$total_days', '$total_nights','$adult_cost','$child_cost','$infant_cost','$child_with','$child_without','$extra_bed','$inclusions','$exclusions','$status','$created_at','$tour_type','$currency_id','','$note','$dest_image')");
 
       if($sq){
+         
+         // Debug logging for program save
+         error_log("Package model debug - package created with ID: " . $max_tour_id);
+         error_log("Package model debug - day_program_arr size: " . sizeof($day_program_arr));
+         error_log("Package model debug - going into program loop");
 
          for($i=0; $i<sizeof($day_program_arr); $i++){
+            
+            error_log("Package model debug - processing program entry $i");
+            error_log("Package model debug - day_program: " . $day_program_arr[$i]);
+            error_log("Package model debug - attraction: " . $special_attaraction_arr[$i]);
 
             $sq = mysqlQuery("select max(entry_id) as max from custom_package_program");
             $value = mysqli_fetch_assoc($sq);
@@ -41,11 +50,16 @@ class custom_package{
             $special_attaraction1 = addslashes($special_attaraction_arr[$i]);
             $day_program_arr1 = addslashes($day_program_arr[$i]);
             $overnight_stay1 = addslashes($overnight_stay_arr[$i]);
+            
+            error_log("Package model debug - about to insert program entry with ID: " . $max_group_id);
             $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan)values('$max_group_id','$max_tour_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]')");
 
             if(!$sq1){
             $GLOBALS['flag'] = false;
+            error_log("Package model debug - ERROR: Failed to insert program entry");
             echo "error--Error in Package Program!";
+            } else {
+            error_log("Package model debug - SUCCESS: Program entry inserted");
             }
          }
 
@@ -126,6 +140,27 @@ class custom_package{
 //update
 function package_master_update($package_id1,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$hotel_check_arr,$vehicle_name_arr,$vehicle_check_arr,$drop_arr,$drop_type_arr,$pickup_arr,$pickup_type_arr,$tr_entry_arr,$checked_programe_arr, $day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr, $entry_id_arr,$hotel_entry_id_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image, $seo_slug,$tour_theme){
 
+   // Add null checks for all array parameters to prevent sizeof() errors
+   $city_name_arr = $city_name_arr ?? [];
+   $hotel_name_arr = $hotel_name_arr ?? [];
+   $hotel_type_arr = $hotel_type_arr ?? [];
+   $total_days_arr = $total_days_arr ?? [];
+   $hotel_check_arr = $hotel_check_arr ?? [];
+   $vehicle_name_arr = $vehicle_name_arr ?? [];
+   $vehicle_check_arr = $vehicle_check_arr ?? [];
+   $drop_arr = $drop_arr ?? [];
+   $drop_type_arr = $drop_type_arr ?? [];
+   $pickup_arr = $pickup_arr ?? [];
+   $pickup_type_arr = $pickup_type_arr ?? [];
+   $tr_entry_arr = $tr_entry_arr ?? [];
+   $checked_programe_arr = $checked_programe_arr ?? [];
+   $day_program_arr = $day_program_arr ?? [];
+   $special_attaraction_arr = $special_attaraction_arr ?? [];
+   $overnight_stay_arr = $overnight_stay_arr ?? [];
+   $meal_plan_arr = $meal_plan_arr ?? [];
+   $entry_id_arr = $entry_id_arr ?? [];
+   $hotel_entry_id_arr = $hotel_entry_id_arr ?? [];
+
    $package_code = mysqlREString($package_code);
    $package_name = mysqlREString($package_name);  
    $total_days = mysqlREString($total_days); 
@@ -182,7 +217,19 @@ function package_master_update($package_id1,$package_code,$package_name,$total_d
 
    if($sq){
 
+      // Debug logging for package update model
+      error_log("Package update model debug - package_id: " . $package_id);
+      error_log("Package update model debug - day_program_arr size: " . sizeof($day_program_arr));
+      error_log("Package update model debug - checked_programe_arr size: " . sizeof($checked_programe_arr));
+      error_log("Package update model debug - going into program update loop");
+
       for($i=0; $i<sizeof($day_program_arr); $i++){
+
+         error_log("Package update model debug - processing program entry $i");
+         error_log("Package update model debug - checked: " . ($checked_programe_arr[$i] ?? 'undefined'));
+         error_log("Package update model debug - day_program: " . ($day_program_arr[$i] ?? 'undefined'));
+         error_log("Package update model debug - attraction: " . ($special_attaraction_arr[$i] ?? 'undefined'));
+         error_log("Package update model debug - entry_id: " . ($entry_id_arr[$i] ?? 'undefined'));
 
          $meal_plan_arr[$i] = mysqlREString($meal_plan_arr[$i]);
          $entry_id_arr[$i] = mysqlREString($entry_id_arr[$i]);

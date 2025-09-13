@@ -131,20 +131,23 @@ $role_id = $_SESSION['role_id'];
                     <input type="text" id="total_adult" name="total_adult" placeholder="Total Adult(s)" title="Total Adult(s)"
                         onchange="total_passangers_calculate(); validate_balance(this.id)" required>
                 </div>
+              
+              
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" id="total_infant" name="total_infant" placeholder="Total Infant(s)"
-                        title="Total Infant(s)" onchange="total_passangers_calculate(); validate_balance(this.id);"
-                        required>
+                    <input type="text" class="form-control" id="children_with_bed" name="children_with_bed"
+                        onchange="validate_balance(this.id);total_passangers_calculate();" placeholder="Child With Bed(s)"
+                        title="Child With Bed(s)" required>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" class="form-control" id="children_without_bed" name="children_without_bed"
                         onchange="validate_balance(this.id);total_passangers_calculate();"
                         placeholder="Child Without Bed(s)" title="Child Without Bed(s)" required>
                 </div>
+                
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" class="form-control" id="children_with_bed" name="children_with_bed"
-                        onchange="validate_balance(this.id);total_passangers_calculate();" placeholder="Child With Bed(s)"
-                        title="Child With Bed(s)" required>
+                    <input type="text" id="total_infant" name="total_infant" placeholder="Total Infant(s)"
+                        title="Total Infant(s)" onchange="total_passangers_calculate(); validate_balance(this.id);"
+                        required>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" id="total_passangers" name="total_passangers" value="0"
@@ -214,6 +217,10 @@ $("#tour_name").autocomplete({
     select: function (event, ui) {
 		$("#tour_name").val(ui.item.label);
         var newOption = $("<option selected='selected'></option>").val(ui.item.dest_id).text(ui.item.label);
+        
+        // Store selected destination for package filtering
+        sessionStorage.setItem('selected_destination_id', ui.item.dest_id);
+        sessionStorage.setItem('selected_destination_name', ui.item.label);
         $('#dest_name').append(newOption).trigger('change.select2');
         // $('#dest_name').prepend('<option value="' + ui.item.dest_id + '">' +ui.item.label +'</option>');
         // $('#dest_name').select2().trigger("change");
@@ -301,6 +308,7 @@ $('#frm_tab1').validate({
             error_msg_alert("Enter atleast adult count!");
             return false;
         }
+        
         $('#tab1_head').addClass('done');
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');

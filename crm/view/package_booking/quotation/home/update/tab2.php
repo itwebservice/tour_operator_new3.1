@@ -12,6 +12,18 @@
 
 </style>
 
+<?php
+// Debug information
+echo "<!-- Debug Info: quotation_id = " . (isset($quotation_id) ? $quotation_id : 'NOT SET') . " -->";
+echo "<!-- Debug Info: package_id = " . (isset($package_id) ? $package_id : 'NOT SET') . " -->";
+if (isset($quotation_id) && !empty($quotation_id)) {
+    $debug_query = "select * from package_quotation_program where quotation_id = '$quotation_id'";
+    $debug_result = mysqlQuery($debug_query);
+    $debug_count = mysqli_num_rows($debug_result);
+    echo "<!-- Debug Info: Query result count = " . $debug_count . " -->";
+}
+?>
+
 
 
 <form id="frm_tab2_u">
@@ -26,6 +38,19 @@
                     <input type="hidden" value="<?= $sq_pacakge['dest_id'] ?>" id='dest_name'>
                     <input type="hidden" value="<?= $package_id ?>" id='img_package_id'>
                     <input type='hidden' id='pckg_daywise_url' name='pckg_daywise_url' />
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_20">
+                    <select name="nights_filter" id="nights_filter" title="Filter by Nights" 
+                        onchange="filter_packages_by_nights()" style="width:100%">
+                        <option value="">All Nights</option>
+                        <?php
+                        // Generate options for 1 to 30 nights
+                        for($i = 1; $i <= 30; $i++) {
+                            $selected = ($sq_quotation['total_days'] == $i) ? 'selected' : '';
+                            echo "<option value='$i' $selected>$i Night" . ($i > 1 ? 's' : '') . "</option>";
+                        }
+                        ?>
+                    </select>
                 </div>
             </div>
             <div class="row">
@@ -44,9 +69,26 @@
                                             <h3 class="editor_title" style="width:100%;">Tour Itinerary</h3>
                                             <?php
                                             $offset = 0;
-                                            $sq_program = mysqlQuery("select * from package_quotation_program where quotation_id = '$quotation_id'");
-                                            while ($row_program = mysqli_fetch_assoc($sq_program)) {
-                                                $offset++;
+                                            // Debug: Check if quotation_id is available
+                                            if (isset($quotation_id) && !empty($quotation_id)) {
+                                                echo "<!-- Debug: Searching for quotation_id = '$quotation_id' -->";
+                                                
+                                                // First, let's check what quotation IDs exist in the table
+                                                $debug_all = mysqlQuery("SELECT DISTINCT quotation_id FROM package_quotation_program ORDER BY quotation_id DESC LIMIT 10");
+                                                echo "<!-- Debug: Recent quotation IDs in database: ";
+                                                while($debug_row = mysqli_fetch_assoc($debug_all)) {
+                                                    echo $debug_row['quotation_id'] . ", ";
+                                                }
+                                                echo " -->";
+                                                
+                                                // Try both string and integer comparison
+                                                $sq_program = mysqlQuery("select * from package_quotation_program where quotation_id = '$quotation_id' OR quotation_id = " . intval($quotation_id));
+                                                $program_count = mysqli_num_rows($sq_program);
+                                                echo "<!-- Debug: Found $program_count records for quotation_id '$quotation_id' -->";
+                                                
+                                                if ($program_count > 0) {
+                                                    while ($row_program = mysqli_fetch_assoc($sq_program)) {
+                                                        $offset++;
                                             ?>
                                                 <tr>
                                                     <td style="width: 50px;"><input class="css-checkbox mg_bt_10" id="chk_program<?= $offset ?>" type="checkbox" checked><label class="css-label" style="margin-top: 55px;" for="chk_program<?= $offset ?>"> </label></td>
@@ -58,7 +100,7 @@
                                                     <td  class='col-md-5 no-pad' style="max-width:800px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $offset; ?>-u" name="day_program" class="form-control mg_bt_10 day_program"  style=" height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                                                     </td>
                                                     <td class='col-md-1/2 no-pad' style='width:150px;'><input type="text" id="overnight_stay<?php echo $offset; ?>-u" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control mg_bt_10" placeholder="*Overnight Stay" title="Overnight Stay" value="<?php echo $row_program['stay']; ?>" style='width:200px;margin-top: 35px;'></td>
-                                                    <td class='col-md-1/2 no-pad' style='width:150px;'><select id="meal_plan<?php echo $offset; ?>" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style='width: 140px;margin-top: 35px;'>
+                                                    <td class='col-md-1/2 no-pad' style='width:150px;'><select id="meal_plan<?php echo $offset; ?>-u" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style='width: 140px;margin-top: 35px;'>
                                                             <?php if ($row_program['meal_plan'] != '') { ?>
                                                                 <option value="<?php echo $row_program['meal_plan']; ?>">
                                                                     <?php echo $row_program['meal_plan']; ?></option>
@@ -67,9 +109,114 @@
                                                         </select></td>
                                                     <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary<?php echo $offset; ?>" onclick="add_itinerary('dest_name','special_attaraction<?php echo $offset; ?>-u','day_program<?php echo $offset; ?>-u','overnight_stay<?php echo $offset; ?>-u','Day-<?= $offset ?>')"><i class="fa fa-plus"></i></button>
                                                     </td>
+                                                    <td class='col-md-1 pad_8' style="width: 120px;">
+                                                        <div style="margin-top: 35px;">
+                                                            <label for="day_image_<?php echo $offset; ?>" class="btn btn-sm btn-success" 
+                                                                   style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                                                                Upload Image
+                                                            </label>
+                                                            <input type="file" id="day_image_<?php echo $offset; ?>" 
+                                                                   name="day_image_<?php echo $offset; ?>" accept="image/*" 
+                                                                   onchange="previewDayImage(this, '<?php echo $offset; ?>')" 
+                                                                   style="display: none;">
+                                                        </div>
+                                                        <div id="day_image_preview_<?php echo $offset; ?>" style="display: none; margin-top: 5px;">
+                                                            <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                                                                <img id="preview_img_<?php echo $offset; ?>" src="" alt="Preview" 
+                                                                     style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                                                                <button type="button" 
+                                                                        onclick="removeDayImage('<?php echo $offset; ?>')" 
+                                                                        title="Remove Image" 
+                                                                        style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                                    ×
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <?php
+                                                        // Load existing image for this day
+                                                        $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_$offset%'";
+                                                        $existing_image_result = mysqlQuery($existing_image_query);
+                                                        if (mysqli_num_rows($existing_image_result) > 0) {
+                                                            $existing_image = mysqli_fetch_assoc($existing_image_result);
+                                                            $image_url = BASE_URL . $existing_image['image_url'];
+                                                        ?>
+                                                        <div id="saved_image_<?php echo $offset; ?>" style="margin-top: 5px;">
+                                                            <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #28a745; border-radius: 8px; background-color: #f8f9fa;">
+                                                                <img src="<?php echo $image_url; ?>" alt="Saved Image" 
+                                                                     style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                                                                <button type="button" 
+                                                                        onclick="removeSavedImage('<?php echo $offset; ?>', '<?php echo $existing_image['image_url']; ?>')" 
+                                                                        title="Remove Image" 
+                                                                        style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                                    ×
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <script>
+                                                        // Hide upload button when saved image exists
+                                                        $(document).ready(function() {
+                                                            $('#saved_image_<?php echo $offset; ?>').show();
+                                                            $('label[for="day_image_<?php echo $offset; ?>"]').hide();
+                                                        });
+                                                        </script>
+                                                        <?php } ?>
+                                                    </td>
                                                     <td class="hidden"><input type="hidden" name="package_id_n" value="<?php echo $row_program['id']; ?>"></td>
                                                 </tr>
-                                            <?php } ?>
+                                            <?php 
+                                                    }
+                                                } else {
+                                                    // Show empty form for adding itinerary when no data exists
+                                                    echo '<tr>';
+                                                    echo '<td style="width: 50px;"><input class="css-checkbox mg_bt_10" id="chk_program1" type="checkbox" checked><label class="css-label" style="margin-top: 55px;" for="chk_program1"> </label></td>';
+                                                    echo '<td style="width: 50px;" class="hidden"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled /></td>';
+                                                    echo '<td style="width: 100px;"><input type="text" id="special_attaraction1-u" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction" style="width:220px;margin-top: 35px;"></td>';
+                                                    echo '<td class="col-md-5 no-pad" style="max-width:800px;overflow: hidden;position: relative;"><textarea id="day_program1-u" name="day_program" class="form-control mg_bt_10 day_program" style="height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3"></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>';
+                                                    echo '<td class="col-md-1/2 no-pad" style="width:150px;"><input type="text" id="overnight_stay1-u" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control mg_bt_10" placeholder="*Overnight Stay" title="Overnight Stay" style="width:200px;margin-top: 35px;"></td>';
+                                                    echo '<td class="col-md-1/2 no-pad" style="width:150px;"><select id="meal_plan1-u" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style="width: 140px;margin-top: 35px;">';
+                                                    echo '<option value="">Select Meal Plan</option>';
+                                                    echo get_mealplan_dropdown();
+                                                    echo '</select></td>';
+                                                    echo '<td class="col-md-1 pad_8"><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary1" onclick="add_itinerary(\'dest_name\',\'special_attaraction1-u\',\'day_program1-u\',\'overnight_stay1-u\',\'Day-1\')"><i class="fa fa-plus"></i></button></td>';
+                                                    echo '<td class="col-md-1 pad_8" style="width: 120px;">';
+                                                    echo '<div style="margin-top: 35px;">';
+                                                    echo '<label for="day_image_1" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">Upload Image</label>';
+                                                    echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
+                                                    echo '</div>';
+                                                    echo '<div id="day_image_preview_1" style="display: none; margin-top: 5px;">';
+                                                    echo '<div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
+                                                    echo '<img id="preview_img_1" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
+                                                    echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
+                                                    echo '</div>';
+                                                    echo '</div>';
+                                                    
+                                                    // Load existing image for day 1
+                                                    $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_1%'";
+                                                    $existing_image_result = mysqlQuery($existing_image_query);
+                                                    if (mysqli_num_rows($existing_image_result) > 0) {
+                                                        $existing_image = mysqli_fetch_assoc($existing_image_result);
+                                                        $image_url = BASE_URL . $existing_image['image_url'];
+                                                        echo '<div id="saved_image_1" style="margin-top: 5px;">';
+                                                        echo '<div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #28a745; border-radius: 8px; background-color: #f8f9fa;">';
+                                                        echo '<img src="' . $image_url . '" alt="Saved Image" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
+                                                        echo '<button type="button" onclick="removeSavedImage(\'1\', \'' . $existing_image['image_url'] . '\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
+                                                        echo '</div>';
+                                                        echo '</div>';
+                                                        echo '<script>';
+                                                        echo '$(document).ready(function() {';
+                                                        echo '$("#saved_image_1").show();';
+                                                        echo '$("label[for=\\"day_image_1\\"]").hide();';
+                                                        echo '});';
+                                                        echo '</script>';
+                                                    }
+                                                    echo '</td>';
+                                                    echo '<td class="hidden"><input type="hidden" name="package_id_n" value=""></td>';
+                                                    echo '</tr>';
+                                                }
+                                            } else {
+                                                echo '<tr><td colspan="8" class="text-center">Quotation ID not found.</td></tr>';
+                                            }
+                                            ?>
                                         </table>
                                     </div>
                                     <div class="row mg_tp_20">
@@ -97,6 +244,77 @@
             </div>
 </form>
 <script>
+
+// Day image preview functions for update
+function previewDayImage(input, offset) {
+    if (input.files && input.files[0]) {
+        var file = input.files[0];
+        
+        // Validate file type
+        var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        var fileType = file.type.toLowerCase();
+        
+        if (!allowedTypes.includes(fileType)) {
+            alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file size (max 5MB)
+        var maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            alert('File size too large. Maximum size is 5MB.');
+            input.value = '';
+            return;
+        }
+        
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#preview_img_' + offset).attr('src', e.target.result);
+            $('#day_image_preview_' + offset).show();
+            
+            // Hide the upload button when image is uploaded
+            $('label[for="day_image_' + offset + '"]').hide();
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeDayImage(offset) {
+    $('#day_image_' + offset).val('');
+    $('#day_image_preview_' + offset).hide();
+    $('#preview_img_' + offset).attr('src', '');
+    
+    // Show the upload button again when image is removed
+    $('label[for="day_image_' + offset + '"]').show();
+}
+
+function removeSavedImage(offset, imageUrl) {
+    if (confirm('Are you sure you want to remove this image?')) {
+        // AJAX call to delete image from server and database
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo BASE_URL; ?>controller/package_tour/quotation/delete_itinerary_image.php',
+            data: {
+                quotation_id: '<?php echo $quotation_id; ?>',
+                package_id: '<?php echo $package_id; ?>',
+                day_number: offset,
+                image_url: imageUrl
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#saved_image_' + offset).remove();
+                    $('label[for="day_image_' + offset + '"]').show();
+                } else {
+                    alert('Error removing image: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Error removing image. Please try again.');
+            }
+        });
+    }
+}
 
 $(document).on("click", ".style_text_b, .style_text_u", function() {
     var wrapper = $(this).data("wrapper");
@@ -142,6 +360,7 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
         }, 200);
     }
 
+
     $('#frm_tab2_u').validate({
         rules: {},
 
@@ -165,7 +384,7 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
                 var program = row.cells[3].childNodes[0].value;
                 var stay = row.cells[4].childNodes[0].value;
                 var meal_plan = row.cells[5].childNodes[0].value;
-                var package_id1 = row.cells[7].childNodes[0].value;
+                var package_id1 = row.cells[8].childNodes[0].value;
                 if (checked_programe) {
                     count++;
                     if (program == "") {
@@ -248,7 +467,73 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             $('html, body').animate({
                 scrollTop: $('.bk_tab_head').offset().top
             }, 200);
+    }
+});
+
+// Initialize nights filter when tab2 loads for update
+$(document).ready(function() {
+    var selected_nights = sessionStorage.getItem('selected_nights');
+    if (selected_nights) {
+        $('#nights_filter').val(selected_nights);
+    }
+});
+
+// Function to load packages with both destination and nights filter for update
+function load_packages_with_filter() {
+    var dest_id = $('#dest_name').val();
+    var total_nights = $('#nights_filter').val() || sessionStorage.getItem('selected_nights');
+    
+    if (dest_id) {
+        // Update sessionStorage with current nights selection
+        if (total_nights) {
+            sessionStorage.setItem('selected_nights', total_nights);
+        }
+        
+        // Call the package loading function with nights parameter
+        package_dynamic_reflect_with_nights('dest_name', total_nights);
+    }
+}
+
+// Function to filter packages by nights in tab2 for update
+function filter_packages_by_nights() {
+    var total_nights = $('#nights_filter').val();
+    
+    if (total_nights) {
+        sessionStorage.setItem('selected_nights', total_nights);
+    } else {
+        sessionStorage.removeItem('selected_nights');
+    }
+    
+    // Reload packages with the new filter
+    load_packages_with_filter();
+}
+
+// Function to load packages with explicit nights parameter for update
+function package_dynamic_reflect_with_nights(dest_name, total_nights) {
+    var dest_id = $('#' + dest_name).val();
+    var base_url = $('#base_url').val();
+    
+    // Ensure total_nights is not null or undefined
+    if (!total_nights) {
+        total_nights = '';
+    }
+
+    var ajax_data = { 
+        dest_id: dest_id,
+        total_nights: total_nights
+    };
+
+    $.ajax({
+        type: 'post',
+        url: base_url + 'view/package_booking/quotation/inc/get_packages.php',
+        data: ajax_data,
+        success: function (result) {
+            $('#package_name_div').html(result);
+        },
+        error: function (result) {
+            console.log('Package loading error:', result.responseText);
         }
     });
+}
 </script>
 <?= end_panel(); ?>

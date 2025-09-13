@@ -28,7 +28,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
 </style>
 <div class="bk_tabs">
     <div id="tab_1" class="bk_tab active">
-        <form id="frm_package_master_update">
+        <form id="frm_package_master_update" method="post">
             <div class="app_panel">
                 <!--=======Header panel======-->
 
@@ -208,7 +208,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                         <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                             <legend>Tour Itinerary</legend>
                             <div class="col-xs-12 no-pad text-right mg_bt_10">
-                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('dynamic_table_list_update','2')"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addItineraryRowUpdate()"><i class="fa fa-plus"></i></button>
                             </div>
                             <div id="div_list1">
                                 <table style="width: 100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
@@ -237,6 +237,25 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                 </select>
                                             </td>
                                             <td class='col-md-1 pad_8'><button type="button" id="itinerary<?php echo $count; ?>" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="border: none !important;margin-top:35px;" onClick="add_itinerary('dest_name_u','special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?php echo $count; ?>-u','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button>
+                                            </td>
+                                            <td class='col-md-1 pad_8' style="width: 120px;">
+                                                <div style="margin-top: 35px;">
+                                                    <label for="day_image_<?php echo $count; ?>" class="btn btn-sm btn-success" 
+                                                           style="margin-bottom: 5px; padding: 4px 8px; font-size: 11px; cursor: pointer;">
+                                                        <i class="fa fa-image"></i> Image
+                                                    </label>
+                                                    <input type="file" id="day_image_<?php echo $count; ?>" 
+                                                           name="day_image_<?php echo $count; ?>" accept="image/*" 
+                                                           onchange="previewDayImageUpdate(this, '<?php echo $count; ?>')" 
+                                                           style="display: none;">
+                                                </div>
+                                                <div id="day_image_preview_<?php echo $count; ?>" style="display: none; margin-top: 5px;">
+                                                    <img id="preview_img_<?php echo $count; ?>" src="" alt="Preview" 
+                                                         style="max-width: 80px; max-height: 60px; border: 1px solid #ddd; border-radius: 4px; display: block;">
+                                                    <button type="button" class="btn btn-xs btn-danger" 
+                                                            onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
+                                                            style="margin-top: 2px; padding: 1px 4px; font-size: 10px;">×</button>
+                                                </div>
                                             </td>
                                             <td class="hidden"><input type="text" value="<?php echo $sq_pckg1['entry_id']; ?>"></td>
                                         </tr>
@@ -449,6 +468,93 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script>
+// Day image preview functions for update modal
+function previewDayImageUpdate(input, offset) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#preview_img_' + offset).attr('src', e.target.result);
+            $('#day_image_preview_' + offset).show();
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeDayImageUpdate(offset) {
+    $('#day_image_' + offset).val('');
+    $('#day_image_preview_' + offset).hide();
+    $('#preview_img_' + offset).attr('src', '');
+}
+
+// Add new itinerary row function for update modal
+function addItineraryRowUpdate() {
+    var table = document.getElementById('dynamic_table_list_update');
+    if (!table) {
+        console.error('Table not found: dynamic_table_list_update');
+        return;
+    }
+    
+    var rowCount = table.rows.length;
+    var newRow = table.insertRow(rowCount);
+    
+    // Get the next count number
+    var count = rowCount + 1;
+    
+    // Create the new row HTML
+    newRow.innerHTML = `
+        <td width="27px;">
+            <input class="css-checkbox mg_bt_10 labelauty" id="chk_program${count}" type="checkbox" checked autocomplete="off" data-original-title="" title="" aria-hidden="true" style="display: none;">
+            <label for="chk_program${count}" style="margin-top:55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label>
+            <label class="css-label" for="chk_program${count}"></label>
+        </td>
+        <td class='hidden col-md-1 pad_8'>
+            <input maxlength="15" value="${count}" type="text" name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled="" autocomplete="off" data-original-title="" title="" style='width:10px;margin-top:35px;'>
+        </td>
+        <td style='width:140px'>
+            <input type="text" id="special_attaraction${count}-u" name="special_attaraction" class="form-control mg_bt_10" placeholder="*Special Attraction" title="Special Attraction" onchange="validate_spaces(this.id);validate_spattration(this.id);" style='width:150px;margin-top:35px;'>
+        </td>
+        <td class='col-md-7 pad_8' style="max-width: 594px;overflow: hidden;position: relative;">
+            <textarea id="day_program${count}-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style='width:100%;height:900px;'></textarea>
+            <span class="style_text">
+                <span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span>
+                <span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span>
+            </span>
+        </td>
+        <td class='col-md-1/2 pad_8' style='width:100px'>
+            <input type="text" id="overnight_stay${count}-u" name="overnight_stay" class="form-control mg_bt_10" onchange="validate_spaces(this.id);validate_onstay(this.id);" placeholder="*Overnight Stay" title="Overnight Stay" style='width:150px;margin-top:35px;'>
+        </td>
+        <td class='col-md-1/2 pad_8'>
+            <select id="meal_plan${count}" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style='width:125px;margin-top:35px;'>
+                <option value="">Meal Plan</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="All Meals">All Meals</option>
+            </select>
+        </td>
+        <td class='col-md-1 pad_8'>
+            <button type="button" id="itinerary${count}" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="border: none !important;margin-top:35px;" onClick="add_itinerary('dest_name_u','special_attaraction${count}-u','day_program${count}-u','overnight_stay${count}-u','Day-${count}')">
+                <i class="fa fa-plus"></i>
+            </button>
+        </td>
+        <td class='col-md-1 pad_8' style="width: 120px;">
+            <div style="margin-top: 35px;">
+                <label for="day_image_${count}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 4px 8px; font-size: 11px; cursor: pointer;">
+                    <i class="fa fa-image"></i> Image
+                </label>
+                <input type="file" id="day_image_${count}" name="day_image_${count}" accept="image/*" onchange="previewDayImageUpdate(this, '${count}')" style="display: none;">
+            </div>
+            <div id="day_image_preview_${count}" style="display: none; margin-top: 5px;">
+                <img id="preview_img_${count}" src="" alt="Preview" style="max-width: 80px; max-height: 60px; border: 1px solid #ddd; border-radius: 4px; display: block;">
+                <button type="button" class="btn btn-xs btn-danger" onclick="removeDayImageUpdate('${count}')" style="margin-top: 2px; padding: 1px 4px; font-size: 10px;">×</button>
+            </div>
+        </td>
+        <td class="hidden">
+            <input type="text" value="">
+        </td>
+    `;
+}
+
 $(document).on("click", ".style_text_b, .style_text_u", function() {
     var wrapper = $(this).data("wrapper");
     
@@ -572,6 +678,11 @@ $('#seo_slug').val(generateSlug(packageName));
     }
 
     $(function() {
+        // Prevent form submission
+        $('#frm_package_master_update').on('submit', function(e) {
+            e.preventDefault();
+            return false;
+        });
 
         $('#frm_package_master_update').validate({
 
@@ -592,17 +703,22 @@ $('#seo_slug').val(generateSlug(packageName));
                 },
             },
 
-            submitHandler: function(form) {
-
+            submitHandler: function(form, event) {
+                // Prevent default form submission
+                if (event) {
+                    event.preventDefault();
+                }
+                
                 var base_url = $('#base_url').val();
                 var currency_id = $('#currency_code1').val();
-                var taxation_type = $('#taxation_type1').val();
-                var taxation_id = $('#taxation_id1').val();
-                var service_tax = $('#service_tax1').val();
-                if (service_tax == '') {
-                    error_msg_alert('Select Tax(%)!');
-                    return false;
-                }
+                var taxation_type = $('#taxation_type1').val() || '';
+                var taxation_id = $('#taxation_id1').val() || '';
+                var service_tax = $('#service_tax1').val() || '';
+                // Remove the service_tax validation since it might not be required
+                // if (service_tax == '') {
+                //     error_msg_alert('Select Tax(%)!');
+                //     return false;
+                // }
                 var package_id = $("#package_id1").val();
                 var package_code = $("#package_code1").val();
                 var package_name = $("#package_name1").val();
@@ -621,7 +737,7 @@ $('#seo_slug').val(generateSlug(packageName));
                 var child_without = $("#child_without1").val();
                 var extra_bed = $("#extra_bed1").val();
                 var status = $("#status1").val();
-                var transport_id = $("#transport_name2").val();
+                var transport_id = $("#transport_name2").val() || '';
                 var note = $('#note1').val();
                 var dest_image = $('#dest_image1').val();
 
@@ -639,19 +755,34 @@ $('#seo_slug').val(generateSlug(packageName));
 
                 var table = document.getElementById("dynamic_table_list_update");
                 var rowCount = table.rows.length;
+                console.log("Total rows in itinerary table:", rowCount);
                 for (var i = 0; i < rowCount; i++) {
 
                     var row = table.rows[i];
-                    var checked_programe = row.cells[0].childNodes[0].checked;
-                    var special_attaraction = row.cells[2].childNodes[0].value;
-                    var day_program = row.cells[3].childNodes[0].value;
-                    var overnight_stay = row.cells[4].childNodes[0].value;
-                    var meal_plan = row.cells[5].childNodes[0].value;
-                    if (row.cells[7]) {
-                        var entry_id = row.cells[7].childNodes[0].value;
-                    } else {
-                        var entry_id = '';
+                    var rowNum = i + 1; // Row numbers start from 1 in the IDs
+                    
+                    // Get elements by their IDs instead of relying on cell positions
+                    var checkboxElement = document.getElementById("chk_program" + rowNum);
+                    var attractionElement = document.getElementById("special_attaraction" + rowNum + "-u");
+                    var programElement = document.getElementById("day_program" + rowNum + "-u"); 
+                    var stayElement = document.getElementById("overnight_stay" + rowNum + "-u");
+                    var mealPlanElement = document.getElementById("meal_plan" + rowNum);
+                    // Get entry_id from the hidden cell (cell 8)
+                    var entryIdElement = null;
+                    if (row.cells[8]) {
+                        var entryIdInput = row.cells[8].querySelector('input[type="text"]');
+                        entryIdElement = entryIdInput;
                     }
+                    
+                    var checked_programe = checkboxElement ? checkboxElement.checked : false;
+                    var special_attaraction = attractionElement ? attractionElement.value : '';
+                    var day_program = programElement ? programElement.value : '';
+                    var overnight_stay = stayElement ? stayElement.value : '';
+                    var meal_plan = mealPlanElement ? mealPlanElement.value : '';
+                    var entry_id = entryIdElement ? entryIdElement.value : '';
+                    
+                    console.log("Row " + i + " - Checked:", checked_programe, "Attraction:", special_attaraction, "Program:", (day_program || '').substring(0, 50) + "...", "Entry ID:", entry_id);
+                    console.log("Row " + i + " - Entry ID element found:", !!entryIdElement, "Entry ID raw value:", entryIdElement ? '"' + entryIdElement.value + '"' : 'null');
                     if (checked_programe === true) {
 
                         if (special_attaraction == "") {
@@ -666,9 +797,9 @@ $('#seo_slug').val(generateSlug(packageName));
                             error_msg_alert('Overnight stay is mandatory in row' + (i + 1));
                             return false;
                         }
-                        var flag1 = validate_spattration(row.cells[2].childNodes[0].id);
-                        var flag2 = validate_dayprogram(row.cells[3].childNodes[0].id);
-                        var flag3 = validate_onstay(row.cells[4].childNodes[0].id);
+                        var flag1 = validate_spattration("special_attaraction" + rowNum + "-u");
+                        var flag2 = validate_dayprogram("day_program" + rowNum + "-u");
+                        var flag3 = validate_onstay("overnight_stay" + rowNum + "-u");
                         if (!flag1 || !flag2 || !flag3) {
                             return false;
                         }
@@ -681,6 +812,12 @@ $('#seo_slug').val(generateSlug(packageName));
                     meal_plan_arr.push(meal_plan);
                     entry_id_arr.push(entry_id);
                 }
+                
+                console.log("Arrays being sent:");
+                console.log("checked_programe_arr:", checked_programe_arr);
+                console.log("special_attaraction_arr:", special_attaraction_arr);
+                console.log("day_program_arr:", day_program_arr);
+                console.log("entry_id_arr:", entry_id_arr);
 
                 //Hotel information
                 var hotel_check_arr = new Array();
@@ -852,6 +989,7 @@ $('#seo_slug').val(generateSlug(packageName));
                             $('#btn_update').button('reset');
                         }
                     });
+                return false; // Prevent default form submission
             }
         });
     });

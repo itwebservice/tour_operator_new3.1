@@ -139,7 +139,7 @@ $debug_count = 0;
 ?>
 <input type="hidden" id="whatsapp_switch" value="<?= $whatsapp_switch ?>">
 <div class="modal fade" id="quotation_send_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
-	<div class="modal-dialog modal-lg" role="document">
+	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -297,9 +297,9 @@ $debug_count = 0;
     $title = $hotel_status['title'];
     ?>
     
-    <!-- Combined Download Button -->
+    <!-- Combined Download Button with Email -->
     <div class="btn-group download-btn-group">
-        <button type="button" class="btn btn-info btn-sm dropdown-toggle download-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download Quotation">
+        <button type="button" class="btn btn-info btn-sm dropdown-toggle download-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download & Email Quotation">
             <i class="fa fa-download"></i>
         </button>
         <div class="dropdown-menu download-dropdown">
@@ -317,74 +317,87 @@ $debug_count = 0;
                     <small>Microsoft Word Document</small>
                 </span>
             </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item download-option" href="javascript:void(0)" 
+               onclick="openEmailWhatsappModal({
+                   quotation_id: <?php echo $row_tours['quotation_id']; ?>,
+                   email_id: '<?php echo $row_tours['email_id']; ?>',
+                   mobile_no: '<?php echo $row_tours['mobile_no']; ?>',
+                   package_name: '<?php echo addslashes($sq_tours_package['package_name']); ?>',
+                   customer_name: '<?php echo addslashes($row_tours['customer_name']); ?>'
+               })" 
+               title="<?php echo $whatsapp_tooltip_change; ?>">
+                <i class="fa fa-envelope-o email-icon"></i>
+                <span class="option-text">
+                    <strong>Email to Customer</strong>
+                    <small>Send via Email & WhatsApp</small>
+                </span>
+            </a>
         </div>
     </div>
 
-    <!-- WhatsApp Quotation -->
-    <!-- <button class="btn btn-info btn-sm" onclick="quotation_whatsapp(<?php echo $row_tours['quotation_id']; ?>)" title="What'sApp Quotation to customer" data-toggle="tooltip">
-        <i class="fa fa-whatsapp"></i>
-    </button> -->
-
-    <!-- Email to Customer -->
-        <a data-toggle="tooltip" href="javascript:void(0)" 
-       id="btn_email_<?php echo $count; ?>" 
-       class="btn btn-info btn-sm" 
-       onclick="openEmailWhatsappModal({
-           quotation_id: <?php echo $row_tours['quotation_id']; ?>,
-           email_id: '<?php echo $row_tours['email_id']; ?>',
-           mobile_no: '<?php echo $row_tours['mobile_no']; ?>',
-           package_name: '<?php echo addslashes($sq_tours_package['package_name']); ?>',
-           customer_name: '<?php echo addslashes($row_tours['customer_name']); ?>'
-       })" 
-       title="<?php echo $whatsapp_tooltip_change; ?>">
-        <i class="fa fa-envelope-o"></i>
-    </a>
-
-    <!-- Email to Backoffice -->
-    <a href="javascript:void(0)" id="btn_email1_<?php echo $count; ?>" title="Email Quotation to Backoffice" class="btn btn-info btn-sm"
-       onclick="quotation_email_send_backoffice_modal(<?php echo $row_tours['quotation_id']; ?>);btnDisableEnable(this.id)" 
-       id="email_backoffice_btn-<?php echo $row_tours['quotation_id']; ?>">
-        <i class="fa fa-paper-plane-o"></i>
-    </a>
-
-    <!-- Hotel Request -->
-    <button data-toggle="tooltip" style="display:inline-block" class="btn <?php echo $req_btn_class; ?> btn-sm" 
-            onclick="view_request(<?php echo $row_tours['quotation_id']; ?>)" 
-            id="view_req<?php echo $row_tours['quotation_id']; ?>" 
-            title="<?php echo $title; ?>">
-        <i class="fa fa-paper-plane-o"></i>
-    </button>
-
-    <!-- Copy Quotation -->
-    <button data-toggle="tooltip" style="display:inline-block" class="btn btn-warning btn-sm" 
+    <!-- Actions Button -->
+    <div class="btn-group actions-btn-group">
+        <button type="button" class="btn btn-success btn-sm dropdown-toggle actions-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Actions">
+            <span class="btn-text">Actions</span>
+        </button>
+        <div class="dropdown-menu actions-dropdown">
+            <a class="dropdown-item action-option" href="javascript:void(0)" 
             onclick="quotation_clone(<?php echo $row_tours['quotation_id']; ?>)" 
             title="Create Copy of this Quotation">
-        <i class="fa fa-files-o"></i>
-    </button>
+                <i class="fa fa-files-o copy-icon"></i>
+                <span class="option-text">
+                    <strong>Copy</strong>
+                    <small>Create a copy of this quotation</small>
+                </span>
+            </a>
+            <a class="dropdown-item action-option" href="javascript:void(0)" 
+               onclick="editQuotationWithCopy(<?php echo $row_tours['quotation_id']; ?>)" 
+               title="Edit Quotation (Creates Copy)">
+                <i class="fa fa-pencil-square-o edit-icon"></i>
+                <span class="option-text">
+                    <strong>Edit</strong>
+                    <small>Edit this quotation</small>
+                </span>
+            </a>
+            <a class="dropdown-item action-option" href="quotation_view.php?quotation_id=<?php echo $row_tours['quotation_id']; ?>" 
+               target="_BLANK" title="View Details">
+                <i class="fa fa-eye view-icon"></i>
+                <span class="option-text">
+                    <strong>View</strong>
+                    <small>View quotation details</small>
+                </span>
+            </a>
+            <a class="dropdown-item action-option" href="javascript:void(0)" 
+               onclick="view_request(<?php echo $row_tours['quotation_id']; ?>)" 
+               title="<?php echo $title; ?>">
+                <i class="fa fa-bed hotel-icon"></i>
+                <span class="option-text">
+                    <strong>Hotel Availability</strong>
+                    <small>Check hotel availability</small>
+                </span>
+            </a>
+            <a class="dropdown-item action-option" href="javascript:void(0)" 
+               onclick="quotation_email_send_backoffice_modal(<?php echo $row_tours['quotation_id']; ?>);btnDisableEnable('email_backoffice_btn-<?php echo $row_tours['quotation_id']; ?>')" 
+               title="Email Quotation to Backoffice">
+                <i class="fa fa-paper-plane-o backoffice-icon"></i>
+                <span class="option-text">
+                    <strong>Email to Backoffice</strong>
+                    <small>Send to internal team</small>
+                </span>
+            </a>
+            <a class="dropdown-item action-option" href="javascript:void(0)" 
+               onclick="convertQuotation(<?php echo $row_tours['quotation_id']; ?>)" 
+               title="Convert Quotation">
+                <i class="fa fa-exchange convert-icon"></i>
+                <span class="option-text">
+                    <strong>Convert</strong>
+                    <small>Convert quotation to booking</small>
+                </span>
+            </a>
+        </div>
+    </div>
 
-    <!-- View Details -->
-    <a data-toggle="tooltip" style="display:inline-block" href="quotation_view.php?quotation_id=<?php echo $row_tours['quotation_id']; ?>" target="_BLANK" class="btn btn-info btn-sm" title="View Details">
-        <i class="fa fa-eye"></i>
-    </a>
-
-	<?php
-$to_date = $row_tours['to_date'];
-$today = date('Y-m-d');
-
-// Edit button that creates a copy and opens edit screen
-$update_btn = '
-    <button data-toggle="tooltip" style="display:inline-block" class="btn btn-info btn-sm" onclick="editQuotationWithCopy(' . $row_tours['quotation_id'] . ')" title="Edit Quotation (Creates Copy)">
-        <i class="fa fa-pencil-square-o"></i>
-    </button>';
-
-// Hide if conditions not satisfied
-if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $role != 'Branch Admin') {
-    $update_btn = '';
-}	
-?>
-
-    <!-- Conditionally added Update button -->
-    <?php echo $update_btn; ?>
 </td>
 
 									</tr>
@@ -447,32 +460,40 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
                     <div class="tab-pane fade show active" id="email-content" role="tabpanel" aria-labelledby="email-tab">
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <!-- Checkbox Options -->
-                                <div class="form-group">
-                                    <label class="font-weight-bold mb-3" >Select Content Options:</label>
-                                    <div class="row email-options-row">
-                                        <div class="col-md-3">
-                                            <div class="form-check email-option-check">
-                                                <input class="form-check-input email-option" type="checkbox" id="emailPriceStructure" name="emailOptions[]" value="price_structure" checked>
-                                                <label class="form-check-label" for="emailPriceStructure">Price Structure</label>
+                                <!-- Content Options Card -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Select Content Options</h6>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-check email-option-check">
-                                                <input class="form-check-input email-option" type="checkbox" id="emailInclusionExclusion" name="emailOptions[]" value="inclusion_exclusion" checked>
-                                                <label class="form-check-label" for="emailInclusionExclusion">Inclusion/Exclusion</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-check email-option-check">
-                                                <input class="form-check-input email-option" type="checkbox" id="emailTermsConditions" name="emailOptions[]" value="terms_conditions" checked>
-                                                <label class="form-check-label" for="emailTermsConditions">Terms & Conditions</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-check email-option-check">
-                                                <input class="form-check-input email-option" type="checkbox" id="emailItinerary" name="emailOptions[]" value="itinerary" checked>
-                                                <label class="form-check-label" for="emailItinerary">Itinerary</label>
+                                            <div class="card-body">
+                                                <div class="row email-options-row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-check email-option-check">
+                                                            <input class="form-check-input email-option" type="checkbox" id="emailPriceStructure" name="emailOptions[]" value="price_structure" checked>
+                                                            <label class="form-check-label" for="emailPriceStructure">Price Structure</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check email-option-check">
+                                                            <input class="form-check-input email-option" type="checkbox" id="emailInclusionExclusion" name="emailOptions[]" value="inclusion_exclusion" checked>
+                                                            <label class="form-check-label" for="emailInclusionExclusion">Inclusion/Exclusion</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check email-option-check">
+                                                            <input class="form-check-input email-option" type="checkbox" id="emailTermsConditions" name="emailOptions[]" value="terms_conditions" checked>
+                                                            <label class="form-check-label" for="emailTermsConditions">Terms & Conditions</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check email-option-check">
+                                                            <input class="form-check-input email-option" type="checkbox" id="emailItinerary" name="emailOptions[]" value="itinerary" checked>
+                                                            <label class="form-check-label" for="emailItinerary">Itinerary</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -525,32 +546,40 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
                     <div class="tab-pane fade" id="whatsapp-content" role="tabpanel" aria-labelledby="whatsapp-tab">
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <!-- Checkbox Options for WhatsApp -->
-                                <div class="form-group">
-                                    <label class="font-weight-bold">Select Content Options:</label>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappPriceStructure" name="whatsappOptions[]" value="price_structure" checked>
-                                                <label class="form-check-label" for="whatsappPriceStructure">Price Structure</label>
+                                <!-- Content Options Card for WhatsApp -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">Select Content Options</h6>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappInclusionExclusion" name="whatsappOptions[]" value="inclusion_exclusion" checked>
-                                                <label class="form-check-label" for="whatsappInclusionExclusion">Inclusion/Exclusion</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappTermsConditions" name="whatsappOptions[]" value="terms_conditions" checked>
-                                                <label class="form-check-label" for="whatsappTermsConditions">Terms & Conditions</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappItinerary" name="whatsappOptions[]" value="itinerary" checked>
-                                                <label class="form-check-label" for="whatsappItinerary">Itinerary</label>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappPriceStructure" name="whatsappOptions[]" value="price_structure" checked>
+                                                            <label class="form-check-label" for="whatsappPriceStructure">Price Structure</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappInclusionExclusion" name="whatsappOptions[]" value="inclusion_exclusion" checked>
+                                                            <label class="form-check-label" for="whatsappInclusionExclusion">Inclusion/Exclusion</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappTermsConditions" name="whatsappOptions[]" value="terms_conditions" checked>
+                                                            <label class="form-check-label" for="whatsappTermsConditions">Terms & Conditions</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappItinerary" name="whatsappOptions[]" value="itinerary" checked>
+                                                            <label class="form-check-label" for="whatsappItinerary">Itinerary</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1177,6 +1206,51 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
 		// This is a fallback method
 		return null;
 	}
+
+	// Function to convert quotation to booking
+	function convertQuotation(quotation_id) {
+		var base_url = $('#base_url').val();
+		
+		// Show confirmation dialog
+		$('#vi_confirm_box').vi_confirm_box({
+			callback: function(data1) {
+				if (data1 == "yes") {
+					// Show loading state
+					msg_alert('Converting quotation to booking...');
+					
+					$.ajax({
+						type: 'post',
+						url: base_url + 'controller/package_tour/quotation/quotation_convert_to_booking.php',
+						data: {
+							quotation_id: quotation_id
+						},
+						success: function(result) {
+							try {
+								var response = JSON.parse(result);
+								if (response.status === 'success') {
+									msg_alert(response.message);
+									// Refresh the quotation list
+									quotation_list_reflect();
+									// Close the modal
+									$('#quotation_send_modal').modal('hide');
+								} else {
+									error_msg_alert(response.message);
+								}
+							} catch (e) {
+								// Fallback for non-JSON response
+								msg_alert(result);
+								quotation_list_reflect();
+								$('#quotation_send_modal').modal('hide');
+							}
+						},
+						error: function() {
+							error_msg_alert('Error converting quotation. Please try again.');
+						}
+					});
+				}
+			}
+		});
+	}
 </script>
 <script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/quotation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
@@ -1185,10 +1259,11 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     /* Action buttons styling in modal */
     #tbl_tour_list td:last-child {
         white-space: nowrap;
+        position: relative;
     }
     
     #tbl_tour_list .btn {
-        margin: 1px;
+        margin: 1px 2px 1px 0;
         padding: 4px 8px;
         font-size: 12px;
     }
@@ -1200,8 +1275,40 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     
     /* Modal table responsive */
     .table-responsive {
-        max-height: 400px;
+        max-height: 600px;
         overflow-y: auto;
+        overflow-x: visible;
+    }
+    
+    /* Ensure dropdowns don't cause horizontal scroll */
+    .table-responsive {
+        position: relative;
+        overflow-x: visible;
+    }
+    
+    /* Modal height adjustments */
+    #quotation_send_modal .modal-dialog {
+        max-height: 90vh;
+        height: auto;
+        margin: 20px auto;
+    }
+    
+    #quotation_send_modal .modal-content {
+        height: auto;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #quotation_send_modal .modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+    }
+    
+    /* Fix dropdown positioning for last column */
+    #tbl_tour_list td:last-child .btn-group {
+        position: static;
     }
     
     /* Action buttons container */
@@ -1209,6 +1316,16 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
         display: flex;
         flex-wrap: wrap;
         gap: 2px;
+        justify-content: flex-start;
+    }
+    
+    /* Move buttons to the left */
+    #tbl_tour_list td:last-child .btn-group:first-child {
+        margin-left: 0;
+    }
+    
+    #tbl_tour_list td:last-child .btn-group:last-child {
+        margin-right: 0;
     }
     
     /* Tooltip styling */
@@ -1252,6 +1369,20 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
         max-height: 400px;
         overflow-y: auto;
         padding: 15px;
+    }
+    
+    /* Card border to match email preview */
+    .card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 12px 16px;
     }
     
     #emailPreviewArea, #whatsappPreviewArea {
@@ -1362,6 +1493,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
         display: flex;
         align-items: center;
         gap: 6px;
+        white-space: nowrap;
     }
     
     .download-btn:hover {
@@ -1388,6 +1520,10 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
         margin-top: 4px;
         background: white;
         overflow: hidden;
+        position: absolute;
+        right: 0;
+        left: auto;
+        z-index: 1050;
     }
     
     .download-option {
@@ -1447,6 +1583,137 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
         border-right: 4px solid transparent;
         border-left: 4px solid transparent;
         vertical-align: middle;
+    }
+
+    /* Actions Button Styling */
+    .actions-btn-group {
+        position: relative;
+    }
+    
+    .actions-btn {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(40,167,69,0.3);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+    
+    .actions-btn .btn-text {
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .actions-btn:hover {
+        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(40,167,69,0.4);
+    }
+    
+    .actions-btn:focus {
+        box-shadow: 0 0 0 3px rgba(40,167,69,0.25);
+    }
+    
+    .actions-dropdown {
+        min-width: 220px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 0;
+        margin-top: 4px;
+        background: white;
+        overflow: hidden;
+        position: absolute;
+        right: 0;
+        left: auto;
+        z-index: 1050;
+    }
+    
+    .action-option {
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+        border: none;
+        text-decoration: none;
+        color: #495057;
+    }
+    
+    .action-option:hover {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        color: #28a745;
+        transform: translateX(4px);
+    }
+    
+    .action-option .copy-icon {
+        color: #ffc107;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .action-option .edit-icon {
+        color: #007bff;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .action-option .view-icon {
+        color: #17a2b8;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .action-option .hotel-icon {
+        color: #fd7e14;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .action-option .convert-icon {
+        color: #6f42c1;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .action-option .backoffice-icon {
+        color: #6c757d;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .actions-btn-group .dropdown-toggle::after {
+        margin-left: 6px;
+        border-top: 4px solid;
+        border-right: 4px solid transparent;
+        border-left: 4px solid transparent;
+        vertical-align: middle;
+    }
+
+    /* Additional icon styling for download dropdown */
+    .download-option .email-icon {
+        color: #007bff;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .download-option .backoffice-icon {
+        color: #6c757d;
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
     }
     
     /* Enhanced tab styling */
@@ -1521,14 +1788,30 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
+    /* Card Styling for Content Options */
+    .card-title {
+        color: #009898;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .card-body {
+        padding: 16px;
+    }
+    
+    /* Card width and spacing */
+    .col-md-6 .card {
+        margin-bottom: 20px;
+    }
+
     /* Email Options Checkbox Styling */
     .email-options-row {
         margin-bottom: 0;
     }
 
     .email-option-check {
-        margin-bottom: 8px;
-        padding: 4px 0;
+        margin-bottom: 4px;
+        padding: 2px 0;
     }
 
     .email-option-check .form-check-input {
@@ -1536,8 +1819,45 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     }
 
     .email-option-check .form-check-label {
-        font-size: 14px;
+        font-size: 13px;
         margin-bottom: 0;
+        font-weight: 500;
+    }
+    
+    /* WhatsApp Options Styling */
+    .whatsapp-option {
+        margin-bottom: 4px;
+        padding: 2px 0;
+    }
+    
+    .whatsapp-option .form-check-input {
+        margin-right: 6px;
+    }
+    
+    .whatsapp-option .form-check-label {
+        font-size: 13px;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+    
+    /* Reduce spacing between form groups */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    /* Compact row spacing */
+    .row {
+        margin-bottom: 0;
+    }
+    
+    .col-md-3 {
+        padding: 0 8px;
+    }
+    
+    /* Card internal column spacing */
+    .card-body .col-md-6 {
+        padding: 0 8px;
+        margin-bottom: 8px;
     }
 
     /* Content area scrollbar styling */
@@ -1600,7 +1920,7 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     
     #tbl_tour_list th,
     #tbl_tour_list td {
-        padding: 8px 12px;
+        padding: 8px 6px;
         text-align: left;
         vertical-align: middle;
         border: 1px solid #ddd;
@@ -1612,19 +1932,47 @@ if ($to_date < $today && $modify_entries_switch == 'No' && $role != 'Admin' && $
     }
     
     .table-responsive {
-        overflow-x: auto;
+        overflow-x: visible;
         margin: 0;
     }
     
     /* Ensure proper alignment for action buttons */
     #tbl_tour_list td:last-child {
-        text-align: center;
+        text-align: left;
         white-space: nowrap;
+        padding: 8px 4px 8px 2px;
     }
     
     /* Fix button group alignment */
     .btn-group {
         display: inline-block;
         vertical-align: middle;
+        margin: 0 2px 0 0;
+    }
+    
+    /* Ensure dropdowns are visible and properly positioned */
+    .btn-group .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: auto;
+        z-index: 1000;
+        display: none;
+        float: left;
+        min-width: 160px;
+        padding: 5px 0;
+        margin: 2px 0 0;
+        font-size: 14px;
+        text-align: left;
+        list-style: none;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border: 1px solid rgba(0,0,0,.15);
+        border-radius: 4px;
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    }
+    
+    .btn-group.open .dropdown-menu {
+        display: block;
     }
 </style>
