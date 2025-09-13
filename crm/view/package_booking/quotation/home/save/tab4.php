@@ -1295,31 +1295,43 @@
                                     error_msg_alert(msg[1]);
                                 } else {
                                     // Extract quotation ID from success message for image uploads
-                                    console.log("Success message:", message);
-                                    var quotationIdMatch = message.match(/quotation\s+(\d+)/i);
+                                    console.log("DEBUG: Success message:", message);
+                                    var quotationIdMatch = message.match(/Quotation ID:\s*(\d+)/i);
                                     var quotationId = quotationIdMatch ? quotationIdMatch[1] : null;
-                                    console.log("Extracted quotation ID:", quotationId);
+                                    console.log("DEBUG: Extracted quotation ID:", quotationId);
                                     
-                                    // Debug: Check what images we have
-                                    console.log("Available images:", window.itineraryImages);
-                                    console.log("Number of images:", window.itineraryImages ? window.itineraryImages.length : 0);
+                                    // Try alternative patterns if first one fails
+                                    if (!quotationId) {
+                                        var altMatch1 = message.match(/quotation\s+(\d+)/i);
+                                        var altMatch2 = message.match(/(\d+)/);
+                                        console.log("DEBUG: Alternative matches - pattern1:", altMatch1, "pattern2:", altMatch2);
+                                        quotationId = altMatch1 ? altMatch1[1] : (altMatch2 ? altMatch2[1] : null);
+                                        console.log("DEBUG: Final quotation ID:", quotationId);
+                                    }
+                                    
+                                    // Collect stored images from itinerary interface
+                                    var storedImages = collectStoredImages();
+                                    console.log("Collected " + storedImages.length + " stored images for upload");
                                     
                                     // Upload itinerary images if any exist
-                                    if (window.itineraryImages && window.itineraryImages.length > 0) {
+                                    if (storedImages && storedImages.length > 0) {
                                         if (quotationId) {
-                                            console.log("Uploading " + window.itineraryImages.length + " itinerary images for quotation " + quotationId);
-                                            uploadItineraryImages(quotationId, window.itineraryImages);
+                                            console.log("DEBUG: Uploading " + storedImages.length + " itinerary images for quotation " + quotationId);
+                                            uploadItineraryImages(quotationId, storedImages);
                                         } else {
-                                            console.error("Could not extract quotation ID from message:", message);
+                                            console.error("DEBUG: Could not extract quotation ID from message:", message);
                                             // Try alternative ID extraction methods
                                             var altMatch = message.match(/(\d+)/);
                                             if (altMatch) {
-                                                console.log("Using alternative quotation ID:", altMatch[1]);
-                                                uploadItineraryImages(altMatch[1], window.itineraryImages);
+                                                console.log("DEBUG: Using alternative quotation ID:", altMatch[1]);
+                                                uploadItineraryImages(altMatch[1], storedImages);
+                                            } else {
+                                                console.error("DEBUG: No quotation ID found, cannot upload images");
+                                                alert("Images could not be uploaded - quotation ID not found");
                                             }
                                         }
                                     } else {
-                                        console.log("No images to upload");
+                                        console.log("DEBUG: No images to upload");
                                     }
                                     
                                     $('#vi_confirm_box').vi_confirm_box({
@@ -1433,6 +1445,30 @@ function customTcsTax(id)
 
 }
 
+// Function to collect all stored images from itinerary interface
+function collectStoredImages() {
+    var storedImages = [];
+    
+    console.log("DEBUG: Checking window.quotationImages:", window.quotationImages);
+    
+    if (window.quotationImages) {
+        console.log("DEBUG: quotationImages object exists, checking properties...");
+        for (var offset in window.quotationImages) {
+            console.log("DEBUG: Checking offset", offset, ":", window.quotationImages[offset]);
+            if (window.quotationImages[offset] && !window.quotationImages[offset].uploaded) {
+                console.log("DEBUG: Adding image for offset", offset, "to upload list");
+                storedImages.push(window.quotationImages[offset]);
+            }
+        }
+    } else {
+        console.log("DEBUG: window.quotationImages does not exist");
+    }
+    
+    console.log("DEBUG: Collected " + storedImages.length + " stored images for upload");
+    console.log("DEBUG: Stored images details:", storedImages);
+    return storedImages;
+}
+
 // Function to upload itinerary images after quotation is saved
 function uploadItineraryImages(quotationId, images) {
     var base_url = $('#base_url').val();
@@ -1460,6 +1496,11 @@ function uploadItineraryImages(quotationId, images) {
                 console.log("Image upload response for day " + imageData.day_number + ":", response);
                 if (response && response.success) {
                     console.log("Image uploaded successfully: " + response.image_url);
+                    // Mark as uploaded
+                    if (window.quotationImages && window.quotationImages[imageData.day_number]) {
+                        window.quotationImages[imageData.day_number].uploaded = true;
+                        window.quotationImages[imageData.day_number].image_url = response.image_url;
+                    }
                 } else {
                     console.error("Image upload failed: " + (response ? response.message : 'Unknown error'));
                 }
@@ -1480,7 +1521,7 @@ function uploadItineraryImages(quotationId, images) {
     Promise.all(uploadPromises).then(function() {
         console.log("All itinerary images uploaded successfully");
         // Clear the stored images
-        window.itineraryImages = [];
+        window.quotationImages = [];
     }).catch(function(error) {
         console.error("Some image uploads failed:", error);
     });

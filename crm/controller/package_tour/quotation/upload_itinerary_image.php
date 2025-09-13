@@ -20,6 +20,9 @@ try {
             throw new Exception("Missing required parameters");
         }
         
+        // Handle temporary quotation IDs - we'll update them later when actual quotation is created
+        $is_temp_quotation = (strpos($quotation_id, 'temp_') === 0);
+        
         $file = $_FILES['image'];
         $fileName = $file['name'];
         $fileTmpName = $file['tmp_name'];
@@ -46,8 +49,16 @@ try {
         
         // Create upload directory if it doesn't exist
         $uploadDir = "../../../uploads/quotation_images/";
+        error_log("DEBUG: Upload directory path: " . $uploadDir);
+        error_log("DEBUG: Current working directory: " . getcwd());
+        error_log("DEBUG: Directory exists: " . (file_exists($uploadDir) ? 'YES' : 'NO'));
+        error_log("DEBUG: Directory is writable: " . (is_writable($uploadDir) ? 'YES' : 'NO'));
+        
         if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+            error_log("DEBUG: Creating directory: " . $uploadDir);
+            if (!mkdir($uploadDir, 0777, true)) {
+                throw new Exception("Failed to create upload directory");
+            }
         }
         
         // Generate unique filename
@@ -56,7 +67,12 @@ try {
         $uploadPath = $uploadDir . $uniqueFileName;
         
         // Move uploaded file
+        error_log("DEBUG: Attempting to move file from: " . $fileTmpName . " to: " . $uploadPath);
+        error_log("DEBUG: Source file exists: " . (file_exists($fileTmpName) ? 'YES' : 'NO'));
+        error_log("DEBUG: Target directory writable: " . (is_writable($uploadDir) ? 'YES' : 'NO'));
+        
         if (move_uploaded_file($fileTmpName, $uploadPath)) {
+            error_log("DEBUG: File moved successfully to: " . $uploadPath);
             
             // Save to database
             $image_url = "uploads/quotation_images/" . $uniqueFileName;
@@ -77,7 +93,9 @@ try {
             $insert_query = "INSERT INTO package_tour_quotation_images 
                            (id, quotation_id, package_id, image_url) 
                            VALUES ('$image_id', '$quotation_id', '$package_id', '$image_url_with_day')";
+            error_log("DEBUG: Inserting image record with query: " . $insert_query);
             $result = mysqlQuery($insert_query);
+            error_log("DEBUG: Database insert result: " . ($result ? 'SUCCESS' : 'FAILED'));
             
             if ($result) {
                 $response['success'] = true;

@@ -195,7 +195,12 @@ public function quotation_master_update()
 		$this->tranport_entries_update($quotation_id,$vehicle_name_arr,$start_date_arr,$pickup_arr,$drop_arr,$vehicle_count_arr,$transport_cost_arr1,$package_name_arr1,$pickup_type_arr,$drop_type_arr, $package_id,$transport_status_arr,$transport_id_arr,$end_date_arr,$service_duration_arr);	
 		$this->excursion_entries_save($quotation_id,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$excursion_id_arr,$exc_status_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr);
 		$this->costing_entries_update($tour_cost_arr,$transport_cost_arr, $basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr, $costing_id_arr,$excursion_cost_arr,$adult_cost,$infant_cost,$child_with,$child_without,$bsmValues,$quotation_id,$entry_id_arr,$discount_in_arr,$discount_arr);
+		// Debug: Log package_id before calling program_entries_save
+		error_log("DEBUG: About to call program_entries_save with package_id: $package_id");
 		$this->program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr);	
+		
+		// Copy image entries from original quotation to new quotation
+		$this->copy_image_entries($quotation_id, $package_id);
 
 		echo "Quotation has been successfully updated.";	
 		exit;
@@ -210,6 +215,18 @@ public function quotation_master_update()
 
 public function program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr)
 {
+	// Debug: Log the received arrays
+	error_log("DEBUG: program_entries_save called with quotation_id: $quotation_id, package_id: $package_id");
+	error_log("DEBUG: package_p_id_arr: " . print_r($package_p_id_arr, true));
+	error_log("DEBUG: checked_programe_arr1: " . print_r($checked_programe_arr1, true));
+	error_log("DEBUG: attraction_arr: " . print_r($attraction_arr, true));
+	error_log("DEBUG: day_count_arr: " . print_r($day_count_arr, true));
+	
+	// First, delete all existing entries for this quotation to prevent duplicates
+	$delete_query = "DELETE FROM package_quotation_program WHERE quotation_id = '$quotation_id'";
+	$delete_result = mysqlQuery($delete_query);
+	error_log("DEBUG: Deleted existing entries for quotation $quotation_id. Result: " . ($delete_result ? "SUCCESS" : "FAILED"));
+	
 	for($i=0; $i<sizeof($program_arr); $i++)
 	{
 		$attraction = addslashes($attraction_arr[$i]);
@@ -217,34 +234,24 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 		$stay = addslashes($stay_arr[$i]);
 		$meal_plan = addslashes($meal_plan_arr[$i]);
 
+		error_log("DEBUG: Processing row $i - checked: '{$checked_programe_arr1[$i]}'");
+
 		if($checked_programe_arr1[$i]=="true")
 		{
-			if($package_p_id_arr[$i] == '')
-			{
-				$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_quotation_program"));
-				$id = $sq_max['max']+1;
+			error_log("DEBUG: Inserting new itinerary entry for row $i");
+			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_quotation_program"));
+			$id = $sq_max['max']+1;
 
-				$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_count ) values ('$id', '$quotation_id', '$package_id','$attraction','$program', '$stay','$meal_plan',$day_count_arr[$i])");
-				if(!$sq_plane){
-					echo "error--Tour Itinerary not saved!";
-					exit;
-				}
-			}
-			else{
-				$sq_train = mysqlQuery("update package_quotation_program set attraction='$attraction', day_wise_program='$program', stay='$stay', meal_plan='$meal_plan' where id='$package_p_id_arr[$i]' ");
-				if(!$sq_train){
-					echo "error--Tour Itinerary not updated!";
-					exit;
-				}
-			}
-		}else{
-			$query = "Delete from package_quotation_program where id='$package_p_id_arr[$i]'";
-			$sq_hotel = mysqlQuery($query);
-			if(!$sq_hotel){
-				echo "error--Itinarary not updated!";
+			$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_count ) values ('$id', '$quotation_id', '$package_id','$attraction','$program', '$stay','$meal_plan',$day_count_arr[$i])");
+			if(!$sq_plane){
+				error_log("ERROR: Failed to insert new itinerary entry");
+				echo "error--Tour Itinerary not saved!";
 				exit;
+			} else {
+				error_log("DEBUG: Successfully inserted new itinerary entry with ID $id");
 			}
 		}
+		// Note: We don't need to handle deletion here since we already deleted all existing entries
 	}
 }
 
@@ -534,6 +541,91 @@ function quotation_daywiseimages_update(){
 		echo $new_url;
 		exit;
 	}
-}
+	}
+
+	// Copy image entries from original quotation to new quotation
+	public function copy_image_entries($new_quotation_id, $package_id) {
+		// Find the original quotation ID by looking for quotations with the same package_id and tour details
+		// We'll look for the most recent quotation with the same package_id that has images
+		$original_query = "SELECT DISTINCT quotation_id FROM package_tour_quotation_images 
+						   WHERE package_id = '$package_id' 
+						   AND quotation_id != '$new_quotation_id' 
+						   ORDER BY quotation_id DESC LIMIT 1";
+		$original_result = mysqlQuery($original_query);
+		
+		if (mysqli_num_rows($original_result) > 0) {
+			$original_quotation = mysqli_fetch_assoc($original_result);
+			$original_quotation_id = $original_quotation['quotation_id'];
+			
+			error_log("DEBUG: Copying images from quotation $original_quotation_id to $new_quotation_id for package $package_id");
+			
+			// Get all image entries from the original quotation
+			$images_query = "SELECT * FROM package_tour_quotation_images 
+							 WHERE quotation_id = '$original_quotation_id' 
+							 AND package_id = '$package_id'";
+			$images_result = mysqlQuery($images_query);
+			
+			// Copy each image entry to the new quotation
+			while ($image_row = mysqli_fetch_assoc($images_result)) {
+				$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_tour_quotation_images"));
+				$new_image_id = $sq_max['max'] + 1;
+				
+				// Update the image URL to reflect the new quotation ID
+				$original_image_url = $image_row['image_url'];
+				// Use a more specific regex pattern to match quotation_XX_ pattern
+				$new_image_url = preg_replace('/quotation_\d+_/', 'quotation_' . $new_quotation_id . '_', $original_image_url);
+				
+				// If regex didn't work, try a more direct approach
+				if ($new_image_url == $original_image_url) {
+					// Extract the part after quotation_XX_ and rebuild the URL
+					if (preg_match('/quotation_\d+_(.+)/', $original_image_url, $matches)) {
+						$new_image_url = 'uploads/quotation_images/day_1_quotation_' . $new_quotation_id . '_' . $matches[1];
+					}
+				}
+				
+				// Debug the regex replacement
+				error_log("DEBUG: Original URL before regex: $original_image_url");
+				error_log("DEBUG: New quotation ID: $new_quotation_id");
+				error_log("DEBUG: URL after regex: $new_image_url");
+				
+				error_log("DEBUG: Original URL: $original_image_url");
+				error_log("DEBUG: New URL: $new_image_url");
+				
+				// Copy the physical image file
+				$original_file_path = "../../../" . $original_image_url;
+				$new_file_path = "../../../" . $new_image_url;
+				
+				// Create directory if it doesn't exist
+				$new_dir = dirname($new_file_path);
+				if (!is_dir($new_dir)) {
+					mkdir($new_dir, 0755, true);
+				}
+				
+				// Copy the file
+				if (file_exists($original_file_path)) {
+					if (copy($original_file_path, $new_file_path)) {
+						error_log("SUCCESS: Copied physical file from $original_file_path to $new_file_path");
+					} else {
+						error_log("ERROR: Failed to copy physical file from $original_file_path to $new_file_path");
+					}
+				} else {
+					error_log("ERROR: Original file does not exist: $original_file_path");
+				}
+				
+				$copy_query = "INSERT INTO package_tour_quotation_images 
+							   (id, quotation_id, package_id, image_url) 
+							   VALUES ('$new_image_id', '$new_quotation_id', '$package_id', '$new_image_url')";
+				
+				$copy_result = mysqlQuery($copy_query);
+				if (!$copy_result) {
+					error_log("ERROR: Failed to copy image entry for quotation $new_quotation_id: " . mysqli_error($conn));
+				} else {
+					error_log("SUCCESS: Copied image entry from quotation $original_quotation_id to $new_quotation_id with updated URL: $new_image_url");
+				}
+			}
+		} else {
+			error_log("DEBUG: No original quotation found for package $package_id");
+		}
+	}
 }
 ?>

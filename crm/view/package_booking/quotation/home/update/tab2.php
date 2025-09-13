@@ -13,6 +13,36 @@
 </style>
 
 <?php
+// Get quotation_id and package_id from URL parameters or form data
+if (!isset($quotation_id) || empty($quotation_id)) {
+    $quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id'] : (isset($_POST['quotation_id']) ? $_POST['quotation_id'] : '');
+}
+if (!isset($package_id) || empty($package_id)) {
+    $package_id = isset($_GET['package_id']) ? $_GET['package_id'] : (isset($_POST['package_id']) ? $_POST['package_id'] : '');
+}
+
+// If package_id is still empty, try to get it from the quotation data
+if (empty($package_id) && !empty($quotation_id)) {
+    $package_query = "SELECT package_id FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id' LIMIT 1";
+    $package_result = mysqlQuery($package_query);
+    if (mysqli_num_rows($package_result) > 0) {
+        $package_row = mysqli_fetch_assoc($package_result);
+        $package_id = $package_row['package_id'];
+        echo "<!-- DEBUG: Got package_id from quotation_master: $package_id -->";
+    }
+}
+
+// If still empty, try to get it from package_quotation_program
+if (empty($package_id) && !empty($quotation_id)) {
+    $package_query = "SELECT package_id FROM package_quotation_program WHERE quotation_id = '$quotation_id' LIMIT 1";
+    $package_result = mysqlQuery($package_query);
+    if (mysqli_num_rows($package_result) > 0) {
+        $package_row = mysqli_fetch_assoc($package_result);
+        $package_id = $package_row['package_id'];
+        echo "<!-- DEBUG: Got package_id from package_quotation_program: $package_id -->";
+    }
+}
+
 // Debug information
 echo "<!-- Debug Info: quotation_id = " . (isset($quotation_id) ? $quotation_id : 'NOT SET') . " -->";
 echo "<!-- Debug Info: package_id = " . (isset($package_id) ? $package_id : 'NOT SET') . " -->";
@@ -81,8 +111,8 @@ if (isset($quotation_id) && !empty($quotation_id)) {
                                                 }
                                                 echo " -->";
                                                 
-                                                // Try both string and integer comparison
-                                                $sq_program = mysqlQuery("select * from package_quotation_program where quotation_id = '$quotation_id' OR quotation_id = " . intval($quotation_id));
+                                                // Get itinerary records for this quotation
+                                                $sq_program = mysqlQuery("select * from package_quotation_program where quotation_id = '$quotation_id' ORDER BY id");
                                                 $program_count = mysqli_num_rows($sq_program);
                                                 echo "<!-- Debug: Found $program_count records for quotation_id '$quotation_id' -->";
                                                 
@@ -134,11 +164,35 @@ if (isset($quotation_id) && !empty($quotation_id)) {
                                                         </div>
                                                         <?php
                                                         // Load existing image for this day
-                                                        $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_$offset%'";
+                                                        echo "<!-- DEBUG: quotation_id = $quotation_id, package_id = $package_id, offset = $offset -->";
+                                                        
+                                                        // If quotation_id is not set, try to get it from the form
+                                                        if (empty($quotation_id)) {
+                                                            $quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id'] : '';
+                                                        }
+                                                        if (empty($package_id)) {
+                                                            $package_id = isset($_GET['package_id']) ? $_GET['package_id'] : '';
+                                                        }
+                                                        
+                                                        // If package_id is still empty, get it from database
+                                                        if (empty($package_id) && !empty($quotation_id)) {
+                                                            $package_query = "SELECT package_id FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id' LIMIT 1";
+                                                            $package_result = mysqlQuery($package_query);
+                                                            if (mysqli_num_rows($package_result) > 0) {
+                                                                $package_row = mysqli_fetch_assoc($package_result);
+                                                                $package_id = $package_row['package_id'];
+                                                            }
+                                                        }
+                                                        
+                                                        $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_$offset_%'";
+                                                        echo "<!-- DEBUG: Query = $existing_image_query -->";
                                                         $existing_image_result = mysqlQuery($existing_image_query);
-                                                        if (mysqli_num_rows($existing_image_result) > 0) {
+                                                        $image_count = mysqli_num_rows($existing_image_result);
+                                                        echo "<!-- DEBUG: Found $image_count images -->";
+                                                        if ($image_count > 0) {
                                                             $existing_image = mysqli_fetch_assoc($existing_image_result);
                                                             $image_url = BASE_URL . $existing_image['image_url'];
+                                                            echo "<!-- DEBUG: Image URL = $image_url -->";
                                                         ?>
                                                         <div id="saved_image_<?php echo $offset; ?>" style="margin-top: 5px;">
                                                             <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #28a745; border-radius: 8px; background-color: #f8f9fa;">
@@ -150,6 +204,9 @@ if (isset($quotation_id) && !empty($quotation_id)) {
                                                                         style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                                                     ×
                                                                 </button>
+                                                            </div>
+                                                            <div style="margin-top: 5px; text-align: center;">
+                                                                <button type="button" onclick="replaceSavedImage('<?php echo $offset; ?>')" class="btn btn-sm btn-warning" style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">Replace Image</button>
                                                             </div>
                                                         </div>
                                                         <script>
@@ -191,8 +248,31 @@ if (isset($quotation_id) && !empty($quotation_id)) {
                                                     echo '</div>';
                                                     
                                                     // Load existing image for day 1
-                                                    $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_1%'";
+                                                    echo "<!-- DEBUG: Day 1 - quotation_id = $quotation_id, package_id = $package_id -->";
+                                                    
+                                                    // If quotation_id is not set, try to get it from the form
+                                                    if (empty($quotation_id)) {
+                                                        $quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id'] : '';
+                                                    }
+                                                    if (empty($package_id)) {
+                                                        $package_id = isset($_GET['package_id']) ? $_GET['package_id'] : '';
+                                                    }
+                                                    
+                                                    // If package_id is still empty, get it from database
+                                                    if (empty($package_id) && !empty($quotation_id)) {
+                                                        $package_query = "SELECT package_id FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id' LIMIT 1";
+                                                        $package_result = mysqlQuery($package_query);
+                                                        if (mysqli_num_rows($package_result) > 0) {
+                                                            $package_row = mysqli_fetch_assoc($package_result);
+                                                            $package_id = $package_row['package_id'];
+                                                        }
+                                                    }
+                                                    
+                                                    $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_1_%'";
+                                                    echo "<!-- DEBUG: Day 1 Query = $existing_image_query -->";
                                                     $existing_image_result = mysqlQuery($existing_image_query);
+                                                    $day1_image_count = mysqli_num_rows($existing_image_result);
+                                                    echo "<!-- DEBUG: Day 1 Found $day1_image_count images -->";
                                                     if (mysqli_num_rows($existing_image_result) > 0) {
                                                         $existing_image = mysqli_fetch_assoc($existing_image_result);
                                                         $image_url = BASE_URL . $existing_image['image_url'];
@@ -245,8 +325,20 @@ if (isset($quotation_id) && !empty($quotation_id)) {
 </form>
 <script>
 
+// Function to get package ID for a specific offset
+function getPackageIdForOffset(offset) {
+    // Try to find package ID from the current row
+    var packageIdInput = $('input[name="package_id_n"]').first();
+    var packageId = packageIdInput.val() || '1'; // Default to 1 if not found
+    
+    console.log("DEBUG: Getting package ID for offset", offset, ":", packageId);
+    return packageId;
+}
+
 // Day image preview functions for update
 function previewDayImage(input, offset) {
+    console.log("previewDayImage called with offset:", offset, "file:", input.files[0]);
+    
     if (input.files && input.files[0]) {
         var file = input.files[0];
         
@@ -270,11 +362,43 @@ function previewDayImage(input, offset) {
         
         var reader = new FileReader();
         reader.onload = function(e) {
+            console.log("FileReader loaded, showing preview for edit mode");
             $('#preview_img_' + offset).attr('src', e.target.result);
             $('#day_image_preview_' + offset).show();
             
             // Hide the upload button when image is uploaded
             $('label[for="day_image_' + offset + '"]').hide();
+            
+            // Show the upload button in preview area
+            $('#upload_btn_' + offset).show();
+            
+            // Store image data for later upload (when quotation is updated)
+            if (!window.quotationImages) {
+                window.quotationImages = {};
+            }
+            
+            // Get package ID for this row
+            var packageId = getPackageIdForOffset(offset);
+            
+            // Store image by offset for later upload (when quotation is updated)
+            window.quotationImages[offset] = {
+                file: file,
+                offset: offset,
+                package_id: packageId,
+                day_number: offset,
+                preview_url: e.target.result,
+                uploaded: false
+            };
+            
+            // Update button text to indicate it will be uploaded when quotation is updated
+            $('#upload_btn_' + offset).text('Will Upload on Update');
+            
+            console.log("DEBUG: Stored image for offset " + offset + " in edit mode:", file.name, "Package ID:", packageId);
+            console.log("DEBUG: Full stored object:", window.quotationImages[offset]);
+        }
+        reader.onerror = function() {
+            console.error("FileReader error");
+            alert('Error reading file');
         }
         reader.readAsDataURL(file);
     }
@@ -285,8 +409,35 @@ function removeDayImage(offset) {
     $('#day_image_preview_' + offset).hide();
     $('#preview_img_' + offset).attr('src', '');
     
+    // Hide the upload button in preview area
+    $('#upload_btn_' + offset).hide();
+    
+    // Clear any stored image data
+    if (window.quotationImages && window.quotationImages[offset]) {
+        delete window.quotationImages[offset];
+    }
+    
     // Show the upload button again when image is removed
     $('label[for="day_image_' + offset + '"]').show();
+    
+    console.log("Removed image for offset:", offset);
+}
+
+// Handle day image upload (deferred until quotation update)
+function uploadDayImage(offset) {
+    console.log("uploadDayImage called with offset:", offset);
+    
+    // Check if image is already stored
+    if (!window.quotationImages || !window.quotationImages[offset]) {
+        alert('Please select an image first');
+        return;
+    }
+    
+    // Show message that image will be uploaded when quotation is updated
+    $('#upload_status_' + offset).html('<span style="color: blue;">✓ Ready for upload on update</span>');
+    $('#upload_btn_' + offset).prop('disabled', true).text('Ready to Upload');
+    
+    console.log("Image marked for upload when quotation is updated:", window.quotationImages[offset]);
 }
 
 function removeSavedImage(offset, imageUrl) {
@@ -314,6 +465,25 @@ function removeSavedImage(offset, imageUrl) {
             }
         });
     }
+}
+
+function replaceSavedImage(offset) {
+    // Hide the saved image and show the file input
+    $('#saved_image_' + offset).hide();
+    $('label[for="day_image_' + offset + '"]').show();
+    
+    // Clear any existing preview
+    $('#day_image_preview_' + offset).hide();
+    
+    // Clear the file input value to ensure change event fires
+    $('#day_image_' + offset).val('');
+    
+    // Clear any stored image data
+    if (window.quotationImages && window.quotationImages[offset]) {
+        delete window.quotationImages[offset];
+    }
+    
+    console.log("Ready to replace image for offset:", offset);
 }
 
 $(document).on("click", ".style_text_b, .style_text_u", function() {
@@ -377,14 +547,31 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
 
             var table = document.getElementById("dynamic_table_list_update");
             var rowCount = table.rows.length;
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                var checked_programe = row.cells[0].childNodes[0].checked;
-                var attraction = row.cells[2].childNodes[0].value;
-                var program = row.cells[3].childNodes[0].value;
-                var stay = row.cells[4].childNodes[0].value;
-                var meal_plan = row.cells[5].childNodes[0].value;
-                var package_id1 = row.cells[8].childNodes[0].value;
+        for (var i = 0; i < rowCount; i++) {
+            var row = table.rows[i];
+            var checked_programe = row.cells[0].childNodes[0].checked;
+            var attraction = row.cells[2].childNodes[0].value;
+            var program = row.cells[3].childNodes[0].value;
+            var stay = row.cells[4].childNodes[0].value;
+            var meal_plan = row.cells[5].childNodes[0].value;
+            
+            // Debug: Log cell count and package_id1 value
+            console.log("Row " + i + " has " + row.cells.length + " cells");
+            
+            // Try to find the hidden input field with package_id_n
+            var package_id1 = '';
+            for (var j = 0; j < row.cells.length; j++) {
+                if (row.cells[j].querySelector('input[name="package_id_n"]')) {
+                    package_id1 = row.cells[j].querySelector('input[name="package_id_n"]').value;
+                    console.log("Found package_id_n in cell " + j + " with value: " + package_id1);
+                    break;
+                }
+            }
+            
+            if (!package_id1) {
+                console.log("No package_id_n found, trying cell 8: ", row.cells[8] ? row.cells[8].childNodes[0].value : "Cell 8 not found");
+                package_id1 = row.cells[8] ? row.cells[8].childNodes[0].value : '';
+            }
                 if (checked_programe) {
                     count++;
                     if (program == "") {
@@ -423,6 +610,10 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
                 package_p_id_arr.push(package_id1);
             }
             day_count_arr.push(count);
+            
+            // Debug: Log the arrays being sent
+            console.log("package_p_id_arr:", package_p_id_arr);
+            console.log("checked_programe_arr:", checked_programe_arr);
 
             var dest_id = $('#dest_name').val();
             var package_id = $('#img_package_id').val();

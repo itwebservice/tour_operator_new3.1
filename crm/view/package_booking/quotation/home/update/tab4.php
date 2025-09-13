@@ -1236,6 +1236,23 @@ $('#frm_tab4').validate({
                                 error_msg_alert(msg[1]);
                                 $('#btn_quotation_update').prop('disabled', false);
                             } else {
+                                // Extract quotation ID from success message for image uploads
+                                console.log("DEBUG: Update success message:", message);
+                                var quotationIdMatch = message.match(/Quotation ID:\s*(\d+)/i);
+                                var quotationId = quotationIdMatch ? quotationIdMatch[1] : quotation_id;
+                                console.log("DEBUG: Using quotation ID for image upload:", quotationId);
+                                
+                                // Collect stored images from itinerary interface
+                                var storedImages = collectStoredImages();
+                                console.log("DEBUG: Collected " + storedImages.length + " stored images for upload");
+                                
+                                // Upload itinerary images if any exist
+                                if (storedImages && storedImages.length > 0) {
+                                    console.log("DEBUG: Uploading " + storedImages.length + " itinerary images for quotation " + quotationId);
+                                    uploadItineraryImages(quotationId, storedImages);
+                                } else {
+                                    console.log("DEBUG: No images to upload");
+                                }
                                 $('#vi_confirm_box').vi_confirm_box({
                                     false_btn: false,
                                     message: message,
@@ -1454,6 +1471,74 @@ function customTcsTax(rowId) {
 
     // Update total tour cost field
     total_tour_cost_field.val(total_tour_cost.toFixed(2));
+}
+
+// Function to collect all stored images from itinerary interface
+function collectStoredImages() {
+    var storedImages = [];
+    
+    console.log("DEBUG: Checking window.quotationImages:", window.quotationImages);
+    
+    if (window.quotationImages) {
+        console.log("DEBUG: quotationImages object exists, checking properties...");
+        for (var offset in window.quotationImages) {
+            console.log("DEBUG: Checking offset", offset, ":", window.quotationImages[offset]);
+            if (window.quotationImages[offset] && !window.quotationImages[offset].uploaded) {
+                console.log("DEBUG: Adding image for offset", offset, "to upload list");
+                storedImages.push(window.quotationImages[offset]);
+            }
+        }
+    } else {
+        console.log("DEBUG: window.quotationImages does not exist");
+    }
+    
+    console.log("DEBUG: Collected " + storedImages.length + " stored images for upload");
+    console.log("DEBUG: Stored images details:", storedImages);
+    return storedImages;
+}
+
+// Function to upload itinerary images after quotation is updated
+function uploadItineraryImages(quotationId, images) {
+    var base_url = $('#base_url').val();
+    var uploadPromises = [];
+
+    images.forEach(function(imageData) {
+        var formData = new FormData();
+        formData.append('quotation_id', quotationId);
+        formData.append('package_id', imageData.package_id);
+        formData.append('day_number', imageData.day_number);
+        formData.append('image', imageData.file);
+        
+        console.log("Uploading image for day " + imageData.day_number + ", package " + imageData.package_id + ", file: " + imageData.file.name);
+        
+        var promise = $.ajax({
+            url: base_url + 'controller/package_tour/quotation/upload_itinerary_image.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                console.log("Image upload successful for offset " + imageData.offset + ":", response);
+                // Mark as uploaded
+                if (window.quotationImages && window.quotationImages[imageData.offset]) {
+                    window.quotationImages[imageData.offset].uploaded = true;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Image upload failed for offset " + imageData.offset + ":", error);
+                alert("Failed to upload image for day " + imageData.day_number + ". Please try again.");
+            }
+        });
+        
+        uploadPromises.push(promise);
+    });
+
+    // Wait for all uploads to complete
+    Promise.all(uploadPromises).then(function() {
+        console.log("All images uploaded successfully");
+    }).catch(function(error) {
+        console.error("Some images failed to upload:", error);
+    });
 }
 
 </script>

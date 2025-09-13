@@ -161,6 +161,15 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                             ×
                                         </button>
                                     </div>
+                                    <div style="margin-top: 5px; text-align: center;">
+                                        <button type="button" 
+                                                id="upload_btn_<?php echo $offset1; ?>" 
+                                                onclick="uploadDayImage('<?php echo $offset1; ?>')" 
+                                                class="btn btn-sm btn-primary" 
+                                                style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">
+                                            Upload
+                                        </button>
+                                    </div>
                                     <div id="upload_status_<?php echo $offset1; ?>" style="margin-top: 2px; font-size: 10px;"></div>
                                 </div>
                             </td>
@@ -239,6 +248,15 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                 title="Remove Image" 
                                                 style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                             ×
+                                        </button>
+                                    </div>
+                                    <div style="margin-top: 5px; text-align: center;">
+                                        <button type="button" 
+                                                id="upload_btn_<?php echo $offset; ?>" 
+                                                onclick="uploadDayImage('<?php echo $offset; ?>')" 
+                                                class="btn btn-sm btn-primary" 
+                                                style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">
+                                            Upload
                                         </button>
                                     </div>
                                     <div id="upload_status_<?php echo $offset; ?>" style="margin-top: 2px; font-size: 10px;"></div>
@@ -344,19 +362,33 @@ function previewDayImage(input, offset) {
             // Hide the upload button when image is uploaded
             $('label[for="day_image_' + offset + '"]').hide();
             
+            // Show the upload button in preview area
+            $('#upload_btn_' + offset).show();
+            
             // Store image data for later upload
             if (!window.quotationImages) {
                 window.quotationImages = {};
             }
             
-            // Store image by offset for later retrieval
+            // Get package ID for this row
+            var packageId = getPackageIdForOffset(offset);
+            
+            // Store image by offset for later upload (when quotation is saved)
             window.quotationImages[offset] = {
                 file: file,
                 offset: offset,
-                preview_url: e.target.result
+                package_id: packageId,
+                day_number: offset,
+                preview_url: e.target.result,
+                uploaded: false
             };
             
-            console.log("Stored image for offset " + offset + ":", file.name);
+            // Update button text to indicate it will be uploaded when quotation is saved
+            $('#upload_btn_' + offset).text('Will Upload on Save');
+            
+            console.log("DEBUG: Stored image for offset " + offset + ":", file.name, "Package ID:", packageId);
+            console.log("DEBUG: Full stored object:", window.quotationImages[offset]);
+            console.log("DEBUG: Total stored images:", Object.keys(window.quotationImages).length);
         }
         reader.onerror = function() {
             console.error("FileReader error");
@@ -377,6 +409,9 @@ function removeDayImage(offset) {
     // Show the upload button again when image is removed
     $('label[for="day_image_' + offset + '"]').show();
     
+    // Hide the upload button in preview area
+    $('#upload_btn_' + offset).hide();
+    
     $('#upload_status_' + offset).text(''); // Clear status
     
     // Remove from stored images
@@ -385,81 +420,31 @@ function removeDayImage(offset) {
     }
 }
 
-// Upload day image immediately
+// Function to get package ID for a specific offset
+function getPackageIdForOffset(offset) {
+    // Try to find package ID from the current row
+    var packageIdInput = $('input[name="package_id_n"]').first();
+    var packageId = packageIdInput.val() || '1'; // Default to 1 if not found
+    
+    console.log("DEBUG: Getting package ID for offset", offset, ":", packageId);
+    return packageId;
+}
+
+// Handle day image upload (deferred until quotation save)
 function uploadDayImage(offset) {
     console.log("uploadDayImage called with offset:", offset);
-    alert("Upload button clicked for day " + offset); // Debug alert
     
-    // Get the file input directly
-    var fileInput = document.getElementById('day_image_' + offset);
-    
-    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+    // Check if image is already stored
+    if (!window.quotationImages || !window.quotationImages[offset]) {
         alert('Please select an image first');
         return;
     }
     
-    var file = fileInput.files[0];
-    console.log("Found file:", file.name, file.size, file.type);
+    // Show message that image will be uploaded when quotation is saved
+    $('#upload_status_' + offset).html('<span style="color: blue;">✓ Ready for upload on save</span>');
+    $('#upload_btn_' + offset).prop('disabled', true).text('Ready to Upload');
     
-    // Get package ID from the row
-    var packageIdInput = $('input[name="package_id_n"]').first();
-    var packageId = packageIdInput.val() || '1'; // Default to 1 if not found
-    
-    // Use a temporary quotation ID for immediate uploads
-    var tempQuotationId = 'temp_' + Date.now();
-    
-    console.log("Uploading image:", file.name, "Package ID:", packageId, "Day:", offset);
-    
-    // Show uploading status
-    $('#upload_status_' + offset).html('<span style="color: orange;">Uploading...</span>');
-    $('#upload_btn_' + offset).prop('disabled', true).text('Uploading...');
-    
-    // Create form data
-    var formData = new FormData();
-    formData.append('image', file);
-    formData.append('quotation_id', tempQuotationId);
-    formData.append('package_id', packageId);
-    formData.append('day_number', offset);
-    
-    var base_url = $('#base_url').val();
-    
-    // Upload image
-    $.ajax({
-        url: base_url + 'controller/package_tour/quotation/upload_itinerary_image.php',
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: 'json',
-        success: function(response) {
-            console.log("Upload response:", response);
-            
-            if (response && response.success) {
-                $('#upload_status_' + offset).html('<span style="color: green;">✓ Uploaded</span>');
-                $('#upload_btn_' + offset).prop('disabled', false).text('Re-upload');
-                
-                // Store upload info for later use
-                window.quotationImages[offset].uploaded = true;
-                window.quotationImages[offset].image_url = response.image_url;
-                window.quotationImages[offset].image_id = response.image_id;
-                
-                console.log("Image uploaded successfully:", response.image_url);
-            } else {
-                $('#upload_status_' + offset).html('<span style="color: red;">Upload failed</span>');
-                $('#upload_btn_' + offset).prop('disabled', false).text('Retry');
-                console.error("Upload failed:", response ? response.message : 'Unknown error');
-            }
-        },
-        error: function(xhr, status, error) {
-            $('#upload_status_' + offset).html('<span style="color: red;">Upload error</span>');
-            $('#upload_btn_' + offset).prop('disabled', false).text('Retry');
-            console.error("Upload error:", {
-                status: status,
-                error: error,
-                responseText: xhr.responseText
-            });
-        }
-    });
+    console.log("Image marked for upload when quotation is saved:", window.quotationImages[offset]);
 }
 
 // Add new itinerary row function
@@ -529,6 +514,16 @@ function addItineraryRow(package_id) {
                         ×
                     </button>
                 </div>
+                <div style="margin-top: 5px; text-align: center;">
+                    <button type="button" 
+                            id="upload_btn_${offset}" 
+                            onclick="uploadDayImage('${offset}')" 
+                            class="btn btn-sm btn-primary" 
+                            style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">
+                        Upload
+                    </button>
+                </div>
+                <div id="upload_status_${offset}" style="margin-top: 2px; font-size: 10px;"></div>
             </div>
         </td>
         <td style="width: 100px;">

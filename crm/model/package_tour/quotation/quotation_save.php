@@ -160,9 +160,14 @@ public function quotation_master_save()
 		$whatsapp_no = $country_code.$mobile_no;
 		$sq_quotation = mysqlQuery("insert into package_tour_quotation_master ( quotation_id,enquiry_id, branch_admin_id,financial_year_id, tour_name, from_date, to_date, total_days, customer_name, email_id,mobile_no,country_code,whatsapp_no, total_adult, total_infant, total_passangers, children_without_bed, children_with_bed, quotation_date, booking_type, train_cost, flight_cost, cruise_cost, visa_cost, guide_cost,misc_cost, price_str_url, package_id, created_at, login_id,emp_id,inclusions,exclusions,costing_type,currency_code,discount,status, train_acost, flight_acost, cruise_acost, train_ccost, flight_ccost, cruise_ccost, train_icost, flight_icost, cruise_icost,other_desc,user_id) values ( '$quotation_id','$enquiry_id', '$branch_admin_id','$financial_year_id', '$tour_name', '$from_date', '$to_date', '$total_days', '$customer_name', '$email_id','$whatsapp_no','$country_code','$mobile_no', '$total_adult', '$total_infant', '$total_passangers', '$children_without_bed', '$children_with_bed', '$quotation_date', '$booking_type', '$train_cost','$flight_cost','$cruise_cost','$visa_cost','$guide_cost','$misc_cost','$price_str_url','$package_id_arr[$i]', '$created_at', '$login_id', '$emp_id','$incl','$excl','$costing_type','$currency_code','$discount','1','$train_acost','$flight_acost','$cruise_acost','$train_ccost','$flight_ccost','$cruise_ccost','$train_icost','$flight_icost','$cruise_icost','$other_desc','$user_id')");
 
-		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_tour_quotation_images"));
-		$image_id = $sq_max['max']+1;
-		$sq_quotation1 = mysqlQuery("insert into package_tour_quotation_images ( id,quotation_id,package_id,image_url) values('$image_id','$quotation_id','$package_id_arr[$i]','$pckg_daywise_url')");
+		// Only create image entry if pckg_daywise_url is not empty (gallery images)
+		// Uploaded images are already handled by upload_itinerary_image.php
+		// Do not create empty image entries
+		if (!empty($pckg_daywise_url) && trim($pckg_daywise_url) != '') {
+			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_tour_quotation_images"));
+			$image_id = $sq_max['max']+1;
+			$sq_quotation1 = mysqlQuery("insert into package_tour_quotation_images ( id,quotation_id,package_id,image_url) values('$image_id','$quotation_id','$package_id_arr[$i]','$pckg_daywise_url')");
+		}
 	}
 
 	if($sq_quotation){
@@ -195,9 +200,12 @@ public function quotation_master_save()
 		// Update temporary quotation IDs with actual quotation IDs
 		$this->update_temporary_quotation_ids($quotation_id_arr, $temp_quotation_id);
 		
+		// Update temporary quotation IDs in package_tour_quotation_images table
+		$this->update_temporary_quotation_ids_in_images($quotation_id_arr, $temp_quotation_id);
+		
 		$this->program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url);	
 
-		echo "Quotation has been successfully saved.";
+		echo "Quotation has been successfully saved. Quotation ID: " . $quotation_id_arr[0];
 		exit;
 	}
 	else{
@@ -356,13 +364,54 @@ public function update_temporary_quotation_ids($quotation_id_arr, $temp_quotatio
 			if ($result) {
 				error_log("DEBUG: Update successful");
 			} else {
-				error_log("DEBUG: Update failed: " . mysqli_error($con));
+				error_log("DEBUG: Update failed");
 			}
 		} else {
 			// Fallback: update any temporary quotation IDs
 			$update_query = "UPDATE package_quotation_program SET quotation_id = '$actual_quotation_id' WHERE quotation_id LIKE 'temp_%'";
 			mysqlQuery($update_query);
 			error_log("DEBUG: Updated all temporary quotation IDs to actual quotation ID: $actual_quotation_id");
+		}
+	}
+}
+
+public function update_temporary_quotation_ids_in_images($quotation_id_arr, $temp_quotation_id = '')
+{
+	// Update any temporary quotation IDs in package_tour_quotation_images table
+	for($i=0; $i<sizeof($quotation_id_arr); $i++)
+	{
+		$actual_quotation_id = $quotation_id_arr[$i];
+		
+		// First, try to update specific temporary quotation ID if provided
+		if (!empty($temp_quotation_id)) {
+			$update_query = "UPDATE package_tour_quotation_images SET quotation_id = '$actual_quotation_id' WHERE quotation_id = '$temp_quotation_id'";
+			$result = mysqlQuery($update_query);
+			error_log("DEBUG: Updated specific temporary quotation ID '$temp_quotation_id' to actual quotation ID in images table: $actual_quotation_id");
+			if ($result) {
+				error_log("DEBUG: Specific temp ID update successful");
+			} else {
+				error_log("DEBUG: Specific temp ID update failed");
+			}
+		}
+		
+		// Always also update any remaining temporary quotation IDs (fallback)
+		$update_query = "UPDATE package_tour_quotation_images SET quotation_id = '$actual_quotation_id' WHERE quotation_id LIKE 'temp_%'";
+		$result = mysqlQuery($update_query);
+		error_log("DEBUG: Updated all temporary quotation IDs in images table to actual quotation ID: $actual_quotation_id");
+		if ($result) {
+			error_log("DEBUG: General temp ID update successful");
+		} else {
+			error_log("DEBUG: General temp ID update failed");
+		}
+		
+		// Also update any images with quotation_id = 0 (failed temp ID updates)
+		$update_query_zero = "UPDATE package_tour_quotation_images SET quotation_id = '$actual_quotation_id' WHERE quotation_id = 0 AND package_id = '$package_id_arr[$i]'";
+		$result_zero = mysqlQuery($update_query_zero);
+		error_log("DEBUG: Updated images with quotation_id = 0 to actual quotation ID: $actual_quotation_id");
+		if ($result_zero) {
+			error_log("DEBUG: Zero ID update successful");
+		} else {
+			error_log("DEBUG: Zero ID update failed");
 		}
 	}
 }
@@ -418,7 +467,7 @@ public function program_entries_save($quotation_id_arr,$attraction_arr, $program
 			error_log("DEBUG: Inserting program data - ID: $id, Quotation ID: $quotation_id, Package ID: $package_id, Attraction: $attr");
 			$sq_plane = mysqlQuery("insert into package_quotation_program ( id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_count ) values ( '$id', '$quotation_id','$package_id', '$attr','$program', '$stay','$meal_plan','$day_count')");
 			if(!$sq_plane){
-				error_log("ERROR: Program not saved! MySQL Error: " . mysqli_error($con));
+				error_log("ERROR: Program not saved!");
 				echo "error--Program not saved!";
 				exit;
 		    } else {
