@@ -872,52 +872,73 @@ function foo(tableID, quot_table_id, rowCounts) {
     $(row.cells[14]).addClass("hidden");
   }
   if (tableID == "dynamic_table_list_update") {
-    row.cells[0].childNodes[0].setAttribute("id", "chk_program1" + foo.counter);
-    row.cells[0].childNodes[1].setAttribute(
-      "for",
-      "chk_program1" + foo.counter
-    );
-
-    row.cells[2].childNodes[0].setAttribute(
-      "id",
-      "special_attaraction" + foo.counter
-    );
-    row.cells[3].childNodes[0].setAttribute("id", "day_program" + foo.counter);
-    row.cells[3].setAttribute("style", "position: relative !important;");
-    row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
-   );
-
-    row.cells[4].childNodes[0].setAttribute(
-      "id",
-      "overnight_stay" + foo.counter
-    );
-    row.cells[5].childNodes[0].setAttribute("id", "meal_plan" + foo.counter);
-    for (var i = row.cells[6].childNodes[0].attributes.length; i-- > 0; )
-      row.cells[6].childNodes[0].removeAttribute(
-        row.cells[6].childNodes[0].attributes[i]
+    // Add null checks to prevent errors
+    if (row.cells[0] && row.cells[0].childNodes[0]) {
+      row.cells[0].childNodes[0].setAttribute("id", "chk_program1" + foo.counter);
+    }
+    if (row.cells[0] && row.cells[0].childNodes[1]) {
+      row.cells[0].childNodes[1].setAttribute(
+        "for",
+        "chk_program1" + foo.counter
       );
-    row.cells[6].childNodes[0].setAttribute(
-      "id",
-      "itinerary" + (rowCounts + 1)
-    );
-    row.cells[6].childNodes[0].setAttribute(
-      "onclick",
-      'add_itinerary("dest_name_u","special_attaraction' +
-        foo.counter +
-        '","day_program' +
-        foo.counter +
-        '","overnight_stay' +
-        foo.counter +
-        '","Day-' +
-        (rowCounts + 1) +
-        '")'
-    );
+    }
+
+    if (row.cells[2] && row.cells[2].childNodes[0]) {
+      row.cells[2].childNodes[0].setAttribute(
+        "id",
+        "special_attaraction" + foo.counter
+      );
+    }
+    if (row.cells[3] && row.cells[3].childNodes[0]) {
+      row.cells[3].childNodes[0].setAttribute("id", "day_program" + foo.counter);
+      row.cells[3].setAttribute("style", "position: relative !important;");
+    }
+    if (row.cells[3] && row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;");
+    }
+
+    if (row.cells[4] && row.cells[4].childNodes[0]) {
+      row.cells[4].childNodes[0].setAttribute(
+        "id",
+        "overnight_stay" + foo.counter
+      );
+    }
+    if (row.cells[5] && row.cells[5].childNodes[0]) {
+      row.cells[5].childNodes[0].setAttribute("id", "meal_plan" + foo.counter);
+    }
+    if (row.cells[6] && row.cells[6].childNodes[0]) {
+      for (var i = row.cells[6].childNodes[0].attributes.length; i-- > 0; )
+        row.cells[6].childNodes[0].removeAttribute(
+          row.cells[6].childNodes[0].attributes[i]
+        );
+      row.cells[6].childNodes[0].setAttribute(
+        "id",
+        "itinerary" + (rowCounts + 1)
+      );
+      row.cells[6].childNodes[0].setAttribute(
+        "onclick",
+        'add_itinerary("dest_name_u","special_attaraction' +
+          foo.counter +
+          '","day_program' +
+          foo.counter +
+          '","overnight_stay' +
+          foo.counter +
+          '","Day-' +
+          (rowCounts + 1) +
+          '")'
+      );
+    }
 
     if (row.cells[7]) {
       $(row.cells[7]).addClass("hidden");
-      row.cells[7].childNodes[0].setAttribute("value", "");
+      if (row.cells[7].childNodes[0]) {
+        row.cells[7].childNodes[0].setAttribute("value", "");
+      }
     }
-    $(row.cells[1]).addClass("hidden");
+    
+    if (row.cells[1]) {
+      $(row.cells[1]).addClass("hidden");
+    }
   }
   //Package Sale Itinerary
   if (tableID == "package_program_list") {
@@ -4575,11 +4596,23 @@ function deleteRow(tableID) {
 
 /// **** Dynamic Table Entries ***********************//////////////////////////////
 function addRow(tableID, quot_table = "", itinerary = "") {
+    console.log("DEBUG: addRow called with tableID:", tableID, "quot_table:", quot_table, "itinerary:", itinerary);
+    
     var table = document.getElementById(tableID);
+    if (!table) {
+        console.error("DEBUG: Table not found with ID:", tableID);
+        alert("Error: Table not found. Please refresh the page and try again.");
+        return;
+    }
+    
     var rowCount = table.rows.length; // index for new row
+    console.log("DEBUG: Current row count:", rowCount);
+    
     var row = table.insertRow(rowCount);
+    console.log("DEBUG: New row created");
 
     var colCount = table.rows[0].cells.length;
+    console.log("DEBUG: Column count:", colCount);
 
     for (var i = 0; i < colCount; i++) {
         var newcell = row.insertCell(i);
@@ -4629,7 +4662,73 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     // ✅ Initialize datepicker for new row
     $(row).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
 
+    // Special handling for itinerary tables
+    if (itinerary === "itinerary") {
+        console.log("DEBUG: Handling itinerary addRow for table:", tableID);
+        handleItineraryAddRow(table, row, rowCount);
+    }
+
     // Update serial numbers or custom logic
     foo(tableID, quot_table, rowCount);
+}
+
+// Special function to handle itinerary table row addition
+function handleItineraryAddRow(table, row, rowCount) {
+    console.log("DEBUG: handleItineraryAddRow called for row", rowCount);
+    console.log("DEBUG: Row has", row.cells.length, "cells");
+    
+    // Debug each cell
+    for (var i = 0; i < row.cells.length; i++) {
+        console.log("DEBUG: Cell", i, "content:", row.cells[i].innerHTML.substring(0, 100));
+    }
+    
+    // Find the image cell (usually the last cell)
+    var imageCell = null;
+    if (row.cells.length >= 9) {
+        imageCell = row.cells[8]; // 9th cell (0-indexed)
+        console.log("DEBUG: Using cell 8 for image upload");
+    } else if (row.cells.length >= 8) {
+        imageCell = row.cells[7]; // 8th cell if only 8 cells
+        console.log("DEBUG: Using cell 7 for image upload");
+    } else {
+        console.log("DEBUG: Not enough cells for image upload. Row has", row.cells.length, "cells");
+    }
+    
+    if (imageCell) {
+        console.log("DEBUG: Adding image upload to cell " + (imageCell === row.cells[8] ? 8 : 7));
+        
+        // Set proper styling for the image cell
+        imageCell.setAttribute("class", "col-md-1 pad_8");
+        imageCell.setAttribute("style", "width: 120px;");
+        
+        // Create image upload structure
+        imageCell.innerHTML = `
+            <div style="margin-top: 35px;">
+                <label for="day_image_${rowCount}" class="btn btn-sm btn-success" 
+                       style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                    Upload Image
+                </label>
+                <input type="file" id="day_image_${rowCount}" 
+                       name="day_image_${rowCount}" accept="image/*" 
+                       onchange="previewDayImage(this, '${rowCount}')" 
+                       style="display: none;">
+            </div>
+            <div id="day_image_preview_${rowCount}" style="display: none; margin-top: 5px;">
+                <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <img id="preview_img_${rowCount}" src="" alt="Preview" 
+                         style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                    <button type="button" 
+                            onclick="removeDayImage('${rowCount}')" 
+                            title="Remove Image" 
+                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        ×
+                    </button>
+                </div>
+            </div>
+        `;
+        console.log("DEBUG: Image upload structure added successfully");
+    } else {
+        console.log("DEBUG: No suitable cell found for image upload in itinerary row");
+    }
 }
 

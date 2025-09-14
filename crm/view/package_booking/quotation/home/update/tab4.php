@@ -1098,6 +1098,14 @@ $('#frm_tab4').validate({
                 if (result == "yes") {
                     $('#btn_quotation_update').button('loading');
                     $('#btn_quotation_update').prop('disabled', false);
+                    
+                    // Debug: Log the data being sent
+                    console.log("DEBUG: Sending quotation update data:");
+                    console.log("attraction_arr:", attraction_arr);
+                    console.log("program_arr:", program_arr);
+                    console.log("day_count_arr:", day_count_arr);
+                    console.log("checked_programe_arr:", checked_programe_arr);
+                    
                     $.ajax({
 
                         type: 'post',
@@ -1229,6 +1237,7 @@ $('#frm_tab4').validate({
                         },
 
                         success: function(message) {
+                            console.log("DEBUG: Quotation update response:", message);
                             $('#btn_quotation_update').button('reset');
                             $('#btn_quotation_update').prop('disabled', false);
                             var msg = message.split('--');
@@ -1281,6 +1290,13 @@ $('#frm_tab4').validate({
                                     }
                                 });
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("DEBUG: AJAX Error - Status:", status, "Error:", error);
+                            console.error("DEBUG: Response Text:", xhr.responseText);
+                            $('#btn_quotation_update').button('reset');
+                            $('#btn_quotation_update').prop('disabled', false);
+                            error_msg_alert("Failed to update quotation: " + error);
                         }
                     });
                 } else {
@@ -1503,34 +1519,44 @@ function uploadItineraryImages(quotationId, images) {
     var uploadPromises = [];
 
     images.forEach(function(imageData) {
-        var formData = new FormData();
-        formData.append('quotation_id', quotationId);
-        formData.append('package_id', imageData.package_id);
-        formData.append('day_number', imageData.day_number);
-        formData.append('image', imageData.file);
-        
-        console.log("Uploading image for day " + imageData.day_number + ", package " + imageData.package_id + ", file: " + imageData.file.name);
-        
-        var promise = $.ajax({
-            url: base_url + 'controller/package_tour/quotation/upload_itinerary_image.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                console.log("Image upload successful for offset " + imageData.offset + ":", response);
-                // Mark as uploaded
-                if (window.quotationImages && window.quotationImages[imageData.offset]) {
-                    window.quotationImages[imageData.offset].uploaded = true;
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Image upload failed for offset " + imageData.offset + ":", error);
-                alert("Failed to upload image for day " + imageData.day_number + ". Please try again.");
+        // If this is a replacement, first delete the old image
+        if (imageData.is_replacement) {
+            console.log("This is a replacement image for day " + imageData.day_number + ", deleting old image first");
+            
+            // Find the existing image URL for this day
+            var existingImageUrl = $('#saved_image_' + imageData.offset + ' img').attr('src');
+            if (existingImageUrl) {
+                // Extract the relative path from the full URL
+                var relativePath = existingImageUrl.replace(base_url, '');
+                
+                // Delete the old image first
+                var deletePromise = $.ajax({
+                    type: 'POST',
+                    url: base_url + 'controller/package_tour/quotation/delete_itinerary_image.php',
+                    data: {
+                        quotation_id: quotationId,
+                        package_id: imageData.package_id,
+                        day_number: imageData.day_number,
+                        image_url: relativePath
+                    }
+                });
+                
+                // Chain the delete operation before upload
+                uploadPromises.push(deletePromise.then(function(deleteResponse) {
+                    console.log("Old image deleted successfully:", deleteResponse);
+                    return uploadSingleImage(imageData, quotationId, base_url);
+                }).catch(function(error) {
+                    console.log("Error deleting old image, proceeding with upload anyway:", error);
+                    return uploadSingleImage(imageData, quotationId, base_url);
+                }));
+            } else {
+                // No existing image, just upload
+                uploadPromises.push(uploadSingleImage(imageData, quotationId, base_url));
             }
-        });
-        
-        uploadPromises.push(promise);
+        } else {
+            // Regular upload (not a replacement)
+            uploadPromises.push(uploadSingleImage(imageData, quotationId, base_url));
+        }
     });
 
     // Wait for all uploads to complete
@@ -1538,6 +1564,36 @@ function uploadItineraryImages(quotationId, images) {
         console.log("All images uploaded successfully");
     }).catch(function(error) {
         console.error("Some images failed to upload:", error);
+    });
+}
+
+// Helper function to upload a single image
+function uploadSingleImage(imageData, quotationId, base_url) {
+    var formData = new FormData();
+    formData.append('quotation_id', quotationId);
+    formData.append('package_id', imageData.package_id);
+    formData.append('day_number', imageData.day_number);
+    formData.append('image', imageData.file);
+    
+    console.log("Uploading image for day " + imageData.day_number + ", package " + imageData.package_id + ", file: " + imageData.file.name);
+    
+    return $.ajax({
+        url: base_url + 'controller/package_tour/quotation/upload_itinerary_image.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log("Image upload successful for offset " + imageData.offset + ":", response);
+            // Mark as uploaded
+            if (window.quotationImages && window.quotationImages[imageData.offset]) {
+                window.quotationImages[imageData.offset].uploaded = true;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Image upload failed for offset " + imageData.offset + ":", error);
+            alert("Failed to upload image for day " + imageData.day_number + ". Please try again.");
+        }
     });
 }
 

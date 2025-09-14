@@ -221,6 +221,7 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 	error_log("DEBUG: checked_programe_arr1: " . print_r($checked_programe_arr1, true));
 	error_log("DEBUG: attraction_arr: " . print_r($attraction_arr, true));
 	error_log("DEBUG: day_count_arr: " . print_r($day_count_arr, true));
+	error_log("DEBUG: Array sizes - attraction_arr: " . count($attraction_arr) . ", program_arr: " . count($program_arr) . ", day_count_arr: " . count($day_count_arr));
 	
 	// First, delete all existing entries for this quotation to prevent duplicates
 	$delete_query = "DELETE FROM package_quotation_program WHERE quotation_id = '$quotation_id'";
@@ -229,27 +230,37 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 	
 	for($i=0; $i<sizeof($program_arr); $i++)
 	{
-		$attraction = addslashes($attraction_arr[$i]);
-		$program = addslashes($program_arr[$i]);
-		$stay = addslashes($stay_arr[$i]);
-		$meal_plan = addslashes($meal_plan_arr[$i]);
+		try {
+			$attraction = addslashes($attraction_arr[$i]);
+			$program = addslashes($program_arr[$i]);
+			$stay = addslashes($stay_arr[$i]);
+			$meal_plan = addslashes($meal_plan_arr[$i]);
 
-		error_log("DEBUG: Processing row $i - checked: '{$checked_programe_arr1[$i]}'");
+			error_log("DEBUG: Processing row $i - checked: '{$checked_programe_arr1[$i]}'");
 
-		if($checked_programe_arr1[$i]=="true")
-		{
-			error_log("DEBUG: Inserting new itinerary entry for row $i");
-			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_quotation_program"));
-			$id = $sq_max['max']+1;
+			if($checked_programe_arr1[$i]=="true")
+			{
+				error_log("DEBUG: Inserting new itinerary entry for row $i");
+				$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_quotation_program"));
+				$id = $sq_max['max']+1;
 
-			$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_count ) values ('$id', '$quotation_id', '$package_id','$attraction','$program', '$stay','$meal_plan',$day_count_arr[$i])");
-			if(!$sq_plane){
-				error_log("ERROR: Failed to insert new itinerary entry");
-				echo "error--Tour Itinerary not saved!";
-				exit;
-			} else {
-				error_log("DEBUG: Successfully inserted new itinerary entry with ID $id");
+				// Use the row index as day count for new rows, or use the provided day count
+				$day_count = isset($day_count_arr[$i]) ? $day_count_arr[$i] : ($i + 1);
+				error_log("DEBUG: Using day_count: $day_count for row $i");
+				
+				$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_count ) values ('$id', '$quotation_id', '$package_id','$attraction','$program', '$stay','$meal_plan',$day_count)");
+				if(!$sq_plane){
+					error_log("ERROR: Failed to insert new itinerary entry: " . mysqli_error($GLOBALS['conn']));
+					echo "error--Tour Itinerary not saved!";
+					exit;
+				} else {
+					error_log("DEBUG: Successfully inserted new itinerary entry with ID $id");
+				}
 			}
+		} catch (Exception $e) {
+			error_log("ERROR: Exception in program_entries_save for row $i: " . $e->getMessage());
+			echo "error--Tour Itinerary not saved! Exception: " . $e->getMessage();
+			exit;
 		}
 		// Note: We don't need to handle deletion here since we already deleted all existing entries
 	}
@@ -618,7 +629,7 @@ function quotation_daywiseimages_update(){
 				
 				$copy_result = mysqlQuery($copy_query);
 				if (!$copy_result) {
-					error_log("ERROR: Failed to copy image entry for quotation $new_quotation_id: " . mysqli_error($conn));
+					error_log("ERROR: Failed to copy image entry for quotation $new_quotation_id");
 				} else {
 					error_log("SUCCESS: Copied image entry from quotation $original_quotation_id to $new_quotation_id with updated URL: $new_image_url");
 				}

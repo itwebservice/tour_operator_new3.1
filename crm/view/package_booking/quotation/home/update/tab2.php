@@ -51,6 +51,17 @@ if (isset($quotation_id) && !empty($quotation_id)) {
     $debug_result = mysqlQuery($debug_query);
     $debug_count = mysqli_num_rows($debug_result);
     echo "<!-- Debug Info: Query result count = " . $debug_count . " -->";
+    
+    // Additional debug: Check what package_id is being used for images
+    if (isset($package_id) && !empty($package_id)) {
+        echo "<!-- Debug Info: Using package_id '$package_id' for image uploads -->";
+        
+        // Verify this package_id exists in the database
+        $verify_query = "SELECT package_id FROM custom_package_master WHERE package_id = '$package_id'";
+        $verify_result = mysqlQuery($verify_query);
+        $verify_count = mysqli_num_rows($verify_result);
+        echo "<!-- Debug Info: Package ID verification - found $verify_count records -->";
+    }
 }
 ?>
 
@@ -91,7 +102,7 @@ if (isset($quotation_id) && !empty($quotation_id)) {
                                 <div class="col-md-12 no-pad" id="div_list1">
                                     <div class="row mg_bt_10">
                                         <div class="col-xs-12 text-right text_center_xs">
-                                            <button type="button" class="btn btn-excel btn-sm" onClick="addRow('dynamic_table_list_update','','itinerary')"><i class="fa fa-plus"></i></button>
+                                            <button type="button" class="btn btn-excel btn-sm" onClick="addItineraryRow('<?php echo $package_id; ?>')"><i class="fa fa-plus"></i></button>
                                         </div>
                                     </div>
                                     <div class="table-responsive">
@@ -325,11 +336,104 @@ if (isset($quotation_id) && !empty($quotation_id)) {
 </form>
 <script>
 
+// Function to add new itinerary row (copied from create page)
+function addItineraryRow(package_id) {
+    var table = document.getElementById('dynamic_table_list_update');
+    if (!table) {
+        console.error('Table not found: dynamic_table_list_update');
+        return;
+    }
+    
+    var rowCount = table.rows.length;
+    var newRow = table.insertRow(rowCount);
+    
+    // Get the next offset number
+    var offset = rowCount + 1;
+    
+    // Create the new row HTML
+    newRow.innerHTML = `
+        <td style="width: 50px;">
+            <input class="css-checkbox mg_bt_10" id="chk_program${offset}" type="checkbox" checked>
+            <label class="css-label" style="margin-top: 55px;" for="chk_program${offset}"></label>
+        </td>
+        <td style="width: 50px;" class="hidden">
+            <input maxlength="15" value="${offset}" type="text" name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled />
+        </td>
+        <td style="width: 100px;">
+            <input type="text" id="special_attaraction${offset}-u" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction" style='width:220px;margin-top: 35px;'>
+        </td>
+        <td class='col-md-5 no-pad' style="max-width:800px;overflow: hidden;position: relative;">
+            <textarea id="day_program${offset}-u" name="day_program" class="form-control mg_bt_10 day_program" style="height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3"></textarea>
+            <span class="style_text">
+                <span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span>
+                <span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span>
+            </span>
+        </td>
+        <td class='col-md-1/2 no-pad' style='width:150px;'>
+            <input type="text" id="overnight_stay${offset}-u" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control mg_bt_10" placeholder="*Overnight Stay" title="Overnight Stay" style='width:200px;margin-top: 35px;'>
+        </td>
+        <td class='col-md-1/2 no-pad' style='width:150px;'>
+            <select id="meal_plan${offset}-u" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style='width: 140px;margin-top: 35px;'>
+                <option value="">Select Meal Plan</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="All Meals">All Meals</option>
+            </select>
+        </td>
+        <td class='col-md-1 pad_8'>
+            <button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary${offset}" onclick="add_itinerary('dest_name','special_attaraction${offset}-u','day_program${offset}-u','overnight_stay${offset}-u','Day-${offset}')">
+                <i class="fa fa-plus"></i>
+            </button>
+        </td>
+        <td class='col-md-1 pad_8' style="width: 120px;">
+            <div style="margin-top: 35px;">
+                <label for="day_image_${offset}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                    Upload Image
+                </label>
+                <input type="file" id="day_image_${offset}" name="day_image_${offset}" accept="image/*" onchange="previewDayImage(this, '${offset}')" style="display: none;">
+            </div>
+            <div id="day_image_preview_${offset}" style="display: none; margin-top: 5px;">
+                <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <img id="preview_img_${offset}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                    <button type="button" 
+                            onclick="removeDayImage('${offset}')" 
+                            title="Remove Image" 
+                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        ×
+                    </button>
+                </div>
+            </div>
+        </td>
+        <td class="hidden">
+            <input type="hidden" name="package_id_n" value="${package_id}">
+        </td>
+    `;
+    
+    console.log("DEBUG: New itinerary row added with offset:", offset, "package_id:", package_id);
+}
+
 // Function to get package ID for a specific offset
 function getPackageIdForOffset(offset) {
-    // Try to find package ID from the current row
-    var packageIdInput = $('input[name="package_id_n"]').first();
-    var packageId = packageIdInput.val() || '1'; // Default to 1 if not found
+    // Use the package_id from PHP variables (already validated)
+    var packageId = '<?php echo $package_id; ?>';
+    
+    // If package_id is still empty, try to get it from the hidden input
+    if (!packageId || packageId === '') {
+        var packageIdInput = $('input[name="package_id_n"]').first();
+        packageId = packageIdInput.val();
+    }
+    
+    // If still empty, use the img_package_id hidden input
+    if (!packageId || packageId === '') {
+        packageId = $('#img_package_id').val();
+    }
+    
+    // Final fallback - this should not happen if package_id is properly set
+    if (!packageId || packageId === '') {
+        console.error("ERROR: No package_id found for offset", offset);
+        packageId = '1'; // This should not be reached
+    }
     
     console.log("DEBUG: Getting package ID for offset", offset, ":", packageId);
     return packageId;
@@ -380,6 +484,13 @@ function previewDayImage(input, offset) {
             // Get package ID for this row
             var packageId = getPackageIdForOffset(offset);
             
+            // Validate package ID - it should not be '1' or empty for update operations
+            if (!packageId || packageId === '1' || packageId === '') {
+                console.error("ERROR: Invalid package_id for image upload:", packageId);
+                alert('Error: Package ID not found. Please refresh the page and try again.');
+                return;
+            }
+            
             // Store image by offset for later upload (when quotation is updated)
             window.quotationImages[offset] = {
                 file: file,
@@ -387,14 +498,25 @@ function previewDayImage(input, offset) {
                 package_id: packageId,
                 day_number: offset,
                 preview_url: e.target.result,
-                uploaded: false
+                uploaded: false,
+                is_replacement: (window.replacingImage === offset) // Mark if this is a replacement
             };
             
+            // Reset the replacement flag
+            if (window.replacingImage === offset) {
+                window.replacingImage = null;
+            }
+            
             // Update button text to indicate it will be uploaded when quotation is updated
-            $('#upload_btn_' + offset).text('Will Upload on Update');
+            if (window.quotationImages[offset].is_replacement) {
+                $('#upload_btn_' + offset).text('Will Replace on Update');
+            } else {
+                $('#upload_btn_' + offset).text('Will Upload on Update');
+            }
             
             console.log("DEBUG: Stored image for offset " + offset + " in edit mode:", file.name, "Package ID:", packageId);
             console.log("DEBUG: Full stored object:", window.quotationImages[offset]);
+            console.log("DEBUG: Expected package_id should be 29, actual package_id:", packageId);
         }
         reader.onerror = function() {
             console.error("FileReader error");
@@ -483,8 +605,12 @@ function replaceSavedImage(offset) {
         delete window.quotationImages[offset];
     }
     
+    // Set a flag to indicate this is a replacement
+    window.replacingImage = offset;
+    
     console.log("Ready to replace image for offset:", offset);
 }
+
 
 $(document).on("click", ".style_text_b, .style_text_u", function() {
     var wrapper = $(this).data("wrapper");
@@ -608,12 +734,15 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
                 stay_arr.push(stay);
                 meal_plan_arr.push(meal_plan);
                 package_p_id_arr.push(package_id1);
+                day_count_arr.push(i + 1); // Use row index + 1 as day count
             }
-            day_count_arr.push(count);
             
             // Debug: Log the arrays being sent
             console.log("package_p_id_arr:", package_p_id_arr);
             console.log("checked_programe_arr:", checked_programe_arr);
+            console.log("day_count_arr:", day_count_arr);
+            console.log("attraction_arr:", attraction_arr);
+            console.log("program_arr:", program_arr);
 
             var dest_id = $('#dest_name').val();
             var package_id = $('#img_package_id').val();
