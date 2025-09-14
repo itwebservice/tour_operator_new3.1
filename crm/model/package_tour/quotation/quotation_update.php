@@ -195,8 +195,6 @@ public function quotation_master_update()
 		$this->tranport_entries_update($quotation_id,$vehicle_name_arr,$start_date_arr,$pickup_arr,$drop_arr,$vehicle_count_arr,$transport_cost_arr1,$package_name_arr1,$pickup_type_arr,$drop_type_arr, $package_id,$transport_status_arr,$transport_id_arr,$end_date_arr,$service_duration_arr);	
 		$this->excursion_entries_save($quotation_id,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$excursion_id_arr,$exc_status_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr);
 		$this->costing_entries_update($tour_cost_arr,$transport_cost_arr, $basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr, $costing_id_arr,$excursion_cost_arr,$adult_cost,$infant_cost,$child_with,$child_without,$bsmValues,$quotation_id,$entry_id_arr,$discount_in_arr,$discount_arr);
-		// Debug: Log package_id before calling program_entries_save
-		error_log("DEBUG: About to call program_entries_save with package_id: $package_id");
 		$this->program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr);	
 		
 		// Copy image entries from original quotation to new quotation
@@ -215,18 +213,9 @@ public function quotation_master_update()
 
 public function program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr)
 {
-	// Debug: Log the received arrays
-	error_log("DEBUG: program_entries_save called with quotation_id: $quotation_id, package_id: $package_id");
-	error_log("DEBUG: package_p_id_arr: " . print_r($package_p_id_arr, true));
-	error_log("DEBUG: checked_programe_arr1: " . print_r($checked_programe_arr1, true));
-	error_log("DEBUG: attraction_arr: " . print_r($attraction_arr, true));
-	error_log("DEBUG: day_count_arr: " . print_r($day_count_arr, true));
-	error_log("DEBUG: Array sizes - attraction_arr: " . count($attraction_arr) . ", program_arr: " . count($program_arr) . ", day_count_arr: " . count($day_count_arr));
-	
 	// First, delete all existing entries for this quotation to prevent duplicates
 	$delete_query = "DELETE FROM package_quotation_program WHERE quotation_id = '$quotation_id'";
 	$delete_result = mysqlQuery($delete_query);
-	error_log("DEBUG: Deleted existing entries for quotation $quotation_id. Result: " . ($delete_result ? "SUCCESS" : "FAILED"));
 	
 	for($i=0; $i<sizeof($program_arr); $i++)
 	{
@@ -236,11 +225,8 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 			$stay = addslashes($stay_arr[$i]);
 			$meal_plan = addslashes($meal_plan_arr[$i]);
 
-			error_log("DEBUG: Processing row $i - checked: '{$checked_programe_arr1[$i]}'");
-
 			if($checked_programe_arr1[$i]=="true")
 			{
-				error_log("DEBUG: Inserting new itinerary entry for row $i");
 				$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_quotation_program"));
 				$id = $sq_max['max']+1;
 

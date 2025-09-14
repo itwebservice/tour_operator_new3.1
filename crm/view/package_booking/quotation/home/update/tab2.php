@@ -13,56 +13,6 @@
 </style>
 
 <?php
-// Get quotation_id and package_id from URL parameters or form data
-if (!isset($quotation_id) || empty($quotation_id)) {
-    $quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id'] : (isset($_POST['quotation_id']) ? $_POST['quotation_id'] : '');
-}
-if (!isset($package_id) || empty($package_id)) {
-    $package_id = isset($_GET['package_id']) ? $_GET['package_id'] : (isset($_POST['package_id']) ? $_POST['package_id'] : '');
-}
-
-// If package_id is still empty, try to get it from the quotation data
-if (empty($package_id) && !empty($quotation_id)) {
-    $package_query = "SELECT package_id FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id' LIMIT 1";
-    $package_result = mysqlQuery($package_query);
-    if (mysqli_num_rows($package_result) > 0) {
-        $package_row = mysqli_fetch_assoc($package_result);
-        $package_id = $package_row['package_id'];
-        echo "<!-- DEBUG: Got package_id from quotation_master: $package_id -->";
-    }
-}
-
-// If still empty, try to get it from package_quotation_program
-if (empty($package_id) && !empty($quotation_id)) {
-    $package_query = "SELECT package_id FROM package_quotation_program WHERE quotation_id = '$quotation_id' LIMIT 1";
-    $package_result = mysqlQuery($package_query);
-    if (mysqli_num_rows($package_result) > 0) {
-        $package_row = mysqli_fetch_assoc($package_result);
-        $package_id = $package_row['package_id'];
-        echo "<!-- DEBUG: Got package_id from package_quotation_program: $package_id -->";
-    }
-}
-
-// Debug information
-echo "<!-- Debug Info: quotation_id = " . (isset($quotation_id) ? $quotation_id : 'NOT SET') . " -->";
-echo "<!-- Debug Info: package_id = " . (isset($package_id) ? $package_id : 'NOT SET') . " -->";
-if (isset($quotation_id) && !empty($quotation_id)) {
-    $debug_query = "select * from package_quotation_program where quotation_id = '$quotation_id'";
-    $debug_result = mysqlQuery($debug_query);
-    $debug_count = mysqli_num_rows($debug_result);
-    echo "<!-- Debug Info: Query result count = " . $debug_count . " -->";
-    
-    // Additional debug: Check what package_id is being used for images
-    if (isset($package_id) && !empty($package_id)) {
-        echo "<!-- Debug Info: Using package_id '$package_id' for image uploads -->";
-        
-        // Verify this package_id exists in the database
-        $verify_query = "SELECT package_id FROM custom_package_master WHERE package_id = '$package_id'";
-        $verify_result = mysqlQuery($verify_query);
-        $verify_count = mysqli_num_rows($verify_result);
-        echo "<!-- Debug Info: Package ID verification - found $verify_count records -->";
-    }
-}
 ?>
 
 
@@ -781,9 +731,9 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             });
 
             $('#tab2_head').addClass('done');
-            $('#tab_daywise_head').addClass('active');
+            $('#tab3_head').addClass('active');
             $('.bk_tab').removeClass('active');
-            $('#tab_daywise').addClass('active');
+            $('#tab3').addClass('active');
             $('html, body').animate({
                 scrollTop: $('.bk_tab_head').offset().top
             }, 200);

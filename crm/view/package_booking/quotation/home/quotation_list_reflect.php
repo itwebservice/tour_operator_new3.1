@@ -46,7 +46,7 @@ if ($branch_id != "") {
 	$query .= " and branch_admin_id = '$branch_id'";
 }
 include "../../../../model/app_settings/branchwise_filteration.php";
-$query .= " order by quotation_id asc ";
+$query .= " order by quotation_id desc ";
 
 $count = 0;
 $quotation_cost = 0;

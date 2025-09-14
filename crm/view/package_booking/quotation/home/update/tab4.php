@@ -1,3 +1,4 @@
+
 <form id="frm_tab4">
 
     <div class="app_panel">
@@ -1105,7 +1106,6 @@ $('#frm_tab4').validate({
                     console.log("program_arr:", program_arr);
                     console.log("day_count_arr:", day_count_arr);
                     console.log("checked_programe_arr:", checked_programe_arr);
-                    
                     $.ajax({
 
                         type: 'post',

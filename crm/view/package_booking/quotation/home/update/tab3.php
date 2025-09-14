@@ -1244,11 +1244,33 @@ $package_name = $sq_package['package_name'];
 
     function switch_to_tab2() {
         $('#tab3_head').removeClass('active');
-        $('#tab_daywise_head').addClass('active');
+        $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');
-        $('#tab_daywise').addClass('active');
+        $('#tab2').addClass('active');
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
     }
+
+    // Initialize tab3 when it becomes active
+    $(document).ready(function() {
+        // Check if tab3 is active and initialize data
+        if ($('#tab3').hasClass('active')) {
+            // Load hotel and transport data
+            setTimeout(function() {
+                get_hotel_cost();
+                get_excursion_amount();
+                get_transport_cost();
+            }, 500);
+        }
+    });
+
+    // Initialize when tab3 becomes active
+    $('#tab3_head').on('click', function() {
+        setTimeout(function() {
+            get_hotel_cost();
+            get_excursion_amount();
+            get_transport_cost();
+        }, 300);
+    });
 </script>

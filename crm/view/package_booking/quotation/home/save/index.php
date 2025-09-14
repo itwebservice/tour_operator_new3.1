@@ -32,7 +32,7 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
                 <span class="text">Package</span>
             </a>
         </li>
-        <li>
+        <li style="display: none;">
             <a href="javascript:void(0)" id="tab_daywise_head">
                 <span class="num" title="Daywise Gallery">3<i class="fa fa-check"></i></span><br>
                 <span class="text">Daywise Images</span>
@@ -40,13 +40,13 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
         </li>
         <li>
             <a href="javascript:void(0)" id="tab3_head">
-                <span class="num" title="Travel And Stay">4<i class="fa fa-check"></i></span><br>
+                <span class="num" title="Travel And Stay">3<i class="fa fa-check"></i></span><br>
                 <span class="text">Travel And Stay</span>
             </a>
         </li>
         <li>
             <a href="javascript:void(0)" id="tab4_head">
-                <span class="num" title="Costing">5<i class="fa fa-check"></i></span><br>
+                <span class="num" title="Costing">4<i class="fa fa-check"></i></span><br>
                 <span class="text">Costing</span>
             </a>
         </li>
@@ -61,7 +61,7 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
     <div id="tab2" class="bk_tab">
         <?php include_once("tab2.php"); ?>
     </div>
-    <div id="tab_daywise" class="bk_tab">
+    <div id="tab_daywise" class="bk_tab" style="display: none;">
         <?php include_once("daywise_images.php"); ?>
     </div>
     <div id="tab3" class="bk_tab">
@@ -117,10 +117,21 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
     function hotel_type_load_cate(id) {
         var hotel_id = $("#" + id).val();
         var count = id.substring(11);
+        console.log("DEBUG: Loading room categories for hotel_id:", hotel_id, "count:", count);
         $.get("../hotel/hotel_category.php", {
             hotel_id: hotel_id
         }, function(data) {
+            console.log("DEBUG: Room category data received:", data);
             $("#room_cat-" + count).html(data);
+            
+            // Check if Deluxe Room is available and select it
+            setTimeout(function() {
+                var deluxeOption = $("#room_cat-" + count + " option[value*='Deluxe']");
+                if (deluxeOption.length > 0) {
+                    $("#room_cat-" + count).val(deluxeOption.first().val());
+                    $("#room_cat-" + count).trigger('change');
+                }
+            }, 100);
         });
     }
     /**Excursion Name load**/

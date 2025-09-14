@@ -555,9 +555,9 @@ $('#frm_tab2').validate({
         saveItineraryData();
 
         $('#tab2_head').addClass('done');
-        $('#tab_daywise_head').addClass('active');
+        $('#tab3_head').addClass('active');
         $('.bk_tab').removeClass('active');
-        $('#tab_daywise').addClass('active');
+        $('#tab3').addClass('active');
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
