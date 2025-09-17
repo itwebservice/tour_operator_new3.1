@@ -1076,6 +1076,7 @@
             var program_arr = [];
             var stay_arr = [];
             var meal_plan_arr = [];
+            var day_image_arr = [];
             var package_p_id_arr = [];
 
             if (itineraryData) {
@@ -1084,6 +1085,7 @@
                 program_arr = data.program_arr || [];
                 stay_arr = data.stay_arr || [];
                 meal_plan_arr = data.meal_plan_arr || [];
+                day_image_arr = data.day_image_arr || [];
                 package_p_id_arr = data.package_p_id_arr || [];
                 
                 console.log("Using stored itinerary data:", {
@@ -1091,6 +1093,7 @@
                     program_arr: program_arr,
                     stay_arr: stay_arr,
                     meal_plan_arr: meal_plan_arr,
+                    day_image_arr: day_image_arr,
                     package_p_id_arr: package_p_id_arr
                 });
                 
@@ -1125,6 +1128,15 @@
                             program_arr.push(program);
                             stay_arr.push(stay);
                             meal_plan_arr.push(meal_plan);
+                            
+                            // Get image data for this row
+                            var img = '';
+                            var existingImgInput = row.querySelector('input[id^="existing_image_path_"]');
+                            if (existingImgInput) {
+                                img = existingImgInput.value || '';
+                            }
+                            day_image_arr.push(img);
+                            
                             package_p_id_arr.push(package_id1);
                         }
                     }
@@ -1136,6 +1148,7 @@
                 program_arr: program_arr,
                 stay_arr: stay_arr,
                 meal_plan_arr: meal_plan_arr,
+                day_image_arr: day_image_arr,
                 package_p_id_arr: package_p_id_arr
             });
 
@@ -1255,6 +1268,7 @@
                                 program_arr: program_arr,
                                 stay_arr: stay_arr,
                                 hotel_meal_plan_arr: hotel_meal_plan_arr,
+                                day_image_arr: day_image_arr,
                                 package_p_id_arr: package_p_id_arr,
                                 branch_admin_id: branch_admin_id,
                                 c_package_id_arr: c_package_id_arr,

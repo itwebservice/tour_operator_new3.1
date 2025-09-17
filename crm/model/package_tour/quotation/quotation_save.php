@@ -139,6 +139,7 @@ public function quotation_master_save()
 	$program_arr = isset($_POST['program_arr']) ? $_POST['program_arr'] : [];
 	$stay_arr = isset($_POST['stay_arr']) ? $_POST['stay_arr'] : [];
 	$meal_plan_arr = isset($_POST['meal_plan_arr']) ? $_POST['meal_plan_arr'] : [];
+	$day_image_arr = isset($_POST['day_image_arr']) ? $_POST['day_image_arr'] : [];
 	$package_p_id_arr = isset($_POST['package_p_id_arr']) ? $_POST['package_p_id_arr'] : [];
 
 	$enquiry_content = '[{"name":"tour_name","value":"'.$tour_name.'"},{"name":"travel_from_date","value":"'.$from_date.'"},{"name":"travel_to_date","value":"'.$to_date.'"},{"name":"budget","value":"0"},{"name":"total_adult","value":"'.$total_adult.'"},{"name":"total_children","value":"0"},{"name":"total_infant","value":"'.$total_infant.'"},{"name":"total_members","value":"'.$total_passangers.'"},{"name":"hotel_type","value":""},{"name":"children_without_bed","value":"'.$children_without_bed.'"},{"name":"children_with_bed","value":"'.$children_with_bed.'"}]';
@@ -201,9 +202,9 @@ public function quotation_master_save()
 		$this->update_temporary_quotation_ids($quotation_id_arr, $temp_quotation_id);
 		
 		// Update temporary quotation IDs in package_tour_quotation_images table
-		$this->update_temporary_quotation_ids_in_images($quotation_id_arr, $temp_quotation_id);
+		$this->update_temporary_quotation_ids_in_images($quotation_id_arr, $temp_quotation_id, $package_id_arr);
 		
-		$this->program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url);	
+		$this->program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url);	
 
 		echo "Quotation has been successfully saved. Quotation ID: " . $quotation_id_arr[0];
 		exit;
@@ -375,7 +376,7 @@ public function update_temporary_quotation_ids($quotation_id_arr, $temp_quotatio
 	}
 }
 
-public function update_temporary_quotation_ids_in_images($quotation_id_arr, $temp_quotation_id = '')
+public function update_temporary_quotation_ids_in_images($quotation_id_arr, $temp_quotation_id = '', $package_id_arr = [])
 {
 	// Update any temporary quotation IDs in package_tour_quotation_images table
 	for($i=0; $i<sizeof($quotation_id_arr); $i++)
@@ -416,7 +417,7 @@ public function update_temporary_quotation_ids_in_images($quotation_id_arr, $tem
 	}
 }
 
-public function program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url)
+public function program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url)
 {
 	error_log("DEBUG: program_entries_save called with:");
 	error_log("quotation_id_arr: " . print_r($quotation_id_arr, true));
@@ -424,6 +425,7 @@ public function program_entries_save($quotation_id_arr,$attraction_arr, $program
 	error_log("program_arr: " . print_r($program_arr, true));
 	error_log("stay_arr: " . print_r($stay_arr, true));
 	error_log("meal_plan_arr: " . print_r($meal_plan_arr, true));
+	error_log("day_image_arr: " . print_r($day_image_arr, true));
 	error_log("package_p_id_arr: " . print_r($package_p_id_arr, true));
 	error_log("package_id_arr: " . print_r($package_id_arr, true));
 
@@ -460,12 +462,13 @@ public function program_entries_save($quotation_id_arr,$attraction_arr, $program
 			$program = addslashes($program_arr[$j]);
 			$stay = addslashes($stay_arr[$j]);
 			$meal_plan = addslashes($meal_plan_arr[$j]);
+			$day_image = isset($day_image_arr[$j]) ? addslashes($day_image_arr[$j]) : '';
 			
 			// Use the first package ID if available, otherwise use 1 as default
 			$package_id = !empty($package_id_arr) ? $package_id_arr[0] : 1;
 			
-			error_log("DEBUG: Inserting program data - ID: $id, Quotation ID: $quotation_id, Package ID: $package_id, Attraction: $attr");
-			$sq_plane = mysqlQuery("insert into package_quotation_program ( id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_count ) values ( '$id', '$quotation_id','$package_id', '$attr','$program', '$stay','$meal_plan','$day_count')");
+			error_log("DEBUG: Inserting program data - ID: $id, Quotation ID: $quotation_id, Package ID: $package_id, Attraction: $attr, Day Image: $day_image");
+			$sq_plane = mysqlQuery("insert into package_quotation_program ( id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_image,day_count ) values ( '$id', '$quotation_id','$package_id', '$attr','$program', '$stay','$meal_plan','$day_image','$day_count')");
 			if(!$sq_plane){
 				error_log("ERROR: Program not saved!");
 				echo "error--Program not saved!";

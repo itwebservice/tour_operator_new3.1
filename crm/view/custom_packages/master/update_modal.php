@@ -239,23 +239,59 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                             <td class='col-md-1 pad_8'><button type="button" id="itinerary<?php echo $count; ?>" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="border: none !important;margin-top:35px;" onClick="add_itinerary('dest_name_u','special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?php echo $count; ?>-u','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button>
                                             </td>
                                             <td class='col-md-1 pad_8' style="width: 120px;">
+                                                <!-- Debug: Image path = <?= $sq_pckg1['day_image'] ?? 'NULL' ?> -->
                                                 <div style="margin-top: 35px;">
                                                     <label for="day_image_<?php echo $count; ?>" class="btn btn-sm btn-success" 
-                                                           style="margin-bottom: 5px; padding: 4px 8px; font-size: 11px; cursor: pointer;">
-                                                        <i class="fa fa-image"></i> Image
+                                                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:none;' : '' ?>">
+                                                        <i class="fa fa-image"></i> Upload Image
                                                     </label>
                                                     <input type="file" id="day_image_<?php echo $count; ?>" 
                                                            name="day_image_<?php echo $count; ?>" accept="image/*" 
                                                            onchange="previewDayImageUpdate(this, '<?php echo $count; ?>')" 
                                                            style="display: none;">
                                                 </div>
-                                                <div id="day_image_preview_<?php echo $count; ?>" style="display: none; margin-top: 5px;">
-                                                    <img id="preview_img_<?php echo $count; ?>" src="" alt="Preview" 
-                                                         style="max-width: 80px; max-height: 60px; border: 1px solid #ddd; border-radius: 4px; display: block;">
-                                                    <button type="button" class="btn btn-xs btn-danger" 
-                                                            onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
-                                                            style="margin-top: 2px; padding: 1px 4px; font-size: 10px;">×</button>
+                                                <div id="day_image_preview_<?php echo $count; ?>" style="<?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
+                                                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                                                        <img id="preview_img_<?php echo $count; ?>" src="<?php 
+                                                            if (!empty($sq_pckg1['day_image'])) {
+                                                                $image_path = trim($sq_pckg1['day_image']);
+                                                                // Debug the actual path
+                                                                error_log("PACKAGE UPDATE: Image path from DB: " . $image_path);
+                                                                
+                                                                // Check if path is valid and not empty
+                                                                if ($image_path && $image_path !== '' && $image_path !== 'NULL') {
+                                                                    // Check if path already starts with http
+                                                                    if (strpos($image_path, 'http') === 0) {
+                                                                        echo $image_path;
+                                                                    } else {
+                                                                        // For package images, use project root URL
+                                                                        $project_base_url = str_replace('/crm/', '/', BASE_URL);
+                                                                        $project_base_url = rtrim($project_base_url, '/');
+                                                                        $image_path = ltrim($image_path, '/');
+                                                                        $final_url = $project_base_url . '/' . $image_path;
+                                                                        error_log("PACKAGE UPDATE: Final image URL: " . $final_url);
+                                                                        echo $final_url;
+                                                                    }
+                                                                } else {
+                                                                    // Empty or invalid path, don't output anything
+                                                                    echo '';
+                                                                }
+                                                            } else {
+                                                                echo '';
+                                                            }
+                                                        ?>" alt="Preview" 
+                                                             style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
+                                                             onerror="console.log('PACKAGE UPDATE: Existing image failed to load:', this.src); this.style.display='none'; this.parentElement.parentElement.style.display='none'; this.parentElement.parentElement.parentElement.querySelector('label').style.display='block'; this.parentElement.querySelector('button[onclick*=removeDayImageUpdate]').style.display='none';"
+                                                             onload="console.log('PACKAGE UPDATE: Image loaded successfully:', this.src);">
+                                                        <button type="button" 
+                                                                onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
+                                                                title="Remove Image" 
+                                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($sq_pckg1['day_image']) || trim($sq_pckg1['day_image']) === '' || trim($sq_pckg1['day_image']) === 'NULL') ? 'display:none;' : '' ?>">
+                                                            ×
+                                                        </button>
+                                                    </div>
                                                 </div>
+                                                <input type="hidden" id="existing_image_path_<?php echo $count; ?>" name="existing_image_path_<?php echo $count; ?>" value="<?= $sq_pckg1['day_image'] ?? '' ?>" />
                                             </td>
                                             <td class="hidden"><input type="text" value="<?php echo $sq_pckg1['entry_id']; ?>"></td>
                                         </tr>
@@ -465,25 +501,106 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
     </form>
 </div>
 </div>
+<input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script>
 // Day image preview functions for update modal
 function previewDayImageUpdate(input, offset) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            $('#preview_img_' + offset).attr('src', e.target.result);
-            $('#day_image_preview_' + offset).show();
-        }
-        reader.readAsDataURL(input.files[0]);
+    console.log("PACKAGE UPDATE: Preview triggered for row:", offset);
+    console.log("PACKAGE UPDATE: Input file:", input.files[0]);
+    
+    var file = input.files[0];
+    if (!file) {
+        console.log("PACKAGE UPDATE: No file selected");
+        return;
     }
+    
+    // Validate file type
+    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        error_msg_alert('Only JPG, JPEG, PNG, WEBP files are allowed');
+        input.value = ''; // Clear the input
+        return;
+    }
+    
+    console.log("PACKAGE UPDATE: File validation passed, showing preview for row:", offset);
+    
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        console.log("PACKAGE UPDATE: FileReader loaded, setting image src for row:", offset);
+        var previewImg = $('#preview_img_' + offset);
+        var previewDiv = $('#day_image_preview_' + offset);
+        
+        if (previewImg.length === 0) {
+            console.error("PACKAGE UPDATE: Preview image element not found for row:", offset);
+            return;
+        }
+        
+        if (previewDiv.length === 0) {
+            console.error("PACKAGE UPDATE: Preview div element not found for row:", offset);
+            return;
+        }
+        
+        // Set the image source and show preview
+        previewImg.attr('src', e.target.result);
+        previewDiv.show();
+        
+        // Show the remove button when image is selected
+        previewDiv.find('button[onclick*="removeDayImageUpdate"]').css('display', 'flex');
+        
+        // Hide the upload button after image selection
+        $('#day_image_' + offset).parent().find('label').hide();
+        
+        console.log("PACKAGE UPDATE: Preview displayed successfully for row:", offset);
+    };
+    
+    reader.onerror = function(e) {
+        console.error("PACKAGE UPDATE: FileReader error for row:", offset, e);
+        error_msg_alert('Error reading the selected file');
+    };
+    
+    reader.readAsDataURL(file);
+    
+    // Store file for later upload with the correct offset key
+    if (!window.packageImages) {
+        window.packageImages = {};
+    }
+    window.packageImages[offset] = {
+        file: file,
+        uploaded: false
+    };
+    
+    console.log("PACKAGE UPDATE: Image stored in window.packageImages[" + offset + "]");
+    console.log("PACKAGE UPDATE: Current packageImages object:", window.packageImages);
 }
 
 function removeDayImageUpdate(offset) {
+    console.log("PACKAGE UPDATE: Removing image for row:", offset);
+    
+    // Clear file input
     $('#day_image_' + offset).val('');
-    $('#day_image_preview_' + offset).hide();
+    
+    // Hide preview and remove button
+    var previewDiv = $('#day_image_preview_' + offset);
+    previewDiv.hide();
+    previewDiv.find('button[onclick*="removeDayImageUpdate"]').hide();
+    
+    // Clear the image src
     $('#preview_img_' + offset).attr('src', '');
+    
+    // Show the upload button again
+    $('#day_image_' + offset).parent().find('label').show();
+    
+    // Clear existing image path
+    $('#existing_image_path_' + offset).val('');
+    
+    // Clear stored file
+    if (window.packageImages && window.packageImages[offset]) {
+        delete window.packageImages[offset];
+    }
+    
+    console.log("PACKAGE UPDATE: Image removed successfully for row:", offset);
 }
 
 // Add new itinerary row function for update modal
@@ -539,15 +656,18 @@ function addItineraryRowUpdate() {
         </td>
         <td class='col-md-1 pad_8' style="width: 120px;">
             <div style="margin-top: 35px;">
-                <label for="day_image_${count}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 4px 8px; font-size: 11px; cursor: pointer;">
-                    <i class="fa fa-image"></i> Image
+                <label for="day_image_${count}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                    <i class="fa fa-image"></i> Upload Image
                 </label>
                 <input type="file" id="day_image_${count}" name="day_image_${count}" accept="image/*" onchange="previewDayImageUpdate(this, '${count}')" style="display: none;">
             </div>
             <div id="day_image_preview_${count}" style="display: none; margin-top: 5px;">
-                <img id="preview_img_${count}" src="" alt="Preview" style="max-width: 80px; max-height: 60px; border: 1px solid #ddd; border-radius: 4px; display: block;">
-                <button type="button" class="btn btn-xs btn-danger" onclick="removeDayImageUpdate('${count}')" style="margin-top: 2px; padding: 1px 4px; font-size: 10px;">×</button>
+                <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <img id="preview_img_${count}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                    <button type="button" onclick="removeDayImageUpdate('${count}')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>
+                </div>
             </div>
+            <input type="hidden" id="existing_image_path_${count}" name="existing_image_path_${count}" value="" />
         </td>
         <td class="hidden">
             <input type="text" value="">
@@ -752,6 +872,7 @@ $('#seo_slug').val(generateSlug(packageName));
                 var overnight_stay_arr = new Array();
                 var meal_plan_arr = new Array();
                 var entry_id_arr = new Array();
+                var day_image_arr = new Array();
 
                 var table = document.getElementById("dynamic_table_list_update");
                 var rowCount = table.rows.length;
@@ -811,13 +932,72 @@ $('#seo_slug').val(generateSlug(packageName));
                     overnight_stay_arr.push(overnight_stay);
                     meal_plan_arr.push(meal_plan);
                     entry_id_arr.push(entry_id);
+                    
+                    // Get image path - check both stored images and upload if needed
+                    var img = '';
+                    var rowIndex = i + 1; // Convert 0-based index to 1-based for matching PHP count
+                    
+                    console.log("PACKAGE UPDATE: Processing image for row", i, "with rowIndex", rowIndex);
+                    
+                    // First check if we have a new image in window.packageImages
+                    if (window.packageImages && window.packageImages[rowIndex]) {
+                        var imageData = window.packageImages[rowIndex];
+                        console.log("PACKAGE UPDATE: Found image data for rowIndex", rowIndex, imageData);
+                        
+                        if (imageData.file && !imageData.uploaded) {
+                            console.log("PACKAGE UPDATE: Uploading new image for rowIndex", rowIndex);
+                            // Upload the image immediately
+                            var formData = new FormData();
+                            formData.append('uploadfile', imageData.file);
+                            
+                            $.ajax({
+                                url: $('#base_url').val() + 'view/other_masters/itinerary/upload_itinerary_image.php',
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                async: false, // Make it synchronous for data collection
+                                success: function(response) {
+                                    try {
+                                        var msg = response.split('--');
+                                        if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
+                                            img = response;
+                                            window.packageImages[rowIndex].uploaded = true;
+                                            window.packageImages[rowIndex].image_url = response;
+                                            console.log("PACKAGE UPDATE: Image uploaded successfully for rowIndex", rowIndex, ":", img);
+                                        } else {
+                                            console.log("PACKAGE UPDATE: Upload failed for rowIndex", rowIndex, ":", response);
+                                        }
+                                    } catch(e) {
+                                        console.log('PACKAGE UPDATE: Upload parse error for rowIndex', rowIndex, ':', e);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.log("PACKAGE UPDATE: Upload error for rowIndex", rowIndex, ":", error);
+                                }
+                            });
+                        } else if (imageData.image_url) {
+                            img = imageData.image_url;
+                            console.log("PACKAGE UPDATE: Using existing image URL for rowIndex", rowIndex, ":", img);
+                        }
+                    } else {
+                        // Fallback to existing image from hidden input
+                        var existingImgInput = row.querySelector('input[id="existing_image_path_' + rowIndex + '"]');
+                        img = existingImgInput ? existingImgInput.value : '';
+                        console.log("PACKAGE UPDATE: Using existing image for rowIndex", rowIndex, ":", img);
+                    }
+                    
+                    console.log("PACKAGE UPDATE: Final image for row", i, ":", img);
+                    day_image_arr.push(img || '');
                 }
                 
                 console.log("Arrays being sent:");
                 console.log("checked_programe_arr:", checked_programe_arr);
                 console.log("special_attaraction_arr:", special_attaraction_arr);
                 console.log("day_program_arr:", day_program_arr);
+                console.log("day_image_arr:", day_image_arr);
                 console.log("entry_id_arr:", entry_id_arr);
+                console.log("window.packageImages:", window.packageImages);
 
                 //Hotel information
                 var hotel_check_arr = new Array();
@@ -959,6 +1139,7 @@ $('#seo_slug').val(generateSlug(packageName));
                         special_attaraction_arr: special_attaraction_arr,
                         overnight_stay_arr: overnight_stay_arr,
                         meal_plan_arr: meal_plan_arr,
+                        day_image_arr: day_image_arr,
                         entry_id_arr: entry_id_arr,
                         hotel_entry_id_arr: hotel_entry_id_arr,
                         vehicle_name_arr: vehicle_name_arr,

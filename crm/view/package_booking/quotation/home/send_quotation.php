@@ -3,6 +3,7 @@ include "../../../../model/model.php";
 
 $email_id = $_POST['email_id'];
 $mobile_no = $_POST['mobile_no'];
+$specific_quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] : null;
 
 $branch_admin_id = $_SESSION['branch_admin_id'];
 $emp_id = $_SESSION['emp_id'];
@@ -91,11 +92,26 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
 $email_id = $_POST['email_id'];
 $mobile_no = $_POST['mobile_no'];
 
-$query = "select *, 
-	COALESCE(is_sub_quotation, '0') as is_sub_quotation,
-	COALESCE(parent_quotation_id, '0') as parent_quotation_id,
-	COALESCE(quotation_display_id, '') as quotation_display_id
-	from package_tour_quotation_master where email_id = '$email_id'  and status='1'";
+// Build query based on whether specific quotation_id is provided
+if ($specific_quotation_id) {
+    // Show only the specific quotation and its sub-quotations
+    $query = "select *, 
+        COALESCE(is_sub_quotation, '0') as is_sub_quotation,
+        COALESCE(parent_quotation_id, '0') as parent_quotation_id,
+        COALESCE(quotation_display_id, '') as quotation_display_id
+        from package_tour_quotation_master 
+        where (quotation_id = '$specific_quotation_id' OR parent_quotation_id = '$specific_quotation_id') 
+        and status='1'";
+    echo "<!-- DEBUG: Filtering for specific quotation_id: $specific_quotation_id -->";
+} else {
+    // Show all quotations for the email (original behavior)
+    $query = "select *, 
+        COALESCE(is_sub_quotation, '0') as is_sub_quotation,
+        COALESCE(parent_quotation_id, '0') as parent_quotation_id,
+        COALESCE(quotation_display_id, '') as quotation_display_id
+        from package_tour_quotation_master where email_id = '$email_id'  and status='1'";
+    echo "<!-- DEBUG: Showing all quotations for email: $email_id -->";
+}
 if ($role != 'Admin' && $role != 'Branch Admin') {
 	$query .= " and emp_id='$emp_id'";
 }
@@ -132,9 +148,11 @@ if ($first_quotation) {
 
 // Reset the query for the main loop
 $sq_query = mysqlQuery($query);
+$quotation_count = mysqli_num_rows($sq_query);
 
 // Debug: Log the query and results
 error_log("Modal query: " . $query);
+error_log("Found $quotation_count quotations for display");
 $debug_count = 0;
 ?>
 <input type="hidden" id="whatsapp_switch" value="<?= $whatsapp_switch ?>">
@@ -148,6 +166,11 @@ $debug_count = 0;
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-xs-12">
+						<?php if ($specific_quotation_id) { ?>
+							<div class="alert alert-info">
+								<i class="fa fa-info-circle"></i> Displaying quotation ID <?= $specific_quotation_id ?> and its sub-quotations (<?= $quotation_count ?> total)
+							</div>
+						<?php } ?>
 						<input type="checkbox" id="check_all" name="check_all" onClick="select_all_check(this.id,'custom_package')">&nbsp;&nbsp;&nbsp;<span style="text-transform: initial;">Check All</span>
 					</div>
 				</div>
@@ -1251,6 +1274,80 @@ $debug_count = 0;
 			}
 		});
 	}
+
+	// Smart dropdown positioning function
+	function adjustDropdownPosition() {
+		$('.btn-group').each(function() {
+			var $btnGroup = $(this);
+			var $dropdown = $btnGroup.find('.dropdown-menu');
+			
+			if ($dropdown.length === 0) return;
+			
+			// Reset classes and positioning
+			$btnGroup.removeClass('dropup');
+			$dropdown.css('position', 'absolute');
+			
+			// Get button position and viewport height
+			var buttonOffset = $btnGroup.offset();
+			if (!buttonOffset) return;
+			
+			var buttonHeight = $btnGroup.outerHeight();
+			var dropdownHeight = $dropdown.outerHeight() || 200; // Estimate if not visible
+			var viewportHeight = $(window).height();
+			var scrollTop = $(window).scrollTop();
+			
+			// Calculate space below and above
+			var spaceBelow = viewportHeight - (buttonOffset.top - scrollTop + buttonHeight);
+			var spaceAbove = buttonOffset.top - scrollTop;
+			
+			// Check if we're inside a scrollable container
+			var $scrollContainer = $btnGroup.closest('.table-responsive, .modal-body');
+			var isInScrollContainer = $scrollContainer.length > 0;
+			
+			// If not enough space below, position above or use fixed positioning
+			if (spaceBelow < dropdownHeight + 20) {
+				if (spaceAbove > dropdownHeight + 20) {
+					$btnGroup.addClass('dropup');
+					console.log('SEND MODAL: Dropdown positioned above for button at', buttonOffset.top);
+				} else if (isInScrollContainer && window.innerHeight > 600) {
+					// Use fixed positioning if in scroll container and viewport is large enough
+					$dropdown.css({
+						'position': 'fixed',
+						'top': Math.max(10, buttonOffset.top - dropdownHeight - 5) + 'px',
+						'left': (buttonOffset.left - $dropdown.outerWidth() + $btnGroup.outerWidth()) + 'px',
+						'z-index': '9999'
+					});
+					console.log('SEND MODAL: Dropdown positioned with fixed positioning');
+				}
+			}
+		});
+	}
+
+	// Apply smart positioning on page load and when dropdowns are opened
+	$(document).ready(function() {
+		// Adjust positioning when dropdown is about to be shown
+		$(document).on('show.bs.dropdown', '.btn-group', function() {
+			var $this = $(this);
+			setTimeout(function() {
+				adjustDropdownPosition();
+			}, 10);
+		});
+		
+		// Also adjust on window resize and scroll
+		$(window).on('resize scroll', function() {
+			adjustDropdownPosition();
+		});
+		
+		// Adjust when modal is shown
+		$('#quotation_send_modal').on('shown.bs.modal', function() {
+			setTimeout(function() {
+				adjustDropdownPosition();
+			}, 100);
+		});
+		
+		// Initial adjustment
+		adjustDropdownPosition();
+	});
 </script>
 <script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/quotation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
@@ -1284,31 +1381,72 @@ $debug_count = 0;
     .table-responsive {
         position: relative;
         overflow-x: visible;
+        overflow-y: visible;
     }
     
-    /* Modal height adjustments */
+    /* Ensure table container doesn't clip dropdowns */
+    .table-responsive table {
+        overflow: visible;
+    }
+    
+    /* If modal content is too tall, add scroll only to table container */
+    @media (max-height: 800px) {
+        #quotation_send_modal .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: visible;
+        }
+        
+        /* But still keep dropdowns visible outside the scrollable area */
+        #quotation_send_modal .table-responsive .btn-group .dropdown-menu {
+            position: fixed !important;
+            z-index: 9999 !important;
+        }
+    }
+    
+    /* Modal height adjustments - Remove scroll for better dropdown visibility */
     #quotation_send_modal .modal-dialog {
-        max-height: 90vh;
+        max-height: none;
         height: auto;
         margin: 20px auto;
+        max-width: 95%;
     }
     
     #quotation_send_modal .modal-content {
         height: auto;
-        max-height: 90vh;
+        max-height: none;
         display: flex;
         flex-direction: column;
     }
     
     #quotation_send_modal .modal-body {
         flex: 1;
-        overflow-y: auto;
+        overflow-y: visible;
+        overflow-x: visible;
         padding: 20px;
+        max-height: none;
     }
     
     /* Fix dropdown positioning for last column */
     #tbl_tour_list td:last-child .btn-group {
         position: static;
+    }
+    
+    /* Ensure dropdowns are always visible above other content */
+    .btn-group .dropdown-menu {
+        z-index: 9999 !important;
+        position: absolute !important;
+    }
+    
+    /* Prevent modal backdrop from interfering with dropdowns */
+    .modal-backdrop {
+        z-index: 1040;
+    }
+    
+    /* Ensure dropdown menus are above modal backdrop */
+    .btn-group.open .dropdown-menu,
+    .btn-group.show .dropdown-menu {
+        z-index: 1050 !important;
     }
     
     /* Action buttons container */
@@ -1970,6 +2108,15 @@ $debug_count = 0;
         border: 1px solid rgba(0,0,0,.15);
         border-radius: 4px;
         box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        transition: all 0.2s ease;
+    }
+    
+    /* Smart positioning - show above when near bottom */
+    .btn-group.dropup .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin: 0 0 2px;
+        box-shadow: 0 -6px 12px rgba(0,0,0,.175);
     }
     
     .btn-group.open .dropdown-menu {

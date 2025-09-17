@@ -353,18 +353,21 @@ quotation_list_reflect();
         // Add timestamp to prevent caching
         var timestamp = new Date().getTime();
         
+        console.log('Loading specific quotation:', quotation_id, 'for email:', email_id);
+        
         $.post('send_quotation.php', {
+            quotation_id: quotation_id,  // Pass specific quotation_id
             email_id: email_id,
             mobile_no: mobile_no,
             _t: timestamp
         }, function(data) {
-            console.log('Modal response:', data);
+            console.log('Modal response for quotation:', quotation_id);
             $('#div_quotation_form').html(data);
             $('#' + btn_id).button('reset');
             // Show the modal after content is loaded
             $('#quotation_send_modal').modal('show');
         }).fail(function(xhr, status, error) {
-            console.error('Error loading modal:', error);
+            console.error('Error loading modal for quotation:', quotation_id, error);
             console.error('Response text:', xhr.responseText);
             $('#' + btn_id).button('reset');
             error_msg_alert('Error loading quotation modal. Please try again.');
@@ -510,6 +513,55 @@ $(document).ready(function() {
 function addActionsButton(quotationData) {
     return '<button class="btn btn-primary btn-sm" onclick="openActionsModal(' + JSON.stringify(quotationData).replace(/"/g, '&quot;') + ')" title="View All Actions"><i class="fa fa-cogs"></i> Actions</button>';
 }
+
+// Smart dropdown positioning function for Actions modal and other dropdowns
+function adjustDropdownPosition() {
+    $('.btn-group, .dropdown').each(function() {
+        var $btnGroup = $(this);
+        var $dropdown = $btnGroup.find('.dropdown-menu');
+        
+        if ($dropdown.length === 0) return;
+        
+        // Reset classes
+        $btnGroup.removeClass('dropup');
+        
+        // Get button position and viewport height
+        var buttonOffset = $btnGroup.offset();
+        var buttonHeight = $btnGroup.outerHeight();
+        var dropdownHeight = $dropdown.outerHeight() || 200; // Estimate if not visible
+        var viewportHeight = $(window).height();
+        var scrollTop = $(window).scrollTop();
+        
+        // Calculate space below and above
+        var spaceBelow = viewportHeight - (buttonOffset.top - scrollTop + buttonHeight);
+        var spaceAbove = buttonOffset.top - scrollTop;
+        
+        // If not enough space below but enough space above, use dropup
+        if (spaceBelow < dropdownHeight + 20 && spaceAbove > dropdownHeight + 20) {
+            $btnGroup.addClass('dropup');
+            console.log('QUOTATION INDEX: Dropdown positioned above for button at', buttonOffset.top);
+        }
+    });
+}
+
+// Apply smart positioning for all dropdowns
+$(document).ready(function() {
+    // Adjust positioning when dropdown is about to be shown
+    $(document).on('show.bs.dropdown', '.btn-group, .dropdown', function() {
+        var $this = $(this);
+        setTimeout(function() {
+            adjustDropdownPosition();
+        }, 10);
+    });
+    
+    // Also adjust on window resize and scroll
+    $(window).on('resize scroll', function() {
+        adjustDropdownPosition();
+    });
+    
+    // Initial adjustment
+    adjustDropdownPosition();
+});
 </script>
 <style>
     .action_width {
@@ -519,6 +571,32 @@ function addActionsButton(quotationData) {
 
     tr.warning {
         background-color: #fcf8e3;
+    }
+
+    /* Smart dropdown positioning */
+    .btn-group .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: auto;
+        z-index: 1000;
+        transition: all 0.2s ease;
+    }
+    
+    /* Dropup positioning - show above when near bottom */
+    .btn-group.dropup .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin: 0 0 2px;
+        box-shadow: 0 -6px 12px rgba(0,0,0,.175);
+    }
+    
+    /* Ensure dropdown arrow points in correct direction for dropup */
+    .btn-group.dropup .dropdown-toggle::after {
+        border-top: 0;
+        border-bottom: 4px solid;
+        border-right: 4px solid transparent;
+        border-left: 4px solid transparent;
     }
 
     .table-hover>tbody>tr.warning:hover {

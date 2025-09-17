@@ -147,6 +147,7 @@ function saveItineraryData() {
     var program_arr = [];
     var stay_arr = [];
     var meal_plan_arr = [];
+    var day_image_arr = [];
     var package_p_id_arr = [];
     var package_id_arr = [];
 
@@ -203,6 +204,25 @@ function saveItineraryData() {
                         meal_plan_arr.push(meal_plan);
                         package_p_id_arr.push(package_p_id);
                         
+                        // Get image data - check existing image path first
+                        var img = '';
+                        var existingImgInput = row.querySelector('input[id^="existing_image_path_"]');
+                        if (existingImgInput) {
+                            img = existingImgInput.value || '';
+                        }
+                        
+                        // Check if new image was uploaded
+                        var rowOffset = i + 1;
+                        if (window.quotationImages && window.quotationImages[rowOffset]) {
+                            var imageData = window.quotationImages[rowOffset];
+                            if (imageData.image_url) {
+                                img = imageData.image_url;
+                            }
+                        }
+                        
+                        day_image_arr.push(img);
+                        console.log("Added image for row", i, ":", img);
+                        
                         // Store image data if an image is selected (using the global storage)
                         var dayOffset = i + 1;
                         if (window.quotationImages && window.quotationImages[dayOffset]) {
@@ -247,6 +267,7 @@ function saveItineraryData() {
             program_arr: program_arr,
             stay_arr: stay_arr,
             meal_plan_arr: meal_plan_arr,
+            day_image_arr: day_image_arr,
             package_p_id_arr: package_p_id_arr,
             package_id_arr: package_id_arr
         });
@@ -257,6 +278,7 @@ function saveItineraryData() {
             program_arr: program_arr,
             stay_arr: stay_arr,
             meal_plan_arr: meal_plan_arr,
+            day_image_arr: day_image_arr,
             package_p_id_arr: package_p_id_arr,
             package_id_arr: package_id_arr
         }));

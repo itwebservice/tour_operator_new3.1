@@ -10,6 +10,7 @@ $attraction_arr = isset($_POST['attraction_arr']) ? $_POST['attraction_arr'] : [
 $program_arr = isset($_POST['program_arr']) ? $_POST['program_arr'] : [];
 $stay_arr = isset($_POST['stay_arr']) ? $_POST['stay_arr'] : [];
 $meal_plan_arr = isset($_POST['meal_plan_arr']) ? $_POST['meal_plan_arr'] : [];
+$day_image_arr = isset($_POST['day_image_arr']) ? $_POST['day_image_arr'] : [];
 $package_p_id_arr = isset($_POST['package_p_id_arr']) ? $_POST['package_p_id_arr'] : [];
 $package_id_arr = isset($_POST['package_id_arr']) ? $_POST['package_id_arr'] : [];
 $quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] : '';
@@ -82,6 +83,7 @@ for ($i = 0; $i < count($attraction_arr); $i++) {
     $program = addslashes($program_arr[$i]);
     $stay = addslashes($stay_arr[$i]);
     $meal_plan = addslashes($meal_plan_arr[$i]);
+    $day_image = isset($day_image_arr[$i]) ? addslashes($day_image_arr[$i]) : '';
     $package_id = addslashes($package_p_id_arr[$i]);
     
     // Ensure package_id is not empty
@@ -89,8 +91,8 @@ for ($i = 0; $i < count($attraction_arr); $i++) {
         $package_id = '1'; // Default package ID
     }
     
-    $insert_query = "INSERT INTO package_quotation_program (quotation_id, package_id, attraction, day_wise_program, stay, meal_plan, day_count) 
-                     VALUES ('$quotation_id', '$package_id', '$attraction', '$program', '$stay', '$meal_plan', '$day_count')";
+    $insert_query = "INSERT INTO package_quotation_program (quotation_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image, day_count) 
+                     VALUES ('$quotation_id', '$package_id', '$attraction', '$program', '$stay', '$meal_plan', '$day_image', '$day_count')";
     
     error_log("DEBUG: Inserting program data - Query: " . $insert_query);
     

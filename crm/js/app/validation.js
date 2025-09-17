@@ -4607,9 +4607,13 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     
     var rowCount = table.rows.length; // index for new row
     console.log("DEBUG: Current row count:", rowCount);
+    console.log("DEBUG: Table structure before adding row:");
+    for (var debugI = 0; debugI < table.rows.length; debugI++) {
+        console.log("  Row", debugI, ":", debugI === 0 ? "(HEADER)" : "(DATA ROW, should have ID " + debugI + ")");
+    }
     
     var row = table.insertRow(rowCount);
-    console.log("DEBUG: New row created");
+    console.log("DEBUG: New row created at index", rowCount);
 
     var colCount = table.rows[0].cells.length;
     console.log("DEBUG: Column count:", colCount);
@@ -4617,6 +4621,33 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     for (var i = 0; i < colCount; i++) {
         var newcell = row.insertCell(i);
         var oldCell = table.rows[table.rows.length - 2].cells[i]; // copy from last row
+        
+        // Special handling for checkbox cell (index 0) - copy complete HTML structure
+        if (i === 0) {
+            console.log("DEBUG: Special handling for checkbox cell");
+            var cellContent = oldCell.innerHTML;
+            // Replace IDs to be unique for the new row
+            cellContent = cellContent.replace(/chk_programd[0-9]+/g, 'chk_programd' + rowCount);
+            // Ensure checkbox is checked by default
+            cellContent = cellContent.replace(/<input[^>]*type="checkbox"[^>]*>/g, function(match) {
+                if (match.includes('checked')) {
+                    return match; // Already has checked
+                } else {
+                    return match.replace('>', ' checked>');
+                }
+            });
+            newcell.innerHTML = cellContent;
+            continue;
+        }
+        
+        // Special handling for image upload cell (cell index 5 for itinerary table)
+        if (tableID === "default_program_list" && i === 5) {
+            console.log("DEBUG: Special handling for image cell during cloning");
+            // For image cell, just create empty cell - handleItineraryAddRow will fix it
+            newcell.innerHTML = '';
+            continue;
+        }
+        
         var oldInput = oldCell.querySelector("input, select, textarea");
 
         // 🔹 If this column is Package Type, add class & hide
@@ -4672,63 +4703,62 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     foo(tableID, quot_table, rowCount);
 }
 
+// Static counter for itinerary row IDs (starts from 2 because row 1 is default)
+if (typeof window.itineraryRowIdCounter === 'undefined') {
+    window.itineraryRowIdCounter = 2;
+}
+
 // Special function to handle itinerary table row addition
 function handleItineraryAddRow(table, row, rowCount) {
     console.log("DEBUG: handleItineraryAddRow called for row", rowCount);
     console.log("DEBUG: Row has", row.cells.length, "cells");
     
-    // Debug each cell
-    for (var i = 0; i < row.cells.length; i++) {
-        console.log("DEBUG: Cell", i, "content:", row.cells[i].innerHTML.substring(0, 100));
+    // Use static counter for data row ID (starts from 2)
+    var dataRowId = window.itineraryRowIdCounter;
+    window.itineraryRowIdCounter++; // Increment for next row
+    console.log("DEBUG: Data row ID will be:", dataRowId, "(static counter, next will be:", window.itineraryRowIdCounter, ")");
+    
+    // Always work with cell index 5 for image upload
+    var imageCell = row.cells[5];
+    if (!imageCell) {
+        console.log("DEBUG: Creating missing image cell at index 5");
+        imageCell = row.insertCell(5);
     }
     
-    // Find the image cell (usually the last cell)
-    var imageCell = null;
-    if (row.cells.length >= 9) {
-        imageCell = row.cells[8]; // 9th cell (0-indexed)
-        console.log("DEBUG: Using cell 8 for image upload");
-    } else if (row.cells.length >= 8) {
-        imageCell = row.cells[7]; // 8th cell if only 8 cells
-        console.log("DEBUG: Using cell 7 for image upload");
-    } else {
-        console.log("DEBUG: Not enough cells for image upload. Row has", row.cells.length, "cells");
-    }
+    console.log("DEBUG: Working with image cell at index 5");
     
-    if (imageCell) {
-        console.log("DEBUG: Adding image upload to cell " + (imageCell === row.cells[8] ? 8 : 7));
-        
-        // Set proper styling for the image cell
-        imageCell.setAttribute("class", "col-md-1 pad_8");
-        imageCell.setAttribute("style", "width: 120px;");
-        
-        // Create image upload structure
-        imageCell.innerHTML = `
-            <div style="margin-top: 35px;">
-                <label for="day_image_${rowCount}" class="btn btn-sm btn-success" 
-                       style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                    Upload Image
-                </label>
-                <input type="file" id="day_image_${rowCount}" 
-                       name="day_image_${rowCount}" accept="image/*" 
-                       onchange="previewDayImage(this, '${rowCount}')" 
-                       style="display: none;">
-            </div>
-            <div id="day_image_preview_${rowCount}" style="display: none; margin-top: 5px;">
+    // Always replace the image cell content with complete upload UI
+    imageCell.setAttribute("class", "col-md-2 no-pad");
+    imageCell.setAttribute("style", "padding-left:5px !important;");
+    
+    imageCell.innerHTML = `
+        <div style="margin-top:35px;">
+            <label for="day_image_${dataRowId}" class="btn btn-sm btn-success" 
+                   style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                Upload Image
+            </label>
+            <input type="file" id="day_image_${dataRowId}" 
+                   name="day_image_${dataRowId}" accept="image/*" 
+                   onchange="previewDayImage(this, '${dataRowId}')" 
+                   style="display: none;">
+            <div id="day_image_preview_${dataRowId}" style="display: none; margin-top: 5px;">
                 <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                    <img id="preview_img_${rowCount}" src="" alt="Preview" 
+                    <img id="preview_img_${dataRowId}" src="" alt="Preview" 
                          style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
-                    <button type="button" 
-                            onclick="removeDayImage('${rowCount}')" 
-                            title="Remove Image" 
-                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                        ×
-                    </button>
+                                    <button type="button" 
+                                            onclick="removeDayImage('${dataRowId}')" 
+                                            title="Remove Image" 
+                                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                        ×
+                                    </button>
                 </div>
             </div>
-        `;
-        console.log("DEBUG: Image upload structure added successfully");
-    } else {
-        console.log("DEBUG: No suitable cell found for image upload in itinerary row");
-    }
+            <input type="hidden" id="itinerary_image_path_${dataRowId}" name="itinerary_image_path_${dataRowId}" />
+        </div>
+    `;
+    console.log("DEBUG: Image upload structure FORCED for row", rowCount, "with data row ID", dataRowId);
+
+    // Image upload is now handled by the onchange event directly
+    console.log("DEBUG: Image upload structure ready for row", rowCount, "with data row ID", dataRowId);
 }
 

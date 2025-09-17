@@ -138,7 +138,7 @@ class custom_package{
 
 
 //update
-function package_master_update($package_id1,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$hotel_check_arr,$vehicle_name_arr,$vehicle_check_arr,$drop_arr,$drop_type_arr,$pickup_arr,$pickup_type_arr,$tr_entry_arr,$checked_programe_arr, $day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr, $entry_id_arr,$hotel_entry_id_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image, $seo_slug,$tour_theme){
+function package_master_update($package_id1,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$hotel_check_arr,$vehicle_name_arr,$vehicle_check_arr,$drop_arr,$drop_type_arr,$pickup_arr,$pickup_type_arr,$tr_entry_arr,$checked_programe_arr, $day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$day_image_arr, $entry_id_arr,$hotel_entry_id_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image, $seo_slug,$tour_theme){
 
    // Add null checks for all array parameters to prevent sizeof() errors
    $city_name_arr = $city_name_arr ?? [];
@@ -158,6 +158,7 @@ function package_master_update($package_id1,$package_code,$package_name,$total_d
    $special_attaraction_arr = $special_attaraction_arr ?? [];
    $overnight_stay_arr = $overnight_stay_arr ?? [];
    $meal_plan_arr = $meal_plan_arr ?? [];
+   $day_image_arr = $day_image_arr ?? [];
    $entry_id_arr = $entry_id_arr ?? [];
    $hotel_entry_id_arr = $hotel_entry_id_arr ?? [];
 
@@ -236,20 +237,21 @@ function package_master_update($package_id1,$package_code,$package_name,$total_d
          $special_attaraction1 = addslashes($special_attaraction_arr[$i]);
          $day_program_arr1 = addslashes($day_program_arr[$i]);
          $overnight_stay1 = addslashes($overnight_stay_arr[$i]);
+         $day_image1 = isset($day_image_arr[$i]) ? addslashes($day_image_arr[$i]) : '';
 
          if($checked_programe_arr[$i]=='true'){
          if($entry_id_arr[$i] == ''){
             $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(entry_id) as max from custom_package_program"));
             $id = $sq_max['max']+1;
 
-            $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan)values('$id','$package_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]')");
+            $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image)values('$id','$package_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
             if(!$sq1){
                echo "error--Tour Itinerary not saved!";
                exit;
                }
          }
          else{
-            $query_pckg = "update custom_package_program set day_wise_program = '$day_program_arr1', attraction = '$special_attaraction1', stay = '$overnight_stay1',meal_plan='$meal_plan_arr[$i]' where entry_id='$entry_id_arr[$i]'";   
+            $query_pckg = "update custom_package_program set day_wise_program = '$day_program_arr1', attraction = '$special_attaraction1', stay = '$overnight_stay1',meal_plan='$meal_plan_arr[$i]',day_image='$day_image1' where entry_id='$entry_id_arr[$i]'";   
          
             $sq1 = mysqlQuery($query_pckg);
             if(!$sq1){

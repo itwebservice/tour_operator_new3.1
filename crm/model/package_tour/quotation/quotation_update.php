@@ -136,6 +136,7 @@ public function quotation_master_update()
     $program_arr = $_POST['program_arr'];
     $stay_arr = $_POST['stay_arr'];
     $meal_plan_arr = $_POST['meal_plan_arr'];
+    $day_image_arr = isset($_POST['day_image_arr']) ? $_POST['day_image_arr'] : [];
     $package_p_id_arr = $_POST['package_p_id_arr'];
 
     $inclusions = $_POST['inclusions'];
@@ -195,7 +196,7 @@ public function quotation_master_update()
 		$this->tranport_entries_update($quotation_id,$vehicle_name_arr,$start_date_arr,$pickup_arr,$drop_arr,$vehicle_count_arr,$transport_cost_arr1,$package_name_arr1,$pickup_type_arr,$drop_type_arr, $package_id,$transport_status_arr,$transport_id_arr,$end_date_arr,$service_duration_arr);	
 		$this->excursion_entries_save($quotation_id,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$excursion_id_arr,$exc_status_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr);
 		$this->costing_entries_update($tour_cost_arr,$transport_cost_arr, $basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr, $costing_id_arr,$excursion_cost_arr,$adult_cost,$infant_cost,$child_with,$child_without,$bsmValues,$quotation_id,$entry_id_arr,$discount_in_arr,$discount_arr);
-		$this->program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr);	
+		$this->program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr);	
 		
 		// Copy image entries from original quotation to new quotation
 		$this->copy_image_entries($quotation_id, $package_id);
@@ -211,7 +212,7 @@ public function quotation_master_update()
 }
 
 
-public function program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr)
+public function program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr)
 {
 	// First, delete all existing entries for this quotation to prevent duplicates
 	$delete_query = "DELETE FROM package_quotation_program WHERE quotation_id = '$quotation_id'";
@@ -224,6 +225,7 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 			$program = addslashes($program_arr[$i]);
 			$stay = addslashes($stay_arr[$i]);
 			$meal_plan = addslashes($meal_plan_arr[$i]);
+			$day_image = isset($day_image_arr[$i]) ? addslashes($day_image_arr[$i]) : '';
 
 			if($checked_programe_arr1[$i]=="true")
 			{
@@ -232,9 +234,9 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 
 				// Use the row index as day count for new rows, or use the provided day count
 				$day_count = isset($day_count_arr[$i]) ? $day_count_arr[$i] : ($i + 1);
-				error_log("DEBUG: Using day_count: $day_count for row $i");
+				error_log("DEBUG: Using day_count: $day_count for row $i, day_image: $day_image");
 				
-				$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_count ) values ('$id', '$quotation_id', '$package_id','$attraction','$program', '$stay','$meal_plan',$day_count)");
+				$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_image,day_count ) values ('$id', '$quotation_id', '$package_id','$attraction','$program', '$stay','$meal_plan','$day_image',$day_count)");
 				if(!$sq_plane){
 					error_log("ERROR: Failed to insert new itinerary entry: " . mysqli_error($GLOBALS['conn']));
 					echo "error--Tour Itinerary not saved!";

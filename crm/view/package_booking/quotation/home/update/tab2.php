@@ -18,6 +18,7 @@
 
 
 <form id="frm_tab2_u">
+    <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
     <div class="app_panel">
 
         <div class="container" style="width:100% !important;">
@@ -64,15 +65,7 @@
                                             if (isset($quotation_id) && !empty($quotation_id)) {
                                                 echo "<!-- Debug: Searching for quotation_id = '$quotation_id' -->";
                                                 
-                                                // First, let's check what quotation IDs exist in the table
-                                                $debug_all = mysqlQuery("SELECT DISTINCT quotation_id FROM package_quotation_program ORDER BY quotation_id DESC LIMIT 10");
-                                                echo "<!-- Debug: Recent quotation IDs in database: ";
-                                                while($debug_row = mysqli_fetch_assoc($debug_all)) {
-                                                    echo $debug_row['quotation_id'] . ", ";
-                                                }
-                                                echo " -->";
-                                                
-                                                // Get itinerary records for this quotation
+                                                // Get itinerary records for this quotation with day_image
                                                 $sq_program = mysqlQuery("select * from package_quotation_program where quotation_id = '$quotation_id' ORDER BY id");
                                                 $program_count = mysqli_num_rows($sq_program);
                                                 echo "<!-- Debug: Found $program_count records for quotation_id '$quotation_id' -->";
@@ -101,83 +94,59 @@
                                                     <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary<?php echo $offset; ?>" onclick="add_itinerary('dest_name','special_attaraction<?php echo $offset; ?>-u','day_program<?php echo $offset; ?>-u','overnight_stay<?php echo $offset; ?>-u','Day-<?= $offset ?>')"><i class="fa fa-plus"></i></button>
                                                     </td>
                                                     <td class='col-md-1 pad_8' style="width: 120px;">
+                                                        <!-- Debug: Image path = <?= $row_program['day_image'] ?? 'NULL' ?> -->
                                                         <div style="margin-top: 35px;">
                                                             <label for="day_image_<?php echo $offset; ?>" class="btn btn-sm btn-success" 
-                                                                   style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                                                                Upload Image
+                                                                   style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none;' : '' ?>">
+                                                                <i class="fa fa-image"></i> Upload Image
                                                             </label>
                                                             <input type="file" id="day_image_<?php echo $offset; ?>" 
                                                                    name="day_image_<?php echo $offset; ?>" accept="image/*" 
                                                                    onchange="previewDayImage(this, '<?php echo $offset; ?>')" 
                                                                    style="display: none;">
                                                         </div>
-                                                        <div id="day_image_preview_<?php echo $offset; ?>" style="display: none; margin-top: 5px;">
+                                                        <div id="day_image_preview_<?php echo $offset; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
                                                             <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                                                                <img id="preview_img_<?php echo $offset; ?>" src="" alt="Preview" 
-                                                                     style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                                                                <img id="preview_img_<?php echo $offset; ?>" src="<?php 
+                                                                    if (!empty($row_program['day_image'])) {
+                                                                        $image_path = trim($row_program['day_image']);
+                                                                        // Debug the actual path
+                                                                        error_log("QUOTATION UPDATE: Image path from DB for offset " . $offset . ": " . $image_path);
+                                                                        
+                                                                        // Check if path is valid and not empty
+                                                                        if ($image_path && $image_path !== '' && $image_path !== 'NULL') {
+                                                                            // Check if path already starts with http
+                                                                            if (strpos($image_path, 'http') === 0) {
+                                                                                echo $image_path;
+                                                                            } else {
+                                                                                // For package images, use project root URL
+                                                                                $project_base_url = str_replace('/crm/', '/', BASE_URL);
+                                                                                $project_base_url = rtrim($project_base_url, '/');
+                                                                                $image_path = ltrim($image_path, '/');
+                                                                                $final_url = $project_base_url . '/' . $image_path;
+                                                                                error_log("QUOTATION UPDATE: Final image URL for offset " . $offset . ": " . $final_url);
+                                                                                echo $final_url;
+                                                                            }
+                                                                        } else {
+                                                                            // Empty or invalid path, don't output anything
+                                                                            echo '';
+                                                                        }
+                                                                    } else {
+                                                                        echo '';
+                                                                    }
+                                                                ?>" alt="Preview" 
+                                                                     style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
+                                                                     onerror="console.log('QUOTATION UPDATE: Existing image failed to load for offset <?php echo $offset; ?>:', this.src); this.style.display='none'; this.parentElement.parentElement.style.display='none'; this.parentElement.parentElement.parentElement.querySelector('label').style.display='block'; this.parentElement.querySelector('button[onclick*=removeDayImage]').style.display='none';"
+                                                                     onload="console.log('QUOTATION UPDATE: Image loaded successfully for offset <?php echo $offset; ?>:', this.src);">
                                                                 <button type="button" 
                                                                         onclick="removeDayImage('<?php echo $offset; ?>')" 
                                                                         title="Remove Image" 
-                                                                        style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                                        style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($row_program['day_image']) || trim($row_program['day_image']) === '' || trim($row_program['day_image']) === 'NULL') ? 'display:none;' : '' ?>">
                                                                     ×
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                        <?php
-                                                        // Load existing image for this day
-                                                        echo "<!-- DEBUG: quotation_id = $quotation_id, package_id = $package_id, offset = $offset -->";
-                                                        
-                                                        // If quotation_id is not set, try to get it from the form
-                                                        if (empty($quotation_id)) {
-                                                            $quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id'] : '';
-                                                        }
-                                                        if (empty($package_id)) {
-                                                            $package_id = isset($_GET['package_id']) ? $_GET['package_id'] : '';
-                                                        }
-                                                        
-                                                        // If package_id is still empty, get it from database
-                                                        if (empty($package_id) && !empty($quotation_id)) {
-                                                            $package_query = "SELECT package_id FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id' LIMIT 1";
-                                                            $package_result = mysqlQuery($package_query);
-                                                            if (mysqli_num_rows($package_result) > 0) {
-                                                                $package_row = mysqli_fetch_assoc($package_result);
-                                                                $package_id = $package_row['package_id'];
-                                                            }
-                                                        }
-                                                        
-                                                        $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_$offset_%'";
-                                                        echo "<!-- DEBUG: Query = $existing_image_query -->";
-                                                        $existing_image_result = mysqlQuery($existing_image_query);
-                                                        $image_count = mysqli_num_rows($existing_image_result);
-                                                        echo "<!-- DEBUG: Found $image_count images -->";
-                                                        if ($image_count > 0) {
-                                                            $existing_image = mysqli_fetch_assoc($existing_image_result);
-                                                            $image_url = BASE_URL . $existing_image['image_url'];
-                                                            echo "<!-- DEBUG: Image URL = $image_url -->";
-                                                        ?>
-                                                        <div id="saved_image_<?php echo $offset; ?>" style="margin-top: 5px;">
-                                                            <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #28a745; border-radius: 8px; background-color: #f8f9fa;">
-                                                                <img src="<?php echo $image_url; ?>" alt="Saved Image" 
-                                                                     style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
-                                                                <button type="button" 
-                                                                        onclick="removeSavedImage('<?php echo $offset; ?>', '<?php echo $existing_image['image_url']; ?>')" 
-                                                                        title="Remove Image" 
-                                                                        style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                                                                    ×
-                                                                </button>
-                                                            </div>
-                                                            <div style="margin-top: 5px; text-align: center;">
-                                                                <button type="button" onclick="replaceSavedImage('<?php echo $offset; ?>')" class="btn btn-sm btn-warning" style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">Replace Image</button>
-                                                            </div>
-                                                        </div>
-                                                        <script>
-                                                        // Hide upload button when saved image exists
-                                                        $(document).ready(function() {
-                                                            $('#saved_image_<?php echo $offset; ?>').show();
-                                                            $('label[for="day_image_<?php echo $offset; ?>"]').hide();
-                                                        });
-                                                        </script>
-                                                        <?php } ?>
+                                                        <input type="hidden" id="existing_image_path_<?php echo $offset; ?>" name="existing_image_path_<?php echo $offset; ?>" value="<?= $row_program['day_image'] ?? '' ?>" />
                                                     </td>
                                                     <td class="hidden"><input type="hidden" name="package_id_n" value="<?php echo $row_program['id']; ?>"></td>
                                                 </tr>
@@ -206,50 +175,17 @@
                                                     echo '<img id="preview_img_1" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
                                                     echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
                                                     echo '</div>';
+                                                    echo '<div style="margin-top: 35px;">';
+                                                    echo '<label for="day_image_1" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label>';
+                                                    echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
                                                     echo '</div>';
-                                                    
-                                                    // Load existing image for day 1
-                                                    echo "<!-- DEBUG: Day 1 - quotation_id = $quotation_id, package_id = $package_id -->";
-                                                    
-                                                    // If quotation_id is not set, try to get it from the form
-                                                    if (empty($quotation_id)) {
-                                                        $quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id'] : '';
-                                                    }
-                                                    if (empty($package_id)) {
-                                                        $package_id = isset($_GET['package_id']) ? $_GET['package_id'] : '';
-                                                    }
-                                                    
-                                                    // If package_id is still empty, get it from database
-                                                    if (empty($package_id) && !empty($quotation_id)) {
-                                                        $package_query = "SELECT package_id FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id' LIMIT 1";
-                                                        $package_result = mysqlQuery($package_query);
-                                                        if (mysqli_num_rows($package_result) > 0) {
-                                                            $package_row = mysqli_fetch_assoc($package_result);
-                                                            $package_id = $package_row['package_id'];
-                                                        }
-                                                    }
-                                                    
-                                                    $existing_image_query = "SELECT image_url FROM package_tour_quotation_images WHERE quotation_id = '$quotation_id' AND package_id = '$package_id' AND image_url LIKE '%day_1_%'";
-                                                    echo "<!-- DEBUG: Day 1 Query = $existing_image_query -->";
-                                                    $existing_image_result = mysqlQuery($existing_image_query);
-                                                    $day1_image_count = mysqli_num_rows($existing_image_result);
-                                                    echo "<!-- DEBUG: Day 1 Found $day1_image_count images -->";
-                                                    if (mysqli_num_rows($existing_image_result) > 0) {
-                                                        $existing_image = mysqli_fetch_assoc($existing_image_result);
-                                                        $image_url = BASE_URL . $existing_image['image_url'];
-                                                        echo '<div id="saved_image_1" style="margin-top: 5px;">';
-                                                        echo '<div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #28a745; border-radius: 8px; background-color: #f8f9fa;">';
-                                                        echo '<img src="' . $image_url . '" alt="Saved Image" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
-                                                        echo '<button type="button" onclick="removeSavedImage(\'1\', \'' . $existing_image['image_url'] . '\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
-                                                        echo '</div>';
-                                                        echo '</div>';
-                                                        echo '<script>';
-                                                        echo '$(document).ready(function() {';
-                                                        echo '$("#saved_image_1").show();';
-                                                        echo '$("label[for=\\"day_image_1\\"]").hide();';
-                                                        echo '});';
-                                                        echo '</script>';
-                                                    }
+                                                    echo '<div id="day_image_preview_1" style="display: none; margin-top: 5px;">';
+                                                    echo '<div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
+                                                    echo '<img id="preview_img_1" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
+                                                    echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
+                                                    echo '</div>';
+                                                    echo '</div>';
+                                                    echo '<input type="hidden" id="existing_image_path_1" name="existing_image_path_1" value="" />';
                                                     echo '</td>';
                                                     echo '<td class="hidden"><input type="hidden" name="package_id_n" value=""></td>';
                                                     echo '</tr>';

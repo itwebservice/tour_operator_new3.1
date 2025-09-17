@@ -647,6 +647,7 @@ $('#frm_tab4').validate({
         var program_arr = [];
         var stay_arr = [];
         var meal_plan_arr = [];
+        var day_image_arr = [];
         var package_p_id_arr = [];
 
         var table = document.getElementById("dynamic_table_list_update");
@@ -666,6 +667,64 @@ $('#frm_tab4').validate({
             program_arr.push(program);
             stay_arr.push(stay);
             meal_plan_arr.push(meal_plan);
+            
+            // Get image data for this row - check both new uploads and existing images
+            var img = '';
+            var rowIndex = i + 1; // Convert to 1-based index
+            
+            console.log("UPDATE TAB4: Processing image for row", i, "with rowIndex", rowIndex);
+            
+            // First check if we have a new image uploaded via previewDayImage
+            if (window.quotationImages && window.quotationImages[rowIndex]) {
+                var imageData = window.quotationImages[rowIndex];
+                console.log("UPDATE TAB4: Found new image data for rowIndex", rowIndex, imageData);
+                
+                if (imageData.file && !imageData.uploaded) {
+                    console.log("UPDATE TAB4: Uploading new image for rowIndex", rowIndex);
+                    // Upload the image immediately
+                    var formData = new FormData();
+                    formData.append('uploadfile', imageData.file);
+                    
+                    $.ajax({
+                        url: $('#base_url').val() + 'view/other_masters/itinerary/upload_itinerary_image.php',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        async: false, // Make it synchronous for data collection
+                        success: function(response) {
+                            try {
+                                var msg = response.split('--');
+                                if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
+                                    img = response;
+                                    window.quotationImages[rowIndex].uploaded = true;
+                                    window.quotationImages[rowIndex].image_url = response;
+                                    console.log("UPDATE TAB4: Image uploaded successfully for rowIndex", rowIndex, ":", img);
+                                } else {
+                                    console.log("UPDATE TAB4: Upload failed for rowIndex", rowIndex, ":", response);
+                                }
+                            } catch(e) {
+                                console.log('UPDATE TAB4: Upload parse error for rowIndex', rowIndex, ':', e);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("UPDATE TAB4: Upload error for rowIndex", rowIndex, ":", error);
+                        }
+                    });
+                } else if (imageData.image_url) {
+                    img = imageData.image_url;
+                    console.log("UPDATE TAB4: Using existing uploaded image URL for rowIndex", rowIndex, ":", img);
+                }
+            } else {
+                // Fallback to existing image from hidden input
+                var existingImgInput = row.querySelector('input[id^="existing_image_path_"]');
+                img = existingImgInput ? existingImgInput.value : '';
+                console.log("UPDATE TAB4: Using existing image for rowIndex", rowIndex, ":", img);
+            }
+            
+            console.log("UPDATE TAB4: Final image for row", i, ":", img);
+            day_image_arr.push(img || '');
+            
             package_p_id_arr.push(package_id1);
         }
 
@@ -1105,7 +1164,15 @@ $('#frm_tab4').validate({
                     console.log("attraction_arr:", attraction_arr);
                     console.log("program_arr:", program_arr);
                     console.log("day_count_arr:", day_count_arr);
+                    console.log("day_image_arr:", day_image_arr);
                     console.log("checked_programe_arr:", checked_programe_arr);
+                    console.log("window.quotationImages:", window.quotationImages);
+                    
+                    // Additional debugging for image data
+                    console.log("DEBUG: day_image_arr length:", day_image_arr.length);
+                    for (var idx = 0; idx < day_image_arr.length; idx++) {
+                        console.log("DEBUG: day_image_arr[" + idx + "]:", day_image_arr[idx]);
+                    }
                     $.ajax({
 
                         type: 'post',
@@ -1210,6 +1277,7 @@ $('#frm_tab4').validate({
                             program_arr: program_arr,
                             stay_arr: stay_arr,
                             meal_plan_arr: meal_plan_arr,
+                            day_image_arr: day_image_arr,
                             package_p_id_arr: package_p_id_arr,
                             inclusions: inclusions,
                             exclusions: exclusions,
