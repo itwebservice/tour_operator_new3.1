@@ -71,11 +71,12 @@ class quotation_sub_create
         $insertSQL = "INSERT INTO package_tour_quotation_master (".implode(", ", $cols).") VALUES (";
         $count = count($cols);
         
+        // Get new quotation ID
+        $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(quotation_id) as max from package_tour_quotation_master"));
+        $quotation_max = $sq_max['max'] + 1;
+        
         foreach($cols as $counter => $col) {
             if($col == 'quotation_id') {
-                // Get new quotation ID
-                $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(quotation_id) as max from package_tour_quotation_master"));
-                $quotation_max = $sq_max['max'] + 1;
                 $insertSQL .= "'".$quotation_max."'";
             }
             else if($col == 'quotation_id_display') {
@@ -98,17 +99,11 @@ class quotation_sub_create
                 $insertSQL .= "'".date('Y-m-d')."'";
             }
             else if($col == 'parent_quotation_id') {
-                // Set parent quotation ID for tracking (only if field exists)
-                if ($is_sub_quotation && $parent_quotation_id && $parent_quotation_id != '0') {
-                    // If editing a sub-quotation, use the same parent
-                    $insertSQL .= "'".$parent_quotation_id."'";
-                } else {
-                    // If editing a parent quotation, use the quotation_id as parent
-                    $insertSQL .= "'".$quotation_id."'";
-                }
+                // Always set parent quotation ID to the original quotation being copied
+                $insertSQL .= "'".$quotation_id."'";
             }
             else if($col == 'is_sub_quotation') {
-                // Mark as sub-quotation (only if field exists)
+                // Always mark as sub-quotation
                 $insertSQL .= "'1'";
             }
             else {
@@ -142,24 +137,12 @@ class quotation_sub_create
             $this->clone_program_entries($quotation_id, $quotation_max);
             $this->clone_images_entries($quotation_id, $quotation_max);
             
-            // Try to mark as sub-quotation and update quotation_id_display (only if fields exist)
-            try {
-                $sq_update = mysqlQuery("UPDATE package_tour_quotation_master SET is_sub_quotation='1', parent_quotation_id='$quotation_id', quotation_id_display='$new_quotation_id_display', quotation_display_id='$new_quotation_id_display' WHERE quotation_id='$quotation_max'");
-                
-                // Debug: Log the update result
-                if ($sq_update) {
-                    error_log("Sub-quotation created successfully: ID=$quotation_max, Display ID=$new_quotation_id_display, Parent=$quotation_id");
-                } else {
-                    error_log("Failed to update sub-quotation fields for ID=$quotation_max");
-                }
-            } catch (Exception $e) {
-                // If fields don't exist, just continue without error
-                error_log("Error updating quotation fields: " . $e->getMessage());
-            }
+            // Debug: Log sub-quotation creation
+            error_log("Sub-quotation created successfully: ID=$quotation_max, Display ID=$new_quotation_id_display, Parent=$quotation_id");
             
             // Debug: Log final sub-quotation details
-            $final_check = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_id, email_id, mobile_no, is_sub_quotation, parent_quotation_id FROM package_tour_quotation_master WHERE quotation_id='$quotation_max'"));
-            error_log("Sub-quotation created - ID: " . $quotation_max . ", Email: " . ($final_check['email_id'] ?? 'NULL') . ", Mobile: " . ($final_check['mobile_no'] ?? 'NULL') . ", Parent: " . ($final_check['parent_quotation_id'] ?? 'NULL'));
+            $final_check = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_id, email_id, mobile_no, is_sub_quotation, parent_quotation_id, quotation_display_id FROM package_tour_quotation_master WHERE quotation_id='$quotation_max'"));
+            error_log("Sub-quotation created - ID: " . $quotation_max . ", Display ID: " . ($final_check['quotation_display_id'] ?? 'NULL') . ", Email: " . ($final_check['email_id'] ?? 'NULL') . ", Mobile: " . ($final_check['mobile_no'] ?? 'NULL') . ", Parent: " . ($final_check['parent_quotation_id'] ?? 'NULL') . ", Is Sub: " . ($final_check['is_sub_quotation'] ?? 'NULL'));
             
             // Return JSON response with the new quotation ID
             echo json_encode([

@@ -263,7 +263,7 @@ $debug_count = 0;
 									$yr = explode("-", $quotation_date);
 									$year = $yr[0];
 									
-									// Check if this is a sub-quotation (handle missing fields gracefully)
+									// Initialize variables
 									$is_sub_quotation = false;
 									$parent_quotation_id = null;
 									
@@ -294,11 +294,11 @@ $debug_count = 0;
 									
 									// Apply sub-quotation formatting if it's a sub-quotation
 									if ($is_sub_quotation) {
-										// Add indentation and styling for sub-quotations with enhanced visibility
-										$quotation_id_display_formatted = '<span class="sub-quotation-id-display">' . $quotation_id_display . '</span>';
+										// Sub-quotation styling - same as parent, perfectly aligned
+										$quotation_id_display_formatted = '<span class="sub-quotation-id-display" style="font-weight: bold; color: #000; font-size: 1em;">' . $quotation_id_display . '</span>';
 									} else {
 										// Main quotation styling
-										$quotation_id_display_formatted = '<span class="main-quotation-id-display">' . $quotation_id_display . '</span>';
+										$quotation_id_display_formatted = '<span class="main-quotation-id-display" style="font-weight: bold; color: #000; font-size: 1em;">' . $quotation_id_display . '</span>';
 									}
 								?>
 									<tr <?php echo $is_sub_quotation ? 'class="sub-quotation-row"' : ''; ?>>
@@ -366,17 +366,17 @@ $debug_count = 0;
         </button>
         <div class="dropdown-menu actions-dropdown">
             <a class="dropdown-item action-option" href="javascript:void(0)" 
-            onclick="quotation_clone(<?php echo $row_tours['quotation_id']; ?>)" 
-            title="Create Copy of this Quotation">
+            onclick="quotation_sub_copy(<?php echo $row_tours['quotation_id']; ?>)" 
+            title="Create Sub-Quotation Copy">
                 <i class="fa fa-files-o copy-icon"></i>
                 <span class="option-text">
                     <strong>Copy</strong>
-                    <small>Create a copy of this quotation</small>
+                    <small>Create a sub-quotation copy</small>
                 </span>
             </a>
             <a class="dropdown-item action-option" href="javascript:void(0)" 
-               onclick="editQuotationWithCopy(<?php echo $row_tours['quotation_id']; ?>)" 
-               title="Edit Quotation (Creates Copy)">
+               onclick="editQuotationDirect(<?php echo $row_tours['quotation_id']; ?>, <?php echo $row_tours['package_id']; ?>)" 
+               title="Edit Quotation">
                 <i class="fa fa-pencil-square-o edit-icon"></i>
                 <span class="option-text">
                     <strong>Edit</strong>
@@ -1133,6 +1133,82 @@ $debug_count = 0;
 				}
 			}
 		});
+	}
+
+	// Function to create sub-quotation copy
+	function quotation_sub_copy(quotation_id) {
+		var base_url = $('#base_url').val();
+		
+		// Show confirmation dialog
+		$('#vi_confirm_box').vi_confirm_box({
+			callback: function(data1) {
+				if (data1 == "yes") {
+					// Show loading state
+					msg_alert('Creating sub-quotation copy...');
+					
+					$.ajax({
+						type: 'post',
+						url: base_url + 'controller/package_tour/quotation/quotation_sub_create.php',
+						data: {
+							quotation_id: quotation_id
+						},
+						success: function(result) {
+							try {
+								var response = JSON.parse(result);
+								if (response.status === 'success') {
+									// Close the modal first
+									$('#quotation_send_modal').modal('hide');
+									
+									// Show success message
+									msg_alert('Sub-quotation created successfully with ID: ' + response.quotation_id_display);
+									
+									// Refresh the page to show the new sub-quotation
+									location.reload();
+								} else {
+									error_msg_alert(response.message);
+								}
+							} catch (e) {
+								// Fallback for non-JSON response
+								error_msg_alert('Sub-quotation created successfully');
+								$('#quotation_send_modal').modal('hide');
+								location.reload();
+							}
+						},
+						error: function(xhr, status, error) {
+							console.error('Error creating sub-quotation:', error);
+							error_msg_alert('Failed to create sub-quotation. Please try again.');
+						}
+					});
+				}
+			}
+		});
+	}
+
+	// Function to edit quotation directly (without creating a copy)
+	function editQuotationDirect(quotation_id, package_id) {
+		var base_url = $('#base_url').val();
+		
+		// Close the modal first
+		$('#quotation_send_modal').modal('hide');
+		
+		// Create and submit the update form directly
+		var form = $('<form>', {
+			'method': 'POST',
+			'action': base_url + 'view/package_booking/quotation/home/update/index.php',
+			'style': 'display: inline-block'
+		});
+		form.append($('<input>', {
+			'type': 'hidden',
+			'name': 'quotation_id',
+			'value': quotation_id
+		}));
+		form.append($('<input>', {
+			'type': 'hidden',
+			'name': 'package_id',
+			'value': package_id
+		}));
+		$('body').append(form);
+		form.submit();
 	}
 
 	// Function to edit quotation by creating a copy first
@@ -2121,5 +2197,27 @@ $debug_count = 0;
     
     .btn-group.open .dropdown-menu {
         display: block;
+    }
+    
+    /* Sub-quotation styling */
+    .sub-quotation-row {
+        background-color: #f8f9fa;
+        border-left: 3px solid #007bff;
+    }
+    
+    .sub-quotation-row:hover {
+        background-color: #e9ecef;
+    }
+    
+    .sub-quotation-id-display {
+        font-weight: bold;
+        color: #000;
+        font-size: 1em;
+    }
+    
+    .main-quotation-id-display {
+        font-weight: bold;
+        color: #000;
+        font-size: 1em;
     }
 </style>

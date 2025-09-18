@@ -183,8 +183,8 @@
                                                     echo '<div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
                                                     echo '<img id="preview_img_1" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
                                                     echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
-                                                    echo '</div>';
-                                                    echo '</div>';
+                                                        echo '</div>';
+                                                        echo '</div>';
                                                     echo '<input type="hidden" id="existing_image_path_1" name="existing_image_path_1" value="" />';
                                                     echo '</td>';
                                                     echo '<td class="hidden"><input type="hidden" name="package_id_n" value=""></td>';

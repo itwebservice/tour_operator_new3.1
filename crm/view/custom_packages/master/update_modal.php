@@ -284,12 +284,12 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                              onerror="console.log('PACKAGE UPDATE: Existing image failed to load:', this.src); this.style.display='none'; this.parentElement.parentElement.style.display='none'; this.parentElement.parentElement.parentElement.querySelector('label').style.display='block'; this.parentElement.querySelector('button[onclick*=removeDayImageUpdate]').style.display='none';"
                                                              onload="console.log('PACKAGE UPDATE: Image loaded successfully:', this.src);">
                                                         <button type="button" 
-                                                                onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
+                                                            onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
                                                                 title="Remove Image" 
                                                                 style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($sq_pckg1['day_image']) || trim($sq_pckg1['day_image']) === '' || trim($sq_pckg1['day_image']) === 'NULL') ? 'display:none;' : '' ?>">
                                                             ×
                                                         </button>
-                                                    </div>
+                                                </div>
                                                 </div>
                                                 <input type="hidden" id="existing_image_path_<?php echo $count; ?>" name="existing_image_path_<?php echo $count; ?>" value="<?= $sq_pckg1['day_image'] ?? '' ?>" />
                                             </td>
@@ -526,8 +526,8 @@ function previewDayImageUpdate(input, offset) {
     
     console.log("PACKAGE UPDATE: File validation passed, showing preview for row:", offset);
     
-    var reader = new FileReader();
-    reader.onload = function(e) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
         console.log("PACKAGE UPDATE: FileReader loaded, setting image src for row:", offset);
         var previewImg = $('#preview_img_' + offset);
         var previewDiv = $('#day_image_preview_' + offset);
@@ -665,7 +665,7 @@ function addItineraryRowUpdate() {
                 <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                     <img id="preview_img_${count}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
                     <button type="button" onclick="removeDayImageUpdate('${count}')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>
-                </div>
+            </div>
             </div>
             <input type="hidden" id="existing_image_path_${count}" name="existing_image_path_${count}" value="" />
         </td>

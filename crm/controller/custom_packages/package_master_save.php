@@ -25,14 +25,19 @@ $day_program_arr = isset($_POST['day_program_arr'])?$_POST['day_program_arr']:[]
 $special_attaraction_arr = isset($_POST['special_attaraction_arr']) ? $_POST['special_attaraction_arr'] : [];
 $overnight_stay_arr = isset($_POST['overnight_stay_arr']) ? $_POST['overnight_stay_arr'] : [];
 $meal_plan_arr = isset($_POST['meal_plan_arr']) ? $_POST['meal_plan_arr'] : [];
+$day_image_arr = isset($_POST['day_image_arr']) ? $_POST['day_image_arr'] : [];
 
 // Debug logging for package tour save
 error_log("Package save debug - day_program_arr count: " . count($day_program_arr));
 error_log("Package save debug - special_attaraction_arr count: " . count($special_attaraction_arr));
 error_log("Package save debug - overnight_stay_arr count: " . count($overnight_stay_arr));
 error_log("Package save debug - meal_plan_arr count: " . count($meal_plan_arr));
+error_log("Package save debug - day_image_arr count: " . count($day_image_arr));
 if(!empty($day_program_arr)) {
     error_log("Package save debug - first day program: " . $day_program_arr[0]);
+}
+if(!empty($day_image_arr)) {
+    error_log("Package save debug - first day image: " . $day_image_arr[0]);
 }
 
 $city_name_arr = isset($_POST['city_name_arr'])?$_POST['city_name_arr'] : [];
@@ -48,5 +53,5 @@ $status = isset($_POST['status']) ? $_POST['status'] : [];
 $package_master = new custom_package();
 $currency_id = $_POST['currency_id'];
 
-$package_master->package_master_save($tour_type,$dest_id,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$vehicle_name_arr,$drop_arr,$pickup_arr, $day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image,$seo_slug,$tour_theme);
+$package_master->package_master_save($tour_type,$dest_id,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$vehicle_name_arr,$drop_arr,$pickup_arr, $day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$day_image_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image,$seo_slug,$tour_theme);
 ?>

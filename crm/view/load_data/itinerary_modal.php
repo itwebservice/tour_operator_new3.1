@@ -42,6 +42,7 @@ textarea.form-control {
       <input type="hidden" id="spa" value='<?=$spa ?>'/>
       <input type="hidden" id="dwp" value='<?=$dwp ?>'/>
       <input type="hidden" id="ovs" value='<?=$ovs ?>'/>
+      <input type="hidden" id="base_url" value="<?= BASE_URL ?>"/>
         <div class="row">
           <div class="text-left col-md-3 col-sm-6">
             <select id="dest_ids1"  name="dest_names1" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_itinerary(this.id)" required> 
@@ -80,6 +81,38 @@ textarea.form-control {
                     <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction<?= $count?>" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?= $row_itinerary['special_attraction']?>"></td>
                     <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="day_program<?= $count?>" name="day_program" class="form-control" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?=$row_itinerary['daywise_program']?></textarea></td>
                     <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay<?= $count?>" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?=$row_itinerary['overnight_stay']?>"></td>
+                    <td class="col-md-1 no-pad" style="padding-left: 5px !important; width: 120px;">
+                        <!-- Display existing image if available -->
+                        <?php if (!empty($row_itinerary['itinerary_image']) && trim($row_itinerary['itinerary_image']) !== '' && trim($row_itinerary['itinerary_image']) !== 'NULL') { ?>
+                            <div style="margin-top: 5px;">
+                                <div style="height:80px; max-height: 80px; overflow:hidden; position: relative; width: 80px; border: 2px solid #28a745; border-radius: 8px; background-color: #f8f9fa;">
+                                    <img src="<?php 
+                                        $image_path = trim($row_itinerary['itinerary_image']);
+                                        // Check if path already starts with http
+                                        if (strpos($image_path, 'http') === 0) {
+                                            echo $image_path;
+                                        } else {
+                                            // For itinerary images, use project root URL
+                                            $project_base_url = str_replace('/crm/', '/', BASE_URL);
+                                            $project_base_url = rtrim($project_base_url, '/');
+                                            $image_path = ltrim($image_path, '/');
+                                            $final_url = $project_base_url . '/' . $image_path;
+                                            echo $final_url;
+                                        }
+                                    ?>" alt="Itinerary Image" 
+                                         style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
+                                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'text-align:center; padding:20px; color:#999;\'>No Image</div>';">
+                                </div>
+                                <small class="text-success">✓ Has Image</small>
+                            </div>
+                        <?php } else { ?>
+                            <div style="margin-top: 5px; text-align: center; padding: 20px; color: #999; border: 1px dashed #ddd; border-radius: 4px;">
+                                <i class="fa fa-image" style="font-size: 20px; margin-bottom: 5px;"></i><br>
+                                <small>No Image</small>
+                            </div>
+                        <?php } ?>
+                        <input type="hidden" id="itinerary_image_<?= $count?>" name="itinerary_image" value="<?= $row_itinerary['itinerary_image'] ?? '' ?>">
+                    </td>
                     <td class="hidden"><input type="text" id="entry_id<?= $count?>" name="entry_id" class="form-control" value="<?=$row_itinerary['entry_id']?>"></td>
                     </tr>
                     <?php
@@ -155,9 +188,33 @@ $('#itinerary_detail_frm').validate({
                   var sp = row.cells[2].childNodes[0].value;
                   var dwp1 = row.cells[3].childNodes[0].value;
                   var os1 = row.cells[4].childNodes[0].value;
+                  
+                  // Get image path from hidden input
+                  var imgInput = row.querySelector('input[id^="itinerary_image_"]');
+                  var img = imgInput ? imgInput.value : '';
+                  console.log('ITINERARY MODAL: Image input found:', imgInput, 'value:', img);
+                  console.log('ITINERARY MODAL: Row cells count:', row.cells.length);
+                  console.log('ITINERARY MODAL: All inputs in row:', row.querySelectorAll('input'));
+                  
                   $('#'+spa).val(sp);
                   $('#'+dwp).val(dwp1);
                   $('#'+ovs).val(os1);
+                  
+                  // Also copy the image to the package form
+                  var dayId = spa.split('special_attaraction')[1]; // Extract day number
+                  console.log('ITINERARY MODAL: dayId extracted:', dayId, 'from spa:', spa);
+                  console.log('ITINERARY MODAL: img value:', img);
+                  
+                  if (dayId && img) {
+                      // Store the image data for later use after modal closes
+                      window.selectedItineraryImage = {
+                          dayId: dayId,
+                          img: img
+                      };
+                      console.log('ITINERARY MODAL: Stored image data for later processing:', window.selectedItineraryImage);
+                  } else {
+                      console.log('ITINERARY MODAL: Missing dayId or img - dayId:', dayId, 'img:', img);
+                  }
               }
           }
           $('#itinerary_detail_modal').modal('hide');

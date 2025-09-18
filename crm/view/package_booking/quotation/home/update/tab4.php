@@ -593,6 +593,13 @@ $('#frm_tab4').validate({
     submitHandler: function(form, e) {
 
         e.preventDefault();
+        
+        // Prevent double submission
+        if (window.quotationUpdateInProgress) {
+            console.log("QUOTATION UPDATE: Already in progress, preventing double submission");
+            return false;
+        }
+        window.quotationUpdateInProgress = true;
 
         $('#btn_quotation_update').prop('disabled', true);
         var quotation_id = $('#quotation_id1').val();
@@ -1306,6 +1313,8 @@ $('#frm_tab4').validate({
 
                         success: function(message) {
                             console.log("DEBUG: Quotation update response:", message);
+                            console.log("QUOTATION UPDATE: Response received");
+                            window.quotationUpdateInProgress = false; // Reset flag
                             $('#btn_quotation_update').button('reset');
                             $('#btn_quotation_update').prop('disabled', false);
                             var msg = message.split('--');
@@ -1362,12 +1371,16 @@ $('#frm_tab4').validate({
                         error: function(xhr, status, error) {
                             console.error("DEBUG: AJAX Error - Status:", status, "Error:", error);
                             console.error("DEBUG: Response Text:", xhr.responseText);
+                            console.log("QUOTATION UPDATE: AJAX failed, resetting flag");
+                            window.quotationUpdateInProgress = false; // Reset flag on error
                             $('#btn_quotation_update').button('reset');
                             $('#btn_quotation_update').prop('disabled', false);
                             error_msg_alert("Failed to update quotation: " + error);
                         }
                     });
                 } else {
+                    console.log("QUOTATION UPDATE: User cancelled, resetting flag");
+                    window.quotationUpdateInProgress = false; // Reset flag
                     $('#btn_quotation_update').button('reset');
                     $('#btn_quotation_update').prop('disabled', false);
                 }

@@ -2,7 +2,7 @@
 $flag = true;
 class custom_package{
    //save
-   function package_master_save($tour_type,$dest_id,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$vehicle_name_arr,$drop_arr,$pickup_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image,$seo_slug, $tour_theme){
+   function package_master_save($tour_type,$dest_id,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$vehicle_name_arr,$drop_arr,$pickup_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$day_image_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image,$seo_slug, $tour_theme){
 
       $created_at =date('Y-m-d H:i');
 
@@ -50,9 +50,10 @@ class custom_package{
             $special_attaraction1 = addslashes($special_attaraction_arr[$i]);
             $day_program_arr1 = addslashes($day_program_arr[$i]);
             $overnight_stay1 = addslashes($overnight_stay_arr[$i]);
+            $day_image1 = isset($day_image_arr[$i]) ? addslashes($day_image_arr[$i]) : '';
             
-            error_log("Package model debug - about to insert program entry with ID: " . $max_group_id);
-            $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan)values('$max_group_id','$max_tour_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]')");
+            error_log("Package model debug - about to insert program entry with ID: " . $max_group_id . ", day_image: " . $day_image1);
+            $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image)values('$max_group_id','$max_tour_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
 
             if(!$sq1){
             $GLOBALS['flag'] = false;

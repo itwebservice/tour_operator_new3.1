@@ -393,6 +393,14 @@
 
         submitHandler: function(form, e) {
             e.preventDefault();
+            
+            // Prevent double submission
+            if (window.quotationSaveInProgress) {
+                console.log("QUOTATION SAVE: Already in progress, preventing double submission");
+                return false;
+            }
+            window.quotationSaveInProgress = true;
+            
             $('#btn_quotation_save').prop('disabled', true);
             var login_id = $("#login_id").val();
 
@@ -1301,7 +1309,8 @@
                                 temp_quotation_id: temp_quotation_id
                             },
                             success: function(message) {
-
+                                console.log("QUOTATION SAVE: Response received");
+                                window.quotationSaveInProgress = false; // Reset flag
                                 $('#btn_quotation_save').button('reset');
                                 $('#btn_quotation_save').prop('disabled', false);
                                 var msg = message.split('--');
@@ -1377,10 +1386,17 @@
                             }
                         });
                     } else {
+                        console.log("QUOTATION SAVE: User cancelled, resetting flag");
+                        window.quotationSaveInProgress = false; // Reset flag
                         $('#btn_quotation_save').button('reset');
                         $('#btn_quotation_save').prop('disabled', false);
                     }
                 }
+            }).fail(function() {
+                console.log("QUOTATION SAVE: AJAX failed, resetting flag");
+                window.quotationSaveInProgress = false; // Reset flag on error
+                $('#btn_quotation_save').button('reset');
+                $('#btn_quotation_save').prop('disabled', false);
             });
         }
     });
