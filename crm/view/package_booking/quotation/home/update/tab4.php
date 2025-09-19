@@ -648,6 +648,7 @@ $('#frm_tab4').validate({
         var price_str_url = $("#upload_url1").val();
         var currency_code = $('#currency_code1').val();
 
+        // Try to get data from stored tab2 form data first
         var checked_programe_arr = [];
         var day_count_arr = [];
         var attraction_arr = [];
@@ -657,23 +658,36 @@ $('#frm_tab4').validate({
         var day_image_arr = [];
         var package_p_id_arr = [];
 
-        var table = document.getElementById("dynamic_table_list_update");
-        var rowCount = table.rows.length;
-        for (var i = 0; i < rowCount; i++) {
-            var row = table.rows[i];
-            var checked_programe = row.cells[0].childNodes[0].checked;
-            var day_count = row.cells[1].childNodes[0].value;
-            var attraction = row.cells[2].childNodes[0].value;
-            var program = row.cells[3].childNodes[0].value;
-            var stay = row.cells[4].childNodes[0].value;
-            var meal_plan = row.cells[5].childNodes[0].value;
-            var package_id1 = row.cells[7].childNodes[0].value;
-            checked_programe_arr.push(checked_programe);
-            day_count_arr.push(day_count);
-            attraction_arr.push(attraction);
-            program_arr.push(program);
-            stay_arr.push(stay);
-            meal_plan_arr.push(meal_plan);
+        if (window.tab2FormData) {
+            console.log("UPDATE TAB4: Using stored tab2 form data:", window.tab2FormData);
+            checked_programe_arr = window.tab2FormData.checked_programe_arr || [];
+            day_count_arr = window.tab2FormData.day_count_arr || [];
+            attraction_arr = window.tab2FormData.attraction_arr || [];
+            program_arr = window.tab2FormData.program_arr || [];
+            stay_arr = window.tab2FormData.stay_arr || [];
+            meal_plan_arr = window.tab2FormData.meal_plan_arr || [];
+            day_image_arr = window.tab2FormData.day_image_arr || [];
+            package_p_id_arr = window.tab2FormData.package_p_id_arr || [];
+        } else {
+            console.log("UPDATE TAB4: No stored tab2 data, reading from table");
+            // Fallback to reading from table if no stored data
+            var table = document.getElementById("dynamic_table_list_update");
+            var rowCount = table.rows.length;
+            for (var i = 0; i < rowCount; i++) {
+                var row = table.rows[i];
+                var checked_programe = row.cells[0].childNodes[0].checked;
+                var day_count = row.cells[1].childNodes[0].value;
+                var attraction = row.cells[2].childNodes[0].value;
+                var program = row.cells[3].childNodes[0].value;
+                var stay = row.cells[4].childNodes[0].value;
+                var meal_plan = row.cells[5].childNodes[0].value;
+                var package_id1 = row.cells[7].childNodes[0].value;
+                checked_programe_arr.push(checked_programe);
+                day_count_arr.push(day_count);
+                attraction_arr.push(attraction);
+                program_arr.push(program);
+                stay_arr.push(stay);
+                meal_plan_arr.push(meal_plan);
             
             // Get image data for this row - check both new uploads and existing images
             var img = '';
@@ -733,6 +747,7 @@ $('#frm_tab4').validate({
             day_image_arr.push(img || '');
             
             package_p_id_arr.push(package_id1);
+            }
         }
 
         //Train Information
@@ -1677,5 +1692,24 @@ function uploadSingleImage(imageData, quotationId, base_url) {
         }
     });
 }
+
+// Load form data from sessionStorage when tab4 loads
+$(document).ready(function() {
+    var storedData = sessionStorage.getItem('tab2_form_data');
+    if (storedData) {
+        try {
+            var formData = JSON.parse(storedData);
+            console.log("TAB4: Loading stored form data:", formData);
+            
+            // Store the data in global variables for use in form submission
+            window.tab2FormData = formData;
+            
+            // Clear the stored data after loading
+            sessionStorage.removeItem('tab2_form_data');
+        } catch (e) {
+            console.error("TAB4: Error parsing stored form data:", e);
+        }
+    }
+});
 
 </script>

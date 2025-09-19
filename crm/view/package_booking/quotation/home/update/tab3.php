@@ -664,6 +664,25 @@ $package_name = $sq_package['package_name'];
     destinationLoading(".pickup_from", 'Pickup Location');
     destinationLoading(".drop_to", 'Drop-off Location');
     city_lzloading('.city_name');
+    
+    // Load form data from sessionStorage when tab3 loads
+    $(document).ready(function() {
+        var storedData = sessionStorage.getItem('tab2_form_data');
+        if (storedData) {
+            try {
+                var formData = JSON.parse(storedData);
+                console.log("Loading stored form data:", formData);
+                
+                // Store the data in global variables for use in tab4
+                window.tab2FormData = formData;
+                
+                // Clear the stored data after loading
+                sessionStorage.removeItem('tab2_form_data');
+            } catch (e) {
+                console.error("Error parsing stored form data:", e);
+            }
+        }
+    });
     // App_accordion
     jQuery(document).ready(function() {
         jQuery(".panel-heading").click(function() {

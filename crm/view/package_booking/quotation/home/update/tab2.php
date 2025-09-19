@@ -216,7 +216,7 @@
                 <div class="col-xs-12">
                     <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab1()"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp Previous</button>
                     &nbsp;&nbsp;
-                    <button class="btn btn-info btn-sm ico_right">Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></button>
+                    <button class="btn btn-info btn-sm ico_right" type="submit">Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></button>
                 </div>
             </div>
 </form>
@@ -555,6 +555,8 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             var meal_plan_arr = new Array();
             var package_p_id_arr = new Array();
             var day_count_arr = new Array();
+            var day_image_arr = new Array();
+            var existing_image_path_arr = new Array();
             var count = 0;
 
             var table = document.getElementById("dynamic_table_list_update");
@@ -566,6 +568,21 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             var program = row.cells[3].childNodes[0].value;
             var stay = row.cells[4].childNodes[0].value;
             var meal_plan = row.cells[5].childNodes[0].value;
+            
+            // Get image data
+            var day_image = '';
+            var existing_image_path = '';
+            
+            // Look for image inputs in the row
+            var imageInput = row.querySelector('input[id^="day_image_"]');
+            var existingImageInput = row.querySelector('input[id^="existing_image_path_"]');
+            
+            if (imageInput) {
+                day_image = imageInput.value;
+            }
+            if (existingImageInput) {
+                existing_image_path = existingImageInput.value;
+            }
             
             // Debug: Log cell count and package_id1 value
             console.log("Row " + i + " has " + row.cells.length + " cells");
@@ -621,6 +638,8 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
                 meal_plan_arr.push(meal_plan);
                 package_p_id_arr.push(package_id1);
                 day_count_arr.push(i + 1); // Use row index + 1 as day count
+                day_image_arr.push(day_image);
+                existing_image_path_arr.push(existing_image_path);
             }
             
             // Debug: Log the arrays being sent
@@ -629,6 +648,27 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             console.log("day_count_arr:", day_count_arr);
             console.log("attraction_arr:", attraction_arr);
             console.log("program_arr:", program_arr);
+            console.log("day_image_arr:", day_image_arr);
+            console.log("existing_image_path_arr:", existing_image_path_arr);
+
+            // Store form data in sessionStorage to prevent URL length issues
+            var formData = {
+                checked_programe_arr: checked_programe_arr,
+                attraction_arr: attraction_arr,
+                program_arr: program_arr,
+                stay_arr: stay_arr,
+                meal_plan_arr: meal_plan_arr,
+                package_p_id_arr: package_p_id_arr,
+                day_count_arr: day_count_arr,
+                day_image_arr: day_image_arr,
+                existing_image_path_arr: existing_image_path_arr,
+                dest_id: $('#dest_name').val(),
+                package_id: $('#img_package_id').val(),
+                nights_filter: $('#nights_filter').val()
+            };
+            
+            sessionStorage.setItem('tab2_form_data', JSON.stringify(formData));
+            console.log("Form data stored in sessionStorage:", formData);
 
             var dest_id = $('#dest_name').val();
             var package_id = $('#img_package_id').val();

@@ -1,4 +1,5 @@
 <?php include "../../model/model.php";
+include "../../model/database_setup/sub_quotation_setup.php";
 
 $token = filter_input(INPUT_POST, 'token', FILTER_DEFAULT);
 // var_dump($_SESSION);
@@ -77,6 +78,21 @@ if($row_count>0){
 				echo "Sorry log entry is not done!";
 				exit;
 			}
+		}
+
+		// Auto-setup sub-quotation database structure on successful login
+		try {
+			$sub_quotation_setup = new sub_quotation_setup();
+			$setup_result = $sub_quotation_setup->ensure_sub_quotation_ready();
+			
+			if ($setup_result) {
+				error_log("Sub-quotation database setup completed successfully for user: " . $username);
+			} else {
+				error_log("Warning: Sub-quotation database setup failed for user: " . $username);
+			}
+		} catch (Exception $e) {
+			error_log("Error during sub-quotation setup: " . $e->getMessage());
+			// Don't fail login if setup fails, just log the error
 		}
 	}
 
