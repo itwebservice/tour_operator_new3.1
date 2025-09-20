@@ -216,6 +216,11 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
         </div>
     </div>
     <div id="div_modal_content"></div>
+    
+    <!-- Itinerary Modal Container -->
+    <div id="div_itinerary_modal"></div>
+    
+    <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 
 </form>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

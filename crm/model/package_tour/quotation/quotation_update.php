@@ -5,6 +5,12 @@ public function quotation_master_update()
 {
 	$quotation_id = $_POST['quotation_id'];
 	error_log("QUOTATION UPDATE: Starting update for quotation_id = " . $quotation_id);
+	
+	// Check if this is just saving itinerary data
+	if (isset($_POST['action']) && $_POST['action'] === 'save_itinerary_only') {
+		$this->save_itinerary_only($quotation_id);
+		return;
+	}
 	$enquiry_id = $_POST['enquiry_id'];
 	$package_id = $_POST['package_id'];
 	$tour_name = $_POST['tour_name'];
@@ -627,6 +633,47 @@ function quotation_daywiseimages_update(){
 			}
 		} else {
 			error_log("DEBUG: No original quotation found for package $package_id");
+		}
+	}
+
+	// Method to save only itinerary data
+	public function save_itinerary_only($quotation_id)
+	{
+		error_log("QUOTATION UPDATE: Saving itinerary only for quotation_id = " . $quotation_id);
+		
+		try {
+			// Get the itinerary data from POST
+			$checked_programe_arr1 = $_POST['checked_programe_arr'];
+			$day_count_arr = $_POST['day_count_arr'];
+			$attraction_arr = $_POST['attraction_arr'];
+			$program_arr = $_POST['program_arr'];
+			$stay_arr = $_POST['stay_arr'];
+			$meal_plan_arr = $_POST['meal_plan_arr'];
+			$day_image_arr = isset($_POST['day_image_arr']) ? $_POST['day_image_arr'] : [];
+			$package_p_id_arr = $_POST['package_p_id_arr'];
+			$package_id = $_POST['package_id'];
+			
+			error_log("QUOTATION UPDATE: Itinerary data - checked_programe_arr1: " . print_r($checked_programe_arr1, true));
+			error_log("QUOTATION UPDATE: Itinerary data - attraction_arr: " . print_r($attraction_arr, true));
+			error_log("QUOTATION UPDATE: Itinerary data - program_arr: " . print_r($program_arr, true));
+			error_log("QUOTATION UPDATE: Itinerary data - day_image_arr: " . print_r($day_image_arr, true));
+			
+			// Save the itinerary data
+			$this->program_entries_save($quotation_id, $attraction_arr, $program_arr, $stay_arr, $meal_plan_arr, $day_image_arr, $package_p_id_arr, $checked_programe_arr1, $package_id, $day_count_arr);
+			
+			error_log("QUOTATION UPDATE: Itinerary data saved successfully");
+			
+			// Set proper headers for JSON response
+			header('Content-Type: application/json');
+			echo json_encode(['status' => 'success', 'message' => 'Itinerary data saved successfully.']);
+			exit;
+			
+		} catch (Exception $e) {
+			error_log("QUOTATION UPDATE: Error saving itinerary data: " . $e->getMessage());
+			header('Content-Type: application/json');
+			http_response_code(500);
+			echo json_encode(['status' => 'error', 'message' => 'Error saving itinerary data: ' . $e->getMessage()]);
+			exit;
 		}
 	}
 }

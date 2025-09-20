@@ -647,6 +647,97 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
 		//console.log(content);    
 });
 
+// Function to process selected itinerary image after modal closes
+function processSelectedItineraryImageQuotation() {
+    console.log("QUOTATION: processSelectedItineraryImageQuotation called");
+    console.log("QUOTATION: window.selectedItineraryImage =", window.selectedItineraryImage);
+    
+    if (window.selectedItineraryImage) {
+        var dayId = window.selectedItineraryImage.dayId;
+        var img = window.selectedItineraryImage.img;
+        
+        console.log("QUOTATION: Processing selected itinerary image for day:", dayId, "img:", img);
+        
+        // Set the image path in hidden input
+        $('#existing_image_path_' + dayId).val(img);
+        console.log("QUOTATION: Set hidden input value for day", dayId);
+        
+        // Show image preview if image exists
+        if (img && img !== '' && img !== 'NULL') {
+            var imageUrl = img;
+            
+            // Check if path already starts with http
+            if (img.indexOf('http') !== 0) {
+                // For package images, use project root URL
+                var project_base_url = $('#base_url').val().replace('/crm/', '/');
+                project_base_url = project_base_url.replace(/\/$/, '');
+                var image_path = img.replace(/^\//, '');
+                imageUrl = project_base_url + '/' + image_path;
+            }
+            
+            console.log("QUOTATION: Final image URL:", imageUrl);
+            
+            // Update the image preview
+            var previewImg = $('#preview_img_' + dayId);
+            var previewDiv = $('#day_image_preview_' + dayId);
+            
+            if (previewImg.length && previewDiv.length) {
+                previewImg.attr('src', imageUrl);
+                previewDiv.show();
+                
+                // Show the remove button
+                previewDiv.find('button[onclick*="removeDayImage"]').show();
+                
+                // Hide the upload button
+                $('#day_image_' + dayId).parent().find('label').hide();
+                
+                console.log("QUOTATION: Image preview updated for day", dayId);
+            } else {
+                console.log("QUOTATION: Preview elements not found for day", dayId);
+                console.log("QUOTATION: Looking for preview_img_" + dayId + " and day_image_preview_" + dayId);
+            }
+        } else {
+            console.log("QUOTATION: No valid image to process for day", dayId);
+        }
+        
+        // Clear the stored data
+        window.selectedItineraryImage = null;
+        console.log("QUOTATION: Image processing completed and data cleared");
+    } else {
+        console.log("QUOTATION: No selectedItineraryImage data found");
+    }
+}
+
+// Listen for modal close event and process selected image
+$(document).ready(function() {
+    console.log("QUOTATION: Setting up modal event listeners");
+    
+    // Multiple event listeners to ensure we catch the modal close
+    $(document).on('hidden.bs.modal', '#itinerary_detail_modal', function() {
+        console.log("QUOTATION: Modal closed (hidden.bs.modal), processing selected image");
+        console.log("QUOTATION: window.selectedItineraryImage =", window.selectedItineraryImage);
+        setTimeout(function() {
+            processSelectedItineraryImageQuotation();
+        }, 100);
+    });
+    
+    $(document).on('hide.bs.modal', '#itinerary_detail_modal', function() {
+        console.log("QUOTATION: Modal closing (hide.bs.modal), processing selected image");
+        console.log("QUOTATION: window.selectedItineraryImage =", window.selectedItineraryImage);
+        setTimeout(function() {
+            processSelectedItineraryImageQuotation();
+        }, 200);
+    });
+    
+    // Also check periodically if image data is available
+    setInterval(function() {
+        if (window.selectedItineraryImage) {
+            console.log("QUOTATION: Periodic check found selectedItineraryImage, processing...");
+            processSelectedItineraryImageQuotation();
+        }
+    }, 1000);
+});
+
 
 </script>
 <script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>

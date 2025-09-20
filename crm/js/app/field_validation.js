@@ -1617,7 +1617,18 @@ function get_to_datetime(from_date, to_date) {
 
 //Validation for special attration
 function validate_spattration(id) {
-	var obj = document.getElementById(id).value;
+	var element = document.getElementById(id);
+	if (!element) {
+		console.log('validate_spattration: Element not found for id:', id);
+		return true; // Return true if element doesn't exist
+	}
+	
+	var obj = element.value;
+	if (obj === null || obj === undefined) {
+		console.log('validate_spattration: Element value is null/undefined for id:', id);
+		return true; // Return true if value is null/undefined
+	}
+	
 	obj = obj.replace(/^\s+|\s+$/g, '');
 	if (obj.length >= 86) {
 		error_msg_alert('Character limit for Special attraction is 85 characters');
@@ -1634,7 +1645,18 @@ function validate_spattration(id) {
 
 //Validation for daywise program
 function validate_dayprogram(id) {
-	var obj = document.getElementById(id).value;
+	var element = document.getElementById(id);
+	if (!element) {
+		console.log('validate_dayprogram: Element not found for id:', id);
+		return true; // Return true if element doesn't exist
+	}
+	
+	var obj = element.value;
+	if (obj === null || obj === undefined) {
+		console.log('validate_dayprogram: Element value is null/undefined for id:', id);
+		return true; // Return true if value is null/undefined
+	}
+	
 	obj = obj.replace(/^\s+|\s+$/g, '');
 	if (obj.length > 2000) {
 		error_msg_alert('Character limit for Day-wise program is 2000 characters');
@@ -1650,7 +1672,18 @@ function validate_dayprogram(id) {
 }
 //Validation for overnight stay
 function validate_onstay(id) {
-	var obj = document.getElementById(id).value;
+	var element = document.getElementById(id);
+	if (!element) {
+		console.log('validate_onstay: Element not found for id:', id);
+		return true; // Return true if element doesn't exist
+	}
+	
+	var obj = element.value;
+	if (obj === null || obj === undefined) {
+		console.log('validate_onstay: Element value is null/undefined for id:', id);
+		return true; // Return true if value is null/undefined
+	}
+	
 	obj = obj.replace(/^\s+|\s+$/g, '');
 	if (obj.length >= 31) {
 		error_msg_alert('Character limit for Overnight stay is 30 characters');

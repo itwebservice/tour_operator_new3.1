@@ -157,12 +157,15 @@ $('#itinerary_detail_frm').validate({
     },
     submitHandler:function(form){
       
-        var sq_itinerary_c = $('#sq_itinerary_c1').val();
+        var sq_itinerary_c = <?= $sq_itinerary_c ?>;
+        console.log('ITINERARY MODAL: sq_itinerary_c =', sq_itinerary_c);
         if(sq_itinerary_c != 0){
           var dest_id = $('#dest_ids1').val();
           var spa = $('#spa').val();
           var dwp = $('#dwp').val();
           var ovs = $('#ovs').val();
+
+          console.log('ITINERARY MODAL: dest_id =', dest_id, 'spa =', spa, 'dwp =', dwp, 'ovs =', ovs);
 
           if(dest_id == '' || dest_id == 0){
             error_msg_alert("Please select destination!");
@@ -170,13 +173,17 @@ $('#itinerary_detail_frm').validate({
           }
           var table = document.getElementById("default_program_list");
           var rowCount = table.rows.length;
+          console.log('ITINERARY MODAL: Table found, rowCount =', rowCount);
           var count = 0;
           for(var i=0; i<rowCount; i++){
               var row = table.rows[i];
-              if(row.cells[0].childNodes[0].checked){
+              var checkbox = row.cells[0].childNodes[0];
+              console.log('ITINERARY MODAL: Row', i, 'checkbox checked =', checkbox.checked);
+              if(checkbox.checked){
                   count++;
               }
           }
+          console.log('ITINERARY MODAL: Total checked items =', count);
           if(parseInt(count) != 1){
               error_msg_alert("Please select one day program!");
               return false;
@@ -184,10 +191,13 @@ $('#itinerary_detail_frm').validate({
           for(var i=0; i<rowCount; i++){
               var row = table.rows[i];
               if(row.cells[0].childNodes[0].checked){
+                  console.log('ITINERARY MODAL: Processing selected row', i);
 
                   var sp = row.cells[2].childNodes[0].value;
                   var dwp1 = row.cells[3].childNodes[0].value;
                   var os1 = row.cells[4].childNodes[0].value;
+                  
+                  console.log('ITINERARY MODAL: Values - sp:', sp, 'dwp1:', dwp1, 'os1:', os1);
                   
                   // Get image path from hidden input
                   var imgInput = row.querySelector('input[id^="itinerary_image_"]');
@@ -200,10 +210,27 @@ $('#itinerary_detail_frm').validate({
                   $('#'+dwp).val(dwp1);
                   $('#'+ovs).val(os1);
                   
+                  console.log('ITINERARY MODAL: Set form values - spa:', spa, 'dwp:', dwp, 'ovs:', ovs);
+                  
                   // Also copy the image to the package form
-                  var dayId = spa.split('special_attaraction')[1]; // Extract day number
+                  // Extract day number from spa parameter - handle different formats
+                  var dayId = '';
+                  if (spa.includes('special_attaraction')) {
+                      dayId = spa.split('special_attaraction')[1];
+                      // Remove any suffix like '-u' for update modal
+                      dayId = dayId.replace(/-u$/, '');
+                  } else if (spa.includes('special_attraction')) {
+                      dayId = spa.split('special_attraction')[1];
+                      dayId = dayId.replace(/-u$/, '');
+                  } else {
+                      // Fallback: try to extract number from the end
+                      var match = spa.match(/(\d+)(?:-u)?$/);
+                      dayId = match ? match[1] : '';
+                  }
                   console.log('ITINERARY MODAL: dayId extracted:', dayId, 'from spa:', spa);
                   console.log('ITINERARY MODAL: img value:', img);
+                  console.log('ITINERARY MODAL: All available preview_img elements:', $('[id^="preview_img_"]').map(function() { return this.id; }).get());
+                  console.log('ITINERARY MODAL: All available day_image_preview elements:', $('[id^="day_image_preview_"]').map(function() { return this.id; }).get());
                   
                   if (dayId && img) {
                       // Store the image data for later use after modal closes
@@ -217,6 +244,7 @@ $('#itinerary_detail_frm').validate({
                   }
               }
           }
+          console.log('ITINERARY MODAL: Closing modal');
           $('#itinerary_detail_modal').modal('hide');
         }
         else{

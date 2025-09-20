@@ -91,13 +91,15 @@
                                                             <?php } ?>
                                                             <?php get_mealplan_dropdown(); ?>
                                                         </select></td>
-                                                    <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary<?php echo $offset; ?>" onclick="add_itinerary('dest_name','special_attaraction<?php echo $offset; ?>-u','day_program<?php echo $offset; ?>-u','overnight_stay<?php echo $offset; ?>-u','Day-<?= $offset ?>')"><i class="fa fa-plus"></i></button>
+                                                    <td class='col-md-1 pad_8'>
+                                                        <button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary<?php echo $offset; ?>" onclick="add_itinerary('dest_name','special_attaraction<?php echo $offset; ?>-u','day_program<?php echo $offset; ?>-u','overnight_stay<?php echo $offset; ?>-u','Day-<?= $offset ?>')"><i class="fa fa-plus"></i></button>
+                                                        <button type="button" class="btn btn-danger btn-sm" style="border:none;margin-top: 35px; margin-left: 5px;" title="Delete Row" onclick="deleteItineraryRow(<?php echo $offset; ?>)"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                     <td class='col-md-1 pad_8' style="width: 120px;">
                                                         <!-- Debug: Image path = <?= $row_program['day_image'] ?? 'NULL' ?> -->
                                                         <div style="margin-top: 35px;">
                                                             <label for="day_image_<?php echo $offset; ?>" class="btn btn-sm btn-success" 
-                                                                   style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none;' : '' ?>">
+                                                                   style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none;' : '' ?>;">
                                                                 <i class="fa fa-image"></i> Upload Image
                                                             </label>
                                                             <input type="file" id="day_image_<?php echo $offset; ?>" 
@@ -105,7 +107,7 @@
                                                                    onchange="previewDayImage(this, '<?php echo $offset; ?>')" 
                                                                    style="display: none;">
                                                         </div>
-                                                        <div id="day_image_preview_<?php echo $offset; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
+                                                        <div id="day_image_preview_<?php echo $offset; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?>; margin-top: 5px;">
                                                             <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                                                                 <img id="preview_img_<?php echo $offset; ?>" src="<?php 
                                                                     if (!empty($row_program['day_image'])) {
@@ -141,7 +143,7 @@
                                                                 <button type="button" 
                                                                         onclick="removeDayImage('<?php echo $offset; ?>')" 
                                                                         title="Remove Image" 
-                                                                        style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($row_program['day_image']) || trim($row_program['day_image']) === '' || trim($row_program['day_image']) === 'NULL') ? 'display:none;' : '' ?>">
+                                                                        style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($row_program['day_image']) || trim($row_program['day_image']) === '' || trim($row_program['day_image']) === 'NULL') ? 'display:none;' : '' ?>;">
                                                                     ×
                                                                 </button>
                                                             </div>
@@ -164,7 +166,10 @@
                                                     echo '<option value="">Select Meal Plan</option>';
                                                     echo get_mealplan_dropdown();
                                                     echo '</select></td>';
-                                                    echo '<td class="col-md-1 pad_8"><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary1" onclick="add_itinerary(\'dest_name\',\'special_attaraction1-u\',\'day_program1-u\',\'overnight_stay1-u\',\'Day-1\')"><i class="fa fa-plus"></i></button></td>';
+                                                    echo '<td class="col-md-1 pad_8">';
+                                                    echo '<button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary1" onclick="add_itinerary(\'dest_name\',\'special_attaraction1-u\',\'day_program1-u\',\'overnight_stay1-u\',\'Day-1\')"><i class="fa fa-plus"></i></button>';
+                                                    echo '<button type="button" class="btn btn-danger btn-sm" style="border:none;margin-top: 35px; margin-left: 5px;" title="Delete Row" onclick="deleteItineraryRow(1)"><i class="fa fa-trash"></i></button>';
+                                                    echo '</td>';
                                                     echo '<td class="col-md-1 pad_8" style="width: 120px;">';
                                                     echo '<div style="margin-top: 35px;">';
                                                     echo '<label for="day_image_1" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">Upload Image</label>';
@@ -216,7 +221,7 @@
                 <div class="col-xs-12">
                     <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab1()"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp Previous</button>
                     &nbsp;&nbsp;
-                    <button class="btn btn-info btn-sm ico_right" type="submit">Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></button>
+                    <button class="btn btn-info btn-sm ico_right" type="button" onclick="submitTab2Form()">Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></button>
                 </div>
             </div>
 </form>
@@ -235,6 +240,10 @@ function addItineraryRow(package_id) {
     
     // Get the next offset number
     var offset = rowCount + 1;
+    
+    console.log("DEBUG: addItineraryRow called with package_id:", package_id);
+    console.log("DEBUG: Current row count:", rowCount);
+    console.log("DEBUG: New offset will be:", offset);
     
     // Create the new row HTML
     newRow.innerHTML = `
@@ -271,6 +280,9 @@ function addItineraryRow(package_id) {
             <button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary${offset}" onclick="add_itinerary('dest_name','special_attaraction${offset}-u','day_program${offset}-u','overnight_stay${offset}-u','Day-${offset}')">
                 <i class="fa fa-plus"></i>
             </button>
+            <button type="button" class="btn btn-danger btn-sm" style="border:none;margin-top: 35px; margin-left: 5px;" title="Delete Row" onclick="deleteItineraryRow(${offset})">
+                <i class="fa fa-trash"></i>
+            </button>
         </td>
         <td class='col-md-1 pad_8' style="width: 120px;">
             <div style="margin-top: 35px;">
@@ -293,10 +305,34 @@ function addItineraryRow(package_id) {
         </td>
         <td class="hidden">
             <input type="hidden" name="package_id_n" value="${package_id}">
+            <input type="hidden" id="existing_image_path_${offset}" name="existing_image_path_${offset}" value="" />
         </td>
     `;
     
     console.log("DEBUG: New itinerary row added with offset:", offset, "package_id:", package_id);
+}
+
+// Function to delete itinerary row
+function deleteItineraryRow(offset) {
+    if (confirm('Are you sure you want to delete this itinerary row?')) {
+        var table = document.getElementById('dynamic_table_list_update');
+        if (!table) {
+            console.error('Table not found: dynamic_table_list_update');
+            return;
+        }
+        
+        // Find the row with the matching offset
+        var rows = table.rows;
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            var deleteButton = row.querySelector('button[onclick*="deleteItineraryRow(' + offset + ')"]');
+            if (deleteButton) {
+                table.deleteRow(i);
+                console.log("DEBUG: Deleted itinerary row with offset:", offset);
+                break;
+            }
+        }
+    }
 }
 
 // Function to get package ID for a specific offset
@@ -543,11 +579,17 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
     }
 
 
-    $('#frm_tab2_u').validate({
-        rules: {},
-
-        submitHandler: function(form) {
-            var base_url = $('#base_url').val();
+    // Function to submit tab2 form
+    function submitTab2Form() {
+        console.log("TAB2: submitTab2Form called");
+        
+        // Validate form first
+        if (!$('#frm_tab2_u').valid()) {
+            console.log("TAB2: Form validation failed");
+            return false;
+        }
+        
+        var base_url = $('#base_url').val();
             var checked_programe_arr = new Array();
             var attraction_arr = new Array();
             var program_arr = new Array();
@@ -563,11 +605,50 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             var rowCount = table.rows.length;
         for (var i = 0; i < rowCount; i++) {
             var row = table.rows[i];
-            var checked_programe = row.cells[0].childNodes[0].checked;
-            var attraction = row.cells[2].childNodes[0].value;
-            var program = row.cells[3].childNodes[0].value;
-            var stay = row.cells[4].childNodes[0].value;
-            var meal_plan = row.cells[5].childNodes[0].value;
+            
+            // Skip header row if it exists
+            if (i === 0 && row.cells.length < 5) {
+                continue;
+            }
+            
+            // Get data using more robust selectors instead of hardcoded cell positions
+            var checked_programe = false;
+            var attraction = '';
+            var program = '';
+            var stay = '';
+            var meal_plan = '';
+            
+            // Find checkbox (checked_programe)
+            var checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checked_programe = checkbox.checked;
+            }
+            
+            // Find special attraction input
+            var attractionInput = row.querySelector('input[id*="special_attaraction"]');
+            if (attractionInput) {
+                attraction = attractionInput.value;
+            }
+            
+            // Find day program textarea
+            var programTextarea = row.querySelector('textarea[id*="day_program"]');
+            if (programTextarea) {
+                program = programTextarea.value;
+            }
+            
+            // Find overnight stay input
+            var stayInput = row.querySelector('input[id*="overnight_stay"]');
+            if (stayInput) {
+                stay = stayInput.value;
+            }
+            
+            // Find meal plan select
+            var mealPlanSelect = row.querySelector('select[id*="meal_plan"]');
+            if (mealPlanSelect) {
+                meal_plan = mealPlanSelect.value;
+            }
+            
+            console.log("TAB2: Row", i, "data - attraction:", attraction, "program:", program, "stay:", stay, "meal_plan:", meal_plan, "checked:", checked_programe);
             
             // Get image data
             var day_image = '';
@@ -577,29 +658,30 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             var imageInput = row.querySelector('input[id^="day_image_"]');
             var existingImageInput = row.querySelector('input[id^="existing_image_path_"]');
             
-            if (imageInput) {
+            if (existingImageInput && existingImageInput.value && existingImageInput.value !== '') {
+                // Prioritize existing_image_path if it has a value (from modal selection)
+                existing_image_path = existingImageInput.value;
+                day_image = existingImageInput.value; // Use the same value for day_image
+                console.log("TAB2: Using existing_image_path for day", i, ":", existing_image_path);
+            } else if (imageInput) {
                 day_image = imageInput.value;
+                console.log("TAB2: Using day_image for day", i, ":", day_image);
             }
+            
             if (existingImageInput) {
                 existing_image_path = existingImageInput.value;
             }
             
-            // Debug: Log cell count and package_id1 value
-            console.log("Row " + i + " has " + row.cells.length + " cells");
-            
-            // Try to find the hidden input field with package_id_n
+            // Get package_id using robust selector
             var package_id1 = '';
-            for (var j = 0; j < row.cells.length; j++) {
-                if (row.cells[j].querySelector('input[name="package_id_n"]')) {
-                    package_id1 = row.cells[j].querySelector('input[name="package_id_n"]').value;
-                    console.log("Found package_id_n in cell " + j + " with value: " + package_id1);
-                    break;
-                }
-            }
-            
-            if (!package_id1) {
-                console.log("No package_id_n found, trying cell 8: ", row.cells[8] ? row.cells[8].childNodes[0].value : "Cell 8 not found");
-                package_id1 = row.cells[8] ? row.cells[8].childNodes[0].value : '';
+            var packageIdInput = row.querySelector('input[name="package_id_n"]');
+            if (packageIdInput) {
+                package_id1 = packageIdInput.value;
+                console.log("TAB2: Found package_id_n with value:", package_id1);
+            } else {
+                // Fallback to the global package_id
+                package_id1 = '<?php echo $package_id; ?>';
+                console.log("TAB2: Using global package_id:", package_id1);
             }
                 if (checked_programe) {
                     count++;
@@ -608,9 +690,41 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
                         return false;
                     }
 
-                    var flag1 = validate_spattration(row.cells[2].childNodes[0].id);
-                    var flag2 = validate_dayprogram(row.cells[3].childNodes[0].id);
-                    var flag3 = validate_onstay(row.cells[4].childNodes[0].id);
+                    // Validate form elements if they exist
+                    var flag1 = true, flag2 = true, flag3 = true;
+                    
+                    // Check special attraction validation
+                    var attractionInput = row.querySelector('input[id*="special_attaraction"]');
+                    if (attractionInput && attractionInput.id) {
+                        try {
+                            flag1 = validate_spattration(attractionInput.id);
+                        } catch (e) {
+                            console.log('TAB2: validate_spattration error:', e);
+                            flag1 = true; // Continue if validation fails
+                        }
+                    }
+                    
+                    // Check day program validation
+                    var programTextarea = row.querySelector('textarea[id*="day_program"]');
+                    if (programTextarea && programTextarea.id) {
+                        try {
+                            flag2 = validate_dayprogram(programTextarea.id);
+                        } catch (e) {
+                            console.log('TAB2: validate_dayprogram error:', e);
+                            flag2 = true; // Continue if validation fails
+                        }
+                    }
+                    
+                    // Check overnight stay validation
+                    var stayInput = row.querySelector('input[id*="overnight_stay"]');
+                    if (stayInput && stayInput.id) {
+                        try {
+                            flag3 = validate_onstay(stayInput.id);
+                        } catch (e) {
+                            console.log('TAB2: validate_onstay error:', e);
+                            flag3 = true; // Continue if validation fails
+                        }
+                    }
                     if (!flag1 || !flag2 || !flag3) {
                         return false;
                     }
@@ -643,6 +757,7 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             }
             
             // Debug: Log the arrays being sent
+            console.log("TAB2: Final data being sent:");
             console.log("package_p_id_arr:", package_p_id_arr);
             console.log("checked_programe_arr:", checked_programe_arr);
             console.log("day_count_arr:", day_count_arr);
@@ -650,6 +765,7 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             console.log("program_arr:", program_arr);
             console.log("day_image_arr:", day_image_arr);
             console.log("existing_image_path_arr:", existing_image_path_arr);
+            console.log("Total rows processed:", count);
 
             // Store form data in sessionStorage to prevent URL length issues
             var formData = {
@@ -674,47 +790,118 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
             var package_id = $('#img_package_id').val();
             var package_id_arr = [package_id];
 
+            // Save the itinerary data to server first
+            console.log('TAB2: Starting AJAX call to save itinerary data');
+            console.log('TAB2: URL:', base_url + 'controller/package_tour/quotation/quotation_update.php');
+            console.log('TAB2: Data being sent:', {
+                quotation_id: '<?php echo $quotation_id; ?>',
+                package_id: '<?php echo $package_id; ?>',
+                checked_programe_arr: checked_programe_arr,
+                attraction_arr: attraction_arr,
+                program_arr: program_arr,
+                stay_arr: stay_arr,
+                meal_plan_arr: meal_plan_arr,
+                package_p_id_arr: package_p_id_arr,
+                day_count_arr: day_count_arr,
+                day_image_arr: day_image_arr,
+                existing_image_path_arr: existing_image_path_arr,
+                dest_id: $('#dest_name').val(),
+                package_id: $('#img_package_id').val(),
+                nights_filter: $('#nights_filter').val(),
+                action: 'save_itinerary_only'
+            });
+            
             $.ajax({
+                url: base_url + 'controller/package_tour/quotation/quotation_update.php',
                 type: 'post',
-                url: '../../inc/get_packages_days.php',
+                beforeSend: function() {
+                    console.log('TAB2: AJAX call starting...');
+                },
                 data: {
-                    dest_id: dest_id,
+                    quotation_id: '<?php echo $quotation_id; ?>',
+                    package_id: '<?php echo $package_id; ?>',
+                    checked_programe_arr: checked_programe_arr,
+                    attraction_arr: attraction_arr,
+                    program_arr: program_arr,
+                    stay_arr: stay_arr,
+                    meal_plan_arr: meal_plan_arr,
+                    package_p_id_arr: package_p_id_arr,
                     day_count_arr: day_count_arr,
-                    package_id_arr: package_id_arr
+                    day_image_arr: day_image_arr,
+                    existing_image_path_arr: existing_image_path_arr,
+                    dest_id: $('#dest_name').val(),
+                    package_id: $('#img_package_id').val(),
+                    nights_filter: $('#nights_filter').val(),
+                    action: 'save_itinerary_only' // Flag to indicate this is just saving itinerary data
                 },
                 success: function(result) {
-                    $('#daywise_image_select').html(result);
-                },
-                error: function(result) {
-                    console.log(result.responseText);
-                }
-            });
+                    console.log('TAB2: AJAX success - Itinerary data saved successfully:', result);
+                    
+                    // Parse JSON response if it's a string
+                    var response = result;
+                    if (typeof result === 'string') {
+                        try {
+                            response = JSON.parse(result);
+                        } catch (e) {
+                            console.log('TAB2: Response is not JSON, treating as plain text');
+                        }
+                    }
+                    
+                    // Load daywise images after successful save
+                    $.ajax({
+                        type: 'post',
+                        url: '../../inc/get_packages_days.php',
+                        data: {
+                            dest_id: dest_id,
+                            day_count_arr: day_count_arr,
+                            package_id_arr: package_id_arr
+                        },
+                        success: function(result) {
+                            $('#daywise_image_select').html(result);
+                        },
+                        error: function(result) {
+                            console.log('Daywise image loading error:', result.responseText);
+                        }
+                    });
 
-            $.ajax({
-                type: 'post',
-                url: '../../inc/get_packages_days.php',
-                data: {
-                    dest_id: dest_id,
-                    day_count_arr: day_count_arr,
-                    package_id_arr: package_id_arr
+                    $('#tab2_head').addClass('done');
+                    $('#tab3_head').addClass('active');
+                    $('.bk_tab').removeClass('active');
+                    $('#tab3').addClass('active');
+                    $('html, body').animate({
+                        scrollTop: $('.bk_tab_head').offset().top
+                    }, 200);
                 },
-                success: function(result) {
-                    $('#daywise_image_select').html(result);
+                error: function(xhr, status, error) {
+                    console.error('TAB2: AJAX error - Error saving itinerary data:', error);
+                    console.error('TAB2: AJAX error - Status:', status);
+                    console.error('TAB2: AJAX error - Response:', xhr.responseText);
+                    console.error('TAB2: AJAX error - XHR object:', xhr);
+                    
+                    // Fallback: proceed to tab 3 even if save fails
+                    console.log('TAB2: Proceeding to tab 3 despite save error');
+                    $('#tab2_head').addClass('done');
+                    $('#tab3_head').addClass('active');
+                    $('.bk_tab').removeClass('active');
+                    $('#tab3').addClass('active');
+                    $('html, body').animate({
+                        scrollTop: $('.bk_tab_head').offset().top
+                    }, 200);
+                    
+                    error_msg_alert('Error saving itinerary data, but proceeding to next tab. Please save again later.');
                 },
-                error: function(result) {
-                    console.log(result.responseText);
-                }
+                timeout: 10000 // 10 second timeout
             });
-
-            $('#tab2_head').addClass('done');
-            $('#tab3_head').addClass('active');
-            $('.bk_tab').removeClass('active');
-            $('#tab3').addClass('active');
-            $('html, body').animate({
-                scrollTop: $('.bk_tab_head').offset().top
-            }, 200);
     }
-});
+    
+    // Initialize form validation
+    $('#frm_tab2_u').validate({
+        rules: {},
+        submitHandler: function(form) {
+            // This will be handled by submitTab2Form() function
+            return false;
+        }
+    });
 
 // Initialize nights filter when tab2 loads for update
 $(document).ready(function() {

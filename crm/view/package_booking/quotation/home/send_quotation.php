@@ -98,7 +98,7 @@ if ($specific_quotation_id) {
     $query = "select *, 
         COALESCE(is_sub_quotation, '0') as is_sub_quotation,
         COALESCE(parent_quotation_id, '0') as parent_quotation_id,
-        COALESCE(quotation_display_id, '') as quotation_display_id
+        COALESCE(quotation_id_display, '') as quotation_display_id
         from package_tour_quotation_master 
         where (quotation_id = '$specific_quotation_id' OR parent_quotation_id = '$specific_quotation_id') 
         and status='1'";
@@ -108,7 +108,7 @@ if ($specific_quotation_id) {
     $query = "select *, 
         COALESCE(is_sub_quotation, '0') as is_sub_quotation,
         COALESCE(parent_quotation_id, '0') as parent_quotation_id,
-        COALESCE(quotation_display_id, '') as quotation_display_id
+        COALESCE(quotation_id_display, '') as quotation_display_id
         from package_tour_quotation_master where email_id = '$email_id'  and status='1'";
     echo "<!-- DEBUG: Showing all quotations for email: $email_id -->";
 }
@@ -128,7 +128,7 @@ $sq_query = mysqlQuery($query);
 
 // Debug: Log the query and check for errors
 if (!$sq_query) {
-    error_log("Modal Query Error: " . mysqli_error($GLOBALS['con']));
+    error_log("Modal Query Error: " . mysqli_error($conn));
     error_log("Query: " . $query);
 }
 

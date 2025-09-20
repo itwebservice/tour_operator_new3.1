@@ -71,6 +71,12 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
         <?php include_once("tab4.php"); ?>
     </div>
 </div>
+
+<!-- Itinerary Modal Container -->
+<div id="div_itinerary_modal"></div>
+
+<input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
+
 <script>
     $('#enquiry_id, #currency_code').select2();
 

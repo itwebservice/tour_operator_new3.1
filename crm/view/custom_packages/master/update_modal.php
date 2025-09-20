@@ -209,6 +209,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                             <legend>Tour Itinerary</legend>
                             <div class="col-xs-12 no-pad text-right mg_bt_10">
                                 <button type="button" class="btn btn-excel" title="Add Row" onclick="addItineraryRowUpdate()"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-warning btn-sm" title="Debug Image Processing" onclick="debugImageProcessing()" style="margin-left: 10px;"><i class="fa fa-bug"></i> Debug</button>
                             </div>
                             <div id="div_list1">
                                 <table style="width: 100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
@@ -242,7 +243,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                 <!-- Debug: Image path = <?= $sq_pckg1['day_image'] ?? 'NULL' ?> -->
                                                 <div style="margin-top: 35px;">
                                                     <label for="day_image_<?php echo $count; ?>" class="btn btn-sm btn-success" 
-                                                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:none;' : '' ?>">
+                                                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:none;' : '' ?>;">
                                                         <i class="fa fa-image"></i> Upload Image
                                                     </label>
                                                     <input type="file" id="day_image_<?php echo $count; ?>" 
@@ -250,7 +251,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                            onchange="previewDayImageUpdate(this, '<?php echo $count; ?>')" 
                                                            style="display: none;">
                                                 </div>
-                                                <div id="day_image_preview_<?php echo $count; ?>" style="<?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
+                                                <div id="day_image_preview_<?php echo $count; ?>" style="<?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?>; margin-top: 5px;">
                                                     <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                                                         <img id="preview_img_<?php echo $count; ?>" src="<?php 
                                                             if (!empty($sq_pckg1['day_image'])) {
@@ -286,7 +287,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                         <button type="button" 
                                                             onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
                                                                 title="Remove Image" 
-                                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($sq_pckg1['day_image']) || trim($sq_pckg1['day_image']) === '' || trim($sq_pckg1['day_image']) === 'NULL') ? 'display:none;' : '' ?>">
+                                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($sq_pckg1['day_image']) || trim($sq_pckg1['day_image']) === '' || trim($sq_pckg1['day_image']) === 'NULL') ? 'display:none;' : '' ?>;">
                                                             ×
                                                         </button>
                                                 </div>
@@ -501,6 +502,10 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
     </form>
 </div>
 </div>
+
+<!-- Itinerary Modal Container -->
+<div id="div_itinerary_modal"></div>
+
 <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
@@ -601,6 +606,88 @@ function removeDayImageUpdate(offset) {
     }
     
     console.log("PACKAGE UPDATE: Image removed successfully for row:", offset);
+}
+
+// Debug function to test image processing
+function debugImageProcessing() {
+    console.log("DEBUG: Manual debug triggered");
+    console.log("DEBUG: window.selectedItineraryImage =", window.selectedItineraryImage);
+    
+    // Simulate image data for testing
+    if (!window.selectedItineraryImage) {
+        window.selectedItineraryImage = {
+            dayId: '1',
+            img: 'uploads/itinerary_images/20250920_103312_1bc5f39f_assam1.jpeg'
+        };
+        console.log("DEBUG: Set test image data:", window.selectedItineraryImage);
+    }
+    
+    processSelectedItineraryImageUpdate();
+}
+
+// Function to process selected itinerary image after modal closes
+function processSelectedItineraryImageUpdate() {
+    console.log("PACKAGE UPDATE: processSelectedItineraryImageUpdate called");
+    console.log("PACKAGE UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
+    
+    if (window.selectedItineraryImage) {
+        var dayId = window.selectedItineraryImage.dayId;
+        var img = window.selectedItineraryImage.img;
+        
+        console.log("PACKAGE UPDATE: Processing selected itinerary image for day:", dayId, "img:", img);
+        
+        // Set the image path in hidden input
+        $('#existing_image_path_' + dayId).val(img);
+        console.log("PACKAGE UPDATE: Set hidden input value for day", dayId);
+        
+        // Show image preview if image exists
+        if (img && img !== '' && img !== 'NULL') {
+            var imageUrl = img;
+            
+            // Check if path already starts with http
+            if (img.indexOf('http') !== 0) {
+                // For package images, use project root URL
+                var project_base_url = $('#base_url').val().replace('/crm/', '/');
+                project_base_url = project_base_url.replace(/\/$/, '');
+                var image_path = img.replace(/^\//, '');
+                imageUrl = project_base_url + '/' + image_path;
+            }
+            
+            console.log("PACKAGE UPDATE: Final image URL:", imageUrl);
+            
+            // Update the image preview
+            var previewImg = $('#preview_img_' + dayId);
+            var previewDiv = $('#day_image_preview_' + dayId);
+            
+            console.log("PACKAGE UPDATE: Looking for elements - previewImg:", previewImg.length, "previewDiv:", previewDiv.length);
+            console.log("PACKAGE UPDATE: Selectors used - #preview_img_" + dayId + ", #day_image_preview_" + dayId);
+            
+            if (previewImg.length && previewDiv.length) {
+                previewImg.attr('src', imageUrl);
+                previewDiv.show();
+                
+                // Show the remove button
+                previewDiv.find('button[onclick*="removeDayImageUpdate"]').show();
+                
+                // Hide the upload button
+                $('#day_image_' + dayId).parent().find('label').hide();
+                
+                console.log("PACKAGE UPDATE: Image preview updated for day", dayId);
+            } else {
+                console.log("PACKAGE UPDATE: Preview elements not found for day", dayId);
+                console.log("PACKAGE UPDATE: Available preview elements:", $('[id^="preview_img_"]').length);
+                console.log("PACKAGE UPDATE: Available preview divs:", $('[id^="day_image_preview_"]').length);
+            }
+        } else {
+            console.log("PACKAGE UPDATE: No valid image to process for day", dayId);
+        }
+        
+        // Clear the stored data
+        window.selectedItineraryImage = null;
+        console.log("PACKAGE UPDATE: Image processing completed and data cleared");
+    } else {
+        console.log("PACKAGE UPDATE: No selectedItineraryImage data found");
+    }
 }
 
 // Add new itinerary row function for update modal
@@ -1212,6 +1299,46 @@ $('#seo_slug').val(generateSlug(packageName));
     }
 
     /////////////********** Tour Master Information Save end**********/////////////
+    
+    // Listen for modal close event and process selected image
+    $(document).ready(function() {
+        console.log("PACKAGE UPDATE: Setting up modal event listeners");
+        
+        // Use a more reliable approach - check for image data periodically
+        var imageCheckInterval = setInterval(function() {
+            if (window.selectedItineraryImage) {
+                console.log("PACKAGE UPDATE: Found pending image data, processing...");
+                processSelectedItineraryImageUpdate();
+            }
+        }, 500);
+        
+        // Also set up event listeners for modal close
+        $(document).on('hidden.bs.modal', '#itinerary_detail_modal', function() {
+            console.log("PACKAGE UPDATE: Modal closed (hidden.bs.modal), processing selected image");
+            console.log("PACKAGE UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
+            setTimeout(function() {
+                processSelectedItineraryImageUpdate();
+            }, 100);
+        });
+        
+        $(document).on('hide.bs.modal', '#itinerary_detail_modal', function() {
+            console.log("PACKAGE UPDATE: Modal closing (hide.bs.modal), processing selected image");
+            console.log("PACKAGE UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
+            setTimeout(function() {
+                processSelectedItineraryImageUpdate();
+            }, 200);
+        });
+        
+        // Debug: Log when modal is shown
+        $(document).on('show.bs.modal', '#itinerary_detail_modal', function() {
+            console.log("PACKAGE UPDATE: Itinerary modal opened");
+        });
+        
+        // Clean up interval when page unloads
+        $(window).on('beforeunload', function() {
+            clearInterval(imageCheckInterval);
+        });
+    });
 </script>
 
 <?php
