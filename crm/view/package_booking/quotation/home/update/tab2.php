@@ -147,21 +147,22 @@ function findImageUrl($image_path, $is_new_quotation = false) {
                     <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : The Package is not available for this Destination.Please create here."><i class="fa fa-question-circle"></i></button>
                 </div>
                 <div class="col-md-12 col-sm-8 col-xs-12 no-pad" id="package_name_div">
-                    <div class="col-md-6 col-sm-4 col-xs-12" style="margin-left:15px;">
-                        <?php $sq_pacakge = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$sq_quotation[package_id]'")) ?>
-                        <input type="text" value="<?= $sq_pacakge['package_name'] . ' (' . ($sq_pacakge['total_days'] + 1) . 'D/' . $sq_pacakge['total_nights'] . 'N )' ?>" readonly>
-                        <input type="hidden" value="<?= $sq_pacakge['dest_id'] ?>" id='dest_name_hidden'>
-                        <input type="hidden" value="<?= $sq_quotation['package_id'] ?>" id='img_package_id'>
-                        <!-- Debug: package_id from POST = <?= $package_id ?>, package_id from quotation = <?= $sq_quotation['package_id'] ?> -->
-                        <script>
-                        console.log('DEBUG: package_id from POST = "<?= $package_id ?>"');
-                        console.log('DEBUG: package_id from quotation = "<?= $sq_quotation['package_id'] ?>"');
-                        console.log('DEBUG: img_package_id element exists:', $('#img_package_id').length > 0);
-                        console.log('DEBUG: img_package_id value:', $('#img_package_id').val());
-                        </script>
-                        <input type='hidden' id='pckg_daywise_url' name='pckg_daywise_url' />
+                    <!-- Packages will be loaded here via AJAX -->
+                    <div class="text-center" style="padding: 20px;">
+                        <i class="fa fa-spinner fa-spin"></i> Loading packages...
                     </div>
                 </div>
+                
+                <!-- Hidden fields for package data -->
+                <?php 
+                $sq_pacakge = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$sq_quotation[package_id]'"));
+                $sq_destination = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id='{$sq_pacakge['dest_id']}'"));
+                ?>
+                <input type="hidden" value="<?= $sq_pacakge['dest_id'] ?>" id='dest_name_hidden'>
+                <input type="hidden" value="<?= $sq_quotation['package_id'] ?>" id='img_package_id'>
+                <input type='hidden' id='pckg_daywise_url' name='pckg_daywise_url' />
+                <input type='hidden' id='quotation_id' name='quotation_id' value='<?= $quotation_id ?>' />
+                <input type='hidden' id='base_url' name='base_url' value='<?= BASE_URL ?>' />
             </div>
             <div class="row">
                 <div class="col-md-12 col-sm-8 col-xs-12 no-pad" id="package_name_div">
@@ -323,11 +324,19 @@ function findImageUrl($image_path, $is_new_quotation = false) {
                                     <div class="row mg_tp_20">
                                         <div class="col-md-6">
                                             <h3 class="editor_title">Inclusions</h3>
-                                            <textarea class="feature_editor form-control" id="inclusions1" name="inclusions1" placeholder="Inclusions" title="Inclusions" rows="4"><?php echo $sq_quotation['inclusions']; ?></textarea>
+                                            <div style="background: #f0f0f0; padding: 5px; margin-bottom: 5px; font-size: 12px;">
+                                                Debug: Data length: <?php echo strlen($sq_quotation['inclusions']); ?> | 
+                                                Preview: <?php echo substr(strip_tags($sq_quotation['inclusions']), 0, 50); ?>...
+                                            </div>
+                                            <textarea class="feature_editor form-control" id="inclusions1" name="inclusions1" placeholder="Inclusions" title="Inclusions" rows="4"><?php echo htmlspecialchars_decode($sq_quotation['inclusions']); ?></textarea>
                                         </div>
                                         <div class="col-md-6">
                                             <h3 class="editor_title">Exclusions</h3>
-                                            <textarea class="feature_editor form-control" id="exclusions1" name="exclusions1" placeholder="Exclusions" title="Exclusions" rows="4"><?php echo $sq_quotation['exclusions']; ?></textarea>
+                                            <div style="background: #f0f0f0; padding: 5px; margin-bottom: 5px; font-size: 12px;">
+                                                Debug: Data length: <?php echo strlen($sq_quotation['exclusions']); ?> | 
+                                                Preview: <?php echo substr(strip_tags($sq_quotation['exclusions']), 0, 50); ?>...
+                                            </div>
+                                            <textarea class="feature_editor form-control" id="exclusions1" name="exclusions1" placeholder="Exclusions" title="Exclusions" rows="4"><?php echo htmlspecialchars_decode($sq_quotation['exclusions']); ?></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -1179,6 +1188,8 @@ function load_packages_with_filter() {
     var dest_id = $('#dest_name').val();
     var total_nights = $('#nights_filter').val() || sessionStorage.getItem('selected_nights');
     
+    console.log('TAB2: load_packages_with_filter called - dest_id:', dest_id, 'total_nights:', total_nights);
+    
     if (dest_id) {
         // Update sessionStorage with current nights selection
         if (total_nights) {
@@ -1187,6 +1198,10 @@ function load_packages_with_filter() {
         
         // Call the package loading function with nights parameter
         package_dynamic_reflect_with_nights('dest_name', total_nights);
+    } else {
+        console.log('TAB2: No destination selected, cannot load packages');
+        // Show message to select destination first
+        $('#package_name_div').html('<div class="alert alert-info text-center">Please select a destination first to view packages.</div>');
     }
 }
 
@@ -1289,6 +1304,9 @@ function package_dynamic_reflect_with_nights(dest_name, total_nights) {
     console.log('Quotation ID from input:', $('#quotation_id').val());
     console.log('Quotation ID length:', $('#quotation_id').val() ? $('#quotation_id').val().length : 'undefined');
 
+    console.log('TAB2: Making AJAX call with data:', ajax_data);
+    console.log('TAB2: AJAX URL:', base_url + 'view/package_booking/quotation/inc/get_packages.php?v=' + Date.now());
+    
     $.ajax({
         type: 'post',
         url: base_url + 'view/package_booking/quotation/inc/get_packages.php?v=' + Date.now(),
@@ -1296,16 +1314,117 @@ function package_dynamic_reflect_with_nights(dest_name, total_nights) {
         success: function (result) {
             console.log('=== PACKAGE LOADING SUCCESS ===');
             console.log('Result length:', result.length);
+            console.log('Result preview:', result.substring(0, 200));
             $('#package_name_div').html(result);
             
             // Pre-select the saved package after loading
             console.log('Calling preselectPackage...');
-            preselectPackage();
+            setTimeout(function() {
+                preselectPackage();
+            }, 500); // Small delay to ensure DOM is ready
         },
-        error: function (result) {
-            console.log('Package loading error:', result.responseText);
+        error: function (xhr, status, error) {
+            console.log('Package loading error:', status, error);
+            console.log('Response text:', xhr.responseText);
+            $('#package_name_div').html('<div class="alert alert-danger">Error loading packages: ' + error + '</div>');
         }
     });
 }
+
+// Initialize tab2 for edit mode
+$(document).ready(function(){
+    console.log("TAB2: Document ready - initializing edit mode");
+    console.log("TAB2: jQuery version:", $.fn.jquery);
+    console.log("TAB2: Base URL:", $('#base_url').val());
+    
+    // Initialize destination and nights from quotation data
+    var dest_id = $('#dest_name_hidden').val();
+    var total_nights = '<?= $sq_quotation['total_days'] ?>';
+    
+    console.log("TAB2: Initializing with dest_id:", dest_id, "total_nights:", total_nights);
+    
+    // Set the destination dropdown
+    if (dest_id) {
+        $('#dest_name').val(dest_id);
+        console.log("TAB2: Set destination to:", dest_id);
+    } else {
+        console.log("TAB2: No destination ID found, checking dropdown options");
+        // Fallback: try to find the destination by name
+        var dest_name = '<?= $sq_destination['dest_name'] ?? '' ?>';
+        if (dest_name) {
+            $('#dest_name option').each(function() {
+                if ($(this).text().trim() === dest_name.trim()) {
+                    $(this).prop('selected', true);
+                    console.log("TAB2: Set destination by name:", dest_name);
+                    return false;
+                }
+            });
+        }
+    }
+    
+    // Set the nights filter
+    if (total_nights) {
+        $('#nights_filter').val(total_nights);
+        sessionStorage.setItem('selected_nights', total_nights);
+        console.log("TAB2: Set nights filter to:", total_nights);
+    }
+    
+    // Load packages automatically on page load
+    console.log("TAB2: Auto-loading packages for edit mode");
+    console.log("TAB2: Destination value:", $('#dest_name').val());
+    console.log("TAB2: Nights value:", $('#nights_filter').val());
+    console.log("TAB2: Hidden dest_id:", $('#dest_name_hidden').val());
+    
+    // Small delay to ensure DOM is fully ready
+    setTimeout(function() {
+        console.log("TAB2: About to call load_packages_with_filter");
+        load_packages_with_filter();
+    }, 100);
+    
+    // Handle inclusions and exclusions WYSIWYG
+    console.log("TAB2: Inclusions textarea exists:", $('#inclusions1').length > 0);
+    console.log("TAB2: Exclusions textarea exists:", $('#exclusions1').length > 0);
+    console.log("TAB2: Inclusions content length:", $('#inclusions1').val().length);
+    console.log("TAB2: Exclusions content length:", $('#exclusions1').val().length);
+    
+    // Store the original content before any WYSIWYG initialization
+    var inclusionsContent = $('#inclusions1').val();
+    var exclusionsContent = $('#exclusions1').val();
+    
+    console.log("TAB2: Stored content - inclusions length:", inclusionsContent.length);
+    console.log("TAB2: Stored content - exclusions length:", exclusionsContent.length);
+    
+    // Remove the feature_editor class temporarily to prevent global initialization
+    $('#inclusions1, #exclusions1').removeClass('feature_editor');
+    
+    // Wait for global WYSIWYG initialization to complete, then initialize our fields
+    setTimeout(function() {
+        console.log("TAB2: Initializing WYSIWYG for inclusions and exclusions with preserved content");
+        
+        // Re-add the feature_editor class and initialize with preserved content
+        $('#inclusions1, #exclusions1').addClass('feature_editor');
+        
+        if (typeof $().wysiwyg === 'function') {
+            $('#inclusions1, #exclusions1').wysiwyg({
+                controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
+                initialContent: ''
+            });
+            
+            // Set the preserved content
+            if (inclusionsContent) {
+                $('#inclusions1').wysiwyg('setContent', inclusionsContent);
+                console.log("TAB2: Set inclusions content in WYSIWYG");
+            }
+            if (exclusionsContent) {
+                $('#exclusions1').wysiwyg('setContent', exclusionsContent);
+                console.log("TAB2: Set exclusions content in WYSIWYG");
+            }
+        } else {
+            console.log("TAB2: WYSIWYG function not available, restoring original content");
+            $('#inclusions1').val(inclusionsContent);
+            $('#exclusions1').val(exclusionsContent);
+        }
+    }, 2000); // Wait 2 seconds for global initialization
+});
 </script>
 <?= end_panel(); ?>

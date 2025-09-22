@@ -116,27 +116,14 @@ function findImageUrl($image_path, $is_new_quotation = false) {
     return '';
 }
 
-// Check if this is an update operation (quotation_id provided)
-if (!empty($quotation_id)) {
-    // For update operations, load quotation-specific itinerary data from package_quotation_program
-    // Group by package_id to get unique packages with their itinerary data
-    $query = "SELECT DISTINCT p.package_id, c.package_name, c.total_nights, c.total_days, c.dest_id
-              FROM package_quotation_program p 
-              LEFT JOIN custom_package_master c ON p.package_id = c.package_id 
-              WHERE p.quotation_id = '$quotation_id' 
-              ORDER BY p.package_id";
-    
-    error_log("Loading quotation-specific data for quotation_id: " . $quotation_id);
-} else {
-    // For new quotations, load package templates from custom_package_master
-    $query = "select * from custom_package_master where dest_id = '$dest_id' and status!='Inactive'";
-    if (!empty($total_nights) && $total_nights != '') {
-        // Ensure we're comparing the same data type
-        $query .= " and total_nights = " . intval($total_nights);
-    }
-    
-    error_log("Loading package template data for dest_id: " . $dest_id . ", total_nights: " . $total_nights);
+// Always load all available packages for the destination and nights (both new and edit mode)
+$query = "select * from custom_package_master where dest_id = '$dest_id' and status!='Inactive'";
+if (!empty($total_nights) && $total_nights != '') {
+    // Ensure we're comparing the same data type
+    $query .= " and total_nights = " . intval($total_nights);
 }
+
+error_log("Loading package data for dest_id: " . $dest_id . ", total_nights: " . $total_nights . ", quotation_id: " . $quotation_id);
 
 // Debug information
 echo "<!-- Debug: dest_id = " . $dest_id . " -->";
