@@ -84,7 +84,7 @@ function package_dynamic_reflect(dest_name) {
 
 	$.ajax({
 		type: 'post',
-		url: base_url + 'view/package_booking/quotation/inc/get_packages.php',
+		url: base_url + 'view/package_booking/quotation/inc/get_packages.php?v=' + Date.now(),
 		data: ajax_data,
 		success: function (result) {
 			$('#package_name_div').html(result);

@@ -91,6 +91,71 @@ for ($i = 0; $i < count($attraction_arr); $i++) {
         $package_id = '1'; // Default package ID
     }
     
+    // Handle image path consistency - ensure ALL images are in quotation_images folder
+    if (!empty($day_image) && trim($day_image) !== '' && trim($day_image) !== 'NULL') {
+        // Check if this is an original package image from itinerary_images
+        if (strpos($day_image, 'uploads/itinerary_images/') === 0) {
+            // This is an original package image, copy it to quotation_images folder
+            $source_path = "../../../" . $day_image;
+            $filename = basename($day_image);
+            $new_filename = "quotation_" . $quotation_id . "_day_" . $day_count . "_" . $filename;
+            $destination_path = "../../../uploads/quotation_images/" . $new_filename;
+
+            // Create quotation_images directory if it doesn't exist
+            $quotation_images_dir = "../../../uploads/quotation_images/";
+            if (!file_exists($quotation_images_dir)) {
+                if (!mkdir($quotation_images_dir, 0777, true)) {
+                    error_log("ERROR: Failed to create quotation_images directory");
+                }
+            }
+
+            // Copy the file if source exists
+            if (file_exists($source_path)) {
+                if (copy($source_path, $destination_path)) {
+                    $day_image = "uploads/quotation_images/" . $new_filename;
+                    error_log("SUCCESS: Copied original image from $source_path to $destination_path");
+                } else {
+                    error_log("ERROR: Failed to copy original image from $source_path to $destination_path");
+                    // Keep original path if copy failed
+                }
+            } else {
+                error_log("WARNING: Original image not found: $source_path");
+                // Keep original path if source doesn't exist
+            }
+        }
+        // Also check for images that might be in crm/uploads/itinerary_images/
+        elseif (strpos($day_image, 'crm/uploads/itinerary_images/') === 0) {
+            // This is an image from crm/uploads/itinerary_images/, copy it to quotation_images folder
+            $source_path = "../../../" . $day_image;
+            $filename = basename($day_image);
+            $new_filename = "quotation_" . $quotation_id . "_day_" . $day_count . "_" . $filename;
+            $destination_path = "../../../uploads/quotation_images/" . $new_filename;
+
+            // Create quotation_images directory if it doesn't exist
+            $quotation_images_dir = "../../../uploads/quotation_images/";
+            if (!file_exists($quotation_images_dir)) {
+                if (!mkdir($quotation_images_dir, 0777, true)) {
+                    error_log("ERROR: Failed to create quotation_images directory");
+                }
+            }
+
+            // Copy the file if source exists
+            if (file_exists($source_path)) {
+                if (copy($source_path, $destination_path)) {
+                    $day_image = "uploads/quotation_images/" . $new_filename;
+                    error_log("SUCCESS: Copied CRM image from $source_path to $destination_path");
+                } else {
+                    error_log("ERROR: Failed to copy CRM image from $source_path to $destination_path");
+                    // Keep original path if copy failed
+                }
+            } else {
+                error_log("WARNING: CRM image not found: $source_path");
+                // Keep original path if source doesn't exist
+            }
+        }
+        // If it's already in quotation_images folder, keep it as is
+        // If it's a new image path from upload, keep it as is
+    }
     $insert_query = "INSERT INTO package_quotation_program (quotation_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image, day_count) 
                      VALUES ('$quotation_id', '$package_id', '$attraction', '$program', '$stay', '$meal_plan', '$day_image', '$day_count')";
     

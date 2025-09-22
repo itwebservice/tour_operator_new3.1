@@ -74,12 +74,8 @@ try {
         if (move_uploaded_file($fileTmpName, $uploadPath)) {
             error_log("DEBUG: File moved successfully to: " . $uploadPath);
             
-            // Save to database
+            // Save to database - Update package_quotation_program table
             $image_url = "uploads/quotation_images/" . $uniqueFileName;
-            
-            // Insert new record (following existing table structure)
-            $sq_max = mysqli_fetch_assoc(mysqlQuery("SELECT MAX(id) as max FROM package_tour_quotation_images"));
-            $image_id = $sq_max['max'] + 1;
             
             // Include day number in the image URL path for identification
             $image_url_with_day = "uploads/quotation_images/day_" . $day_number . "_" . $uniqueFileName;
@@ -90,18 +86,21 @@ try {
                 rename($uploadPath, $final_upload_path);
             }
             
-            $insert_query = "INSERT INTO package_tour_quotation_images 
-                           (id, quotation_id, package_id, image_url) 
-                           VALUES ('$image_id', '$quotation_id', '$package_id', '$image_url_with_day')";
-            error_log("DEBUG: Inserting image record with query: " . $insert_query);
-            $result = mysqlQuery($insert_query);
-            error_log("DEBUG: Database insert result: " . ($result ? 'SUCCESS' : 'FAILED'));
+            // Update the package_quotation_program table with the image URL
+            $update_query = "UPDATE package_quotation_program 
+                            SET day_image = '$image_url_with_day' 
+                            WHERE quotation_id = '$quotation_id' 
+                            AND package_id = '$package_id' 
+                            AND day_count = '$day_number'";
+            
+            error_log("DEBUG: Updating package_quotation_program with query: " . $update_query);
+            $result = mysqlQuery($update_query);
+            error_log("DEBUG: Database update result: " . ($result ? 'SUCCESS' : 'FAILED'));
             
             if ($result) {
                 $response['success'] = true;
                 $response['message'] = "Image uploaded successfully";
                 $response['image_url'] = BASE_URL . $image_url_with_day;
-                $response['image_id'] = $image_id;
                 $response['day_number'] = $day_number;
             } else {
                 throw new Exception("Failed to save image to database");

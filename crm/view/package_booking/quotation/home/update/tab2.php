@@ -13,23 +13,121 @@
 </style>
 
 <?php
-?>
 
+// Helper function to check image existence in multiple locations
+function findImageUrl($image_path, $is_new_quotation = false) {
+    if (empty($image_path) || $image_path === 'NULL') {
+        return '';
+    }
+
+    $image_path = trim($image_path);
+
+    // Check if path already starts with http
+    if (strpos($image_path, 'http') === 0) {
+        return $image_path;
+    }
+
+    // Get project base URL
+    $project_base_url = str_replace('/crm/', '/', BASE_URL);
+    $project_base_url = rtrim($project_base_url, '/');
+
+    $image_path_clean = ltrim($image_path, '/');
+
+    // For new quotations, prioritize itinerary_images folder
+    if ($is_new_quotation) {
+        // Check itinerary_images folder first for new quotations
+        $itinerary_images_path = "../../../../../uploads/itinerary_images/" . basename($image_path_clean);
+        if (file_exists($itinerary_images_path)) {
+            error_log("TAB2: Found image in itinerary_images folder (new quotation priority): " . $itinerary_images_path);
+            $itinerary_images_url = $project_base_url . '/uploads/itinerary_images/' . basename($image_path_clean);
+            return $itinerary_images_url;
+        }
+    }
+
+    // Check original path first
+    $original_url = $project_base_url . '/' . $image_path_clean;
+    $original_file_path = "../../../" . $image_path_clean;
+
+    if (file_exists($original_file_path)) {
+        error_log("TAB2: Found image in original location: " . $original_file_path);
+        return $original_url;
+    }
+
+    // Check quotation_images folder (full path as stored in database)
+    if (strpos($image_path_clean, 'uploads/quotation_images/') === 0) {
+        // For database paths like "uploads/quotation_images/filename.jpg", 
+        // we need to check in crm/uploads/quotation_images/ folder
+        $quotation_images_url = $project_base_url . '/crm/' . $image_path_clean;
+        $quotation_images_file_path = "../../../../" . $image_path_clean;
+
+        if (file_exists($quotation_images_file_path)) {
+            error_log("TAB2: Found image in quotation_images folder (database path): " . $quotation_images_file_path);
+            return $quotation_images_url;
+        }
+    }
+
+    // Check quotation_images folder (with just filename, not full path)
+    $quotation_images_path = "crm/uploads/quotation_images/" . basename($image_path_clean);
+    $quotation_images_url = $project_base_url . '/' . $quotation_images_path;
+    $quotation_images_file_path = "../../../../" . $quotation_images_path;
+
+    if (file_exists($quotation_images_file_path)) {
+        error_log("TAB2: Found image in quotation_images folder: " . $quotation_images_file_path);
+        return $quotation_images_url;
+    }
+
+    // Check CRM uploads folder directly
+    $crm_uploads_path = "../../../../crm/uploads/" . basename($image_path_clean);
+    if (file_exists($crm_uploads_path)) {
+        error_log("TAB2: Found image in CRM uploads folder: " . $crm_uploads_path);
+        $crm_uploads_url = $project_base_url . '/crm/uploads/' . basename($image_path_clean);
+        return $crm_uploads_url;
+    }
+
+    // Check CRM uploads quotation_images folder directly
+    $crm_quotation_images_path = "../../../../crm/uploads/quotation_images/" . basename($image_path_clean);
+    if (file_exists($crm_quotation_images_path)) {
+        error_log("TAB2: Found image in CRM uploads quotation_images folder: " . $crm_quotation_images_path);
+        $crm_quotation_images_url = $project_base_url . '/crm/uploads/quotation_images/' . basename($image_path_clean);
+        return $crm_quotation_images_url;
+    }
+
+    // Check itinerary_images folder as fallback (for both new and existing quotations)
+    $itinerary_images_path = "../../../../../uploads/itinerary_images/" . basename($image_path_clean);
+    if (file_exists($itinerary_images_path)) {
+        error_log("TAB2: Found image in itinerary_images folder (fallback): " . $itinerary_images_path);
+        $itinerary_images_url = $project_base_url . '/uploads/itinerary_images/' . basename($image_path_clean);
+        return $itinerary_images_url;
+    }
+
+    error_log("TAB2: Image not found in any location: " . $image_path);
+    return '';
+}
+
+?>
 
 
 <form id="frm_tab2_u">
     <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
+    <input type="hidden" id="quotation_id" value="<?= $quotation_id ?>" />
     <div class="app_panel">
 
         <div class="container" style="width:100% !important;">
 
             <div class="row">
-                <div class="col-md-6 col-sm-4 col-xs-12" style="margin-left:15px;">
-                    <?php $sq_pacakge = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$sq_quotation[package_id]'")) ?>
-                    <input type="text" value="<?= $sq_pacakge['package_name'] . ' (' . ($sq_pacakge['total_days'] + 1) . 'D/' . $sq_pacakge['total_nights'] . 'N )' ?>" readonly>
-                    <input type="hidden" value="<?= $sq_pacakge['dest_id'] ?>" id='dest_name'>
-                    <input type="hidden" value="<?= $package_id ?>" id='img_package_id'>
-                    <input type='hidden' id='pckg_daywise_url' name='pckg_daywise_url' />
+                <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_20" id="package_div">
+                    <select name="dest_name" id="dest_name" title="Select Destination"
+                        onchange="load_packages_with_filter()" style="width:100%">
+                        <option value="">*Select Destination</option>
+                        <?php
+                        $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");
+                        while ($row_dest = mysqli_fetch_assoc($sq_query)) { 
+                            $selected = ($sq_pacakge['dest_id'] == $row_dest['dest_id']) ? 'selected' : '';
+                        ?>
+                        <option value="<?php echo $row_dest['dest_id']; ?>" <?= $selected ?>><?php echo $row_dest['dest_name']; ?>
+                        </option>
+                        <?php } ?>
+                    </select>
                 </div>
                 <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_20">
                     <select name="nights_filter" id="nights_filter" title="Filter by Nights" 
@@ -44,8 +142,33 @@
                         ?>
                     </select>
                 </div>
+                <div class="col-md-6 col-sm-4 col-xs-12 mg_bt_20 text-right">
+                    <a href="../../../../custom_packages/master/index.php" target='_blank' class="btn btn-info btn-sm"><i class="fa fa-plus"></i>&nbsp;&nbsp;Package Tour</a>
+                    <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : The Package is not available for this Destination.Please create here."><i class="fa fa-question-circle"></i></button>
+                </div>
+                <div class="col-md-12 col-sm-8 col-xs-12 no-pad" id="package_name_div">
+                    <div class="col-md-6 col-sm-4 col-xs-12" style="margin-left:15px;">
+                        <?php $sq_pacakge = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$sq_quotation[package_id]'")) ?>
+                        <input type="text" value="<?= $sq_pacakge['package_name'] . ' (' . ($sq_pacakge['total_days'] + 1) . 'D/' . $sq_pacakge['total_nights'] . 'N )' ?>" readonly>
+                        <input type="hidden" value="<?= $sq_pacakge['dest_id'] ?>" id='dest_name_hidden'>
+                        <input type="hidden" value="<?= $sq_quotation['package_id'] ?>" id='img_package_id'>
+                        <!-- Debug: package_id from POST = <?= $package_id ?>, package_id from quotation = <?= $sq_quotation['package_id'] ?> -->
+                        <script>
+                        console.log('DEBUG: package_id from POST = "<?= $package_id ?>"');
+                        console.log('DEBUG: package_id from quotation = "<?= $sq_quotation['package_id'] ?>"');
+                        console.log('DEBUG: img_package_id element exists:', $('#img_package_id').length > 0);
+                        console.log('DEBUG: img_package_id value:', $('#img_package_id').val());
+                        </script>
+                        <input type='hidden' id='pckg_daywise_url' name='pckg_daywise_url' />
+                    </div>
+                </div>
             </div>
             <div class="row">
+                <div class="col-md-12 col-sm-8 col-xs-12 no-pad" id="package_name_div">
+                    <!-- Packages will be loaded here via AJAX -->
+                </div>
+            </div>
+            <div class="row" style="display: none;">
                 <div class="col-md-12 col-sm-8 col-xs-12 no-pad">
                     <div class="col-md-12 app_accordion">
                         <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
@@ -117,17 +240,13 @@
                                                                         
                                                                         // Check if path is valid and not empty
                                                                         if ($image_path && $image_path !== '' && $image_path !== 'NULL') {
-                                                                            // Check if path already starts with http
-                                                                            if (strpos($image_path, 'http') === 0) {
-                                                                                echo $image_path;
-                                                                            } else {
-                                                                                // For package images, use project root URL
-                                                                                $project_base_url = str_replace('/crm/', '/', BASE_URL);
-                                                                                $project_base_url = rtrim($project_base_url, '/');
-                                                                                $image_path = ltrim($image_path, '/');
-                                                                                $final_url = $project_base_url . '/' . $image_path;
-                                                                                error_log("QUOTATION UPDATE: Final image URL for offset " . $offset . ": " . $final_url);
+                                                                            $final_url = findImageUrl($image_path, false); // tab2 is for updating existing quotations
+                                                                            if (!empty($final_url)) {
+                                                                                error_log("QUOTATION UPDATE: Using found image URL for offset " . $offset . ": " . $final_url);
                                                                                 echo $final_url;
+                                                                            } else {
+                                                                                error_log("QUOTATION UPDATE: No image found for path (offset " . $offset . "): " . $image_path);
+                                                                                echo '';
                                                                             }
                                                                         } else {
                                                                             // Empty or invalid path, don't output anything
@@ -367,6 +486,7 @@ function previewDayImage(input, offset) {
     
     if (input.files && input.files[0]) {
         var file = input.files[0];
+        console.log("Selected file details:", file.name, file.size, file.type);
         
         // Validate file type
         var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
@@ -389,14 +509,18 @@ function previewDayImage(input, offset) {
         var reader = new FileReader();
         reader.onload = function(e) {
             console.log("FileReader loaded, showing preview for edit mode");
+            
+            // Set the image source
             $('#preview_img_' + offset).attr('src', e.target.result);
+            
+            // Show the preview div
             $('#day_image_preview_' + offset).show();
             
             // Hide the upload button when image is uploaded
             $('label[for="day_image_' + offset + '"]').hide();
             
-            // Show the upload button in preview area
-            $('#upload_btn_' + offset).show();
+            // Show the remove button
+            $('#day_image_preview_' + offset).find('button[onclick*="removeDayImage"]').show();
             
             // Store image data for later upload (when quotation is updated)
             if (!window.quotationImages) {
@@ -406,13 +530,6 @@ function previewDayImage(input, offset) {
             // Get package ID for this row
             var packageId = getPackageIdForOffset(offset);
             
-            // Validate package ID - it should not be '1' or empty for update operations
-            if (!packageId || packageId === '1' || packageId === '') {
-                console.error("ERROR: Invalid package_id for image upload:", packageId);
-                alert('Error: Package ID not found. Please refresh the page and try again.');
-                return;
-            }
-            
             // Store image by offset for later upload (when quotation is updated)
             window.quotationImages[offset] = {
                 file: file,
@@ -420,51 +537,56 @@ function previewDayImage(input, offset) {
                 package_id: packageId,
                 day_number: offset,
                 preview_url: e.target.result,
-                uploaded: false,
-                is_replacement: (window.replacingImage === offset) // Mark if this is a replacement
+                uploaded: false
             };
             
-            // Reset the replacement flag
-            if (window.replacingImage === offset) {
-                window.replacingImage = null;
-            }
-            
-            // Update button text to indicate it will be uploaded when quotation is updated
-            if (window.quotationImages[offset].is_replacement) {
-                $('#upload_btn_' + offset).text('Will Replace on Update');
-            } else {
-                $('#upload_btn_' + offset).text('Will Upload on Update');
-            }
-            
             console.log("DEBUG: Stored image for offset " + offset + " in edit mode:", file.name, "Package ID:", packageId);
-            console.log("DEBUG: Full stored object:", window.quotationImages[offset]);
-            console.log("DEBUG: Expected package_id should be 29, actual package_id:", packageId);
+            console.log("DEBUG: Upload button hidden:", !$('label[for="day_image_' + offset + '"]').is(':visible'));
+            console.log("DEBUG: Preview div shown:", $('#day_image_preview_' + offset).is(':visible'));
         }
         reader.onerror = function() {
             console.error("FileReader error");
             alert('Error reading file');
         }
         reader.readAsDataURL(file);
+    } else {
+        console.log("No file selected or file input is empty");
     }
 }
 
 function removeDayImage(offset) {
+    console.log("removeDayImage called for offset:", offset);
+    
+    // Clear the file input
     $('#day_image_' + offset).val('');
+    
+    // Hide the preview div completely
     $('#day_image_preview_' + offset).hide();
+    
+    // Clear the image source
     $('#preview_img_' + offset).attr('src', '');
     
-    // Hide the upload button in preview area
-    $('#upload_btn_' + offset).hide();
+    // Clear the existing image path
+    $('#existing_image_path_' + offset).val('');
     
     // Clear any stored image data
     if (window.quotationImages && window.quotationImages[offset]) {
         delete window.quotationImages[offset];
+        console.log("Cleared stored image data for offset:", offset);
     }
     
-    // Show the upload button again when image is removed
+    // Show ONLY the upload button (hide any preview elements)
     $('label[for="day_image_' + offset + '"]').show();
     
-    console.log("Removed image for offset:", offset);
+    // Hide any remove buttons
+    $('#day_image_preview_' + offset).find('button[onclick*="removeDayImage"]').hide();
+    
+    // Reset the file input to ensure change event fires on next selection
+    $('#day_image_' + offset).prop('value', '');
+    
+    console.log("Image removed and upload button shown for offset:", offset);
+    console.log("Upload button visible:", $('label[for="day_image_' + offset + '"]').is(':visible'));
+    console.log("Preview div hidden:", !$('#day_image_preview_' + offset).is(':visible'));
 }
 
 // Handle day image upload (deferred until quotation update)
@@ -568,6 +690,10 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
 
 
     function switch_to_tab1() {
+        // Reset user modification flag when going back to Tab1
+        // This allows re-sync when returning to Tab2
+        sessionStorage.removeItem('user_modified_nights');
+        console.log('Reset user_modified_nights flag - returning to Tab1 (update)');
 
         $('#tab2_head').removeClass('active');
         $('#tab1_head').addClass('active');
@@ -903,12 +1029,149 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
         }
     });
 
-// Initialize nights filter when tab2 loads for update
+// Initialize nights filter and destination when tab2 loads for update
 $(document).ready(function() {
-    var selected_nights = sessionStorage.getItem('selected_nights');
-    if (selected_nights) {
-        $('#nights_filter').val(selected_nights);
+    // Function to sync nights filter and destination
+    function syncNightsFilter(force_sync = false) {
+        // Get total days from tab1 first
+        var total_days = $('#total_days12').val();
+        var selected_nights = sessionStorage.getItem('selected_nights');
+        var destination_id = sessionStorage.getItem('selected_destination_id');
+        var destination_name = sessionStorage.getItem('selected_destination_name');
+        var current_nights_filter = $('#nights_filter').val();
+        var user_modified_nights = sessionStorage.getItem('user_modified_nights');
+        
+        console.log('Tab2 ready (update) - total_days from tab1:', total_days);
+        console.log('Tab2 ready (update) - selected_nights from sessionStorage:', selected_nights);
+        console.log('Tab2 ready (update) - destination_id:', destination_id, 'destination_name:', destination_name);
+        console.log('Tab2 ready (update) - current_nights_filter:', current_nights_filter, 'user_modified_nights:', user_modified_nights);
+        
+        // Use total_days from tab1 as primary source (only if user hasn't manually modified)
+        if (total_days && total_days > 0 && (!user_modified_nights || force_sync)) {
+            selected_nights = total_days;
+            sessionStorage.setItem('selected_nights', selected_nights);
+            console.log('Using total_days from tab1 (update):', selected_nights);
+        } else if (selected_nights) {
+            console.log('Using stored nights from sessionStorage (update):', selected_nights);
+        }
+        
+        // Sync nights filter (only if user hasn't manually changed it or if force_sync is true)
+        if (selected_nights && selected_nights > 0 && (!user_modified_nights || force_sync)) {
+            $('#nights_filter').val(selected_nights);
+            console.log('Initialized nights filter with value (update):', selected_nights);
+        }
+        
+        // Sync destination
+        if (destination_id && destination_name) {
+            $('#dest_name').val(destination_id);
+            $('#dest_name').trigger('change');
+            console.log('Initialized destination with (update):', destination_name);
+        }
+        
+        // Trigger package filtering if both destination and nights are available
+        if ((destination_id || $('#dest_name').val()) && (selected_nights || $('#nights_filter').val())) {
+            if (typeof load_packages_with_filter === 'function') {
+                load_packages_with_filter();
+            }
+        }
     }
+    
+    // Initial sync
+    syncNightsFilter();
+    
+    // Test preselectPackage immediately
+    console.log('=== TESTING PRESELECT PACKAGE ON PAGE LOAD ===');
+    setTimeout(function() {
+        preselectPackage();
+    }, 2000);
+    
+    // Add click event listener for image upload buttons
+    $(document).on('click', 'label[for^="day_image_"]', function() {
+        var forAttr = $(this).attr('for');
+        var offset = forAttr.replace('day_image_', '');
+        console.log('Upload button clicked for offset:', offset);
+        
+        // Trigger the file input click
+        $('#day_image_' + offset).click();
+    });
+    
+    // Add change event listener for file inputs
+    $(document).on('change', 'input[id^="day_image_"]', function() {
+        var offset = $(this).attr('id').replace('day_image_', '');
+        console.log('File input changed for offset:', offset);
+        previewDayImage(this, offset);
+    });
+    
+    // Initialize image states on page load
+    function initializeImageStates() {
+        $('input[id^="day_image_"]').each(function() {
+            var offset = $(this).attr('id').replace('day_image_', '');
+            var hasExistingImage = $('#existing_image_path_' + offset).val() && $('#existing_image_path_' + offset).val() !== '';
+            var hasPreviewImage = $('#preview_img_' + offset).attr('src') && $('#preview_img_' + offset).attr('src') !== '';
+            
+            console.log('Initializing image state for offset:', offset, 'hasExisting:', hasExistingImage, 'hasPreview:', hasPreviewImage);
+            
+            if (hasExistingImage || hasPreviewImage) {
+                // Show preview, hide upload button
+                $('#day_image_preview_' + offset).show();
+                $('label[for="day_image_' + offset + '"]').hide();
+                $('#day_image_preview_' + offset).find('button[onclick*="removeDayImage"]').show();
+            } else {
+                // Show upload button, hide preview
+                $('#day_image_preview_' + offset).hide();
+                $('label[for="day_image_' + offset + '"]').show();
+                $('#day_image_preview_' + offset).find('button[onclick*="removeDayImage"]').hide();
+            }
+        });
+    }
+    
+    // Initialize image states after a short delay
+    setTimeout(initializeImageStates, 1000);
+    
+    // Also sync when tab2 becomes visible (in case of dynamic loading)
+    $(document).on('click', '#tab2_head', function() {
+        // Check if user modification flag was reset (meaning user went back to Tab1)
+        var user_modified_nights = sessionStorage.getItem('user_modified_nights');
+        var force_sync = !user_modified_nights; // Force sync if flag was reset
+        
+        console.log('Tab2 clicked (update) - user_modified_nights:', user_modified_nights, 'force_sync:', force_sync);
+        setTimeout(function() {
+            syncNightsFilter(force_sync);
+        }, 50);
+    });
+    
+    // Reset user modification flag when clicking on Tab1 header
+    $(document).on('click', '#tab1_head', function() {
+        sessionStorage.removeItem('user_modified_nights');
+        console.log('Reset user_modified_nights flag - clicked Tab1 header (update)');
+    });
+    
+    // Fallback: Check every 500ms for total_days and destination changes
+    setInterval(function() {
+        var current_total_days = $('#total_days12').val();
+        var current_nights_filter = $('#nights_filter').val();
+        var current_destination_id = sessionStorage.getItem('selected_destination_id');
+        var current_dest_name = $('#dest_name').val();
+        var user_modified_nights = sessionStorage.getItem('user_modified_nights');
+        
+        var needs_sync = false;
+        
+        // Check if total_days changed (only if user hasn't manually modified nights)
+        if (current_total_days && current_total_days > 0 && current_nights_filter != current_total_days && !user_modified_nights) {
+            console.log('Detected total_days change, syncing nights filter (update):', current_total_days);
+            needs_sync = true;
+        }
+        
+        // Check if destination changed
+        if (current_destination_id && current_dest_name != current_destination_id) {
+            console.log('Detected destination change, syncing destination (update):', current_destination_id);
+            needs_sync = true;
+        }
+        
+        if (needs_sync) {
+            syncNightsFilter();
+        }
+    }, 500);
 });
 
 // Function to load packages with both destination and nights filter for update
@@ -927,9 +1190,72 @@ function load_packages_with_filter() {
     }
 }
 
+// Function to pre-select the saved package (checkbox only)
+function preselectPackage() {
+    var saved_package_id = $('#img_package_id').val();
+    console.log('=== PRESELECT PACKAGE DEBUG ===');
+    console.log('Saved package ID from img_package_id:', saved_package_id);
+    console.log('Type of saved_package_id:', typeof saved_package_id);
+    
+    if (saved_package_id) {
+        console.log('Pre-selecting package for update:', saved_package_id);
+        
+        // Try immediate selection first
+        var immediate_radio = $('input[name="custom_package"][value="' + saved_package_id + '"]');
+        console.log('Immediate radio button found:', immediate_radio.length);
+        
+        if (immediate_radio.length > 0) {
+            immediate_radio.prop('checked', true).trigger('change');
+            console.log('Package immediately checked:', saved_package_id);
+            return;
+        }
+        
+        // Wait for packages to load, then select the saved one
+        setTimeout(function() {
+            console.log('=== TIMEOUT DEBUG ===');
+            console.log('Looking for package with ID:', saved_package_id);
+            console.log('All available radio buttons:', $('input[name="custom_package"]').map(function() { return this.value; }).get());
+            console.log('All radio button elements:', $('input[name="custom_package"]'));
+            
+            // Try to find the radio button
+            var package_radio = $('input[name="custom_package"][value="' + saved_package_id + '"]');
+            console.log('Found radio button:', package_radio.length);
+            console.log('Radio button element:', package_radio);
+            
+            if (package_radio.length > 0) {
+                package_radio.prop('checked', true);
+                console.log('Package radio button checked:', saved_package_id);
+                
+                // Also trigger change event to ensure any listeners are notified
+                package_radio.trigger('change');
+            } else {
+                console.log('Package not found in loaded packages:', saved_package_id);
+                console.log('Available packages:', $('input[name="custom_package"]').map(function() { return this.value; }).get());
+                
+                // Try different selectors
+                var alt_radio = $('input[value="' + saved_package_id + '"]');
+                console.log('Alternative selector found:', alt_radio.length);
+                
+                if (alt_radio.length > 0) {
+                    alt_radio.prop('checked', true).trigger('change');
+                    console.log('Package checked with alternative selector:', saved_package_id);
+                }
+            }
+        }, 1500);
+    } else {
+        console.log('No saved package ID found!');
+        console.log('img_package_id element:', $('#img_package_id'));
+        console.log('img_package_id value:', $('#img_package_id').val());
+    }
+}
+
 // Function to filter packages by nights in tab2 for update
 function filter_packages_by_nights() {
     var total_nights = $('#nights_filter').val();
+    
+    // Mark that user has manually modified the nights filter
+    sessionStorage.setItem('user_modified_nights', 'true');
+    console.log('User manually changed nights filter to (update):', total_nights);
     
     if (total_nights) {
         sessionStorage.setItem('selected_nights', total_nights);
@@ -953,15 +1279,28 @@ function package_dynamic_reflect_with_nights(dest_name, total_nights) {
 
     var ajax_data = { 
         dest_id: dest_id,
-        total_nights: total_nights
+        total_nights: total_nights,
+        current_package_id: $('#img_package_id').val(), // Pass current package ID for pre-selection
+        quotation_id: $('#quotation_id').val() // Pass quotation ID for loading quotation-specific data
     };
+    
+    // Debug: Log the data being sent
+    console.log('AJAX Data being sent:', ajax_data);
+    console.log('Quotation ID from input:', $('#quotation_id').val());
+    console.log('Quotation ID length:', $('#quotation_id').val() ? $('#quotation_id').val().length : 'undefined');
 
     $.ajax({
         type: 'post',
-        url: base_url + 'view/package_booking/quotation/inc/get_packages.php',
+        url: base_url + 'view/package_booking/quotation/inc/get_packages.php?v=' + Date.now(),
         data: ajax_data,
         success: function (result) {
+            console.log('=== PACKAGE LOADING SUCCESS ===');
+            console.log('Result length:', result.length);
             $('#package_name_div').html(result);
+            
+            // Pre-select the saved package after loading
+            console.log('Calling preselectPackage...');
+            preselectPackage();
         },
         error: function (result) {
             console.log('Package loading error:', result.responseText);

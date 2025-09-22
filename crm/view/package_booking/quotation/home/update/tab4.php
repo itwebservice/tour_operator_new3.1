@@ -1684,7 +1684,41 @@ function uploadSingleImage(imageData, quotationId, base_url) {
             // Mark as uploaded
             if (window.quotationImages && window.quotationImages[imageData.offset]) {
                 window.quotationImages[imageData.offset].uploaded = true;
+                window.quotationImages[imageData.offset].image_url = response;
             }
+            
+            // Refresh the image preview with the new URL
+            if (typeof window.refreshImageAfterUpload === 'function') {
+                console.log("TAB4: Calling refreshImageAfterUpload for offset", imageData.offset);
+                window.refreshImageAfterUpload(imageData.offset, response);
+            } else {
+                console.log("TAB4: refreshImageAfterUpload function not found, using fallback");
+                // Fallback: manually update the image
+                var previewImg = $('#preview_img_' + imageData.offset);
+                var previewDiv = $('#day_image_preview_' + imageData.offset);
+                
+                if (previewImg.length && previewDiv.length) {
+                    // Add cache-busting parameter to ensure new image loads
+                    var cacheBuster = '?t=' + new Date().getTime();
+                    var imageUrl = response + cacheBuster;
+                    
+                    previewImg.attr('src', imageUrl);
+                    $('#existing_image_path_' + imageData.offset).val(response);
+                    previewDiv.show();
+                    $('.upload-btn-' + imageData.offset).hide();
+                    console.log("Image preview updated for offset", imageData.offset, "with URL:", imageUrl);
+                } else {
+                    console.log("TAB4: Preview elements not found for offset", imageData.offset);
+                }
+            }
+            
+            // Force refresh all images after this upload
+            setTimeout(function() {
+                if (typeof window.refreshAllImagesAfterUpload === 'function') {
+                    console.log("TAB4: Calling refreshAllImagesAfterUpload");
+                    window.refreshAllImagesAfterUpload();
+                }
+            }, 500);
         },
         error: function(xhr, status, error) {
             console.error("Image upload failed for offset " + imageData.offset + ":", error);
@@ -1712,4 +1746,5 @@ $(document).ready(function() {
     }
 });
 
+</script>
 </script>

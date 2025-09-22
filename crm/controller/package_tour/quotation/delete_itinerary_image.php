@@ -16,13 +16,14 @@ try {
             throw new Exception("Missing required parameters");
         }
         
-        // Delete from database
-        $delete_query = "DELETE FROM package_tour_quotation_images 
+        // Delete from database - Update package_quotation_program table
+        $update_query = "UPDATE package_quotation_program 
+                        SET day_image = NULL 
                         WHERE quotation_id = '$quotation_id' 
                         AND package_id = '$package_id' 
-                        AND image_url = '$image_url'";
+                        AND day_count = '$day_number'";
         
-        $result = mysqlQuery($delete_query);
+        $result = mysqlQuery($update_query);
         
         if ($result) {
             // Delete physical file
