@@ -59,13 +59,98 @@ $('#dest_name').select2();
 
 // Initialize nights filter when tab2 loads
 $(document).ready(function() {
-    var selected_nights = sessionStorage.getItem('selected_nights');
-    
-    if (selected_nights) {
-        $('#nights_filter').val(selected_nights);
-        // Trigger the filter when page loads
-        load_packages_with_filter();
+    // Function to sync nights filter and destination
+    function syncNightsFilter(force_sync = false) {
+        // Get total days from tab1 first
+        var total_days = $('#total_days').val();
+        var selected_nights = sessionStorage.getItem('selected_nights');
+        var destination_id = sessionStorage.getItem('selected_destination_id');
+        var destination_name = sessionStorage.getItem('selected_destination_name');
+        var current_nights_filter = $('#nights_filter').val();
+        var user_modified_nights = sessionStorage.getItem('user_modified_nights');
+        
+        console.log('Tab2 ready - total_days from tab1:', total_days);
+        console.log('Tab2 ready - selected_nights from sessionStorage:', selected_nights);
+        console.log('Tab2 ready - destination_id:', destination_id, 'destination_name:', destination_name);
+        console.log('Tab2 ready - current_nights_filter:', current_nights_filter, 'user_modified_nights:', user_modified_nights);
+        
+        // Use total_days from tab1 as primary source (only if user hasn't manually modified)
+        if (total_days && total_days > 0 && (!user_modified_nights || force_sync)) {
+            selected_nights = total_days;
+            sessionStorage.setItem('selected_nights', selected_nights);
+            console.log('Using total_days from tab1:', selected_nights);
+        } else if (selected_nights) {
+            console.log('Using stored nights from sessionStorage:', selected_nights);
+        }
+        
+        // Sync nights filter (only if user hasn't manually changed it or if force_sync is true)
+        if (selected_nights && selected_nights > 0 && (!user_modified_nights || force_sync)) {
+            $('#nights_filter').val(selected_nights);
+            console.log('Initialized nights filter with value:', selected_nights);
+        }
+        
+        // Sync destination
+        if (destination_id && destination_name) {
+            $('#dest_name').val(destination_id);
+            $('#dest_name').trigger('change');
+            console.log('Initialized destination with:', destination_name);
+        }
+        
+        // Trigger package filtering if both destination and nights are available
+        if ((destination_id || $('#dest_name').val()) && (selected_nights || $('#nights_filter').val())) {
+            if (typeof load_packages_with_filter === 'function') {
+                load_packages_with_filter();
+            }
+        }
     }
+    
+    // Initial sync
+    syncNightsFilter();
+    
+    // Also sync when tab2 becomes visible (in case of dynamic loading)
+    $(document).on('click', '#tab2_head', function() {
+        // Check if user modification flag was reset (meaning user went back to Tab1)
+        var user_modified_nights = sessionStorage.getItem('user_modified_nights');
+        var force_sync = !user_modified_nights; // Force sync if flag was reset
+        
+        console.log('Tab2 clicked - user_modified_nights:', user_modified_nights, 'force_sync:', force_sync);
+        setTimeout(function() {
+            syncNightsFilter(force_sync);
+        }, 50);
+    });
+    
+    // Reset user modification flag when clicking on Tab1 header
+    $(document).on('click', '#tab1_head', function() {
+        sessionStorage.removeItem('user_modified_nights');
+        console.log('Reset user_modified_nights flag - clicked Tab1 header');
+    });
+    
+    // Fallback: Check every 500ms for total_days and destination changes
+    setInterval(function() {
+        var current_total_days = $('#total_days').val();
+        var current_nights_filter = $('#nights_filter').val();
+        var current_destination_id = sessionStorage.getItem('selected_destination_id');
+        var current_dest_name = $('#dest_name').val();
+        var user_modified_nights = sessionStorage.getItem('user_modified_nights');
+        
+        var needs_sync = false;
+        
+        // Check if total_days changed (only if user hasn't manually modified nights)
+        if (current_total_days && current_total_days > 0 && current_nights_filter != current_total_days && !user_modified_nights) {
+            console.log('Detected total_days change, syncing nights filter:', current_total_days);
+            needs_sync = true;
+        }
+        
+        // Check if destination changed
+        if (current_destination_id && current_dest_name != current_destination_id) {
+            console.log('Detected destination change, syncing destination:', current_destination_id);
+            needs_sync = true;
+        }
+        
+        if (needs_sync) {
+            syncNightsFilter();
+        }
+    }, 500);
 });
 
 // Function to load packages with both destination and nights filter
@@ -92,6 +177,10 @@ function load_packages_with_filter() {
 // Function to filter packages by nights in tab2
 function filter_packages_by_nights() {
     var total_nights = $('#nights_filter').val();
+    
+    // Mark that user has manually modified the nights filter
+    sessionStorage.setItem('user_modified_nights', 'true');
+    console.log('User manually changed nights filter to:', total_nights);
     
     if (total_nights) {
         sessionStorage.setItem('selected_nights', total_nights);
@@ -132,6 +221,11 @@ function package_dynamic_reflect_with_nights(dest_name, total_nights) {
 }
 
 function switch_to_tab1() {
+    // Reset user modification flag when going back to Tab1
+    // This allows re-sync when returning to Tab2
+    sessionStorage.removeItem('user_modified_nights');
+    console.log('Reset user_modified_nights flag - returning to Tab1');
+    
     $('#tab2_head').removeClass('active');
     $('#tab1_head').addClass('active');
     $('.bk_tab').removeClass('active');
@@ -595,9 +689,11 @@ $(document).ready(function() {
     var storedDestId = sessionStorage.getItem('selected_destination_id');
     var storedDestName = sessionStorage.getItem('selected_destination_name');
     
-    // Get stored nights
-    var storedNights = sessionStorage.getItem('selected_nights');
+    // Get total days from tab1 as primary source for nights
+    var total_days = $('#total_days').val();
+    var storedNights = total_days || sessionStorage.getItem('selected_nights');
     
+    console.log("Total days from tab1:", total_days);
     console.log("Stored destination ID:", storedDestId);
     console.log("Stored destination name:", storedDestName);
     console.log("Stored nights:", storedNights);
@@ -605,13 +701,18 @@ $(document).ready(function() {
     // Set destination if available
     if (storedDestId && storedDestName) {
         $('#dest_name').val(storedDestId);
+        $('#dest_name').trigger('change');
         console.log("Set destination to:", storedDestName);
     }
     
-    // Set nights if available
-    if (storedNights) {
+    // Set nights if available - prioritize total_days from tab1
+    if (total_days && total_days > 0) {
+        $('#nights_filter').val(total_days);
+        sessionStorage.setItem('selected_nights', total_days);
+        console.log("Set nights filter to total_days from tab1:", total_days);
+    } else if (storedNights && storedNights > 0) {
         $('#nights_filter').val(storedNights);
-        console.log("Set nights filter to:", storedNights);
+        console.log("Set nights filter to stored value:", storedNights);
     }
     
     // Load packages with the stored filters

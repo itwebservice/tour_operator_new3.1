@@ -30,6 +30,37 @@ function total_days_reflect(offset = '') {
 		if (offset === '') {
 			sessionStorage.setItem('selected_nights', total_days);
 			console.log('Stored nights in sessionStorage:', total_days);
+			
+			// Reset user modification flag when dates change (allows re-sync)
+			sessionStorage.removeItem('user_modified_nights');
+			console.log('Reset user_modified_nights flag due to date change');
+			
+			// Auto-update nights filter on tab2 if it exists
+			if ($('#nights_filter').length > 0) {
+				$('#nights_filter').val(total_days);
+				$('#nights_filter').trigger('change');
+				console.log('Auto-updated nights filter to:', total_days);
+				
+				// Trigger package filtering if destination is already selected
+				if ($('#dest_name').val()) {
+					console.log('Triggering package filtering with updated nights');
+					if (typeof load_packages_with_filter === 'function') {
+						load_packages_with_filter();
+					} else if (typeof package_dynamic_reflect === 'function') {
+						package_dynamic_reflect('dest_name');
+					}
+				}
+			} else {
+				// If tab2 is not loaded yet, set up a listener for when it becomes available
+				console.log('Tab2 not loaded yet, setting up listener for nights filter');
+				$(document).on('DOMNodeInserted', function(e) {
+					if ($(e.target).find('#nights_filter').length > 0 || $(e.target).is('#nights_filter')) {
+						$('#nights_filter').val(total_days);
+						$('#nights_filter').trigger('change');
+						console.log('Auto-updated nights filter after tab2 loaded:', total_days);
+					}
+				});
+			}
 		}
 	}
 }

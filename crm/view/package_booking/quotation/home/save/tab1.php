@@ -221,6 +221,8 @@ $("#tour_name").autocomplete({
         // Store selected destination for package filtering
         sessionStorage.setItem('selected_destination_id', ui.item.dest_id);
         sessionStorage.setItem('selected_destination_name', ui.item.label);
+        console.log('Stored destination - ID:', ui.item.dest_id, 'Name:', ui.item.label);
+        
         $('#dest_name').append(newOption).trigger('change.select2');
         // $('#dest_name').prepend('<option value="' + ui.item.dest_id + '">' +ui.item.label +'</option>');
         // $('#dest_name').select2().trigger("change");
@@ -246,6 +248,7 @@ $(document).ready(function() {
         $('#enquiry_id').trigger('change');
     }
 });
+
 // New Customization ----end
 $('#frm_tab1').validate({
 
@@ -313,6 +316,47 @@ $('#frm_tab1').validate({
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');
         $('#tab2').addClass('active');
+        
+        // Reset user modification flag when submitting Tab1 (going to Tab2)
+        // This ensures fresh sync from Tab1 values
+        sessionStorage.removeItem('user_modified_nights');
+        console.log('Reset user_modified_nights flag - submitting Tab1');
+        
+        // Sync nights filter and destination when switching to tab2
+        setTimeout(function() {
+            var total_days = $('#total_days').val();
+            var destination_id = sessionStorage.getItem('selected_destination_id');
+            var destination_name = sessionStorage.getItem('selected_destination_name');
+            
+            console.log('Syncing on tab switch - total_days:', total_days, 'destination_id:', destination_id, 'destination_name:', destination_name);
+            
+            // Sync nights filter (always sync when coming from Tab1)
+            if (total_days && total_days > 0) {
+                if ($('#nights_filter').length > 0) {
+                    $('#nights_filter').val(total_days);
+                    $('#nights_filter').trigger('change');
+                    sessionStorage.setItem('selected_nights', total_days);
+                    console.log('Synced nights filter:', total_days);
+                }
+            }
+            
+            // Sync destination
+            if (destination_id && destination_name) {
+                if ($('#dest_name').length > 0) {
+                    $('#dest_name').val(destination_id);
+                    $('#dest_name').trigger('change');
+                    console.log('Synced destination:', destination_name);
+                    
+                    // Trigger package filtering with both destination and nights
+                    if (typeof load_packages_with_filter === 'function') {
+                        load_packages_with_filter();
+                    } else if (typeof package_dynamic_reflect === 'function') {
+                        package_dynamic_reflect('dest_name');
+                    }
+                }
+            }
+        }, 100);
+        
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
