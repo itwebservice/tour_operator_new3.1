@@ -1692,7 +1692,7 @@ function foo(tableID, quot_table_id, rowCounts) {
 
     row.cells[0].childNodes[0].setAttribute(
       "id",
-      "chk_hotel1" + prefix + foo.counter
+      "chk_hotel" + foo.counter
     );
     row.cells[2].childNodes[0].setAttribute(
       "id",
@@ -1789,7 +1789,7 @@ function foo(tableID, quot_table_id, rowCounts) {
       "onchange",
       "calculate_total_nights(id);validate_validDates(id);get_hotel_cost();"
     );
-    row.cells[0].childNodes[0].setAttribute("onchange", "get_hotel_cost();");
+    // row.cells[0].childNodes[0].setAttribute("onchange", "get_hotel_cost();");
     row.cells[4].childNodes[0].setAttribute(
       "onchange",
       "hotel_type_load(id);get_hotel_cost();"
@@ -4701,6 +4701,18 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // Update serial numbers or custom logic
     foo(tableID, quot_table, rowCount);
+    
+    // Ensure checkbox has onchange handler for hotel table
+    if (tableID === "tbl_package_tour_quotation_dynamic_hotel") {
+        // Remove any existing onchange handlers first
+        $(row).find('input[type="checkbox"]').removeAttr('onchange');
+        // Add the onchange handler
+        $(row).find('input[type="checkbox"]').attr('onchange', 'get_hotel_cost();');
+        
+        // Also update the label to match the new ID
+        var checkboxId = $(row).find('input[type="checkbox"]').attr('id');
+        $(row).find('label').attr('for', checkboxId);
+    }
 }
 
 // Static counter for itinerary row IDs (starts from 2 because row 1 is default)

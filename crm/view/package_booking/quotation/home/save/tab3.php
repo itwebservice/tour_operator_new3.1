@@ -20,7 +20,7 @@
                                         <div class="col-md-12"><span>Hotel Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse4" class="panel-collapse collapse main_block" role="tabpanel"
+                                <div id="collapse4" class="panel-collapse in collapse main_block" role="tabpanel"
                                     aria-labelledby="heading4">
                                     <div class="panel-body">
                                         <div class="row">
@@ -54,10 +54,8 @@
                                                         name="tbl_package_tour_quotation_dynamic_hotel"
                                                         class="table mg_bt_0 table-bordered mg_bt_10">
                                                         <tr>
-                                                            <td><input class="css-checkbox" id="chk_hotel1"
-                                                                    type="checkbox" onchange="get_hotel_cost();" checked
-                                                                    readonly><label class="css-label" for="chk_hotel1">
-                                                                    <label></td>
+                                                        <td><input class="css-checkbox" id="chk_hotel1" type="checkbox" checked><label class="css-label" for="chk_hotel1"></label></td>
+
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
@@ -261,7 +259,7 @@
                                         <div class="col-md-12"><span>Flight Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse2" class="panel-collapse collapse in main_block" role="tabpanel"
+                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel"
                                     aria-labelledby="heading2">
                                     <div class="panel-body">
                                         <div class="row">
@@ -664,6 +662,9 @@
     city_lzloading('#city_name1,#city_name-1');
     city_lzloading('#train_to_location1', "*To", true);
     city_lzloading('#train_from_location1', "*From", true);
+    
+    // Event handler removed - using inline onchange attributes instead
+    
     event_airport('tbl_package_tour_quotation_dynamic_plane');
     // App_accordion
     jQuery(document).ready(function() {
@@ -782,7 +783,8 @@
                                 'checked': false
                             });
                         }
-                        $(row.cells[0].childNodes[0]).prop('checked', true) /* .trigger('change') */ ;
+                        // Don't force checkboxes to be checked - let user control them
+                        // $(row.cells[0].childNodes[0]).prop('checked', true) /* .trigger('change') */ ;
                         $(row.cells[2].childNodes[0]).prop('disabled', true);
                         hideHotelPackage(row.cells[2].childNodes[0].value);
                     }
