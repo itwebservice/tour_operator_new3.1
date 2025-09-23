@@ -639,7 +639,7 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 	});
 }else{
 	$(element).select2({
-		placeholder: placeholder,	
+		placeholder: placeholder,
 		ajax: {
 			url: url,
 			dataType: 'json',
@@ -658,6 +658,8 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 	});
 }
 }
+
+
 function destinationLoading(element, placeholder = "Destination", valueasText = false) {
 	var base_url = $("#base_url").val();
 	url = base_url + '/view/load_data/generic_destination_loading.php';
