@@ -1637,9 +1637,9 @@
 
     function switch_to_tab2() {
         $('#tab3_head').removeClass('active');
-        $('#tab_daywise_head').addClass('active');
+        $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');
-        $('#tab_daywise').addClass('active');
+        $('#tab2').addClass('active');
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
