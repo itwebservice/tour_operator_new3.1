@@ -83,7 +83,7 @@ class quotation_sub_create
                 // Set the versioned quotation ID display
                 $insertSQL .= "'".$new_quotation_id_display."'";
             }
-            else if($col == 'quotation_display_id') {
+            else if($col == 'quotation_id_display') {
                 // Set the versioned quotation display ID
                 $insertSQL .= "'".$new_quotation_id_display."'";
             }
@@ -141,8 +141,8 @@ class quotation_sub_create
             error_log("Sub-quotation created successfully: ID=$quotation_max, Display ID=$new_quotation_id_display, Parent=$quotation_id");
             
             // Debug: Log final sub-quotation details
-            $final_check = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_id, email_id, mobile_no, is_sub_quotation, parent_quotation_id, quotation_display_id FROM package_tour_quotation_master WHERE quotation_id='$quotation_max'"));
-            error_log("Sub-quotation created - ID: " . $quotation_max . ", Display ID: " . ($final_check['quotation_display_id'] ?? 'NULL') . ", Email: " . ($final_check['email_id'] ?? 'NULL') . ", Mobile: " . ($final_check['mobile_no'] ?? 'NULL') . ", Parent: " . ($final_check['parent_quotation_id'] ?? 'NULL') . ", Is Sub: " . ($final_check['is_sub_quotation'] ?? 'NULL'));
+            $final_check = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_id, email_id, mobile_no, is_sub_quotation, parent_quotation_id, quotation_id_display FROM package_tour_quotation_master WHERE quotation_id='$quotation_max'"));
+            error_log("Sub-quotation created - ID: " . $quotation_max . ", Display ID: " . ($final_check['quotation_id_display'] ?? 'NULL') . ", Email: " . ($final_check['email_id'] ?? 'NULL') . ", Mobile: " . ($final_check['mobile_no'] ?? 'NULL') . ", Parent: " . ($final_check['parent_quotation_id'] ?? 'NULL') . ", Is Sub: " . ($final_check['is_sub_quotation'] ?? 'NULL'));
             
             // Return JSON response with the new quotation ID
             echo json_encode([

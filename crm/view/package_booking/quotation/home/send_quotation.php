@@ -164,6 +164,9 @@ $debug_count = 0;
 				<h4 class="modal-title" id="myModalLabel"><?= $modal_title ?></h4>
 			</div>
 			<div class="modal-body">
+				<!-- Hidden field for base URL -->
+				<input type="hidden" id="base_url" value="<?php echo BASE_URL ?>">
+				
 				<div class="row">
 					<div class="col-xs-12">
 						<?php if ($specific_quotation_id) { ?>
@@ -1135,6 +1138,12 @@ $debug_count = 0;
 		});
 	}
 
+	// Function to refresh the quotation list
+	function quotation_list_reflect() {
+		// Reload the page to show updated quotation list
+		location.reload();
+	}
+
 	// Function to create sub-quotation copy
 	function quotation_sub_copy(quotation_id) {
 		var base_url = $('#base_url').val();
@@ -1155,6 +1164,8 @@ $debug_count = 0;
 						success: function(result) {
 							try {
 								var response = JSON.parse(result);
+
+                                console.log(response,'idrhhh');
 								if (response.status === 'success') {
 									// Close the modal first
 									$('#quotation_send_modal').modal('hide');
@@ -1162,22 +1173,22 @@ $debug_count = 0;
 									// Show success message
 									msg_alert('Sub-quotation created successfully with ID: ' + response.quotation_id_display);
 									
-									// Refresh the page to show the new sub-quotation
-									location.reload();
+									// Refresh the quotation list to show the new sub-quotation
+									quotation_list_reflect();
 								} else {
 									error_msg_alert(response.message);
 								}
 							} catch (e) {
 								// Fallback for non-JSON response
-								error_msg_alert('Sub-quotation created successfully');
+								msg_alert('Sub-quotation created successfully');
 								$('#quotation_send_modal').modal('hide');
-								location.reload();
+								quotation_list_reflect();
 							}
 						},
-						error: function(xhr, status, error) {
-							console.error('Error creating sub-quotation:', error);
-							error_msg_alert('Failed to create sub-quotation. Please try again.');
-						}
+						// error: function(xhr, status, error) {
+						// 	console.error('Error creating sub-quotation:', error);
+						// 	error_msg_alert('Failed to create sub-quotation. Please try again.');
+						// }
 					});
 				}
 			}

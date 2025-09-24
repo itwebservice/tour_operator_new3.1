@@ -44,7 +44,7 @@
                                                     onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
-                                             
+
                                             </div>
                                         </div>
 
