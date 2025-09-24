@@ -270,6 +270,9 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                                         $project_base_url = rtrim($project_base_url, '/');
                                                                         $image_path = ltrim($image_path, '/');
                                                                         $final_url = $project_base_url . '/' . $image_path;
+                                                                        error_log("PACKAGE UPDATE: BASE_URL: " . BASE_URL);
+                                                                        error_log("PACKAGE UPDATE: Project base URL: " . $project_base_url);
+                                                                        error_log("PACKAGE UPDATE: Image path: " . $image_path);
                                                                         error_log("PACKAGE UPDATE: Final image URL: " . $final_url);
                                                                         echo $final_url;
                                                                     }
@@ -282,8 +285,9 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                             }
                                                         ?>" alt="Preview" 
                                                              style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
-                                                             onerror="console.log('PACKAGE UPDATE: Existing image failed to load:', this.src); this.style.display='none'; this.parentElement.parentElement.style.display='none'; this.parentElement.parentElement.parentElement.querySelector('label').style.display='block'; this.parentElement.querySelector('button[onclick*=removeDayImageUpdate]').style.display='none';"
-                                                             onload="console.log('PACKAGE UPDATE: Image loaded successfully:', this.src);">
+                                                             onerror="console.log('PACKAGE UPDATE: Image failed to load:', this.src); this.style.display='none'; this.parentElement.style.display='none'; this.parentElement.parentElement.querySelector('label').style.display='block';"
+                                                             onload="console.log('PACKAGE UPDATE: Image loaded successfully:', this.src); this.style.display='block'; this.parentElement.style.display='block'; this.parentElement.parentElement.querySelector('label').style.display='none';"
+                                                             onabort="console.log('PACKAGE UPDATE: Image load aborted:', this.src);">
                                                         <button type="button" 
                                                             onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
                                                                 title="Remove Image" 
@@ -613,6 +617,17 @@ function debugImageProcessing() {
     console.log("DEBUG: Manual debug triggered");
     console.log("DEBUG: window.selectedItineraryImage =", window.selectedItineraryImage);
     
+    // Check all existing image previews
+    $('[id^="preview_img_"]').each(function() {
+        var img = $(this);
+        var src = img.attr('src');
+        var id = img.attr('id');
+        console.log("DEBUG: Image element", id, "src:", src);
+        console.log("DEBUG: Image visible:", img.is(':visible'));
+        console.log("DEBUG: Parent div visible:", img.parent().is(':visible'));
+        console.log("DEBUG: Parent parent visible:", img.parent().parent().is(':visible'));
+    });
+    
     // Simulate image data for testing
     if (!window.selectedItineraryImage) {
         window.selectedItineraryImage = {
@@ -623,6 +638,46 @@ function debugImageProcessing() {
     }
     
     processSelectedItineraryImageUpdate();
+}
+
+// Function to fix image preview display issues
+function fixImagePreviewDisplay() {
+    console.log("PACKAGE UPDATE: Fixing image preview display...");
+    
+    $('[id^="preview_img_"]').each(function() {
+        var img = $(this);
+        var src = img.attr('src');
+        var id = img.attr('id');
+        
+        if (src && src !== '') {
+            console.log("PACKAGE UPDATE: Checking image", id, "with src:", src);
+            
+            // Test if image loads
+            var testImg = new Image();
+            testImg.onload = function() {
+                console.log("PACKAGE UPDATE: Image", id, "loads successfully");
+                img.show();
+                img.parent().show();
+                img.parent().parent().find('label').hide();
+            };
+            testImg.onerror = function() {
+                console.log("PACKAGE UPDATE: Image", id, "failed to load, trying alternative URL");
+                
+                // Try alternative URL construction
+                var altSrc = src;
+                if (src.indexOf('http') === -1) {
+                    // Try with different base URL
+                    var baseUrl = $('#base_url').val();
+                    if (baseUrl) {
+                        altSrc = baseUrl.replace('/crm/', '/') + src;
+                        console.log("PACKAGE UPDATE: Trying alternative URL:", altSrc);
+                        img.attr('src', altSrc);
+                    }
+                }
+            };
+            testImg.src = src;
+        }
+    });
 }
 
 // Function to process selected itinerary image after modal closes
@@ -1303,6 +1358,11 @@ $('#seo_slug').val(generateSlug(packageName));
     // Listen for modal close event and process selected image
     $(document).ready(function() {
         console.log("PACKAGE UPDATE: Setting up modal event listeners");
+        
+        // Fix image preview display on page load
+        setTimeout(function() {
+            fixImagePreviewDisplay();
+        }, 1000);
         
         // Use a more reliable approach - check for image data periodically
         var imageCheckInterval = setInterval(function() {
