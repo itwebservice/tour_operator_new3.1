@@ -4755,6 +4755,33 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         // Also update the label to match the new ID
         var checkboxId = $(row).find('input[type="checkbox"]').attr('id');
         $(row).find('label').attr('for', checkboxId);
+        
+        // Copy city selection from previous row
+        var previousRow = table.rows[table.rows.length - 2]; // Previous row (current row - 1)
+        if (previousRow && previousRow.cells[3] && previousRow.cells[3].childNodes[0]) {
+            var previousCitySelect = previousRow.cells[3].childNodes[0];
+            var newCitySelect = row.cells[3].childNodes[0];
+            
+            // Get the selected city value and text from previous row
+            var selectedCityValue = $(previousCitySelect).val();
+            var selectedCityText = $(previousCitySelect).find('option:selected').text();
+            
+            // If there's a selected city in the previous row, copy it to the new row
+            if (selectedCityValue && selectedCityValue !== "" && selectedCityText && selectedCityText !== "*City Name") {
+                // Initialize city dropdown first
+                city_lzloading($(newCitySelect));
+                
+                // Add the selected city option to the new dropdown
+                var newOption = new Option(selectedCityText, selectedCityValue, true, true);
+                $(newCitySelect).append(newOption).trigger('change');
+            } else {
+                // Initialize city dropdown without pre-selection
+                city_lzloading($(newCitySelect));
+            }
+        } else {
+            // Initialize city dropdown without pre-selection if no previous row
+            city_lzloading($(row.cells[3].childNodes[0]));
+        }
     }
 }
 
