@@ -1611,6 +1611,9 @@
                     get_business(row.cells[3].childNodes[1].id, 'true');
                 }
 
+                // Populate tab4 costing table before switching
+                populateTab4CostingTable();
+
                 $('.accordion_content').removeClass("indicator");
                 $('#tab3_head').addClass('done');
                 $('#tab4_head').addClass('active');
@@ -1631,6 +1634,97 @@
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
+    }
+
+    function populateTab4CostingTable() {
+        // Get the costing data from tab3
+        var hotel_main_arr = [];
+        var unique_package_type_arr = [];
+        
+        // Collect package data from hotel table
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        var rowCount = table.rows.length;
+        
+        for (var i = 0; i < rowCount; i++) {
+            var row = table.rows[i];
+            if (row.cells[0].childNodes[0].checked) {
+                var package_type = row.cells[2].childNodes[0].value;
+                var hotel_cost = parseFloat(row.cells[13].childNodes[0].value) || 0;
+                var package_id = row.cells[14].childNodes[0].value;
+                
+                if (package_type && package_type !== "*Package Type") {
+                    // Add to unique package types
+                    if (unique_package_type_arr.indexOf(package_type) === -1) {
+                        unique_package_type_arr.push(package_type);
+                    }
+                    
+                    // Add to hotel main array
+                    hotel_main_arr.push({
+                        'id': package_id,
+                        'type': package_type,
+                        'cost': hotel_cost,
+                        'checked': true
+                    });
+                }
+            }
+        }
+        
+        // Get the tab4 costing table
+        var costingTable = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+        if (!costingTable) {
+            console.log("Costing table not found in tab4");
+            return;
+        }
+        
+        // Clear existing rows (except header)
+        while (costingTable.rows.length > 1) {
+            costingTable.deleteRow(costingTable.rows.length - 1);
+        }
+        
+        // Add rows for each unique package type
+        for (var i = 0; i < unique_package_type_arr.length; i++) {
+            if (i > 0) { // Add row for each package type after the first one
+                addRow('tbl_package_tour_quotation_dynamic_costing');
+            }
+            
+            var row = costingTable.rows[i];
+            var packageType = unique_package_type_arr[i];
+            
+            // Find the total cost for this package type
+            var totalCost = 0;
+            for (var j = 0; j < hotel_main_arr.length; j++) {
+                if (hotel_main_arr[j]['type'] === packageType) {
+                    totalCost += hotel_main_arr[j]['cost'];
+                }
+            }
+            
+            // Populate the row
+            if (row.cells[2].childNodes[1]) {
+                row.cells[2].childNodes[1].value = packageType; // Package Type
+            }
+            if (row.cells[3].childNodes[1]) {
+                row.cells[3].childNodes[1].value = totalCost; // Hotel Cost
+            }
+            if (row.cells[5].childNodes[1]) {
+                row.cells[5].childNodes[1].value = 0; // Activity Cost (default)
+            }
+            if (row.cells[6].childNodes[1]) {
+                row.cells[6].childNodes[1].value = totalCost; // Basic Amount
+            }
+            if (row.cells[7].childNodes[1]) {
+                row.cells[7].childNodes[1].value = 0; // Service Charge (default)
+            }
+            if (row.cells[16].childNodes[1]) {
+                row.cells[16].childNodes[1].value = totalCost; // Total Tour Cost
+            }
+            
+            // Trigger change events to calculate totals
+            if (row.cells[3].childNodes[1]) {
+                $(row.cells[3].childNodes[1]).trigger('change');
+            }
+        }
+        
+        console.log("Tab4 costing table populated with", unique_package_type_arr.length, "package types");
     }
 
 

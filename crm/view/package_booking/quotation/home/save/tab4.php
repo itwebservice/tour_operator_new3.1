@@ -390,9 +390,17 @@
 
 
         },
+        
+        invalidHandler: function(event, validator) {
+            console.log("QUOTATION SAVE: Form validation failed");
+            console.log("Validation errors:", validator.numberOfInvalids());
+            console.log("Invalid fields:", validator.invalid);
+        },
 
         submitHandler: function(form, e) {
             e.preventDefault();
+            
+            console.log("QUOTATION SAVE: Form submission started");
             
             // Prevent double submission
             if (window.quotationSaveInProgress) {
@@ -400,6 +408,15 @@
                 return false;
             }
             window.quotationSaveInProgress = true;
+            
+            // Add timeout to reset flag in case of issues
+            setTimeout(function() {
+                if (window.quotationSaveInProgress) {
+                    console.log("QUOTATION SAVE: Timeout reached, resetting flag");
+                    window.quotationSaveInProgress = false;
+                    $('#btn_quotation_save').prop('disabled', false);
+                }
+            }, 30000); // 30 second timeout
             
             $('#btn_quotation_save').prop('disabled', true);
             var login_id = $("#login_id").val();

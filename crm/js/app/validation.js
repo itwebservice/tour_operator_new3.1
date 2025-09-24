@@ -2146,81 +2146,110 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[3].childNodes[0].setAttribute("title","City Name");
   }
   if (tableID == "tbl_package_tour_quotation_dynamic_costing") {
-    row.cells[0].childNodes[1].setAttribute("id", "chk_costing1" + foo.counter);
-    row.cells[2].childNodes[1].setAttribute(
-      "id",
-      "package_type-" + foo.counter
-    );
-    row.cells[3].childNodes[1].setAttribute("id", "tour_cost-" + foo.counter);
-    row.cells[4].childNodes[1].setAttribute(
-      "id",
-      "transport_cost1-" + foo.counter
-    );
-    row.cells[5].childNodes[1].setAttribute(
-      "id",
-      "excursion_cost-" + foo.counter
-    );
-    row.cells[6].childNodes[1].setAttribute(
-      "id",
-      "basic_amount-" + foo.counter
-    );
-    row.cells[6].childNodes[0].setAttribute("id", "basic_show-" + foo.counter);
-    row.cells[6].childNodes[1].setAttribute("value", "0.00");
-    row.cells[7].childNodes[1].setAttribute(
-      "id",
-      "service_charge-" + foo.counter
-    );
-    row.cells[7].childNodes[0].setAttribute(
-      "id",
-      "service_show-" + foo.counter
-    );
-    row.cells[7].childNodes[1].setAttribute("value", "0.00");
-    row.cells[8].childNodes[3].setAttribute(
-      "id",
-      "discount_in-" + foo.counter
-    );
-    row.cells[9].childNodes[1].setAttribute(
-      "id",
-      "discount_amt-" + foo.counter
-    );
-    row.cells[10].childNodes[3].setAttribute(
-      "id",
-      "tax_apply_on-" + foo.counter
-    );
-    row.cells[11].childNodes[3].setAttribute(
-      "id",
-      "tax_value-" + foo.counter
-    );
-    row.cells[12].childNodes[1].setAttribute(
-      "id",
-      "service_tax_subtotal-" + foo.counter
-    );
-    row.cells[13].childNodes[3].setAttribute(
-      "id",
-      "tcs_tax-" + foo.counter
-    );
-
-   
-    row.cells[14].childNodes[3].setAttribute(
-      "id",
-      "tcs1-" + foo.counter
-    );
-    // row.cells[13].childNodes[3].setAttribute("onchange", "quotation_cost_calculate(id)");
-    row.cells[13].childNodes[3].setAttribute("onchange", "customTcsTax()")
-    row.cells[15].childNodes[3].setAttribute(
-      "id",
-      "tds-" + foo.counter
-    );
-
-    row.cells[16].childNodes[3].setAttribute(
-      "id",
-      "total_tour_cost-" + foo.counter
-    );
-    row.cells[17].childNodes[1].setAttribute(
-      "id",
-      "package_name1" + foo.counter
-    );
-    row.cells[18].childNodes[1].setAttribute("id", "package_id1" + foo.counter);
+    console.log("Setting up costing table row, counter:", foo.counter);
+    console.log("Row cells count:", row.cells.length);
+    
+    // Cell 0: checkbox (childNodes[0] = input, childNodes[1] = span)
+    if (row.cells[0] && row.cells[0].childNodes && row.cells[0].childNodes[0]) {
+      row.cells[0].childNodes[0].setAttribute("id", "chk_costing1" + foo.counter);
+    }
+    if (row.cells[0] && row.cells[0].childNodes && row.cells[0].childNodes[1]) {
+      row.cells[0].childNodes[1].setAttribute("for", "chk_costing1" + foo.counter);
+    }
+    
+    // Cell 2: package type (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[2] && row.cells[2].childNodes && row.cells[2].childNodes[1]) {
+      row.cells[2].childNodes[1].setAttribute("id", "package_type-" + foo.counter);
+    }
+    
+    // Cell 3: tour cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[3] && row.cells[3].childNodes && row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("id", "tour_cost-" + foo.counter);
+    }
+    
+    // Cell 4: transport cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[1]) {
+      row.cells[4].childNodes[1].setAttribute("id", "transport_cost1-" + foo.counter);
+    }
+    
+    // Cell 5: excursion cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[1]) {
+      row.cells[5].childNodes[1].setAttribute("id", "excursion_cost-" + foo.counter);
+    }
+    
+    // Cell 6: basic amount (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[0]) {
+      row.cells[6].childNodes[0].setAttribute("id", "basic_show-" + foo.counter);
+    }
+    if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[1]) {
+      row.cells[6].childNodes[1].setAttribute("id", "basic_amount-" + foo.counter);
+      row.cells[6].childNodes[1].setAttribute("value", "0.00");
+    }
+    
+    // Cell 7: service charge (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
+      row.cells[7].childNodes[0].setAttribute("id", "service_show-" + foo.counter);
+    }
+    if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[1]) {
+      row.cells[7].childNodes[1].setAttribute("id", "service_charge-" + foo.counter);
+      row.cells[7].childNodes[1].setAttribute("value", "0.00");
+    }
+    
+    // Cell 8: discount in (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[8] && row.cells[8].childNodes && row.cells[8].childNodes[1]) {
+      row.cells[8].childNodes[1].setAttribute("id", "discount_in-" + foo.counter);
+    }
+    
+    // Cell 9: discount amount (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[9] && row.cells[9].childNodes && row.cells[9].childNodes[1]) {
+      row.cells[9].childNodes[1].setAttribute("id", "discount_amt-" + foo.counter);
+    }
+    
+    // Cell 10: tax apply on (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[10] && row.cells[10].childNodes && row.cells[10].childNodes[1]) {
+      row.cells[10].childNodes[1].setAttribute("id", "tax_apply_on-" + foo.counter);
+    }
+    
+    // Cell 11: tax value (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[11] && row.cells[11].childNodes && row.cells[11].childNodes[1]) {
+      row.cells[11].childNodes[1].setAttribute("id", "tax_value-" + foo.counter);
+    }
+    
+    // Cell 12: service tax subtotal (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[12] && row.cells[12].childNodes && row.cells[12].childNodes[1]) {
+      row.cells[12].childNodes[1].setAttribute("id", "service_tax_subtotal-" + foo.counter);
+    }
+    
+    // Cell 13: tcs tax (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[13] && row.cells[13].childNodes && row.cells[13].childNodes[1]) {
+      row.cells[13].childNodes[1].setAttribute("id", "tcs_tax-" + foo.counter);
+      row.cells[13].childNodes[1].setAttribute("onchange", "customTcsTax()");
+    }
+    
+    // Cell 14: tcs1 (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[14] && row.cells[14].childNodes && row.cells[14].childNodes[1]) {
+      row.cells[14].childNodes[1].setAttribute("id", "tcs1-" + foo.counter);
+    }
+    
+    // Cell 15: tds (hidden)
+    if (row.cells[15] && row.cells[15].childNodes && row.cells[15].childNodes[1]) {
+      row.cells[15].childNodes[1].setAttribute("id", "tds-" + foo.counter);
+    }
+    
+    // Cell 16: total tour cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[1]) {
+      row.cells[16].childNodes[1].setAttribute("id", "total_tour_cost-" + foo.counter);
+    }
+    
+    // Cell 17: package name (hidden)
+    if (row.cells[17] && row.cells[17].childNodes && row.cells[17].childNodes[1]) {
+      row.cells[17].childNodes[1].setAttribute("id", "package_name1" + foo.counter);
+    }
+    
+    // Cell 18: package id (hidden)
+    if (row.cells[18] && row.cells[18].childNodes && row.cells[18].childNodes[1]) {
+      row.cells[18].childNodes[1].setAttribute("id", "package_id1" + foo.counter);
+    }
 
     $(row.cells[0]).addClass("header_btn");
     $(row.cells[1]).addClass("header_btn");
@@ -4692,6 +4721,20 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // ✅ Initialize datepicker for new row
     $(row).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
+
+    // Special handling for costing table
+    if (tableID === "tbl_package_tour_quotation_dynamic_costing") {
+        console.log("DEBUG: Special handling for costing table");
+        // For costing table, we need to ensure proper structure
+        // The table should have the same structure as the header row
+        var headerRow = table.rows[0];
+        for (var i = 0; i < colCount; i++) {
+            if (row.cells[i] && headerRow.cells[i]) {
+                // Copy the innerHTML structure from header row
+                row.cells[i].innerHTML = headerRow.cells[i].innerHTML;
+            }
+        }
+    }
 
     // Special handling for itinerary tables
     if (itinerary === "itinerary") {
