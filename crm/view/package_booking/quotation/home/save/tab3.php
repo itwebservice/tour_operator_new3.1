@@ -1068,6 +1068,13 @@
                         var city_name = row.cells[3].childNodes[0].value;
                         var hotel_id = row.cells[4].childNodes[0].value;
                         var hotel_cat = row.cells[5].childNodes[0].value;
+                        
+                        // Debug logging
+                        console.log('Row ' + (i + 1) + ' - Package Type:', package_type, 'City:', city_name, 'Hotel ID:', hotel_id, 'Hotel Cat:', hotel_cat);
+                        console.log('Row ' + (i + 1) + ' - Hotel dropdown options:', $(row.cells[4].childNodes[0]).html());
+                        console.log('Row ' + (i + 1) + ' - Selected hotel value:', $(row.cells[4].childNodes[0]).val());
+                        console.log('Row ' + (i + 1) + ' - City dropdown options:', $(row.cells[3].childNodes[0]).html());
+                        console.log('Row ' + (i + 1) + ' - Selected city value:', $(row.cells[3].childNodes[0]).val());
                         var check_in = row.cells[6].childNodes[0].value;
                         var checkout = row.cells[7].childNodes[0].value;
                         var hotel_stay_days1 = row.cells[9].childNodes[0].value;
@@ -1077,29 +1084,29 @@
                         var package_id1 = row.cells[14].childNodes[0].value;
                         var extra_bed_cost = row.cells[15].childNodes[0].value;
 
-                        if (package_type == "") {
+                        if (package_type == "" || package_type == "*Package Type") {
                             error_msg_alert('Select Package Type in row' + (i + 1));
                             $('.accordion_content').removeClass("indicator");
                             $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
                                 '.accordion_content').addClass("indicator");
                             return false;
                         }
-                        if (city_name == "") {
+                        if (city_name == "" || city_name == "*City Name") {
                             error_msg_alert('Select Hotel city in row' + (i + 1));
                             $('.accordion_content').removeClass("indicator");
                             $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
                                 '.accordion_content').addClass("indicator");
                             return false;
                         }
-                        if (hotel_id == "") {
-                            error_msg_alert('Enter Hotel in row' + (i + 1));
+                        if (hotel_id == "" || hotel_id == "*Hotel Name") {
+                            error_msg_alert('Select Hotel in row' + (i + 1));
                             $('.accordion_content').removeClass("indicator");
                             $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
                                 '.accordion_content').addClass("indicator");
                             return false;
                         }
-                        if (hotel_cat == "") {
-                            error_msg_alert('Enter Room Category in row' + (i + 1));
+                        if (hotel_cat == "" || hotel_cat == "*Room Category") {
+                            error_msg_alert('Select Room Category in row' + (i + 1));
                             $('.accordion_content').removeClass("indicator");
                             $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
                                 '.accordion_content').addClass("indicator");
@@ -1751,9 +1758,20 @@
 
         // Fill other fields
         $(row.cells[4].childNodes[0]).html(
-            '<option value="' + hotel_arr[i]['hotel_id1'] + '">' + hotel_arr[i]['hotel_name'] + '</option>'
+            '<option value="">*Hotel Name</option><option value="' + hotel_arr[i]['hotel_id1'] + '">' + hotel_arr[i]['hotel_name'] + '</option>'
         );
-        $('#' + row.cells[5].childNodes[0].id).val($('#' + table.rows[i].cells[5].childNodes[0].id).val().trim());
+        // Select the hotel
+        $(row.cells[4].childNodes[0]).val(hotel_arr[i]['hotel_id1']);
+        // Set room category with proper default option
+        var roomCatValue = $('#' + table.rows[i].cells[5].childNodes[0].id).val().trim();
+        if (roomCatValue && roomCatValue !== "") {
+            $('#' + row.cells[5].childNodes[0].id).val(roomCatValue);
+        } else {
+            // Ensure default option is present
+            if ($('#' + row.cells[5].childNodes[0].id).find('option[value=""]').length === 0) {
+                $('#' + row.cells[5].childNodes[0].id).prepend('<option value="">Room Category</option>');
+            }
+        }
         row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
         row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
         row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
