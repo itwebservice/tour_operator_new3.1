@@ -1723,7 +1723,14 @@
             if (row.cells[7].childNodes[1]) {
                 row.cells[7].childNodes[1].value = 0; // Service Charge (default)
             }
-            if (row.cells[16].childNodes[1]) {
+            // Find the last cell in the row which should be the Total Cost
+            var lastCellIndex = row.cells.length - 1;
+            if (row.cells[lastCellIndex] && row.cells[lastCellIndex].childNodes[1]) {
+                row.cells[lastCellIndex].childNodes[1].value = totalCost; // Total Tour Cost
+            }
+            
+            // Also try setting it in cell 16 if it exists
+            if (row.cells[16] && row.cells[16].childNodes[1]) {
                 row.cells[16].childNodes[1].value = totalCost; // Total Tour Cost
             }
             
@@ -1731,6 +1738,23 @@
             if (row.cells[3].childNodes[1]) {
                 $(row.cells[3].childNodes[1]).trigger('change');
             }
+            
+            // Force calculation of total cost
+            setTimeout(function() {
+                quotation_cost_calculate(row.cells[3].childNodes[1].id);
+                
+                // Also manually set the total cost in the correct field
+                // Find the total_tour_cost input by name pattern
+                var $totalCostInput = $(row).find('input[name^="total_tour_cost"]');
+                if ($totalCostInput.length > 0) {
+                    $totalCostInput.val(totalCost);
+                }
+                
+                // Debug: log all inputs in the row to find the correct one
+                console.log('Row inputs:', $(row).find('input').map(function() { 
+                    return this.name + ' = ' + this.value; 
+                }).get());
+            }, 100);
         }
         
         console.log("Tab4 costing table populated with", unique_package_type_arr.length, "package types");
