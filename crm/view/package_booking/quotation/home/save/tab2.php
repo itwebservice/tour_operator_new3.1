@@ -125,7 +125,7 @@ $(document).ready(function() {
         console.log('Reset user_modified_nights flag - clicked Tab1 header');
     });
     
-    // Fallback: Check every 500ms for total_days and destination changes
+    // Reduced frequency check - only check every 2 seconds to prevent excessive calls
     setInterval(function() {
         var current_total_days = $('#total_days').val();
         var current_nights_filter = $('#nights_filter').val();
@@ -150,8 +150,14 @@ $(document).ready(function() {
         if (needs_sync) {
             syncNightsFilter();
         }
-    }, 500);
+    }, 2000); // Increased from 500ms to 2000ms
 });
+
+// Debounce timer for package loading
+var packageLoadingTimer = null;
+var isLoadingPackages = false;
+var lastLoadedDestId = null;
+var lastLoadedNights = null;
 
 // Function to load packages with both destination and nights filter
 function load_packages_with_filter() {
@@ -160,15 +166,41 @@ function load_packages_with_filter() {
     
     console.log("load_packages_with_filter called - dest_id:", dest_id, "total_nights:", total_nights);
     
+    // Prevent multiple simultaneous loads
+    if (isLoadingPackages) {
+        console.log("Package loading already in progress, skipping...");
+        return;
+    }
+    
+    // Prevent loading same data
+    if (lastLoadedDestId === dest_id && lastLoadedNights === total_nights) {
+        console.log("Same data already loaded, skipping...");
+        return;
+    }
+    
+    // Clear any existing timer
+    if (packageLoadingTimer) {
+        clearTimeout(packageLoadingTimer);
+    }
+    
     if (dest_id) {
-        // Update sessionStorage with current nights selection
-        if (total_nights) {
-            sessionStorage.setItem('selected_nights', total_nights);
-        }
-        
-        console.log("Calling package_dynamic_reflect_with_nights with dest_id:", dest_id, "nights:", total_nights);
-        // Call the package loading function with nights parameter
-        package_dynamic_reflect_with_nights('dest_name', total_nights);
+        // Debounce the loading to prevent excessive calls
+        packageLoadingTimer = setTimeout(function() {
+            isLoadingPackages = true;
+            
+            // Show loading indicator
+            $('#package_loading_indicator').show();
+            $('.package_content').addClass('loading');
+            
+            // Update sessionStorage with current nights selection
+            if (total_nights) {
+                sessionStorage.setItem('selected_nights', total_nights);
+            }
+            
+            console.log("Calling package_dynamic_reflect_with_nights with dest_id:", dest_id, "nights:", total_nights);
+            // Call the package loading function with nights parameter
+            package_dynamic_reflect_with_nights('dest_name', total_nights);
+        }, 800); // Increased to 800ms debounce
     } else {
         console.log("No destination selected, cannot load packages");
     }
@@ -213,9 +245,25 @@ function package_dynamic_reflect_with_nights(dest_name, total_nights) {
         data: ajax_data,
         success: function (result) {
             $('#package_name_div').html(result);
+            // Hide loading indicator and remove loading class
+            $('#package_loading_indicator').hide();
+            $('.package_content').removeClass('loading');
+            isLoadingPackages = false;
+            
+            // Track loaded data to prevent reloading same data
+            lastLoadedDestId = dest_id;
+            lastLoadedNights = total_nights;
         },
         error: function (result) {
             console.log('Package loading error:', result.responseText);
+            // Hide loading indicator even on error
+            $('#package_loading_indicator').hide();
+            $('.package_content').removeClass('loading');
+            isLoadingPackages = false;
+            
+            // Reset loaded data tracking on error
+            lastLoadedDestId = null;
+            lastLoadedNights = null;
         }
     });
 }

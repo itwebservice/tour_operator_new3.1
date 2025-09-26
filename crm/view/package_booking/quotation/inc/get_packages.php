@@ -151,6 +151,34 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     top: 0px;
 }
 
+/* Prevent content jumping during loading */
+.package_content {
+    min-height: 200px;
+    transition: opacity 0.3s ease;
+}
+
+.package_content.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Smooth transitions for accordion */
+.accordion_content {
+    transition: all 0.3s ease;
+}
+
+/* Simple radio button stability fix */
+.package_selector {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.package_selector input[type="radio"] {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
 </style>
 
 <div class="col-md-12 app_accordion">
@@ -159,6 +187,12 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         <strong>Showing packages for <?= $total_nights ?> night<?= $total_nights > 1 ? 's' : '' ?></strong>
     </div>
     <?php } ?>
+    
+    <!-- Loading indicator -->
+    <div id="package_loading_indicator" style="display: none; text-align: center; padding: 20px;">
+        <i class="fa fa-spinner fa-spin"></i> Loading packages...
+    </div>
+    
     <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
         <?php
         $table_count = 0;
