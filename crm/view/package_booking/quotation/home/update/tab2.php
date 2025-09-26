@@ -8,6 +8,30 @@
         padding: 0px 14px;
         top: 0px;
     }
+    
+    /* Upload button styling with left padding */
+    label[class*="upload-btn-"] {
+        margin-left: 15px !important;
+        padding-left: 15px !important;
+    }
+
+    /* For dynamically added rows */
+    .upload-btn-dynamic {
+        margin-left: 15px !important;
+        padding-left: 15px !important;
+    }
+
+    /* General upload button styling */
+    .btn-success[class*="upload-btn"] {
+        margin-left: 15px !important;
+        padding-left: 15px !important;
+    }
+
+    /* Update section specific upload button styling */
+    .btn-success[style*="background-color: #28a745"] {
+        margin-left: 15px !important;
+        padding-left: 15px !important;
+    }
 </style>
 
 <?php
@@ -228,7 +252,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                             <td class='col-md-1 pad_8' style="width: 120px;">
                                                                 <!-- Debug: Image path = <?= $row_program['day_image'] ?? 'NULL' ?> -->
                                                                 <div style="margin-top: 35px;">
-                                                                    <label for="day_image_<?php echo $offset; ?>" class="btn btn-sm btn-success"
+                                                                    <label for="day_image_<?php echo $offset; ?>" class="btn btn-sm btn-success upload-btn-<?php echo $offset; ?>"
                                                                         style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none;' : '' ?>;">
                                                                         <i class="fa fa-image"></i> Upload Image
                                                                     </label>
@@ -298,7 +322,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                     echo '</td>';
                                                     echo '<td class="col-md-1 pad_8" style="width: 120px;">';
                                                     echo '<div style="margin-top: 35px;">';
-                                                    echo '<label for="day_image_1" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">Upload Image</label>';
+                                                    echo '<label for="day_image_1" class="btn btn-sm btn-success upload-btn-1" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i>Upload Image</label>';
                                                     echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
                                                     echo '</div>';
                                                     echo '<div id="day_image_preview_1" style="display: none; margin-top: 5px;">';
@@ -307,7 +331,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                     echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
                                                     echo '</div>';
                                                     echo '<div style="margin-top: 35px;">';
-                                                    echo '<label for="day_image_1" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label>';
+                                                    echo '<label for="day_image_1" class="btn btn-sm btn-success upload-btn-1" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label>';
                                                     echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
                                                     echo '</div>';
                                                     echo '<div id="day_image_preview_1" style="display: none; margin-top: 5px;">';
@@ -419,8 +443,8 @@ function findImageUrl($image_path, $is_new_quotation = false)
         </td>
         <td class='col-md-1 pad_8' style="width: 120px;">
             <div style="margin-top: 35px;">
-                <label for="day_image_${offset}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                    Upload Image
+                <label for="day_image_${offset}" class="btn btn-sm btn-success upload-btn-dynamic" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                   <i class="fa fa-image"></i> Upload Image
                 </label>
                 <input type="file" id="day_image_${offset}" name="day_image_${offset}" accept="image/*" onchange="previewDayImage(this, '${offset}')" style="display: none;">
             </div>

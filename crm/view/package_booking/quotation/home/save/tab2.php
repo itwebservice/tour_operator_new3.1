@@ -18,6 +18,7 @@
                             </option>
                         <?php } ?>
                     </select>
+                    <input type="hidden" id="destinations" name="destinations" value='<?= get_destinations() ?>'>
                 </div>
                 <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_20">
                     <select name="nights_filter" id="nights_filter" title="Filter by Nights"
@@ -61,7 +62,52 @@
 <?= end_panel() ?>
 
 <script>
-    $('#dest_name').select2();
+$('#dest_name').select2();
+
+// Force destination sync on page load
+setTimeout(function() {
+    console.log("Force sync - checking for destination from Tab1...");
+    var tab1Destination = $('#tour_name').val();
+    console.log("Force sync - Tab1 destination:", tab1Destination);
+    
+    if (tab1Destination) {
+        // Try to find and set the destination
+        var destinations = JSON.parse($('#destinations').val() || '[]');
+        for (var i = 0; i < destinations.length; i++) {
+            if (destinations[i].label === tab1Destination) {
+                console.log("Force sync - Found matching destination:", destinations[i]);
+                $('#dest_name').val(destinations[i].dest_id).trigger('change');
+                sessionStorage.setItem('selected_destination_id', destinations[i].dest_id);
+                sessionStorage.setItem('selected_destination_name', destinations[i].label);
+                console.log("Force sync - Destination set to:", destinations[i].label);
+                break;
+            }
+        }
+    }
+}, 500);
+
+// Additional sync when Tab2 becomes visible
+$(document).on('click', '#tab2_head', function() {
+    console.log("Tab2 clicked - forcing destination sync...");
+    setTimeout(function() {
+        var tab1Destination = $('#tour_name').val();
+        console.log("Tab2 clicked - Tab1 destination:", tab1Destination);
+        
+        if (tab1Destination) {
+            var destinations = JSON.parse($('#destinations').val() || '[]');
+            for (var i = 0; i < destinations.length; i++) {
+                if (destinations[i].label === tab1Destination) {
+                    console.log("Tab2 clicked - Found matching destination:", destinations[i]);
+                    $('#dest_name').val(destinations[i].dest_id).trigger('change');
+                    sessionStorage.setItem('selected_destination_id', destinations[i].dest_id);
+                    sessionStorage.setItem('selected_destination_name', destinations[i].label);
+                    console.log("Tab2 clicked - Destination set to:", destinations[i].label);
+                    break;
+                }
+            }
+        }
+    }, 100);
+});
 
 
     // Initialize nights filter when tab2 loads
@@ -119,8 +165,20 @@
             // Check if user modification flag was reset (meaning user went back to Tab1)
             var user_modified_nights = sessionStorage.getItem('user_modified_nights');
             var force_sync = !user_modified_nights; // Force sync if flag was reset
-
+            
             console.log('Tab2 clicked - user_modified_nights:', user_modified_nights, 'force_sync:', force_sync);
+            
+            // Force destination sync when clicking Tab2
+            var destination_id = sessionStorage.getItem('selected_destination_id');
+            var destination_name = sessionStorage.getItem('selected_destination_name');
+            console.log('Tab2 clicked - forcing destination sync:', destination_id, destination_name);
+            
+            if (destination_id && destination_name) {
+                $('#dest_name').val(destination_id);
+                $('#dest_name').trigger('change');
+                console.log('Tab2 clicked - destination synced to:', destination_name);
+            }
+            
             setTimeout(function() {
                 syncNightsFilter(force_sync);
             }, 50);
@@ -737,30 +795,76 @@
 
     });
 
-    // Load stored values from Tab 1 when Tab 2 loads
+        // Load stored values from Tab 1 when Tab 2 loads
     $(document).ready(function() {
         console.log("Tab 2 loading - checking for stored destination and nights...");
-
+        
         // Get stored destination
         var storedDestId = sessionStorage.getItem('selected_destination_id');
         var storedDestName = sessionStorage.getItem('selected_destination_name');
-
+        
         // Get total days from tab1 as primary source for nights
         var total_days = $('#total_days').val();
         var storedNights = total_days || sessionStorage.getItem('selected_nights');
-
+        
         console.log("Total days from tab1:", total_days);
         console.log("Stored destination ID:", storedDestId);
         console.log("Stored destination name:", storedDestName);
         console.log("Stored nights:", storedNights);
-
+        
+        // Debug: Check all sessionStorage items
+        console.log("All sessionStorage items:");
+        for (var i = 0; i < sessionStorage.length; i++) {
+            var key = sessionStorage.key(i);
+            console.log(key + ":", sessionStorage.getItem(key));
+        }
+        
+        // Try to get destination from Tab1 input field as fallback
+        var tab1Destination = $('#tour_name').val();
+        console.log("Tab1 destination input value:", tab1Destination);
+        
+        // If no stored destination but Tab1 has a value, try to find the destination ID
+        if (!storedDestId && tab1Destination) {
+            console.log("No stored destination ID, but Tab1 has destination name:", tab1Destination);
+            // Try to find the destination ID by matching the name
+            var destinations = JSON.parse($('#destinations').val() || '[]');
+            console.log("Available destinations:", destinations);
+            
+            for (var i = 0; i < destinations.length; i++) {
+                if (destinations[i].label === tab1Destination) {
+                    storedDestId = destinations[i].dest_id;
+                    storedDestName = destinations[i].label;
+                    console.log("Found matching destination:", storedDestId, storedDestName);
+                    // Store it for future use
+                    sessionStorage.setItem('selected_destination_id', storedDestId);
+                    sessionStorage.setItem('selected_destination_name', storedDestName);
+                    break;
+                }
+            }
+        }
+        
         // Set destination if available
         if (storedDestId && storedDestName) {
-            $('#dest_name').val(storedDestId);
-            $('#dest_name').trigger('change');
-            console.log("Set destination to:", storedDestName);
+            console.log("Setting destination dropdown to:", storedDestId, "(", storedDestName, ")");
+            
+            // Ensure select2 is initialized before setting value
+            if ($('#dest_name').hasClass('select2-hidden-accessible')) {
+                console.log("Select2 already initialized, setting value directly");
+                $('#dest_name').val(storedDestId).trigger('change');
+            } else {
+                console.log("Select2 not initialized, initializing first");
+                $('#dest_name').select2();
+                setTimeout(function() {
+                    $('#dest_name').val(storedDestId).trigger('change');
+                    console.log("Destination set after select2 init. Current value:", $('#dest_name').val());
+                }, 100);
+            }
+            
+            console.log("Destination set successfully. Current value:", $('#dest_name').val());
+        } else {
+            console.log("No stored destination found in sessionStorage or Tab1 input");
         }
-
+        
         // Set nights if available - prioritize total_days from tab1
         if (total_days && total_days > 0) {
             $('#nights_filter').val(total_days);
@@ -770,7 +874,7 @@
             $('#nights_filter').val(storedNights);
             console.log("Set nights filter to stored value:", storedNights);
         }
-
+        
         // Load packages with the stored filters
         if (storedDestId) {
             console.log("Loading packages with destination:", storedDestId, "and nights:", storedNights);

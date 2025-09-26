@@ -221,7 +221,11 @@ $("#tour_name").autocomplete({
         // Store selected destination for package filtering
         sessionStorage.setItem('selected_destination_id', ui.item.dest_id);
         sessionStorage.setItem('selected_destination_name', ui.item.label);
-        console.log('Stored destination - ID:', ui.item.dest_id, 'Name:', ui.item.label);
+        console.log('Tab1 - Stored destination - ID:', ui.item.dest_id, 'Name:', ui.item.label);
+        
+        // Debug: Verify storage
+        console.log('Tab1 - Verification - stored ID:', sessionStorage.getItem('selected_destination_id'));
+        console.log('Tab1 - Verification - stored Name:', sessionStorage.getItem('selected_destination_name'));
         
         $('#dest_name').append(newOption).trigger('change.select2');
         // $('#dest_name').prepend('<option value="' + ui.item.dest_id + '">' +ui.item.label +'</option>');

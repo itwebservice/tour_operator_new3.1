@@ -179,6 +179,24 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     vertical-align: middle;
 }
 
+/* Upload button styling with left padding */
+label[class*="upload-btn-"] {
+    margin-left: 15px !important;
+    padding-left: 38px !important;
+}
+
+/* For dynamically added rows */
+.upload-btn-dynamic {
+    margin-left: 15px !important;
+    padding-left: 38px !important;
+}
+
+/* General upload button styling */
+.btn-success[class*="upload-btn"] {
+    margin-left: 15px !important;
+    padding-left: 38px !important;
+}
+
 </style>
 
 <div class="col-md-12 app_accordion">
@@ -298,7 +316,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                             <td class='col-md-1 pad_8' style="width: 120px;">
                                 <!-- Debug: Image path = <?= $row_program['day_image'] ?? 'NULL' ?> -->
                                 <div style="margin-top: 35px;">
-                                    <label for="day_image_<?php echo $offset1; ?>" class="btn btn-sm btn-success" 
+                                    <label for="day_image_<?php echo $offset1; ?>" class="btn btn-sm btn-success upload-btn-<?php echo $offset1; ?>" 
                                            style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none;' : '' ?>">
                                         <i class="fa fa-image"></i> Upload Image
                                     </label>
@@ -724,8 +742,8 @@ function addItineraryRow(package_id) {
         </td>
         <td class='col-md-1 pad_8' style="width: 120px;">
             <div style="margin-top: 35px;">
-                <label for="day_image_${offset}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                    Upload Image
+                <label for="day_image_${offset}" class="btn btn-sm btn-success upload-btn-dynamic" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                <i class="fa fa-image"></i>    Upload Image
                 </label>
                 <input type="file" id="day_image_${offset}" name="day_image_${offset}" accept="image/*" onchange="previewDayImage(this, '${offset}')" style="display: none;">
             </div>
