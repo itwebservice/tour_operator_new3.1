@@ -17,7 +17,7 @@ error_log("Inclusions/Exclusions selected: " . (in_array('inclusion_exclusion', 
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT *, 
 	COALESCE(is_sub_quotation, '0') as is_sub_quotation,
 	COALESCE(parent_quotation_id, '0') as parent_quotation_id,
-	COALESCE(quotation_display_id, '') as quotation_display_id
+	COALESCE(quotation_id_display, '') as quotation_display_id
 	FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id'"));
 $sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master WHERE package_id = '{$sq_quotation['package_id']}'"));
 

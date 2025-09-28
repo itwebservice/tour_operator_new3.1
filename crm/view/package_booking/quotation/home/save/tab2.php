@@ -618,52 +618,74 @@ $(document).on('click', '#tab2_head', function() {
 
                 success: function(result) {
 
-                    //Hotel Info
+                    //Hotel Info - Preserve existing manually added packages
                     var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-                    if (table.rows.length == 1) {
-                        for (var k = 1; k < table.rows.length; k++) {
-                            document.getElementById("tbl_package_tour_quotation_dynamic_hotel")
-                                .deleteRow(k);
+                    
+                    // Check if there are manually added packages (more than just the header)
+                    var hasExistingPackages = table.rows.length > 1;
+                    var existingPackageCount = table.rows.length - 1; // Subtract header row
+                    
+                    console.log('Tab2 Next: Existing packages count:', existingPackageCount);
+                    
+                    // Only clear and rebuild if there are no existing packages
+                    if (!hasExistingPackages) {
+                        console.log('Tab2 Next: No existing packages, clearing and rebuilding table');
+                        
+                        if (table.rows.length == 1) {
+                            for (var k = 1; k < table.rows.length; k++) {
+                                document.getElementById("tbl_package_tour_quotation_dynamic_hotel")
+                                    .deleteRow(k);
+                            }
+                        } else {
+                            while (table.rows.length > 1) {
+                                document.getElementById("tbl_package_tour_quotation_dynamic_hotel")
+                                    .deleteRow(k);
+                                table.rows.length--;
+                            }
+                        }
+
+                        var hotel_arr = JSON.parse(result);
+                        if (table.rows.length != hotel_arr.length) {
+                            for (var j = 0; j < hotel_arr.length - 1; j++) {
+                                addRow('tbl_package_tour_quotation_dynamic_hotel');
+                            }
                         }
                     } else {
-                        while (table.rows.length > 1) {
-                            document.getElementById("tbl_package_tour_quotation_dynamic_hotel")
-                                .deleteRow(k);
-                            table.rows.length--;
-                        }
+                        console.log('Tab2 Next: Preserving existing packages, skipping table rebuild');
+                        // Don't clear the table, just continue with existing data
+                        var hotel_arr = JSON.parse(result);
                     }
 
-                    var hotel_arr = JSON.parse(result);
-                    if (table.rows.length != hotel_arr.length) {
-                        for (var j = 0; j < hotel_arr.length - 1; j++) {
-                            addRow('tbl_package_tour_quotation_dynamic_hotel');
+                    // Only populate hotel data if we rebuilt the table (no existing packages)
+                    if (!hasExistingPackages) {
+                        console.log('Tab2 Next: Populating hotel data for rebuilt table');
+                        for (var i = 0; i < hotel_arr.length; i++) {
+                            var row = table.rows[i];
+                            row.cells[1].childNodes[0].value = (i + 1);
+                            city_lzloading(row.cells[3].childNodes[0]);
+                            var newOption = $("<option selected='selected'></option>").val(hotel_arr[i]
+                                ['city_id']).text(hotel_arr[i]['city_name']);
+                            $(row.cells[3].childNodes[0]).append(newOption).trigger('change.select2');
+                            $(row.cells[4].childNodes[0]).html('<option value="' + hotel_arr[i][
+                                'hotel_id1'
+                            ] + '">' + hotel_arr[i]['hotel_name'] + '</option>');
+                            row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
+                            row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
+                            row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
+                            row.cells[9].childNodes[0].value = total_days;
+                            row.cells[10].childNodes[0].value = '';
+                            row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
+                            row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
+
+                            $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
+                            document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
+                            $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
+                            document.getElementById(row.cells[5].childNodes[0].id).selectedIndex = 0;
+                            $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
+                            calculate_total_nights(row.cells[7].childNodes[0].id);
                         }
-                    }
-
-                    for (var i = 0; i < hotel_arr.length; i++) {
-                        var row = table.rows[i];
-                        row.cells[1].childNodes[0].value = (i + 1);
-                        city_lzloading(row.cells[3].childNodes[0]);
-                        var newOption = $("<option selected='selected'></option>").val(hotel_arr[i]
-                            ['city_id']).text(hotel_arr[i]['city_name']);
-                        $(row.cells[3].childNodes[0]).append(newOption).trigger('change.select2');
-                        $(row.cells[4].childNodes[0]).html('<option value="' + hotel_arr[i][
-                            'hotel_id1'
-                        ] + '">' + hotel_arr[i]['hotel_name'] + '</option>');
-                        row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
-                        row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
-                        row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
-                        row.cells[9].childNodes[0].value = total_days;
-                        row.cells[10].childNodes[0].value = '';
-                        row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
-                        row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
-
-                        $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
-                        document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
-                        $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
-                        document.getElementById(row.cells[5].childNodes[0].id).selectedIndex = 0;
-                        $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
-                        calculate_total_nights(row.cells[7].childNodes[0].id);
+                    } else {
+                        console.log('Tab2 Next: Skipping hotel data population - preserving existing packages');
                     }
                 }
             });

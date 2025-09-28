@@ -331,7 +331,18 @@ $quotation_count = mysqli_num_rows($sq_query);
 										<td><?php echo $count; ?></td>
 										<td><?php echo $quotation_id_display_formatted; ?></td>
 										<td><?= $quotation_cost_1 ?></td>
-										<td><?php echo get_date_user($row_tours['updated_at']); ?></td>
+										<td><?php 
+											// Show updated_at if available, otherwise show quotation_date
+											$display_date = '';
+											if (!empty($row_tours['updated_at']) && $row_tours['updated_at'] != '0000-00-00 00:00:00') {
+												$display_date = get_date_user($row_tours['updated_at']);
+											} else if (!empty($row_tours['quotation_date']) && $row_tours['quotation_date'] != '0000-00-00') {
+												$display_date = get_date_user($row_tours['quotation_date']);
+											} else {
+												$display_date = 'N/A';
+											}
+											echo $display_date;
+										?></td>
 										<td>
     <?php
     // Get URLs for this specific quotation

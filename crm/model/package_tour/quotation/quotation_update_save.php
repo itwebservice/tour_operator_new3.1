@@ -96,10 +96,6 @@ class quotation_update_save
                 $insertSQL .= "'".$quotation_max."'";
             }
             else if($col == 'quotation_id_display') {
-                // Set the versioned quotation ID display
-                $insertSQL .= "'".$new_quotation_id_display."'";
-            }
-            else if($col == 'quotation_display_id') {
                 // Set the versioned quotation display ID
                 $insertSQL .= "'".$new_quotation_id_display."'";
             }
@@ -206,7 +202,7 @@ class quotation_update_save
             
             // Try to mark as sub-quotation and update quotation_id_display (only if fields exist)
             try {
-                $sq_update = mysqlQuery("UPDATE package_tour_quotation_master SET is_sub_quotation='1', parent_quotation_id='$original_quotation_id', quotation_id_display='$new_quotation_id_display', quotation_display_id='$new_quotation_id_display' WHERE quotation_id='$quotation_max'");
+                $sq_update = mysqlQuery("UPDATE package_tour_quotation_master SET is_sub_quotation='1', parent_quotation_id='$original_quotation_id', quotation_id_display='$new_quotation_id_display' WHERE quotation_id='$quotation_max'");
                 
                 // Debug: Log the update result
                 if ($sq_update) {
