@@ -17,8 +17,6 @@ class quotation_sub_create
             exit;
         }
         
-        // Debug: Log original quotation details
-        error_log("Original quotation details - ID: " . $quotation_id . ", Email: " . ($original_quotation['email_id'] ?? 'NULL') . ", Mobile: " . ($original_quotation['mobile_no'] ?? 'NULL'));
 
         // Get quotation ID format for versioning
         $quotation_date = $original_quotation['quotation_date'];
@@ -34,30 +32,48 @@ class quotation_sub_create
         $is_sub_quotation = isset($original_quotation['is_sub_quotation']) && $original_quotation['is_sub_quotation'] == '1';
         $parent_quotation_id = isset($original_quotation['parent_quotation_id']) ? $original_quotation['parent_quotation_id'] : null;
         
+        // Find the root parent quotation ID
+        $root_parent_quotation_id = $quotation_id; // Default to current quotation if it's a parent
+        
         if ($is_sub_quotation && $parent_quotation_id && $parent_quotation_id != '0') {
-            // If it's already a sub-quotation, find the original parent and create next version
-            $parent_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_date FROM package_tour_quotation_master WHERE quotation_id='$parent_quotation_id'"));
-            if ($parent_quotation) {
-                $parent_year = explode("-", $parent_quotation['quotation_date'])[0];
-                $parent_id_display = get_quotation_id($parent_quotation_id, $parent_year);
+            // If it's already a sub-quotation, find the root parent by traversing up the chain
+            $current_id = $parent_quotation_id;
+            while (true) {
+                $check_query = "SELECT quotation_id, parent_quotation_id, is_sub_quotation FROM package_tour_quotation_master WHERE quotation_id='$current_id'";
+                $check_result = mysqlQuery($check_query);
+                $check_row = mysqli_fetch_assoc($check_result);
                 
-                // Count existing sub-quotations for this parent to get next version number
-                $sub_count = mysqli_num_rows(mysqlQuery("SELECT quotation_id FROM package_tour_quotation_master WHERE parent_quotation_id='$parent_quotation_id'"));
-                $new_version = $sub_count + 1;
-                $new_quotation_id_display = $parent_id_display . '.' . $new_version;
-            } else {
-                // Fallback: use original quotation ID
-                $original_quotation_id_display = get_quotation_id($quotation_id, $year);
-                $new_quotation_id_display = $original_quotation_id_display . '.1';
+                if (!$check_row || !$check_row['parent_quotation_id'] || $check_row['is_sub_quotation'] == '0') {
+                    $root_parent_quotation_id = $current_id;
+                    break;
+                }
+                $current_id = $check_row['parent_quotation_id'];
             }
-        } else {
-            // If it's the original quotation, count existing sub-quotations and create next version
-            $original_quotation_id_display = get_quotation_id($quotation_id, $year);
+        }
+        
+        // Get quotation display ID for the root parent
+        $root_parent_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_date FROM package_tour_quotation_master WHERE quotation_id='$root_parent_quotation_id'"));
+        if ($root_parent_quotation) {
+            $root_year = explode("-", $root_parent_quotation['quotation_date'])[0];
+            $root_id_display = get_quotation_id($root_parent_quotation_id, $root_year);
             
-            // Count existing sub-quotations for this parent
-            $sub_count = mysqli_num_rows(mysqlQuery("SELECT quotation_id FROM package_tour_quotation_master WHERE parent_quotation_id='$quotation_id'"));
+            // Count existing sub-quotations for this root parent to get next version number
+            $sub_count = mysqli_num_rows(mysqlQuery("SELECT quotation_id FROM package_tour_quotation_master WHERE parent_quotation_id='$root_parent_quotation_id'"));
             $new_version = $sub_count + 1;
-            $new_quotation_id_display = $original_quotation_id_display . '.' . $new_version;
+            $new_quotation_id_display = $root_id_display . '.' . $new_version;
+        } else {
+            // Fallback: use original quotation ID
+            $original_quotation_id_display = get_quotation_id($quotation_id, $year);
+            $new_quotation_id_display = $original_quotation_id_display . '.1';
+        }
+        
+        // Get root parent quotation data to avoid duplication
+        $root_parent_result = mysqlQuery("SELECT * FROM package_tour_quotation_master WHERE quotation_id='$root_parent_quotation_id'");
+        $root_parent_quotation_data = mysqli_fetch_assoc($root_parent_result);
+        
+        if (!$root_parent_quotation_data) {
+            echo "error--Root parent quotation not found.";
+            exit;
         }
         
 
@@ -88,26 +104,26 @@ class quotation_sub_create
                 $insertSQL .= "'".$new_quotation_id_display."'";
             }
             else if($col == 'other_desc') {
-                $other_desc = addslashes($original_quotation[$col]);
+                $other_desc = addslashes($root_parent_quotation_data[$col]);
                 $insertSQL .= "'".$other_desc."'";
             }
             else if($col == 'inclusions' || $col == 'exclusions') {
-                $incl_excl = addslashes($original_quotation[$col]);
+                $incl_excl = addslashes($root_parent_quotation_data[$col]);
                 $insertSQL .= "'".$incl_excl."'";
             }
             else if($col == 'created_at' || $col == 'quotation_date') {
                 $insertSQL .= "'".date('Y-m-d')."'";
             }
             else if($col == 'parent_quotation_id') {
-                // Always set parent quotation ID to the original quotation being copied
-                $insertSQL .= "'".$quotation_id."'";
+                // Always set parent quotation ID to the root parent quotation
+                $insertSQL .= "'".$root_parent_quotation_id."'";
             }
             else if($col == 'is_sub_quotation') {
                 // Always mark as sub-quotation
                 $insertSQL .= "'1'";
             }
             else {
-                $insertSQL .= "'".$original_quotation[$col]."'";
+                $insertSQL .= "'".$root_parent_quotation_data[$col]."'";
             }
 
             if ($counter < $count - 1) {
@@ -126,23 +142,17 @@ class quotation_sub_create
             exit;
         }
         else {
-            // Clone all related entries
-            $this->clone_train_entries($quotation_id, $quotation_max);
-            $this->clone_plane_entries($quotation_id, $quotation_max);
-            $this->clone_cruise_entries($quotation_id, $quotation_max);
-            $this->clone_hotel_entries($quotation_id, $quotation_max);
-            $this->clone_transport_entries($quotation_id, $quotation_max);
-            $this->clone_excursion_entries($quotation_id, $quotation_max);
-            $this->clone_costing_entries($quotation_id, $quotation_max);
-            $this->clone_program_entries($quotation_id, $quotation_max);
-            $this->clone_images_entries($quotation_id, $quotation_max);
+            // Clone all related entries from the root parent quotation to avoid duplication
+            $this->clone_train_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_plane_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_cruise_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_hotel_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_transport_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_excursion_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_costing_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_program_entries($root_parent_quotation_id, $quotation_max);
+            $this->clone_images_entries($root_parent_quotation_id, $quotation_max);
             
-            // Debug: Log sub-quotation creation
-            error_log("Sub-quotation created successfully: ID=$quotation_max, Display ID=$new_quotation_id_display, Parent=$quotation_id");
-            
-            // Debug: Log final sub-quotation details
-            $final_check = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_id, email_id, mobile_no, is_sub_quotation, parent_quotation_id, quotation_id_display FROM package_tour_quotation_master WHERE quotation_id='$quotation_max'"));
-            error_log("Sub-quotation created - ID: " . $quotation_max . ", Display ID: " . ($final_check['quotation_id_display'] ?? 'NULL') . ", Email: " . ($final_check['email_id'] ?? 'NULL') . ", Mobile: " . ($final_check['mobile_no'] ?? 'NULL') . ", Parent: " . ($final_check['parent_quotation_id'] ?? 'NULL') . ", Is Sub: " . ($final_check['is_sub_quotation'] ?? 'NULL'));
             
             // Return JSON response with the new quotation ID
             echo json_encode([

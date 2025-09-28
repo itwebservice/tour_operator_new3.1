@@ -123,6 +123,11 @@ $financial_year_id = $_SESSION['financial_year_id'];
             <div id="backoffice_mail"></div>
             <div id="view_request"></div>
             
+            <!-- Hidden fields to store modal parameters for refresh -->
+            <input type="hidden" id="modal_email_id" value="">
+            <input type="hidden" id="modal_mobile_no" value="">
+            <input type="hidden" id="modal_quotation_id" value="">
+            
             
 <!-- Modal Structure -->
 <div class="modal fade" id="contentModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -364,6 +369,12 @@ quotation_list_reflect();
             console.log('Modal response for quotation:', quotation_id);
             $('#div_quotation_form').html(data);
             $('#' + btn_id).button('reset');
+            
+            // Store modal parameters in hidden fields for refresh functionality
+            $('#modal_email_id').val(email_id);
+            $('#modal_mobile_no').val(mobile_no);
+            $('#modal_quotation_id').val(quotation_id);
+            
             // Show the modal after content is loaded
             $('#quotation_send_modal').modal('show');
         }).fail(function(xhr, status, error) {

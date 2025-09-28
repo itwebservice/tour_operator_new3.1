@@ -5,6 +5,7 @@ $email_id = $_POST['email_id'];
 $mobile_no = $_POST['mobile_no'];
 $specific_quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] : null;
 
+
 $branch_admin_id = $_SESSION['branch_admin_id'];
 $emp_id = $_SESSION['emp_id'];
 $role = $_SESSION['role'];
@@ -95,14 +96,46 @@ $mobile_no = $_POST['mobile_no'];
 // Build query based on whether specific quotation_id is provided
 if ($specific_quotation_id) {
     // Show only the specific quotation and its sub-quotations
+    // First, find the root parent quotation
+    $root_parent_query = "SELECT quotation_id FROM package_tour_quotation_master WHERE quotation_id = '$specific_quotation_id' AND is_sub_quotation = '0'";
+    $root_parent_result = mysqlQuery($root_parent_query);
+    $root_parent = mysqli_fetch_assoc($root_parent_result);
+    
+    if ($root_parent) {
+        // If it's a parent quotation, show it and all its sub-quotations
+        $root_quotation_id = $root_parent['quotation_id'];
+    } else {
+        // If it's a sub-quotation, find its root parent
+        $parent_query = "SELECT quotation_id FROM package_tour_quotation_master WHERE quotation_id = '$specific_quotation_id'";
+        $parent_result = mysqlQuery($parent_query);
+        $parent_row = mysqli_fetch_assoc($parent_result);
+        
+        if ($parent_row && $parent_row['parent_quotation_id']) {
+            // Find the root parent by traversing up the chain
+            $current_id = $parent_row['parent_quotation_id'];
+            while (true) {
+                $check_query = "SELECT quotation_id, parent_quotation_id FROM package_tour_quotation_master WHERE quotation_id = '$current_id'";
+                $check_result = mysqlQuery($check_query);
+                $check_row = mysqli_fetch_assoc($check_result);
+                
+                if (!$check_row || !$check_row['parent_quotation_id']) {
+                    $root_quotation_id = $current_id;
+                    break;
+                }
+                $current_id = $check_row['parent_quotation_id'];
+            }
+        } else {
+            $root_quotation_id = $specific_quotation_id;
+        }
+    }
+    
     $query = "select *, 
         COALESCE(is_sub_quotation, '0') as is_sub_quotation,
         COALESCE(parent_quotation_id, '0') as parent_quotation_id,
         COALESCE(quotation_id_display, '') as quotation_display_id
         from package_tour_quotation_master 
-        where (quotation_id = '$specific_quotation_id' OR parent_quotation_id = '$specific_quotation_id') 
+        where (quotation_id = '$root_quotation_id' OR parent_quotation_id = '$root_quotation_id') 
         and status='1'";
-    echo "<!-- DEBUG: Filtering for specific quotation_id: $specific_quotation_id -->";
 } else {
     // Show all quotations for the email (original behavior)
     $query = "select *, 
@@ -110,7 +143,6 @@ if ($specific_quotation_id) {
         COALESCE(parent_quotation_id, '0') as parent_quotation_id,
         COALESCE(quotation_id_display, '') as quotation_display_id
         from package_tour_quotation_master where email_id = '$email_id'  and status='1'";
-    echo "<!-- DEBUG: Showing all quotations for email: $email_id -->";
 }
 if ($role != 'Admin' && $role != 'Branch Admin') {
 	$query .= " and emp_id='$emp_id'";
@@ -150,10 +182,6 @@ if ($first_quotation) {
 $sq_query = mysqlQuery($query);
 $quotation_count = mysqli_num_rows($sq_query);
 
-// Debug: Log the query and results
-error_log("Modal query: " . $query);
-error_log("Found $quotation_count quotations for display");
-$debug_count = 0;
 ?>
 <input type="hidden" id="whatsapp_switch" value="<?= $whatsapp_switch ?>">
 <div class="modal fade" id="quotation_send_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
@@ -196,8 +224,6 @@ $debug_count = 0;
 								// Check if query was successful
 								if ($sq_query) {
 									while ($row_tours = mysqli_fetch_assoc($sq_query)) {
-										$debug_count++;
-										error_log("Quotation $debug_count: ID=" . $row_tours['quotation_id'] . ", Display ID=" . (isset($row_tours['quotation_display_id']) ? $row_tours['quotation_display_id'] : 'N/A') . ", Is Sub=" . (isset($row_tours['is_sub_quotation']) ? $row_tours['is_sub_quotation'] : 'N/A'));
 									$sq_tours_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$row_tours[package_id]'"));
 									$sq_cost = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$row_tours[quotation_id]'"));
 
@@ -276,10 +302,6 @@ $debug_count = 0;
 										$parent_quotation_id = isset($row_tours['parent_quotation_id']) ? $row_tours['parent_quotation_id'] : null;
 									}
 									
-									// Debug: Log sub-quotation detection
-									if ($is_sub_quotation) {
-										error_log("Sub-quotation detected: " . $row_tours['quotation_id'] . " -> " . $quotation_id_display);
-									}
 									
 									// Get quotation display ID (prefer quotation_display_id if available)
 									$quotation_id_display = '';
@@ -433,6 +455,7 @@ $debug_count = 0;
 									// Show error message if query failed
 									echo '<tr><td colspan="6" class="text-center text-danger">Error loading quotations. Please try again.</td></tr>';
 								}
+								
 								?>
 							</table>
 						</div>
@@ -470,6 +493,10 @@ $debug_count = 0;
                 </button>
             </div>
             <div class="modal-body">
+                <!-- Hidden fields to store modal parameters for refresh -->
+                <input type="hidden" id="modal_email_id" value="<?= $email_id ?>">
+                <input type="hidden" id="modal_mobile_no" value="<?= $mobile_no ?>">
+                <input type="hidden" id="modal_quotation_id" value="<?= $specific_quotation_id ?>">
                 <!-- Tab Navigation -->
                 <ul class="nav nav-tabs" id="communicationTabs" role="tablist">
                     <li class="nav-item">
@@ -1143,6 +1170,40 @@ $debug_count = 0;
 		// Reload the page to show updated quotation list
 		location.reload();
 	}
+	
+	// Function to refresh the modal content to show new sub-quotations
+	function refreshModalContent() {
+		var base_url = $('#base_url').val();
+		var email_id = $('#modal_email_id').val();
+		var mobile_no = $('#modal_mobile_no').val();
+		var quotation_id = $('#modal_quotation_id').val();
+		
+		
+		// Show loading indicator in the div_quotation_form
+		$('#div_quotation_form').html('<div class="text-center"><i class="fa fa-spinner fa-spin"></i> Refreshing...</div>');
+		
+		// Add timestamp to prevent caching
+		var timestamp = new Date().getTime();
+		
+		$.ajax({
+			type: 'post',
+			url: base_url + 'view/package_booking/quotation/home/send_quotation.php',
+			data: {
+				email_id: email_id,
+				mobile_no: mobile_no,
+				quotation_id: quotation_id,
+				_t: timestamp
+			},
+			success: function(result) {
+				$('#div_quotation_form').html(result);
+				// Show the modal again after refresh
+				$('#quotation_send_modal').modal('show');
+			},
+			error: function(xhr, status, error) {
+				$('#div_quotation_form').html('<div class="alert alert-danger">Error refreshing content. Please try again.</div>');
+			}
+		});
+	}
 
 	// Function to create sub-quotation copy
 	function quotation_sub_copy(quotation_id) {
@@ -1164,25 +1225,24 @@ $debug_count = 0;
 						success: function(result) {
 							try {
 								var response = JSON.parse(result);
-
-                                console.log(response,'idrhhh');
 								if (response.status === 'success') {
-									// Close the modal first
-									$('#quotation_send_modal').modal('hide');
-									
 									// Show success message
 									msg_alert('Sub-quotation created successfully with ID: ' + response.quotation_id_display);
 									
-									// Refresh the quotation list to show the new sub-quotation
-									quotation_list_reflect();
+									// Wait a moment for the database to be updated, then refresh
+									setTimeout(function() {
+										refreshModalContent();
+									}, 500);
 								} else {
 									error_msg_alert(response.message);
 								}
 							} catch (e) {
 								// Fallback for non-JSON response
 								msg_alert('Sub-quotation created successfully');
-								$('#quotation_send_modal').modal('hide');
-								quotation_list_reflect();
+								// Wait a moment for the database to be updated, then refresh
+								setTimeout(function() {
+									refreshModalContent();
+								}, 500);
 							}
 						},
 						// error: function(xhr, status, error) {
