@@ -1927,7 +1927,7 @@
         var incl_arr = new Array();
         var excl_arr = new Array();
         var package_id_arr = new Array();
-
+        var rowLenth = $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').length;
         $('input[name="custom_package"]:checked').each(function() {
 
             package_id_arr.push($(this).val());
@@ -2223,18 +2223,18 @@
     // 3️⃣ Additional logic to copy hotels to rows that don't have hotels selected
     setTimeout(function() {
         $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').each(function(index, row) {
-            if (index > 0) { // Skip first row
+            if (index) { // Skip first row
                 var $hotelSelect = $(row.cells[4].childNodes[0]);
                 var currentHotelId = $hotelSelect.val();
-                
+                var prevRowIndex =  index - rowLenth;
+
                 // If current row doesn't have a hotel selected, copy from previous row
                 if (!currentHotelId || currentHotelId === '') {
-                    var prevRow = table.rows[index - 1];
+                    var prevRow = table.rows[prevRowIndex];
                     var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
                     var prevHotelId = prevHotelSelect.val();
                     var prevHotelName = prevHotelSelect.find('option:selected').text();
                     
-                    console.log('DEBUG: Row', index, 'has no hotel, copying from previous row - prevHotelId:', prevHotelId, 'prevHotelName:', prevHotelName);
                     
                     if (prevHotelId && prevHotelName) {
                         // Check if the hotel option exists in the current row's options
