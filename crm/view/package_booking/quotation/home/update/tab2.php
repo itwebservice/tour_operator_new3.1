@@ -262,7 +262,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                                         style="display: none;">
                                                                 </div>
                                                                 <div id="day_image_preview_<?php echo $offset; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?>; margin-top: 5px;">
-                                                                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                                                                    <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                                                                         <img id="preview_img_<?php echo $offset; ?>" src="<?php
                                                                                                                             if (!empty($row_program['day_image'])) {
                                                                                                                                 $image_path = trim($row_program['day_image']);
@@ -326,7 +326,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                     echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
                                                     echo '</div>';
                                                     echo '<div id="day_image_preview_1" style="display: none; margin-top: 5px;">';
-                                                    echo '<div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
+                                                    echo '<div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
                                                     echo '<img id="preview_img_1" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
                                                     echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
                                                     echo '</div>';
@@ -335,7 +335,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                     echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
                                                     echo '</div>';
                                                     echo '<div id="day_image_preview_1" style="display: none; margin-top: 5px;">';
-                                                    echo '<div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
+                                                    echo '<div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
                                                     echo '<img id="preview_img_1" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
                                                     echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
                                                     echo '</div>';
@@ -449,7 +449,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 <input type="file" id="day_image_${offset}" name="day_image_${offset}" accept="image/*" onchange="previewDayImage(this, '${offset}')" style="display: none;">
             </div>
             <div id="day_image_preview_${offset}" style="display: none; margin-top: 5px;">
-                <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                     <img id="preview_img_${offset}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
                     <button type="button" 
                             onclick="removeDayImage('${offset}')" 
@@ -1461,5 +1461,143 @@ function findImageUrl($image_path, $is_new_quotation = false)
             }
         }, 2000); // Wait 2 seconds for global initialization
     });
+</script>
+
+<!-- Image Zoom Functionality -->
+<style>
+    .image-zoom-container {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        border-radius: 8px;
+        cursor: zoom-in;
+    }
+    
+    .image-zoom-container img {
+        transition: transform 0.3s ease;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .image-zoom-container:hover img {
+        transform: scale(1.5);
+    }
+    
+    .image-zoom-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        cursor: zoom-out;
+    }
+    
+    .image-zoom-overlay img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .image-zoom-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        z-index: 10000;
+    }
+    
+    .image-zoom-close:hover {
+        color: #ff6b6b;
+    }
+</style>
+
+<script>
+    // Image zoom functionality for update mode
+    function initImageZoomUpdate() {
+        // Add zoom functionality to all existing images
+        $('.image-zoom-container img').off('click').on('click', function(e) {
+            e.preventDefault();
+            showImageZoom($(this).attr('src'));
+        });
+    }
+    
+    function showImageZoom(imageSrc) {
+        // Create overlay
+        var overlay = $('<div class="image-zoom-overlay">' +
+            '<span class="image-zoom-close">&times;</span>' +
+            '<img src="' + imageSrc + '" alt="Zoomed Image">' +
+            '</div>');
+        
+        $('body').append(overlay);
+        overlay.fadeIn(300);
+        
+        // Close on click
+        overlay.on('click', function(e) {
+            if (e.target === this || $(e.target).hasClass('image-zoom-close')) {
+                overlay.fadeOut(300, function() {
+                    overlay.remove();
+                });
+            }
+        });
+        
+        // Close on escape key
+        $(document).on('keyup.imageZoom', function(e) {
+            if (e.keyCode === 27) { // Escape key
+                overlay.fadeOut(300, function() {
+                    overlay.remove();
+                });
+                $(document).off('keyup.imageZoom');
+            }
+        });
+    }
+    
+    // Initialize zoom when packages are loaded
+    $(document).ready(function() {
+        // Initialize zoom for existing images
+        initImageZoomUpdate();
+        
+        // Re-initialize zoom when new content is loaded
+        $(document).on('DOMNodeInserted', function() {
+            setTimeout(function() {
+                initImageZoomUpdate();
+            }, 100);
+        });
+    });
+    
+    // Function to wrap images with zoom container
+    function wrapImagesWithZoomUpdate() {
+        $('img[id^="preview_img_"]').each(function() {
+            if (!$(this).parent().hasClass('image-zoom-container')) {
+                $(this).wrap('<div class="image-zoom-container"></div>');
+            }
+        });
+    }
+    
+    // Call wrapImagesWithZoom when packages are loaded
+    $(document).ajaxComplete(function() {
+        setTimeout(function() {
+            wrapImagesWithZoomUpdate();
+            initImageZoomUpdate();
+        }, 500);
+    });
+    
+    // Also wrap images when new rows are added dynamically
+    function addItineraryRow(package_id) {
+        // Original addItineraryRow function code would go here
+        // For now, just call the wrap function after adding
+        setTimeout(function() {
+            wrapImagesWithZoomUpdate();
+            initImageZoomUpdate();
+        }, 100);
+    }
 </script>
 <?= end_panel(); ?>

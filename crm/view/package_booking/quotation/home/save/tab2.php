@@ -891,3 +891,131 @@ $(document).on('click', '#tab2_head', function() {
         }
     });
 </script>
+
+<!-- Image Zoom Functionality -->
+<style>
+    .image-zoom-container {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        border-radius: 8px;
+        cursor: zoom-in;
+    }
+    
+    .image-zoom-container img {
+        transition: transform 0.3s ease;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .image-zoom-container:hover img {
+        transform: scale(1.5);
+    }
+    
+    .image-zoom-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        cursor: zoom-out;
+    }
+    
+    .image-zoom-overlay img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .image-zoom-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        z-index: 10000;
+    }
+    
+    .image-zoom-close:hover {
+        color: #ff6b6b;
+    }
+</style>
+
+<script>
+    // Image zoom functionality
+    function initImageZoom() {
+        // Add zoom functionality to all existing images
+        $('.image-zoom-container img').off('click').on('click', function(e) {
+            e.preventDefault();
+            showImageZoom($(this).attr('src'));
+        });
+    }
+    
+    function showImageZoom(imageSrc) {
+        // Create overlay
+        var overlay = $('<div class="image-zoom-overlay">' +
+            '<span class="image-zoom-close">&times;</span>' +
+            '<img src="' + imageSrc + '" alt="Zoomed Image">' +
+            '</div>');
+        
+        $('body').append(overlay);
+        overlay.fadeIn(300);
+        
+        // Close on click
+        overlay.on('click', function(e) {
+            if (e.target === this || $(e.target).hasClass('image-zoom-close')) {
+                overlay.fadeOut(300, function() {
+                    overlay.remove();
+                });
+            }
+        });
+        
+        // Close on escape key
+        $(document).on('keyup.imageZoom', function(e) {
+            if (e.keyCode === 27) { // Escape key
+                overlay.fadeOut(300, function() {
+                    overlay.remove();
+                });
+                $(document).off('keyup.imageZoom');
+            }
+        });
+    }
+    
+    // Initialize zoom when packages are loaded
+    $(document).ready(function() {
+        // Initialize zoom for existing images
+        initImageZoom();
+        
+        // Re-initialize zoom when new content is loaded
+        $(document).on('DOMNodeInserted', function() {
+            setTimeout(function() {
+                initImageZoom();
+            }, 100);
+        });
+    });
+    
+    // Function to wrap images with zoom container
+    function wrapImagesWithZoom() {
+        $('img[id^="preview_img_"]').each(function() {
+            if (!$(this).parent().hasClass('image-zoom-container')) {
+                $(this).wrap('<div class="image-zoom-container"></div>');
+            }
+        });
+    }
+    
+    // Call wrapImagesWithZoom when packages are loaded
+    $(document).ajaxComplete(function() {
+        setTimeout(function() {
+            wrapImagesWithZoom();
+            initImageZoom();
+        }, 500);
+    });
+</script>

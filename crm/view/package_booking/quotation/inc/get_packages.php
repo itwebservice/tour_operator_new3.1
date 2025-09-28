@@ -326,7 +326,7 @@ label[class*="upload-btn-"] {
                                            style="display: none;">
                                 </div>
                                 <div id="day_image_preview_<?php echo $offset1; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
-                                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                                    <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                                         <img id="preview_img_<?php echo $offset1; ?>" src="<?php
                                             if (!empty($row_program['day_image'])) {
                                                 $image_path = trim($row_program['day_image']);
@@ -431,7 +431,7 @@ label[class*="upload-btn-"] {
                                            style="display: none;">
                                 </div>
                                 <div id="day_image_preview_<?php echo $current_offset; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
-                                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                                    <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                                         <img id="preview_img_<?php echo $current_offset; ?>" src="<?php
                                             if (!empty($row_program['day_image'])) {
                                                 $image_path = trim($row_program['day_image']);
