@@ -82,7 +82,8 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
 
     $('#from_date, #to_date, #quotation_date').datetimepicker({
         timepicker: false,
-        format: 'd-m-Y'
+        format: 'd-m-Y',
+        minDate: 0  // Disable past dates - 0 means today, -1 would allow yesterday
     });
     $('#txt_arrval1,#txt_dapart1,#train_arrival_date,#train_departure_date').datetimepicker({
         format: 'd-m-Y H:i'

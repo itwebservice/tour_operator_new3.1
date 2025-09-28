@@ -84,7 +84,8 @@ $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotat
 $('#enquiry_id, #currency_code, #transport_vehicle1').select2();
 $('#from_date12, #to_date12, #quotation_date').datetimepicker({
     timepicker: false,
-    format: 'd-m-Y'
+    format: 'd-m-Y',
+    minDate: 0  // Disable past dates - 0 means today, -1 would allow yesterday
 });
 $('#txt_arrval1,#txt_dapart1, #train_arrival_date,#train_departure_date').datetimepicker({
     format: 'd-m-Y H:i'

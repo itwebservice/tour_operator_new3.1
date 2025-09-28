@@ -207,103 +207,10 @@ if($sq_quotation['user_id'] != 0){
 </div>
 <div class="main_block mg_tp_30">
 </div>
-<!-- Flight-->
-<?php $sq_f_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'"));
-if($sq_f_count != '0'){
-?>
-<div class="row mg_tp_30">
-<div class="col-md-12">
-<h3 class="editor_title">Flight Details</h3>
-	<div class="table-responsive">
-	<table class="table table-hover table-bordered no-marg">
-	<thead>
-		<tr class="table-heading-row">
-			<th>S_No.</th>
-			<th>Sector_From</th>
-			<th>Sector_To</th>
-			<th>Airline_Name</th>
-			<th>Class</th>
-			<th>Departure_Date_Time</th>
-			<th>Arrival_Date_Time</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php 
-		$count = 0;
-		$sq_train = mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'");
-		while($row_train = mysqli_fetch_assoc($sq_train))
-		{
-			$sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_train[airline_name]'"));
-			$airline = ($row_train['airline_name'] != '') ? $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' : 'NA';
-			?>
-			<tr>
-				<td><?= ++$count ?></td>
-				<td><?= $row_train['from_location'] ?></td>
-				<td><?= $row_train['to_location'] ?></td>
-				<td><?= $airline ?></td>
-				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
-				<td><?= get_datetime_user($row_train['dapart_time']) ?></td>
-				<td><?= get_datetime_user($row_train['arraval_time']) ?></td>
-			</tr>
-			<?php
-		}
-		?>
-	</tbody>
-</table>
-	</div>
-	</div>
-	</div>
-<?php } ?>
-
-<!-- Train-->
-<?php $sq_t_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'"));
-if($sq_t_count != '0'){
-?>
-<div class="row mg_tp_30">
-<div class="col-md-12">
-<h3 class="editor_title">Train Details</h3>
-	<div class="table-responsive">
-	<table class="table table-hover table-bordered no-marg">
-	<thead>
-		<tr class="table-heading-row">
-			<th>S_No.</th>
-			<th>Location_From</th>
-			<th>Location_To</th>
-			<th>Class</th>
-			<th>Departure_Date_Time</th>
-			<th>Arrival_Date_Time</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php 
-		$count = 0;
-		$sq_train = mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'");
-		while($row_train = mysqli_fetch_assoc($sq_train))
-		{
-			?>
-			<tr>
-				<td><?= ++$count ?></td>
-				<td><?= $row_train['from_location'] ?></td>
-				<td><?= $row_train['to_location'] ?></td>
-				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
-				<td><?= get_datetime_user($row_train['departure_date']) ?></td>
-				<td><?= get_datetime_user($row_train['arrival_date']) ?></td>
-			</tr>
-			<?php
-		}
-		?>
-	</tbody>
-</table>
-	</div>
-	</div>
-	</div>
-<?php } ?>
-
-
+<!-- Hotel -->
 <?php $sq_h_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id'"));
 if($sq_h_count != '0'){
 ?>
-<!-- Hotel -->
 <div class="row mg_tp_30">
 <div class="col-md-12">
 <h3 class="editor_title">Hotel Details</h3>
@@ -356,10 +263,10 @@ if($sq_h_count != '0'){
 </div>
 <?php } ?>
 
+<!-- Transport -->
 <?php $sq_t_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_transport_entries2 where quotation_id='$quotation_id'"));
 if($sq_t_count != '0'){
 ?>
-<!-- Transport -->
 <div class="row mg_tp_30">
 <div class="col-md-12">
 <h3 class="editor_title">Transport Details</h3>
@@ -436,6 +343,55 @@ if($sq_t_count != '0'){
 	</div>
 <?php } ?>
 
+<!-- Flight-->
+<?php $sq_f_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'"));
+if($sq_f_count != '0'){
+?>
+<div class="row mg_tp_30">
+<div class="col-md-12">
+<h3 class="editor_title">Flight Details</h3>
+	<div class="table-responsive">
+	<table class="table table-hover table-bordered no-marg">
+	<thead>
+		<tr class="table-heading-row">
+			<th>S_No.</th>
+			<th>Sector_From</th>
+			<th>Sector_To</th>
+			<th>Airline_Name</th>
+			<th>Class</th>
+			<th>Departure_Date_Time</th>
+			<th>Arrival_Date_Time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php 
+		$count = 0;
+		$sq_train = mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'");
+		while($row_train = mysqli_fetch_assoc($sq_train))
+		{
+			$sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_train[airline_name]'"));
+			$airline = ($row_train['airline_name'] != '') ? $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' : 'NA';
+			?>
+			<tr>
+				<td><?= ++$count ?></td>
+				<td><?= $row_train['from_location'] ?></td>
+				<td><?= $row_train['to_location'] ?></td>
+				<td><?= $airline ?></td>
+				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
+				<td><?= get_datetime_user($row_train['dapart_time']) ?></td>
+				<td><?= get_datetime_user($row_train['arraval_time']) ?></td>
+			</tr>
+			<?php
+		}
+		?>
+	</tbody>
+</table>
+	</div>
+	</div>
+	</div>
+<?php } ?>
+
+<!-- Activity -->
 <?php $sq_e_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_excursion_entries where quotation_id='$quotation_id'"));
 if($sq_e_count != '0'){
 ?>
@@ -489,10 +445,54 @@ if($sq_e_count != '0'){
 	</div>
 <?php } ?>
 
+<!-- Train-->
+<?php $sq_t_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'"));
+if($sq_t_count != '0'){
+?>
+<div class="row mg_tp_30">
+<div class="col-md-12">
+<h3 class="editor_title">Train Details</h3>
+	<div class="table-responsive">
+	<table class="table table-hover table-bordered no-marg">
+	<thead>
+		<tr class="table-heading-row">
+			<th>S_No.</th>
+			<th>Location_From</th>
+			<th>Location_To</th>
+			<th>Class</th>
+			<th>Departure_Date_Time</th>
+			<th>Arrival_Date_Time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php 
+		$count = 0;
+		$sq_train = mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'");
+		while($row_train = mysqli_fetch_assoc($sq_train))
+		{
+			?>
+			<tr>
+				<td><?= ++$count ?></td>
+				<td><?= $row_train['from_location'] ?></td>
+				<td><?= $row_train['to_location'] ?></td>
+				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
+				<td><?= get_datetime_user($row_train['departure_date']) ?></td>
+				<td><?= get_datetime_user($row_train['arrival_date']) ?></td>
+			</tr>
+			<?php
+		}
+		?>
+	</tbody>
+</table>
+	</div>
+	</div>
+	</div>
+<?php } ?>
+
+<!-- Cruise -->
 <?php $sq_c_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_cruise_entries where quotation_id='$quotation_id'"));
 if($sq_c_count != '0'){
 ?>
-<!-- Cruise -->
 <div class="main_block mg_tp_30"></div>
 <h3 class="editor_title main_block">Cruise Details</h3>
 <table class="table table-bordered">
