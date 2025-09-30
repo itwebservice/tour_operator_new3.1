@@ -153,8 +153,9 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
 /* Prevent content jumping during loading */
 .package_content {
-    min-height: 200px;
+    /* min-height: 200px; */
     transition: opacity 0.3s ease;
+    margin-bottom: 10px;
 }
 
 .package_content.loading {
@@ -165,6 +166,121 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 /* Smooth transitions for accordion */
 .accordion_content {
     transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+/* Fix package list spacing */
+.panel-group {
+    margin-bottom: 0;
+}
+
+.panel {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.panel:last-child {
+    margin-bottom: 0;
+}
+
+/* Fix accordion content spacing */
+.accordion_content.package_content {
+    margin-bottom: 10px;
+}
+
+/* Ensure proper spacing between packages */
+.package_selector + .accordion_content {
+    margin-top: 5px;
+}
+
+/* Fix table spacing issues */
+.table-responsive {
+    margin-bottom: 0;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table > tbody > tr > td {
+    padding: 8px;
+    vertical-align: middle;
+}
+
+/* Fix panel body spacing */
+.panel-body {
+    padding: 15px;
+}
+
+/* Remove excessive margins from main_block */
+.main_block {
+    margin-bottom: 0;
+}
+
+/* Fix accordion spacing */
+#accordion .panel {
+    margin-bottom: 15px;
+}
+
+#accordion .panel:last-child {
+    margin-bottom: 0;
+}
+
+/* Fix textarea height issues */
+.day_program {
+    height: 80px !important;
+    min-height: 80px;
+    max-height: 120px;
+    resize: vertical;
+}
+
+/* Ensure consistent row heights */
+.table > tbody > tr {
+    height: auto;
+    min-height: 100px;
+}
+
+/* Fix excessive margins in form controls */
+.mg_bt_10 {
+    margin-bottom: 10px !important;
+}
+
+/* Fix table cell padding */
+.table > tbody > tr > td {
+    padding: 8px 12px;
+    vertical-align: top;
+}
+
+/* Ensure proper spacing in dynamic rows */
+#dynamic_table_list_p_<?= $row_tours['package_id'] ?> tbody tr {
+    margin-bottom: 5px;
+}
+
+/* Force all textareas to have consistent height */
+textarea.day_program {
+    height: 80px !important;
+    min-height: 80px !important;
+    max-height: 120px !important;
+}
+
+/* Remove any excessive spacing from table rows */
+table tbody tr {
+    height: auto !important;
+    min-height: 100px !important;
+    max-height: 150px !important;
+}
+
+/* Fix any remaining height issues */
+.panel-body {
+    padding: 10px 15px !important;
+}
+
+/* Ensure table cells don't have excessive height */
+.table > tbody > tr > td {
+    height: auto !important;
+    max-height: 150px !important;
+    overflow: hidden;
 }
 
 /* Simple radio button stability fix */
@@ -298,7 +414,7 @@ label[class*="upload-btn-"] {
                                     placeholder="*Special Attraction" title="Special Attraction"
                                     value="<?php echo $row_program['attraction']; ?>" style='width:220px;margin-top: 35px;' >
                             </td>
-                            <td class='col-md-6 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $offset1; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day-wise Program" title="Day-wise Program"  style=" height:900px;" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
+                            <td class='col-md-6 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $offset1; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day-wise Program" title="Day-wise Program"  style="height:80px;" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                             </td>
                             <td style="width: 100px;"><input type="text"
                                     id="overnight_stay<?php echo $offset1; ?>-u" name="overnight_stay"
@@ -400,7 +516,7 @@ label[class*="upload-btn-"] {
                             <!-- <td  style="max-width: 594px;overflow: hidden;width:100px;"><textarea id="day_program<?php echo $offset; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day-wise Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style='width:400px'
                             value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                             </td> -->
-                            <td class='col-md-6 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $current_offset; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day-wise Program" title="Day-wise Program"  style=" height:900px;" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
+                            <td class='col-md-6 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $current_offset; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day-wise Program" title="Day-wise Program"  style="height:80px;" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                             </td>
                             <td style="width: 100px;"><input type="text"
                                     id="overnight_stay<?php echo $current_offset; ?>-u" name="overnight_stay"
@@ -722,7 +838,7 @@ function addItineraryRow(package_id) {
             <input type="text" id="special_attaraction${offset}-u" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction" style='width:220px;margin-top: 35px;'>
         </td>
         <td class='col-md-5 pad_8' style="max-width: 594px;overflow: hidden;position: relative;">
-            <textarea id="day_program${offset}-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="Day-wise Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style="height:900px;"></textarea>
+            <textarea id="day_program${offset}-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="Day-wise Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style="height:80px;"></textarea>
             <span class="style_text">
                 <span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span>
                 <span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span>
