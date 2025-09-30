@@ -273,14 +273,14 @@ class quotation_email_send
 			error_log("quotation_email - Using default generated content");
 			$subject = 'New Quotation : (' . $sq_tours_package['package_name'] . ' )';
 		}
-		
+
 		$model->app_email_send('8', $sq_quotation['customer_name'], $sq_quotation['email_id'], $content, $subject, '1');
 
 		echo "Quotation successfully sent.";
 		exit;
 	}
 
-	public function quotation_email_body($custom_content = null)
+	public function quotation_email_body($custom_content = null, $options = array())
 	{
 
 		$quotation_id_arr = $_POST['quotation_id_arr'];
@@ -392,7 +392,8 @@ class quotation_email_send
 					<tr><td style="text-align:left;border: 1px solid #888888;width:30%">Total</td>   <td style="text-align:left;border: 1px solid #888888;">' . $sq_quotation['total_passangers'] . '</td></tr>
 				</table>
 			</tr>';
-			$content .= '
+			if (in_array('itinerary', $options)) {
+				$content .= '
 			<tr>
 				<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
 					<tr><td style="text-align:center;border: 1px solid #888888;width:1000%;color: #fff;
@@ -400,26 +401,26 @@ class quotation_email_send
 				</table>
 			</tr>';
 
-			$count = 0;
-			$i = 0;
+				$count = 0;
+				$i = 0;
 
-			while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
+				while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
-				$dates = (array) get_dates_for_package_itineary($row_itinarary["quotation_id"]);
-				$date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
+					$dates = (array) get_dates_for_package_itineary($row_itinarary["quotation_id"]);
+					$date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
 
-				$sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]' and package_id='$sq_quotation[package_id]'"));
-				$day_url1 = explode(',', $sq_day_image['image_url']);
-				$daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
-				for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
-					$day_url2 = explode('=', $day_url1[$count1]);
-					if ($day_url2[0] == $sq_quotation['package_id'] && $day_url2[1] == $row_itinarary['day_count']) {
-						$daywise_image = $day_url2[2];
+					$sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]' and package_id='$sq_quotation[package_id]'"));
+					$day_url1 = explode(',', $sq_day_image['image_url']);
+					$daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
+					for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
+						$day_url2 = explode('=', $day_url1[$count1]);
+						if ($day_url2[0] == $sq_quotation['package_id'] && $day_url2[1] == $row_itinarary['day_count']) {
+							$daywise_image = $day_url2[2];
+						}
 					}
-				}
 
-				$count++;
-				$content .= '<tr>
+					$count++;
+					$content .= '<tr>
 					<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
 						<tr>
 							<td style="text-align:left;border: 1px solid #888888;width:20%"><b>Day : </b> ' . $count . ' (' . $date_format . ')' . '</td> 
@@ -438,8 +439,8 @@ class quotation_email_send
 					</table>
 				</tr>
 			';
+				}
 			}
-
 			if ($sq_hotel_count1 > 0) {
 				$content .= '   
 				
@@ -449,6 +450,8 @@ class quotation_email_send
 						background: #009898;">ACCOMMODATION DETAILS</td></tr>
 					</table>
 				</tr>';
+
+
 				$sq_package_type = mysqlQuery("select DISTINCT(package_type) from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' order by 
 '$sq_cost[sort_order]'");
 
@@ -729,7 +732,8 @@ class quotation_email_send
 									</table>
 								</tr>';
 			}
-			if (isset($sq_query['terms_and_conditions'])) {
+			if (in_array('terms_conditions', $options)) {
+
 				$content .= '<tr>
 								<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
 									<tr><td style="text-align:center;border: 1px solid #888888;width:1000%;color: #fff;
@@ -742,7 +746,11 @@ class quotation_email_send
 										<td style="text-align:left;border: 1px solid #888888;width:100%"><pre>' . $sq_query['terms_and_conditions'] . '</pre></td></tr>
 								</table>
 							</tr>';
-			}
+			
+		}
+
+
+			if (in_array('inclusion_exclusion', $options)) {
 			$content .= '<tr>
 						<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
 							<tr><td style="text-align:center;border: 1px solid #888888;width:1000%;color: #fff;
@@ -767,6 +775,7 @@ class quotation_email_send
 								<td style="text-align:left;border: 1px solid #888888;width:100%"><pre>' . $sq_quotation['exclusions'] . '</pre></td></tr>
 						</table>
 					</tr>';
+			}
 			if ($sq_tours_package['note'] != '') {
 				$content .= '<tr>
 							<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
@@ -854,17 +863,18 @@ class quotation_email_send
 								<tbody> 
 							</table>
 						</tr>';
-
-			$content .= '
+			if (in_array('price_structure', $options)) {
+		     	$content .= '
 						<tr>
 							<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
 								<tr><td style="text-align:center;border: 1px solid #888888;width:1000%;color: #fff;
 								background: #009898;">COSTING DETAILS</td></tr>
 							</table>
 						</tr>';
-			if ($sq_quotation['costing_type'] == 2) {
+		
+			    if ($sq_quotation['costing_type'] == 2) {
 
-				$sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order");
+			    	$sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order");
 				while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
 
 					$service_charge = $sq_costing['service_charge'];
@@ -1037,7 +1047,7 @@ class quotation_email_send
 									: currency_conversion($currency, $sq_quotation['currency_code'], (float)(0))) .
 								'</td>
     </tr>';
-						}
+							}	
 						if ($sq_cruise_count > 0) {
 
 							$content .= '	
@@ -1130,6 +1140,7 @@ class quotation_email_send
 										<tr><td style="text-align:left;border: 1px solid #888888;width:30%">Travel and other cost</td><td style="text-align:left;border: 1px solid #888888;">' . $travel_cost . '</td><td style="text-align:left;border: 1px solid #888888;width:30%">Quotation Cost</td> <td style="text-align:left;border: 1px solid #888888;">' . $currency_amount1 . ' <s>' . $act_tour_cost_camount . '</s>' . '</td><td style="text-align:left;border: 1px solid #888888;width:30%"> </td><td style="text-align:left;border: 1px solid #888888;width:30%"></td></tr>
 									</table>
 								</tr>';
+								
 					// for cond end
 					// if($tcs_note_show != ''){
 					// 	$content .= '<tr> 
@@ -1141,6 +1152,7 @@ class quotation_email_send
 				}
 			}
 		}
+	}
 		$content .= '
 		<tr>
 			<table style="width:100%;margin-top:20px">
@@ -1897,7 +1909,7 @@ Thank you.');
 	}
 
 	// Individual quotation email sending (Body format)
-	public function quotation_email_body_individual($quotation_id, $email_id)
+	public function quotation_email_body_individual($quotation_id, $email_id, $options = array())
 	{
 		global $currency, $app_cancel_pdf, $model, $quot_note, $theme_color;
 
@@ -1957,12 +1969,13 @@ Thank you.');
 		$email_content .= "               \n";
 
 		// Price Structure
-		$email_content .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-		$email_content .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-		$email_content .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-		$email_content .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-		$email_content .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
-
+		if (in_array('price_structure', $options)) {
+			$email_content .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
+			$email_content .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
+			$email_content .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
+			$email_content .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
+			$email_content .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+		}
 		// Hotels
 		if (!empty($hotel_details)) {
 			$email_content .= "🏨  *Hotels*\n";
@@ -1971,11 +1984,13 @@ Thank you.');
 		}
 
 		// Itinerary
-		if (!empty($itinerary_details)) {
-			$email_content .= "-----------\n";
-			$email_content .= $itinerary_details . "\n";
-		}
+		if (in_array('itinerary', $options)) {
 
+			if (!empty($itinerary_details)) {
+				$email_content .= "-----------\n";
+				$email_content .= $itinerary_details . "\n";
+			}
+		}
 		// Transportation
 		if (!empty($transport_details)) {
 			$email_content .= "🚖  *Transportation*\n";
@@ -1984,20 +1999,22 @@ Thank you.');
 		}
 
 		// Inclusion/Exclusion
-		$email_content .= "✅ *Inclusions*\n";
-		$email_content .= "-----------\n";
-		$email_content .= $inclusions_details . "\n";
-		$email_content .= "❌ *Exclusions*\n";
-		$email_content .= "-----------\n";
-		$email_content .= $exclusions_details . "\n";
-
-		// Terms & Conditions
-		if (!empty($terms_and_conditions_details)) {
-			$email_content .= "📌 *TERMS AND CONDITIONS*\n";
+		if (in_array('inclusion_exclusion', $options)) {
+			$email_content .= "✅ *Inclusions*\n";
 			$email_content .= "-----------\n";
-			$email_content .= $terms_and_conditions_details . "\n";
+			$email_content .= $inclusions_details . "\n";
+			$email_content .= "❌ *Exclusions*\n";
+			$email_content .= "-----------\n";
+			$email_content .= $exclusions_details . "\n";
 		}
-
+		// Terms & Conditions
+		if (in_array('terms_conditions', $options)) {
+			if (!empty($terms_and_conditions_details)) {
+				$email_content .= "📌 *TERMS AND CONDITIONS*\n";
+				$email_content .= "-----------\n";
+				$email_content .= $terms_and_conditions_details . "\n";
+			}
+		}
 		$email_content .= "\n*Link* : " . $quotation_link . "\n\n";
 		$email_content .= "Please contact for more details : " . $app_name . " " . $contact . "\n";
 		$email_content .= "Thank you.";
@@ -2014,7 +2031,7 @@ Thank you.');
 		$_POST['quotation_id_arr'] = $quotation_id_arr;
 
 		// Use the existing email sending logic but with our custom content
-		$this->quotation_email_body($email_content);
+		$this->quotation_email_body($email_content ,  $options);
 	}
 
 	// Individual quotation WhatsApp sending
@@ -2105,11 +2122,11 @@ Thank you.');
 			// Get city name
 			$sq_city = mysqli_fetch_assoc(mysqlQuery("SELECT city_name FROM city_master WHERE city_id = '{$row_hotel['city_id']}'"));
 			$city_name = $sq_city ? $sq_city['city_name'] : '';
-			
+
 			// Get hotel name from hotel_master table
 			$sq_hotel_name = mysqli_fetch_assoc(mysqlQuery("SELECT hotel_name FROM hotel_master WHERE hotel_id = '{$row_hotel['hotel_name']}'"));
 			$hotel_name = $sq_hotel_name ? $sq_hotel_name['hotel_name'] : $row_hotel['hotel_name'];
-			
+
 			$hotel_details .= "*{$city_name}*  -*{$hotel_name}* - *{$row_hotel['room_category']}*  -*{$row_hotel['meal_plan']}*\n";
 			$hotel_count++;
 		}
@@ -2143,48 +2160,44 @@ Thank you.');
 			$from_date_trans = get_date_user($row_transport['from_date']);
 			$to_date_trans = get_date_user($row_transport['to_date']);
 			$vehicle_name = !empty($row_transport['actual_vehicle_name']) ? $row_transport['actual_vehicle_name'] : 'Vehicle ID: ' . $row_transport['vehicle_name'];
-			
+
 			// Get pickup location
 			$pickup = '';
-			if($row_transport['pickup_type'] == 'city'){
+			if ($row_transport['pickup_type'] == 'city') {
 				$row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[pickup]'"));
 				$pickup = $row['city_name'];
-			}
-			else if($row_transport['pickup_type'] == 'hotel'){
+			} else if ($row_transport['pickup_type'] == 'hotel') {
 				$row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[pickup]'"));
 				$pickup = $row['hotel_name'];
-			}
-			else{
+			} else {
 				$row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[pickup]'"));
 				$airport_nam = clean($row['airport_name']);
 				$airport_code = clean($row['airport_code']);
-				$pickup = $airport_nam." (".$airport_code.")";
+				$pickup = $airport_nam . " (" . $airport_code . ")";
 			}
-			
+
 			// Get drop location
 			$drop = '';
-			if($row_transport['drop_type'] == 'city'){
+			if ($row_transport['drop_type'] == 'city') {
 				$row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[drop]'"));
 				$drop = $row['city_name'];
-			}
-			else if($row_transport['drop_type'] == 'hotel'){
+			} else if ($row_transport['drop_type'] == 'hotel') {
 				$row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[drop]'"));
 				$drop = $row['hotel_name'];
-			}
-			else{
+			} else {
 				$row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[drop]'"));
 				$airport_nam = clean($row['airport_name']);
 				$airport_code = clean($row['airport_code']);
-				$drop = $airport_nam." (".$airport_code.")";
+				$drop = $airport_nam . " (" . $airport_code . ")";
 			}
-			
+
 			// Get service duration
 			$service_duration = '';
-			if(!empty($row_transport['service_duration'])){
+			if (!empty($row_transport['service_duration'])) {
 				$row = mysqli_fetch_assoc(mysqlQuery("select duration from service_duration_master where entry_id='$row_transport[service_duration]'"));
 				$service_duration = $row['duration'];
 			}
-			
+
 			$transport_details .= "*{$vehicle_name}* *{$from_date_trans}*    *{$to_date_trans}*    *{$pickup} to {$drop}*    *{$service_duration}*    *({$row_transport['vehicle_count']})*\n";
 			$transport_count++;
 		}
@@ -2244,7 +2257,7 @@ Thank you.');
 				$inclusions = html_entity_decode($inclusions, ENT_QUOTES, 'UTF-8');
 				$inclusions = preg_replace('/\s+/', ' ', $inclusions); // Replace multiple spaces with single space
 				$inclusions = trim($inclusions);
-				
+
 				// Split by common separators and format as bullet points
 				$inclusions_list = preg_split('/(\.|;|,)/', $inclusions);
 				foreach ($inclusions_list as $inclusion) {
@@ -2268,7 +2281,7 @@ Thank you.');
 				$exclusions = html_entity_decode($exclusions, ENT_QUOTES, 'UTF-8');
 				$exclusions = preg_replace('/\s+/', ' ', $exclusions); // Replace multiple spaces with single space
 				$exclusions = trim($exclusions);
-				
+
 				// Split by common separators and format as bullet points
 				$exclusions_list = preg_split('/(\.|;|,)/', $exclusions);
 				foreach ($exclusions_list as $exclusion) {
@@ -2314,7 +2327,7 @@ Thank you.');
 				$terms = html_entity_decode($terms, ENT_QUOTES, 'UTF-8');
 				$terms = preg_replace('/\s+/', ' ', $terms); // Replace multiple spaces with single space
 				$terms = trim($terms);
-				
+
 				// Split by common separators and format as bullet points
 				$terms_list = preg_split('/(\.|;|,)/', $terms);
 				foreach ($terms_list as $term) {

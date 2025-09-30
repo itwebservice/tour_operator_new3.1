@@ -11,7 +11,6 @@ $options = isset($_POST['options']) && !empty($_POST['options']) ? $_POST['optio
 error_log("Quotation ID: " . $quotation_id);
 error_log("Email Option: " . $email_option);
 error_log("Selected Options: " . print_r($options, true));
-error_log("Inclusions/Exclusions selected: " . (in_array('inclusion_exclusion', $options) ? 'YES' : 'NO'));
 
 // Get quotation details
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT *, 
@@ -105,6 +104,15 @@ if ($is_sub_quotation) {
 
 $from_date = get_date_user($sq_quotation['from_date']);
 $to_date = get_date_user($sq_quotation['to_date']);
+
+// Debug information
+error_log("Price Structure selected: " . (in_array('price_structure', $options) ? 'YES' : 'NO'));
+error_log("Inclusions/Exclusions selected: " . (in_array('inclusion_exclusion', $options) ? 'YES' : 'NO'));
+error_log("Terms & Conditions selected: " . (in_array('terms_conditions', $options) ? 'YES' : 'NO'));
+error_log("Itinerary selected: " . (in_array('itinerary', $options) ? 'YES' : 'NO'));
+error_log("Hotel count: " . $hotel_count);
+error_log("Transport count: " . $transport_count);
+error_log("Itinerary count: " . $itinerary_count);
 
 // Calculate duration
 $from_date_obj = new DateTime($sq_quotation['from_date']);
@@ -237,8 +245,10 @@ $email_content .= "* " . ($sq_quotation['children_with_bed'] + $sq_quotation['ch
 $email_content .= "* {$sq_quotation['total_infant']} Infant\n";
 $email_content .= "               \n";
 
-// Price Structure - only show if selected
-if (in_array('price_structure', $options)) {
+// Price Structure - show if selected OR no specific options are selected (show all sections)
+$show_price = in_array('price_structure', $options) || $show_all_sections;
+
+if ($show_price) {
     $email_content .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
     $email_content .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
     $email_content .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
@@ -249,21 +259,25 @@ if (in_array('price_structure', $options)) {
 
 
 
-if (!empty($hotel_details)) {
-    if ($hotel_count > 0) {
-        $email_content .= "🏨  *Hotels*\n";
-        $email_content .= "-----------\n";
-        $email_content .= $hotel_details . "\n";
-    } else {
-        $email_content .= "🏨  *Hotels*\n";
-        $email_content .= "-----------\n";
-        $email_content .= "Hotel details will be provided upon confirmation.\n\n";
-    }
+// Hotels - show if we have hotel data AND no specific options are selected (show all sections)
+$show_all_sections = empty($options);
+$show_hotels = !empty($hotel_details) && $show_all_sections;
+
+if ($show_hotels && $hotel_count > 0) {
+    $email_content .= "🏨  *Hotels*\n";
+    $email_content .= "-----------\n";
+    $email_content .= $hotel_details . "\n";
+} elseif ($show_hotels) {
+    $email_content .= "🏨  *Hotels*\n";
+    $email_content .= "-----------\n";
+    $email_content .= "Hotel details will be provided upon confirmation.\n\n";
 }
 
 
-// Itinerary - only show if selected
-if (in_array('itinerary', $options)) {
+// Itinerary - show if selected OR no specific options are selected (show all sections)
+$show_itinerary = in_array('itinerary', $options) || $show_all_sections;
+
+if ($show_itinerary) {
     if ($itinerary_count > 0) {
         $email_content .= "-----------\n";
         $email_content .= $itinerary_details . "\n";
@@ -275,15 +289,19 @@ if (in_array('itinerary', $options)) {
     }
 }
 
-// transport_details - only show if selected
-if ($transport_count > 0) {
+// Transportation - show if we have transport data AND no specific options are selected (show all sections)
+$show_transport = $transport_count > 0 && $show_all_sections;
+
+if ($show_transport) {
     $email_content .= "🚖  *Transportation*\n";
     $email_content .= "-----------\n";
     $email_content .= $transport_details . "\n";
 }
 
-// Inclusion/Exclusion - only show if selected
-if (in_array('inclusion_exclusion', $options)) {
+// Inclusion/Exclusion - show if selected OR no specific options are selected (show all sections)
+$show_inclusions = in_array('inclusion_exclusion', $options) || $show_all_sections;
+
+if ($show_inclusions) {
     error_log("Processing inclusions/exclusions...");
     error_log("Inclusions data: " . (isset($sq_quotation['inclusions']) ? $sq_quotation['inclusions'] : 'NOT SET'));
     error_log("Exclusions data: " . (isset($sq_quotation['exclusions']) ? $sq_quotation['exclusions'] : 'NOT SET'));
@@ -343,8 +361,10 @@ if (in_array('inclusion_exclusion', $options)) {
 
 
 
-// Terms & Conditions - only show if selected
-if (in_array('terms_conditions', $options)) {
+// Terms & Conditions - show if selected OR no specific options are selected (show all sections)
+$show_terms = in_array('terms_conditions', $options) || $show_all_sections;
+
+if ($show_terms) {
     error_log("Processing terms and conditions...");
     error_log("Terms data: " . (isset($terms_and_conditions_details) ? substr($terms_and_conditions_details, 0, 200) . '...' : 'NOT SET'));
     
@@ -388,6 +408,7 @@ $email_content .= "Thank you.";
 
 // If WhatsApp is requested, format content for WhatsApp
 if ($email_option == 'WhatsApp') {
+    error_log("Formatting for WhatsApp");
     // Format content for WhatsApp (remove HTML tags, use * for bold)
     $email_content = str_replace(['<br>', '<br/>', '<br />'], "\n", $email_content);
     $email_content = strip_tags($email_content);
@@ -395,6 +416,8 @@ if ($email_option == 'WhatsApp') {
     $email_content = str_replace(['<i>', '</i>', '<em>', '</em>'], '_', $email_content);
     $email_content = preg_replace('/\*+/', '*', $email_content); // Remove multiple asterisks
     $email_content = preg_replace('/\n\s*\n/', "\n\n", $email_content); // Clean up multiple newlines
+} else {
+    error_log("Formatting for Email");
 }
 
 echo $email_content;

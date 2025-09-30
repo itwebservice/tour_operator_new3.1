@@ -356,7 +356,7 @@ $quotation_count = mysqli_num_rows($sq_query);
     $title = $hotel_status['title'];
     ?>
     
-    <!-- Combined Download Button with Email -->
+    <!-- Combined Download Button with Email2 -->
     <div class="btn-group download-btn-group">
         <button type="button" class="btn btn-info btn-sm dropdown-toggle download-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download & Email Quotation">
             <i class="fa fa-download"></i>
@@ -934,6 +934,7 @@ $quotation_count = mysqli_num_rows($sq_query);
 		$('input[name="emailOptions[]"]:checked').each(function() {
 			selectedOptions.push($(this).val());
 		});
+
 		
 		// Always use Email Body format (HTML format removed)
 		var emailFormat = 'body';
@@ -942,6 +943,7 @@ $quotation_count = mysqli_num_rows($sq_query);
 		
 		// Call individual email send function
 		if (window.currentQuotationData) {
+
 			sendIndividualQuotationEmail(window.currentQuotationData.quotation_id, 
 				window.currentQuotationData.email_id, selectedOptions, emailOption);
 		}
@@ -975,7 +977,8 @@ $quotation_count = mysqli_num_rows($sq_query);
 			selectedOptions.push($(this).val());
 		});
 		
-		
+
+        return false;
 		if (window.currentQuotationData) {
 			sendIndividualQuotationWhatsApp(window.currentQuotationData.quotation_id, 
 				window.currentQuotationData.mobile_no, selectedOptions);
@@ -1055,7 +1058,8 @@ $quotation_count = mysqli_num_rows($sq_query);
 		var formData = {
 			quotation_id: quotation_id,
 			email_id: email_id,
-			email_option: emailOption || 'Email Body'
+			email_option: emailOption || 'Email Body',
+            'options[]': selectedOptions
 		};
 		
 		$.ajax({

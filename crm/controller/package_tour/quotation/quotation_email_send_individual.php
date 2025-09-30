@@ -15,6 +15,7 @@ $quotation_email_send = new quotation_email_send;
 if($email_option=='By HTML'){
     $quotation_email_send->quotation_email_individual($quotation_id, $email_id);	
 }else{
+    // print_r($options);die;
     $quotation_email_send->quotation_email_body_individual($quotation_id, $email_id, $options);
 }
 ?>
