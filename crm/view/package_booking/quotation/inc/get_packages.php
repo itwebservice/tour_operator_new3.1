@@ -324,6 +324,11 @@ label[class*="upload-btn-"] {
                                            name="day_image_<?php echo $offset1; ?>" accept="image/*" 
                                            onchange="previewDayImage(this, '<?php echo $offset1; ?>')" 
                                            style="display: none;">
+                                    <div class="image-requirements-tooltip" style="font-size: 10px; color: white; margin-top: 3px; line-height: 1.2; background-color: #000; padding:8px; border-radius: 3px; max-width: 147px; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none;' : '' ?>">
+                                        Image Size Should Be Less Than<br>
+                                        100KB, Resolution : 900 X 900<br>
+                                        and Format: Jpg/JPEG/Png
+                                    </div>
                                 </div>
                                 <div id="day_image_preview_<?php echo $offset1; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
                                     <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
@@ -746,6 +751,11 @@ function addItineraryRow(package_id) {
                 <i class="fa fa-image"></i>    Upload Image
                 </label>
                 <input type="file" id="day_image_${offset}" name="day_image_${offset}" accept="image/*" onchange="previewDayImage(this, '${offset}')" style="display: none;">
+                <div class="image-requirements-tooltip" style="font-size: 10px; color: white; margin-top: 3px; line-height: 1.2; background-color: #000; padding: 4px 6px; border-radius: 3px; display: inline-block; max-width: 120px;">
+                    Image Size Should Be Less Than<br>
+                    100KB, Resolution : 900 X 900<br>
+                    and Format: Jpg/JPEG/Png
+                </div>
             </div>
             <div id="day_image_preview_${offset}" style="display: none; margin-top: 5px;">
                 <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
@@ -875,6 +885,9 @@ window.previewDayImage = function(input, offset) {
         uploadLabel.hide();
         uploadLabel.css('display', 'none !important');
         uploadLabel.attr('style', 'display: none !important;');
+        
+        // Hide the requirements tooltip when image is selected
+        $('.image-requirements-tooltip').hide();
         
         console.log("QUOTATION: Preview displayed successfully for offset:", offset);
         console.log("QUOTATION: Preview div visible:", previewDiv.is(':visible'));
@@ -1112,6 +1125,9 @@ window.removeDayImage = function(offset) {
     uploadLabel.show();
     uploadLabel.css('display', 'block');
     
+    // Show the requirements tooltip when upload button is shown
+    $('.image-requirements-tooltip').show();
+    
     // Reset the file input's change event handler
     fileInput.off('change').on('change', function() {
         console.log("QUOTATION: File input change event triggered for offset:", offset);
@@ -1130,6 +1146,7 @@ window.removeDayImage = function(offset) {
         previewDiv.css('display', 'none');
         uploadLabel.show();
         uploadLabel.css('display', 'block');
+        $('.image-requirements-tooltip').show();
         delete window.removingImage[offset];
         console.log("QUOTATION: Image removal completed for offset:", offset);
     }, 100);
