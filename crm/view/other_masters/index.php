@@ -1,4 +1,4 @@
- changes  <?php
+<?php
 include "../../model/model.php";
 /*======******Header******=======*/
 require_once('../layouts/admin_header.php');
