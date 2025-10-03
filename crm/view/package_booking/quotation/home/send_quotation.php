@@ -591,8 +591,8 @@ $quotation_count = mysqli_num_rows($sq_query);
                                     </div>
                                 </div>
 
-                                <!-- Email Draft -->
-                                <div class="form-group">
+                                <!-- Email Draft - Hidden -->
+                                <div class="form-group" style="display: none;">
                                     <label class="font-weight-bold" style="color: #009898;">Email Draft (Email Body Format):</label>
                                     <div id="emailDraftArea">
                                         <!-- Email draft will be loaded here -->
@@ -667,8 +667,8 @@ $quotation_count = mysqli_num_rows($sq_query);
                                     </div>
                                 </div>
 
-                                <!-- WhatsApp Draft -->
-                                <div class="form-group">
+                                <!-- WhatsApp Draft - Hidden -->
+                                <div class="form-group" style="display: none;">
                                     <label class="font-weight-bold" style="color: #009898;">WhatsApp Draft:</label>
                                     <div id="whatsappDraftArea">
                                         <!-- WhatsApp draft will be loaded here -->

@@ -800,8 +800,47 @@
         var base_url = $("#base_url").val();
         var city_id = $("#" + id).val();
         var count = id.substring(9); // Extract number from city_name1, city_name2, etc.
-        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", { city_id: city_id }, function(data) {
+        
+        console.log("Loading hotels for city_id:", city_id, "count:", count);
+        console.log("AJAX URL:", base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php");
+        
+        // Clear existing options first
+        $("#hotel_name-" + count).html('<option value="">Loading hotels...</option>');
+        
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", { city_id: city_id })
+        .done(function(data) {
+            console.log("Hotel data received:", data);
             $("#hotel_name-" + count).html(data);
+            
+            // Re-initialize Select2 for the updated dropdown
+            $("#hotel_name-" + count).select2({
+                placeholder: "Select Hotel",
+                allowClear: true
+            });
+        })
+        .fail(function(xhr, status, error) {
+            console.error("Error loading hotels:", status, error);
+            console.error("Response:", xhr.responseText);
+            console.error("Status Code:", xhr.status);
+            console.error("Ready State:", xhr.readyState);
+            
+            // Try alternative URL structure
+            var altUrl = base_url + "crm/view/package_booking/quotation/home/hotel/hotel_name_load.php";
+            console.log("Trying alternative URL:", altUrl);
+            
+            $.get(altUrl, { city_id: city_id })
+            .done(function(data) {
+                console.log("Hotel data received from alternative URL:", data);
+                $("#hotel_name-" + count).html(data);
+                $("#hotel_name-" + count).select2({
+                    placeholder: "Select Hotel",
+                    allowClear: true
+                });
+            })
+            .fail(function(xhr2, status2, error2) {
+                console.error("Alternative URL also failed:", status2, error2);
+                $("#hotel_name-" + count).html('<option value="">Error loading hotels</option>');
+            });
         });
     }
 
@@ -817,7 +856,16 @@
 
     // Event handlers for city and hotel dropdowns
     $('#tbl_package_tour_quotation_dynamic_hotel').on('change', 'select[name^="city_name"]', function() {
+        console.log("City dropdown changed:", this.id, "Value:", $(this).val());
         hotel_name_list_load(this.id);
+    });
+    
+    // Additional event handler for manual trigger
+    $(document).on('change', 'select[name^="city_name"]', function() {
+        if ($(this).closest('#tbl_package_tour_quotation_dynamic_hotel').length > 0) {
+            console.log("Manual city dropdown change detected:", this.id, "Value:", $(this).val());
+            hotel_name_list_load(this.id);
+        }
     });
 
     $('#tbl_package_tour_quotation_dynamic_hotel').on('change', 'select[name^="hotel_name"]', function() {
@@ -1928,6 +1976,8 @@
         var excl_arr = new Array();
         var package_id_arr = new Array();
         var rowLenth = $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').length;
+
+        console.log("rowLenth", rowLenth);
         $('input[name="custom_package"]:checked').each(function() {
 
             package_id_arr.push($(this).val());

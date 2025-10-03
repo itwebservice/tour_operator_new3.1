@@ -433,6 +433,26 @@ function openActionsModal(quotationData) {
     
     // Show modal
     $('#actionsModal').modal('show');
+    
+    // Ensure modal scrolls into view and is accessible
+    $('#actionsModal').on('shown.bs.modal', function() {
+        // Scroll to top of page to ensure modal is visible
+        $('html, body').animate({
+            scrollTop: 0
+        }, 300);
+        
+        // Focus on modal for accessibility
+        $(this).find('.modal-content').focus();
+        
+        // Ensure modal is centered
+        var modal = $(this);
+        var modalDialog = modal.find('.modal-dialog');
+        modalDialog.css({
+            'margin': '30px auto',
+            'max-width': '90%',
+            'width': 'auto'
+        });
+    });
 }
 
 // Modal action handlers
@@ -572,6 +592,80 @@ $(document).ready(function() {
     
     // Initial adjustment
     adjustDropdownPosition();
+    
+    // Enhanced modal positioning for long lists
+    $(document).on('show.bs.modal', '.modal', function() {
+        // Store current scroll position
+        var scrollTop = $(window).scrollTop();
+        
+        // Add class to body to prevent background scrolling
+        $('body').addClass('modal-open');
+        
+        // Ensure modal is positioned correctly
+        var modal = $(this);
+        var modalDialog = modal.find('.modal-dialog');
+        
+        // Reset any previous positioning
+        modalDialog.css({
+            'margin': '30px auto',
+            'max-width': '90%',
+            'width': 'auto',
+            'position': 'relative',
+            'top': 'auto',
+            'left': 'auto',
+            'transform': 'none'
+        });
+    });
+    
+    // Handle modal shown event
+    $(document).on('shown.bs.modal', '.modal', function() {
+        var modal = $(this);
+        
+        // Scroll to top to ensure modal is visible
+        $('html, body').animate({
+            scrollTop: 0
+        }, 300);
+        
+        // Focus on modal for accessibility
+        modal.find('.modal-content').focus();
+        
+        // Ensure modal is properly centered
+        var modalDialog = modal.find('.modal-dialog');
+        var windowHeight = $(window).height();
+        var modalHeight = modalDialog.outerHeight();
+        
+        if (modalHeight > windowHeight - 60) {
+            modalDialog.css({
+                'margin-top': '30px',
+                'margin-bottom': '30px',
+                'max-height': (windowHeight - 60) + 'px',
+                'overflow-y': 'auto'
+            });
+        }
+    });
+    
+    // Handle modal hidden event
+    $(document).on('hidden.bs.modal', '.modal', function() {
+        // Remove modal-open class from body
+        $('body').removeClass('modal-open');
+    });
+    
+    // Add keyboard navigation support for modal
+    $(document).on('keydown', '.modal', function(e) {
+        // Close modal on Escape key
+        if (e.keyCode === 27) { // Escape key
+            $(this).modal('hide');
+        }
+    });
+    
+    // Ensure modal is properly focused when shown
+    $(document).on('shown.bs.modal', '.modal', function() {
+        // Focus on the first focusable element in the modal
+        var focusableElements = $(this).find('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusableElements.length > 0) {
+            focusableElements.first().focus();
+        }
+    });
 });
 </script>
 <style>
@@ -651,6 +745,86 @@ $(document).ready(function() {
     #actionsModal .modal-body {
         max-height: 500px;
         overflow-y: auto;
+    }
+    
+    /* Fix modal positioning for long lists */
+    .modal {
+        z-index: 1055 !important;
+    }
+    
+    .modal-backdrop {
+        z-index: 1050 !important;
+    }
+    
+    /* Ensure modal stays centered and accessible */
+    .modal-dialog {
+        margin: 30px auto !important;
+        max-width: 90% !important;
+        width: auto !important;
+    }
+    
+    /* Force modal to scroll into view when opened */
+    .modal.show {
+        display: block !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Ensure modal content is visible */
+    .modal-content {
+        position: relative !important;
+        z-index: 1056 !important;
+    }
+    
+    /* Fix for long lists - ensure modal appears in viewport */
+    .modal.fade .modal-dialog {
+        transform: translate(0, 0) !important;
+        transition: transform 0.3s ease-out !important;
+    }
+    
+    .modal.show .modal-dialog {
+        transform: none !important;
+    }
+    
+    /* Fix modal backdrop and body scrolling */
+    body.modal-open {
+        overflow: hidden !important;
+        padding-right: 0 !important;
+    }
+    
+    .modal-backdrop {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        z-index: 1050 !important;
+    }
+    
+    /* Ensure modal is always visible and accessible */
+    .modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1055 !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Responsive modal sizing */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 10px !important;
+            max-width: calc(100% - 20px) !important;
+        }
+    }
+    
+    /* Ensure modal content is scrollable if needed */
+    .modal-content {
+        border-radius: 6px !important;
+        box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5) !important;
     }
 </style>
 <?php
