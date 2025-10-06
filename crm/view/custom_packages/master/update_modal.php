@@ -209,7 +209,6 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                             <legend>Tour Itinerary</legend>
                             <div class="col-xs-12 no-pad text-right mg_bt_10">
                                 <button type="button" class="btn btn-excel" title="Add Row" onclick="addItineraryRowUpdate()"><i class="fa fa-plus"></i></button>
-                                <button type="button" class="btn btn-warning btn-sm" title="Debug Image Processing" onclick="debugImageProcessing()" style="margin-left: 10px;"><i class="fa fa-bug"></i> Debug</button>
                             </div>
                             <div id="div_list1">
                                 <table style="width: 100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
@@ -243,8 +242,9 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                 <!-- Debug: Image path = <?= $sq_pckg1['day_image'] ?? 'NULL' ?> -->
                                                 <div style="margin-top: 35px;">
                                                     <label for="day_image_<?php echo $count; ?>" class="btn btn-sm btn-success" 
-                                                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:none;' : '' ?>;">
-                                                        <i class="fa fa-image"></i> Upload Image
+                                                           style="margin-bottom: 5px; padding: 8px 16px; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap; <?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:none;' : '' ?>;">
+                                                        <!-- <i class="fa fa-image" style="font-size: 12px;"></i>  -->
+                                                        <span>Upload Image</span>
                                                     </label>
                                                     <input type="file" id="day_image_<?php echo $count; ?>" 
                                                            name="day_image_<?php echo $count; ?>" accept="image/*" 
@@ -798,8 +798,8 @@ function addItineraryRowUpdate() {
         </td>
         <td class='col-md-1 pad_8' style="width: 120px;">
             <div style="margin-top: 35px;">
-                <label for="day_image_${count}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                    <i class="fa fa-image"></i> Upload Image
+                <label for="day_image_${count}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 8px 16px; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap;">
+                    <span>Upload Image</span>
                 </label>
                 <input type="file" id="day_image_${count}" name="day_image_${count}" accept="image/*" onchange="previewDayImageUpdate(this, '${count}')" style="display: none;">
             </div>

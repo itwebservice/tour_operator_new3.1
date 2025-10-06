@@ -622,7 +622,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                             formData.append('uploadfile', imageData.file);
                             
                             $.ajax({
-                                url: base_url() + 'view/other_masters/itinerary/upload_itinerary_image.php',
+                                url: base_url + 'view/other_masters/itinerary/upload_itinerary_image.php',
                                 type: 'POST',
                                 data: formData,
                                 processData: false,
