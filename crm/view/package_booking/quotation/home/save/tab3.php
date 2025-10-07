@@ -800,48 +800,52 @@
         var base_url = $("#base_url").val();
         var city_id = $("#" + id).val();
         var count = id.substring(9); // Extract number from city_name1, city_name2, etc.
-        
+
         console.log("Loading hotels for city_id:", city_id, "count:", count);
         console.log("AJAX URL:", base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php");
-        
+
         // Clear existing options first
         $("#hotel_name-" + count).html('<option value="">Loading hotels...</option>');
-        
-        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", { city_id: city_id })
-        .done(function(data) {
-            console.log("Hotel data received:", data);
-            $("#hotel_name-" + count).html(data);
-            
-            // Re-initialize Select2 for the updated dropdown
-            $("#hotel_name-" + count).select2({
-                placeholder: "Select Hotel",
-                allowClear: true
-            });
-        })
-        .fail(function(xhr, status, error) {
-            console.error("Error loading hotels:", status, error);
-            console.error("Response:", xhr.responseText);
-            console.error("Status Code:", xhr.status);
-            console.error("Ready State:", xhr.readyState);
-            
-            // Try alternative URL structure
-            var altUrl = base_url + "crm/view/package_booking/quotation/home/hotel/hotel_name_load.php";
-            console.log("Trying alternative URL:", altUrl);
-            
-            $.get(altUrl, { city_id: city_id })
+
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", {
+                city_id: city_id
+            })
             .done(function(data) {
-                console.log("Hotel data received from alternative URL:", data);
+                console.log("Hotel data received:", data);
                 $("#hotel_name-" + count).html(data);
+
+                // Re-initialize Select2 for the updated dropdown
                 $("#hotel_name-" + count).select2({
                     placeholder: "Select Hotel",
                     allowClear: true
                 });
             })
-            .fail(function(xhr2, status2, error2) {
-                console.error("Alternative URL also failed:", status2, error2);
-                $("#hotel_name-" + count).html('<option value="">Error loading hotels</option>');
+            .fail(function(xhr, status, error) {
+                console.error("Error loading hotels:", status, error);
+                console.error("Response:", xhr.responseText);
+                console.error("Status Code:", xhr.status);
+                console.error("Ready State:", xhr.readyState);
+
+                // Try alternative URL structure
+                var altUrl = base_url + "crm/view/package_booking/quotation/home/hotel/hotel_name_load.php";
+                console.log("Trying alternative URL:", altUrl);
+
+                $.get(altUrl, {
+                        city_id: city_id
+                    })
+                    .done(function(data) {
+                        console.log("Hotel data received from alternative URL:", data);
+                        $("#hotel_name-" + count).html(data);
+                        $("#hotel_name-" + count).select2({
+                            placeholder: "Select Hotel",
+                            allowClear: true
+                        });
+                    })
+                    .fail(function(xhr2, status2, error2) {
+                        console.error("Alternative URL also failed:", status2, error2);
+                        $("#hotel_name-" + count).html('<option value="">Error loading hotels</option>');
+                    });
             });
-        });
     }
 
     // Hotel type load function
@@ -849,7 +853,9 @@
         var base_url = $("#base_url").val();
         var hotel_id = $("#" + id).val();
         var count = id.substring(10); // Extract number from hotel_name-1, hotel_name-2, etc.
-        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_type_load.php", { hotel_id: hotel_id }, function(data) {
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_type_load.php", {
+            hotel_id: hotel_id
+        }, function(data) {
             $("#hotel_type-" + count).val(data);
         });
     }
@@ -859,7 +865,7 @@
         console.log("City dropdown changed:", this.id, "Value:", $(this).val());
         hotel_name_list_load(this.id);
     });
-    
+
     // Additional event handler for manual trigger
     $(document).on('change', 'select[name^="city_name"]', function() {
         if ($(this).closest('#tbl_package_tour_quotation_dynamic_hotel').length > 0) {
@@ -962,7 +968,7 @@
             rules: {},
             submitHandler: function(form, e) {
                 e.preventDefault();
-                
+
                 // Before validation, ensure all hotel dropdowns have proper values
                 ensureHotelSelections();
 
@@ -1125,7 +1131,7 @@
                         }
                         var hotel_id = row.cells[4].childNodes[0].value;
                         var hotel_cat = row.cells[5].childNodes[0].value;
-                        
+
                         // Debug logging
                         console.log('Row ' + (i + 1) + ' - Package Type:', package_type, 'City:', city_name, 'Hotel ID:', hotel_id, 'Hotel Cat:', hotel_cat);
                         console.log('Row ' + (i + 1) + ' - Hotel dropdown options:', $(row.cells[4].childNodes[0]).html());
@@ -1686,7 +1692,7 @@
     function switch_to_tab2() {
         // Save hotel table state before switching away
         saveHotelTableState();
-        
+
         $('#tab3_head').removeClass('active');
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');
@@ -1705,7 +1711,7 @@
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
-        
+
         // Restore saved packages after a short delay to ensure tab is loaded
         setTimeout(function() {
             restoreSavedPackages();
@@ -1719,14 +1725,14 @@
             try {
                 var packageIds = JSON.parse(savedPackages);
                 console.log('Restoring saved packages:', packageIds);
-                
+
                 // Check if packages are already loaded in the hotel table
                 var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
                 if (table && table.rows.length > 1) {
                     console.log('Hotel table already has data, skipping restoration');
                     return;
                 }
-                
+
                 // If no data in hotel table, restore the packages
                 if (packageIds.length > 0) {
                     // Simulate the addHotelInfo function call
@@ -1772,25 +1778,25 @@
             try {
                 var tableData = JSON.parse(savedState);
                 var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-                
+
                 if (table && tableData.length > 0) {
                     // Clear existing rows except header
                     while (table.rows.length > 1) {
                         table.deleteRow(table.rows.length - 1);
                     }
-                    
+
                     // Restore each row with a single timeout to ensure all rows are created first
                     setTimeout(function() {
                         for (var i = 0; i < tableData.length; i++) {
                             addRow('tbl_package_tour_quotation_dynamic_hotel');
                         }
-                        
+
                         // Then restore data after all rows are created
                         setTimeout(function() {
                             for (var i = 0; i < tableData.length; i++) {
                                 var row = table.rows[i + 1]; // +1 because first row is header
                                 var data = tableData[i];
-                                
+
                                 if (row && row.cells && row.cells.length > 14) {
                                     try {
                                         // Restore row data with safety checks
@@ -1834,7 +1840,7 @@
                             }
                             console.log('Hotel table state restored:', tableData.length, 'rows');
                         }, 200); // Wait for rows to be fully created
-                        
+
                     }, 100);
                 }
             } catch (e) {
@@ -1857,24 +1863,24 @@
         // Get the costing data from tab3
         var hotel_main_arr = [];
         var unique_package_type_arr = [];
-        
+
         // Collect package data from hotel table
         var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
         var rowCount = table.rows.length;
-        
+
         for (var i = 0; i < rowCount; i++) {
             var row = table.rows[i];
             if (row.cells[0].childNodes[0].checked) {
                 var package_type = row.cells[2].childNodes[0].value;
                 var hotel_cost = parseFloat(row.cells[13].childNodes[0].value) || 0;
                 var package_id = row.cells[14].childNodes[0].value;
-                
+
                 if (package_type && package_type !== "*Package Type") {
                     // Add to unique package types
                     if (unique_package_type_arr.indexOf(package_type) === -1) {
                         unique_package_type_arr.push(package_type);
                     }
-                    
+
                     // Add to hotel main array
                     hotel_main_arr.push({
                         'id': package_id,
@@ -1885,28 +1891,28 @@
                 }
             }
         }
-        
+
         // Get the tab4 costing table
         var costingTable = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
         if (!costingTable) {
             console.log("Costing table not found in tab4");
             return;
         }
-        
+
         // Clear existing rows (except header)
         while (costingTable.rows.length > 1) {
             costingTable.deleteRow(costingTable.rows.length - 1);
         }
-        
+
         // Add rows for each unique package type
         for (var i = 0; i < unique_package_type_arr.length; i++) {
             if (i > 0) { // Add row for each package type after the first one
                 addRow('tbl_package_tour_quotation_dynamic_costing');
             }
-            
+
             var row = costingTable.rows[i];
             var packageType = unique_package_type_arr[i];
-            
+
             // Find the total cost for this package type
             var totalCost = 0;
             for (var j = 0; j < hotel_main_arr.length; j++) {
@@ -1914,7 +1920,7 @@
                     totalCost += hotel_main_arr[j]['cost'];
                 }
             }
-            
+
             // Populate the row
             if (row.cells[2].childNodes[1]) {
                 row.cells[2].childNodes[1].value = packageType; // Package Type
@@ -1936,398 +1942,398 @@
             if (row.cells[lastCellIndex] && row.cells[lastCellIndex].childNodes[1]) {
                 row.cells[lastCellIndex].childNodes[1].value = totalCost; // Total Tour Cost
             }
-            
+
             // Also try setting it in cell 16 if it exists
             if (row.cells[16] && row.cells[16].childNodes[1]) {
                 row.cells[16].childNodes[1].value = totalCost; // Total Tour Cost
             }
-            
+
             // Trigger change events to calculate totals
             if (row.cells[3].childNodes[1]) {
                 $(row.cells[3].childNodes[1]).trigger('change');
             }
-            
+
             // Force calculation of total cost
             setTimeout(function() {
                 quotation_cost_calculate(row.cells[3].childNodes[1].id);
-                
+
                 // Also manually set the total cost in the correct field
                 // Find the total_tour_cost input by name pattern
                 var $totalCostInput = $(row).find('input[name^="total_tour_cost"]');
                 if ($totalCostInput.length > 0) {
                     $totalCostInput.val(totalCost);
                 }
-                
+
                 // Debug: log all inputs in the row to find the correct one
-                console.log('Row inputs:', $(row).find('input').map(function() { 
-                    return this.name + ' = ' + this.value; 
+                console.log('Row inputs:', $(row).find('input').map(function() {
+                    return this.name + ' = ' + this.value;
                 }).get());
             }, 100);
         }
-        
+
         console.log("Tab4 costing table populated with", unique_package_type_arr.length, "package types");
     }
 
 
-    function addHotelInfo(tableID, quot_table = "", itinerary = "") {
-        var base_url = $('#base_url').val();
+    // function addHotelInfo(tableID, quot_table = "", itinerary = "") {
+    //     var base_url = $('#base_url').val();
 
-        var incl_arr = new Array();
-        var excl_arr = new Array();
-        var package_id_arr = new Array();
-        var rowLenth = $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').length;
+    //     var incl_arr = new Array();
+    //     var excl_arr = new Array();
+    //     var package_id_arr = new Array();
+    //     var rowLenth = $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').length;
 
-        console.log("rowLenth", rowLenth);
-        $('input[name="custom_package"]:checked').each(function() {
+    //     console.log("rowLenth", rowLenth);
+    //     $('input[name="custom_package"]:checked').each(function() {
 
-            package_id_arr.push($(this).val());
-            var package_id = $(this).val();
-            //Incl & Excl
-            var table = document.getElementById("dynamic_table_incl" + package_id);
-            var rowCount = table.rows.length;
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                var inclusion = $('#inclusions' + package_id).val();
-                var exclusion = $('#exclusions' + package_id).val();
+    //         package_id_arr.push($(this).val());
+    //         var package_id = $(this).val();
+    //         //Incl & Excl
+    //         var table = document.getElementById("dynamic_table_incl" + package_id);
+    //         var rowCount = table.rows.length;
+    //         for (var i = 0; i < rowCount; i++) {
+    //             var row = table.rows[i];
+    //             var inclusion = $('#inclusions' + package_id).val();
+    //             var exclusion = $('#exclusions' + package_id).val();
 
-                incl_arr.push(inclusion);
-                excl_arr.push(exclusion);
-            }
+    //             incl_arr.push(inclusion);
+    //             excl_arr.push(exclusion);
+    //         }
 
-        });
-        if (package_id_arr.length == 0) {
-            error_msg_alert('Please select at least one Package!');
-            return false;
-        }
+    //     });
+    //     if (package_id_arr.length == 0) {
+    //         error_msg_alert('Please select at least one Package!');
+    //         return false;
+    //     }
 
-        // Save selected packages to sessionStorage for persistence
-        sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
-        
-        // Also save the current hotel table state
-        saveHotelTableState();
+    //     // Save selected packages to sessionStorage for persistence
+    //     sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
 
-        var attraction_arr = new Array();
-        var program_arr = new Array();
-        var stay_arr = new Array();
-        var meal_plan_arr = new Array();
-        var package_p_id_arr = new Array();
-        var day_count_arr = new Array();
-        var count = 0;
+    //     // Also save the current hotel table state
+    //     saveHotelTableState();
 
-
-        for (var j = 0; j < package_id_arr.length; j++) {
-            var table = document.getElementById("dynamic_table_list_p_" + package_id_arr[j]);
-            var rowCount = table.rows.length;
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                if (row.cells[0].childNodes[0].checked) {
-
-                    count++;
-                    var attraction = row.cells[2].childNodes[0].value;
-                    var program = row.cells[3].childNodes[0].value;
-                    var stay = row.cells[4].childNodes[0].value;
-                    var meal_plan = row.cells[5].childNodes[0].value;
-                    var package_id1 = row.cells[7].childNodes[0].value;
-
-                    if (attraction == "") {
-                        error_msg_alert('Special Attraction is mandatory in row' + (i + 1));
-                        return false;
-                    }
-                    if (program == "") {
-                        error_msg_alert('Daywise program is mandatory in row' + (i + 1));
-                        return false;
-                    }
-                    if (stay == "") {
-                        error_msg_alert('Overnight Stay is mandatory in row' + (i + 1));
-                        return false;
-                    }
-
-                    var flag1 = validate_spattration(row.cells[2].childNodes[0].id);
-                    var flag2 = validate_dayprogram(row.cells[3].childNodes[0].id);
-                    var flag3 = validate_onstay(row.cells[4].childNodes[0].id);
-                    if (!flag1 || !flag2 || !flag3) {
-                        return false;
-                    }
-                    attraction_arr.push(attraction);
-                    program_arr.push(program);
-                    stay_arr.push(stay);
-                    meal_plan_arr.push(meal_plan);
-                    package_p_id_arr.push(package_id1);
-                }
-            }
-            day_count_arr.push(count);
-            count = 0;
-        }
-
-        var total_adult = $('#total_adult').val();
-        var total_children = $('#total_children').val();
-        var from_date = $('#from_date').val();
-        var to_date = $('#to_date').val();
-        var total_days = $('#total_days').val();
+    //     var attraction_arr = new Array();
+    //     var program_arr = new Array();
+    //     var stay_arr = new Array();
+    //     var meal_plan_arr = new Array();
+    //     var package_p_id_arr = new Array();
+    //     var day_count_arr = new Array();
+    //     var count = 0;
 
 
-        $.ajax({
+    //     for (var j = 0; j < package_id_arr.length; j++) {
+    //         var table = document.getElementById("dynamic_table_list_p_" + package_id_arr[j]);
+    //         var rowCount = table.rows.length;
+    //         for (var i = 0; i < rowCount; i++) {
+    //             var row = table.rows[i];
+    //             if (row.cells[0].childNodes[0].checked) {
 
-            type: 'post',
+    //                 count++;
+    //                 var attraction = row.cells[2].childNodes[0].value;
+    //                 var program = row.cells[3].childNodes[0].value;
+    //                 var stay = row.cells[4].childNodes[0].value;
+    //                 var meal_plan = row.cells[5].childNodes[0].value;
+    //                 var package_id1 = row.cells[7].childNodes[0].value;
 
-            url: '../save/package_hotel_info.php',
+    //                 if (attraction == "") {
+    //                     error_msg_alert('Special Attraction is mandatory in row' + (i + 1));
+    //                     return false;
+    //                 }
+    //                 if (program == "") {
+    //                     error_msg_alert('Daywise program is mandatory in row' + (i + 1));
+    //                     return false;
+    //                 }
+    //                 if (stay == "") {
+    //                     error_msg_alert('Overnight Stay is mandatory in row' + (i + 1));
+    //                     return false;
+    //                 }
 
-            data: {
-                package_id_arr: package_id_arr,
-                from_date: from_date
-            },
-            success: function(result) {
-    var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-    var hotel_arr = JSON.parse(result);
+    //                 var flag1 = validate_spattration(row.cells[2].childNodes[0].id);
+    //                 var flag2 = validate_dayprogram(row.cells[3].childNodes[0].id);
+    //                 var flag3 = validate_onstay(row.cells[4].childNodes[0].id);
+    //                 if (!flag1 || !flag2 || !flag3) {
+    //                     return false;
+    //                 }
+    //                 attraction_arr.push(attraction);
+    //                 program_arr.push(program);
+    //                 stay_arr.push(stay);
+    //                 meal_plan_arr.push(meal_plan);
+    //                 package_p_id_arr.push(package_id1);
+    //             }
+    //         }
+    //         day_count_arr.push(count);
+    //         count = 0;
+    //     }
 
-    // Find current max row number (column 1 of existing rows) with safety checks
-    var lastIndex = 0;
-    for (var r = 1; r < table.rows.length; r++) {
-        var row = table.rows[r];
-        if (row && row.cells && row.cells[1] && row.cells[1].childNodes && row.cells[1].childNodes[0]) {
-            var val = parseInt(row.cells[1].childNodes[0].value);
-            if (!isNaN(val) && val > lastIndex) lastIndex = val;
-        }
-    }
-
-    var rowCopyFrom = table.rows;
-    var startingRowIndex = table.rows.length; // remember table length before adding new rows
-
-    // 1️⃣ Append all new rows
-    for (var i = 0; i < hotel_arr.length; i++) {
-        addRow('tbl_package_tour_quotation_dynamic_hotel');  // Add new row
-        var rowIndex = table.rows.length - 1;  // Get the new row index
-        var row = table.rows[rowIndex];
-
-        // Safety check for row and cells
-        if (!row || !row.cells || row.cells.length < 17) {
-            console.log('Row not properly created, skipping row', i);
-            continue;
-        }
-
-        // Continuous numbering
-        if (row.cells[1] && row.cells[1].childNodes && row.cells[1].childNodes[0]) {
-            row.cells[1].childNodes[0].value = ++lastIndex;
-        }
-
-        // Populate hotel dropdown with available options
-        if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[0]) {
-            $(row.cells[4].childNodes[0]).html(
-                '<option value="">*Hotel Name</option>' + 
-                hotel_arr.map(function(hotel) {
-                    return `<option value="${hotel.hotel_id1}">${hotel.hotel_name}</option>`;
-                }).join('')
-            );
-
-            // Set the selected hotel based on the previous row's selection (if any)
-            var previousHotelId = hotel_arr[i] ? hotel_arr[i].hotel_id1 : null;
-            if (previousHotelId) {
-                $(row.cells[4].childNodes[0]).val(previousHotelId).trigger('change');  // Select the hotel
-            }
-        }
-
-        // Set room category if available
-        if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[0]) {
-            var roomCatValue = '';
-            if (table.rows[i] && table.rows[i].cells && table.rows[i].cells[5] && table.rows[i].cells[5].childNodes && table.rows[i].cells[5].childNodes[0]) {
-                roomCatValue = $('#' + table.rows[i].cells[5].childNodes[0].id).val().trim();
-            }
-            
-            if (roomCatValue && roomCatValue !== "") {
-                $('#' + row.cells[5].childNodes[0].id).val(roomCatValue);  // Set room category
-            } else {
-                if ($('#' + row.cells[5].childNodes[0].id).find('option[value=""]').length === 0) {
-                    $('#' + row.cells[5].childNodes[0].id).prepend('<option value="">Room Category</option>');
-                }
-            }
-        }
-
-        // Fill other fields (dates, package details, etc.) with safety checks
-        if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[0]) {
-            row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
-        }
-        if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
-            row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
-        }
-        if (row.cells[8] && row.cells[8].childNodes && row.cells[8].childNodes[0]) {
-            row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
-        }
-        if (row.cells[9] && row.cells[9].childNodes && row.cells[9].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[9] && table.rows[i].cells[9].childNodes && table.rows[i].cells[9].childNodes[0]) {
-            row.cells[9].childNodes[0].value = table.rows[i].cells[9].childNodes[0].value;
-        }
-        if (row.cells[10] && row.cells[10].childNodes && row.cells[10].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[10] && table.rows[i].cells[10].childNodes && table.rows[i].cells[10].childNodes[0]) {
-            row.cells[10].childNodes[0].value = table.rows[i].cells[10].childNodes[0].value;
-        }
-        if (row.cells[11] && row.cells[11].childNodes && row.cells[11].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[11] && table.rows[i].cells[11].childNodes && table.rows[i].cells[11].childNodes[0]) {
-            row.cells[11].childNodes[0].value = table.rows[i].cells[11].childNodes[0].value;
-        }
-        if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[0] && rowCopyFrom[i] && rowCopyFrom[i].cells && rowCopyFrom[i].cells[16] && rowCopyFrom[i].cells[16].childNodes && rowCopyFrom[i].cells[16].childNodes[0]) {
-            $('#' + row.cells[16].childNodes[0].id).val(rowCopyFrom[i].cells[16].childNodes[0].value);
-        }
-        if (row.cells[12] && row.cells[12].childNodes && row.cells[12].childNodes[0]) {
-            row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
-        }
-        if (row.cells[14] && row.cells[14].childNodes && row.cells[14].childNodes[0]) {
-            row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
-        }
-
-        if (row.cells[2] && row.cells[2].childNodes && row.cells[2].childNodes[0]) {
-            if ($('#package_type').val() != '') {
-                $('#' + row.cells[2].childNodes[0].id).val($('#package_type').val());
-            } else {
-                document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
-            }
-
-            // Init select2s for other dropdowns (except city)
-            $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
-        }
-        
-        if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[0]) {
-            $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
-            
-            // After hotel selection, load hotel type
-            setTimeout(function() {
-                hotel_type_load($('#' + row.cells[4].childNodes[0].id).attr('id'));
-            }, 100);  // Adjust timeout as needed for your setup
-        }
-        
-        if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[0]) {
-            $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
-        }
-        
-        if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[0]) {
-            $('#' + row.cells[16].childNodes[0].id).select2().trigger("change");
-        }
-
-        if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
-            calculate_total_nights(row.cells[7].childNodes[0].id);
-        }
-    }
-
-    // 2️⃣ Initialize city dropdowns ONLY for newly added rows (starting from startingRowIndex)
-    for (var i = startingRowIndex; i < table.rows.length; i++) {
-        var row = table.rows[i];
-        
-        // Safety check for row and cells
-        if (!row || !row.cells || row.cells.length < 4) {
-            console.log('Row not properly created for city initialization, skipping row', i);
-            continue;
-        }
-        
-        var $citySelect = $(row.cells[3].childNodes[0]);
-
-        // Initialize city dropdown for new row
-        city_lzloading($citySelect);
-
-        // Get city from hotel_arr data
-        var cityId = hotel_arr[i - startingRowIndex] ? hotel_arr[i - startingRowIndex]['city_id'] : null;
-        var cityName = hotel_arr[i - startingRowIndex] ? hotel_arr[i - startingRowIndex]['city_name'] : null;
-
-        // If no city data from server, copy from previous row
-        if (!cityId && !cityName && i > 0) {
-            var prevRow = table.rows[i - 1];
-            var prevCitySelect = $(prevRow.cells[3].childNodes[0]);
-            cityId = prevCitySelect.val();
-            cityName = prevCitySelect.find('option:selected').text();
-        }
-
-        if (cityId && cityName) {
-            var newOption = new Option(cityName, cityId, true, true);
-            $citySelect.append(newOption);
-            
-            // Set the value and trigger change after Select2 is initialized
-            $citySelect.val(cityId).trigger('change');
-            
-            // Load hotel dropdown for the new row
-            setTimeout(function() {
-                var currentRow = row;
-                var currentCitySelect = $citySelect;
-                
-                hotel_name_list_load(currentCitySelect.attr('id'));
-                
-                // If we need to copy hotel from previous row
-                if (i > 0 && !hotel_arr[i - startingRowIndex]) {
-                    setTimeout(function() {
-                        var prevRow = table.rows[i - 1];
-                        var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
-                        var prevHotelId = prevHotelSelect.val();
-                        var prevHotelName = prevHotelSelect.find('option:selected').text();
-                        
-                        if (prevHotelId && prevHotelName && prevHotelName !== "Select Hotel" && prevHotelName !== "*Hotel Name") {
-                            var $hotelSelect = $(currentRow.cells[4].childNodes[0]);
-                            
-                            // Wait a bit for hotels to load, then select
-                            setTimeout(function() {
-                                if ($hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
-                                    $hotelSelect.val(prevHotelId).trigger('change');
-                                    hotel_type_load($hotelSelect.attr('id'));
-                                }
-                            }, 300);
-                        }
-                    }, 200);
-                }
-            }, 200);
-        }
-    }
-
-    // 3️⃣ Additional logic to copy hotels to rows that don't have hotels selected
-    setTimeout(function() {
-        $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').each(function(index, row) {
-            if (index) { // Skip first row
-                var $hotelSelect = $(row.cells[4].childNodes[0]);
-                var currentHotelId = $hotelSelect.val();
-                var prevRowIndex =  index - rowLenth;
-
-                // If current row doesn't have a hotel selected, copy from previous row
-                if (!currentHotelId || currentHotelId === '') {
-                    var prevRow = table.rows[prevRowIndex];
-                    var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
-                    var prevHotelId = prevHotelSelect.val();
-                    var prevHotelName = prevHotelSelect.find('option:selected').text();
-                    
-                    
-                    if (prevHotelId && prevHotelName) {
-                        // Check if the hotel option exists in the current row's options
-                        var hotelExists = $hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0;
-                        
-                        if (hotelExists) {
-                            // Hotel exists in options, just select it
-                            console.log('DEBUG: Selecting existing hotel in row', index, ':', prevHotelId);
-                            $hotelSelect.val(prevHotelId).trigger('change');
-                            
-                            // Trigger hotel type load
-                            setTimeout(function() {
-                                hotel_type_load($hotelSelect.attr('id'));
-                            }, 100);
-                        } else {
-                            // Hotel doesn't exist in options, add it manually
-                            console.log('DEBUG: Adding hotel manually in row', index, ':', prevHotelId, prevHotelName);
-                            var hotelOption = new Option(prevHotelName, prevHotelId, true, true);
-                            $hotelSelect.append(hotelOption);
-                            $hotelSelect.val(prevHotelId).trigger('change');
-                            
-                            // Trigger hotel type load
-                            setTimeout(function() {
-                                hotel_type_load($hotelSelect.attr('id'));
-                            }, 100);
-                        }
-                    }
-                }
-            }
-        });
-    }, 1000); // Wait 1 second to ensure all dropdowns are loaded
-
-    // Hide hotel package if needed
-    var selectedPackagevalue = table.rows[1] ? table.rows[1].cells[2].childNodes[0].value : '';
-    hideHotelPackage(selectedPackagevalue);
-}
+    //     var total_adult = $('#total_adult').val();
+    //     var total_children = $('#total_children').val();
+    //     var from_date = $('#from_date').val();
+    //     var to_date = $('#to_date').val();
+    //     var total_days = $('#total_days').val();
 
 
+    //     $.ajax({
+
+    //         type: 'post',
+
+    //         url: '../save/package_hotel_info.php',
+
+    //         data: {
+    //             package_id_arr: package_id_arr,
+    //             from_date: from_date
+    //         },
+    //         success: function(result) {
+    //             var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+    //             var hotel_arr = JSON.parse(result);
+
+    //             // Find current max row number (column 1 of existing rows) with safety checks
+    //             var lastIndex = 0;
+    //             for (var r = 1; r < table.rows.length; r++) {
+    //                 var row = table.rows[r];
+    //                 if (row && row.cells && row.cells[1] && row.cells[1].childNodes && row.cells[1].childNodes[0]) {
+    //                     var val = parseInt(row.cells[1].childNodes[0].value);
+    //                     if (!isNaN(val) && val > lastIndex) lastIndex = val;
+    //                 }
+    //             }
+
+    //             var rowCopyFrom = table.rows;
+    //             var startingRowIndex = table.rows.length; // remember table length before adding new rows
+
+    //             // 1️⃣ Append all new rows
+    //             for (var i = 0; i < hotel_arr.length; i++) {
+    //                 addRow('tbl_package_tour_quotation_dynamic_hotel'); // Add new row
+    //                 var rowIndex = table.rows.length - 1; // Get the new row index
+    //                 var row = table.rows[rowIndex];
+
+    //                 // Safety check for row and cells
+    //                 if (!row || !row.cells || row.cells.length < 17) {
+    //                     console.log('Row not properly created, skipping row', i);
+    //                     continue;
+    //                 }
+
+    //                 // Continuous numbering
+    //                 if (row.cells[1] && row.cells[1].childNodes && row.cells[1].childNodes[0]) {
+    //                     row.cells[1].childNodes[0].value = ++lastIndex;
+    //                 }
+
+    //                 // Populate hotel dropdown with available options
+    //                 if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[0]) {
+    //                     $(row.cells[4].childNodes[0]).html(
+    //                         '<option value="">*Hotel Name</option>' +
+    //                         hotel_arr.map(function(hotel) {
+    //                             return `<option value="${hotel.hotel_id1}">${hotel.hotel_name}</option>`;
+    //                         }).join('')
+    //                     );
+
+    //                     // Set the selected hotel based on the previous row's selection (if any)
+    //                     var previousHotelId = hotel_arr[i] ? hotel_arr[i].hotel_id1 : null;
+    //                     if (previousHotelId) {
+    //                         $(row.cells[4].childNodes[0]).val(previousHotelId).trigger('change'); // Select the hotel
+    //                     }
+    //                 }
+
+    //                 // Set room category if available
+    //                 if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[0]) {
+    //                     var roomCatValue = '';
+    //                     if (table.rows[i] && table.rows[i].cells && table.rows[i].cells[5] && table.rows[i].cells[5].childNodes && table.rows[i].cells[5].childNodes[0]) {
+    //                         roomCatValue = $('#' + table.rows[i].cells[5].childNodes[0].id).val().trim();
+    //                     }
+
+    //                     if (roomCatValue && roomCatValue !== "") {
+    //                         $('#' + row.cells[5].childNodes[0].id).val(roomCatValue); // Set room category
+    //                     } else {
+    //                         if ($('#' + row.cells[5].childNodes[0].id).find('option[value=""]').length === 0) {
+    //                             $('#' + row.cells[5].childNodes[0].id).prepend('<option value="">Room Category</option>');
+    //                         }
+    //                     }
+    //                 }
+
+    //                 // Fill other fields (dates, package details, etc.) with safety checks
+    //                 if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[0]) {
+    //                     row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
+    //                 }
+    //                 if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
+    //                     row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
+    //                 }
+    //                 if (row.cells[8] && row.cells[8].childNodes && row.cells[8].childNodes[0]) {
+    //                     row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
+    //                 }
+    //                 if (row.cells[9] && row.cells[9].childNodes && row.cells[9].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[9] && table.rows[i].cells[9].childNodes && table.rows[i].cells[9].childNodes[0]) {
+    //                     row.cells[9].childNodes[0].value = table.rows[i].cells[9].childNodes[0].value;
+    //                 }
+    //                 if (row.cells[10] && row.cells[10].childNodes && row.cells[10].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[10] && table.rows[i].cells[10].childNodes && table.rows[i].cells[10].childNodes[0]) {
+    //                     row.cells[10].childNodes[0].value = table.rows[i].cells[10].childNodes[0].value;
+    //                 }
+    //                 if (row.cells[11] && row.cells[11].childNodes && row.cells[11].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[11] && table.rows[i].cells[11].childNodes && table.rows[i].cells[11].childNodes[0]) {
+    //                     row.cells[11].childNodes[0].value = table.rows[i].cells[11].childNodes[0].value;
+    //                 }
+    //                 if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[0] && rowCopyFrom[i] && rowCopyFrom[i].cells && rowCopyFrom[i].cells[16] && rowCopyFrom[i].cells[16].childNodes && rowCopyFrom[i].cells[16].childNodes[0]) {
+    //                     $('#' + row.cells[16].childNodes[0].id).val(rowCopyFrom[i].cells[16].childNodes[0].value);
+    //                 }
+    //                 if (row.cells[12] && row.cells[12].childNodes && row.cells[12].childNodes[0]) {
+    //                     row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
+    //                 }
+    //                 if (row.cells[14] && row.cells[14].childNodes && row.cells[14].childNodes[0]) {
+    //                     row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
+    //                 }
+
+    //                 if (row.cells[2] && row.cells[2].childNodes && row.cells[2].childNodes[0]) {
+    //                     if ($('#package_type').val() != '') {
+    //                         $('#' + row.cells[2].childNodes[0].id).val($('#package_type').val());
+    //                     } else {
+    //                         document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
+    //                     }
+
+    //                     // Init select2s for other dropdowns (except city)
+    //                     $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
+    //                 }
+
+    //                 if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[0]) {
+    //                     $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
+
+    //                     // After hotel selection, load hotel type
+    //                     setTimeout(function() {
+    //                         hotel_type_load($('#' + row.cells[4].childNodes[0].id).attr('id'));
+    //                     }, 100); // Adjust timeout as needed for your setup
+    //                 }
+
+    //                 if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[0]) {
+    //                     $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
+    //                 }
+
+    //                 if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[0]) {
+    //                     $('#' + row.cells[16].childNodes[0].id).select2().trigger("change");
+    //                 }
+
+    //                 if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
+    //                     calculate_total_nights(row.cells[7].childNodes[0].id);
+    //                 }
+    //             }
+
+    //             // 2️⃣ Initialize city dropdowns ONLY for newly added rows (starting from startingRowIndex)
+    //             for (var i = startingRowIndex; i < table.rows.length; i++) {
+    //                 var row = table.rows[i];
+
+    //                 // Safety check for row and cells
+    //                 if (!row || !row.cells || row.cells.length < 4) {
+    //                     console.log('Row not properly created for city initialization, skipping row', i);
+    //                     continue;
+    //                 }
+
+    //                 var $citySelect = $(row.cells[3].childNodes[0]);
+
+    //                 // Initialize city dropdown for new row
+    //                 city_lzloading($citySelect);
+
+    //                 // Get city from hotel_arr data
+    //                 var cityId = hotel_arr[i - startingRowIndex] ? hotel_arr[i - startingRowIndex]['city_id'] : null;
+    //                 var cityName = hotel_arr[i - startingRowIndex] ? hotel_arr[i - startingRowIndex]['city_name'] : null;
+
+    //                 // If no city data from server, copy from previous row
+    //                 if (!cityId && !cityName && i > 0) {
+    //                     var prevRow = table.rows[i - 1];
+    //                     var prevCitySelect = $(prevRow.cells[3].childNodes[0]);
+    //                     cityId = prevCitySelect.val();
+    //                     cityName = prevCitySelect.find('option:selected').text();
+    //                 }
+
+    //                 if (cityId && cityName) {
+    //                     var newOption = new Option(cityName, cityId, true, true);
+    //                     $citySelect.append(newOption);
+
+    //                     // Set the value and trigger change after Select2 is initialized
+    //                     $citySelect.val(cityId).trigger('change');
+
+    //                     // Load hotel dropdown for the new row
+    //                     setTimeout(function() {
+    //                         var currentRow = row;
+    //                         var currentCitySelect = $citySelect;
+
+    //                         hotel_name_list_load(currentCitySelect.attr('id'));
+
+    //                         // If we need to copy hotel from previous row
+    //                         if (i > 0 && !hotel_arr[i - startingRowIndex]) {
+    //                             setTimeout(function() {
+    //                                 var prevRow = table.rows[i - 1];
+    //                                 var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
+    //                                 var prevHotelId = prevHotelSelect.val();
+    //                                 var prevHotelName = prevHotelSelect.find('option:selected').text();
+
+    //                                 if (prevHotelId && prevHotelName && prevHotelName !== "Select Hotel" && prevHotelName !== "*Hotel Name") {
+    //                                     var $hotelSelect = $(currentRow.cells[4].childNodes[0]);
+
+    //                                     // Wait a bit for hotels to load, then select
+    //                                     setTimeout(function() {
+    //                                         if ($hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
+    //                                             $hotelSelect.val(prevHotelId).trigger('change');
+    //                                             hotel_type_load($hotelSelect.attr('id'));
+    //                                         }
+    //                                     }, 300);
+    //                                 }
+    //                             }, 200);
+    //                         }
+    //                     }, 200);
+    //                 }
+    //             }
+
+    //             // 3️⃣ Additional logic to copy hotels to rows that don't have hotels selected
+    //             setTimeout(function() {
+    //                 $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').each(function(index, row) {
+    //                     if (index) { // Skip first row
+    //                         var $hotelSelect = $(row.cells[4].childNodes[0]);
+    //                         var currentHotelId = $hotelSelect.val();
+    //                         var prevRowIndex = index - rowLenth;
+
+    //                         // If current row doesn't have a hotel selected, copy from previous row
+    //                         if (!currentHotelId || currentHotelId === '') {
+    //                             var prevRow = table.rows[prevRowIndex];
+    //                             var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
+    //                             var prevHotelId = prevHotelSelect.val();
+    //                             var prevHotelName = prevHotelSelect.find('option:selected').text();
+
+
+    //                             if (prevHotelId && prevHotelName) {
+    //                                 // Check if the hotel option exists in the current row's options
+    //                                 var hotelExists = $hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0;
+
+    //                                 if (hotelExists) {
+    //                                     // Hotel exists in options, just select it
+    //                                     console.log('DEBUG: Selecting existing hotel in row', index, ':', prevHotelId);
+    //                                     $hotelSelect.val(prevHotelId).trigger('change');
+
+    //                                     // Trigger hotel type load
+    //                                     setTimeout(function() {
+    //                                         hotel_type_load($hotelSelect.attr('id'));
+    //                                     }, 100);
+    //                                 } else {
+    //                                     // Hotel doesn't exist in options, add it manually
+    //                                     console.log('DEBUG: Adding hotel manually in row', index, ':', prevHotelId, prevHotelName);
+    //                                     var hotelOption = new Option(prevHotelName, prevHotelId, true, true);
+    //                                     $hotelSelect.append(hotelOption);
+    //                                     $hotelSelect.val(prevHotelId).trigger('change');
+
+    //                                     // Trigger hotel type load
+    //                                     setTimeout(function() {
+    //                                         hotel_type_load($hotelSelect.attr('id'));
+    //                                     }, 100);
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 });
+    //             }, 1000); // Wait 1 second to ensure all dropdowns are loaded
+
+    //             // Hide hotel package if needed
+    //             var selectedPackagevalue = table.rows[1] ? table.rows[1].cells[2].childNodes[0].value : '';
+    //             hideHotelPackage(selectedPackagevalue);
+    //         }
 
 
 
-        });
-    }
+
+
+    //     });
+    // }
 
 
 
@@ -2354,24 +2360,24 @@
     function ensureHotelSelections() {
         var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
         var rowCount = table.rows.length;
-        
+
         for (var i = 0; i < rowCount; i++) {
             var row = table.rows[i];
             var chk = row.cells[0].childNodes[0].checked;
-            
+
             if (chk) {
                 var $hotelSelect = $(row.cells[4].childNodes[0]);
                 var hotelValue = $hotelSelect.val();
-                
+
                 console.log('Ensuring hotel selection for row', i + 1, '- Current value:', hotelValue);
-                
+
                 // If no hotel selected but there are options available
                 if ((!hotelValue || hotelValue === '') && i > 0) {
                     // Try to copy from previous row
                     var prevRow = table.rows[i - 1];
                     var $prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
                     var prevHotelId = $prevHotelSelect.val();
-                    
+
                     if (prevHotelId && $hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
                         console.log('Setting hotel value to:', prevHotelId);
                         $hotelSelect.val(prevHotelId);
@@ -2387,47 +2393,47 @@
     function addSimpleHotelRow() {
         var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
         var rowCount = table.rows.length;
-        
+
         if (rowCount < 1) return; // No rows to copy from
-        
+
         // Add new row
         addRow('tbl_package_tour_quotation_dynamic_hotel');
-        
+
         var newRowIndex = table.rows.length - 1;
         var newRow = table.rows[newRowIndex];
         var prevRow = table.rows[newRowIndex - 1];
-        
+
         // Copy city from previous row
         var prevCitySelect = $(prevRow.cells[3].childNodes[0]);
         var prevCityId = prevCitySelect.val();
         var prevCityName = prevCitySelect.find('option:selected').text();
-        
+
         if (prevCityId && prevCityName) {
             var $newCitySelect = $(newRow.cells[3].childNodes[0]);
-            
+
             // Initialize city dropdown
             city_lzloading($newCitySelect);
-            
+
             // Set city value after a short delay
             setTimeout(function() {
                 var cityOption = new Option(prevCityName, prevCityId, true, true);
                 $newCitySelect.append(cityOption);
                 $newCitySelect.val(prevCityId).trigger('change');
-                
+
                 // Copy hotel from previous row after city is set
                 setTimeout(function() {
                     var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
                     var prevHotelId = prevHotelSelect.val();
                     var prevHotelName = prevHotelSelect.find('option:selected').text();
-                    
+
                     if (prevHotelId && prevHotelName) {
                         // Load hotels for the city
                         hotel_name_list_load($newCitySelect.attr('id'));
-                        
+
                         // Set hotel after hotels are loaded
                         setTimeout(function() {
                             var $newHotelSelect = $(newRow.cells[4].childNodes[0]);
-                            
+
                             // Check if hotel exists in loaded options
                             if ($newHotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
                                 $newHotelSelect.val(prevHotelId).trigger('change');
@@ -2437,7 +2443,7 @@
                                 $newHotelSelect.append(hotelOption);
                                 $newHotelSelect.val(prevHotelId).trigger('change');
                             }
-                            
+
                             // Load hotel type
                             hotel_type_load($newHotelSelect.attr('id'));
                         }, 500);
@@ -2445,24 +2451,217 @@
                 }, 200);
             }, 100);
         }
-        
+
         // Copy other fields from previous row
         $(newRow.cells[2].childNodes[0]).val($(prevRow.cells[2].childNodes[0]).val()).trigger('change'); // Package type
         $(newRow.cells[5].childNodes[0]).val($(prevRow.cells[5].childNodes[0]).val()).trigger('change'); // Room category
         $(newRow.cells[8].childNodes[0]).val($(prevRow.cells[8].childNodes[0]).val()); // Hotel type
         $(newRow.cells[16].childNodes[0]).val($(prevRow.cells[16].childNodes[0]).val()).trigger('change'); // Meal plan
-        
+
         // Set row number
         $(newRow.cells[1].childNodes[0]).val(parseInt($(prevRow.cells[1].childNodes[0]).val()) + 1);
-        
+
         // Initialize select2
         $(newRow).find('.app_select2').select2();
-        
+
         // Calculate hotel cost
         get_hotel_cost();
     }
 
 
-   
+function addHotelInfo(tableID, quot_table = "", itinerary = "") {
+    const base_url = $('#base_url').val();
+    let incl_arr = [], excl_arr = [], package_id_arr = [];
+    const rowLenth = $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').length;
+
+    console.log("rowLenth", rowLenth);
+
+    // Collect selected package IDs and inclusions/exclusions
+    $('input[name="custom_package"]:checked').each(function() {
+        const package_id = $(this).val();
+        package_id_arr.push(package_id);
+        const table = document.getElementById(`dynamic_table_incl${package_id}`);
+        const rowCount = table.rows.length;
+        const inclusion = $(`#inclusions${package_id}`).val();
+        const exclusion = $(`#exclusions${package_id}`).val();
+
+        // Push inclusion/exclusion for each row (although only one value will be stored)
+        incl_arr.push(inclusion);
+        excl_arr.push(exclusion);
+    });
+
+    if (package_id_arr.length === 0) {
+        error_msg_alert('Please select at least one Package!');
+        return false;
+    }
+
+    // Save selected packages to sessionStorage
+    sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
+
+    // Save hotel table state
+    saveHotelTableState();
+
+    // Collect data arrays for each row in selected packages
+    let attraction_arr = [], program_arr = [], stay_arr = [], meal_plan_arr = [], package_p_id_arr = [], day_count_arr = [];
+    let count = 0;
+
+    package_id_arr.forEach(package_id => {
+        const table = document.getElementById(`dynamic_table_list_p_${package_id}`);
+        const rowCount = table.rows.length;
+
+        for (let i = 0; i < rowCount; i++) {
+            const row = table.rows[i];
+            if (row.cells[0].childNodes[0].checked) {
+                count++;
+                const attraction = row.cells[2].childNodes[0].value;
+                const program = row.cells[3].childNodes[0].value;
+                const stay = row.cells[4].childNodes[0].value;
+                const meal_plan = row.cells[5].childNodes[0].value;
+                const package_id1 = row.cells[7].childNodes[0].value;
+
+                // Validation
+                if (!attraction || !program || !stay) {
+                    error_msg_alert(`Special Attraction, Daywise Program, and Overnight Stay are mandatory in row ${i + 1}`);
+                    return false;
+                }
+
+                // Validate inputs
+                if (!validate_spattration(row.cells[2].childNodes[0].id) || 
+                    !validate_dayprogram(row.cells[3].childNodes[0].id) ||
+                    !validate_onstay(row.cells[4].childNodes[0].id)) {
+                    return false;
+                }
+
+                // Push valid values into arrays
+                attraction_arr.push(attraction);
+                program_arr.push(program);
+                stay_arr.push(stay);
+                meal_plan_arr.push(meal_plan);
+                package_p_id_arr.push(package_id1);
+            }
+        }
+        day_count_arr.push(count);
+        count = 0;
+    });
+
+    const total_adult = $('#total_adult').val();
+    const total_children = $('#total_children').val();
+    const from_date = $('#from_date').val();
+    const to_date = $('#to_date').val();
+    const total_days = $('#total_days').val();
+
+    // Ajax to save data and update the table
+    $.ajax({
+        type: 'post',
+        url: '../save/package_hotel_info.php',
+        data: { package_id_arr, from_date },
+        success: function(result) {
+            const hotel_arr = JSON.parse(result);
+            const table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+
+            // Find current max row number
+            let lastIndex = Math.max(...Array.from(table.rows).slice(1).map(row => parseInt(row.cells[1].childNodes[0].value) || 0));
+
+            // Append new rows from hotel data
+            hotel_arr.forEach((hotel, i) => {
+                addRow('tbl_package_tour_quotation_dynamic_hotel'); // Add new row
+                const rowIndex = table.rows.length - 1;
+                const row = table.rows[rowIndex];
+
+                if (!row || !row.cells || row.cells.length < 17) return;
+
+                // Continuous numbering for new row
+                row.cells[1].childNodes[0].value = ++lastIndex;
+
+                // Populate dropdowns and fields with hotel data
+                populateHotelRow(row, hotel, i, hotel_arr);
+            });
+
+            // Initialize city dropdowns ONLY for newly added rows
+            initializeCityDropdowns(table, hotel_arr);
+
+            // Hide hotel package if needed
+            const selectedPackagevalue = table.rows[1]?.cells[2]?.childNodes[0]?.value || '';
+            hideHotelPackage(selectedPackagevalue);
+        }
+    });
+}
+
+// Helper function to populate hotel row
+// Helper function to populate hotel row
+function populateHotelRow(row, hotel, i, hotel_arr) {
+    const hotelSelect = $(row.cells[4].childNodes[0]);
+    const roomCatSelect = $(row.cells[5].childNodes[0]);
+
+    // Set hotel dropdown options
+    hotelSelect.html('<option value="">*Hotel Name</option>' + hotel_arr.map(h => `<option value="${h.hotel_id1}">${h.hotel_name}</option>`).join(''));
+
+    // Set hotel selection based on previous row's selection
+    const prevHotelId = hotel_arr[i]?.hotel_id1 || null;
+    if (prevHotelId) {
+        hotelSelect.val(prevHotelId).trigger('change');
+    }
+
+    // Set room category if available
+    const prevRoomCatValue = roomCatSelect.val();
+    if (prevRoomCatValue) {
+        roomCatSelect.val(prevRoomCatValue);
+    }
+
+    // Set other fields (dates, package details, etc.)
+    row.cells[6].childNodes[0].value = hotel.check_in_date;
+    row.cells[7].childNodes[0].value = hotel.check_out_date;
+    row.cells[8].childNodes[0].value = hotel.hotel_type;
+    row.cells[9].childNodes[0].value = hotel.package_name;
+    row.cells[14].childNodes[0].value = hotel.package_id;
+
+    // Set the package type (make sure this is properly set for new rows)
+    const packageTypeSelect = $(row.cells[2].childNodes[0]);
+    if ($('#package_type').val()) {
+        packageTypeSelect.val($('#package_type').val()).trigger('change');
+    } else {
+        packageTypeSelect.selectedIndex = 0; // Default to the first option
+    }
+
+    // Initialize select2 for dropdowns
+    $('#'+row.cells[2].childNodes[0].id).select2().trigger("change");
+    hotelSelect.select2().trigger("change");
+    roomCatSelect.select2().trigger("change");
+}
+
+
+// Helper function to initialize city dropdowns
+function initializeCityDropdowns(table, hotel_arr) {
+    const startingRowIndex = table.rows.length;
+    for (let i = startingRowIndex; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        const citySelect = $(row.cells[3].childNodes[0]);
+
+        city_lzloading(citySelect);
+
+        const cityId = hotel_arr[i - startingRowIndex]?.city_id || null;
+        const cityName = hotel_arr[i - startingRowIndex]?.city_name || null;
+
+        if (cityId && cityName) {
+            const newOption = new Option(cityName, cityId, true, true);
+            citySelect.append(newOption);
+            citySelect.val(cityId).trigger('change');
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </script>

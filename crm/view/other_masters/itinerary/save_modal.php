@@ -75,7 +75,7 @@ textarea.form-control {
                       <div style="margin-top:35px;">
                         <label for="day_image_1" class="btn btn-sm btn-success" 
                                style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                            Upload Image
+                            Upload Image1
                         </label>
                         <input type="file" id="day_image_1" 
                                name="day_image_1" accept="image/*" 
@@ -657,9 +657,9 @@ $(document).ready(function() {
             
             // Clear file input
             $('#day_image_' + rowIndex).val('');
-            
+            $('#day_image_' + rowIndex).val('');
             // Hide preview
-            $('#day_image_preview_' + rowIndex).hide();
+            $('#preview_img_' + rowIndex).show();
             
             // Show the upload button again
             $('#day_image_' + rowIndex).parent().find('label').show();

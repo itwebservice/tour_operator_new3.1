@@ -495,13 +495,13 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         height: 0 !important;
         overflow: hidden !important;
     }
-    
+
     /* Prevent fluctuation by stabilizing initial states */
     div[id^="day_image_preview_"] {
         transition: none !important;
         animation: none !important;
     }
-    
+
     label[for^="day_image_"] {
         transition: none !important;
         animation: none !important;
@@ -623,13 +623,17 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                 <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary<?php echo $offset1; ?>" onclick="add_itinerary('dest_name','special_attaraction<?php echo $offset1; ?>-u','day_program<?php echo $offset1; ?>-u','overnight_stay<?php echo $offset1; ?>-u','Day-<?= $offset1 ?>')"><i class="fa fa-plus"></i></button>
                                                 </td>
                                                 <td class='col-md-1 pad_8' style="width: 120px;">
-                                                    <!-- Debug: Image path = <?= $row_program['day_image'] ?? 'NULL' ?> -->
+                                                    <!-- Debug: Image path2 = </?= $row_program['day_image'] ?? 'NULL' ?> -->
                                                     <!-- Debug: Row program data = <?= json_encode($row_program) ?> -->
                                                     <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
+                                                          <?php  if(empty($row_program['day_image'])){?>   
+
                                                         <label for="day_image_<?php echo $offset1; ?>" class="btn btn-sm btn-success upload-btn-<?php echo $offset1; ?>"
-                                                            style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none !important;' : '' ?>">
+                                                            style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
                                                             <i class="fa fa-image"></i> Upload Image
                                                         </label>
+                                                              <?php } ?>
+
 
                                                         <input type="file" id="day_image_<?php echo $offset1; ?>"
                                                             name="day_image_<?php echo $offset1; ?>" accept="image/*"
@@ -637,7 +641,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                             style="display: none;">
 
                                                     </div>
-                                                    <div id="day_image_preview_<?php echo $offset1; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
+                                                    <?php if (!empty($row_program['day_image'])) { ?>
+                                                    <div id="day_image_preview_<?php echo $offset1; ?>" style="margin-top: 5px;">
                                                         <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                                                             <img id="preview_img_<?php echo $offset1; ?>" src="<?php
                                                                                                                 if (!empty($row_program['day_image'])) {
@@ -673,7 +678,9 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                                 ×
                                                             </button>
                                                         </div>
+                                                     
                                                     </div>
+                                                       <?php } ?>
                                                     <input type="hidden" id="existing_image_path_<?php echo $offset1; ?>" name="existing_image_path_<?php echo $offset1; ?>" value="<?= $row_program['day_image'] ?? '' ?>" />
                                                 </td>
                                                 <td class="hidden"><input type="hidden" name="package_id_n" value=""></td>
@@ -733,22 +740,27 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                                 class="fa fa-plus"></i></button>
                                                     </td>
                                                     <td class='col-md-1 pad_8' style="width: 120px;">
-                                                        <!-- Debug: Image path = <?= $row_program['day_image'] ?? 'NULL' ?> -->
+                                                        <!-- Debug: Image path6 = </?= $row_program['day_image'] ?? 'NULL' ?> -->
+
                                                         <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
-                                                            <label for="day_image_<?php echo $current_offset; ?>" class="btn btn-sm btn-success upload-btn-<?php echo $current_offset; ?>"
-                                                                style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; <?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:none !important;' : '' ?>">
+                                                        <?php if($row_program['day_image'] ?? ''){?>   
+                                                        <label for="day_image_<?php echo $current_offset; ?>"
+                                                                class="btn btn-sm btn-success upload-btn-<?= $current_offset?>"
+                                                                style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
                                                                 <i class="fa fa-image"></i> Upload Image
                                                             </label>
-
+                                                                       
 
                                                             <input type="file" id="day_image_<?php echo $current_offset; ?>"
                                                                 name="day_image_<?php echo $current_offset; ?>" accept="image/*"
                                                                 onchange="previewDayImage(this, '<?php echo $current_offset; ?>')"
                                                                 onclick="console.log('File input clicked for offset: <?php echo $current_offset; ?>')"
                                                                 style="display: none;">
+                                                                <?php } ?>
                                                         </div>
-
-                                                        <div id="day_image_preview_<?php echo $current_offset; ?>" style="<?= (!empty($row_program['day_image']) && trim($row_program['day_image']) !== '' && trim($row_program['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?> margin-top: 5px;">
+                                                      <?php
+                                                             if (!empty($row_program['day_image'])) {?>
+                                                        <div id="day_image_preview_<?php echo $current_offset; ?>" style=" margin-top: 5px;">
                                                             <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                                                                 <img id="preview_img_<?php echo $current_offset; ?>" src="<?php
                                                                                                                             if (!empty($row_program['day_image'])) {
@@ -782,6 +794,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                                 </button>
                                                             </div>
                                                         </div>
+                                                        <?php } ?>
                                                         <input type="hidden" id="existing_image_path_<?php echo $current_offset; ?>" name="existing_image_path_<?php echo $current_offset; ?>" value="<?= $row_program['day_image'] ?? '' ?>" />
                                                     </td>
                                                     <td style="width: 100px;"><input style="display:none" type="text"
@@ -854,7 +867,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
         if (input.files && input.files[0]) {
             var file = input.files[0];
-            
+
             // Validate file type
             var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
             var fileType = file.type.toLowerCase();
@@ -952,73 +965,44 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     }
 
     function removeDayImage(offset) {
-        console.log("QUOTATION: Removing image for offset:", offset);
 
         // Clear file input
         $('#day_image_' + offset).val('');
 
-        // Hide preview div
+        // Hide preview and clear image
         $('#day_image_preview_' + offset).hide();
-        $('#preview_img_' + offset).attr('src', '');
-        
-        // Check if upload button exists, if not recreate it
-        var uploadButton = $('label[for="day_image_' + offset + '"]');
-        if (uploadButton.length === 0) {
-            console.log('QUOTATION: Upload button was removed, recreating for offset:', offset);
-            // Find the preview div's parent container
-            var previewDiv = $('#day_image_preview_' + offset);
-            var container = previewDiv.parent();
-            
-            // Create new upload button container
-            var newUploadContainer = $('<div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;"></div>');
-            var newUploadButton = $('<label for="day_image_' + offset + '" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label>');
-            var newFileInput = $('<input type="file" id="day_image_' + offset + '" name="day_image_' + offset + '" accept="image/*" onchange="previewDayImage(this, \'' + offset + '\')" style="display: none;">');
-            
-            newUploadContainer.append(newUploadButton);
-            newUploadContainer.append(newFileInput);
-            container.append(newUploadContainer);
-            return; // Exit early since we recreated the button
-        }
-        
-        var uploadButtonParent = uploadButton.parent();
-        
-        // AGGRESSIVE: Remove ALL inline styles completely
-        uploadButtonParent.removeAttr('style');
-        uploadButton.removeAttr('style');
-        
-        // Force show the upload button
-        uploadButton.show();
-        uploadButton.css({
-            'display': 'block !important',
-            'visibility': 'visible !important',
-            'opacity': '1 !important'
-        });
-        
-        // AGGRESSIVE: Set parent container with new clean style
-        uploadButtonParent.attr('style', 'margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;');
-        
-        // Force override any remaining display:none
-        uploadButtonParent.css({
-            'display': 'flex !important',
-            'visibility': 'visible !important',
-            'opacity': '1 !important'
-        });
-            
-        // Nuclear option: Remove and recreate parent if needed
-        setTimeout(function() {
-            var currentStyle = uploadButtonParent.attr('style');
-            if (currentStyle && currentStyle.includes('display: none')) {
-                console.log('QUOTATION: Nuclear option - recreating parent container');
-                var newParent = $('<div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;"></div>');
-                uploadButtonParent.after(newParent);
-                newParent.append(uploadButton);
-                uploadButtonParent.remove();
+        $('#preview_img_' + offset).attr('src', '').hide();
+
+        // Show upload button again
+        var uploadLabel = $('label[for="day_image_' + offset + '"]');
+        if (uploadLabel.length) {
+            uploadLabel.show().css({
+                'display': 'inline-block',
+                'cursor': 'pointer',
+                'margin-top': '5px'
+            });
+        } else {
+            // If label somehow got removed, recreate it
+            var input = $('#day_image_' + offset);
+            if (input.length === 0) {
+                // Recreate file input if needed
+                var newFileInput = $('<input type="file" id="day_image_' + offset + '" name="day_image_' + offset + '" accept="image/*" onchange="previewDayImage(this, \'' + offset + '\')" style="display:none;">');
+                $('#day_image_preview_' + offset).after(newFileInput);
+                input = newFileInput;
             }
-        }, 100);
-        
-        console.log("QUOTATION: Upload button should now be visible for offset:", offset);
-        console.log("QUOTATION: Parent container style after fix:", uploadButtonParent.attr('style'));
+
+            var newLabel = $('<label for="day_image_' + offset + '" class="btn btn-sm btn-success" style="margin-top:5px;"><i class="fa fa-image"></i> Upload Image3</label>');
+            input.after(newLabel);
+        }
+
+        // Clear stored image data if using global object
+        if (window.itineraryImages && window.itineraryImages[offset]) {
+            delete window.itineraryImages[offset];
+        }
+
+        console.log("QUOTATION: Image removed successfully and upload button visible for offset:", offset);
     }
+
 
     // Function to get package ID for a specific offset
     function getPackageIdForOffset(offset) {
@@ -1201,7 +1185,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 var previewDiv = $(this);
                 var offset = previewDiv.attr('id').replace('day_image_preview_', '');
                 var img = previewDiv.find('img');
-                
+
                 if (img.attr('src') && img.attr('src') !== '') {
                     // Has image - hide upload button
                     $('label[for="day_image_' + offset + '"]').css('display', 'none !important');
@@ -1222,11 +1206,11 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 var img = previewDiv.find('img');
                 var uploadButton = $('label[for="day_image_' + offset + '"]');
                 var uploadButtonParent = uploadButton.parent();
-                
+
                 // Check if image actually exists and has valid src
                 var hasImage = img.attr('src') && img.attr('src') !== '' && img.attr('src') !== 'undefined';
                 console.log('QUOTATION: Row', offset, 'hasImage:', hasImage, 'src:', img.attr('src'));
-                
+
                 if (hasImage) {
                     // Has image - show preview, hide upload button
                     console.log('QUOTATION: Row', offset, '- showing preview, hiding button');
@@ -1236,7 +1220,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         'visibility': 'visible !important',
                         'opacity': '1 !important'
                     });
-                    
+
                     // Aggressively hide upload button
                     uploadButton.hide();
                     uploadButton.css({
@@ -1246,7 +1230,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         'position': 'absolute !important',
                         'left': '-9999px !important'
                     });
-                    
+
                     // Aggressively hide upload button parent
                     uploadButtonParent.css({
                         'display': 'none !important',
@@ -1266,11 +1250,11 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         'position': 'absolute !important',
                         'left': '-9999px !important'
                     });
-                    
+
                     // Show upload button
                     uploadButtonParent.removeAttr('style');
                     uploadButton.removeAttr('style');
-                    
+
                     uploadButton.show();
                     uploadButton.css({
                         'display': 'block !important',
@@ -1279,7 +1263,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         'position': 'static !important',
                         'left': 'auto !important'
                     });
-                    
+
                     uploadButtonParent.css({
                         'display': 'flex !important',
                         'visibility': 'visible !important',
@@ -1294,7 +1278,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 }
             });
         }, 100);
-        
+
         // Nuclear option - completely remove upload buttons when images exist
         setTimeout(function() {
             console.log('QUOTATION: Nuclear option - removing upload buttons for rows with images...');
@@ -1304,10 +1288,10 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 var img = previewDiv.find('img');
                 var uploadButton = $('label[for="day_image_' + offset + '"]');
                 var uploadButtonParent = uploadButton.parent();
-                
+
                 // Check if image actually exists and has valid src
                 var hasImage = img.attr('src') && img.attr('src') !== '' && img.attr('src') !== 'undefined';
-                
+
                 if (hasImage) {
                     console.log('QUOTATION: Nuclear option for row', offset, '- removing upload button completely');
                     // Completely remove the upload button and its parent
@@ -1322,14 +1306,14 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             var firstRowPreview = $('#day_image_preview_1');
             var firstRowImg = $('#preview_img_1');
             var firstRowUpload = $('label[for="day_image_1"]');
-            
+
             console.log('QUOTATION: First row preview div:', firstRowPreview.length, firstRowPreview.is(':visible'));
             console.log('QUOTATION: First row image src:', firstRowImg.attr('src'));
             console.log('QUOTATION: First row upload button:', firstRowUpload.length, firstRowUpload.is(':visible'));
             console.log('QUOTATION: First row preview div style:', firstRowPreview.attr('style'));
             console.log('QUOTATION: First row image onload/onerror:', firstRowImg.attr('onload'), firstRowImg.attr('onerror'));
         };
-        
+
         // Comprehensive debug function for all rows
         window.debugAllRows = function() {
             console.log('QUOTATION: === COMPREHENSIVE DEBUG ===');
@@ -1338,13 +1322,13 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 var offset = previewDiv.attr('id').replace('day_image_preview_', '');
                 var img = previewDiv.find('img');
                 var uploadBtn = $('label[for="day_image_' + offset + '"]');
-                
+
                 console.log('QUOTATION: Row ' + offset + ' - Preview visible:', previewDiv.is(':visible'));
                 console.log('QUOTATION: Row ' + offset + ' - Image src:', img.attr('src'));
                 console.log('QUOTATION: Row ' + offset + ' - Upload button visible:', uploadBtn.is(':visible'));
                 console.log('QUOTATION: Row ' + offset + ' - Preview style:', previewDiv.attr('style'));
                 console.log('QUOTATION: Row ' + offset + ' - Upload button style:', uploadBtn.attr('style'));
-                
+
                 // Test image loading
                 if (img.attr('src') && img.attr('src') !== '') {
                     var testImg = new Image();
@@ -1366,10 +1350,10 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 var previewDiv = $(this);
                 var offset = previewDiv.attr('id').replace('day_image_preview_', '');
                 var img = previewDiv.find('img');
-                
+
                 if (img.attr('src') && img.attr('src') !== '') {
                     console.log('QUOTATION: Force showing image for offset:', offset);
-                    
+
                     // Force show preview
                     previewDiv.css({
                         'display': 'block !important',
@@ -1382,14 +1366,14 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         'overflow': 'visible !important'
                     });
                     previewDiv.show();
-                    
+
                     // Force hide upload button
                     $('label[for="day_image_' + offset + '"]').css({
                         'display': 'none !important',
                         'visibility': 'hidden !important',
                         'opacity': '0 !important'
                     });
-                    
+
                     // Force show remove button
                     previewDiv.find('button[onclick*="removeDayImage"]').css({
                         'display': 'flex !important',
@@ -1398,14 +1382,14 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                     });
                 } else {
                     console.log('QUOTATION: No image for offset:', offset, '- showing upload button');
-                    
+
                     // Force show upload button
                     $('label[for="day_image_' + offset + '"]').css({
                         'display': 'block !important',
                         'visibility': 'visible !important',
                         'opacity': '1 !important'
                     });
-                    
+
                     // Force hide preview
                     previewDiv.css({
                         'display': 'none !important',
@@ -1415,7 +1399,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 }
             });
         };
-        
+
         // Run debug after page load
         setTimeout(function() {
             window.debugFirstRow();
@@ -1470,7 +1454,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 testImg.src = firstRowImg.attr('src');
             }
         }, 2000);
-        
+
         // Add global test functions for debugging
         window.testImageSystem = function() {
             console.log('=== TESTING IMAGE SYSTEM ===');
@@ -1479,19 +1463,19 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             console.log('- debugAllRows()');
             console.log('- forceShowAllImages()');
             console.log('- testImageSystem()');
-            
+
             // Run all debug functions
             window.debugFirstRow();
             window.debugAllRows();
             window.forceShowAllImages();
         };
-        
+
         // Test remove function
         window.testRemoveImage = function(offset) {
             console.log('QUOTATION: Testing remove image for offset:', offset);
             removeDayImage(offset);
         };
-        
+
         // Debug function to check parent div styles
         window.debugParentDiv = function(offset) {
             var uploadButton = $('label[for="day_image_' + offset + '"]');
@@ -1503,35 +1487,35 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             console.log('- Parent visibility:', uploadButtonParent.css('visibility'));
             console.log('- Upload button visible:', uploadButton.is(':visible'));
         };
-        
+
         // Force remove display:none function
         window.forceRemoveDisplayNone = function(offset) {
             console.log('QUOTATION: Force removing display:none for offset:', offset);
             var uploadButton = $('label[for="day_image_' + offset + '"]');
             var uploadButtonParent = uploadButton.parent();
-            
+
             // Get current style
             var currentStyle = uploadButtonParent.attr('style') || '';
             console.log('QUOTATION: Current parent style:', currentStyle);
-            
+
             // Remove display:none completely
             var newStyle = currentStyle.replace(/display\s*:\s*none[^;]*;?/gi, '');
             newStyle = newStyle.replace(/;\s*;/g, ';'); // Clean up double semicolons
             newStyle = newStyle.replace(/^;|;$/g, ''); // Remove leading/trailing semicolons
-            
+
             console.log('QUOTATION: New parent style:', newStyle);
-            
+
             // Set new style
             uploadButtonParent.attr('style', newStyle);
-            
+
             // Force show
             uploadButtonParent.css('display', 'flex !important');
             uploadButton.show();
-            
+
             console.log('QUOTATION: Final parent style:', uploadButtonParent.attr('style'));
             console.log('QUOTATION: Upload button visible:', uploadButton.is(':visible'));
         };
-        
+
         // Fix all upload buttons function with proper logic
         window.fixAllUploadButtons = function() {
             console.log('QUOTATION: Fixing all upload buttons with proper logic...');
@@ -1541,10 +1525,10 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 var img = previewDiv.find('img');
                 var uploadButton = $('label[for="day_image_' + offset + '"]');
                 var uploadButtonParent = uploadButton.parent();
-                
+
                 // Check if image actually exists and has valid src
                 var hasImage = img.attr('src') && img.attr('src') !== '' && img.attr('src') !== 'undefined';
-                
+
                 if (hasImage) {
                     // Has image - show preview, hide upload button
                     console.log('QUOTATION: Row', offset, 'has image - showing preview, hiding button');
@@ -1554,14 +1538,14 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         'visibility': 'visible !important',
                         'opacity': '1 !important'
                     });
-                    
+
                     uploadButton.hide();
                     uploadButton.css({
                         'display': 'none !important',
                         'visibility': 'hidden !important',
                         'opacity': '0 !important'
                     });
-                    
+
                     uploadButtonParent.css({
                         'display': 'none !important',
                         'visibility': 'hidden !important',
@@ -1576,17 +1560,17 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         'visibility': 'hidden !important',
                         'opacity': '0 !important'
                     });
-                    
+
                     uploadButtonParent.removeAttr('style');
                     uploadButton.removeAttr('style');
-                    
+
                     uploadButton.show();
                     uploadButton.css({
                         'display': 'block !important',
                         'visibility': 'visible !important',
                         'opacity': '1 !important'
                     });
-                    
+
                     uploadButtonParent.css({
                         'display': 'flex !important',
                         'visibility': 'visible !important',
@@ -1600,7 +1584,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             });
             console.log('QUOTATION: All rows fixed with proper logic!');
         };
-        
+
         // Quick fix function for immediate use
         window.quickFix = function() {
             console.log('QUOTATION: Quick fix - hiding all upload buttons when images exist...');
@@ -1610,7 +1594,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 var img = previewDiv.find('img');
                 var uploadButton = $('label[for="day_image_' + offset + '"]');
                 var uploadButtonParent = uploadButton.parent();
-                
+
                 if (img.attr('src') && img.attr('src') !== '') {
                     // Has image - hide upload button completely
                     uploadButton.hide();
@@ -1632,7 +1616,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 }
             });
         };
-        
+
         // Make functions globally available
         window.debugFirstRow = window.debugFirstRow;
         window.debugAllRows = window.debugAllRows;
@@ -2064,7 +2048,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         var fileInput = $('#day_image_' + offset);
         var previewDiv = $('#day_image_preview_' + offset);
         var previewImg = $('#preview_img_' + offset);
-        var uploadLabel = $('.upload-btn-' + offset);
+        var uploadLabel = $('label[for="day_image_' + offset + '"]');
+        var uploadContainer = uploadLabel.parent();
 
         // Clear file input completely
         fileInput.val('');
@@ -2091,8 +2076,19 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         // Hide preview div and show upload button
         previewDiv.hide();
         previewDiv.css('display', 'none');
-        uploadLabel.show();
-        uploadLabel.css('display', 'block');
+
+        // Force show the upload button and container
+        uploadContainer.css({
+            'display': 'flex !important',
+            'visibility': 'visible !important',
+            'opacity': '1 !important'
+        });
+
+        uploadLabel.css({
+            'display': 'inline-block !important',
+            'visibility': 'visible !important',
+            'opacity': '1 !important'
+        });
 
         // Show the requirements tooltip when upload button is shown
         $('.image-requirements-tooltip').show();
@@ -2113,11 +2109,32 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         setTimeout(function() {
             previewDiv.hide();
             previewDiv.css('display', 'none');
-            uploadLabel.show();
-            uploadLabel.css('display', 'block');
+
+            // Force show the upload button and container again
+            uploadContainer.css({
+                'display': 'flex !important',
+                'visibility': 'visible !important',
+                'opacity': '1 !important'
+            });
+
+            uploadLabel.css({
+                'display': 'inline-block !important',
+                'visibility': 'visible !important',
+                'opacity': '1 !important'
+            });
+
             $('.image-requirements-tooltip').show();
             delete window.removingImage[offset];
             console.log("QUOTATION: Image removal completed for offset:", offset);
+            console.log("QUOTATION: Upload button visible after cleanup:", uploadLabel.is(':visible'));
+
+            // If upload button is still not visible, try force create
+            if (!uploadLabel.is(':visible') || uploadLabel.length === 0) {
+                console.log("QUOTATION: Upload button not visible after cleanup, trying force create...");
+                setTimeout(function() {
+                    window.forceCreateUploadButton(offset);
+                }, 50);
+            }
         }, 100);
 
         console.log("QUOTATION: Image removed for offset:", offset);
@@ -2337,7 +2354,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         // Add change event listener for file inputs (copied from update_modal.php)
         $(document).on('change', 'input[id^="day_image_"]', function() {
             var offset = $(this).attr('id').replace('day_image_', '');
-        
+
 
             // Only process if there are actually files selected
             if (this.files && this.files.length > 0) {
@@ -2350,8 +2367,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                         console.error('QUOTATION: previewDayImage function not available in event listener');
                     }
                 }.bind(this), 10);
-            } else {
-            }
+            } else {}
         });
 
         // Also add direct onclick handlers to the file inputs
@@ -2388,9 +2404,9 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 console.log("QUOTATION: Checking if previewDayImage is available (direct):", typeof previewDayImage);
 
                 container.html(`
-                <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
+                <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
                     <label for="day_image_${offsetNum}" class="btn btn-sm btn-success upload-btn-${offsetNum}" 
-                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: block !important;">
+                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
                         <i class="fa fa-image"></i> Upload Image
                     </label>
 
@@ -2415,6 +2431,86 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             `);
 
                 console.log("QUOTATION: Fresh upload button created and shown for offset:", offsetNum);
+
+                // Force show the upload button and ensure it's visible
+                setTimeout(function() {
+                    console.log("QUOTATION: Starting force visibility for offset:", offsetNum);
+
+                    var uploadLabel = $('label[for="day_image_' + offsetNum + '"]');
+                    var uploadContainer = uploadLabel.parent();
+                    var fileInput = $('#day_image_' + offsetNum);
+
+                    console.log("QUOTATION: Elements found - label:", uploadLabel.length, "container:", uploadContainer.length, "input:", fileInput.length);
+                    console.log("QUOTATION: Container HTML:", uploadContainer.html());
+
+                    if (uploadLabel.length === 0) {
+                        console.error("QUOTATION: Upload label not found, trying to recreate...");
+                        // Try to find the container and recreate the label
+                        var container = $('#day_image_' + offsetNum).parent();
+                        if (container.length > 0) {
+                            container.html(`
+                                <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
+                                    <label for="day_image_${offsetNum}" class="btn btn-sm btn-success upload-btn-${offsetNum}" 
+                                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
+                                        <i class="fa fa-image"></i> Upload Image
+                                    </label>
+                                    <input type="file" id="day_image_${offsetNum}" 
+                                           name="day_image_${offsetNum}" accept="image/*" 
+                                           onchange="console.log('QUOTATION: File input changed for offset ${offsetNum}'); if(typeof window.previewDayImage === 'function') { window.previewDayImage(this, '${offsetNum}'); } else { console.error('QUOTATION: previewDayImage function not available'); }" 
+                                           style="display: none;">
+                                </div>
+                                <div id="day_image_preview_${offsetNum}" style="display: none; margin-top: 5px;">
+                                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                                        <img id="preview_img_${offsetNum}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                                        <button type="button" 
+                                                onclick="removeDayImage('${offsetNum}')" 
+                                                title="Remove Image" 
+                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="existing_image_path_${offsetNum}" name="existing_image_path_${offsetNum}" value="" />
+                            `);
+
+                            // Update references after recreation
+                            uploadLabel = $('label[for="day_image_' + offsetNum + '"]');
+                            uploadContainer = uploadLabel.parent();
+                            fileInput = $('#day_image_' + offsetNum);
+
+                            console.log("QUOTATION: After recreation - label:", uploadLabel.length, "container:", uploadContainer.length, "input:", fileInput.length);
+                        }
+                    }
+
+                    // Force show the container and label
+                    if (uploadContainer.length > 0) {
+                        uploadContainer.css({
+                            'display': 'flex !important',
+                            'visibility': 'visible !important',
+                            'opacity': '1 !important'
+                        });
+                    }
+
+                    if (uploadLabel.length > 0) {
+                        uploadLabel.css({
+                            'display': 'inline-block !important',
+                            'visibility': 'visible !important',
+                            'opacity': '1 !important'
+                        });
+                    }
+
+                    console.log("QUOTATION: Forced upload button visibility for offset:", offsetNum);
+                    console.log("QUOTATION: Upload button visible after force:", uploadLabel.is(':visible'));
+                    console.log("QUOTATION: Upload button computed style display:", uploadLabel.css('display'));
+
+                    // If still not visible, try the force create function
+                    if (!uploadLabel.is(':visible') || uploadLabel.length === 0) {
+                        console.log("QUOTATION: Upload button still not visible, trying force create...");
+                        setTimeout(function() {
+                            window.forceCreateUploadButton(offsetNum);
+                        }, 100);
+                    }
+                }, 100);
 
                 // Add direct event listener to the new file input
                 var newFileInput = $('#day_image_' + offsetNum);
@@ -2454,6 +2550,137 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             return false;
         });
     });
+
+    // Function to force create and show upload button
+    window.forceCreateUploadButton = function(offset) {
+        console.log("QUOTATION: Force creating upload button for offset:", offset);
+
+        // Try multiple methods to find the container
+        var container = null;
+
+        // Method 1: Look for existing file input
+        var existingInput = $('#day_image_' + offset);
+        if (existingInput.length > 0) {
+            container = existingInput.closest('td');
+            console.log("QUOTATION: Found container via existing input:", container.length);
+        }
+
+        // Method 2: Look for preview div
+        if (!container || container.length === 0) {
+            var previewDiv = $('#day_image_preview_' + offset);
+            if (previewDiv.length > 0) {
+                container = previewDiv.closest('td');
+                console.log("QUOTATION: Found container via preview div:", container.length);
+            }
+        }
+
+        // Method 3: Look for table row with specific offset pattern
+        if (!container || container.length === 0) {
+            container = $('tr').filter(function() {
+                return $(this).find('input[name*="day_image_' + offset + '"]').length > 0 ||
+                    $(this).find('label[for*="day_image_' + offset + '"]').length > 0 ||
+                    $(this).find('[id*="day_image_' + offset + '"]').length > 0;
+            }).find('td.col-md-1.pad_8').last();
+            console.log("QUOTATION: Found container via row search:", container.length);
+        }
+
+        // Method 4: Look for any td with the right class that might contain our elements
+        if (!container || container.length === 0) {
+            container = $('td.col-md-1.pad_8').filter(function() {
+                var $td = $(this);
+                return $td.attr('style') && $td.attr('style').includes('width: 120px');
+            }).eq(offset - 1); // Try to match by position
+            console.log("QUOTATION: Found container via class and style:", container.length);
+        }
+
+        // Method 5: Look for the specific table structure pattern
+        if (!container || container.length === 0) {
+            // Look for table rows that contain day inputs and find the image column
+            var dayRows = $('tr').filter(function() {
+                return $(this).find('input[name*="day_' + offset + '"]').length > 0 ||
+                    $(this).find('input[value*="day ' + offset + '"]').length > 0;
+            });
+
+            if (dayRows.length > 0) {
+                // Find the last td in the row (which should be the image column)
+                container = dayRows.find('td').last();
+                console.log("QUOTATION: Found container via day row pattern:", container.length);
+            }
+        }
+
+        if (!container || container.length === 0) {
+            console.error("QUOTATION: Container not found for offset:", offset);
+            console.log("QUOTATION: Available tds with col-md-1 pad_8:", $('td.col-md-1.pad_8').length);
+            console.log("QUOTATION: Available file inputs:", $('input[id^="day_image_"]').length);
+            console.log("QUOTATION: Available preview divs:", $('[id^="day_image_preview_"]').length);
+            return false;
+        }
+
+        // Clear the container completely
+        container.empty();
+
+        // Create fresh HTML structure
+        container.html(`
+            <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
+                <label for="day_image_${offset}" class="btn btn-sm btn-success upload-btn-${offset}" 
+                       style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
+                    <i class="fa fa-image"></i> Upload Image
+                </label>
+                <input type="file" id="day_image_${offset}" 
+                       name="day_image_${offset}" accept="image/*" 
+                       onchange="console.log('QUOTATION: File input changed for offset ${offset}'); if(typeof window.previewDayImage === 'function') { window.previewDayImage(this, '${offset}'); } else { console.error('QUOTATION: previewDayImage function not available'); }" 
+                       style="display: none;">
+            </div>
+            <div id="day_image_preview_${offset}" style="display: none; margin-top: 5px;">
+                <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <img id="preview_img_${offset}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                    <button type="button" 
+                            onclick="removeDayImage('${offset}')" 
+                            title="Remove Image" 
+                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        ×
+                    </button>
+                </div>
+            </div>
+            <input type="hidden" id="existing_image_path_${offset}" name="existing_image_path_${offset}" value="" />
+        `);
+
+        // Verify the button was created and is visible
+        setTimeout(function() {
+            var uploadLabel = $('label[for="day_image_' + offset + '"]');
+            console.log("QUOTATION: Force created upload button - found:", uploadLabel.length);
+            console.log("QUOTATION: Force created upload button - visible:", uploadLabel.is(':visible'));
+            console.log("QUOTATION: Force created upload button - display:", uploadLabel.css('display'));
+        }, 50);
+
+        return true;
+    };
+
+    // Test function to manually create upload button for testing
+    window.testCreateUploadButton = function(offset) {
+        console.log("QUOTATION: Testing upload button creation for offset:", offset);
+        return window.forceCreateUploadButton(offset);
+    };
+
+    // Debug function to analyze table structure
+    window.debugTableStructure = function() {
+        console.log("QUOTATION: Analyzing table structure...");
+        console.log("QUOTATION: Total table rows:", $('tr').length);
+        console.log("QUOTATION: Total tds with col-md-1 pad_8:", $('td.col-md-1.pad_8').length);
+        console.log("QUOTATION: Total file inputs:", $('input[id^="day_image_"]').length);
+        console.log("QUOTATION: Total preview divs:", $('[id^="day_image_preview_"]').length);
+
+        // Log each row structure
+        $('tr').each(function(index) {
+            var $row = $(this);
+            var dayInputs = $row.find('input[name*="day_"]');
+            var imageInputs = $row.find('input[id^="day_image_"]');
+            if (dayInputs.length > 0 || imageInputs.length > 0) {
+                console.log("QUOTATION: Row", index, "- Day inputs:", dayInputs.length, "Image inputs:", imageInputs.length);
+                console.log("QUOTATION: Row", index, "- TDs:", $row.find('td').length);
+            }
+        });
+    };
 
     // Simple test functions to debug image preview
     window.testImagePreview = function(offset) {

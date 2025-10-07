@@ -392,9 +392,9 @@ window.previewDayImage = function(input, rowIndex) {
             return;
         }
         
-        // Set the image source and show preview
-        previewImg.attr('src', e.target.result);
-        previewDiv.show();
+      // Set the image source and show preview
+previewImg.attr('src', e.target.result).show();
+previewDiv.show();
         
         // Show the remove button when image is selected
         previewDiv.find('button[onclick*="removeDayImage"]').show();

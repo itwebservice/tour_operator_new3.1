@@ -45,7 +45,7 @@ include '../../../../model/model.php';
             <td class='col-md-1 pad_8' style="width: 120px;">
                 <div style="margin-top: 15px;">
                     <label for="day_image_<?php echo $i; ?>" class="btn btn-sm btn-success" 
-                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                           style="margin-bottom: 5px;  12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
                         <i class="fa fa-image"></i> Upload Image
                     </label>
                     <input type="file" id="day_image_<?php echo $i; ?>" 
