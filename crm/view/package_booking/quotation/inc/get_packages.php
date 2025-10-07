@@ -655,7 +655,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
     <!-- Upload button -->
            <div id="upload_btn_container_<?php echo $offset_id; ?>"
-                style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
+                style="margin-top: 35px; display: <?php echo $has_image ? 'none' : 'flex'; ?>; align-items: center; justify-content: center; height: 100%;">
         <label for="day_image_<?php echo $offset_id; ?>"
                class="btn btn-sm btn-success"
                style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; border-radius: 4px;">
@@ -672,7 +672,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
     <!-- Image preview -->
     <div id="day_image_preview_<?php echo $offset_id; ?>" 
-         style="margin-top:5px; <?php echo $has_image ? '' : 'display:none;'; ?>">
+         style="margin-top:5px; display: <?php echo $has_image ? 'block' : 'none'; ?>;">
         <div class="image-zoom-container" 
              style="height:100px; width:100px; overflow:hidden; border:2px solid #ddd; border-radius:8px; position:relative;">
             <img id="preview_img_<?php echo $offset_id; ?>" 
@@ -776,7 +776,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
 
                                                             <div id="upload_btn_container_<?php echo $offset_id; ?>" 
-                                                                 style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
+                                                                 style="margin-top: 35px; display: <?php echo $has_image ? 'none' : 'flex'; ?>; align-items: center; justify-content: center; height: 100%;">
                                                             <label for="day_image_<?php echo $offset_id; ?>"
                                                                    class="btn btn-sm btn-success"
                                                                    style="margin-bottom: 5px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
@@ -792,7 +792,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                         </div>
                                                         <!-- Image preview container -->
                                                         <div id="day_image_preview_<?php echo $offset_id; ?>" 
-                                                             style="margin-top:5px; <?php echo $has_image ? '' : 'display:none;'; ?>">
+                                                             style="margin-top:5px; display: <?php echo $has_image ? 'block' : 'none'; ?>;">
                                                             <div class="image-zoom-container" 
                                                                  style="height:100px; width:100px; overflow:hidden; border:2px solid #ddd; border-radius:8px; position:relative;">
                                                                 <img id="preview_img_<?php echo $offset_id; ?>" 
@@ -3365,58 +3365,9 @@ window.initializeUploadButtonVisibility = function() {
     console.log("QUOTATION: Upload button visibility initialization completed");
 };
 
-// Run initialization when page loads
+// Simple initialization - let PHP handle the initial state
 $(document).ready(function() {
-    console.log("QUOTATION: Page loaded, initializing upload button visibility...");
-    
-    // IMMEDIATE check and set correct visibility
-    setTimeout(function() {
-        console.log("QUOTATION: Setting correct visibility based on actual image state...");
-        
-        $('div[id^="upload_btn_container_"]').each(function() {
-            var $this = $(this);
-            var uniqueId = this.id.replace('upload_btn_container_', '');
-            var $previewDiv = $('#day_image_preview_' + uniqueId);
-            var $previewImg = $('#preview_img_' + uniqueId);
-            
-            console.log("QUOTATION: Checking uniqueId:", uniqueId);
-            console.log("QUOTATION: Preview div found:", $previewDiv.length);
-            console.log("QUOTATION: Preview img found:", $previewImg.length);
-            
-            // Check if there's actually a valid image
-            var hasValidImage = false;
-            if ($previewImg.length > 0) {
-                var imgSrc = $previewImg.attr('src');
-                console.log("QUOTATION: Image src for", uniqueId, ":", imgSrc);
-                
-                if (imgSrc && imgSrc !== '' && imgSrc !== 'null' && imgSrc !== 'undefined') {
-                    // Check if the image preview div is currently visible
-                    var previewVisible = $previewDiv.is(':visible');
-                    console.log("QUOTATION: Preview visible for", uniqueId, ":", previewVisible);
-                    hasValidImage = previewVisible;
-                }
-            }
-            
-            if (hasValidImage) {
-                // Has valid image - show preview, hide upload
-                $previewDiv.show();
-                $this.hide();
-                console.log("QUOTATION: Showing preview, hiding upload for uniqueId:", uniqueId);
-            } else {
-                // No valid image - hide preview, show upload
-                $previewDiv.hide();
-                $this.show();
-                $this.css({
-                    'display': 'flex !important',
-                    'visibility': 'visible !important',
-                    'opacity': '1 !important'
-                });
-                console.log("QUOTATION: Hiding preview, showing upload for uniqueId:", uniqueId);
-            }
-        });
-        
-        console.log("QUOTATION: Visibility initialization completed");
-    }, 200);
+    console.log("QUOTATION: Page loaded - PHP handles initial state");
 });
 
 // Emergency function to fix the specific issue with package 3, offset 1
@@ -3508,6 +3459,130 @@ window.emergencyFix = function() {
     });
     
     console.log("QUOTATION: Emergency fix completed");
+};
+
+// Specific function to fix package 2 issue
+window.fixPackage2Issue = function() {
+    console.log("QUOTATION: Fixing package 2 issue - hiding empty previews, showing upload buttons");
+    
+    // Find all preview divs that are showing but have no valid image
+    $('div[id^="day_image_preview_"]').each(function() {
+        var $previewDiv = $(this);
+        var uniqueId = this.id.replace('day_image_preview_', '');
+        var $previewImg = $previewDiv.find('img');
+        var $uploadContainer = $('#upload_btn_container_' + uniqueId);
+        
+        console.log("QUOTATION: Checking preview for uniqueId:", uniqueId);
+        
+        // Check if there's a valid image
+        var hasValidImage = false;
+        if ($previewImg.length > 0) {
+            var imgSrc = $previewImg.attr('src');
+            console.log("QUOTATION: Image src:", imgSrc);
+            
+            if (imgSrc && imgSrc !== '' && imgSrc !== 'null' && imgSrc !== 'undefined') {
+                // Check if the image has a valid source (not just empty or placeholder)
+                var hasValidSrc = (imgSrc.indexOf('data:') === 0) || // Base64 image
+                                 (imgSrc.indexOf('http') === 0) || // HTTP URL
+                                 (imgSrc.indexOf('/') === 0) || // Relative path
+                                 (imgSrc.indexOf('blob:') === 0); // Blob URL
+                
+                if (hasValidSrc) {
+                    // Check if image is actually visible and not broken
+                    var isVisible = $previewDiv.is(':visible') && $previewImg.is(':visible');
+                    hasValidImage = isVisible;
+                    console.log("QUOTATION: Image is valid and visible:", hasValidImage);
+                } else {
+                    console.log("QUOTATION: Invalid image src:", imgSrc);
+                }
+            }
+        }
+        
+        if (!hasValidImage) {
+            // No valid image - hide preview completely, show upload button
+            console.log("QUOTATION: Hiding empty preview for uniqueId:", uniqueId);
+            
+            $previewDiv.hide();
+            $previewDiv.css({
+                'display': 'none !important',
+                'visibility': 'hidden !important',
+                'opacity': '0 !important',
+                'position': 'absolute !important',
+                'left': '-9999px !important',
+                'width': '0 !important',
+                'height': '0 !important',
+                'overflow': 'hidden !important'
+            });
+            $previewDiv.attr('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
+            
+            // Show upload button
+            if ($uploadContainer.length > 0) {
+                $uploadContainer.show();
+                $uploadContainer.css({
+                    'display': 'flex !important',
+                    'visibility': 'visible !important',
+                    'opacity': '1 !important'
+                });
+                console.log("QUOTATION: Showing upload container for uniqueId:", uniqueId);
+            }
+        } else {
+            // Has valid image - show preview, hide upload
+            console.log("QUOTATION: Showing preview for uniqueId:", uniqueId);
+            $previewDiv.show();
+            if ($uploadContainer.length > 0) {
+                $uploadContainer.hide();
+            }
+        }
+    });
+    
+    console.log("QUOTATION: Package 2 fix completed");
+};
+
+// Function to check all image states
+window.checkAllImageStates = function() {
+    console.log("QUOTATION: === CHECKING ALL IMAGE STATES ===");
+    
+    $('div[id^="day_image_preview_"]').each(function() {
+        var $previewDiv = $(this);
+        var uniqueId = this.id.replace('day_image_preview_', '');
+        var $previewImg = $previewDiv.find('img');
+        var $uploadContainer = $('#upload_btn_container_' + uniqueId);
+        
+        console.log("QUOTATION: === UNIQUE ID:", uniqueId, "===");
+        console.log("- Preview div visible:", $previewDiv.is(':visible'));
+        console.log("- Preview img found:", $previewImg.length);
+        
+        if ($previewImg.length > 0) {
+            var imgSrc = $previewImg.attr('src');
+            console.log("- Image src:", imgSrc);
+            console.log("- Image visible:", $previewImg.is(':visible'));
+            
+            if (imgSrc && imgSrc !== '' && imgSrc !== 'null' && imgSrc !== 'undefined') {
+                var hasValidSrc = (imgSrc.indexOf('data:') === 0) || 
+                                 (imgSrc.indexOf('http') === 0) || 
+                                 (imgSrc.indexOf('/') === 0) || 
+                                 (imgSrc.indexOf('blob:') === 0);
+                console.log("- Has valid src:", hasValidSrc);
+            } else {
+                console.log("- No valid src");
+            }
+        }
+        
+        console.log("- Upload container visible:", $uploadContainer.is(':visible'));
+        console.log("---");
+    });
+    
+    console.log("QUOTATION: === END IMAGE STATE CHECK ===");
+};
+
+// Simple function to show all upload buttons (for debugging)
+window.showAllUploadButtons = function() {
+    console.log("QUOTATION: Showing all upload buttons");
+    
+    $('div[id^="upload_btn_container_"]').show();
+    $('div[id^="day_image_preview_"]').hide();
+    
+    console.log("QUOTATION: All upload buttons shown, all previews hidden");
 };
 
 </script>
