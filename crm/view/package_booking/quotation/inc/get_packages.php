@@ -498,29 +498,9 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         animation: none !important;
     }
 
-    /* FORCE SHOW upload buttons after image removal - This overrides all hiding rules */
-    div[id^="upload_btn_container_"]:not([style*="display: none"]) {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        left: auto !important;
-        width: auto !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
+    /* REMOVED: This CSS rule was conflicting with JavaScript hiding */
 
-    /* FORCE SHOW upload labels after image removal - Fallback for old system */
-    label[for^="day_image_"]:not([style*="display: none"]) {
-        display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        left: auto !important;
-        width: auto !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
+    /* REMOVED: This CSS rule was also conflicting with JavaScript hiding */
 </style>
 
 <div class="col-md-12 app_accordion">
@@ -666,7 +646,29 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                id="day_image_<?php echo $offset_id; ?>"
                name="day_image_<?php echo $offset_id; ?>"
                accept="image/*"
-               onchange="previewDayImage(this, '<?php echo $package_id; ?>', '<?php echo $current_offset; ?>')"
+               onchange="
+               console.log('File selected for <?php echo $offset_id; ?>');
+               var uniqueId = '<?php echo $offset_id; ?>';
+               var file = this.files[0];
+               if (file) {
+                   var reader = new FileReader();
+                   reader.onload = function(e) {
+                       // Show preview
+                       $('#preview_img_' + uniqueId).attr('src', e.target.result).show();
+                       $('#day_image_preview_' + uniqueId).show().css('display', 'block !important');
+                       
+                       // Hide upload button - SIMPLE DIRECT APPROACH
+                       var element = document.getElementById('upload_btn_container_' + uniqueId);
+                       if (element) {
+                           element.style.display = 'none';
+                           element.style.visibility = 'hidden';
+                           element.style.opacity = '0';
+                           console.log('Upload button hidden for ' + uniqueId);
+                       }
+                   };
+                   reader.readAsDataURL(file);
+               }
+               "
                style="display:none;">
     </div>
 
@@ -787,7 +789,29 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                                    id="day_image_<?php echo $offset_id; ?>"
                                                                    name="day_image_<?php echo $offset_id; ?>"
                                                                    accept="image/*"
-                                                                   onchange="previewDayImage(this, '<?php echo $package_id; ?>', '<?php echo $current_offset; ?>')"
+                                                                   onchange="
+                                                                   console.log('File selected for <?php echo $offset_id; ?>');
+                                                                   var uniqueId = '<?php echo $offset_id; ?>';
+                                                                   var file = this.files[0];
+                                                                   if (file) {
+                                                                       var reader = new FileReader();
+                                                                       reader.onload = function(e) {
+                                                                           // Show preview
+                                                                           $('#preview_img_' + uniqueId).attr('src', e.target.result).show();
+                                                                           $('#day_image_preview_' + uniqueId).show().css('display', 'block !important');
+                                                                           
+                                                                           // Hide upload button - SIMPLE DIRECT APPROACH
+                                                                           var element = document.getElementById('upload_btn_container_' + uniqueId);
+                                                                           if (element) {
+                                                                               element.style.display = 'none';
+                                                                               element.style.visibility = 'hidden';
+                                                                               element.style.opacity = '0';
+                                                                               console.log('Upload button hidden for ' + uniqueId);
+                                                                           }
+                                                                       };
+                                                                       reader.readAsDataURL(file);
+                                                                   }
+                                                                   "
                                                                    style="display: none;">
                                                         </div>
                                                         <!-- Image preview container -->
@@ -1714,7 +1738,28 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                     <i class="fa fa-image"></i> Upload Image
                 </label>
                 
-                <input type="file" id="day_image_${uniqueId}" name="day_image_${uniqueId}" accept="image/*" onchange="previewDayImage(this, '${package_id}', '${offset}')" style="display: none;">
+                <input type="file" id="day_image_${uniqueId}" name="day_image_${uniqueId}" accept="image/*" onchange="
+                console.log('File selected for ${uniqueId}');
+                var file = this.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Show preview
+                        $('#preview_img_${uniqueId}').attr('src', e.target.result).show();
+                        $('#day_image_preview_${uniqueId}').show().css('display', 'block !important');
+                        
+                        // Hide upload button - SIMPLE DIRECT APPROACH
+                        var element = document.getElementById('upload_btn_container_${uniqueId}');
+                        if (element) {
+                            element.style.display = 'none';
+                            element.style.visibility = 'hidden';
+                            element.style.opacity = '0';
+                            console.log('Upload button hidden for ${uniqueId}');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+                " style="display: none;">
             </div>
              
             <!-- Image preview container -->
@@ -3059,16 +3104,52 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
 
     function previewDayImage(input, packageId, offset) {
+    console.log("QUOTATION: previewDayImage called with packageId:", packageId, "offset:", offset);
     const uniqueId = packageId + "_" + offset;
+    console.log("QUOTATION: Generated uniqueId:", uniqueId);
 
     if (input.files && input.files[0]) {
+        console.log("QUOTATION: File selected, starting file reader");
         const file = input.files[0];
         const reader = new FileReader();
 
         reader.onload = function (e) {
+            console.log("QUOTATION: Image loaded for uniqueId:", uniqueId);
+            
+            // Show preview
             $('#preview_img_' + uniqueId).attr('src', e.target.result).show();
-            $('#day_image_preview_' + uniqueId).show();
-            $('#upload_btn_container_' + uniqueId).hide();
+            $('#day_image_preview_' + uniqueId).show().css({
+                'display': 'block !important',
+                'visibility': 'visible !important',
+                'opacity': '1 !important',
+                'position': 'relative !important',
+                'left': 'auto !important',
+                'width': 'auto !important',
+                'height': 'auto !important',
+                'overflow': 'visible !important'
+            });
+            
+            // AGGRESSIVE APPROACH - Use the working method
+            setTimeout(function() {
+                console.log("QUOTATION: Using aggressive hide for uniqueId:", uniqueId);
+                
+                var element = document.getElementById('upload_btn_container_' + uniqueId);
+
+                console.log(element,'helllooo')
+                if (element) {
+                    // Remove the element completely and recreate it hidden
+                    var parent = element.parentNode;
+                    var hiddenElement = element.cloneNode(true);
+                    hiddenElement.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;';
+                    hiddenElement.setAttribute('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
+                    
+                    parent.replaceChild(hiddenElement, element);
+                    
+                    console.log("QUOTATION: Aggressive hide completed for uniqueId:", uniqueId);
+                } else {
+                    console.log("QUOTATION: ERROR - Upload container element not found for uniqueId:", uniqueId);
+                }
+            }, 50);
 
             if (!window.quotationImages) window.quotationImages = {};
             window.quotationImages[uniqueId] = { file, package_id: packageId, offset, preview_url: e.target.result };
@@ -3583,6 +3664,118 @@ window.showAllUploadButtons = function() {
     $('div[id^="day_image_preview_"]').hide();
     
     console.log("QUOTATION: All upload buttons shown, all previews hidden");
+};
+
+// Function to force hide upload button for a specific uniqueId
+window.forceHideUploadButton = function(uniqueId) {
+    console.log("QUOTATION: Force hiding upload button for uniqueId:", uniqueId);
+    
+    var $uploadContainer = $('#upload_btn_container_' + uniqueId);
+    $uploadContainer.hide();
+    $uploadContainer.css({
+        'display': 'none !important',
+        'visibility': 'hidden !important',
+        'opacity': '0 !important',
+        'position': 'absolute !important',
+        'left': '-9999px !important',
+        'width': '0 !important',
+        'height': '0 !important',
+        'overflow': 'hidden !important'
+    });
+    $uploadContainer.attr('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
+    $uploadContainer.removeClass();
+    
+    console.log("QUOTATION: Upload button force hidden for uniqueId:", uniqueId);
+};
+
+// SIMPLE FUNCTION TO TEST - Call this after selecting an image
+window.testImageUpload = function(uniqueId) {
+    console.log("QUOTATION: Testing image upload for uniqueId:", uniqueId);
+    
+    // Hide upload button using direct DOM access
+    var uploadElement = document.getElementById('upload_btn_container_' + uniqueId);
+    if (uploadElement) {
+        uploadElement.style.display = 'none';
+        console.log("QUOTATION: Upload button hidden for uniqueId:", uniqueId);
+        console.log("QUOTATION: Upload container style:", uploadElement.style.cssText);
+    } else {
+        console.log("QUOTATION: ERROR - Upload container not found for uniqueId:", uniqueId);
+    }
+    
+    // Show preview
+    var previewElement = document.getElementById('day_image_preview_' + uniqueId);
+    if (previewElement) {
+        previewElement.style.display = 'block';
+        console.log("QUOTATION: Preview shown for uniqueId:", uniqueId);
+    } else {
+        console.log("QUOTATION: ERROR - Preview container not found for uniqueId:", uniqueId);
+    }
+    
+    console.log("QUOTATION: Test completed");
+};
+
+// Function to test with the specific uniqueId you mentioned
+window.testUpload42 = function() {
+    testImageUpload('4_2');
+};
+
+// AGGRESSIVE HIDE FUNCTION - Use this if the normal approach doesn't work
+window.aggressiveHideUpload = function(uniqueId) {
+    console.log("QUOTATION: AGGRESSIVE HIDE for uniqueId:", uniqueId);
+    
+    var element = document.getElementById('upload_btn_container_' + uniqueId);
+    if (element) {
+        // Remove the element completely and recreate it hidden
+        var parent = element.parentNode;
+        var hiddenElement = element.cloneNode(true);
+        hiddenElement.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;';
+        hiddenElement.setAttribute('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
+        
+        parent.replaceChild(hiddenElement, element);
+        
+        console.log("QUOTATION: AGGRESSIVE HIDE completed for uniqueId:", uniqueId);
+    } else {
+        console.log("QUOTATION: Element not found for aggressive hide:", uniqueId);
+    }
+};
+
+// TEST FUNCTION - Simulate the previewDayImage function
+window.testPreviewDayImage = function(packageId, offset) {
+    console.log("QUOTATION: TEST - Simulating previewDayImage");
+    const uniqueId = packageId + "_" + offset;
+    console.log("QUOTATION: TEST - Generated uniqueId:", uniqueId);
+    
+    // Show preview
+    $('#preview_img_' + uniqueId).attr('src', 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A8A=').show();
+    $('#day_image_preview_' + uniqueId).show().css({
+        'display': 'block !important',
+        'visibility': 'visible !important',
+        'opacity': '1 !important',
+        'position': 'relative !important',
+        'left': 'auto !important',
+        'width': 'auto !important',
+        'height': 'auto !important',
+        'overflow': 'visible !important'
+    });
+    
+    // Hide upload button using aggressive approach
+    setTimeout(function() {
+        console.log("QUOTATION: TEST - Using aggressive hide for uniqueId:", uniqueId);
+        
+        var element = document.getElementById('upload_btn_container_' + uniqueId);
+        if (element) {
+            var parent = element.parentNode;
+            var hiddenElement = element.cloneNode(true);
+            hiddenElement.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;';
+            hiddenElement.setAttribute('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
+            
+            parent.replaceChild(hiddenElement, element);
+            
+            console.log("QUOTATION: TEST - Aggressive hide completed for uniqueId:", uniqueId);
+        } else {
+            console.log("QUOTATION: TEST - Element not found for uniqueId:", uniqueId);
+        }
+    }, 50);
 };
 
 </script>

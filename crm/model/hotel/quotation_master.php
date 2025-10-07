@@ -99,7 +99,7 @@ class quotation_master
 
         $bsmValues_ins = json_encode($bsmValues_val);
         $costingDetails_ins = json_encode($costingDetails, true);
-        $sq_upd = mysqlQuery("UPDATE `hotel_quotation_master` SET  `hotel_details` = '$hotelDetails',`costing_details` = '$costingDetails_ins', `enquiry_details` = '$enquiryDetails', `bsmValues` = '$bsmValues_ins',quotation_date='$quotation_date',`currency_code`='$currency_code',status='$active_flag',hotel_req='$hotel_requirements' WHERE `quotation_id` =" . $quotationId);
+        $sq_upd = mysqlQuery("UPDATE `hotel_quotation_master` SET  `hotel_details` = '$hotelDetails',`costing_details` = '$costingDetails_ins', `enquiry_details` = '$enquiryDetails', `bsmValues` = '$bsmValues_ins',quotation_date='$quotation_date',`currency_code`='$currency_code',status='$active_flag',hotel_req='$hotel_requirements',created_at=NOW() WHERE `quotation_id` =" . $quotationId);
 
         if (!$sq_upd) {
             rollback_t();

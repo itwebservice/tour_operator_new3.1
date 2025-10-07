@@ -75,7 +75,7 @@ textarea.form-control {
                       <div style="margin-top:35px;">
                         <label for="day_image_1" class="btn btn-sm btn-success" 
                                style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                            Upload Image1
+                            Upload Image
                         </label>
                         <input type="file" id="day_image_1" 
                                name="day_image_1" accept="image/*" 

@@ -4783,6 +4783,18 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             city_lzloading($(row.cells[3].childNodes[0]));
         }
     }
+    
+    // Handle city dropdown initialization for custom package hotel master table
+    if (tableID === "tbl_package_hotel_master") {
+        // Initialize city dropdown for the new row
+        var citySelect = $(row).find('select[name^="city_name"]');
+        if (citySelect.length > 0) {
+            city_lzloading(citySelect);
+            
+            // Add onchange handler for hotel loading
+            citySelect.attr('onchange', 'hotel_name_list_load(this.id);');
+        }
+    }
 }
 
 // Static counter for itinerary row IDs (starts from 2 because row 1 is default)

@@ -307,6 +307,74 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                         </div>
 
 
+                        <!-- <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
+                            <legend>Hotel Information</legend>
+                            <div class="bg_white main_block panel-default-inner">
+                                <div class="col-md-6 mg_tp_10"><button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added city wise hotel & tariff using Supplier Master"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button></div>
+                                <div class="col-xs-6 text-right mg_tp_10">
+                                    <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_package_hotel_master');"><i class="fa fa-plus"></i></button>
+                                </div>
+                                <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table border_0 table-hover" style="padding: 0 !important;">
+                                    <?php
+                                    $sq_count = mysqli_num_rows(mysqlQuery("select * from custom_package_hotels where package_id = '$package_id'"));
+                                    if ($sq_count == 0) { ?>
+                                        <tr>
+                                            <td><input id="chk_dest" type="checkbox"></td>
+                                            <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
+                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
+                                                </select></td>
+                                            <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                                    <option value="">*Hotel Name</option>
+                                                </select></td>
+                                            <td><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
+                                            <td><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" placeholder="*Total Night" title="Total Night"></td>
+                                        </tr>
+                                        <script type="text/javascript">
+                                            city_lzloading('select[name^="city_name1"]');
+                                        </script>
+                                        <?php } else {
+                                        $count_hotel = 0;
+                                        $sq_pckg_hotel = mysqlQuery("select * from custom_package_hotels where package_id = '$package_id'");
+                                        while ($row_hotel = mysqli_fetch_assoc($sq_pckg_hotel)) {
+                                            $count_hotel++;
+                                            $sq_pckgh = mysqli_fetch_assoc(mysqlQuery("select * from hotel_master where hotel_id = '$row_hotel[hotel_name]'"));
+                                            $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id = '$row_hotel[city_name]'"));
+                                        ?>
+                                            <tr>
+                                                <td><input id="chk_dest<?php echo $count_hotel; ?>-u" type="checkbox" checked>
+                                                </td>
+                                                <td><input maxlength="15" value="<?php echo $count_hotel; ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                <td><select id="city_name<?php echo $count_hotel; ?>-u" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
+                                                        <option value="<?php echo $sq_city['city_id']; ?>">
+                                                            <?php echo $sq_city['city_name']; ?></option>
+                                                    </select></td>
+                                                <td><select id="hotel_name<?php echo $count_hotel; ?>-u" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                                        <?php
+                                                        $rowsHotel = mysqlQuery("SELECT * FROM `hotel_master` WHERE `city_id`=" . $sq_city['city_id']);
+                                                        while ($rows = mysqli_fetch_assoc($rowsHotel)) {
+                                                            if ($sq_pckgh['hotel_id'] == $rows['hotel_id']) {
+                                                                $selected = "selected";
+                                                            } else {
+                                                                $selected = "";
+                                                            }
+                                                        ?>
+                                                            <option value="<?php echo $rows['hotel_id']; ?>" <?= $selected ?>>
+                                                                <?php echo $rows['hotel_name']; ?></option>
+                                                        <?php } ?>
+                                                    </select></td>
+                                                <td><input type="text" id="hotel_type<?php echo $count_hotel; ?>-u" name="hotel_type1" value="<?php echo $row_hotel['hotel_type']; ?>" placeholder="Hotel Category" title="Hotel Category" readonly></td>
+                                                <td><input type="text" id="hotel_tota_days1" value="<?php echo $row_hotel['total_days']; ?>" name="hotel_tota_days1" placeholder="Total Night" onchange="validate_balance(this.id);" title="Total Night"></td>
+                                                <td class="hidden"><input type="text" value="<?php echo $row_hotel['entry_id']; ?>">
+                                                </td>
+                                            </tr>
+                                            <script type="text/javascript">
+                                                city_lzloading('select[name^=city_name1]')
+                                            </script>
+                                    <?php }
+                                    } ?>
+                                </table>
+                            </div>
+                        </div> -->
                         <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                             <legend>Hotel Information</legend>
                             <div class="bg_white main_block panel-default-inner">
@@ -375,7 +443,6 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                 </table>
                             </div>
                         </div>
-
                         <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                             <legend>Transport Information</legend>
                             <div class="bg_white main_block panel-default-inner">
@@ -1334,23 +1401,82 @@ $('#seo_slug').val(generateSlug(packageName));
     // /**Hotel Name load start**/
     function hotel_name_list_load(id) {
         var city_id = $("#" + id).val();
-        var count = id.substring(9);
-        $.get("package/hotel/hotel_name_load.php", {
-            city_id: city_id
-        }, function(data) {
-            $("#hotel_name" + count).html(data);
-        });
+        console.log("Hotel loading for city_id:", city_id, "from element:", id);
+        
+        // Extract counter from city ID - handle different ID patterns
+        var count = "";
+        if (id.includes("city_name")) {
+            // For existing rows: city_name1, city_name2, etc.
+            count = id.replace("city_name", "");
+        } else if (id.includes("city_name-")) {
+            // For dynamic rows: city_name-1, city_name-2, etc.
+            count = id.replace("city_name-", "");
+        }
+        
+        console.log("Extracted count:", count);
+        
+        // Find the corresponding hotel dropdown
+        var hotelSelectId = "hotel_name" + count;
+        var hotelSelect = $("#" + hotelSelectId);
+        
+        // If not found by ID, try to find it in the same row
+        if (hotelSelect.length === 0) {
+            var cityElement = $("#" + id);
+            var row = cityElement.closest('tr');
+            hotelSelect = row.find('select[name^="hotel_name"]');
+            console.log("Found hotel select in same row:", hotelSelect.length > 0);
+        }
+        
+        if (hotelSelect.length > 0) {
+            $.get("package/hotel/hotel_name_load.php", {
+                city_id: city_id
+            }, function(data) {
+                hotelSelect.html(data);
+                console.log("Hotel options loaded for", hotelSelectId);
+            });
+        } else {
+            console.log("Hotel select not found for ID:", hotelSelectId);
+        }
     }
 
     function hotel_type_load(id) {
         var hotel_id = $("#" + id).val();
-        var count = id.substring(10);
-
-        $.get("package/hotel/hotel_type_load.php", {
-            hotel_id: hotel_id
-        }, function(data) {
-            $("#hotel_type" + count).val(data);
-        });
+        console.log("Hotel type loading for hotel_id:", hotel_id, "from element:", id);
+        
+        // Extract counter from hotel ID - handle different ID patterns
+        var count = "";
+        if (id.includes("hotel_name")) {
+            // For existing rows: hotel_name1, hotel_name2, etc.
+            count = id.replace("hotel_name", "");
+        } else if (id.includes("hotel_name-")) {
+            // For dynamic rows: hotel_name-1, hotel_name-2, etc.
+            count = id.replace("hotel_name-", "");
+        }
+        
+        console.log("Extracted count for hotel type:", count);
+        
+        // Find the corresponding hotel type input
+        var hotelTypeId = "hotel_type" + count;
+        var hotelTypeInput = $("#" + hotelTypeId);
+        
+        // If not found by ID, try to find it in the same row
+        if (hotelTypeInput.length === 0) {
+            var hotelElement = $("#" + id);
+            var row = hotelElement.closest('tr');
+            hotelTypeInput = row.find('input[name^="hotel_type"]');
+            console.log("Found hotel type input in same row:", hotelTypeInput.length > 0);
+        }
+        
+        if (hotelTypeInput.length > 0) {
+            $.get("package/hotel/hotel_type_load.php", {
+                hotel_id: hotel_id
+            }, function(data) {
+                hotelTypeInput.val(data);
+                console.log("Hotel type loaded:", data, "for", hotelTypeId);
+            });
+        } else {
+            console.log("Hotel type input not found for ID:", hotelTypeId);
+        }
     }
 
     /////////////********** Tour Master Information Save end**********/////////////
