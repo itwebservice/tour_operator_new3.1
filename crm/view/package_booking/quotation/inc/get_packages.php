@@ -448,44 +448,35 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         display: inline-block !important;
     }
 
-    /* Force hide upload button and instruction div when preview is shown */
-    div[id^="day_image_preview_"][style*="display: block"]+label[for^="day_image_"],
-    div[id^="day_image_preview_"]:not([style*="display: none"])+label[for^="day_image_"],
-    div[id^="day_image_preview_"][style*="display: block"]~.image-requirements,
-    div[id^="day_image_preview_"][style*="display: block"]+.image-requirements,
-    div[id^="day_image_preview_"]:not([style*="display: none"])~.image-requirements,
-    div[id^="day_image_preview_"]:not([style*="display: none"])+.image-requirements {
+    /* Force hide upload button and instruction div when preview is shown - USING UNIQUE IDS */
+    div[id^="day_image_preview_"][style*="display: block"] ~ div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"]:not([style*="display: none"]) ~ div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"][style*="display: block"] ~ .image-requirements,
+    div[id^="day_image_preview_"][style*="display: block"] + .image-requirements,
+    div[id^="day_image_preview_"]:not([style*="display: none"]) ~ .image-requirements,
+    div[id^="day_image_preview_"]:not([style*="display: none"]) + .image-requirements {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
     }
 
-    /* Additional aggressive hiding for upload buttons when previews exist */
-    div[id^="day_image_preview_"]:not([style*="display: none"])~label[for^="day_image_"],
-    div[id^="day_image_preview_"]:not([style*="display: none"])+label[for^="day_image_"],
-    div[id^="day_image_preview_"]:not([style*="display: none"])~div label[for^="day_image_"],
-    div[id^="day_image_preview_"]:not([style*="display: none"])+div label[for^="day_image_"] {
+    /* Additional aggressive hiding for upload buttons when previews exist - USING UNIQUE IDS */
+    div[id^="day_image_preview_"]:not([style*="display: none"]) ~ div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"]:not([style*="display: none"]) + div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"]:not([style*="display: none"]) ~ div div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"]:not([style*="display: none"]) + div div[id^="upload_btn_container_"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
     }
 
-    /* Hide upload buttons by class when previews are visible */
-    div[id^="day_image_preview_"]:not([style*="display: none"])~.upload-btn-1,
-    div[id^="day_image_preview_"]:not([style*="display: none"])~.upload-btn-2,
-    div[id^="day_image_preview_"]:not([style*="display: none"])~.upload-btn-3,
-    div[id^="day_image_preview_"]:not([style*="display: none"])~.upload-btn-4,
-    div[id^="day_image_preview_"]:not([style*="display: none"])~.upload-btn-5 {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-    }
+    /* Hide upload buttons by class when previews are visible - REMOVED (using unique IDs now) */
 
-    /* NUCLEAR OPTION: Hide ALL upload buttons when ANY preview is visible */
-    div[id^="day_image_preview_"]:not([style*="display: none"])~label[for^="day_image_"],
-    div[id^="day_image_preview_"]:not([style*="display: none"])+label[for^="day_image_"],
-    div[id^="day_image_preview_"]:not([style*="display: none"])~div label[for^="day_image_"],
-    div[id^="day_image_preview_"]:not([style*="display: none"])+div label[for^="day_image_"] {
+    /* NUCLEAR OPTION: Hide upload button containers when previews are visible - USING UNIQUE IDS */
+    div[id^="day_image_preview_"]:not([style*="display: none"]) ~ div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"]:not([style*="display: none"]) + div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"]:not([style*="display: none"]) ~ div div[id^="upload_btn_container_"],
+    div[id^="day_image_preview_"]:not([style*="display: none"]) + div div[id^="upload_btn_container_"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -505,6 +496,30 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     label[for^="day_image_"] {
         transition: none !important;
         animation: none !important;
+    }
+
+    /* FORCE SHOW upload buttons after image removal - This overrides all hiding rules */
+    div[id^="upload_btn_container_"]:not([style*="display: none"]) {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* FORCE SHOW upload labels after image removal - Fallback for old system */
+    label[for^="day_image_"]:not([style*="display: none"]) {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        overflow: visible !important;
     }
 </style>
 
@@ -622,67 +637,71 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                     </select></td>
                                                 <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary<?php echo $offset1; ?>" onclick="add_itinerary('dest_name','special_attaraction<?php echo $offset1; ?>-u','day_program<?php echo $offset1; ?>-u','overnight_stay<?php echo $offset1; ?>-u','Day-<?= $offset1 ?>')"><i class="fa fa-plus"></i></button>
                                                 </td>
-                                                <td class='col-md-1 pad_8' style="width: 120px;">
-                                                    <!-- Debug: Image path2 = </?= $row_program['day_image'] ?? 'NULL' ?> -->
-                                                    <!-- Debug: Row program data = <?= json_encode($row_program) ?> -->
-                                                    <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
-                                                          <?php  if(empty($row_program['day_image'])){?>   
+                                              <?php
+    $package_id = $row_program['package_id'] ?? 'pkg0'; // or however you have it stored
+    $offset_id = $package_id . '_' . $current_offset;
+    $image_path = trim($row_program['day_image'] ?? '');
+    $has_image = ($image_path !== '' && strtolower($image_path) !== 'null');
 
-                                                        <label for="day_image_<?php echo $offset1; ?>" class="btn btn-sm btn-success upload-btn-<?php echo $offset1; ?>"
-                                                            style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                                                            <i class="fa fa-image"></i> Upload Image
-                                                        </label>
-                                                              <?php } ?>
+    $final_url = '';
+    if ($has_image) {
+        $final_url = findImageUrl($image_path, true);
+        if (empty($final_url)) {
+            $has_image = false;
+        }
+    }
+?>
+<td class="col-md-1 pad_8" style="width: 120px;">
 
+    <!-- Upload button -->
+           <div id="upload_btn_container_<?php echo $offset_id; ?>"
+                style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
+        <label for="day_image_<?php echo $offset_id; ?>"
+               class="btn btn-sm btn-success"
+               style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; border-radius: 4px;">
+            <i class="fa fa-image"></i> Upload Image
+        </label>
 
-                                                        <input type="file" id="day_image_<?php echo $offset1; ?>"
-                                                            name="day_image_<?php echo $offset1; ?>" accept="image/*"
-                                                            onchange="previewDayImage(this, '<?php echo $offset1; ?>')"
-                                                            style="display: none;">
+        <input type="file" 
+               id="day_image_<?php echo $offset_id; ?>"
+               name="day_image_<?php echo $offset_id; ?>"
+               accept="image/*"
+               onchange="previewDayImage(this, '<?php echo $package_id; ?>', '<?php echo $current_offset; ?>')"
+               style="display:none;">
+    </div>
 
-                                                    </div>
-                                                    <?php if (!empty($row_program['day_image'])) { ?>
-                                                    <div id="day_image_preview_<?php echo $offset1; ?>" style="margin-top: 5px;">
-                                                        <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                                                            <img id="preview_img_<?php echo $offset1; ?>" src="<?php
-                                                                                                                if (!empty($row_program['day_image'])) {
-                                                                                                                    $image_path = trim($row_program['day_image']);
-                                                                                                                    error_log("QUOTATION: Image path from DB for package " . $row_tours['package_id'] . " offset " . $offset1 . ": " . $image_path);
-                                                                                                                    error_log("QUOTATION: Is new quotation: " . (empty($quotation_id) ? 'YES' : 'NO'));
+    <!-- Image preview -->
+    <div id="day_image_preview_<?php echo $offset_id; ?>" 
+         style="margin-top:5px; <?php echo $has_image ? '' : 'display:none;'; ?>">
+        <div class="image-zoom-container" 
+             style="height:100px; width:100px; overflow:hidden; border:2px solid #ddd; border-radius:8px; position:relative;">
+            <img id="preview_img_<?php echo $offset_id; ?>" 
+                 src="<?php echo $has_image ? htmlspecialchars($final_url) : ''; ?>"
+                 alt="Preview"
+                 style="width:100%; height:100%; object-fit:cover; border-radius:6px; <?php echo $has_image ? '' : 'display:none;'; ?>"
+                 onerror="
+                    console.log('Image failed for <?php echo $offset_id; ?>');
+                    this.style.display='none';
+                    var previewDiv = document.getElementById('day_image_preview_<?php echo $offset_id; ?>');
+                    var uploadContainer = document.getElementById('upload_btn_container_<?php echo $offset_id; ?>');
+                    if (previewDiv) previewDiv.style.display='none';
+                    if (uploadContainer) uploadContainer.style.display='flex';
+                 ">
+            <button type="button"
+                    onclick="removeDayImage('<?php echo $package_id; ?>', '<?php echo $current_offset; ?>')"
+                    title="Remove Image"
+                    style="position:absolute; top:5px; right:5px; background-color:#dc3545; color:#fff; border:none; border-radius:50%; width:20px; height:20px; display:<?php echo $has_image ? 'flex' : 'none'; ?>; align-items:center; justify-content:center;">
+                ×
+            </button>
+        </div>
+    </div>
 
-                                                                                                                    if ($image_path && $image_path !== '' && $image_path !== 'NULL') {
-                                                                                                                        $final_url = findImageUrl($image_path, true); // Always check multiple locations
-                                                                                                                        if (!empty($final_url)) {
-                                                                                                                            error_log("QUOTATION: Using found image URL: " . $final_url);
-                                                                                                                            echo $final_url;
-                                                                                                                        } else {
-                                                                                                                            error_log("QUOTATION: No image found for path: " . $image_path);
-                                                                                                                            echo '';
-                                                                                                                        }
-                                                                                                                    } else {
-                                                                                                                        error_log("QUOTATION: Empty or NULL image path");
-                                                                                                                        echo '';
-                                                                                                                    }
-                                                                                                                } else {
-                                                                                                                    error_log("QUOTATION: No day_image field in row_program");
-                                                                                                                    echo '';
-                                                                                                                }
-                                                                                                                ?>" alt="Preview"
-                                                                style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
-                                                                onerror="console.log('QUOTATION: Existing image failed to load:', this.src); this.style.display='none'; if(this.parentElement && this.parentElement.parentElement) { this.parentElement.parentElement.style.display='none'; } if(this.parentElement && this.parentElement.parentElement && this.parentElement.parentElement.parentElement) { var label = this.parentElement.parentElement.parentElement.querySelector('label'); if(label) { label.style.display='block'; label.style.visibility='visible'; label.style.opacity='1'; } } if(this.parentElement) { var removeBtn = this.parentElement.querySelector('button[onclick*=removeDayImage]'); if(removeBtn) { removeBtn.style.display='none'; } } setTimeout(function(){ var previewDiv = this.parentElement.parentElement; if(previewDiv) { previewDiv.style.display='none'; } var uploadBtn = document.querySelector('label[for=\'day_image_<?php echo $offset1; ?>\']'); if(uploadBtn) { uploadBtn.style.display='block'; uploadBtn.style.visibility='visible'; uploadBtn.style.opacity='1'; } }.bind(this), 100);"
-                                                                onload="console.log('QUOTATION: Image loaded successfully:', this.src); this.style.display='block'; if(this.parentElement) { this.parentElement.style.display='block'; this.parentElement.style.visibility='visible'; this.parentElement.style.opacity='1'; } if(this.parentElement && this.parentElement.parentElement) { this.parentElement.parentElement.style.display='block'; this.parentElement.parentElement.style.visibility='visible'; this.parentElement.parentElement.style.opacity='1'; } if(this.parentElement && this.parentElement.parentElement && this.parentElement.parentElement.parentElement) { var label = this.parentElement.parentElement.parentElement.querySelector('label'); if(label) { label.style.display='none'; label.style.visibility='hidden'; label.style.opacity='0'; } } if(this.parentElement) { var removeBtn = this.parentElement.querySelector('button[onclick*=removeDayImage]'); if(removeBtn) { removeBtn.style.display='flex'; } } var instructionDivs = document.querySelectorAll('.image-requirements'); for(var i = 0; i < instructionDivs.length; i++) { instructionDivs[i].style.display='none'; instructionDivs[i].style.visibility='hidden'; instructionDivs[i].style.opacity='0'; } setTimeout(function() { var allLabels = document.querySelectorAll('label[for^=day_image_]'); for(var j = 0; j < allLabels.length; j++) { allLabels[j].style.display='none'; allLabels[j].style.visibility='hidden'; allLabels[j].style.opacity='0'; } }, 100);">
-                                                            <button type="button"
-                                                                onclick="removeDayImage('<?php echo $offset1; ?>')"
-                                                                title="Remove Image"
-                                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($row_program['day_image']) || trim($row_program['day_image']) === '' || trim($row_program['day_image']) === 'NULL') ? 'display:none;' : '' ?>">
-                                                                ×
-                                                            </button>
-                                                        </div>
-                                                     
-                                                    </div>
-                                                       <?php } ?>
-                                                    <input type="hidden" id="existing_image_path_<?php echo $offset1; ?>" name="existing_image_path_<?php echo $offset1; ?>" value="<?= $row_program['day_image'] ?? '' ?>" />
-                                                </td>
+    <input type="hidden" 
+           id="existing_image_path_<?php echo $offset_id; ?>" 
+           name="existing_image_path_<?php echo $offset_id; ?>" 
+           value="<?php echo htmlspecialchars($image_path); ?>">
+</td>
+
                                                 <td class="hidden"><input type="hidden" name="package_id_n" value=""></td>
                                             </tr>
                                             <?php
@@ -691,6 +710,18 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                             while ($row_program = mysqli_fetch_assoc($sq_program)) {
                                                 $offset1++;
                                                 $current_offset = $offset1; // Use consistent offset for this row
+                                                $package_id = $row_tours['package_id'] ?? 'pkg0';
+                                                $offset_id = $package_id . '_' . $current_offset;
+                                                $image_path = trim($row_program['day_image'] ?? '');
+                                                $has_image = ($image_path !== '' && strtolower($image_path) !== 'null');
+                                                
+                                                $final_url = '';
+                                                if ($has_image) {
+                                                    $final_url = findImageUrl($image_path, true);
+                                                    if (empty($final_url)) {
+                                                        $has_image = false;
+                                                    }
+                                                }
                                             ?>
                                                 <tr>
                                                     <td style="width: 50px;"><input class="css-checkbox mg_bt_10"
@@ -740,62 +771,55 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                                 class="fa fa-plus"></i></button>
                                                     </td>
                                                     <td class='col-md-1 pad_8' style="width: 120px;">
-                                                        <!-- Debug: Image path6 = </?= $row_program['day_image'] ?? 'NULL' ?> -->
+                                                         <!-- Upload button container -->
 
-                                                        <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
-                                                        <?php if($row_program['day_image'] ?? ''){?>   
-                                                        <label for="day_image_<?php echo $current_offset; ?>"
-                                                                class="btn btn-sm btn-success upload-btn-<?= $current_offset?>"
-                                                                style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+
+
+                                                            <div id="upload_btn_container_<?php echo $offset_id; ?>" 
+                                                                 style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
+                                                            <label for="day_image_<?php echo $offset_id; ?>"
+                                                                   class="btn btn-sm btn-success"
+                                                                   style="margin-bottom: 5px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
                                                                 <i class="fa fa-image"></i> Upload Image
                                                             </label>
-                                                                       
-
-                                                            <input type="file" id="day_image_<?php echo $current_offset; ?>"
-                                                                name="day_image_<?php echo $current_offset; ?>" accept="image/*"
-                                                                onchange="previewDayImage(this, '<?php echo $current_offset; ?>')"
-                                                                onclick="console.log('File input clicked for offset: <?php echo $current_offset; ?>')"
-                                                                style="display: none;">
-                                                                <?php } ?>
+                                                            
+                                                            <input type="file" 
+                                                                   id="day_image_<?php echo $offset_id; ?>"
+                                                                   name="day_image_<?php echo $offset_id; ?>"
+                                                                   accept="image/*"
+                                                                   onchange="previewDayImage(this, '<?php echo $package_id; ?>', '<?php echo $current_offset; ?>')"
+                                                                   style="display: none;">
                                                         </div>
-                                                      <?php
-                                                             if (!empty($row_program['day_image'])) {?>
-                                                        <div id="day_image_preview_<?php echo $current_offset; ?>" style=" margin-top: 5px;">
-                                                            <div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                                                                <img id="preview_img_<?php echo $current_offset; ?>" src="<?php
-                                                                                                                            if (!empty($row_program['day_image'])) {
-                                                                                                                                $image_path = trim($row_program['day_image']);
-                                                                                                                                error_log("QUOTATION: Image path from DB for offset " . $current_offset . ": " . $image_path);
-
-                                                                                                                                if ($image_path && $image_path !== '' && $image_path !== 'NULL') {
-                                                                                                                                    $final_url = findImageUrl($image_path, true); // Always check multiple locations
-                                                                                                                                    if (!empty($final_url)) {
-                                                                                                                                        error_log("QUOTATION: Using found image URL for offset " . $current_offset . ": " . $final_url);
-                                                                                                                                        echo $final_url;
-                                                                                                                                    } else {
-                                                                                                                                        error_log("QUOTATION: No image found for path (offset " . $current_offset . "): " . $image_path);
-                                                                                                                                        echo '';
-                                                                                                                                    }
-                                                                                                                                } else {
-                                                                                                                                    echo '';
-                                                                                                                                }
-                                                                                                                            } else {
-                                                                                                                                echo '';
-                                                                                                                            }
-                                                                                                                            ?>" alt="Preview"
-                                                                    style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
-                                                                    onerror="console.log('QUOTATION: Existing image failed to load for offset <?php echo $current_offset; ?>:', this.src); this.style.display='none'; if(this.parentElement && this.parentElement.parentElement) { this.parentElement.parentElement.style.display='none'; } if(this.parentElement && this.parentElement.parentElement && this.parentElement.parentElement.parentElement) { var label = this.parentElement.parentElement.parentElement.querySelector('label'); if(label) { label.style.display='block'; } } if(this.parentElement) { var removeBtn = this.parentElement.querySelector('button[onclick*=removeDayImage]'); if(removeBtn) { removeBtn.style.display='none'; } } setTimeout(function(){ $('#day_image_preview_<?php echo $current_offset; ?>').hide(); $('label[for=\'day_image_<?php echo $current_offset; ?>\']').show(); }, 100);"
-                                                                    onload="console.log('QUOTATION: Image loaded successfully for offset <?php echo $current_offset; ?>:', this.src); this.style.display='block'; if(this.parentElement) { this.parentElement.style.display='block'; this.parentElement.style.visibility='visible'; this.parentElement.style.opacity='1'; } if(this.parentElement && this.parentElement.parentElement) { this.parentElement.parentElement.style.display='block'; this.parentElement.parentElement.style.visibility='visible'; this.parentElement.parentElement.style.opacity='1'; } if(this.parentElement && this.parentElement.parentElement && this.parentElement.parentElement.parentElement) { var label = this.parentElement.parentElement.parentElement.querySelector('label'); if(label) { label.style.display='none'; label.style.visibility='hidden'; label.style.opacity='0'; } } if(this.parentElement) { var removeBtn = this.parentElement.querySelector('button[onclick*=removeDayImage]'); if(removeBtn) { removeBtn.style.display='flex'; } } var instructionDivs = document.querySelectorAll('.image-requirements'); for(var i = 0; i < instructionDivs.length; i++) { instructionDivs[i].style.display='none'; instructionDivs[i].style.visibility='hidden'; instructionDivs[i].style.opacity='0'; } setTimeout(function() { var allLabels = document.querySelectorAll('label[for^=day_image_]'); for(var j = 0; j < allLabels.length; j++) { allLabels[j].style.display='none'; allLabels[j].style.visibility='hidden'; allLabels[j].style.opacity='0'; } }, 100);">
+                                                        <!-- Image preview container -->
+                                                        <div id="day_image_preview_<?php echo $offset_id; ?>" 
+                                                             style="margin-top:5px; <?php echo $has_image ? '' : 'display:none;'; ?>">
+                                                            <div class="image-zoom-container" 
+                                                                 style="height:100px; width:100px; overflow:hidden; border:2px solid #ddd; border-radius:8px; position:relative;">
+                                                                <img id="preview_img_<?php echo $offset_id; ?>" 
+                                                                     src="<?php echo $has_image ? htmlspecialchars($final_url) : ''; ?>"
+                                                                     alt="Preview"
+                                                                     style="width:100%; height:100%; object-fit:cover; border-radius:6px; <?php echo $has_image ? '' : 'display:none;'; ?>"
+                                                                     onerror="
+                                                                        console.log('Image failed for <?php echo $offset_id; ?>');
+                                                                        this.style.display='none';
+                                                                        var previewDiv = document.getElementById('day_image_preview_<?php echo $offset_id; ?>');
+                                                                        var uploadContainer = document.getElementById('upload_btn_container_<?php echo $offset_id; ?>');
+                                                                        if (previewDiv) previewDiv.style.display='none';
+                                                                        if (uploadContainer) uploadContainer.style.display='flex';
+                                                                     ">
                                                                 <button type="button"
-                                                                    onclick="removeDayImage('<?php echo $current_offset; ?>'); return false;"
-                                                                    title="Remove Image"
-                                                                    style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($row_program['day_image']) || trim($row_program['day_image']) === '' || trim($row_program['day_image']) === 'NULL') ? 'display:none;' : '' ?>">
+                                                                        onclick="removeDayImage('<?php echo $package_id; ?>', '<?php echo $current_offset; ?>')"
+                                                                        title="Remove Image"
+                                                                        style="position:absolute; top:5px; right:5px; background-color:#dc3545; color:#fff; border:none; border-radius:50%; width:20px; height:20px; display:<?php echo $has_image ? 'flex' : 'none'; ?>; align-items:center; justify-content:center;">
                                                                     ×
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                        <?php } ?>
-                                                        <input type="hidden" id="existing_image_path_<?php echo $current_offset; ?>" name="existing_image_path_<?php echo $current_offset; ?>" value="<?= $row_program['day_image'] ?? '' ?>" />
+                                                        
+                                                        <input type="hidden" 
+                                                               id="existing_image_path_<?php echo $offset_id; ?>" 
+                                                               name="existing_image_path_<?php echo $offset_id; ?>" 
+                                                               value="<?php echo htmlspecialchars($image_path); ?>">
                                                     </td>
                                                     <td style="width: 100px;"><input style="display:none" type="text"
                                                             name="package_id_n" value="<?php echo $row_tours['package_id']; ?>">
@@ -862,146 +886,146 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 </div>
 <script>
     // Day image preview functions  
-    function previewDayImage(input, offset) {
-        console.log("previewDayImage called with offset:", offset);
+    // function previewDayImage(input, offset) {
+    //     console.log("previewDayImage called with offset:", offset);
 
-        if (input.files && input.files[0]) {
-            var file = input.files[0];
+    //     if (input.files && input.files[0]) {
+    //         var file = input.files[0];
 
-            // Validate file type
-            var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            var fileType = file.type.toLowerCase();
+    //         // Validate file type
+    //         var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    //         var fileType = file.type.toLowerCase();
 
-            if (!allowedTypes.includes(fileType)) {
-                alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
-                input.value = '';
-                return;
-            }
+    //         if (!allowedTypes.includes(fileType)) {
+    //             alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+    //             input.value = '';
+    //             return;
+    //         }
 
-            // Validate file size (max 5MB)
-            var maxSize = 5 * 1024 * 1024; // 5MB
-            if (file.size > maxSize) {
-                alert('File size too large. Maximum size is 5MB.');
-                input.value = '';
-                return;
-            }
+    //         // Validate file size (max 5MB)
+    //         var maxSize = 5 * 1024 * 1024; // 5MB
+    //         if (file.size > maxSize) {
+    //             alert('File size too large. Maximum size is 5MB.');
+    //             input.value = '';
+    //             return;
+    //         }
 
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                console.log("QUOTATION: Showing preview for offset:", offset);
+    //         var reader = new FileReader();
+    //         reader.onload = function(e) {
+    //             console.log("QUOTATION: Showing preview for offset:", offset);
 
-                // Set image source
-                $('#preview_img_' + offset).attr('src', e.target.result);
+    //             // Set image source
+    //             $('#preview_img_' + offset).attr('src', e.target.result);
 
-                // Simple show/hide logic
-                $('#day_image_preview_' + offset).show();
-                $('label[for="day_image_' + offset + '"]').hide();
+    //             // Simple show/hide logic
+    //             $('#day_image_preview_' + offset).show();
+    //             $('label[for="day_image_' + offset + '"]').hide();
 
-                // Hide the upload button container when image is uploaded
-                $('label[for="day_image_' + offset + '"]').parent().hide();
-                $('label[for="day_image_' + offset + '"]').parent().css('display', 'none !important');
-                $('label[for="day_image_' + offset + '"]').parent().css('visibility', 'hidden !important');
-                $('label[for="day_image_' + offset + '"]').parent().css('opacity', '0 !important');
+    //             // Hide the upload button container when image is uploaded
+    //             $('label[for="day_image_' + offset + '"]').parent().hide();
+    //             $('label[for="day_image_' + offset + '"]').parent().css('display', 'none !important');
+    //             $('label[for="day_image_' + offset + '"]').parent().css('visibility', 'hidden !important');
+    //             $('label[for="day_image_' + offset + '"]').parent().css('opacity', '0 !important');
 
-                // Hide the instruction div
-                $('.image-requirements').hide();
-                $('.image-requirements').css('display', 'none !important');
-                $('.image-requirements').css('visibility', 'hidden !important');
-                $('.image-requirements').css('opacity', '0 !important');
+    //             // Hide the instruction div
+    //             $('.image-requirements').hide();
+    //             $('.image-requirements').css('display', 'none !important');
+    //             $('.image-requirements').css('visibility', 'hidden !important');
+    //             $('.image-requirements').css('opacity', '0 !important');
 
-                // Hide the requirements tooltip
-                $('.image-requirements-tooltip').hide();
-                $('.image-requirements-tooltip').css('display', 'none !important');
-                $('.image-requirements-tooltip').css('visibility', 'hidden !important');
-                $('.image-requirements-tooltip').css('opacity', '0 !important');
+    //             // Hide the requirements tooltip
+    //             $('.image-requirements-tooltip').hide();
+    //             $('.image-requirements-tooltip').css('display', 'none !important');
+    //             $('.image-requirements-tooltip').css('visibility', 'hidden !important');
+    //             $('.image-requirements-tooltip').css('opacity', '0 !important');
 
-                console.log("QUOTATION: Hidden upload button for offset:", offset);
-                console.log("QUOTATION: Upload button visible after hide:", $('label[for="day_image_' + offset + '"]').is(':visible'));
+    //             console.log("QUOTATION: Hidden upload button for offset:", offset);
+    //             console.log("QUOTATION: Upload button visible after hide:", $('label[for="day_image_' + offset + '"]').is(':visible'));
 
-                // Additional aggressive hiding for dynamic rows
-                setTimeout(function() {
-                    $('label[for="day_image_' + offset + '"]').hide();
-                    $('label[for="day_image_' + offset + '"]').css('display', 'none !important');
-                    $('label[for="day_image_' + offset + '"]').css('visibility', 'hidden !important');
-                    $('label[for="day_image_' + offset + '"]').css('opacity', '0 !important');
-                    $('label[for="day_image_' + offset + '"]').attr('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important;');
+    //             // Additional aggressive hiding for dynamic rows
+    //             setTimeout(function() {
+    //                 $('label[for="day_image_' + offset + '"]').hide();
+    //                 $('label[for="day_image_' + offset + '"]').css('display', 'none !important');
+    //                 $('label[for="day_image_' + offset + '"]').css('visibility', 'hidden !important');
+    //                 $('label[for="day_image_' + offset + '"]').css('opacity', '0 !important');
+    //                 $('label[for="day_image_' + offset + '"]').attr('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important;');
 
-                    console.log("QUOTATION: Aggressive hide applied for offset:", offset);
-                    console.log("QUOTATION: Upload button visible after aggressive hide:", $('label[for="day_image_' + offset + '"]').is(':visible'));
-                }, 50);
+    //                 console.log("QUOTATION: Aggressive hide applied for offset:", offset);
+    //                 console.log("QUOTATION: Upload button visible after aggressive hide:", $('label[for="day_image_' + offset + '"]').is(':visible'));
+    //             }, 50);
 
-                console.log("QUOTATION: Preview displayed successfully for offset:", offset);
+    //             console.log("QUOTATION: Preview displayed successfully for offset:", offset);
 
-                // Store image data for later upload
-                if (!window.quotationImages) {
-                    window.quotationImages = {};
-                }
+    //             // Store image data for later upload
+    //             if (!window.quotationImages) {
+    //                 window.quotationImages = {};
+    //             }
 
-                // Get package ID for this row
-                var packageId = getPackageIdForOffset(offset);
+    //             // Get package ID for this row
+    //             var packageId = getPackageIdForOffset(offset);
 
-                // Store image by offset for later upload (when quotation is saved)
-                window.quotationImages[offset] = {
-                    file: file,
-                    offset: offset,
-                    package_id: packageId,
-                    day_number: offset,
-                    preview_url: e.target.result,
-                    uploaded: false
-                };
+    //             // Store image by offset for later upload (when quotation is saved)
+    //             window.quotationImages[offset] = {
+    //                 file: file,
+    //                 offset: offset,
+    //                 package_id: packageId,
+    //                 day_number: offset,
+    //                 preview_url: e.target.result,
+    //                 uploaded: false
+    //             };
 
-                console.log("DEBUG: Stored image for offset " + offset + ":", file.name, "Package ID:", packageId);
-                console.log("DEBUG: Full stored object:", window.quotationImages[offset]);
-                console.log("DEBUG: Total stored images:", Object.keys(window.quotationImages).length);
-            }
-            reader.onerror = function() {
-                console.error("FileReader error");
-                alert('Error reading file');
-            }
-            reader.readAsDataURL(file);
-        } else {
-            console.log("No file selected");
-        }
-    }
+    //             console.log("DEBUG: Stored image for offset " + offset + ":", file.name, "Package ID:", packageId);
+    //             console.log("DEBUG: Full stored object:", window.quotationImages[offset]);
+    //             console.log("DEBUG: Total stored images:", Object.keys(window.quotationImages).length);
+    //         }
+    //         reader.onerror = function() {
+    //             console.error("FileReader error");
+    //             alert('Error reading file');
+    //         }
+    //         reader.readAsDataURL(file);
+    //     } else {
+    //         console.log("No file selected");
+    //     }
+    // }
 
-    function removeDayImage(offset) {
+    // function removeDayImage(offset) {
 
-        // Clear file input
-        $('#day_image_' + offset).val('');
+    //     // Clear file input
+    //     $('#day_image_' + offset).val('');
 
-        // Hide preview and clear image
-        $('#day_image_preview_' + offset).hide();
-        $('#preview_img_' + offset).attr('src', '').hide();
+    //     // Hide preview and clear image
+    //     $('#day_image_preview_' + offset).hide();
+    //     $('#preview_img_' + offset).attr('src', '').hide();
 
-        // Show upload button again
-        var uploadLabel = $('label[for="day_image_' + offset + '"]');
-        if (uploadLabel.length) {
-            uploadLabel.show().css({
-                'display': 'inline-block',
-                'cursor': 'pointer',
-                'margin-top': '5px'
-            });
-        } else {
-            // If label somehow got removed, recreate it
-            var input = $('#day_image_' + offset);
-            if (input.length === 0) {
-                // Recreate file input if needed
-                var newFileInput = $('<input type="file" id="day_image_' + offset + '" name="day_image_' + offset + '" accept="image/*" onchange="previewDayImage(this, \'' + offset + '\')" style="display:none;">');
-                $('#day_image_preview_' + offset).after(newFileInput);
-                input = newFileInput;
-            }
+    //     // Show upload button again
+    //     var uploadLabel = $('label[for="day_image_' + offset + '"]');
+    //     if (uploadLabel.length) {
+    //         uploadLabel.show().css({
+    //             'display': 'inline-block',
+    //             'cursor': 'pointer',
+    //             'margin-top': '5px'
+    //         });
+    //     } else {
+    //         // If label somehow got removed, recreate it
+    //         var input = $('#day_image_' + offset);
+    //         if (input.length === 0) {
+    //             // Recreate file input if needed
+    //             var newFileInput = $('<input type="file" id="day_image_' + offset + '" name="day_image_' + offset + '" accept="image/*" onchange="previewDayImage(this, \'' + offset + '\')" style="display:none;">');
+    //             $('#day_image_preview_' + offset).after(newFileInput);
+    //             input = newFileInput;
+    //         }
 
-            var newLabel = $('<label for="day_image_' + offset + '" class="btn btn-sm btn-success" style="margin-top:5px;"><i class="fa fa-image"></i> Upload Image3</label>');
-            input.after(newLabel);
-        }
+    //         var newLabel = $('<label for="day_image_' + offset + '" class="btn btn-sm btn-success" style="margin-top:5px;"><i class="fa fa-image"></i> Upload Image3</label>');
+    //         input.after(newLabel);
+    //     }
 
-        // Clear stored image data if using global object
-        if (window.itineraryImages && window.itineraryImages[offset]) {
-            delete window.itineraryImages[offset];
-        }
+    //     // Clear stored image data if using global object
+    //     if (window.itineraryImages && window.itineraryImages[offset]) {
+    //         delete window.itineraryImages[offset];
+    //     }
 
-        console.log("QUOTATION: Image removed successfully and upload button visible for offset:", offset);
-    }
+    //     console.log("QUOTATION: Image removed successfully and upload button visible for offset:", offset);
+    // }
 
 
     // Function to get package ID for a specific offset
@@ -1643,8 +1667,9 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         // Use global counter to ensure absolutely unique offset
         window.quotationOffsetCounter++;
         var offset = window.quotationOffsetCounter;
+        var uniqueId = package_id + '_' + offset;
 
-        console.log("QUOTATION: Adding new row with unique offset:", offset, "for package:", package_id);
+        console.log("QUOTATION: Adding new row with unique offset:", offset, "for package:", package_id, "uniqueId:", uniqueId);
 
         // Create the new row HTML
         newRow.innerHTML = `
@@ -1683,38 +1708,36 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             </button>
         </td>
         <td class='col-md-1 pad_8' style="width: 120px;">
-            <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
-                <label for="day_image_${offset}" class="btn btn-sm btn-success upload-btn-dynamic" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
-                <i class="fa fa-image"></i>    Upload Image
+            <!-- Upload button container -->
+            <div id="upload_btn_container_${uniqueId}" style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%;">
+                <label for="day_image_${uniqueId}" class="btn btn-sm btn-success" style="margin-bottom: 5px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                    <i class="fa fa-image"></i> Upload Image
                 </label>
                 
-                <input type="file" id="day_image_${offset}" name="day_image_${offset}" accept="image/*" onchange="previewDayImage(this, '${offset}')" style="display: none;">
-            
-              
+                <input type="file" id="day_image_${uniqueId}" name="day_image_${uniqueId}" accept="image/*" onchange="previewDayImage(this, '${package_id}', '${offset}')" style="display: none;">
             </div>
              
-            <div id="day_image_preview_${offset}" style="display: none; margin-top: 5px;">
+            <!-- Image preview container -->
+            <div id="day_image_preview_${uniqueId}" style="display: none; margin-top: 5px;">
                 <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                    <img id="preview_img_${offset}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                    <img id="preview_img_${uniqueId}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
+                         onerror="
+                            console.log('Image failed for ${uniqueId}');
+                            this.style.display='none';
+                            var previewDiv = document.getElementById('day_image_preview_${uniqueId}');
+                            var uploadContainer = document.getElementById('upload_btn_container_${uniqueId}');
+                            if (previewDiv) previewDiv.style.display='none';
+                            if (uploadContainer) uploadContainer.style.display='flex';
+                         ">
                     <button type="button" 
-                            onclick="removeDayImage('${offset}')" 
+                            onclick="removeDayImage('${package_id}', '${offset}')" 
                             title="Remove Image" 
-                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                         ×
                     </button>
                 </div>
-                <div style="margin-top: 5px; text-align: center;">
-                    <button type="button" 
-                            id="upload_btn_${offset}" 
-                            onclick="uploadDayImage('${offset}')" 
-                            class="btn btn-sm btn-primary" 
-                            style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">
-                        Upload
-                    </button>
-                </div>
-                <div id="upload_status_${offset}" style="margin-top: 2px; font-size: 10px;"></div>
             </div>
-            <input type="hidden" id="existing_image_path_${offset}" name="existing_image_path_${offset}" value="" />
+            <input type="hidden" id="existing_image_path_${uniqueId}" name="existing_image_path_${uniqueId}" value="" />
         </td>
         <td style="width: 100px;">
             <input style="display:none" type="text" name="package_id_n" value="${package_id}">
@@ -1724,12 +1747,12 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         // Apply CSS and event handlers to the new row
         setTimeout(function() {
             // Ensure the preview div is hidden by default
-            $('#day_image_preview_' + offset).hide();
-            $('#day_image_preview_' + offset).css('display', 'none !important');
+            $('#day_image_preview_' + uniqueId).hide();
+            $('#day_image_preview_' + uniqueId).css('display', 'none !important');
 
-            // Ensure the upload button is visible by default
-            $('label[for="day_image_' + offset + '"]').show();
-            $('label[for="day_image_' + offset + '"]').css('display', 'inline-block !important');
+            // Ensure the upload button container is visible by default
+            $('#upload_btn_container_' + uniqueId).show();
+            $('#upload_btn_container_' + uniqueId).css('display', 'flex !important');
 
             // Ensure the requirements tooltip is visible by default
             $('.image-requirements-tooltip').show();
@@ -2029,27 +2052,37 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         };
     }
 
-    // Make function globally available
-    window.removeDayImage = function(offset) {
-        console.log("QUOTATION: REMOVING image for offset:", offset);
+    // Make function globally available - Updated to handle both old and new calling patterns
+    window.removeDayImage = function(packageIdOrOffset, offset) {
+        // Handle both old (single parameter) and new (two parameters) calling patterns
+        if (arguments.length === 1) {
+            // Old calling pattern: removeDayImage(offset)
+            console.log("QUOTATION: REMOVING image for offset (old pattern):", packageIdOrOffset);
+            var offset = packageIdOrOffset;
+            var uniqueId = offset; // For old system, use offset as uniqueId
+        } else {
+            // New calling pattern: removeDayImage(packageId, offset)
+            console.log("QUOTATION: REMOVING image for packageId:", packageIdOrOffset, "offset:", offset);
+            var uniqueId = packageIdOrOffset + "_" + offset;
+        }
 
         // Prevent multiple calls
-        if (window.removingImage && window.removingImage[offset]) {
-            console.log("QUOTATION: Already removing image for offset:", offset);
+        if (window.removingImage && window.removingImage[uniqueId]) {
+            console.log("QUOTATION: Already removing image for uniqueId:", uniqueId);
             return;
         }
 
         if (!window.removingImage) {
             window.removingImage = {};
         }
-        window.removingImage[offset] = true;
+        window.removingImage[uniqueId] = true;
 
-        // Get elements
-        var fileInput = $('#day_image_' + offset);
-        var previewDiv = $('#day_image_preview_' + offset);
-        var previewImg = $('#preview_img_' + offset);
-        var uploadLabel = $('label[for="day_image_' + offset + '"]');
-        var uploadContainer = uploadLabel.parent();
+        // Get elements using uniqueId
+        var fileInput = $('#day_image_' + uniqueId);
+        var previewDiv = $('#day_image_preview_' + uniqueId);
+        var previewImg = $('#preview_img_' + uniqueId);
+        var uploadLabel = $('label[for="day_image_' + uniqueId + '"]');
+        var uploadContainer = $('#upload_btn_container_' + uniqueId);
 
         // Clear file input completely
         fileInput.val('');
@@ -2066,39 +2099,108 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         }
 
         // Clear existing image path
-        $('#existing_image_path_' + offset).val('');
+        $('#existing_image_path_' + uniqueId).val('');
 
         // Clear stored file
-        if (window.quotationImages && window.quotationImages[offset]) {
-            delete window.quotationImages[offset];
+        if (window.quotationImages && window.quotationImages[uniqueId]) {
+            delete window.quotationImages[uniqueId];
         }
 
-        // Hide preview div and show upload button
+        // Update the has_image state to false
+        console.log("QUOTATION: Setting has_image to false for uniqueId:", uniqueId);
+
+        // AGGRESSIVELY hide preview div and clear image
         previewDiv.hide();
-        previewDiv.css('display', 'none');
-
-        // Force show the upload button and container
-        uploadContainer.css({
-            'display': 'flex !important',
-            'visibility': 'visible !important',
-            'opacity': '1 !important'
+        previewDiv.css({
+            'display': 'none !important',
+            'visibility': 'hidden !important',
+            'opacity': '0 !important',
+            'position': 'absolute !important',
+            'left': '-9999px !important',
+            'width': '0 !important',
+            'height': '0 !important',
+            'overflow': 'hidden !important'
         });
+        previewDiv.attr('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
 
-        uploadLabel.css({
-            'display': 'inline-block !important',
-            'visibility': 'visible !important',
-            'opacity': '1 !important'
-        });
+        // Clear the image src completely
+        previewImg.attr('src', '');
+        previewImg.removeAttr('src');
+        previewImg.hide();
+        previewImg.css('display', 'none !important');
+
+        // NUCLEAR OPTION - Force show BOTH container and label
+        console.log("QUOTATION: NUCLEAR OPTION - Showing both container and label for uniqueId:", uniqueId);
+        
+        // Force show upload container
+        if (uploadContainer.length > 0) {
+            uploadContainer.show();
+            uploadContainer.css({
+                'display': 'flex !important',
+                'visibility': 'visible !important',
+                'opacity': '1 !important',
+                'position': 'relative !important',
+                'left': 'auto !important',
+                'top': 'auto !important',
+                'width': 'auto !important',
+                'height': 'auto !important',
+                'overflow': 'visible !important',
+                'z-index': '9999 !important'
+            });
+            uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important;');
+            console.log("QUOTATION: Upload container shown for uniqueId:", uniqueId);
+        }
+        
+        // Force show upload label (fallback)
+        if (uploadLabel.length > 0) {
+            uploadLabel.show();
+            uploadLabel.css({
+                'display': 'inline-block !important',
+                'visibility': 'visible !important',
+                'opacity': '1 !important',
+                'position': 'relative !important',
+                'left': 'auto !important',
+                'top': 'auto !important',
+                'width': 'auto !important',
+                'height': 'auto !important',
+                'overflow': 'visible !important',
+                'z-index': '9999 !important'
+            });
+            uploadLabel.attr('style', 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important;');
+            console.log("QUOTATION: Upload label shown for uniqueId:", uniqueId);
+        }
+        
+        // If still nothing visible, create a new button
+        if ((uploadContainer.length === 0 || !uploadContainer.is(':visible')) && 
+            (uploadLabel.length === 0 || !uploadLabel.is(':visible'))) {
+            console.log("QUOTATION: Creating emergency upload button for uniqueId:", uniqueId);
+            
+            // Find the parent cell
+            var parentCell = $('td:has(div[id="day_image_preview_' + uniqueId + '"])');
+            if (parentCell.length > 0) {
+                // Create emergency upload button
+                var emergencyButton = $('<div style="display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 9999 !important; margin-top: 35px; align-items: center; justify-content: center; height: 100%;"><label for="day_image_' + uniqueId + '" class="btn btn-sm btn-success" style="margin-bottom: 5px;font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label></div>');
+                parentCell.append(emergencyButton);
+                console.log("QUOTATION: Emergency button created for uniqueId:", uniqueId);
+            }
+        }
 
         // Show the requirements tooltip when upload button is shown
         $('.image-requirements-tooltip').show();
 
         // Reset the file input's change event handler
         fileInput.off('change').on('change', function() {
-            console.log("QUOTATION: File input change event triggered for offset:", offset);
+            console.log("QUOTATION: File input change event triggered for uniqueId:", uniqueId);
             if (this.files && this.files.length > 0) {
                 if (typeof window.previewDayImage === 'function') {
-                    window.previewDayImage(this, offset);
+                    // For old system, we need to extract package ID from uniqueId or use a default
+                    if (uniqueId.includes('_')) {
+                        var parts = uniqueId.split('_');
+                        window.previewDayImage(this, parts[0], parts[1]);
+                    } else {
+                        // Fallback for old system
+                        window.previewDayImage(this, 'pkg0', uniqueId);
+                    }
                 } else {
                     console.error('QUOTATION: previewDayImage function not available in fallback');
                 }
@@ -2110,34 +2212,70 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             previewDiv.hide();
             previewDiv.css('display', 'none');
 
-            // Force show the upload button and container again
-            uploadContainer.css({
-                'display': 'flex !important',
-                'visibility': 'visible !important',
-                'opacity': '1 !important'
-            });
-
-            uploadLabel.css({
-                'display': 'inline-block !important',
-                'visibility': 'visible !important',
-                'opacity': '1 !important'
-            });
+            // Force show the upload button container with maximum CSS override
+            if (uploadContainer.length > 0) {
+                uploadContainer.show();
+                uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
+                uploadContainer.css({
+                    'display': 'flex !important',
+                    'visibility': 'visible !important',
+                    'opacity': '1 !important',
+                    'position': 'relative !important',
+                    'left': 'auto !important',
+                    'width': 'auto !important',
+                    'height': 'auto !important',
+                    'overflow': 'visible !important'
+                });
+                console.log("QUOTATION: Upload container shown for uniqueId:", uniqueId);
+            } else {
+                // Fallback for old system with maximum CSS override
+                uploadLabel.show();
+                uploadLabel.attr('style', 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
+                uploadLabel.css({
+                    'display': 'inline-block !important',
+                    'visibility': 'visible !important',
+                    'opacity': '1 !important',
+                    'position': 'relative !important',
+                    'left': 'auto !important',
+                    'width': 'auto !important',
+                    'height': 'auto !important',
+                    'overflow': 'visible !important'
+                });
+                console.log("QUOTATION: Upload label shown (fallback) for uniqueId:", uniqueId);
+            }
 
             $('.image-requirements-tooltip').show();
-            delete window.removingImage[offset];
-            console.log("QUOTATION: Image removal completed for offset:", offset);
-            console.log("QUOTATION: Upload button visible after cleanup:", uploadLabel.is(':visible'));
+            delete window.removingImage[uniqueId];
+            console.log("QUOTATION: Image removal completed for uniqueId:", uniqueId);
+            
+            // Check visibility based on which system we're using
+            var isVisible = false;
+            if (uploadContainer.length > 0) {
+                isVisible = uploadContainer.is(':visible');
+                console.log("QUOTATION: Upload container visible after cleanup:", isVisible);
+            } else {
+                isVisible = uploadLabel.is(':visible');
+                console.log("QUOTATION: Upload label visible after cleanup:", isVisible);
+            }
 
-            // If upload button is still not visible, try force create
-            if (!uploadLabel.is(':visible') || uploadLabel.length === 0) {
-                console.log("QUOTATION: Upload button not visible after cleanup, trying force create...");
-                setTimeout(function() {
-                    window.forceCreateUploadButton(offset);
-                }, 50);
+            // If upload button is still not visible, try to show it using the new system
+            if (!isVisible) {
+                console.log("QUOTATION: Upload button not visible after cleanup, trying to show using new system...");
+                if (uploadContainer.length > 0) {
+                    uploadContainer.show();
+                    uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
+                    uploadContainer.css('display', 'flex !important');
+                    console.log("QUOTATION: Force showed upload container");
+                } else {
+                    uploadLabel.show();
+                    uploadLabel.attr('style', 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
+                    uploadLabel.css('display', 'inline-block !important');
+                    console.log("QUOTATION: Force showed upload label");
+                }
             }
         }, 100);
 
-        console.log("QUOTATION: Image removed for offset:", offset);
+        console.log("QUOTATION: Image removed for uniqueId:", uniqueId);
     }
 
     // Function to get package ID for a specific offset
@@ -2406,7 +2544,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 container.html(`
                 <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
                     <label for="day_image_${offsetNum}" class="btn btn-sm btn-success upload-btn-${offsetNum}" 
-                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
+                           style="margin-bottom: 5px;  font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
                         <i class="fa fa-image"></i> Upload Image
                     </label>
 
@@ -2451,7 +2589,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                             container.html(`
                                 <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
                                     <label for="day_image_${offsetNum}" class="btn btn-sm btn-success upload-btn-${offsetNum}" 
-                                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
+                                           style="margin-bottom: 5px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
                                         <i class="fa fa-image"></i> Upload Image
                                     </label>
                                     <input type="file" id="day_image_${offsetNum}" 
@@ -2503,12 +2641,10 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                     console.log("QUOTATION: Upload button visible after force:", uploadLabel.is(':visible'));
                     console.log("QUOTATION: Upload button computed style display:", uploadLabel.css('display'));
 
-                    // If still not visible, try the force create function
+                    // If still not visible, the new system should handle this
                     if (!uploadLabel.is(':visible') || uploadLabel.length === 0) {
-                        console.log("QUOTATION: Upload button still not visible, trying force create...");
-                        setTimeout(function() {
-                            window.forceCreateUploadButton(offsetNum);
-                        }, 100);
+                        console.log("QUOTATION: Upload button still not visible, new unique ID system should handle this");
+                        // The new system should handle this automatically
                     }
                 }, 100);
 
@@ -2552,7 +2688,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     });
 
     // Function to force create and show upload button
-    window.forceCreateUploadButton = function(offset) {
+    // DISABLED: Old function using offset system - now using unique ID system
+    window.forceCreateUploadButton_OLD = function(offset) {
         console.log("QUOTATION: Force creating upload button for offset:", offset);
 
         // Try multiple methods to find the container
@@ -2623,7 +2760,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         container.html(`
             <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
                 <label for="day_image_${offset}" class="btn btn-sm btn-success upload-btn-${offset}" 
-                       style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
+                       style="margin-bottom: 5px;  font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
                     <i class="fa fa-image"></i> Upload Image
                 </label>
                 <input type="file" id="day_image_${offset}" 
@@ -2656,10 +2793,11 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         return true;
     };
 
-    // Test function to manually create upload button for testing
-    window.testCreateUploadButton = function(offset) {
+    // Test function to manually create upload button for testing - DISABLED (old system)
+    window.testCreateUploadButton_OLD = function(offset) {
         console.log("QUOTATION: Testing upload button creation for offset:", offset);
-        return window.forceCreateUploadButton(offset);
+        console.log("QUOTATION: This function is disabled - use the new unique ID system instead");
+        return false;
     };
 
     // Debug function to analyze table structure
@@ -2729,7 +2867,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     };
 
     // Enhanced force show function with maximum visibility
-    window.forceShowPreview = function(offset) {
+    // DISABLED: Old function using offset system - now using unique ID system
+    window.forceShowPreview_OLD = function(offset) {
         console.log("QUOTATION: Force showing preview for offset:", offset);
 
         var previewDiv = $('#day_image_preview_' + offset);
@@ -2829,7 +2968,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     };
 
     // Function to fix all dynamically added rows
-    window.fixDynamicRows = function() {
+    // DISABLED: Old function using offset system - now using unique ID system
+    window.fixDynamicRows_OLD = function() {
         console.log("QUOTATION: Fixing all dynamic rows");
 
         // Find all dynamically added rows (those with high offset numbers)
@@ -2909,5 +3049,466 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             return false;
         }
     };
+
+
+
+
+
+
+
+
+
+    function previewDayImage(input, packageId, offset) {
+    const uniqueId = packageId + "_" + offset;
+
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#preview_img_' + uniqueId).attr('src', e.target.result).show();
+            $('#day_image_preview_' + uniqueId).show();
+            $('#upload_btn_container_' + uniqueId).hide();
+
+            if (!window.quotationImages) window.quotationImages = {};
+            window.quotationImages[uniqueId] = { file, package_id: packageId, offset, preview_url: e.target.result };
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeDayImage(packageId, offset) {
+    const uniqueId = packageId + "_" + offset;
+
+    $('#day_image_' + uniqueId).val('');
+    $('#preview_img_' + uniqueId).attr('src', '').hide();
+    $('#day_image_preview_' + uniqueId).hide();
+    $('#upload_btn_container_' + uniqueId).show();
+    $('#existing_image_path_' + uniqueId).val('');
+
+    if (window.quotationImages && window.quotationImages[uniqueId]) {
+        delete window.quotationImages[uniqueId];
+    }
+}
+
+// Emergency function to force show all upload buttons
+window.forceShowAllUploadButtons = function() {
+    console.log("QUOTATION: Emergency - Force showing all upload buttons");
+    
+    // Count elements found
+    var containers = $('div[id^="upload_btn_container_"]');
+    var labels = $('label[for^="day_image_"]');
+    console.log("QUOTATION: Found", containers.length, "upload containers and", labels.length, "upload labels");
+    
+    // NUCLEAR OPTION: Remove all CSS classes that might be hiding elements
+    $('div[id^="upload_btn_container_"], label[for^="day_image_"]').removeClass();
+    
+    // Show all upload containers with maximum force
+    containers.each(function(index) {
+        var $this = $(this);
+        console.log("QUOTATION: Processing container", index, "ID:", this.id);
+        
+        // Remove any inline styles that might hide it
+        this.removeAttribute('style');
+        
+        // Force show with maximum CSS override
+        $this.show();
+        $this.css({
+            'display': 'flex !important',
+            'visibility': 'visible !important',
+            'opacity': '1 !important',
+            'position': 'relative !important',
+            'left': 'auto !important',
+            'top': 'auto !important',
+            'width': 'auto !important',
+            'height': 'auto !important',
+            'overflow': 'visible !important',
+            'z-index': '9999 !important',
+            'background': 'transparent !important',
+            'border': 'none !important',
+            'margin': '0 !important',
+            'padding': '0 !important'
+        });
+        
+        // Also set inline style as backup
+        this.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important; background: transparent !important; border: none !important; margin: 0 !important; padding: 0 !important;';
+        
+        console.log("QUOTATION: Container", index, "forced visible");
+    });
+    
+    // Show all upload labels with maximum force
+    labels.each(function(index) {
+        var $this = $(this);
+        console.log("QUOTATION: Processing label", index, "for:", this.getAttribute('for'));
+        
+        // Remove any inline styles that might hide it
+        this.removeAttribute('style');
+        
+        // Force show with maximum CSS override
+        $this.show();
+        $this.css({
+            'display': 'inline-block !important',
+            'visibility': 'visible !important',
+            'opacity': '1 !important',
+            'position': 'relative !important',
+            'left': 'auto !important',
+            'top': 'auto !important',
+            'width': 'auto !important',
+            'height': 'auto !important',
+            'overflow': 'visible !important',
+            'z-index': '9999 !important',
+            'background': '#28a745 !important',
+            'color': 'white !important',
+            'border': 'none !important',
+            'border-radius': '4px !important',
+            'padding': '6px 12px !important',
+            'margin': '0 !important',
+            'cursor': 'pointer !important'
+        });
+        
+        // Also set inline style as backup
+        this.style.cssText = 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important; background: #28a745 !important; color: white !important; border: none !important; border-radius: 4px !important; padding: 6px 12px !important; margin: 0 !important; cursor: pointer !important;';
+        
+        console.log("QUOTATION: Label", index, "forced visible");
+    });
+    
+    console.log("QUOTATION: Emergency force show completed");
+};
+
+// Debug function to check current state
+window.debugUploadButtons = function() {
+    console.log("QUOTATION: === DEBUGGING UPLOAD BUTTONS ===");
+    
+    // Check containers
+    $('div[id^="upload_btn_container_"]').each(function(index) {
+        var $this = $(this);
+        console.log("Container", index, ":", {
+            id: this.id,
+            display: $this.css('display'),
+            visible: $this.is(':visible'),
+            style: this.getAttribute('style'),
+            parent: this.parentElement ? this.parentElement.tagName : 'none'
+        });
+    });
+    
+    // Check labels
+    $('label[for^="day_image_"]').each(function(index) {
+        var $this = $(this);
+        console.log("Label", index, ":", {
+            id: this.id,
+            for: this.getAttribute('for'),
+            display: $this.css('display'),
+            visible: $this.is(':visible'),
+            style: this.getAttribute('style'),
+            parent: this.parentElement ? this.parentElement.tagName : 'none'
+        });
+    });
+    
+    console.log("QUOTATION: === END DEBUG ===");
+};
+
+// Function to check CSS rules that might be hiding elements
+window.checkCSSRules = function() {
+    console.log("QUOTATION: === CHECKING CSS RULES ===");
+    
+    var containers = $('div[id^="upload_btn_container_"]');
+    var labels = $('label[for^="day_image_"]');
+    
+    if (containers.length > 0) {
+        var container = containers.first();
+        var computedStyle = window.getComputedStyle(container[0]);
+        console.log("QUOTATION: First container computed styles:", {
+            display: computedStyle.display,
+            visibility: computedStyle.visibility,
+            opacity: computedStyle.opacity,
+            position: computedStyle.position,
+            left: computedStyle.left,
+            top: computedStyle.top,
+            width: computedStyle.width,
+            height: computedStyle.height,
+            overflow: computedStyle.overflow,
+            zIndex: computedStyle.zIndex
+        });
+    }
+    
+    if (labels.length > 0) {
+        var label = labels.first();
+        var computedStyle = window.getComputedStyle(label[0]);
+        console.log("QUOTATION: First label computed styles:", {
+            display: computedStyle.display,
+            visibility: computedStyle.visibility,
+            opacity: computedStyle.opacity,
+            position: computedStyle.position,
+            left: computedStyle.left,
+            top: computedStyle.top,
+            width: computedStyle.width,
+            height: computedStyle.height,
+            overflow: computedStyle.overflow,
+            zIndex: computedStyle.zIndex
+        });
+    }
+    
+    console.log("QUOTATION: === END CSS CHECK ===");
+};
+
+// Function to manually fix a specific image removal
+window.fixImageRemoval = function(packageId, offset) {
+    var uniqueId = packageId + "_" + offset;
+    console.log("QUOTATION: Manually fixing image removal for uniqueId:", uniqueId);
+    
+    // Get elements
+    var previewDiv = $('#day_image_preview_' + uniqueId);
+    var previewImg = $('#preview_img_' + uniqueId);
+    var uploadContainer = $('#upload_btn_container_' + uniqueId);
+    var uploadLabel = $('label[for="day_image_' + uniqueId + '"]');
+    
+    console.log("QUOTATION: Found elements - previewDiv:", previewDiv.length, "previewImg:", previewImg.length, "uploadContainer:", uploadContainer.length, "uploadLabel:", uploadLabel.length);
+    
+    // AGGRESSIVELY hide preview
+    previewDiv.hide();
+    previewDiv.css({
+        'display': 'none !important',
+        'visibility': 'hidden !important',
+        'opacity': '0 !important',
+        'position': 'absolute !important',
+        'left': '-9999px !important',
+        'width': '0 !important',
+        'height': '0 !important',
+        'overflow': 'hidden !important'
+    });
+    previewDiv.attr('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
+    
+    // Clear image
+    previewImg.attr('src', '');
+    previewImg.removeAttr('src');
+    previewImg.hide();
+    previewImg.css('display', 'none !important');
+    
+    // FORCE show upload button
+    if (uploadContainer.length > 0) {
+        uploadContainer.show();
+        uploadContainer.css({
+            'display': 'flex !important',
+            'visibility': 'visible !important',
+            'opacity': '1 !important',
+            'position': 'relative !important',
+            'left': 'auto !important',
+            'top': 'auto !important',
+            'width': 'auto !important',
+            'height': 'auto !important',
+            'overflow': 'visible !important',
+            'z-index': '9999 !important'
+        });
+        uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important;');
+        console.log("QUOTATION: Upload container shown for uniqueId:", uniqueId);
+    } else if (uploadLabel.length > 0) {
+        uploadLabel.show();
+        uploadLabel.css({
+            'display': 'inline-block !important',
+            'visibility': 'visible !important',
+            'opacity': '1 !important',
+            'position': 'relative !important',
+            'left': 'auto !important',
+            'top': 'auto !important',
+            'width': 'auto !important',
+            'height': 'auto !important',
+            'overflow': 'visible !important',
+            'z-index': '9999 !important'
+        });
+        uploadLabel.attr('style', 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important;');
+        console.log("QUOTATION: Upload label shown for uniqueId:", uniqueId);
+    } else {
+        console.log("QUOTATION: No upload elements found for uniqueId:", uniqueId);
+    }
+    
+    console.log("QUOTATION: Manual fix completed for uniqueId:", uniqueId);
+};
+
+// Function to initialize upload button visibility based on actual image loading
+window.initializeUploadButtonVisibility = function() {
+    console.log("QUOTATION: Initializing upload button visibility...");
+    
+    // Check all image preview containers
+    $('div[id^="day_image_preview_"]').each(function() {
+        var $previewDiv = $(this);
+        var uniqueId = this.id.replace('day_image_preview_', '');
+        var $uploadContainer = $('#upload_btn_container_' + uniqueId);
+        var $previewImg = $('#preview_img_' + uniqueId);
+        
+        console.log("QUOTATION: Checking preview for uniqueId:", uniqueId);
+        
+        // Check if image actually has a valid src and is visible
+        var hasValidImage = false;
+        if ($previewImg.length > 0) {
+            var imgSrc = $previewImg.attr('src');
+            if (imgSrc && imgSrc !== '' && imgSrc !== 'null' && imgSrc !== 'undefined') {
+                // Check if image is actually visible (not hidden by CSS)
+                var isVisible = $previewDiv.is(':visible') && $previewImg.is(':visible');
+                hasValidImage = isVisible;
+                console.log("QUOTATION: Image src:", imgSrc, "visible:", isVisible);
+            }
+        }
+        
+        // Set visibility based on actual image state
+        if (hasValidImage) {
+            $previewDiv.show();
+            $uploadContainer.hide();
+            console.log("QUOTATION: Showing preview, hiding upload for uniqueId:", uniqueId);
+        } else {
+            $previewDiv.hide();
+            $uploadContainer.show();
+            console.log("QUOTATION: Hiding preview, showing upload for uniqueId:", uniqueId);
+        }
+    });
+    
+    console.log("QUOTATION: Upload button visibility initialization completed");
+};
+
+// Run initialization when page loads
+$(document).ready(function() {
+    console.log("QUOTATION: Page loaded, initializing upload button visibility...");
+    
+    // IMMEDIATE check and set correct visibility
+    setTimeout(function() {
+        console.log("QUOTATION: Setting correct visibility based on actual image state...");
+        
+        $('div[id^="upload_btn_container_"]').each(function() {
+            var $this = $(this);
+            var uniqueId = this.id.replace('upload_btn_container_', '');
+            var $previewDiv = $('#day_image_preview_' + uniqueId);
+            var $previewImg = $('#preview_img_' + uniqueId);
+            
+            console.log("QUOTATION: Checking uniqueId:", uniqueId);
+            console.log("QUOTATION: Preview div found:", $previewDiv.length);
+            console.log("QUOTATION: Preview img found:", $previewImg.length);
+            
+            // Check if there's actually a valid image
+            var hasValidImage = false;
+            if ($previewImg.length > 0) {
+                var imgSrc = $previewImg.attr('src');
+                console.log("QUOTATION: Image src for", uniqueId, ":", imgSrc);
+                
+                if (imgSrc && imgSrc !== '' && imgSrc !== 'null' && imgSrc !== 'undefined') {
+                    // Check if the image preview div is currently visible
+                    var previewVisible = $previewDiv.is(':visible');
+                    console.log("QUOTATION: Preview visible for", uniqueId, ":", previewVisible);
+                    hasValidImage = previewVisible;
+                }
+            }
+            
+            if (hasValidImage) {
+                // Has valid image - show preview, hide upload
+                $previewDiv.show();
+                $this.hide();
+                console.log("QUOTATION: Showing preview, hiding upload for uniqueId:", uniqueId);
+            } else {
+                // No valid image - hide preview, show upload
+                $previewDiv.hide();
+                $this.show();
+                $this.css({
+                    'display': 'flex !important',
+                    'visibility': 'visible !important',
+                    'opacity': '1 !important'
+                });
+                console.log("QUOTATION: Hiding preview, showing upload for uniqueId:", uniqueId);
+            }
+        });
+        
+        console.log("QUOTATION: Visibility initialization completed");
+    }, 200);
+});
+
+// Emergency function to fix the specific issue with package 3, offset 1
+window.fixSpecificIssue = function() {
+    console.log("QUOTATION: Fixing specific issue for package 3, offset 1");
+    
+    var uniqueId = '3_1';
+    var $uploadContainer = $('#upload_btn_container_' + uniqueId);
+    var $previewDiv = $('#day_image_preview_' + uniqueId);
+    var $previewImg = $('#preview_img_' + uniqueId);
+    
+    console.log("QUOTATION: Elements found - container:", $uploadContainer.length, "preview:", $previewDiv.length, "img:", $previewImg.length);
+    
+    // Force hide preview
+    $previewDiv.hide();
+    $previewDiv.css({
+        'display': 'none !important',
+        'visibility': 'hidden !important',
+        'opacity': '0 !important'
+    });
+    
+    // Force show upload container
+    $uploadContainer.show();
+    $uploadContainer.css({
+        'display': 'flex !important',
+        'visibility': 'visible !important',
+        'opacity': '1 !important',
+        'position': 'relative !important',
+        'left': 'auto !important',
+        'top': 'auto !important',
+        'width': 'auto !important',
+        'height': 'auto !important',
+        'overflow': 'visible !important',
+        'z-index': '9999 !important'
+    });
+    $uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important;');
+    
+    console.log("QUOTATION: Specific fix completed for uniqueId:", uniqueId);
+    console.log("QUOTATION: Upload container visible:", $uploadContainer.is(':visible'));
+};
+
+// Simple test function to check current state
+window.testCurrentState = function() {
+    console.log("QUOTATION: === TESTING CURRENT STATE ===");
+    
+    var uniqueId = '3_1';
+    var $uploadContainer = $('#upload_btn_container_' + uniqueId);
+    var $previewDiv = $('#day_image_preview_' + uniqueId);
+    var $previewImg = $('#preview_img_' + uniqueId);
+    
+    console.log("QUOTATION: Elements found:");
+    console.log("- Upload container:", $uploadContainer.length, "visible:", $uploadContainer.is(':visible'));
+    console.log("- Preview div:", $previewDiv.length, "visible:", $previewDiv.is(':visible'));
+    console.log("- Preview img:", $previewImg.length, "visible:", $previewImg.is(':visible'));
+    
+    if ($previewImg.length > 0) {
+        console.log("- Image src:", $previewImg.attr('src'));
+    }
+    
+    console.log("QUOTATION: === END TEST ===");
+};
+
+// EMERGENCY FUNCTION - This will definitely work
+window.emergencyFix = function() {
+    console.log("QUOTATION: EMERGENCY FIX - Creating upload buttons everywhere");
+    
+    // Find all cells that have image previews but no visible upload buttons
+    $('td:has(div[id^="day_image_preview_"])').each(function() {
+        var $cell = $(this);
+        var $previewDiv = $cell.find('div[id^="day_image_preview_"]');
+        var $uploadContainer = $cell.find('div[id^="upload_btn_container_"]');
+        var $uploadLabel = $cell.find('label[for^="day_image_"]');
+        
+        // Check if preview is visible
+        var previewVisible = $previewDiv.is(':visible');
+        var uploadVisible = $uploadContainer.is(':visible') || $uploadLabel.is(':visible');
+        
+        console.log("QUOTATION: Cell check - preview visible:", previewVisible, "upload visible:", uploadVisible);
+        
+        // If preview is not visible but upload is also not visible, create emergency button
+        if (!previewVisible && !uploadVisible) {
+            var uniqueId = $previewDiv.attr('id').replace('day_image_preview_', '');
+            console.log("QUOTATION: Creating emergency button for uniqueId:", uniqueId);
+            
+            // Create emergency upload button
+            var emergencyButton = $('<div style="display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 9999 !important; margin-top: 35px; align-items: center; justify-content: center; height: 100%;"><label for="day_image_' + uniqueId + '" class="btn btn-sm btn-success" style="margin-bottom: 5px;font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label></div>');
+            $cell.append(emergencyButton);
+        }
+    });
+    
+    console.log("QUOTATION: Emergency fix completed");
+};
+
 </script>
 <script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
