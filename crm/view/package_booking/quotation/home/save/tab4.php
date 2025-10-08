@@ -1524,13 +1524,21 @@ function uploadItineraryImages(quotationId, images) {
     console.log("Starting upload of " + images.length + " images for quotation " + quotationId);
     
     images.forEach(function(imageData, index) {
+        // Extract simple day number from offset (handles both "1" and "18_1" formats)
+        var dayNumber = imageData.offset || imageData.day_number;
+        if (typeof dayNumber === 'string' && dayNumber.includes('_')) {
+            dayNumber = dayNumber.split('_').pop(); // Extract "1" from "18_1"
+        }
+        
+        console.log("DEBUG: Uploading image for day", dayNumber, "from offset", imageData.offset);
+        
         var formData = new FormData();
         formData.append('image', imageData.file);
         formData.append('quotation_id', quotationId);
         formData.append('package_id', imageData.package_id);
-        formData.append('day_number', imageData.day_number);
+        formData.append('day_number', dayNumber);
         
-        console.log("Uploading image for day " + imageData.day_number + ", package " + imageData.package_id + ", file: " + imageData.file.name);
+        console.log("Uploading image for day " + dayNumber + ", package " + imageData.package_id + ", file: " + imageData.file.name);
         
         var promise = $.ajax({
             url: base_url + 'controller/package_tour/quotation/upload_itinerary_image.php',
@@ -1543,10 +1551,11 @@ function uploadItineraryImages(quotationId, images) {
                 console.log("Image upload response for day " + imageData.day_number + ":", response);
                 if (response && response.success) {
                     console.log("Image uploaded successfully: " + response.image_url);
-                    // Mark as uploaded
-                    if (window.quotationImages && window.quotationImages[imageData.day_number]) {
-                        window.quotationImages[imageData.day_number].uploaded = true;
-                        window.quotationImages[imageData.day_number].image_url = response.image_url;
+                    // Mark as uploaded using the correct offset key
+                    var offsetKey = imageData.offset || dayNumber;
+                    if (window.quotationImages && window.quotationImages[offsetKey]) {
+                        window.quotationImages[offsetKey].uploaded = true;
+                        window.quotationImages[offsetKey].image_url = response.image_url;
                     }
                 } else {
                     console.error("Image upload failed: " + (response ? response.message : 'Unknown error'));
