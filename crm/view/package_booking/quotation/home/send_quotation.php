@@ -691,6 +691,71 @@ $quotation_count = mysqli_num_rows($sq_query);
 </div>
 
 <script>
+
+$(document).off('click', '.actions-btn-group .dropdown-toggle'); // prevent duplicate binding
+$(document).on('click', '.actions-btn-group .dropdown-toggle', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var $btn = $(this);
+    var $menu = $btn.siblings('.dropdown-menu');
+
+    // Close all open dropdowns first
+    $('.actions-dropdown').hide().each(function () {
+        var $parent = $(this).data('original-parent');
+        if ($parent && $parent.length) {
+            $parent.append($(this));
+        }
+    });
+
+    // Save original parent before appending to body
+    if (!$menu.data('original-parent')) {
+        $menu.data('original-parent', $menu.parent());
+    }
+
+    // Calculate positions
+    var windowHeight = $(window).height();
+    var scrollTop = $(window).scrollTop();
+    var btnOffset = $btn.offset();
+    var btnHeight = $btn.outerHeight();
+    var menuHeight = $menu.outerHeight();
+    var spaceBelow = windowHeight - (btnOffset.top - scrollTop + btnHeight);
+    var spaceAbove = btnOffset.top - scrollTop;
+
+    // Default open downward
+    var top = btnOffset.top + btnHeight;
+    var left = btnOffset.left;
+
+    // Open upward if less space below
+    if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
+        top = btnOffset.top - menuHeight;
+    }
+
+    // Move dropdown to body
+    $('body').append($menu);
+
+    $menu.css({
+        position: 'absolute',
+        top: top,
+        left: left,
+        display: 'block',
+        zIndex: 9999
+    });
+});
+
+// Close dropdown on outside click
+$(document).on('click', function () {
+    $('.actions-dropdown:visible').each(function () {
+        var $parent = $(this).data('original-parent');
+        if ($parent && $parent.length) {
+            $parent.append($(this));
+        }
+        $(this).hide();
+    });
+});
+
+
+
 	// Modal will be shown by the calling JavaScript function
 	$('#email_option').select2();
 	
@@ -2306,4 +2371,12 @@ $quotation_count = mysqli_num_rows($sq_query);
         color: #000;
         font-size: 1em;
     }
+
+    .actions-dropdown {
+  display: none;
+  min-width: 200px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  z-index: 9999 !important;
+}
 </style>

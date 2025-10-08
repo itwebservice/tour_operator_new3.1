@@ -75,10 +75,11 @@ try {
             error_log("DEBUG: File moved successfully to: " . $uploadPath);
             
             // Save to database - Update package_quotation_program table
-            $image_url = "uploads/quotation_images/" . $uniqueFileName;
+            // Use correct path relative to project root (crm/uploads instead of uploads)
+            $image_url = "crm/uploads/quotation_images/" . $uniqueFileName;
             
             // Include day number in the image URL path for identification
-            $image_url_with_day = "uploads/quotation_images/day_" . $day_number . "_" . $uniqueFileName;
+            $image_url_with_day = "crm/uploads/quotation_images/day_" . $day_number . "_" . $uniqueFileName;
             
             // Move the file to include day in filename
             $final_upload_path = $uploadDir . "day_" . $day_number . "_" . $uniqueFileName;

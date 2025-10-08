@@ -43,9 +43,9 @@ include '../../../../model/model.php';
                         class="fa fa-plus"></i></button>
             </td>
             <td class='col-md-1 pad_8' style="width: 120px;">
-                <div style="margin-top: 15px;">
+                <div id="upload_btn_container_<?php echo $i; ?>" style="margin-top: 15px; display: block;">
                     <label for="day_image_<?php echo $i; ?>" class="btn btn-sm btn-success" 
-                           style="margin-bottom: 5px;  12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                           style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
                         <i class="fa fa-image"></i> Upload Image
                     </label>
                     <input type="file" id="day_image_<?php echo $i; ?>" 
@@ -53,10 +53,11 @@ include '../../../../model/model.php';
                            onchange="previewDayImageCreate(this, '<?php echo $i; ?>')" 
                            style="display: none;">
                 </div>
-                <div id="day_image_preview_<?php echo $i; ?>" style="display: none; margin-top: 5px;">
+                <div id="day_image_preview_<?php echo $i; ?>" style="display: none !important; margin-top: 5px;">
                     <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
                         <img id="preview_img_<?php echo $i; ?>" src="" alt="Preview" 
-                             style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                             style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
+                             onerror="this.style.display='none';">
                         <button type="button" 
                                 onclick="removeDayImageCreate('<?php echo $i; ?>')" 
                                 title="Remove Image" 
@@ -99,6 +100,7 @@ function previewDayImageCreate(input, offset) {
         console.log("PACKAGE CREATE: FileReader loaded, setting image src for day:", offset);
         var previewImg = $('#preview_img_' + offset);
         var previewDiv = $('#day_image_preview_' + offset);
+        var uploadBtnContainer = $('#upload_btn_container_' + offset);
         
         if (previewImg.length === 0) {
             console.error("PACKAGE CREATE: Preview image element not found for day:", offset);
@@ -111,14 +113,14 @@ function previewDayImageCreate(input, offset) {
         }
         
         // Set the image source and show preview
-        previewImg.attr('src', e.target.result);
-        previewDiv.show();
+        previewImg.attr('src', e.target.result).show();
+        previewDiv.css('display', 'block').show();
         
         // Show the remove button when image is selected
         previewDiv.find('button[onclick*="removeDayImageCreate"]').css('display', 'flex');
         
         // Hide the upload button after image selection
-        $('#day_image_' + offset).parent().find('label').hide();
+        uploadBtnContainer.hide();
         
         console.log("PACKAGE CREATE: Preview displayed successfully for day:", offset);
     };
@@ -158,7 +160,7 @@ function removeDayImageCreate(offset) {
     $('#preview_img_' + offset).attr('src', '');
     
     // Show the upload button again
-    $('#day_image_' + offset).parent().find('label').show();
+    $('#upload_btn_container_' + offset).show();
     
     // Clear hidden path
     $('#day_image_path_' + offset).val('');
@@ -199,23 +201,23 @@ function processSelectedItineraryImage() {
             // Update the preview image
             var previewImg = $('#preview_img_' + dayId);
             var previewDiv = $('#day_image_preview_' + dayId);
-            var uploadLabel = $('#day_image_' + dayId).parent().find('label');
+            var uploadBtnContainer = $('#upload_btn_container_' + dayId);
             
-            console.log("PACKAGE CREATE: Preview elements found - img:", previewImg.length, "div:", previewDiv.length, "label:", uploadLabel.length);
+            console.log("PACKAGE CREATE: Preview elements found - img:", previewImg.length, "div:", previewDiv.length, "container:", uploadBtnContainer.length);
             
             if (previewImg.length > 0) {
-                previewImg.attr('src', imageUrl);
+                previewImg.attr('src', imageUrl).show();
                 console.log("PACKAGE CREATE: Set image src to:", imageUrl);
             }
             
             if (previewDiv.length > 0) {
-                previewDiv.show();
+                previewDiv.css('display', 'block').show();
                 console.log("PACKAGE CREATE: Showed preview div");
             }
             
-            if (uploadLabel.length > 0) {
-                uploadLabel.hide();
-                console.log("PACKAGE CREATE: Hid upload label");
+            if (uploadBtnContainer.length > 0) {
+                uploadBtnContainer.hide();
+                console.log("PACKAGE CREATE: Hid upload button container");
             }
             
             // Show remove button
