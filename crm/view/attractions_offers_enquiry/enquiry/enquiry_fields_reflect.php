@@ -749,6 +749,86 @@ function total_members_calculate(){
 }
 
 
+if($enquiry_type=="Miscellaneous"){
+
+	if(isset($_POST['enquiry_id'])){
+
+		foreach($enquiry_content_arr1 as $enquiry_content_arr2){
+
+			if($enquiry_content_arr2['name']=="hotel_requirements"){ $sq_c['hotel_requirements'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="total_adult"){ $sq_c['total_adult'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="total_cwb"){ $sq_c['total_cwb'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="total_cwob"){ $sq_c['total_cwob'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="total_infant"){ $sq_c['total_infant'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="total_members"){ $sq_c['total_members'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="budget"){ $sq_c['budget'] = $enquiry_content_arr2['value']; }
+
+		}
+
+	}
+
+	else{
+
+		$sq_c['hotel_requirements'] = $sq_c['total_adult'] = $sq_c['total_cwb'] = $sq_c['total_cwob'] = $sq_c['total_infant'] = $sq_c['total_members'] = $sq_c['budget'] =  "";
+
+	}
+?>
+<div class="row mg_bt_10">
+	<div class="col-md-12 col-sm-6 mg_bt_10_sm_xs">
+		<h3 class="editor_title">Miscellaneous Requirements</h3>
+		<textarea name="hotel_requirements" id="hotel_requirements" class="feature_editor form_control" cols="30" rows="10"><?= $sq_c['hotel_requirements']?></textarea>
+	</div>
+</div>
+<div class="row mg_bt_10">
+	<div class="col-md-4 col-sm-6 mg_bt_10_sm_xs">
+        <input type="text" id="total_adult" name="total_adult" onchange="validate_balance(this.id); total_members_calculate()" placeholder="*Total Adult(s)" title="Total Adult(s)" value="<?= $sq_c['total_adult'] ?>" class="form-control">
+    </div>
+	<div class="col-md-4 col-sm-6 mg_bt_10_sm_xs">
+        <input type="text" id="total_cwb" name="total_cwb" onchange="validate_balance(this.id); total_members_calculate()" placeholder="*Total Child With Bed" title="Total Child With Bed" value="<?= $sq_c['total_cwb'] ?>" class="form-control">
+    </div>
+	<div class="col-md-4 col-sm-6 mg_bt_10_sm_xs">
+        <input type="text" id="total_cwob" name="total_cwob" onchange="validate_balance(this.id); total_members_calculate()" placeholder="*Total Child Without Bed" title="Total Child Without Bed" value="<?= $sq_c['total_cwob'] ?>" class="form-control">
+    </div>
+</div>
+<div class="row mg_bt_10">
+	<div class="col-md-4 col-sm-6 mg_bt_10_sm_xs">
+        <input type="text" id="total_infant" name="total_infant" onchange="validate_balance(this.id); total_members_calculate()" placeholder="*Total Infant(s)" title="Total Infant(s)" value="<?= $sq_c['total_infant'] ?>" class="form-control">
+    </div>
+	<div class="col-md-4">
+		<input type="text" id="total_members" name="total_members" placeholder="Total Guest(s)" title="Total Guest(s)" value="<?= $sq_c['total_members'] ?>" class="form-control" readonly>
+	</div>
+	<div class="col-md-4 col-sm-6 mg_bt_10">
+	    <input type="text" id="budget" name="budget" onchange="validate_balance(this.id)" placeholder="Budget" title="Budget" value="<?= $sq_c['budget'] ?>" class="form-control">
+	</div>
+</div>
+<script>
+$('#check_in_date, #check_out_date').datetimepicker({ timepicker:true, format:'d-m-Y H:i' });
+city_lzloading('#city_id');
+
+
+function total_members_calculate(){
+
+	var total_adult = $('#total_adult').val();
+	var total_cwb = $('#total_cwb').val();
+	var total_cwob = $('#total_cwob').val();
+	var total_infant = $('#total_infant').val();
+
+	if(total_adult==""){ total_adult = 0; }
+	if(total_cwb==""){ total_cwb = 0; }
+	if(total_cwob==""){ total_cwob = 0; }
+	if(total_infant==""){ total_infant = 0; }
+
+	var total_members = parseFloat(total_adult) + parseFloat(total_cwb) + parseFloat(total_cwob) + parseFloat(total_infant);
+	$('#total_members').val(total_members);
+
+}
+
+</script>
+
+<?php
+
+}
+
 
 if($enquiry_type=="Car Rental"){
 

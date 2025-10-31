@@ -37,7 +37,9 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                   <ul class="dropdown_menu no-pad">
                     <li><span onclick="show_report_reflect('Group Passenger Report')">Group Passenger Report</span></li>
                     <li><span onclick="show_report_reflect('Room Allocation')">Room Allocation</span></li>
+                    <li><span onclick="show_report_reflect('Booking wise Total Selling Report')">Booking wise Total Selling Report</span></li>
                     <!-- <li><span onclick="show_report_reflect('Payment Collection')">Payment Collection</span></li> -->
+                    <li><span onclick="show_report_reflect('Group Purchase Payment Summary')">Purchase Payment Summary</span></li>
                     <li><span onclick="show_report_reflect('Complete Tour Cancel/Refund')">Complete Tour Cancel/Refund</span></li>
                     <li><span onclick="show_report_reflect('Traveller Cancel/Refund')">Traveller Cancel/Refund</span></li>
                     <li><span onclick="show_report_reflect('Itinerary And Gift')">Itinerary And Gift</span></li>
@@ -55,6 +57,15 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                     <li><span onclick="show_report_reflect('Tour Refund')">Tour Refund</span></li>
                     <li><span onclick="show_report_reflect('Package Repeater Customer')">Repeater Customer</span></li>
                     <li><span onclick="show_report_reflect('Package Travel Tickets')">Travel Tickets</span></li>
+                  </ul>
+                </li>
+                <!-- Single Menu end -->
+
+                   <!-- Single Menu start -->
+                <li class="dropdown">
+                  <a href="#">Consolidated Sales Report <span class="caret"></span></a>
+                  <ul class="dropdown_menu no-pad">
+                    <li><span onclick="show_report_reflect('All Sales')">All Sales</span></li>
                   </ul>
                 </li>
                 <!-- Single Menu end -->
@@ -104,18 +115,25 @@ function show_report_reflect(report_name){
     //Group Report
     if(report_name=="Group Passenger Report"){ url = 'reports_content/group_tour/passanger_details_report/index.php'; }
     if(report_name=="Room Allocation"){ url = 'reports_content/group_tour/room_allocation_report/index.php'; }
+    if(report_name=="Booking wise Total Selling Report"){ url = 'reports_content/group_tour/booking_wise_total_selling_report/index.php'; } 
     if(report_name=="Payment Collection"){ url = 'reports_content/group_tour/total_collection_report/index.php'; }
     if(report_name=="Complete Tour Cancel/Refund"){ url = 'reports_content/group_tour/refund_tour_cancelation_report/index.php'; }
     if(report_name=="Traveller Cancel/Refund"){ url = 'reports_content/group_tour/refund_cancelled_traveler_report/index.php'; }
     if(report_name=="Itinerary And Gift"){ url = 'reports_content/group_tour/adnary_and_gift_handover_report/index.php'; }
     if(report_name=="Group Repeater Customer"){ url = 'reports_content/group_tour/repeater_tourist_report/index.php'; }
     if(report_name=="Group Travel Tickets"){ url = 'reports_content/group_tour/booking_tickets/index.php'; }
+    if(report_name=="Group Purchase Payment Summary"){ url = 'reports_content/group_tour/purchase_payment_summary/index.php'; }
 
     //FIT Report
     if(report_name=="Passenger Report"){ url = 'reports_content/package_tour/tourwise_report/index.php'; }
     if(report_name=="Tour Refund"){ url = 'reports_content/package_tour/refund_report/index.php'; }
     if(report_name=="Package Travel Tickets"){ url = 'reports_content/package_tour/booking_tickets/index.php'; }
     if(report_name=="Package Repeater Customer"){ url = 'reports_content/package_tour/repeater_tourist_report/index.php'; }
+
+
+     // Consolidated Report for All Sales
+
+if(report_name=="All Sales"){ url = 'filters/consolidated_sales_report.php'; } 
 
     $.post(url,{}, function(data){
         $(".dropdown_menu").addClass('hidden');

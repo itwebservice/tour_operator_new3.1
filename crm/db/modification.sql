@@ -79,3 +79,63 @@ ADD COLUMN currency_code VARCHAR(255) NOT NULL;
 
  ALTER TABLE package_train_master 
 ADD COLUMN train_travel_date2 DATETIME;
+
+
+ALTER TABLE travelers_details 
+ADD COLUMN driving_license TEXT NOT NULL;
+
+
+ALTER TABLE package_travelers_details 
+ADD COLUMN driving_license TEXT NOT NULL;
+
+
+ALTER TABLE ticket_master_entries 
+ADD COLUMN driving_license TEXT NOT NULL;
+
+
+ALTER TABLE visa_master_entries 
+ADD COLUMN driving_license TEXT NOT NULL;
+
+
+
+   ALTER TABLE `excursion_master_tariff_basics` 
+   ADD COLUMN `vehicle_id` VARCHAR(50) NULL AFTER `transfer_cost`;
+
+
+ALTER TABLE `branches` 
+ADD COLUMN `qr_url` TEXT NULL AFTER `state`;
+
+
+-- Add Logo URL column
+ALTER TABLE `branches` 
+ADD COLUMN `logo_url` TEXT NULL AFTER `qr_url`;
+
+
+-- For Package Quotation Excursion
+ALTER TABLE `package_tour_quotation_excursion_entries` 
+ADD COLUMN `vehicle_id` VARCHAR(50) NULL AFTER `vehicles`;
+
+
+-- for car rental qtn
+CREATE TABLE car_rental_quotation_program (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    quotation_id INT(11) NOT NULL,
+    package_id INT(11) NOT NULL,
+    attraction VARCHAR(255) NOT NULL,
+    day_wise_program TEXT NOT NULL,
+    stay VARCHAR(255) NOT NULL,
+    meal_plan VARCHAR(20) NOT NULL,
+    day_count INT(11) NOT NULL
+);
+
+
+CREATE TABLE car_rental_booking_program (
+    entry_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   
+    booking_id INT(11) NOT NULL,
+    attraction VARCHAR(255) NOT NULL,
+    day_wise_program TEXT NOT NULL,
+    stay VARCHAR(255) NOT NULL,
+    meal_plan VARCHAR(20) NOT NULL,
+    day_count INT(11) NOT NULL
+);

@@ -24,8 +24,9 @@ class air_ticket_id_proof
 		$id_proof_url = $_POST['id_proof_url'];
 		$id_proof_url3 = $_POST['id_proof_url3'];
 		$id_proof_url4 = $_POST['id_proof_url4'];
+		$driving_license = $_POST['driving_license'];
 
-		$sq = mysqlQuery("update ticket_master_entries set pan_card_url='$id_proof_url', pan_card_url3='$id_proof_url3', pan_card_url4='$id_proof_url4' where entry_id='$entry_id'");
+		$sq = mysqlQuery("update ticket_master_entries set pan_card_url='$id_proof_url', pan_card_url3='$id_proof_url3', pan_card_url4='$id_proof_url4', driving_license='$driving_license' where entry_id='$entry_id'");
 		if($sq){
 			echo "ID Proof uploaded successfully!";
 			exit;
