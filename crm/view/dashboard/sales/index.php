@@ -41,7 +41,7 @@ $emp_id = $_SESSION['emp_id'];
       if($row_enq['followup_status'] == "Converted"){
           $converted_count++;
       }
-      if($row_enq['followup_status'] == "Active"){
+      if($row_enq['followup_status'] == "New"){
           $followup_count++;
       }
       if($row_enq['followup_status'] == "In-Followup"){
@@ -84,9 +84,9 @@ $emp_id = $_SESSION['emp_id'];
                       <div class="col-xs-8 text-right">
                         <span class="single_enquiry_widget_amount dashboard-counter" data-max="<?php echo $followup_count; ?>"></span>
                       </div>
-                      <div class="col-sm-12 single_enquiry_widget_amount">
-                        Active
-                      </div>
+                    <div class="col-sm-12 single_enquiry_widget_amount">
+                      New
+                    </div>
                     </div>
                     <div class="col-sm-6" onclick="window.open('<?= BASE_URL ?>view/attractions_offers_enquiry/enquiry/index.php', 'My Window');">
                       <div class="col-xs-4 text-left">

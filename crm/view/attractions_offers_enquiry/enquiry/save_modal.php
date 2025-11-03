@@ -34,6 +34,7 @@ $branch_status = $_POST['branch_status'];
                                 <option value="Car Rental">Car Rental</option>
                                 <option value="Train Ticket">Train Ticket</option>
                                 <option value="Bus">Bus</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
                             </select>
                         </div>
                     </div>

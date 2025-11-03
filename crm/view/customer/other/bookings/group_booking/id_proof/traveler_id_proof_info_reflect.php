@@ -13,6 +13,8 @@ $pan_url3= preg_replace('/(\/+)/','/',$sq_traveler_info['pan_card_url3']);
 $pan_url3 = BASE_URL.str_replace('../', '', $pan_url3); 
 $pan_url4= preg_replace('/(\/+)/','/',$sq_traveler_info['pan_card_url4']);
 $pan_url4 = BASE_URL.str_replace('../', '', $pan_url4);
+$driving_license_url= preg_replace('/(\/+)/','/',$sq_traveler_info['driving_license']);
+$driving_license_url = BASE_URL.str_replace('../', '', $driving_license_url);
 
 $bg = ($sq_traveler_info['status']=="Cancel") ? "danger" : "";
 ?>
@@ -33,58 +35,60 @@ $bg = ($sq_traveler_info['status']=="Cancel") ? "danger" : "";
       <div class="col-md-4 col-sm-4 mg_bt_10_xs">
         <input type="text" name="expiry_date" id="expiry_date" title="Expiry Date" class="form-control" value="<?= ($sq_traveler_info['passport_expiry_date'] == "1970-01-01" || $sq_traveler_info['passport_expiry_date'] == "0000-00-00") ? date('d-m-Y') : get_date_user($sq_traveler_info['passport_expiry_date']) ?>"  placeholder="Expiry Date" onchange="validate_validDate('issue_date','expiry_date');">
       </div>
-      <div class="col-md-3 mg_tp_20 col-sm-6 text_left_xs">
-          <div  class="div-upload col-md-8" id="div_upload_button">
-              <div id="id_proof_upload_g" class="upload-button1"><span>ID Proof</span></div>
+      <div class="col-md-2 col-sm-6 mg_tp_20 text_left_xs" style="display:flex;align-items:flex-start;gap:5px;">
+          <div class="div-upload" style="margin-bottom: 5px;flex:1;" id="div_upload_button">
+              <div id="id_proof_upload_g" class="upload-button1" style="white-space:nowrap;overflow:hidden;"><span style="font-size:9px;">Passport Copy</span></div>
               <span id="id_proof_status1" ></span>
               <ul id="files" ></ul>
               <input type="hidden" id="txt_id_proof_upload_dir1" name="txt_id_proof_upload_dir1" value="<?= $sq_traveler_info['id_proof_url'] ?>">
           </div>
-          <div class="text_left_xs col-md-2">          
-            <?php if($sq_traveler_info['id_proof_url']!=""){ ?>
-            <a href="<?= $download_url ?>" style="padding: 15px 24px;" title="Download ID Proof" class="btn btn-info ico_left" download><i class="fa fa-download i-download"></i>
-          </a>
-            <?php } ?>
-          </div>
+          <?php if($sq_traveler_info['id_proof_url']!=""){ ?>
+          <a href="<?= $download_url ?>" class="btn btn-info ico_center" title="Download Passport Copy" style="padding: 8px 21px;border-radius:20px;background-color:<?= $theme_color ?>;" download><i class="fa fa-download"></i></a>
+          <?php } ?>
       </div>   
-      <div class="col-md-3 col-sm-6 mg_tp_20 text_left_xs">
-        <div  class="div-upload col-md-8" style="margin-bottom: 5px;"  id="div_upload_button">
-            <div id="pan_card_upload_g" class="upload-button1"><span>ID Proof-2</span></div>
+      <div class="col-md-2 col-sm-6 mg_tp_20 text_left_xs" style="display:flex;align-items:flex-start;gap:5px;">
+        <div class="div-upload" style="margin-bottom: 5px;flex:1;" id="div_upload_button">
+            <div id="pan_card_upload_g" class="upload-button1" style="white-space:nowrap;overflow:hidden;"><span style="font-size:11px;">PAN Card</span></div>
             <span id="pan_card_status1" ></span>
             <ul id="files" ></ul>
             <input type="hidden" id="txt_pan_card_upload_dir1" name="txt_pan_card_upload_dir1" value="<?= $sq_traveler_info['pan_card_url'] ?>">
         </div>
-        <div class="col-md-2 col-sm-6 text_left_xs">          
-          <?php if($sq_traveler_info['pan_card_url']!=""){ ?>
-          <a href="<?= $pan_url ?>" style="padding: 15px 24px;" title="Download ID Proof-2" class="btn btn-info ico_left" download><i class="fa fa-download i-download"></i></a>
-          <?php } ?>
-        </div>
+        <?php if($sq_traveler_info['pan_card_url']!=""){ ?>
+        <a href="<?= $pan_url ?>" class="btn btn-info ico_center" title="Download PAN Card" style="padding: 8px 21px;border-radius:20px;background-color:<?= $theme_color ?>;" download><i class="fa fa-download"></i></a>
+        <?php } ?>
       </div> 
-        <div class="col-md-3 col-sm-6 mg_tp_20 text_left_xs">
-          <div class="div-upload col-md-8" style="margin-bottom: 5px;" id="div_upload_button">
-            <div id="pan_card_upload3" class="upload-button1"><span>ID Proof-3</span></div>
+        <div class="col-md-2 col-sm-6 mg_tp_20 text_left_xs" style="display:flex;align-items:flex-start;gap:5px;">
+          <div class="div-upload" style="margin-bottom: 5px;flex:1;" id="div_upload_button">
+            <div id="pan_card_upload3" class="upload-button1" style="white-space:nowrap;overflow:hidden;"><span style="font-size:11px;">Voter Id</span></div>
               <span id="pan_card_status3"></span>
               <ul id="files" ></ul>
             <input type="hidden" id="txt_pan_card_upload_dir3" name="txt_pan_card_upload_dir3" value="<?= $sq_traveler_info['pan_card_url3'] ?>">
           </div>
-          <div class="col-md-2 col-sm-6 text_left_xs">          
-            <?php if($sq_traveler_info['pan_card_url3']!=""): ?>
-            <a href="<?= $pan_url3 ?>" class="btn btn-info ico_left" title="Download ID Proof-3"  style="padding: 15px 24px;" download><i class="fa fa-download i-download"></i></a>
-            <?php endif; ?>
-          </div>
+          <?php if($sq_traveler_info['pan_card_url3']!=""): ?>
+          <a href="<?= $pan_url3 ?>" class="btn btn-info ico_center" title="Download Voter Id" style="padding: 8px 21px;border-radius:20px;background-color:<?= $theme_color ?>;" download><i class="fa fa-download"></i></a>
+          <?php endif; ?>
         </div>
-        <div class="col-md-3 col-sm-6 mg_tp_20 text_left_xs">
-          <div class="div-upload col-md-8" style="margin-bottom: 5px;" id="div_upload_button">
-            <div id="pan_card_upload4" class="upload-button1"><span>ID Proof-4</span></div>
+        <div class="col-md-2 col-sm-6 mg_tp_20 text_left_xs" style="display:flex;align-items:flex-start;gap:5px;">
+          <div class="div-upload" style="margin-bottom: 5px;flex:1;" id="div_upload_button">
+            <div id="pan_card_upload4" class="upload-button1" style="white-space:nowrap;overflow:hidden;"><span style="font-size:9px;">Aadhar Card</span></div>
               <span id="pan_card_status4"></span>
               <ul id="files" ></ul>
             <input type="hidden" id="txt_pan_card_upload_dir4" name="txt_pan_card_upload_dir4" value="<?= $sq_traveler_info['pan_card_url4'] ?>">
           </div>
-          <div class="col-md-2 col-sm-6 text_left_xs">          
-            <?php if($sq_traveler_info['pan_card_url4']!=""): ?>
-            <a href="<?= $pan_url4 ?>" class="btn btn-info ico_left" title="Download ID Proof-4"  style="padding: 15px 24px;" download><i class="fa fa-download i-download"></i></a>
-            <?php endif; ?>
+          <?php if($sq_traveler_info['pan_card_url4']!=""): ?>
+          <a href="<?= $pan_url4 ?>" class="btn btn-info ico_center" title="Download Aadhar Card" style="padding: 8px 21px;border-radius:20px;background-color:<?= $theme_color ?>;" download><i class="fa fa-download"></i></a>
+          <?php endif; ?>
+        </div>
+        <div class="col-md-2 col-sm-6 mg_tp_20 text_left_xs" style="display:flex;align-items:flex-start;gap:5px;">
+          <div class="div-upload" style="margin-bottom: 5px;flex:1;" id="div_upload_button">
+            <div id="driving_license_upload" class="upload-button1" style="white-space:nowrap;overflow:hidden;"><span style="font-size:9px;">Driving License</span></div>
+              <span id="driving_license_status"></span>
+              <ul id="files" ></ul>
+            <input type="hidden" id="txt_driving_license_upload_dir" name="txt_driving_license_upload_dir" value="<?= $sq_traveler_info['driving_license'] ?>">
           </div>
+          <?php if($sq_traveler_info['driving_license']!=""): ?>
+          <a href="<?= $driving_license_url ?>" class="btn btn-info ico_center" title="Download Driving License" style="padding: 8px 21px;border-radius:20px;background-color:<?= $theme_color ?>;" download><i class="fa fa-download"></i></a>
+          <?php endif; ?>
         </div>
   </div>
   <div class="row mg_tp_10">
@@ -103,7 +107,7 @@ $bg = ($sq_traveler_info['status']=="Cancel") ? "danger" : "";
 <script type="text/javascript">
 $('#issue_date,#expiry_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
 
-function upload_tour_id_proof()
+function upload_tour_id_proof(doc_name)
 {
     var traveler_id = $('#traveler_id').val();
     var id_proof_url = $('#txt_id_proof_upload_dir1').val();
@@ -120,17 +124,18 @@ function upload_tour_id_proof()
         url: base_url+'controller/id_proof/group_tour_id_proof_upload.php',
         data:{ traveler_id : traveler_id, id_proof_url : id_proof_url },
         success:function(result){
-            msg_alert(result);
+            msg_alert(doc_name + ' uploaded successfully!');
         }
     });
 }
 
-function upload_tour_pan_card()
+function upload_tour_pan_card(doc_name)
 {
     var traveler_id = $('#traveler_id').val();
     var id_proof_url = $('#txt_pan_card_upload_dir1').val();
     var id_proof_url3 = $('#txt_pan_card_upload_dir3').val();
     var id_proof_url4 = $('#txt_pan_card_upload_dir4').val();
+    var driving_license = $('#txt_driving_license_upload_dir').val();
 
     if(traveler_id==""){
         error_msg_alert('Please select traveler to upload his pan card!');
@@ -142,9 +147,9 @@ function upload_tour_pan_card()
     $.ajax({
         type:'post',
         url: base_url+'controller/id_proof/group_tour_pan_card_upload.php',
-        data:{ traveler_id : traveler_id, id_proof_url : id_proof_url,id_proof_url3:id_proof_url3,id_proof_url4:id_proof_url4 },
+        data:{ traveler_id : traveler_id, id_proof_url : id_proof_url,id_proof_url3:id_proof_url3,id_proof_url4:id_proof_url4,driving_license:driving_license },
         success:function(result){
-            msg_alert(result);
+            msg_alert(doc_name + ' uploaded successfully!');
             //traveler_id_proof_info_reflect();
         }
     });
@@ -156,7 +161,7 @@ function pan_card_upload1()
 {
     var type="pan_card";
     var btnUpload=$('#pan_card_upload_g');
-    $(btnUpload).find('span').text('ID Proof-2');
+    $(btnUpload).find('span').text('PAN Card');
     var status=$('#pan_card_status1');
     new AjaxUpload(btnUpload, {
       action: 'bookings/group_booking/id_proof/upload_pan_card_file.php',
@@ -188,15 +193,15 @@ function pan_card_upload1()
         //Add uploaded file to list
         if(response1[0]=="error"){     
           error_msg_alert("File size exceeds");    
-          $(btnUpload).find('span').text('ID Proof-2');
+          $(btnUpload).find('span').text('PAN Card');
           return false;         
         }else if(response1[0]=="success"){ 
           document.getElementById("txt_pan_card_upload_dir1").value = response1[1];
           $(btnUpload).find('span').text('Uploaded');
-          upload_tour_pan_card();
+          upload_tour_pan_card('PAN Card');
         }else{
           error_msg_alert("File not uploaded");    
-          $(btnUpload).find('span').text('ID Proof-2');
+          $(btnUpload).find('span').text('PAN Card');
           return false;
         }
       }
@@ -208,7 +213,7 @@ function pan_card_upload3()
 {
     var type="pan_card";
     var btnUpload=$('#pan_card_upload3');
-    $(btnUpload).find('span').text('ID Proof-3');
+    $(btnUpload).find('span').text('Voter Id');
     var status=$('#pan_card_status3');
     new AjaxUpload(btnUpload, {
       action: 'bookings/group_booking/id_proof/upload_pan_card_file3.php',
@@ -237,15 +242,15 @@ function pan_card_upload3()
         //Add uploaded file to list
         if(response1[0]=="error"){     
           error_msg_alert("File size exceeds");    
-          $(btnUpload).find('span').text('ID Proof-3');
+          $(btnUpload).find('span').text('Voter Id');
           return false;         
         }else if(response1[0]=="success"){ 
           document.getElementById("txt_pan_card_upload_dir3").value = response1[1];
           $(btnUpload).find('span').text('Uploaded');
-          upload_tour_pan_card();
+          upload_tour_pan_card('Voter Id');
         }else{
           error_msg_alert("File not uploaded");    
-          $(btnUpload).find('span').text('ID Proof-3');
+          $(btnUpload).find('span').text('Voter Id');
           return false;
         }
       }
@@ -256,7 +261,7 @@ function pan_card_upload4()
 {
     var type="pan_card";
     var btnUpload=$('#pan_card_upload4');
-    $(btnUpload).find('span').text('ID Proof-4');
+    $(btnUpload).find('span').html('<span style="font-size:11px;">Aadhar Card</span>');
     var status=$('#pan_card_status4');
     new AjaxUpload(btnUpload, {
       action: 'bookings/group_booking/id_proof/upload_pan_card_file4.php',
@@ -285,15 +290,64 @@ function pan_card_upload4()
         //Add uploaded file to list
         if(response1[0]=="error"){     
           error_msg_alert("File size exceeds");    
-          $(btnUpload).find('span').text('ID Proof-4');
+          $(btnUpload).find('span').html('<span style="font-size:11px;">Aadhar Card</span>');
           return false;         
         }else if(response1[0]=="success"){ 
           document.getElementById("txt_pan_card_upload_dir4").value = response1[1];
           $(btnUpload).find('span').text('Uploaded');
-          upload_tour_pan_card();
+          upload_tour_pan_card('Aadhar Card');
         }else{
           error_msg_alert("File not uploaded");    
-          $(btnUpload).find('span').text('ID Proof-4');
+          $(btnUpload).find('span').html('<span style="font-size:11px;">Aadhar Card</span>');
+          return false;
+        }
+      }
+    });
+}
+
+driving_license_upload();
+function driving_license_upload()
+{
+    var type="driving_license";
+    var btnUpload=$('#driving_license_upload');
+    $(btnUpload).find('span').html('<span style="font-size:11px;">Driving License</span>');
+    var status=$('#driving_license_status');
+    new AjaxUpload(btnUpload, {
+      action: 'bookings/group_booking/id_proof/upload_driving_license.php',
+      name: 'uploadfile1',
+      onSubmit: function(file, ext){
+
+        status.text('');
+        var tour_id = $("#pcmb_traveler_id").val();
+        var id_proof_url = $("#txt_driving_license_upload_dir").val();
+        if(tour_id=='')
+        {
+          error_msg_alert('Please select booking!');
+          return false;
+        }
+        if (! (ext && /^(jpg|png|jpeg|pdf)$/.test(ext))){ 
+            // extension is not allowed 
+            error_msg_alert('Only JPG, PNG or PDF files are allowed');
+            return false;
+        }
+        $(btnUpload).find('span').text('Uploading...');
+      },
+      onComplete: function(file, response){
+        //On completion clear the status
+        status.text('');
+        var response1 = response.split('--');
+        //Add uploaded file to list
+        if(response1[0]=="error"){     
+          error_msg_alert("File size exceeds");    
+          $(btnUpload).find('span').html('<span style="font-size:11px;">Driving License</span>');
+          return false;         
+        }else if(response1[0]=="success"){ 
+          document.getElementById("txt_driving_license_upload_dir").value = response1[1];
+          $(btnUpload).find('span').text('Uploaded');
+          upload_tour_pan_card('Driving License');
+        }else{
+          error_msg_alert("File not uploaded");    
+          $(btnUpload).find('span').html('<span style="font-size:11px;">Driving License</span>');
           return false;
         }
       }
@@ -304,7 +358,7 @@ function id_proof_upload1()
 {
     var type="id_proof";
     var btnUpload=$('#id_proof_upload_g');
-      $(btnUpload).find('span').text('ID Proof-1');
+      $(btnUpload).find('span').html('<span style="font-size:11px;">Passport Copy</span>');
     var status=$('#id_proof_status1');
     new AjaxUpload(btnUpload, {
       action: 'bookings/group_booking/id_proof/upload_id_proof_file.php',
@@ -332,15 +386,15 @@ function id_proof_upload1()
         //Add uploaded file to list
         if(response1[0]=="error"){     
           error_msg_alert("File size exceeds");    
-          $(btnUpload).find('span').text('ID Proof-1');
+          $(btnUpload).find('span').html('<span style="font-size:11px;">Passport Copy</span>');
           return false;         
         }else if(response1[0]=="success"){ 
           document.getElementById("txt_id_proof_upload_dir1").value = response1[1];
           $(btnUpload).find('span').text('Uploaded');
-          upload_tour_id_proof();
+          upload_tour_id_proof('Passport Copy');
         }else{
           error_msg_alert("File not uploaded");    
-          $(btnUpload).find('span').text('ID Proof-1');
+          $(btnUpload).find('span').html('<span style="font-size:11px;">Passport Copy</span>');
           return false;
         }
       }

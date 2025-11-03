@@ -18,6 +18,9 @@ if ($branch_admin_id != 0) {
   $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 }
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $quotation_id = $_GET['quotation_id'];
 
 $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Car Rental Quotation' and active_flag ='Active'"));
@@ -82,7 +85,30 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 	} else {
 	$quotation_cost = $sq_quotation['total_tour_cost'];
 	}
+
+$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+$sq_package_count = mysqli_num_rows($sq_package_program);
 ?>
+<style>
+  .package_costing table tr:nth-child(even) {
+    background-color: #51514f !important;
+  }
+
+
+ 
+@media print {
+  .pageSection {
+    page-break-before: always;
+    page-break-inside: avoid;
+    position: relative;
+  }
+  .pageSection:first-of-type {
+    page-break-before: auto;
+  }
+}
+
+
+</style>
 
 <!-- landingPage -->
 <section class="landingSec main_block">
@@ -148,7 +174,7 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 <!-- traveling Information -->
 <section class="pageSection main_block">
   <!-- background Image -->
-  <img src="<?= BASE_URL ?>images/quotation/p6/pageBG.jpg" class="img-responsive pageBGImg">
+  <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
   <section class="travelingDetails main_block mg_tp_30 pageSectionInner">
 
     <!-- transport -->
@@ -227,11 +253,84 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
   </section>
 </section>
 
+<!-- Itinerary -->
+<?php
+$count = 1;
+$i = 0;
+$result = get_dates_for_itineary($sq_quotation['from_date'], $sq_quotation['to_date']);
+$iti_dates_days = explode('=', $result);
+$dates = json_decode($iti_dates_days[0], true);
+$checkPageEnd = 0;
+while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
+
+  $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
+  $daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
+  
+  if ($checkPageEnd % 1 == 0 || $checkPageEnd == 0) {
+    $go = $checkPageEnd + 0;
+    $flag = 0;
+?>
+    <section class="pageSection main_block">
+      <!-- background Image -->
+      <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
+
+      <section class="itinerarySec main_block side_pad mg_tp_30 pageSectionInner">
+        <?php if ($count == 1) { ?>
+          <div class="mg-bt-30">
+            <div class="vitinerary_div">
+              <h6>Day Wise Itinerary</h6>
+            </div>
+          </div>
+        <?php } ?>
+      <?php
+    }
+      ?>
+      <ul class="print_itinenary no-pad no-marg">
+        <li class="print_single_itinenary topItinerary">
+          <div>
+            <!-- <div class="itneraryImg">
+              <img src="<?= $daywise_image ?>" class="img-responsive">
+            </div> -->
+            <div class="itneraryText">
+              <div class="itneraryDayInfo">
+                <i class="fa fa-map-marker" aria-hidden="true"></i><span> Day <?= $count ?> <small> (<?= $date_format ?>) </small> : <?= $row_itinarary['attraction'] ?> </span>
+              </div>
+              <div class="itneraryDayPlan">
+                <p><?= $row_itinarary['day_wise_program'] ?></p>
+              </div>
+              <div class="itneraryDayAccomodation">
+                <span><i class="fa fa-bed"></i> : <?= $row_itinarary['stay'] ?></span>
+                <span><i class="fa fa-cutlery"></i> : <?= $row_itinarary['meal_plan'] ?></span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <?php
+        if ($go == $checkPageEnd) {
+          $flag = 1;
+        ?>
+      </ul>
+      </section>
+    </section>
+  <?php
+        }
+        $count++;
+        $i++;
+        $checkPageEnd++;
+      }
+      if ($flag == 0) {
+  ?>
+  </ul>
+  </section>
+  </section>
+<?php } ?>
+
 <!-- Terms and Conditions -->
 <?php if (isset($sq_terms_cond['terms_and_conditions'])) { ?>
-  <section class="pageSection main_block">
+  <section class="pageSection main_block" style="margin-top:50px;">
     <!-- background Image -->
-    <img src="<?= BASE_URL ?>images/quotation/p6/pageBG.jpg" class="img-responsive pageBGImg">
+    <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
 
     <section class="incluExcluTerms main_block side_pad mg_tp_30 pageSectionInner">
 
@@ -245,7 +344,6 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
           </div>
         </div>
       </div>
-      </div>
 
     </section>
   </section>
@@ -254,10 +352,10 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 
 
 <!-- Costing & Banking Page -->
-<section class="pageSection main_block">
+<section class="pageSection main_block" style="margin-top:80px; clear:both;">
   <!-- background Image -->
   <!-- <img src="<?= BASE_URL ?>images/quotation/p6/pageBG.jpg" class="img-responsive pageBGImg"> -->
-  <!-- <section class="main_block mg_tp_30 pageSectionInner"> -->
+  <section class="main_block mg_tp_30 pageSectionInner">
 
     <div class="row">
       <div class="col-md-12">
@@ -379,9 +477,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
             <p>SWIFT CODE</p>
           </div>
           <?php
-          if (check_qr()) { ?>
+          if (check_qr($branch_admin_id)) { ?>
             <div class="col-md-12 text-center ">
-              <?= get_qr('Landscape Advanced') ?>
+              <?= get_qr('Landscape Advanced', $branch_admin_id) ?>
               <h4 class="no-marg">Scan & Pay</h4>
             </div>
           <?php } ?>
@@ -391,7 +489,7 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 
     </div>
 
-  <!-- </section> -->
+  </section>
 </section>
 
 <!-- Contcat Page -->

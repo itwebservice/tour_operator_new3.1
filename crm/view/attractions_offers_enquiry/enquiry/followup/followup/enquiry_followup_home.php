@@ -13,7 +13,7 @@
         <div class="col-md-3 col-sm-6 mg_bt_10">
           <select name="followup_status" id="followup_status" title="Followup Status" class="form-control" onchange="followup_type_reflect(this.value);">
             <option value="">*Status</option>
-            <option value="Active">Active</option>
+            <option value="New">New</option>
 						<option value="In-Followup">In-Followup</option>
             <option value="Dropped">Dropped</option>
             <option value="Converted">Converted</option>

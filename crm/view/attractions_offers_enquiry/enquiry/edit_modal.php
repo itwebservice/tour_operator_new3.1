@@ -37,6 +37,7 @@ $row_user = mysqli_fetch_assoc(mysqlQuery("Select name,user_id from customer_use
                                 <option value="Car Rental">Car Rental</option>
                                 <option value="Train Ticket">Train Ticket</option>
                                 <option value="Bus">Bus</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
                             </select>
                         </div>
                     </div>

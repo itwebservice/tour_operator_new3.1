@@ -59,11 +59,11 @@
 			},
 			{
 				title: "Total Enquiries"
-			},
-			{
-				title: "Active"
-			},
-			{
+		},
+		{
+			title: "New"
+		},
+		{
 				title: "In-Followup"
 			},
 			{

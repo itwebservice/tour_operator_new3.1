@@ -85,7 +85,7 @@ $branch_status1 = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['b
                     GROUP BY enquiry_id
                 ) eme2 ON eme1.entry_id = eme2.max_entry_id
                 WHERE 
-                    followup_status IN ('Active', 'In-Followup')";
+                    followup_status IN ('New', 'In-Followup')";
 
             if ($from_date_db && $to_date_db) {
                 $entries_query .= " AND followup_date BETWEEN '$from_date_db' AND '$to_date_db'";
@@ -149,7 +149,7 @@ $branch_status1 = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['b
                     foreach ($status_data[$enquiry_id] as $status_entry) {
                         if ($status_entry['followup_status'] != 'Dropped') {
                             $fs = $status_entry['followup_status'];
-                            $bg = ($fs == 'Converted') ? 'success' : ($fs == 'Active' ? 'warning' : ($fs == 'Dropped' ? 'danger' : ''));
+                            $bg = ($fs == 'Converted') ? 'success' : ($fs == 'New' ? 'warning' : ($fs == 'Dropped' ? 'danger' : ''));
                             break;
                         }
                     }

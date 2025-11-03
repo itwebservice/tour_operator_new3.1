@@ -75,6 +75,31 @@ include "../../../model/model.php";
                                 <?php get_states_dropdown() ?>
                             </select>
                         </div>
+                     </div>
+                     <div class="row">
+                        <div class="col-sm-4 mg_bt_10">
+                            <label for="qr_upload">Upload QR Code:</label>
+                            <div class="div-upload">
+                                <div id="qr_upload_btn" class="upload-button1"><span>Image</span></div>
+                                <span id="qr_status"></span>
+                                <ul id="files"></ul>
+                                <input type="hidden" id="qr_upload_url" name="qr_upload_url" value="">
+                            </div>
+                            <button type="button" data-toggle="tooltip" class="btn btn-excel btn-sm" title="Image Size Should Be Less Than 100KB, Resolution : 900 X 900 and Format: Jpg/JPEG/Png"><i class="fa fa-question-circle"></i></button>
+                            <button type="button" id="qr_preview_btn" data-toggle="tooltip" class="btn btn-info btn-sm hidden" onclick="preview_qr_image()" title="Preview QR Code"><i class="fa fa-eye"></i></button>
+                        </div>
+                        <div class="img_view" id="img_view"></div>
+                        <div class="col-sm-4 mg_bt_10">
+                            <label for="logo_upload">Upload Branch Logo:</label>
+                            <div class="div-upload">
+                                <div id="logo_upload_btn" class="upload-button1"><span>Image</span></div>
+                                <span id="logo_status"></span>
+                                <ul id="files"></ul>
+                                <input type="hidden" id="logo_upload_url" name="logo_upload_url" value="">
+                            </div>
+                            <button type="button" data-toggle="tooltip" class="btn btn-excel btn-sm" title="Image Size Should Be Less Than 100KB, Dimension : 222 X 83 and Format: Jpg/JPEG/Png"><i class="fa fa-question-circle"></i></button>
+                            <button type="button" id="logo_preview_btn" data-toggle="tooltip" class="btn btn-info btn-sm hidden" onclick="preview_logo_image()" title="Preview Logo"><i class="fa fa-eye"></i></button>
+                        </div>
                         <div class="col-sm-4 mg_bt_10">
                             <input type="hidden" id="bank_name" name="bank_name" placeholder="Bank Name" title="Bank Name"
                                 class="bank_suggest">
@@ -140,6 +165,139 @@ $('#branches_save_modal').on('shown.bs.modal', function() {
 $(".select2-selection span").attr('title', '');
 // till here
 
+
+upload_qr_branch();
+
+function upload_qr_branch() {
+    var btnUpload = $('#qr_upload_btn');
+    $(btnUpload).find('span').text('Image');
+
+    $("#qr_upload_url").val('');
+    new AjaxUpload(btnUpload, {
+        action: 'branches/upload_qr.php',
+        name: 'uploadfileQR',
+        onSubmit: function(file, ext) {
+            if (!(ext && /^(jpg|png|jpeg)$/.test(ext))) {
+                error_msg_alert('Only JPG, PNG, JPEG files are allowed');
+                return false;
+            }
+            $(btnUpload).find('span').text('Uploading...');
+        },
+        onComplete: function(file, response) {
+            console.log('Upload response:', response); // Debug log
+            
+            if (response.indexOf('error') !== -1) {
+                var errorMsg = response.split('--');
+                if(errorMsg.length > 1){
+                    error_msg_alert(errorMsg[1]);
+                } else if (response == "error1") {
+                    error_msg_alert('Maximum size exceeds (Should be less than 100KB)');
+                } else {
+                    error_msg_alert('File upload failed. Please try again.');
+                }
+                $(btnUpload).find('span').text('Image');
+                return false;
+            } else {
+                $(btnUpload).find('span').text('Uploaded');
+                $("#qr_upload_url").val(response);
+                $('#qr_preview_btn').removeClass('hidden'); // Show preview button
+                msg_alert('QR Code uploaded successfully');
+            }
+        }
+    });
+}
+
+upload_logo_branch();
+
+function upload_logo_branch() {
+    var btnUpload = $('#logo_upload_btn');
+    $(btnUpload).find('span').text('Image');
+
+    $("#logo_upload_url").val('');
+    new AjaxUpload(btnUpload, {
+        action: 'branches/upload_logo.php',
+        name: 'uploadfileLOGO',
+        onSubmit: function(file, ext) {
+            if (!(ext && /^(jpg|png|jpeg)$/.test(ext))) {
+                error_msg_alert('Only JPG, PNG, JPEG files are allowed');
+                return false;
+            }
+            $(btnUpload).find('span').text('Uploading...');
+        },
+        onComplete: function(file, response) {
+            console.log('Logo Upload response:', response); // Debug log
+            
+            if (response.indexOf('error') !== -1) {
+                var errorMsg = response.split('--');
+                if(errorMsg.length > 1){
+                    error_msg_alert(errorMsg[1]);
+                } else if (response == "error1") {
+                    error_msg_alert('Maximum size exceeds (Should be less than 100KB)');
+                } else {
+                    error_msg_alert('File upload failed. Please try again.');
+                }
+                $(btnUpload).find('span').text('Image');
+                return false;
+            } else {
+                $(btnUpload).find('span').text('Uploaded');
+                $("#logo_upload_url").val(response);
+                $('#logo_preview_btn').removeClass('hidden'); // Show preview button
+                msg_alert('Branch Logo uploaded successfully');
+            }
+        }
+    });
+}
+
+function preview_qr_image() {
+    var qr_path = $('#qr_upload_url').val();
+    if(qr_path) {
+        var img_url = qr_path.substring(9); // Remove '../../../' from path
+        var full_url = $('#base_url').val() + img_url;
+        
+        var modalHtml = '<div class="modal fade" id="qr_preview_modal" role="dialog">' +
+            '<div class="modal-dialog modal-lg">' +
+            '<div class="modal-content">' +
+            '<div class="modal-header">' +
+            '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+            '<h4 class="modal-title">QR Code Preview</h4>' +
+            '</div>' +
+            '<div class="modal-body text-center">' +
+            '<img src="' + full_url + '" alt="QR Code" style="max-width: 100%; height: auto;">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        
+        $('#img_view').html(modalHtml);
+        $('#qr_preview_modal').modal('show');
+    }
+}
+
+function preview_logo_image() {
+    var logo_path = $('#logo_upload_url').val();
+    if(logo_path) {
+        var img_url = logo_path.substring(9); // Remove '../../../' from path
+        var full_url = $('#base_url').val() + img_url;
+        
+        var modalHtml = '<div class="modal fade" id="logo_preview_modal" role="dialog">' +
+            '<div class="modal-dialog modal-lg">' +
+            '<div class="modal-content">' +
+            '<div class="modal-header">' +
+            '<button type="button" class="close" data-dismiss="modal">&times;</button>' +
+            '<h4 class="modal-title">Branch Logo Preview</h4>' +
+            '</div>' +
+            '<div class="modal-body text-center">' +
+            '<img src="' + full_url + '" alt="Branch Logo" style="max-width: 100%; height: auto;">' +
+            '<p class="mg_tp_10"><small>Recommended Dimension: 222 X 83</small></p>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        
+        $('#img_view').html(modalHtml);
+        $('#logo_preview_modal').modal('show');
+    }
+}
 
 $(function() {
     $('#frm_branch_save').validate({

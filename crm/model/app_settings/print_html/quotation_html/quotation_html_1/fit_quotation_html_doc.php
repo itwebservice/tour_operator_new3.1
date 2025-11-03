@@ -7,6 +7,10 @@ global $app_quot_img, $similar_text, $quot_note, $currency, $tcs_note, $app_quot
 
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
+
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
 $sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='package_booking/quotation/home/index.php'"));
 $branch_status = $sq['branch_status'];
 if ($branch_admin_id != 0) {
@@ -455,11 +459,11 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                       <th style="text-align: left;padding: 8px 12px !important;">Activity Date/Time</th>
                       <th style="text-align: left;padding: 8px  12px !important;">Activity Name</th>
                       <th style="text-align: left;padding: 8px  12px !important;">Transfer Option</th>
+                      <th style="text-align: left;padding: 8px  12px !important;">Vehicle Name</th>
                       <th style="text-align: left; padding: 8px  10px !important;">Adult</th>
                       <th style="text-align: left;padding: 8px  10px !important;">CWB</th>
                       <th style="text-align: left;padding: 8px  10px !important;">CWOB</th>
                       <th style="text-align: left;padding: 8px  10px !important;">Infant</th>
-                      <th style="text-align: left;padding: 8px  10px !important;">Vehicle</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -469,17 +473,25 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                     while ($row_ex = mysqli_fetch_assoc($sq_ex)) {
                       $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
                       $sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
+                      // Get vehicle name
+                      $vehicle_display = '';
+                      if(isset($row_ex['vehicle_id']) && $row_ex['vehicle_id'] != '' && $row_ex['vehicle_id'] != '0' && $row_ex['vehicle_id'] != null){
+                          $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_ex['vehicle_id']."'"));
+                          if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                              $vehicle_display = $sq_vehicle['vehicle_name'];
+                          }
+                      }
                     ?>
                       <tr>
                         <td><?= $sq_city['city_name'] ?></td>
                         <td><?= get_datetime_user($row_ex['exc_date']) ?></td>
                         <td><?= $sq_ex_name['excursion_name'] ?></td>
                         <td><?= $row_ex['transfer_option'] ?></td>
+                        <td><?= $vehicle_display ?></td>
                         <td><?= $row_ex['adult'] ?></td>
                         <td><?= $row_ex['chwb'] ?></td>
                         <td><?= $row_ex['chwob'] ?></td>
                         <td><?= $row_ex['infant'] ?></td>
-                        <td><?= $row_ex['vehicles'] ?></td>
                       </tr>
                     <?php }  ?>
                   </tbody>
@@ -1100,9 +1112,9 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
       </table>
 
       <?php
-      if (check_qr()) { ?>
+      if (check_qr($branch_admin_id)) { ?>
         <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px; text-align:center">
-          <?= get_qr('Protrait Standard') ?>
+          <?= get_qr('Protrait Standard', $branch_admin_id) ?>
           <br>
           <h4 class="no-marg">Scan & Pay </h4>
         </div>

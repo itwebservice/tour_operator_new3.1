@@ -197,7 +197,7 @@ $('#total_tour_cost1').val(total_cost.toFixed(2));
 
 }
 //   
-function switch_to_tab1(){ $('a[href="#tab_1_c"]').tab('show'); }
+function switch_to_tab1(){ $('a[href="#tab_2_c"]').tab('show'); }
 
 $('#frm_tab41_c').validate({
 	rules:{
@@ -263,6 +263,26 @@ $('#frm_tab41_c').validate({
 
 		var base_url = $('#base_url').val();
 
+		// Collect itinerary data
+		var table = document.getElementById("package_program_list");
+		var rowCount = table.rows.length;
+		var special_attraction_arr = [];
+		var day_program_arr = [];
+		var stay_arr = [];
+		var meal_plan_arr = [];
+		var checked_programe_arr = [];
+		var iti_entry_id_arr = [];
+
+		for (var i = 0; i < rowCount; i++) {
+			var row = table.rows[i];
+			checked_programe_arr.push(row.cells[0].childNodes[0].checked);
+			special_attraction_arr.push(row.cells[2].childNodes[0].value);
+			day_program_arr.push(row.cells[3].childNodes[0].value);
+			stay_arr.push(row.cells[4].childNodes[0].value);
+			meal_plan_arr.push(row.cells[5].childNodes[0].value);
+			iti_entry_id_arr.push(row.cells[7].childNodes[0].value);
+		}
+
 		if(parseFloat(taxation_id) == "0"){ error_msg_alert("Please select Tax Percentage");
 		$('#btn_quotation_update').prop('disabled', false); return false; }
 
@@ -274,7 +294,7 @@ $('#frm_tab41_c').validate({
 
 			url: base_url+'controller/package_tour/quotation/car_rental/quotation_update.php',
 
-			data:{quotation_id : quotation_id, enquiry_id : enquiry_id , total_pax : total_pax, days_of_traveling : days_of_traveling,traveling_date : traveling_date, travel_type : travel_type,vehicle_name : vehicle_name, from_date : from_date, to_date : to_date, route : route,extra_km_cost : extra_km_cost , extra_hr_cost : extra_hr_cost, subtotal : subtotal,markup_cost : markup_cost,markup_cost_subtotal : markup_cost_subtotal, taxation_id : taxation_id, service_charge : service_charge , service_tax_subtotal : service_tax_subtotal, permit : permit, toll_parking : toll_parking, driver_allowance : driver_allowance , total_tour_cost : total_tour_cost, customer_name : customer_name,quotation_date : quotation_date,email_id : email_id, mobile_no : mobile_no,country_code:country_code,other_charges:other_charges,state_entry:state_entry,capacity:capacity,total_hrs:total_hrs,total_km:total_km,rate:rate,total_max_km:total_max_km,local_places_to_visit:local_places_to_visit, roundoff : roundoff, bsmValues : bsmValues,active_flag:active_flag,currency_code:currency_code},
+			data:{quotation_id : quotation_id, enquiry_id : enquiry_id , total_pax : total_pax, days_of_traveling : days_of_traveling,traveling_date : traveling_date, travel_type : travel_type,vehicle_name : vehicle_name, from_date : from_date, to_date : to_date, route : route,extra_km_cost : extra_km_cost , extra_hr_cost : extra_hr_cost, subtotal : subtotal,markup_cost : markup_cost,markup_cost_subtotal : markup_cost_subtotal, taxation_id : taxation_id, service_charge : service_charge , service_tax_subtotal : service_tax_subtotal, permit : permit, toll_parking : toll_parking, driver_allowance : driver_allowance , total_tour_cost : total_tour_cost, customer_name : customer_name,quotation_date : quotation_date,email_id : email_id, mobile_no : mobile_no,country_code:country_code,other_charges:other_charges,state_entry:state_entry,capacity:capacity,total_hrs:total_hrs,total_km:total_km,rate:rate,total_max_km:total_max_km,local_places_to_visit:local_places_to_visit, roundoff : roundoff, bsmValues : bsmValues,active_flag:active_flag,currency_code:currency_code, special_attraction_arr : special_attraction_arr, day_program_arr : day_program_arr, stay_arr : stay_arr, meal_plan_arr : meal_plan_arr, checked_programe_arr : checked_programe_arr, iti_entry_id_arr : iti_entry_id_arr},
 			success: function(message){			
                 	$('#btn_quotation_update').button('reset');
                 	var msg = message.split('--');

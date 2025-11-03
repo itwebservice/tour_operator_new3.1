@@ -471,6 +471,19 @@ $package_name = $sq_package['package_name'];
                                                             <td style="display:none"><input type="number"
                                                                     id="infant_total-1" name="infant_total-1"
                                                                     style="width:100px;display:none;"></td>
+                                                            <td><select name="vehicle_id-1" id="vehicle_id-1"
+                                                                    style="width: 155px"
+                                                                    class="form-control app_select2"
+                                                                    title="Select Vehicle">
+                                                                    <option value=''>Select Vehicle</option>
+                                                                    <?php
+                                                                    $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                                    while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                                    ?>
+                                                                        <option value="<?= $row_vehicle['entry_id'] ?>">
+                                                                            <?= $row_vehicle['vehicle_name'] ?></option>
+                                                                    <?php } ?>
+                                                                </select></td>
                                                             <td><input type="number" id="no_vehicles-1" name="no_vehicles-1"
                                                                     placeholder="No.Of Vehicles" title="No.Of Vehicles"
                                                                     style="width:150px" onchange="get_excursion_amount();">
@@ -589,11 +602,26 @@ $package_name = $sq_package['package_name'];
                                                                 <td style="display:none"><input type="number"
                                                                         id="infant_total-1" name="infant_total-1"
                                                                         style="width:100px;display:none;"></td>
+                                                                <td><select name="vehicle_id-<?= $count ?>_u" id="vehicle_id-<?= $count ?>_u"
+                                                                        style="width: 155px"
+                                                                        class="form-control app_select2"
+                                                                        title="Select Vehicle">
+                                                                        <option value=''>Select Vehicle</option>
+                                                                        <?php
+                                                                        $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                                        while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                                            $selected = ($row_vehicle['entry_id'] == $row_q_ex['vehicle_id']) ? 'selected' : '';
+                                                                        ?>
+                                                                            <option value="<?= $row_vehicle['entry_id'] ?>" <?= $selected ?>>
+                                                                                <?= $row_vehicle['vehicle_name'] ?></option>
+                                                                        <?php } ?>
+                                                                    </select></td>
                                                                 <td><input type="number" id="no_vehicles-<?= $count ?>_u" name="no_vehicles-<?= $count ?>_u" placeholder="No.Of Vehicles" title="No.Of Vehicles" style="width:150px" onchange="get_excursion_amount();" value="<?php echo $row_q_ex['vehicles'] ?>">
                                                                 <td class="hidden"><input type="hidden" value="<?= $row_q_ex['id'] ?>"></td>
                                                             </tr>
                                                             <script>
                                                             $('#city_name-<?= $count ?>_u').select2();
+                                                            $('#vehicle_id-<?= $count ?>_u').select2();
                                                             $('#exc_date-<?= $count ?>_u').datetimepicker({format: "d-m-Y H:i"});
                                                             city_lzloading('.act_city', '*City');
                                                             </script>

@@ -1918,6 +1918,8 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "excursion_amount-" + foo.counter
     );
+    row.cells[15].childNodes[0].setAttribute("id", "vehicle_id-" + foo.counter);
+    row.cells[16].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter);
 
     for (var i = row.cells[2].childNodes[0].attributes.length; i-- > 0; )
       row.cells[2].childNodes[0].removeAttributeNode(
@@ -4026,8 +4028,9 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[6].childNodes[0].setAttribute("id", "child_cost" + foo.counter);
     row.cells[7].childNodes[0].setAttribute("id", "infant_cost" + foo.counter);
     row.cells[8].childNodes[0].setAttribute("id", "transfer_cost" + foo.counter);
-    row.cells[9].childNodes[0].setAttribute("id", "markup_in" + foo.counter);
-    row.cells[10].childNodes[0].setAttribute("id", "amount" + foo.counter);
+    row.cells[9].childNodes[0].setAttribute("id", "vehicle_id" + foo.counter);
+    row.cells[10].childNodes[0].setAttribute("id", "markup_in" + foo.counter);
+    row.cells[11].childNodes[0].setAttribute("id", "amount" + foo.counter);
 
     row.cells[3].childNodes[0].value = get_date();
     dynamic_date(row.cells[3].childNodes[0].id);
@@ -4056,7 +4059,7 @@ function foo(tableID, quot_table_id, rowCounts) {
         '")'
     );
 
-    $(row.cells[11]).addClass("hidden");
+    $(row.cells[12]).addClass("hidden");
   }
   if (tableID == "table_exc_tarrif_offer") {
     row.cells[0].childNodes[0].setAttribute("id", "chk_offer" + foo.counter);

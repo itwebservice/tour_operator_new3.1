@@ -165,7 +165,7 @@
 	<br><br>
 	<div class="row text-center">
 		<div class="col-xs-12">
-			<button class="btn btn-info btn-sm ico_right" onclick=get_basic_amount()>Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></button>
+			<button class="btn btn-info btn-sm ico_right" type="submit">Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></button>
 		</div>
 	</div>
 </form>
@@ -174,7 +174,7 @@
 	$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 $('#country_code').select2();
 $("#customer_name").autocomplete({
-    // source: JSON.parse($('#cust_data').val()),
+    source: JSON.parse($('#cust_data').val()),
     select: function(event, ui) {
         $("#customer_name").val(ui.item.label);
         $('#mobile_no').val(ui.item.contact_no);
@@ -236,8 +236,10 @@ $('#frm_tab1').validate({
 			error_msg_alert("Please enter correct rate!");
 			return false;
 		}
-		$('a[href="#tab2"]').tab('show');
-
+		get_basic_amount();
+		// Navigate to Itinerary tab
+		$('.nav-tabs a[href="#tab2"]').tab('show');
+		return false;
 	}
 
 });

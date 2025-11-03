@@ -121,11 +121,11 @@
 			</div>
 			<?php } ?>
 			<div class="col-md-3 col-sm-6 mg_bt_10">
-				<select name="enquiry_status_filter" id="enquiry_status_filter" title="Enquiry Status">
-					<option value="">Status</option>
-					<option value="Active">Active</option>
-					<option value="In-Followup">In-Followup</option>
-					<option value="Dropped">Dropped</option>
+			<select name="enquiry_status_filter" id="enquiry_status_filter" title="Enquiry Status">
+				<option value="">Status</option>
+				<option value="New">New</option>
+				<option value="In-Followup">In-Followup</option>
+				<option value="Dropped">Dropped</option>
 					<option value="Converted">Converted</option>
 				</select>
 			</div>
@@ -151,6 +151,7 @@
 					<option value="Visa">Visa</option>
 					<option value="Bus">Bus</option>
 					<option value="Train Ticket">Train Ticket</option>
+					<option value="Miscellaneous">Miscellaneous</option>
 				</select>
 			</div>
 			<div class="col-md-3 col-sm-6 mg_bt_10_xs">

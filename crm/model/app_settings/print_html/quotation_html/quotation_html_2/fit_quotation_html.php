@@ -6,6 +6,10 @@ global $app_quot_img, $similar_text, $quot_note, $currency, $tcs_note, $app_quot
 
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
+
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
 $sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='package_booking/quotation/home/index.php'"));
 $branch_status = $sq['branch_status'];
 if ($branch_admin_id != 0) {
@@ -443,11 +447,11 @@ if ($sq_quotation['discount'] != 0) {
                                         <th>City</th>
                                         <th>Activity</th>
                                         <th>Transfer</th>
+                                        <th>Vehicle Name</th>
                                         <th>Adult</th>
                                         <th>CWB</th>
                                         <th>CWOB</th>
                                         <th>Infant</th>
-                                        <th>Vehicle</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -457,17 +461,25 @@ if ($sq_quotation['discount'] != 0) {
                                     while ($row_ex = mysqli_fetch_assoc($sq_ex)) {
                                         $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
                                         $sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
+                                        // Get vehicle name
+                                        $vehicle_display = '';
+                                        if(isset($row_ex['vehicle_id']) && $row_ex['vehicle_id'] != '' && $row_ex['vehicle_id'] != '0' && $row_ex['vehicle_id'] != null){
+                                            $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_ex['vehicle_id']."'"));
+                                            if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                                                $vehicle_display = $sq_vehicle['vehicle_name'];
+                                            }
+                                        }
                                     ?>
                                         <tr>
                                             <td><?= get_datetime_user($row_ex['exc_date']) ?></td>
                                             <td><?= $sq_city['city_name'] ?></td>
                                             <td><?= $sq_ex_name['excursion_name'] ?></td>
                                             <td><?= $row_ex['transfer_option'] ?></td>
+                                            <td><?= $vehicle_display ?></td>
                                             <td><?= $row_ex['adult'] ?></td>
                                             <td><?= $row_ex['chwb'] ?></td>
                                             <td><?= $row_ex['chwob'] ?></td>
                                             <td><?= $row_ex['infant'] ?></td>
-                                            <td><?= $row_ex['vehicles'] ?></td>
                                         </tr>
                                     <?php }  ?>
                                 </tbody>
@@ -726,9 +738,9 @@ if ($sq_quotation['discount'] != 0) {
                                 <p>SWIFT CODE</p>
                             </div>
                             <?php
-                            if (check_qr()) { ?>
+                            if (check_qr($branch_admin_id)) { ?>
                                 <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px;">
-                                    <?= get_qr('Landscape Standard') ?>
+                                    <?= get_qr('Landscape Standard', $branch_admin_id) ?>
                                     <br>
                                     <h4 class="no-marg">Scan & Pay </h4>
                                 </div>

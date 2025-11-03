@@ -91,6 +91,11 @@ public function quotation_master_save()
 			$sq_entryid = mysqlQuery("update enquiry_master set entry_id='$entry_id' where enquiry_id='$enquiry_id1'");
 		}
 
+		/////////////Itinerary Save///////////////
+		if(isset($_POST['special_attraction_arr']) && !empty($_POST['special_attraction_arr'])){
+			$this->itinerary_save($quotation_id, $_POST['special_attraction_arr'], $_POST['day_program_arr'], $_POST['stay_arr'], $_POST['meal_plan_arr'], $_POST['checked_programe_arr']);
+		}
+
 		/////////////Enquiry Save End///////////////
 		echo "Quotation has been successfully saved.";
 		exit;
@@ -101,6 +106,30 @@ public function quotation_master_save()
 	}
 
 }
+
+public function itinerary_save($quotation_id, $special_attraction_arr, $day_program_arr, $stay_arr, $meal_plan_arr, $checked_programe_arr)
+{
+	for ($i = 0; $i < sizeof($day_program_arr); $i++) {
+		if ($checked_programe_arr[$i] == 'true') {
+			$sq = mysqlQuery("select max(id) as max from car_rental_quotation_program");
+			$value = mysqli_fetch_assoc($sq);
+			$max_id = $value['max'] + 1;
+
+			$special_attraction_arr1 = addslashes($special_attraction_arr[$i]);
+			$day_program_arr1 = addslashes($day_program_arr[$i]);
+			$stay_arr1 = addslashes($stay_arr[$i]);
+			$meal_plan1 = mysqlREString($meal_plan_arr[$i]);
+
+			$sq = mysqlQuery("insert into car_rental_quotation_program (id, quotation_id, attraction, day_wise_program, stay, meal_plan) values ('$max_id', '$quotation_id', '$special_attraction_arr1', '$day_program_arr1', '$stay_arr1', '$meal_plan1')");
+
+			if (!$sq) {
+				echo "error--Error at row " . ($i + 1) . " for Tour Itinerary information.";
+				exit;
+			}
+		}
+	}
+}
+
 public function quotation_whatsapp(){
 	$quotation_id = $_POST['quotation_id'];
 
@@ -132,12 +161,27 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 		$currency_amount = '';
 	}
 
+	// Itinerary Data
+	$itninarydata = "";
+	$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+	if(mysqli_num_rows($sq_package_program) > 0){
+		$itninarydata = "\n\n" . '📅 *Itinerary*' . "\n" . '------------' . "\n";
+		$count = 1;
+		while ($row_itinerary = mysqli_fetch_assoc($sq_package_program)) {
+			$meal_plan = ($row_itinerary['meal_plan'] != '') ? $row_itinerary['meal_plan'] : 'NA';
+			$itninarydata .= '*Day - ' . $count . '*   ' .
+				'*' . $row_itinerary['attraction'] . '*      ' .
+				'*(' . $row_itinerary['stay'] . '*)     ' .
+				'*(' . $meal_plan . ")*\n";
+			$count++;
+		}
+	}
 
 	$whatsapp_msg = rawurlencode('Dear '.$sq_quotation['customer_name'].',
 Hope you are doing great. This is car rental quotation details as per your request. We look forward to having you onboard with us.
 *Route* : '.$route.'
 *Total Days* : '.$sq_quotation['days_of_traveling'].' Days
-*Quotation Cost* : '.$sq_quotation['total_tour_cost'].$currency_amount.'
+*Quotation Cost* : '.$sq_quotation['total_tour_cost'].$currency_amount.$itninarydata.'
 
 Please contact for more details : '.$app_name.' '.$contact.'
 Thank you.');

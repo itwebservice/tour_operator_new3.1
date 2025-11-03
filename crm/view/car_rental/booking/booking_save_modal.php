@@ -67,7 +67,7 @@ $branch_status = $_POST['branch_status'];
                         <div class="row">
                             <div class="col-md-4 col-sm-6 col-xs-12 ">
                                 <select name="quotation_id" id="quotation_id" style="width:100%"
-                                    onchange="get_enquiry_details('');get_auto_values('balance_date','basic_amount','payment_mode','service_charge','markup_cost','save','true','basic');"
+                                    onchange="get_enquiry_details('');get_auto_values('balance_date','basic_amount','payment_mode','service_charge','markup_cost','save','true','basic');load_quotation_itinerary();"
                                     class="form-control">
                                     <option value="">Select Quotation</option>
                                     <option value="0"><?= "Without Quotation" ?></option>
@@ -197,6 +197,69 @@ $branch_status = $_POST['branch_status'];
                             </div>
                         </div>
                     </div>
+
+                    <!-- Tour Itinerary Section -->
+                    <div class="panel panel-default panel-body app_panel_style feildset-panel">
+                        <legend>Tour Itinerary Details</legend>
+                        <div class="app_panel_content Filter-panel">
+                            <div class="row mg_bt_10">
+                                <div class="col-xs-12 text-right text_center_xs">
+                                    <button type="button" class="btn btn-excel btn-sm" onClick="addRow('package_program_list')" title="Add row"><i class="fa fa-plus"></i></button>
+                                    <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('package_program_list');renumber_itinerary_rows();" title="Delete row"><i class="fa fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-6 col-xs-12 mg_bt_10">
+                                    <div style="max-height: 400px; overflow-y: auto;">
+                                        <table style="width:100%" id="package_program_list" name="package_program_list"
+                                            class="table mg_bt_0 table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <td width="27px;" style="padding-right: 10px !important;">
+                                                        <input class="css-checkbox mg_bt_10 labelauty" id="chk_program1" type="checkbox" checked style="display: none;">
+                                                        <label for="chk_program1" style="margin-top: 55px;">
+                                                            <span class="labelauty-unchecked-image"></span>
+                                                            <span class="labelauty-checked-image"></span>
+                                                        </label>
+                                                    </td>
+                                                    <td width="50px;">
+                                                        <input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." style="margin-top: 35px;" class="form-control" disabled="">
+                                                    </td>
+                                                    <td class="col-md-3 no-pad" style="padding-left: 5px !important;">
+                                                        <input type="text" id="special_attaraction1" style="margin-top: 35px;" onchange="validate_spaces(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction">
+                                                    </td>
+                                                    <td class='col-md-5 no-pad' style="padding-left: 5px !important;position: relative;">
+                                                        <textarea id="day_program1" name="day_program" style="height:90px;" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"></textarea>
+                                                        <span class="style_text">
+                                                            <span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span>
+                                                            <span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span>
+                                                        </span>
+                                                    </td>
+                                                    <td class="col-md-1/2 no-pad" style="padding-left: 5px !important;">
+                                                        <input type="text" id="overnight_stay1" style="margin-top: 35px;" name="overnight_stay" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" placeholder="Overnight Stay" title="Overnight Stay">
+                                                    </td>
+                                                    <td class="col-md-1/2 no-pad" style="padding-left: 5px !important;">
+                                                        <select id="meal_plan1" title="meal plan" style="margin-top: 35px;" name="meal_plan" class="form-control mg_bt_10" data-original-title="Meal Plan">
+                                                            <?php get_mealplan_dropdown(); ?>
+                                                        </select>
+                                                    </td>
+                                                    <td class='col-md-1 pad_8'>
+                                                        <button type="button" class="btn btn-info btn-iti btn-sm itinerary-btn" style="margin-top: 35px; border:none;" data-row="1" id="itinerary1" title="Add Itinerary" onClick="add_itinerary_booking(0,'special_attaraction1','day_program1','overnight_stay1','meal_plan1','Day-1')">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </td>
+                                                    <td style="display:none">
+                                                        <input type="text" name="package_id_n" value="" autocomplete="off" class="form-control" data-original-title="" title="">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="panel panel-default panel-body app_panel_style feildset-panel">
@@ -428,6 +491,25 @@ $branch_status = $_POST['branch_status'];
     </div>
 </form>
 
+<div id="div_itinerary_modal"></div>
+
+<style>
+.style_text {
+    position: absolute;
+    right: 15px;
+    display: flex;
+    gap: 15px;
+    background: #f5f5f5;
+    padding: 0px 14px;
+    top: 0px;
+}
+
+#booking_save_modal .modal-body {
+    max-height: 120vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+</style>
 
 <script>
 $('#booking_save_modal').modal('show');
@@ -631,6 +713,66 @@ $(function() {
                 "markup": $('#markup_show').find('span').text()
             });
 
+            // Collect itinerary data from all rows
+            var table = document.getElementById("package_program_list");
+            if(table) {
+                var rowCount = table.rows.length;
+                var special_attraction_arr = [];
+                var day_program_arr = [];
+                var stay_arr = [];
+                var meal_plan_arr = [];
+                var checked_programe_arr = [];
+
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
+                    
+                    // Get checkbox value
+                    var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+                    var isChecked = checkbox ? checkbox.checked : false;
+                    checked_programe_arr.push(isChecked);
+                    
+                    // Get attraction value - try multiple methods
+                    var attractionInput = row.cells[2].querySelector('input[name="special_attaraction"]') || 
+                                         row.cells[2].querySelector('input');
+                    var attraction = attractionInput ? attractionInput.value : '';
+                    
+                    // Get day program value
+                    var dayProgramTextarea = row.cells[3].querySelector('textarea[name="day_program"]') || 
+                                             row.cells[3].querySelector('textarea');
+                    var dayProgram = dayProgramTextarea ? dayProgramTextarea.value : '';
+                    
+                    // Get stay value
+                    var stayInput = row.cells[4].querySelector('input[name="overnight_stay"]') || 
+                                   row.cells[4].querySelector('input');
+                    var stay = stayInput ? stayInput.value : '';
+                    
+                    // Get meal plan value
+                    var mealSelect = row.cells[5].querySelector('select[name="meal_plan"]') || 
+                                    row.cells[5].querySelector('select');
+                    var mealPlan = mealSelect ? mealSelect.value : '';
+                    
+                    special_attraction_arr.push(attraction);
+                    day_program_arr.push(dayProgram);
+                    stay_arr.push(stay);
+                    meal_plan_arr.push(mealPlan);
+                }
+                
+                console.log('Save - Collecting itinerary data:', {
+                    rowCount: rowCount,
+                    special_attraction_arr: special_attraction_arr,
+                    day_program_arr: day_program_arr,
+                    stay_arr: stay_arr,
+                    meal_plan_arr: meal_plan_arr,
+                    checked_programe_arr: checked_programe_arr
+                });
+            } else {
+                var special_attraction_arr = [];
+                var day_program_arr = [];
+                var stay_arr = [];
+                var meal_plan_arr = [];
+                var checked_programe_arr = [];
+            }
+
             $('#btn_booking_save').button('loading');
             //Validation for booking and payment date in login financial year
             var check_date1 = $('#balance_date').val();
@@ -757,7 +899,12 @@ $(function() {
                                         bsmValues: bsmValues,
                                         credit_charges: credit_charges,
                                         credit_card_details: credit_card_details,
-                                        currency_code:currency_code
+                                        currency_code:currency_code,
+                                        special_attraction_arr: special_attraction_arr,
+                                        day_program_arr: day_program_arr,
+                                        stay_arr: stay_arr,
+                                        meal_plan_arr: meal_plan_arr,
+                                        checked_programe_arr: checked_programe_arr
                                     },
                                     function(result) {
                                         var msg = result.split('--');
@@ -806,5 +953,190 @@ $(function() {
         }
     });
 });
+
+// Function to add new row at the end of table (from top Add button)
+function addRow(table_id) {
+    count_itinerary++;
+    var table = document.getElementById(table_id);
+    var rowCount = table.rows.length;
+    var row = table.insertRow(rowCount);
+    
+    // Clone the meal plan options from the first row
+    var mealPlanOptions = $('#meal_plan1').html();
+    
+    row.innerHTML = '<td style="padding-right: 10px !important;"><input class="css-checkbox mg_bt_10 labelauty" id="chk_program'+count_itinerary+'" type="checkbox" checked style="display: none;"><label for="chk_program'+count_itinerary+'" style="margin-top: 55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>'+
+        '<td><input maxlength="15" value="'+(rowCount + 1)+'" type="text" name="username" placeholder="Sr. No." style="margin-top: 35px;" class="form-control" disabled=""></td>'+
+        '<td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction'+count_itinerary+'" style="margin-top: 35px;" onchange="validate_spaces(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction"></td>'+
+        '<td class="col-md-5 no-pad" style="padding-left: 5px !important;position: relative;"><textarea id="day_program'+count_itinerary+'" name="day_program" style="height:90px;" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>'+
+        '<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay'+count_itinerary+'" style="margin-top: 35px;" name="overnight_stay" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" placeholder="Overnight Stay" title="Overnight Stay"></td>'+
+        '<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan'+count_itinerary+'" title="meal plan" style="margin-top: 35px;" name="meal_plan" class="form-control mg_bt_10">'+mealPlanOptions+'</select></td>'+
+        '<td class="col-md-1 pad_8"><button type="button" class="btn btn-info btn-iti btn-sm itinerary-btn" style="margin-top: 35px; border:none;" title="Add Itinerary" onClick="add_itinerary_booking(0,\'special_attaraction'+count_itinerary+'\',\'day_program'+count_itinerary+'\',\'overnight_stay'+count_itinerary+'\',\'meal_plan'+count_itinerary+'\',\'Day-'+count_itinerary+'\')"><i class="fa fa-plus"></i></button></td>'+
+        '<td style="display:none"><input type="text" name="package_id_n" value="" autocomplete="off" class="form-control"></td>';
+    
+    renumber_itinerary_rows();
+}
+
+// Function to add new itinerary row after the clicked row
+var count_itinerary = 1;
+function add_booking_itinerary(button_element){
+    count_itinerary++;
+    var table = document.getElementById('package_program_list');
+    
+    // Get the row index where button was clicked
+    var currentRow = button_element.parentElement.parentElement;
+    var rowIndex = currentRow.rowIndex;
+    
+    // Insert new row after the current row
+    var row = table.insertRow(rowIndex + 1);
+    
+    // Clone the meal plan options from the first row
+    var mealPlanOptions = $('#meal_plan1').html();
+    
+    row.innerHTML = '<td style="padding-right: 10px !important;"><input class="css-checkbox mg_bt_10 labelauty" id="chk_program'+count_itinerary+'" type="checkbox" checked style="display: none;"><label for="chk_program'+count_itinerary+'" style="margin-top: 55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>'+
+        '<td><input maxlength="15" value="'+(rowIndex + 1)+'" type="text" name="username" placeholder="Sr. No." style="margin-top: 35px;" class="form-control" disabled=""></td>'+
+        '<td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction'+count_itinerary+'" style="margin-top: 35px;" onchange="validate_spaces(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction"></td>'+
+        '<td class="col-md-5 no-pad" style="padding-left: 5px !important;position: relative;"><textarea id="day_program'+count_itinerary+'" name="day_program" style="height:90px;" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>'+
+        '<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay'+count_itinerary+'" style="margin-top: 35px;" name="overnight_stay" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" placeholder="Overnight Stay" title="Overnight Stay"></td>'+
+        '<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan'+count_itinerary+'" title="meal plan" style="margin-top: 35px;" name="meal_plan" class="form-control mg_bt_10">'+mealPlanOptions+'</select></td>'+
+        '<td class="col-md-1 pad_8"><button type="button" class="btn btn-info btn-iti btn-sm itinerary-btn" style="margin-top: 35px; border:none;" title="Add Itinerary" onClick="add_itinerary_booking(0,\'special_attaraction'+count_itinerary+'\',\'day_program'+count_itinerary+'\',\'overnight_stay'+count_itinerary+'\',\'meal_plan'+count_itinerary+'\',\'Day-'+count_itinerary+'\')"><i class="fa fa-plus"></i></button></td>'+
+        '<td style="display:none"><input type="text" name="package_id_n" value="" autocomplete="off" class="form-control"></td>';
+    
+    // Renumber all rows
+    renumber_itinerary_rows();
+}
+
+// Function to renumber all itinerary rows
+function renumber_itinerary_rows(){
+    var table = document.getElementById('package_program_list');
+    for(var i = 0; i < table.rows.length; i++){
+        table.rows[i].cells[1].childNodes[0].value = i + 1;
+    }
+}
+
+// Bold and Underline text formatting for day program
+$(document).on("click", ".style_text_b, .style_text_u", function() {
+    var wrapper = $(this).data("wrapper");
+    
+    // Get the textarea element
+    var textarea = $(this).parents('.style_text').siblings('.day_program')[0];
+    
+    // Ensure textarea exists and selectionStart/selectionEnd are supported
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var selectedText = textarea.value.substring(start, end);
+    
+    if (selectedText) {
+        // Wrap the selected text with the wrapper
+        var newText = textarea.value.substring(0, start) + wrapper + selectedText + wrapper + textarea.value.substring(end);
+        textarea.value = newText;
+        
+        // Set cursor position after the wrapped text
+        textarea.selectionStart = textarea.selectionEnd = end + (wrapper.length * 2);
+        textarea.focus();
+    } else {
+        error_msg_alert("Please select text to format!");
+    }
+});
+
+// Function to open itinerary modal for booking
+function add_itinerary_booking(dest_id1, spa, dwp, ovs, meal, dayp) {
+    var day_id = dayp.split('-');
+    $('#itinerary'+day_id[1]).prop('disabled',true);
+    var base_url = $('#base_url').val();
+    var dest_id = $('#' + dest_id1).val();
+    if (dest_id == '') {
+        dest_id = 0; // Allow opening modal even without destination
+    }
+    $('#itinerary'+day_id[1]).button('loading');
+    $.post(base_url + 'view/car_rental/booking/itinerary_modal.php', { dest_id: dest_id, spa: spa, dwp: dwp, ovs: ovs, meal: meal, dayp: dayp }, function (data) {
+        $('#itinerary'+day_id[1]).button('reset');
+        $('#itinerary'+day_id[1]).prop('disabled',false);
+        $('#div_itinerary_modal').html(data);
+    });
+}
+
+// Function to get itinerary data for booking
+function get_dest_itinerary_booking(dest_id1) {
+    var base_url = $('#base_url').val();
+    var dest_id = $('#' + dest_id1).val();
+    if (dest_id == '' || dest_id == 0) {
+        error_msg_alert('Please select destination!');
+        $('#itinerary_data').html('');
+        return false;
+    }
+    $.post(base_url + 'view/car_rental/booking/get_itinerary_data.php', { dest_id: dest_id }, function (data) {
+        $('#itinerary_data').html(data);
+    });
+}
+
+// Function to load quotation itinerary
+function load_quotation_itinerary(){
+    var quotation_id = $('#quotation_id').val();
+    var base_url = $('#base_url').val();
+    
+    // Clear existing itinerary rows except the first one
+    var table = document.getElementById('package_program_list');
+    var rowCount = table.rows.length;
+    for(var i = rowCount - 1; i > 0; i--){
+        table.deleteRow(i);
+    }
+    
+    // Reset first row to blank
+    $('#special_attaraction1').val('');
+    $('#day_program1').val('');
+    $('#overnight_stay1').val('');
+    $('#meal_plan1').val('');
+    $('#chk_program1').prop('checked', true);
+    count_itinerary = 1;
+    
+    // If quotation is selected (not "Without Quotation" and not empty), fetch itinerary
+    if(quotation_id && quotation_id != '' && quotation_id != '0'){
+        $.ajax({
+            type: 'post',
+            url: base_url + 'view/car_rental/booking/fetch_quotation_itinerary.php',
+            data: { quotation_id: quotation_id },
+            success: function(result){
+                try {
+                    var data = JSON.parse(result);
+                    console.log('Fetched itinerary data:', data);
+                    console.log('Total rows to populate:', data.length);
+                    
+                    if(data.length > 0){
+                        // Populate first row with first itinerary data
+                        $('#special_attaraction1').val(data[0].attraction);
+                        $('#day_program1').val(data[0].day_wise_program);
+                        $('#overnight_stay1').val(data[0].stay);
+                        $('#meal_plan1').val(data[0].meal_plan);
+                        
+                        // Add and populate remaining rows (create as many rows as there are in the quotation)
+                        for(var i = 1; i < data.length; i++){
+                            // Add new row by simulating click on first row's plus button
+                            var lastButton = $('#package_program_list tbody tr:last .btn-info').get(0);
+                            add_booking_itinerary(lastButton);
+                            
+                            // Populate the newly added row
+                            var currentRowNum = count_itinerary;
+                            $('#special_attaraction'+currentRowNum).val(data[i].attraction);
+                            $('#day_program'+currentRowNum).val(data[i].day_wise_program);
+                            $('#overnight_stay'+currentRowNum).val(data[i].stay);
+                            $('#meal_plan'+currentRowNum).val(data[i].meal_plan);
+                            
+                            console.log('Populated row '+(i+1)+' with:', data[i]);
+                        }
+                        console.log('Successfully populated all '+data.length+' itinerary rows');
+                    } else {
+                        console.log('No itinerary data found for this quotation');
+                    }
+                } catch(e) {
+                    console.log('Error parsing itinerary data:', e);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Error fetching itinerary:', error);
+            }
+        });
+    }
+    // If "Without Quotation" is selected or no quotation selected, rows remain blank
+}
 </script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

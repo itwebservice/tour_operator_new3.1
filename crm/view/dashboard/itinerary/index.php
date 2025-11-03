@@ -28,13 +28,28 @@ function report_reflect(){
 	{ title : "Special Attraction"},
 	{ title : "Day Wise Program"},
 	{ title : "Overnight Stay"},
-	{ title : "Meal Plan"}
-    // { title : "WhatsApp to customer"}
-    // { title : "Driver allocation"}
+	{ title : "Meal Plan"},
+	{ title : "Actions"}
 ];
 	$.post('itinerary/list_reflect.php', { date : fromdate}, function(data){
 		pagination_load(data, column, true, true, 20, 'itinerary_report');
 	});
 }
 report_reflect();
+
+function send_itinerary_whatsapp(contact_no, cust_name, attraction, day_wise_program, stay, meal_plan) {
+    var app_name = $('#app_name').val();
+    var app_contact_no = $('#app_contact_no').val();
+    
+    var msg = "Hello Sir/Ma'am\n\nGreetings from " + app_name + ",\n\nTodays program:\n\n";
+    msg += "*Special Attraction*: " + attraction + "\n";
+    msg += "*Day Wise Program*: " + day_wise_program + "\n";
+    msg += "*Overnight Stay*: " + stay + "\n";
+    msg += "*Meal Plan*: " + meal_plan + "\n\n";
+    msg += "May this trip turn out to be a wonderful treat for you and may you create beautiful memories throughout this trip to cherish forever. Wish you a very happy and safe journey!!";
+    msg += "\nThank you.\n";
+	msg += app_name +'('+app_contact_no+ ')';
+    
+    window.open('https://web.whatsapp.com/send?phone=' + contact_no + '&text=' + encodeURIComponent(msg));
+}
 </script>

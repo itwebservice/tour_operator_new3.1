@@ -5,6 +5,10 @@ include "printFunction.php";
 
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
+
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
 $sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='package_booking/quotation/group_tour/index.php'"));
 $branch_status = $sq['branch_status'];
 
@@ -176,10 +180,10 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
                     </span><?= ($sq_bank_count > 0 || $sq_bank_branch['swift_code'] != '') ? strtoupper($sq_bank_branch['swift_code']) :  strtoupper($bank_swift_code) ?></li>
                 </ul>
               </div>
-              <?php
-              if (check_qr()) { ?>
-                <div class="col-md-6 text-center" style="margin-top:20px;">
-                  <?= get_qr('Protrait Standard') ?>
+        <?php
+        if (check_qr($branch_admin_id)) { ?>
+          <div class="col-md-6 text-center" style="margin-top:20px;">
+            <?= get_qr('Protrait Standard', $branch_admin_id) ?>
                   <br>
                   <h4 class="no-marg">Scan & Pay </h4>
 

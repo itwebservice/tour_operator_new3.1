@@ -143,6 +143,16 @@ $exc_name = ($sq_exc['excursion_name']);
 																				<td><input type="text" id="child_cost" name="child_cost" placeholder="*Child Ticket Cost" title="Child Ticket Cost" onchange="validate_balance(this.id);" style="width:120px"></td>
 																				<td><input type="text" id="infant_cost" name="infant_cost" placeholder="Infant Ticket Cost" title="Infant Ticket Cost" onchange="validate_balance(this.id);" style="width:120px"></td>
 																				<td><input type="number" id="transfer_cost" name="transfer_cost" placeholder="Transfer Cost" title="Transfer Cost" style="width:155px"></td>
+																				<td><select name="vehicle_id" id="vehicle_id" style="width: 155px" class="form-control app_select2" title="Select Vehicle">
+																						<option value=''>Select Vehicle</option>
+																						<?php
+																						$sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+																						while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+																						?>
+																							<option value="<?= $row_vehicle['entry_id'] ?>">
+																								<?= $row_vehicle['vehicle_name'] ?></option>
+																						<?php } ?>
+																					</select></td>
 																				<td><select name="markup_in" id="markup_in" style="width: 125px" class="form-control app_select2" title="Markup In">
 																						<option value=''>Amount In</option>
 																						<option value='Flat'>Flat</option>
@@ -172,6 +182,23 @@ $exc_name = ($sq_exc['excursion_name']);
 																					<td><input type="text" id="child_cost-u" name="child_cost-u" placeholder="*Child Ticket Cost" title="Child Ticket Cost" value='<?= $row_basic['child_cost'] ?>' onchange="validate_balance(this.id);" style="width: 155px;"></td>
 																					<td><input type="text" id="infant_cost-u" name="infant_cost" placeholder="Infant Ticket Cost" title="Infant Ticket Cost" onchange="validate_balance(this.id);" value='<?= $row_basic['infant_cost'] ?>' style="width: 155px;"></td>
 																					<td><input type="number" id="transfer_cost" name="transfer_cost" placeholder="Transfer Cost" title="Transfer Cost" value='<?= $row_basic['transfer_cost'] ?>' style="width:155px"></td>
+																					<td><select name="vehicle_id-u<?= $count ?>" id="vehicle_id-u<?= $count ?>" style="width: 155px" class="form-control app_select2" title="Select Vehicle">
+																							<?php 
+																							if(!empty($row_basic['vehicle_id'])){
+																								$sq_sel_vehicle = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='".$row_basic['vehicle_id']."'"));
+																								if($sq_sel_vehicle){ ?>
+																									<option value="<?= $sq_sel_vehicle['entry_id'] ?>"><?= $sq_sel_vehicle['vehicle_name'] ?></option>
+																							<?php }
+																							} ?>
+																							<option value=''>Select Vehicle</option>
+																							<?php
+																							$sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+																							while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+																							?>
+																								<option value="<?= $row_vehicle['entry_id'] ?>">
+																									<?= $row_vehicle['vehicle_name'] ?></option>
+																							<?php } ?>
+																						</select></td>
 																					<td><select name="markup_in" id="markup_in-u" style="width: 125px" class="form-control app_select2" title="Markup In">
 																							<?php if ($row_basic['markup_in'] != '') { ?> <option value="<?= $row_basic['markup_in'] ?>"><?= $row_basic['markup_in'] ?></option> <?php } ?>
 																							<option value=''>Amount In</option>
@@ -182,7 +209,7 @@ $exc_name = ($sq_exc['excursion_name']);
 																					<td><input type="hidden" id="entry_id" name="entry_id" value='<?= $row_basic['entry_id'] ?>' /></td>
 																				</tr>
 																				<script>
-																					$('#transfer_option-u<?= $count ?>').select2({
+																					$('#transfer_option-u<?= $count ?>,#vehicle_id-u<?= $count ?>').select2({
 																						dropdownParent: $("#update_modal")
 																					});
 																					$('#from_date_basic-u<?= $count ?>,#to_date_basic-u<?= $count ?>').datetimepicker({
@@ -545,6 +572,7 @@ $exc_name = ($sq_exc['excursion_name']);
 				var child_cost_array = new Array();
 				var infant_cost_array = new Array();
 				var transfer_cost_array = [];
+				var vehicle_id_array = [];
 				var markup_in_array = new Array();
 				var markup_cost_array = new Array();
 				var basic_entryid_array = new Array();
@@ -561,9 +589,10 @@ $exc_name = ($sq_exc['excursion_name']);
 					var child_cost = row.cells[6].childNodes[0].value;
 					var infant_cost = row.cells[7].childNodes[0].value;
 					var transfer_cost = row.cells[8].childNodes[0].value;
-					var markup_in = row.cells[9].childNodes[0].value;
-					var markup_cost = row.cells[10].childNodes[0].value;
-					var entry_id = row.cells[11].childNodes[0].value;
+					var vehicle_id = row.cells[9].childNodes[0].value;
+					var markup_in = row.cells[10].childNodes[0].value;
+					var markup_cost = row.cells[11].childNodes[0].value;
+					var entry_id = row.cells[12].childNodes[0].value;
 
 					if (transfer_option == '' && row.cells[0].childNodes[0].checked) {
 						error_msg_alert('Select Transfer Option in Row-' + (i + 1));
@@ -592,6 +621,7 @@ $exc_name = ($sq_exc['excursion_name']);
 					child_cost_array.push(child_cost);
 					infant_cost_array.push(infant_cost);
 					transfer_cost_array.push(transfer_cost);
+					vehicle_id_array.push(vehicle_id);
 					markup_in_array.push(markup_in);
 					markup_cost_array.push(markup_cost);
 					basic_entryid_array.push(entry_id);
@@ -697,6 +727,7 @@ $exc_name = ($sq_exc['excursion_name']);
 						child_cost_array: child_cost_array,
 						infant_cost_array: infant_cost_array,
 						transfer_cost_array: transfer_cost_array,
+						vehicle_id_array: vehicle_id_array,
 						markup_in_array: markup_in_array,
 						markup_cost_array: markup_cost_array,
 						basic_entryid_array: basic_entryid_array,

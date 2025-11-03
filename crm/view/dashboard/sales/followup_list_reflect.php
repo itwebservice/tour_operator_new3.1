@@ -48,7 +48,7 @@ if ($from_date != '' && $to_date != '') {
             SELECT e2.entry_id
             FROM enquiry_master_entries e2
             WHERE e2.enquiry_id = e1.enquiry_id
-              AND e2.followup_status != 'Dropped' AND e2.followup_status IN ('Active', 'In-Followup')
+              AND e2.followup_status != 'Dropped' AND e2.followup_status IN ('New', 'In-Followup')
             ORDER BY e2.entry_id DESC
             LIMIT 1
         )
@@ -65,7 +65,7 @@ if ($from_date != '' && $to_date != '') {
             SELECT e2.entry_id
             FROM enquiry_master_entries e2
             WHERE e2.enquiry_id = e1.enquiry_id
-              AND e2.followup_status != 'Dropped' AND e2.followup_status IN ('Active', 'In-Followup')
+              AND e2.followup_status != 'Dropped' AND e2.followup_status IN ('New', 'In-Followup')
             ORDER BY e2.entry_id DESC
             LIMIT 1
         )
@@ -136,7 +136,7 @@ $sq_enquiries = mysqlQuery($query);
                         $bg = '';
                         $bg = ($followup_status == 'Converted') ? "success" : $bg;
                         $bg = ($followup_status == 'Dropped') ? "danger" : $bg;
-                        $bg = ($followup_status == 'Active') ? "warning" : $bg;
+                        $bg = ($followup_status == 'New') ? "warning" : $bg;
 
                         $status = ($followup_type != '') ? $followup_type : 'Not Done';
                         $back_color = ($followup_type != '') ? 'background: #40dbbc !important' : 'background: #ffc674 !important';

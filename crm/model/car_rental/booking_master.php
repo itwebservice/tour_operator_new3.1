@@ -125,6 +125,11 @@ class booking_master
 
     if ($sq_enq) {
 
+      /////////////Itinerary Save///////////////
+      if(isset($_POST['special_attraction_arr']) && !empty($_POST['special_attraction_arr'])){
+        $this->itinerary_save($booking_id, $_POST['special_attraction_arr'], $_POST['day_program_arr'], $_POST['stay_arr'], $_POST['meal_plan_arr'], $_POST['checked_programe_arr']);
+      }
+
       //Advance payment
       $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(payment_id) as max from car_rental_payment"));
       $payment_id = $sq_max['max'] + 1;
@@ -823,6 +828,15 @@ class booking_master
 
     if ($sq_enq) {
 
+      /////////////Itinerary Update///////////////
+      // First, delete existing itinerary for this booking
+      mysqlQuery("DELETE FROM car_rental_booking_program WHERE booking_id='$booking_id'");
+      
+      // Then save new itinerary data
+      if(isset($_POST['special_attraction_arr']) && !empty($_POST['special_attraction_arr'])){
+        $this->itinerary_save($booking_id, $_POST['special_attraction_arr'], $_POST['day_program_arr'], $_POST['stay_arr'], $_POST['meal_plan_arr'], $_POST['checked_programe_arr']);
+      }
+
       //Get Particular
       $cdate = ($travel_type == 'Local') ? $from_date : $traveling_date;
       $particular = $this->get_particular($customer_id, $vehicle_name, $cdate, $booking_id);
@@ -1092,6 +1106,31 @@ class booking_master
     global $model;
     $model->app_email_send('2', $first_name, $email_id, $content, $subject, '1');
   }
+  public function itinerary_save($booking_id, $special_attraction_arr, $day_program_arr, $stay_arr, $meal_plan_arr, $checked_programe_arr)
+  {
+    for ($i = 0; $i < sizeof($day_program_arr); $i++) {
+      // Check if checkbox is checked (handles both boolean true and string 'true')
+      if ($checked_programe_arr[$i] === 'true' || $checked_programe_arr[$i] === true || $checked_programe_arr[$i] === 1 || $checked_programe_arr[$i] === '1') {
+        $sq = mysqlQuery("select max(entry_id) as max from car_rental_booking_program");
+        $value = mysqli_fetch_assoc($sq);
+        $max_id = $value['max'] + 1;
+
+        $special_attraction_arr1 = addslashes($special_attraction_arr[$i]);
+        $day_program_arr1 = addslashes($day_program_arr[$i]);
+        $stay_arr1 = addslashes($stay_arr[$i]);
+        $meal_plan1 = mysqlREString($meal_plan_arr[$i]);
+
+        $sq = mysqlQuery("insert into car_rental_booking_program (entry_id, booking_id, attraction, day_wise_program, stay, meal_plan, day_count) values ('$max_id', '$booking_id', '$special_attraction_arr1', '$day_program_arr1', '$stay_arr1', '$meal_plan1', '".($i+1)."')");
+
+        if (!$sq) {
+          $GLOBALS['flag'] = false;
+          echo "error--Error at row " . ($i + 1) . " for Tour Itinerary information.";
+          exit;
+        }
+      }
+    }
+  }
+
   public function whatsapp_send()
   {
     global $app_contact_no, $encrypt_decrypt, $secret_key, $app_name, $session_emp_id;

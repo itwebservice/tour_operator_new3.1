@@ -19,6 +19,9 @@ $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_booking wh
 $branch_admin_id = ($_SESSION['branch_admin_id'] != '') ? $_SESSION['branch_admin_id'] : $sq_booking['branch_admin_id'];
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 
+// Get branch-wise logo file path for FPDF
+$admin_logo_path = get_branch_logo_path($branch_admin_id);
+
 $no_of_car = ceil(intval($sq_booking['total_pax']) / intval($sq_booking['capacity']));
 $booking_date = $sq_booking['created_at'];
 $yr = explode("-", $booking_date);
@@ -101,7 +104,22 @@ $pdf->addPage();
 
 $pdf->SetFont('Arial', '', 12);
 $pdf->SetXY(0, 0);
-$pdf->Cell(100, 12, $pdf->Image($admin_logo_url, 10, 5, 60, 25), 10, 0, 'C', false);
+// Logo with max width 60mm and proportional height (max 26mm to maintain aspect ratio)
+// Try to load the logo, use fallback if it fails
+try {
+    $pdf->Cell(100, 12, $pdf->Image($admin_logo_path, 10, 5, 60, 0), 10, 0, 'C', false);
+} catch (Exception $e) {
+    // If branch logo fails (e.g., PNG with alpha channel), try default logo
+    $default_logo = __DIR__ . '/../../../images/Admin-Area-Logo.png';
+    if(file_exists($default_logo)) {
+        try {
+            $pdf->Cell(100, 12, $pdf->Image($default_logo, 10, 5, 60, 0), 10, 0, 'C', false);
+        } catch (Exception $e2) {
+            // Skip logo if both fail
+            $pdf->Cell(100, 12, '', 10, 0, 'C', false);
+        }
+    }
+}
 
 $pdf->line(10, 31, 200, 31);
 
@@ -237,5 +255,80 @@ $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_vendor_veh
 $sq_entry_n =mysqli_fetch_assoc( mysqlQuery("select * from car_rental_transport_voucher_entries where booking_id='$booking_id'"));
 
 $pdf->Row(array($count, $sq_booking['vehicle_name'], $sq_entry_n['vehicle_no'],$sq_entry_n['driver_name'],$sq_entry_n['mobile_no'],$sq_entry_n['type_array']));
+
+// Itinerary Details - Using simple text approach to avoid table width issues
+$sq_package_program = mysqlQuery("select * from car_rental_booking_program where booking_id='$booking_id' ORDER BY entry_id ASC");
+$sq_package_count = mysqli_num_rows($sq_package_program);
+if($sq_package_count > 0){
+    
+    // Temporarily disable auto page break to prevent Header() calls
+    $pdf->SetAutoPageBreak(false);
+    
+    // Set header array and widths for potential manual page breaks
+    $_SESSION['header_array'] = array(''); // Empty header for itinerary pages
+    $pdf->SetWidths(array(190));
+    
+    $pdf->Ln(10);
+    $pdf->SetFont('Arial','B',11);
+    $pdf->SetTextColor(0,0,0);
+    $pdf->Cell(190, 8, 'TOUR ITINERARY', 1, 1, 'C', false);
+
+    $pdf->SetTextColor(40,35,35);
+    $count_day = 1;
+
+    while($row_itinarary = mysqli_fetch_assoc($sq_package_program)){
+
+        // Check if we need a new page (leave 40mm for content)
+        if($pdf->GetY() > 257){
+            $pdf->AddPage();
+        }
+
+        $pdf->Ln(5);
+        $pdf->SetFont('Arial','B',9);
+        $pdf->Cell(15, 6, 'Day:', 0, 0);
+        $pdf->SetFont('Arial','',9);
+        $pdf->Cell(175, 6, $count_day, 0, 1);
+        $count_day++;
+
+        // Check page break
+        if($pdf->GetY() > 270){
+            $pdf->AddPage();
+        }
+
+        $pdf->SetFont('Arial','B',9);
+        $pdf->Cell(35, 6, 'Attraction:', 0, 0);
+        $pdf->SetFont('Arial','',9);
+        $pdf->Cell(155, 6, $row_itinarary['attraction'], 0, 1);
+
+        $pdf->SetFont('Arial','B',9);
+        $pdf->Cell(190, 6, 'Day Program:', 0, 1);
+        $pdf->SetFont('Arial','',8);
+        $day_program = strip_tags($row_itinarary['day_wise_program']);
+        $pdf->MultiCell(190, 4, '  '.$day_program);
+
+        // Check page break after long content
+        if($pdf->GetY() > 270){
+            $pdf->AddPage();
+        }
+
+        $pdf->SetFont('Arial','B',9);
+        $pdf->Cell(35, 6, 'Overnight Stay:', 0, 0);
+        $pdf->SetFont('Arial','',9);
+        $pdf->Cell(155, 6, $row_itinarary['stay'], 0, 1);
+
+        $pdf->SetFont('Arial','B',9);
+        $pdf->Cell(25, 6, 'Meal Plan:', 0, 0);
+        $meal_plan = ($row_itinarary['meal_plan'] != '') ? $row_itinarary['meal_plan'] : 'NA';
+        $pdf->SetFont('Arial','',9);
+        $pdf->Cell(165, 6, $meal_plan, 0, 1);
+        
+        // Add separator line
+        $pdf->Ln(3);
+        $pdf->Cell(190, 0, '', 'T', 1);
+    }
+    
+    // Re-enable auto page break
+    $pdf->SetAutoPageBreak(true, 15);
+}
 
 $pdf->Output();

@@ -20,7 +20,7 @@ while($row_enq = mysqli_fetch_assoc($sq_enquiry)){
   if($sq_enquiry_entry['followup_status']=="Converted"){
     $converted_count++;
   }
-  if($sq_enquiry_entry['followup_status']=="Active"){
+  if($sq_enquiry_entry['followup_status']=="New"){
     $followup_count++;
   }
   if($sq_enquiry_entry['followup_status']=="In-Followup"){
@@ -129,7 +129,7 @@ while($row_group_bookings = mysqli_fetch_assoc($sq_group_bookings))
 
                           <span class="dashboard_widget_conetent_amount dashboard-counter" data-max=<?php echo $followup_count; ?>></span>
 
-                          <span class="dashboard_widget_conetent_text widget_yellow_text">Active</span>
+                          <span class="dashboard_widget_conetent_text widget_yellow_text">New</span>
 
                         </div>
 

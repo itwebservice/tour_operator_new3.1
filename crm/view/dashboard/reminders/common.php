@@ -443,7 +443,7 @@ $today_date = $from_date;
                                 $sq_enquiry = mysqlQuery($query);
                                 while ($row_enq = mysqli_fetch_assoc($sq_enquiry)) {
 
-                                    $sq_enquiry_entry = mysqli_fetch_assoc(mysqlQuery(" select enquiry_id from enquiry_master_entries where enquiry_id='$row_enq[enquiry_id]' and followup_status in ('Active','In-Followup') and DATE(followup_date) = '$today_date'"));
+                                    $sq_enquiry_entry = mysqli_fetch_assoc(mysqlQuery(" select enquiry_id from enquiry_master_entries where enquiry_id='$row_enq[enquiry_id]' and followup_status in ('New','In-Followup') and DATE(followup_date) = '$today_date'"));
                                     if ($sq_enquiry_entry > 0) {
                                         $followup_count++;
                                     }
@@ -484,7 +484,7 @@ $today_date = $from_date;
                                     } else {
                                         $tour_name = 'NA';
                                     }
-                                    if (($sq_enquiry_entry['followup_status'] == "Active" || $sq_enquiry_entry['followup_status'] == "In-Followup") && date('Y-m-d', strtotime($sq_enquiry_entry['followup_date'])) == $today_date) {
+                                    if (($sq_enquiry_entry['followup_status'] == "New" || $sq_enquiry_entry['followup_status'] == "In-Followup") && date('Y-m-d', strtotime($sq_enquiry_entry['followup_date'])) == $today_date) {
                                         $enquiries .= get_enquiry_id($enquiry_id, $year) . ' ,';
                                     }
                                 }

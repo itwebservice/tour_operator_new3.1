@@ -149,7 +149,7 @@ function get_excursion_amount()
         var total_children = row.cells[7].childNodes[0].value;
         var total_childrenwo = row.cells[8].childNodes[0].value;
         var total_infant = row.cells[9].childNodes[0].value;
-        var total_vehicles = row.cells[15].childNodes[0].value;
+        var total_vehicles = row.cells[16].childNodes[0].value;
 
         total_adult = (total_adult == '') ? 0 : total_adult;
         total_children = (total_children == '') ? 0 : total_children;
@@ -182,7 +182,7 @@ function get_excursion_amount()
                 row.cells[12].childNodes[0].value = amount_arr[i]['child_cost'];
                 row.cells[13].childNodes[0].value = amount_arr[i]['childwo_cost'];
                 row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
-                row.cells[16].childNodes[0].value = amount_arr[i]['transfer_cost'];
+                row.cells[17].childNodes[0].value = amount_arr[i]['transfer_cost'];
             }
             else{
                 row.cells[10].childNodes[0].value = 0;

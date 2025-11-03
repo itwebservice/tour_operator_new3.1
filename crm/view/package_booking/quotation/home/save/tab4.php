@@ -877,6 +877,7 @@
             var chwob_arr = [];
             var infant_arr = [];
             var excursion_amt_arr = [];
+            var vehicle_id_arr_e = [];
             var vehicles_arr = [];
 
             for (var e = 0; e < rowCount; e++) {
@@ -891,7 +892,8 @@
                     var chwob = row.cells[8].childNodes[0].value;
                     var infant = row.cells[9].childNodes[0].value;
                     var excursion_amount = row.cells[10].childNodes[0].value;
-                    var vehicles = row.cells[15].childNodes[0].value;
+                    var vehicle_id = row.cells[15].childNodes[0].value;
+                    var vehicles = row.cells[16].childNodes[0].value;
 
                     if (exc_date == "") {
                         error_msg_alert('Select Activity date in row' + (i + 1));
@@ -922,6 +924,7 @@
                     chwb_arr.push(chwb);
                     chwob_arr.push(chwob);
                     infant_arr.push(infant);
+                    vehicle_id_arr_e.push(vehicle_id);
                     vehicles_arr.push(vehicles);
                 }
             }
@@ -1207,6 +1210,7 @@
                                 exc_date_arr_e: exc_date_arr_e,
                                 transfer_option_arr: transfer_option_arr,
                                 excursion_amt_arr: excursion_amt_arr,
+                                vehicle_id_arr_e: vehicle_id_arr_e,
                                 guide_cost: guide_cost,
                                 cruise_cost: cruise_cost,
                                 misc_cost: misc_cost,
