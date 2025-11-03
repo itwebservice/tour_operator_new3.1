@@ -6,6 +6,12 @@ $hotel_accomodation_id = $_GET['booking_id'];
 
 $sq_service_voucher1 = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Hotel Service Voucher' and active_flag ='Active'"));
 $sq_accomodation1 =  mysqlQuery("select * from b2c_sale where booking_id='$hotel_accomodation_id'");
+
+// Get branch-wise logo
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+$branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : 1;
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 while ($sq_accomodation = mysqli_fetch_assoc($sq_accomodation1)) {
 
     $enq_data = json_decode($sq_accomodation['enq_data']);

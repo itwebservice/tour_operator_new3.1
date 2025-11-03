@@ -8,6 +8,11 @@ $package_id=$_GET['package_id'];
 $sq_pckg = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_id'"));
 $sq_dest = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id='$sq_pckg[dest_id]'"));
 $sq_dest_link = mysqli_fetch_assoc(mysqlQuery("select link from video_itinerary_master where dest_id = '$sq_pckg[dest_id]'"));
+
+// Get branch-wise logo and QR code
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+$branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : 1;
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
 ?>
 
     <!-- landingPage -->

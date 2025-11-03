@@ -10,6 +10,9 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 $year = $_GET['year'];
 $branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : 1;
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
+
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
 $total_days1 = '';
 $credit_card_charges = $_GET['credit_card_charges'];
 $charge = ($credit_card_charges != '') ? $credit_card_charges : 0;
@@ -89,7 +92,7 @@ $net_amount1 = currency_conversion($currency, $tourwise_details['currency_code']
   <div class=" col-md-4 no-pad">
     <span class="title"><i class="fa fa-file-text"></i> CONFIRMATION FORM</span>
     <div class="print_header_logo">
-      <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10">
+      <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10" style="max-width: 210px; max-height: 90px; object-fit: contain;">
     </div>
   </div>
   <div class="col-md-8 no-pad">

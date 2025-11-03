@@ -7,6 +7,9 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 $branch_status = $_GET['branch_status'];
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Invoice' and active_flag ='Active'")); 
 $emp_id = isset($_SESSION['emp_id']) ? $_SESSION['emp_id'] : 1;
 $sq_emp = mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id='$emp_id'"));

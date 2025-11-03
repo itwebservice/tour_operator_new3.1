@@ -29,6 +29,10 @@ if ($from_date != '' || $to_date != '') {
 	$sq_finance = mysqli_fetch_assoc(mysqlQuery("select * from financial_year where financial_year_id='$session_financial_year_id'"));
 	$pnl_date = ' (As On ' . get_date_user($sq_finance['to_date']) . ')';
 }
+
+// Get branch-wise logo and branch details
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 ?>
 
 <section class="print_header main_block mg_bt_20">

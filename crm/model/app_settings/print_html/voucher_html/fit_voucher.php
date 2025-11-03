@@ -13,6 +13,9 @@ $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_booking_
 $branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : $sq_booking['branch_admin_id'];
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 if (intval($sq_booking['quotation_id']) == 0) {
     $adults = mysqli_num_rows(mysqlQuery("select traveler_id from package_travelers_details where booking_id='$booking_id' and status='Active' and adolescence='Adult'"));
     $children = mysqli_num_rows(mysqlQuery("select traveler_id from package_travelers_details where booking_id='$booking_id' and status='Active' and adolescence='Children'"));
@@ -334,36 +337,46 @@ if ($sq_count != 0) {
                         <div class="col-md-12">
                             <div class="table-responsive">
                                 <table class="table table-bordered no-marg" id="tbl_emp_list">
-                                    <thead>
-                                        <tr class="table-heading-row">
-                                            <th>ACTIVITY DATE</th>
-                                            <th>CITY NAME</th>
-                                            <th>ACTIVITY NAME</th>
-                                            <th>TRANSFER OPTION</th>
-                                            <th>Adult(s)</th>
-                                            <th>CWB</th>
-                                            <th>CWOB</th>
-                                            <th>Infant(s)</th>
+                                <thead>
+                                    <tr class="table-heading-row">
+                                        <th>ACTIVITY DATE</th>
+                                        <th>CITY NAME</th>
+                                        <th>ACTIVITY NAME</th>
+                                        <th>TRANSFER OPTION</th>
+                                        <th>VEHICLE NAME</th>
+                                        <th>Adult(s)</th>
+                                        <th>CWB</th>
+                                        <th>CWOB</th>
+                                        <th>Infant(s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $sq_exc_acc = mysqlQuery("select * from package_tour_excursion_master where booking_id='$booking_id'");
+                                    while ($row_exc_acc = mysqli_fetch_assoc($sq_exc_acc)) {
+                                        $sq_city_name = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_exc_acc[city_id]'"));
+                                        $sq_exc_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_exc_acc[exc_id]'"));
+                                        // Get vehicle name
+                                        $vehicle_name = '';
+                                        if(isset($row_exc_acc['vehicle_name']) && $row_exc_acc['vehicle_name'] != '' && $row_exc_acc['vehicle_name'] != '0' && $row_exc_acc['vehicle_name'] != null){
+                                            $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_exc_acc['vehicle_name']."'"));
+                                            if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                                                $vehicle_name = $sq_vehicle['vehicle_name'];
+                                            }
+                                        }
+                                        ?>
+                                        <tr>
+                                            <td><?= get_datetime_user($row_exc_acc['exc_date']) ?></td>
+                                            <td><?= $sq_city_name['city_name'] ?></td>
+                                            <td><?= $sq_exc_name['excursion_name'] ?></td>
+                                            <td><?= $row_exc_acc['transfer_option'] ?></td>
+                                            <td><?= $vehicle_name ?></td>
+                                            <td><?= $row_exc_acc['adult'] ?> </td>
+                                            <td><?= $row_exc_acc['chwb'] ?> </td>
+                                            <td><?= $row_exc_acc['chwob'] ?> </td>
+                                            <td><?= $row_exc_acc['infant'] ?> </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $sq_exc_acc = mysqlQuery("select * from package_tour_excursion_master where booking_id='$booking_id'");
-                                        while ($row_exc_acc = mysqli_fetch_assoc($sq_exc_acc)) {
-                                            $sq_city_name = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_exc_acc[city_id]'"));
-                                            $sq_exc_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_exc_acc[exc_id]'"));
-                                            ?>
-                                            <tr>
-                                                <td><?= get_datetime_user($row_exc_acc['exc_date']) ?></td>
-                                                <td><?= $sq_city_name['city_name'] ?></td>
-                                                <td><?= $sq_exc_name['excursion_name'] ?></td>
-                                                <td><?= $row_exc_acc['transfer_option'] ?></td>
-                                                <td><?= $row_exc_acc['adult'] ?> </td>
-                                                <td><?= $row_exc_acc['chwb'] ?> </td>
-                                                <td><?= $row_exc_acc['chwob'] ?> </td>
-                                                <td><?= $row_exc_acc['infant'] ?> </td>
-                                            </tr>
-                                        <?php } ?>
+                                    <?php } ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -678,10 +691,11 @@ if($q_transport_count > 0){
                             <table class="table table-bordered no-marg" id="tbl_emp_list">
                                 <thead>
                                     <tr class="table-heading-row">
-                                        <th>Activity_date</th>
-                                        <th>City_Name</th>
-                                        <th>Activity_name</th>
-                                        <th>Transfer_option</th>
+                                        <th>ACTIVITY DATE</th>
+                                        <th>CITY NAME</th>
+                                        <th>ACTIVITY NAME</th>
+                                        <th>TRANSFER OPTION</th>
+                                        <th>VEHICLE NAME</th>
                                         <th>Adult(s)</th>
                                         <th>CWB</th>
                                         <th>CWOB</th>
@@ -694,12 +708,21 @@ if($q_transport_count > 0){
                                     while ($row_entry = mysqli_fetch_assoc($sq_entry)) {
                                         $q_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
                                         $sq_ex = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
+                                        // Get vehicle name
+                                        $vehicle_name = '';
+                                        if(isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0' && $row_entry['vehicle_name'] != null){
+                                            $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_entry['vehicle_name']."'"));
+                                            if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                                                $vehicle_name = $sq_vehicle['vehicle_name'];
+                                            }
+                                        }
                                     ?>
                                         <tr>
-                                            <td><?php echo get_datetime_user($row_entry['exc_date']) ?></td>
+                                            <td><?= get_datetime_user($row_entry['exc_date']) ?></td>
                                             <td><?= $q_city['city_name'] ?></td>
                                             <td><?= $sq_ex['excursion_name'] ?></td>
-                                            <td><?= $row_entry['transfer_option'] ?> </td>
+                                            <td><?= $row_entry['transfer_option'] ?></td>
+                                            <td><?= $vehicle_name ?></td>
                                             <td><?= $row_entry['adult'] ?> </td>
                                             <td><?= $row_entry['chwb'] ?> </td>
                                             <td><?= $row_entry['chwob'] ?> </td>

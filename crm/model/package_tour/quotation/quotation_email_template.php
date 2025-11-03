@@ -10,6 +10,10 @@ $in = 'in';
 
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
 
+$branch_admin_id1 = $sq_quotation['branch_admin_id'];
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id1);
+
 $quotation_date = $sq_quotation['quotation_date'];
 $yr = explode("-", $quotation_date);
 $year = $yr[0];
@@ -144,7 +148,7 @@ $sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotat
       <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header single_quotation_head">
-          <a class="navbar-brand" href="http://<?= $app_website ?>"><img src="<?php echo BASE_URL ?>images/Admin-Area-Logo.png" class="img-responsive"></a>
+          <a class="navbar-brand" href="http://<?= $app_website ?>"><img src="<?php echo $admin_logo_url ?>" class="img-responsive" style="max-width: 210px; max-height: 90px; object-fit: contain;"></a>
           <div class="logo_right_part">
             <h1><i class="fa fa-pencil-square-o"></i> Tour Quotation</h1>
           </div>
@@ -1051,11 +1055,11 @@ $sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotat
                         <th>City Name</th>
                         <th>Activity Name</th>
                         <th>Transfer option</th>
+                        <th>Vehicle Name</th>
                         <th>Adult</th>
                         <th>CWB</th>
                         <th>CWOB</th>
                         <th>Infant</th>
-                        <th>Vehicle</th>
                       </tr>
 
                     </thead>
@@ -1069,6 +1073,14 @@ $sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotat
                         $count++;
                         $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
                         $sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
+                        // Get vehicle name
+                        $vehicle_display = '';
+                        if(isset($row_ex['vehicle_id']) && $row_ex['vehicle_id'] != '' && $row_ex['vehicle_id'] != '0' && $row_ex['vehicle_id'] != null){
+                            $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_ex['vehicle_id']."'"));
+                            if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                                $vehicle_display = $sq_vehicle['vehicle_name'];
+                            }
+                        }
                       ?>
                         <tr>
                           <td><?= $count; ?></td>
@@ -1076,11 +1088,11 @@ $sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotat
                           <td><?= $sq_city['city_name']; ?></td>
                           <td><?= $sq_ex_name['excursion_name']; ?></td>
                           <td><?= $row_ex['transfer_option'] ?></td>
+                          <td><?= $vehicle_display ?></td>
                           <td><?= $row_ex['adult']; ?></td>
                           <td><?= $row_ex['chwb']; ?></td>
                           <td><?= $row_ex['chwob']; ?></td>
                           <td><?= $row_ex['infant']; ?></td>
-                          <td><?= $row_ex['vehicles'] ?></td>
                         </tr>
                       <?php } ?>
 

@@ -11,6 +11,9 @@ $branch_status = $sq['branch_status'];
 $branch_admin_id = ($branch_admin_id != '') ? $branch_admin_id : '1';
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $quotation_id = $_GET['quotation_id'];
 $emp_id = $_SESSION['emp_id'];
 $emp_id = ($emp_id != '') ? $emp_id : '1';

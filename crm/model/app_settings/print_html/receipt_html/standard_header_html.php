@@ -22,6 +22,9 @@ else{
   $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='$branch_admin_id1' and active_flag='Active'"));
 }
 
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $sq_emp = mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id='$emp_id'"));
 if ($emp_id == '0' || $emp_id == '') {
   $emp_name = 'Admin';

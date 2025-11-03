@@ -18,6 +18,9 @@ if ($branch_admin_id != 0) {
   $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 }
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $quotation_id = $_GET['quotation_id'];
 
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
@@ -434,11 +437,11 @@ if ($sq_exc_count > 0) $overall_count++;
                       <th>Activity_D/T</th>
                       <th>Activity Name</th>
                       <th>Transfer Option</th>
+                      <th>Vehicle Name</th>
                       <th>Adult</th>
                       <th>CWB</th>
                       <th>CWOB</th>
                       <th>Infant</th>
-                      <th>Vehicle</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -448,17 +451,25 @@ if ($sq_exc_count > 0) $overall_count++;
                     while ($row_ex = mysqli_fetch_assoc($sq_ex)) {
                       $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
                       $sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
+                      // Get vehicle name
+                      $vehicle_display = '';
+                      if(isset($row_ex['vehicle_id']) && $row_ex['vehicle_id'] != '' && $row_ex['vehicle_id'] != '0' && $row_ex['vehicle_id'] != null){
+                          $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_ex['vehicle_id']."'"));
+                          if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                              $vehicle_display = $sq_vehicle['vehicle_name'];
+                          }
+                      }
                     ?>
                       <tr>
                         <td><?= $sq_city['city_name'] ?></td>
                         <td><?= get_datetime_user($row_ex['exc_date']) ?></td>
                         <td><?= $sq_ex_name['excursion_name'] ?></td>
                         <td><?= $row_ex['transfer_option'] ?></td>
+                        <td><?= $vehicle_display ?></td>
                         <td><?= $row_ex['adult'] ?></td>
                         <td><?= $row_ex['chwb'] ?></td>
                         <td><?= $row_ex['chwob'] ?></td>
                         <td><?= $row_ex['infant'] ?></td>
-                        <td><?= $row_ex['vehicles'] ?></td>
                       </tr>
                     <?php }  ?>
                   </tbody>
@@ -674,10 +685,10 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
           <i class="fa fa-plus"></i>
         </div>
         <?php
-        if (check_qr()) { ?>
+        if (check_qr($branch_admin_id)) { ?>
           <div class="icon">
-            <!-- <img src="<?= get_qr('Landscape Advanced') ?>images/quotation/p4/infant.png" class="img-responsive"> -->
-            <?= get_qr('Landscape Advanced') ?>
+            <!-- <img src="<?= get_qr('Landscape Advanced', $branch_admin_id) ?>images/quotation/p4/infant.png" class="img-responsive"> -->
+            <?= get_qr('Landscape Advanced', $branch_admin_id) ?>
             <h4 class="no-marg">Scan And Pay </h4>
           </div>
         <?php } ?>

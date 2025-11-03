@@ -32,6 +32,9 @@ $cgst_sgst= ($service_tax_subtotal)/2;
 $amount_in_word = $amount_to_word->convert_number_to_words($net_amount);
 $branch_admin_id = ($_SESSION['branch_admin_id'] != '') ? $_SESSION['branch_admin_id'] : 1;
 
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $sq_customer = mysqli_fetch_assoc(mysqlQuery("select * from customer_master where customer_id='$customer_id'"));
 $sq_state = mysqli_fetch_assoc(mysqlQuery("select * from state_master where id='$sq_customer[state_id]'"));
 $sq_app = mysqli_fetch_assoc(mysqlQuery("select state_id from app_Settings where setting_id='1'"));

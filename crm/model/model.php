@@ -33,7 +33,9 @@ $localIP = getHostByName(getHostName());
 $servername = "localhost";
 $username = "root";
 $password = "";
+// $db_name = "tour_operator";
 
+// $db_name = "tour_operator_theme";
 
 $db_name = "tour_operator_new_2_2";
 
@@ -57,6 +59,63 @@ $admin_logo_url = BASE_URL . 'images/Admin-Area-Logo.png';
 $circle_logo_url = BASE_URL . 'images/logo-circle.png';
 $report_logo_small_url = BASE_URL . 'images/Receips-Logo-Small.jpg';
 $terms_conditions_url = BASE_URL . 'images/terms-condition.jpg';
+
+// Function to get branch-wise logo URL
+function get_branch_logo_url($branch_admin_id = 0) {
+	global $admin_logo_url;
+	if($branch_admin_id != 0) {
+		$branch_details = mysqli_fetch_assoc(mysqlQuery("select logo_url from branches where branch_id='$branch_admin_id'"));
+		if($branch_details && !empty($branch_details['logo_url'])) {
+			return BASE_URL . substr($branch_details['logo_url'], 9);
+		}
+	}
+	return $admin_logo_url; // Fallback to admin logo
+}
+
+// Function to get branch-wise logo file path (for FPDF)
+function get_branch_logo_path($branch_admin_id = 0) {
+	if($branch_admin_id != 0) {
+		$branch_details = mysqli_fetch_assoc(mysqlQuery("select logo_url from branches where branch_id='$branch_admin_id'"));
+		if($branch_details && !empty($branch_details['logo_url'])) {
+			// Convert relative path to absolute file path
+			// logo_url is stored as '../../../uploads/...' (9 chars to remove)
+			$relative_path = substr($branch_details['logo_url'], 9);
+			$file_path = __DIR__ . '/../../' . $relative_path;
+			
+			// Check if file exists and is a valid image type for FPDF
+			if(file_exists($file_path)) {
+				$ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+				// FPDF supports jpg, jpeg, png (without alpha), gif
+				if(in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+					return $file_path;
+				}
+			}
+		}
+	}
+	// Fallback to admin logo file path
+	// Try JPG first, then PNG
+	$jpg_path = __DIR__ . '/../../images/Admin-Area-Logo.jpg';
+	if(file_exists($jpg_path)) {
+		return $jpg_path;
+	}
+	return __DIR__ . '/../../images/Admin-Area-Logo.png';
+}
+
+// Function to get branch-wise QR URL
+function get_branch_qr_url($branch_admin_id = 0) {
+	if($branch_admin_id != 0) {
+		$branch_details = mysqli_fetch_assoc(mysqlQuery("select qr_url from branches where branch_id='$branch_admin_id'"));
+		if($branch_details && !empty($branch_details['qr_url'])) {
+			return BASE_URL . substr($branch_details['qr_url'], 9);
+		}
+	}
+	// Fallback to app_settings QR
+	// $sq_settings = mysqli_fetch_assoc(mysqlQuery("select qr_url from app_settings limit 1"));
+	// if($sq_settings && !empty($sq_settings['qr_url'])) {
+	// 	return BASE_URL . substr($sq_settings['qr_url'], 9);
+	// }
+	return '';
+}
 $hotel_service_voucher = BASE_URL . 'images/hotel_service_voucher.jpg';
 $transport_service_voucher = BASE_URL . 'images/transport_service_voucher.jpg';
 $transport_service_voucher2 = BASE_URL . 'images/transport_service_voucher2.jpg';
@@ -583,88 +642,70 @@ include_once('encrypt_decrypt.php');
 // include_once("get_cache_data.php");
 // include_once("app_settings/print_html/qr_sign_print.php");
 
-function get_qr($type)
+function get_qr($type, $branch_admin_id = 0)
 {
-  $QrQry = mysqlQuery('select qr_url,sign_url from app_settings');
-  $result = mysqli_fetch_assoc($QrQry);
+  // Get branch-wise QR URL
+  $qr_url = get_branch_qr_url($branch_admin_id);
+  
+  // If no QR URL found, return empty
+  if(empty($qr_url)) {
+    return '';
+  }
 
   if ($type == 'Landscape Advanced') {
-    if (!empty($result['qr_url'])) {
-      $htmlQR = '<img src="' . BASE_URL . '/' . substr($result['qr_url'], 9) . '" alt="" width=100  height=100  class="img-thumbnail">';
-    } else {
-      $htmlQR = '<h4> No QR Img </h4>';
-    }
+    $htmlQR = '<img src="' . $qr_url . '" alt="" width=100 height=100 class="img-thumbnail">';
     return $htmlQR;
   }
   // Protrait Advance
   if ($type == 'Protrait Advance') {
-
-    if (!empty($result['qr_url'])) {
-      $htmlQR = '<img src="' . BASE_URL . '/' . substr($result['qr_url'], 9) . '" alt="" width=100  height=100 class="img-thumbnail">';
-    } else {
-      $htmlQR = '<h4> No QR Img </h4>';
-    }
+    $htmlQR = '<img src="' . $qr_url . '" alt="" width=100 height=100 class="img-thumbnail">';
     return $htmlQR;
   }
   if ($type == 'Protrait Creative') {
-
-    if (!empty($result['qr_url'])) {
-      $htmlQR = '<img src="' . BASE_URL . '/' . substr($result['qr_url'], 9) . '" alt="" width=100 height=100 class="img-thumbnail">';
-    } else {
-      $htmlQR = '<h4> No QR Img </h4>';
-    }
+    $htmlQR = '<img src="' . $qr_url . '" alt="" width=100 height=100 class="img-thumbnail">';
     return $htmlQR;
   }
   //Landscape
   if ($type == 'Landscape Creative') {
-
-    if (!empty($result['qr_url'])) {
-      $htmlQR = '<img src="' . BASE_URL . '/' . substr($result['qr_url'], 9) . '" alt="" width=100 height=100 class="img-thumbnail">';
-    } else {
-      $htmlQR = '<h4> No QR Img </h4>';
-    }
+    $htmlQR = '<img src="' . $qr_url . '" alt="" width=100 height=100 class="img-thumbnail">';
     return $htmlQR;
   }
   //Standard
   if ($type == 'Landscape Standard') {
-
-    if (!empty($result['qr_url'])) {
-      $htmlQR = '<img src="' . BASE_URL . '/' . substr($result['qr_url'], 9) . '" alt="" width=100 height=100 class="img-thumbnail">';
-    } else {
-      $htmlQR = '<h4> No QR Img </h4>';
-    }
+    $htmlQR = '<img src="' . $qr_url . '" alt="" width=100 height=100 class="img-thumbnail">';
     return $htmlQR;
   }
   //protrait standard
   if ($type == 'Protrait Standard') {
-
-    if (!empty($result['qr_url'])) {
-      $htmlQR = '<img src="' . BASE_URL . '/' . substr($result['qr_url'], 9) . '" alt="" width=100  height=100 class="img-thumbnail">';
-    } else {
-      $htmlQR = '<h4> No QR Img </h4>';
-    }
+    $htmlQR = '<img src="' . $qr_url . '" alt="" width=100 height=100 class="img-thumbnail">';
     return $htmlQR;
   }
   if ($type == 'general') {
-
-    if (!empty($result['qr_url'])) {
-      $htmlQR = '<img src="' . BASE_URL . '/' . substr($result['qr_url'], 9) . '" alt="" width=100  class="img-thumbnail">';
-    } else {
-      $htmlQR = '<h4> No QR Img </h4>';
-    }
+    $htmlQR = '<img src="' . $qr_url . '" alt="" width=100 class="img-thumbnail">';
     return $htmlQR;
   }
+  
+  return '';
 }
 
-function check_qr()
+function check_qr($branch_admin_id = 0)
 {
-  $QrQry = mysqlQuery('select qr_url,sign_url from app_settings');
-  $result = mysqli_fetch_assoc($QrQry);
-  if (!empty($result['qr_url'])) {
-    return true;
-  } else {
-    return false;
+  // Check if branch-specific QR exists
+  if($branch_admin_id != 0) {
+    $branch_qr = mysqli_fetch_assoc(mysqlQuery("select qr_url from branches where branch_id='$branch_admin_id'"));
+    if($branch_qr && !empty($branch_qr['qr_url'])) {
+      return true;
+    }
   }
+  
+  // Check app settings QR as fallback
+  // $QrQry = mysqlQuery('select qr_url,sign_url from app_settings');
+  // $result = mysqli_fetch_assoc($QrQry);
+  // if (!empty($result['qr_url'])) {
+  //   return true;
+  // } else {
+  //   return false;
+  // }
 }
 function check_sign()
 {

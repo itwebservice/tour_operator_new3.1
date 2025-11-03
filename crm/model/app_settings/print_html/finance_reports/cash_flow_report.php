@@ -19,6 +19,10 @@ if ($to_date != '') {
 } else {
 	$pnl_date = '';
 }
+
+// Get branch-wise logo and branch details
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 ?>
 
 <section class="print_header main_block mg_bt_20">

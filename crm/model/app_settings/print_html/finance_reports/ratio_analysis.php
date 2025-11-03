@@ -5,6 +5,10 @@ $from_date = $_GET['from_date'];
 $financial_year_id = $_GET['financial_year_id']; 
 $branch_admin_id = $_GET['branch_admin_id']; 
 
+// Get branch-wise logo and branch details
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
+
 //Get Gross / Net amount from Profit and loss account
 include BASE_URL."view/finance_master/reports/report_reflect/ratio_analysis/get_gross_net_amount.php";
 ?>

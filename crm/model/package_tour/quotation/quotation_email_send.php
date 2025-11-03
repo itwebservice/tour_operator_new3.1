@@ -687,11 +687,11 @@ class quotation_email_send
 											<th style="text-align:left;border: 1px solid #888888;width:30%">City Name</th>
 											<th style="text-align:left;border: 1px solid #888888;width:30%">Activity Name</th>
 											<th style="text-align:left;border: 1px solid #888888;width:30%">Transfer option</th>
+											<th style="text-align:left;border: 1px solid #888888;width:30%">Vehicle Name</th>
 											<th style="text-align:left;border: 1px solid #888888;width:30%">Adult</th>
 											<th style="text-align:left;border: 1px solid #888888;width:30%">CWB</th>
 											<th style="text-align:left;border: 1px solid #888888;width:30%">CWOB</th>
 											<th style="text-align:left;border: 1px solid #888888;width:30%">Infant</th>
-											<th style="text-align:left;border: 1px solid #888888;width:30%">Vehicle</th>
 										</tr>
 									</thead>
 									<tbody> 
@@ -699,6 +699,14 @@ class quotation_email_send
 				while ($row_ex = mysqli_fetch_assoc($sq_ex)) {
 					$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
 					$sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
+					// Get vehicle name
+					$vehicle_display = '';
+					if(isset($row_ex['vehicle_id']) && $row_ex['vehicle_id'] != '' && $row_ex['vehicle_id'] != '0' && $row_ex['vehicle_id'] != null){
+						$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_ex['vehicle_id']."'"));
+						if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+							$vehicle_display = $sq_vehicle['vehicle_name'];
+						}
+					}
 
 					$content .= '	
 											<tr>
@@ -706,11 +714,11 @@ class quotation_email_send
 												<td style="text-align:left;border: 1px solid #888888;">' . $sq_city['city_name'] . '</td>
 												<td style="text-align:left;border: 1px solid #888888;width:30%">' . $sq_ex_name['excursion_name'] . '</td> 
 												<td style="text-align:left;border: 1px solid #888888;">' . $row_ex['transfer_option'] . '</td>
+												<td style="text-align:left;border: 1px solid #888888;">' . $vehicle_display . '</td>
 												<td style="text-align:left;border: 1px solid #888888;">' . $row_ex['adult'] . '</td>
 												<td style="text-align:left;border: 1px solid #888888;">' . $row_ex['chwb'] . '</td>
 												<td style="text-align:left;border: 1px solid #888888;">' . $row_ex['chwob'] . '</td>
 												<td style="text-align:left;border: 1px solid #888888;">' . $row_ex['infant'] . '</td>
-												<td style="text-align:left;border: 1px solid #888888;">' . $row_ex['vehicles'] . '</td>
 											</tr>';
 				}
 				$content .= '
@@ -816,6 +824,10 @@ class quotation_email_send
 				$sq_bank_count = mysqli_num_rows(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 				$sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 			}
+			
+			// Get branch-wise logo and QR code
+			$admin_logo_url = get_branch_logo_url($branch_admin_id);
+			
 			$bank_name = ($sq_bank_count > 0 || $sq_bank_branch['bank_name'] != '') ? $sq_bank_branch['bank_name'] : $bank_name_setting;
 			$branch_name = ($sq_bank_count > 0 || $sq_bank_branch['branch_name'] != '') ? $sq_bank_branch['branch_name'] : $bank_branch_name;
 			$acc_type = ($sq_bank_count > 0 || $sq_bank_branch['account_type'] != '') ? $sq_bank_branch['account_type'] : $acc_name;
@@ -831,11 +843,11 @@ class quotation_email_send
 										<td style="text-align:left;border: 1px solid #888888;">' . $acc_no . '</td>
 										<td style="text-align:left;border: 1px solid #888888;">' . $swift_code . '</td>
 									</tr>';
-			if (check_qr()) {
+			if (check_qr($branch_admin_id)) {
 
 				$content .= '<tr> 
 									<td style="text-align:left;width:30%" colspan=2>QR Code</td>
-									<td style="text-align:left;width:30%" colspan=4>' . get_qr('general') . ' </td>
+									<td style="text-align:left;width:30%" colspan=4>' . get_qr('general', $branch_admin_id) . ' </td>
 									
 									</tr>';
 			}
@@ -1701,13 +1713,16 @@ class quotation_email_send
     SELECT 
         ee.*, 
         cm.city_name, 
-        em.excursion_name 
+        em.excursion_name,
+        bt.vehicle_name as vehicle_display
     FROM 
         package_tour_quotation_excursion_entries ee
     LEFT JOIN 
         city_master cm ON cm.city_id = ee.city_name
     LEFT JOIN 
         excursion_master_tariff em ON em.entry_id = ee.excursion_name 
+    LEFT JOIN
+        b2b_transfer_master bt ON bt.entry_id = ee.vehicle_id
     WHERE 
         ee.quotation_id = '$quotation_id'
 ");
@@ -1721,8 +1736,10 @@ class quotation_email_send
 					// You can now access $row_ex['city_name'] and $row_ex['excursion_name'] directly
 					$cityName = $row_ex['city_name'];
 					$excursionName = $row_ex['excursion_name'];
+					$vehicleName = isset($row_ex['vehicle_display']) && $row_ex['vehicle_display'] != '' ? $row_ex['vehicle_display'] : '';
+					$vehicleText = ($vehicleName != '') ? ' - Vehicle: ' . htmlspecialchars($vehicleName) : '';
 
-					$actvitydata .=    '*' . htmlspecialchars($excursionName) . get_datetime_user($row_ex['exc_date']) . "*\n";
+					$actvitydata .=    '*' . htmlspecialchars($excursionName) . get_datetime_user($row_ex['exc_date']) . $vehicleText . "*\n";
 					// Additional processing can be done here
 				}
 			}

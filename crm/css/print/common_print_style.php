@@ -25,6 +25,12 @@ margin-bottom: 350px;
 }
 .print_header_logo{
 max-width: 210px;
+max-height: 90px;
+}
+.print_header_logo img{
+max-width: 100%;
+max-height: 90px;
+object-fit: contain;
 }
 .print_header span.title {
 margin: 0;

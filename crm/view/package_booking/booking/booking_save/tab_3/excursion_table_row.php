@@ -25,6 +25,14 @@
                         <option value="Sharing Transfer">Sharing Transfer</option>
                         <option value="SIC">SIC</option>
                         </select></td>
+                    <td><select name="vehicle_name-1" id="vehicle_name-1" style="width: 200px" class="form-control app_select2" title="Select Vehicle">
+                        <option value=''>Select Vehicle</option>
+                        <?php
+                        $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                        while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                        ?>
+                            <option value="<?= $row_vehicle['entry_id'] ?>"><?= $row_vehicle['vehicle_name'] ?></option>
+                        <?php } ?>
                     </select></td>
                     <td><input type="number" id="adult-1" name="adult-1" placeholder="Adult(s)" title="Adult(s)" style="width:100px" onchange="validate_balance(this.id);"></td>
                     <td><input type="number" id="child-1" name="child-1" placeholder="Child With-Bed" title="Child With-Bed" style="width:150px" onchange="validate_balance(this.id);" ></td>

@@ -27,6 +27,9 @@ $branch_admin_id1 = $sq_quotation['branch_admin_id'];
 $sq_bank_count = mysqli_num_rows(mysqlQuery("select * from bank_master where branch_id='$branch_admin_id1' and active_flag='Active'"));
 $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='$branch_admin_id1' and active_flag='Active'"));
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id1);
+
 $date = $sq_quotation['created_at'];
 $yr = explode("-", $date);
 $year = $yr[0];
@@ -111,7 +114,7 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header single_quotation_head">
                     <a class="navbar-brand" href="http://<?= $app_website ?>"><img
-                            src="<?php echo BASE_URL ?>images/Admin-Area-Logo.png" class="img-responsive"></a>
+                            src="<?php echo $admin_logo_url ?>" class="img-responsive" style="max-width: 210px; max-height: 90px; object-fit: contain;"></a>
                     <div class="logo_right_part">
                         <h1><i class="fa fa-pencil-square-o"></i> Tour Quotation</h1>
                     </div>
@@ -325,12 +328,12 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
                     <div class="col-md-12">
                         <div class="adolence_info">
                             <?php
-                            if (check_qr()) {
+                            if (check_qr($branch_admin_id1)) {
 
                             ?>
                                 <ul class="main_block">
 
-                                    <li class="col-md-12 text-center mg_bt_10"> <?= get_qr('general') ?>
+                                    <li class="col-md-12 text-center mg_bt_10"> <?= get_qr('general', $branch_admin_id1) ?>
                                         <br>
                                         <p class="text-center">Scan & Pay</p>
                                     </li>

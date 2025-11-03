@@ -10,6 +10,9 @@ $month = $_GET['month'];
 $customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
 $count = 0;
 $sq_salary = mysqli_fetch_assoc(mysqlQuery("select * from employee_salary_master where emp_id=$emp_id and year=$year and month=$month"));
+
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
 ?>
 <!-- header -->
 <section class="print_header main_block" style="margin-bottom: 0 !important;">

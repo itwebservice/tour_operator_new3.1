@@ -72,6 +72,7 @@ $branch_status = $_POST['branch_status'];
 <script>
 var column = [
 	{ title : "S_No."},
+	{title:"Payment_ID"},
 	{ title : "Purchase_Type"},
 	{ title : "Purchase_ID"},
 	{ title:"Supplier_Type"},

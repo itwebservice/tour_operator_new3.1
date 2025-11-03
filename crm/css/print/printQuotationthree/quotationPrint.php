@@ -68,11 +68,15 @@ span.landingPageId {
 .print_header_logo {
     float: right;
     width: 100%;
+    max-width: 210px;
 }
 .print_header_logo img{
     float: right;
     width: auto;
+    max-width: 100%;
     height: 70px;
+    max-height: 90px;
+    object-fit: contain;
     margin: 15px 0 0 0;
 }
 .print_header_contact span.title {

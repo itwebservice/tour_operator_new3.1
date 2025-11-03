@@ -26,6 +26,10 @@ $net_amount = currency_conversion($currency,$currency1,$net_amount);
 
 $amount_in_word = $amount_to_word->convert_number_to_words($net_amount,$currency1);
 
+// Get branch-wise logo
+$branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : 1;
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $service_tax_string = explode(':',$service_tax);
 $tax_amount = currency_conversion($currency,$currency1,$service_tax_string[2]);
 

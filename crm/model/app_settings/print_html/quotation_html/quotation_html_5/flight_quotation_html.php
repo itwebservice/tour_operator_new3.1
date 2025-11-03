@@ -17,6 +17,9 @@ if ($branch_admin_id != 0) {
   $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 }
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 global $app_quot_img, $currency, $quot_note;
 $quotation_id = $_GET['quotation_id'];
 
@@ -333,9 +336,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
         <p>SWIFT CODE</p>
       </div>
       <?php
-      if (check_qr()) { ?>
+      if (check_qr($branch_admin_id)) { ?>
         <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px;">
-          <?= get_qr('Protrait Advance') ?>
+          <?= get_qr('Protrait Advance', $branch_admin_id) ?>
           <br>
           <h4 class="no-marg">Scan & Pay </h4>
         </div>

@@ -31,6 +31,13 @@ $credit_note_id = get_credit_note_id($sq_credit_note['id']);
 
 $branch_admin_id = ($_SESSION['branch_admin_id'] != '') ? $_SESSION['branch_admin_id'] : '1';
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
+
+// Get branch-wise logo file path for FPDF
+$admin_logo_path = get_branch_logo_path($branch_admin_id);
+
+// Debug: Check if logo file exists
+// error_log("Refund Voucher Logo Path: " . $admin_logo_path . " | Exists: " . (file_exists($admin_logo_path) ? 'Yes' : 'No'));
+
 $address = $branch_details['address1'] . ',' . $branch_details['address2'] . ',' . $branch_details['city'];
 $contact_no =  $branch_details['contact_no'];
 $email_id =  $branch_details['email_id'];
@@ -59,7 +66,33 @@ $count = 1;
 $offset = ($count=="1") ? 0 : 135;
 $pdf->SetFillColor(235);
 $pdf->rect(0, 0+$offset, 210, 25, 'F');
-$pdf->Image($admin_logo_url, 10, 4+$offset, 45, 17);
+
+// Try to load the branch logo, use fallback if it fails
+if(file_exists($admin_logo_path)) {
+    try {
+        $pdf->Image($admin_logo_path, 10, 4+$offset, 45, 17);
+    } catch (Exception $e) {
+        // If branch logo fails (e.g., PNG with alpha channel), try default logo
+        $default_logo = __DIR__ . '/../../images/Admin-Area-Logo.png';
+        if(file_exists($default_logo)) {
+            try {
+                $pdf->Image($default_logo, 10, 4+$offset, 45, 17);
+            } catch (Exception $e2) {
+                // Skip logo if both fail
+            }
+        }
+    }
+} else {
+    // If path doesn't exist, use default logo
+    $default_logo = __DIR__ . '/../../images/Admin-Area-Logo.png';
+    if(file_exists($default_logo)) {
+        try {
+            $pdf->Image($default_logo, 10, 4+$offset, 45, 17);
+        } catch (Exception $e) {
+            // Skip logo if default also fails
+        }
+    }
+}
 
 $pdf->SetFont('Arial','',16);
 

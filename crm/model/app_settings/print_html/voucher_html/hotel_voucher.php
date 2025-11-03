@@ -17,6 +17,11 @@ while ($sq_accomodation = mysqli_fetch_assoc($sq_accomodation1)) {
     $booking_id = $sq_accomodation['booking_id'];
     $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from hotel_booking_master where booking_id='$booking_id' and delete_status='0'"));
 
+    $branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : $sq_booking['branch_admin_id'];
+    
+    // Get branch-wise logo
+    $admin_logo_url = get_branch_logo_url($branch_admin_id);
+
     $total_pax = (float)($sq_booking['adults']) + (float)($sq_booking['childrens']) + (float)($sq_booking['infants']);
 
     //Total days

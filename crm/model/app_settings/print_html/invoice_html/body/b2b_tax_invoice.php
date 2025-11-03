@@ -13,6 +13,10 @@ $booking_id = $_GET['booking_id'];
 
 $query = mysqli_fetch_assoc(mysqlQuery("select * from b2b_booking_master where booking_id='$booking_id'"));
 $branch_admin_id = ($_SESSION['branch_admin_id'] != '') ? $_SESSION['branch_admin_id'] : 1;
+
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $cart_checkout_data = json_decode($query['cart_checkout_data']);
 $hotel_list_arr = array();
 $transfer_list_arr = array();

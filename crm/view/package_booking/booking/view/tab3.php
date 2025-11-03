@@ -146,6 +146,7 @@ if($sq_c_package_c > 0){
 							<th>City_Name</th>
 							<th>Activity_name</th>
 							<th>Transfer_option</th>
+							<th>Vehicle_Name</th>
 							<th>Adult(s)</th>
 							<th>CWB</th>
 							<th>CWOB</th>
@@ -154,21 +155,30 @@ if($sq_c_package_c > 0){
 					</thead>
 					<tbody>
 					<?php
-					$sq_entry = mysqlQuery("select * from package_tour_excursion_master where booking_id='$booking_id'");
-					while($row_entry = mysqli_fetch_assoc($sq_entry)){
-						$q_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
-						$sq_ex = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
-						?>
-						<tr class="<?php echo $bg; ?>">
-							<td><?php echo date("d-m-Y H:i", strtotime($row_entry['exc_date'])) ?></td>
-							<td><?= $q_city['city_name'] ?></td>
-							<td><?= $sq_ex['excursion_name'] ?></td>
-							<td><?= $row_entry['transfer_option'] ?> </td>
-							<td><?= $row_entry['adult'] ?> </td>
-							<td><?= $row_entry['chwb'] ?> </td>
-							<td><?= $row_entry['chwob'] ?> </td>
-							<td><?= $row_entry['infant'] ?> </td>
-						</tr>
+				$sq_entry = mysqlQuery("select * from package_tour_excursion_master where booking_id='$booking_id'");
+				while($row_entry = mysqli_fetch_assoc($sq_entry)){
+					$q_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
+					$sq_ex = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
+				// Get vehicle name
+				$vehicle_display = '';
+				if(isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0' && $row_entry['vehicle_name'] != null){
+					$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_entry['vehicle_name']."'"));
+					if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+						$vehicle_display = $sq_vehicle['vehicle_name'];
+					}
+				}
+					?>
+					<tr class="<?php echo $bg; ?>">
+						<td><?php echo date("d-m-Y H:i", strtotime($row_entry['exc_date'])) ?></td>
+						<td><?= $q_city['city_name'] ?></td>
+						<td><?= $sq_ex['excursion_name'] ?></td>
+						<td><?= $row_entry['transfer_option'] ?> </td>
+						<td><?= $vehicle_display ?> </td>
+						<td><?= $row_entry['adult'] ?> </td>
+						<td><?= $row_entry['chwb'] ?> </td>
+						<td><?= $row_entry['chwob'] ?> </td>
+						<td><?= $row_entry['infant'] ?> </td>
+					</tr>
 					<?php } ?>
 					</tbody>
 				</table>
