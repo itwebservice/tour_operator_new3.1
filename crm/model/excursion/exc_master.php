@@ -28,18 +28,21 @@ class exc_master
 		$total_child_arr = $_POST['total_child_arr'];
 		$adult_cost_arr = $_POST['adult_cost_arr'];
 		$child_cost_arr = $_POST['child_cost_arr'];
-		$total_amt_arr = $_POST['total_amt_arr'];
-		$total_infant_arr = $_POST['total_infant_arr'];
-		$infant_cost_arr = $_POST['infant_cost_arr'];
-		$total_vehicle_arr = $_POST['total_vehicle_arr'];
-		$transfer_cost_arr = $_POST['transfer_cost_arr'];
+	$total_amt_arr = $_POST['total_amt_arr'];
+	$total_infant_arr = $_POST['total_infant_arr'];
+	$infant_cost_arr = $_POST['infant_cost_arr'];
+	$vehicle_name_arr = isset($_POST['vehicle_name_arr']) ? $_POST['vehicle_name_arr'] : array();
+	$total_vehicle_arr = $_POST['total_vehicle_arr'];
+	$transfer_cost_arr = $_POST['transfer_cost_arr'];
 
-		$roundoff = $_POST['roundoff'];
+	$roundoff = $_POST['roundoff'];
 		$total_amt_arr = $_POST['total_amt_arr'];
 		$credit_charges = $_POST['credit_charges'];
 		$credit_card_details = $_POST['credit_card_details'];
 		$currency_code = $_POST['currency_code'];
 		$markup = $_POST['markup'];
+		$guest_name = $_POST['guest_name'];
+		$pick_point = $_POST['pick_point'];
 
 		$service_tax_markup = $_POST['service_tax_markup'];
 		$reflections = json_decode(json_encode($_POST['reflections']));
@@ -98,7 +101,7 @@ class exc_master
 		$exc_id = $sq_max['max'] + 1;
 		$reflections = json_encode($reflections);
 		$bsmValues = json_encode($bsmValues);
-		$sq_exc = mysqlQuery("INSERT into excursion_master (exc_id, customer_id, branch_admin_id,financial_year_id, exc_issue_amount, service_charge, service_tax_subtotal, exc_total_cost, created_at, markup, service_tax_markup, reflections, due_date,emp_id , bsm_values , roundoff, currency_code,invoice_pr_id) values ('$exc_id', '$customer_id', '$branch_admin_id','$financial_year_id', '$exc_issue_amount', '$service_charge','$service_tax_subtotal', '$exc_total_cost', '$balance_date', '$markup','$service_tax_markup','$reflections','$due_date', '$emp_id' , '$bsmValues', '$roundoff','$currency_code','$invoice_pr_id')");
+		$sq_exc = mysqlQuery("INSERT into excursion_master (exc_id, customer_id, branch_admin_id,financial_year_id, exc_issue_amount, service_charge, service_tax_subtotal, exc_total_cost, created_at, markup, service_tax_markup, reflections, due_date,emp_id , bsm_values , roundoff, currency_code,invoice_pr_id,guest_name,pick_point) values ('$exc_id', '$customer_id', '$branch_admin_id','$financial_year_id', '$exc_issue_amount', '$service_charge','$service_tax_subtotal', '$exc_total_cost', '$balance_date', '$markup','$service_tax_markup','$reflections','$due_date', '$emp_id' , '$bsmValues', '$roundoff','$currency_code','$invoice_pr_id','$guest_name','$pick_point')");
 
 		if (!$sq_exc) {
 			rollback_t();
@@ -114,7 +117,8 @@ class exc_master
 
 				$exc_date_arr[$i] = get_datetime_db($exc_date_arr[$i]);
 
-				$sq_entry = mysqlQuery("insert into excursion_master_entries(entry_id, exc_id, exc_date, city_id, exc_name,transfer_option, total_adult, total_child, adult_cost, child_cost, total_cost, status, `total_infant`, `infant_cost`, `total_vehicles`, `transfer_cost`) values('$entry_id', '$exc_id', '$exc_date_arr[$i]','$city_id_arr[$i]', '$exc_name_arr[$i]','$transfer_arr[$i]', '$total_adult_arr[$i]', '$total_child_arr[$i]', '$adult_cost_arr[$i]', '$child_cost_arr[$i]', '$total_amt_arr[$i]', '','$total_infant_arr[$i]','$infant_cost_arr[$i]','$total_vehicle_arr[$i]','$transfer_cost_arr[$i]')");
+				$vehicle_name_value = isset($vehicle_name_arr[$i]) ? $vehicle_name_arr[$i] : '';
+			$sq_entry = mysqlQuery("insert into excursion_master_entries(entry_id, exc_id, exc_date, city_id, exc_name,transfer_option, total_adult, total_child, adult_cost, child_cost, total_cost, status, `total_infant`, `infant_cost`, `vehicle_name`, `total_vehicles`, `transfer_cost`) values('$entry_id', '$exc_id', '$exc_date_arr[$i]','$city_id_arr[$i]', '$exc_name_arr[$i]','$transfer_arr[$i]', '$total_adult_arr[$i]', '$total_child_arr[$i]', '$adult_cost_arr[$i]', '$child_cost_arr[$i]', '$total_amt_arr[$i]', '','$total_infant_arr[$i]','$infant_cost_arr[$i]','$vehicle_name_value','$total_vehicle_arr[$i]','$transfer_cost_arr[$i]')");
 
 				if (!$sq_entry) {
 					$GLOBALS['flag'] = false;
@@ -692,16 +696,19 @@ class exc_master
 		$child_cost_arr = $_POST['child_cost_arr'];
 		$total_amt_arr = $_POST['total_amt_arr'];
 		$entry_id_arr = $_POST['entry_id_arr'];
-		$transfer_option_arr = $_POST['transfer_option_arr'];
-		$total_infant_arr = $_POST['total_infant_arr'];
-		$infant_cost_arr = $_POST['infant_cost_arr'];
-		$total_vehicle_arr = $_POST['total_vehicle_arr'];
-		$transfer_cost_arr = $_POST['transfer_cost_arr'];
-		$markup = $_POST['markup'];
+	$transfer_option_arr = $_POST['transfer_option_arr'];
+	$total_infant_arr = $_POST['total_infant_arr'];
+	$infant_cost_arr = $_POST['infant_cost_arr'];
+	$vehicle_name_arr = isset($_POST['vehicle_name_arr']) ? $_POST['vehicle_name_arr'] : array();
+	$total_vehicle_arr = $_POST['total_vehicle_arr'];
+	$transfer_cost_arr = $_POST['transfer_cost_arr'];
+	$markup = $_POST['markup'];
 		$service_tax_markup = $_POST['service_tax_markup'];
 		$roundoff = $_POST['roundoff'];
 		$currency_code = $_POST['currency_code'];
 		$old_total = $_POST['old_total'];
+		$guest_name = $_POST['guest_name'];
+		$pick_point = $_POST['pick_point'];
 
 		$total_adults = 0;
 		$total_childs = 0;
@@ -732,7 +739,7 @@ class exc_master
 		$due_date1 = get_date_db($due_date1);
 		$balance_date1 = get_date_db($balance_date1);
 
-		$sq_exc = mysqlQuery("UPDATE excursion_master set customer_id='$customer_id', exc_issue_amount='$exc_issue_amount', service_charge='$service_charge',service_tax_subtotal='$service_tax_subtotal', exc_total_cost='$exc_total_cost', due_date='$due_date1',created_at='$balance_date1',markup='$markup',service_tax_markup='$service_tax_markup',reflections='$reflections',roundoff='$roundoff' , bsm_values='$bsmValues',currency_code='$currency_code' where exc_id='$exc_id' ");
+		$sq_exc = mysqlQuery("UPDATE excursion_master set customer_id='$customer_id', exc_issue_amount='$exc_issue_amount', service_charge='$service_charge',service_tax_subtotal='$service_tax_subtotal', exc_total_cost='$exc_total_cost', due_date='$due_date1',created_at='$balance_date1',markup='$markup',service_tax_markup='$service_tax_markup',reflections='$reflections',roundoff='$roundoff' , bsm_values='$bsmValues',currency_code='$currency_code',guest_name='$guest_name',pick_point='$pick_point' where exc_id='$exc_id' ");
 
 		if (!$sq_exc) {
 
@@ -758,7 +765,8 @@ class exc_master
 						$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(entry_id) as max from excursion_master_entries"));
 						$entry_id = $sq_max['max'] + 1;
 
-						$sq_entry = mysqlQuery("insert into excursion_master_entries(entry_id, exc_id, exc_date, city_id, exc_name,transfer_option, total_adult, total_child, adult_cost, child_cost, total_cost, status, `total_infant`, `infant_cost`, `total_vehicles`, `transfer_cost`) values('$entry_id', '$exc_id','$exc_date_arr[$i]','$city_id_arr[$i]', '$exc_name_arr[$i]', '$transfer_option_arr[$i]','$total_adult_arr[$i]', '$total_child_arr[$i]', '$adult_cost_arr[$i]', '$child_cost_arr[$i]', '$total_amt_arr[$i]', '','$total_infant_arr[$i]','$infant_cost_arr[$i]','$total_vehicle_arr[$i]','$transfer_cost_arr[$i]')");
+						$vehicle_name_value = isset($vehicle_name_arr[$i]) ? $vehicle_name_arr[$i] : '';
+					$sq_entry = mysqlQuery("insert into excursion_master_entries(entry_id, exc_id, exc_date, city_id, exc_name,transfer_option, total_adult, total_child, adult_cost, child_cost, total_cost, status, `total_infant`, `infant_cost`, `vehicle_name`, `total_vehicles`, `transfer_cost`) values('$entry_id', '$exc_id','$exc_date_arr[$i]','$city_id_arr[$i]', '$exc_name_arr[$i]', '$transfer_option_arr[$i]','$total_adult_arr[$i]', '$total_child_arr[$i]', '$adult_cost_arr[$i]', '$child_cost_arr[$i]', '$total_amt_arr[$i]', '','$total_infant_arr[$i]','$infant_cost_arr[$i]','$vehicle_name_value','$total_vehicle_arr[$i]','$transfer_cost_arr[$i]')");
 						if (!$sq_entry) {
 
 							$GLOBALS['flag'] = false;
@@ -766,7 +774,8 @@ class exc_master
 							//exit;
 						}
 					} else {
-						$sq_entry = mysqlQuery("update excursion_master_entries set exc_date='$exc_date_arr[$i]', city_id='$city_id_arr[$i]', exc_name='$exc_name_arr[$i]', transfer_option='$transfer_option_arr[$i]',total_adult='$total_adult_arr[$i]', total_child='$total_child_arr[$i]', adult_cost='$adult_cost_arr[$i]', child_cost='$child_cost_arr[$i]', total_cost='$total_amt_arr[$i]',total_infant='$total_infant_arr[$i]',infant_cost='$infant_cost_arr[$i]',total_vehicles='$total_vehicle_arr[$i]',transfer_cost='$transfer_cost_arr[$i]' where entry_id='$entry_id_arr[$i]'");
+						$vehicle_name_value = isset($vehicle_name_arr[$i]) ? $vehicle_name_arr[$i] : '';
+					$sq_entry = mysqlQuery("update excursion_master_entries set exc_date='$exc_date_arr[$i]', city_id='$city_id_arr[$i]', exc_name='$exc_name_arr[$i]', transfer_option='$transfer_option_arr[$i]',total_adult='$total_adult_arr[$i]', total_child='$total_child_arr[$i]', adult_cost='$adult_cost_arr[$i]', child_cost='$child_cost_arr[$i]', total_cost='$total_amt_arr[$i]',total_infant='$total_infant_arr[$i]',infant_cost='$infant_cost_arr[$i]',vehicle_name='$vehicle_name_value',total_vehicles='$total_vehicle_arr[$i]',transfer_cost='$transfer_cost_arr[$i]' where entry_id='$entry_id_arr[$i]'");
 
 						if (!$sq_entry) {
 							$GLOBALS['flag'] = false;

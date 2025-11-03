@@ -27,6 +27,47 @@
 				    <i class="fa fa-phone" aria-hidden="true"></i>
 				    <?php echo $contact_no; ?> 
 				</span>
+				<?php if($sq_exc_info['guest_name'] != ''){ ?>
+				<span class="main_block">
+				    <i class="fa fa-user" aria-hidden="true"></i>
+				    <?php echo $sq_exc_info['guest_name']; ?> 
+				</span>
+				<?php } ?>
+				<?php 
+				if($sq_exc_info['pick_point'] != ''){
+					// Determine the type and fetch appropriate data
+					$pickup_display = '';
+					// Check if it's a city
+					$check_city = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$sq_exc_info[pick_point]'"));
+					if($check_city){
+						$pickup_display = $check_city['city_name'];
+					}
+					// Check if it's an airport
+					else{
+						$check_airport = mysqli_fetch_assoc(mysqlQuery("select airport_id,airport_name,airport_code from airport_master where airport_id='$sq_exc_info[pick_point]'"));
+						if($check_airport){
+							$airport_nam = clean($check_airport['airport_name']);
+							$airport_code = clean($check_airport['airport_code']);
+							$pickup_display = $airport_nam." (".$airport_code.")";
+						}
+						// Check if it's a hotel
+						else{
+							$check_hotel = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$sq_exc_info[pick_point]'"));
+							if($check_hotel){
+								$pickup_display = $check_hotel['hotel_name'];
+							}
+						}
+					}
+					if($pickup_display != ''){
+				?>
+				<span class="main_block">
+				    <i class="fa fa-map-marker" aria-hidden="true"></i>
+				    <?php echo $pickup_display; ?> 
+				</span>
+				<?php 
+					}
+				} 
+				?>
 				
 	        	
 	    </div> 
@@ -106,6 +147,7 @@
                        	<th>adult_Amount</th>
                        	<th>child_Amount</th>
                        	<th>infant_Amount</th>
+                       	<th>Vehicle_Name</th>
                        	<th>total_vehicle</th>
                        	<th>transfer_Amount</th>
                        	<th>Activity_Amount</th>
@@ -128,10 +170,20 @@
                        			else{
                        				$bg="#fff";
                        			}
-                       			$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
-                       			$sq_exc = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_name]'"));
-                       			$count++;
-                       			?>
+							$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
+                      			$sq_exc = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_name]'"));
+                      			// Get vehicle name
+                      			$vehicle_display = '';
+                      			// Debug: Show raw value
+                      			// $vehicle_display = 'Raw: ' . (isset($row_entry['vehicle_name']) ? $row_entry['vehicle_name'] : 'NOT SET');
+                      			if(isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0' && $row_entry['vehicle_name'] != null){
+                      				$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_entry['vehicle_name']."'"));
+                      				if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                      					$vehicle_display = $sq_vehicle['vehicle_name'];
+                      				}
+                      			}
+                      			$count++;
+                      			?>
 								 <tr class="<?php echo $bg; ?>">
 								    <td><?php echo $count; ?></td>
 								    <td><?php echo get_datetime_user($row_entry['exc_date']); ?></td>
@@ -144,10 +196,11 @@
 								    <td><?php echo $row_entry['adult_cost']; ?> </td>
 								    <td><?php echo $row_entry['child_cost']; ?> </td>
 								    <td><?php echo $row_entry['infant_cost']; ?> </td>
+								    <td><?php echo $vehicle_display; ?> </td>
 								    <td><?php echo $row_entry['total_vehicles']; ?> </td>
 								    <td><?php echo $row_entry['transfer_cost']; ?> </td>
 								    <td><?php echo $row_entry['total_cost']; ?> </td>
-								</tr>        
+								</tr>
                        			<?php
                        		}
                        }

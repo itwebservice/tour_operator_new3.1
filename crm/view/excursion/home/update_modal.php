@@ -68,6 +68,55 @@ else if($reflections[0]->tax_apply_on == '3') {
 						<input type="text" id="company_name1" class="hidden" name="company_name1" title="Company Name" placeholder="Company Name" title="Company Name" readonly>
 	                </div>       		        		        	
 		        </div>
+
+		        <div class="row mg_tp_10">
+		        	<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
+		        		<input class="form-control" type="text" id="guest_name1" name="guest_name1" placeholder="Guest Name" title="Guest Name" value="<?= $sq_exc_info['guest_name'] ?>">
+		        	</div>
+		        	<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
+		        		<select name="pick_point1" id="pick_point1" data-toggle="tooltip" style="width:100%;" title="Pickup Point" class="form-control app_select2">
+		        			<?php
+		        			// Determine the type and fetch appropriate data
+		        			$pick_point_html = '';
+		        			if($sq_exc_info['pick_point'] != ''){
+		        				// Check if it's a city
+		        				$check_city = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$sq_exc_info[pick_point]'"));
+		        				if($check_city){
+		        					$pick_point_html = '<optgroup value="city" label="City Name"><option value="'.$check_city['city_id'].'">'.$check_city['city_name'].'</option></optgroup>';
+		        				}
+		        				// Check if it's an airport
+		        				else{
+		        					$check_airport = mysqli_fetch_assoc(mysqlQuery("select airport_id,airport_name,airport_code from airport_master where airport_id='$sq_exc_info[pick_point]'"));
+		        					if($check_airport){
+		        						$airport_nam = clean($check_airport['airport_name']);
+		        						$airport_code = clean($check_airport['airport_code']);
+		        						$pickup = $airport_nam." (".$airport_code.")";
+		        						$pick_point_html = '<optgroup value="airport" label="Airport Name"><option value="'.$check_airport['airport_id'].'">'.$pickup.'</option></optgroup>';
+		        					}
+		        					// Check if it's a hotel
+		        					else{
+		        						$check_hotel = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$sq_exc_info[pick_point]'"));
+		        						if($check_hotel){
+		        							$pick_point_html = '<optgroup value="hotel" label="Hotel Name"><option value="'.$check_hotel['hotel_id'].'">'.$check_hotel['hotel_name'].'</option></optgroup>';
+		        						}
+		        					}
+		        				}
+		        			}
+		        			echo $pick_point_html;
+		        			?>
+		        			<option value="">Pickup Point</option>
+		        			<optgroup value='city' label="City Name">
+		        				<?php get_cities_dropdown('1'); ?>
+		        			</optgroup>
+		        			<optgroup value='airport' label="Airport Name">
+		        				<?php get_airport_dropdown(); ?>
+		        			</optgroup>
+		        			<optgroup value='hotel' label="Hotel Name">
+		        				<?php get_hotel_dropdown(); ?>
+		        			</optgroup>
+		        		</select>
+		        	</div>
+		        </div>
 				<script>
 					customer_info_load('1');
 				</script>
@@ -140,8 +189,27 @@ else if($reflections[0]->tax_apply_on == '3') {
 										<td><input class="form-control" type="text" id="total_infant-<?= $offset.$count ?>" name="total_infant-<?= $offset.$count ?>" value="<?php echo $row_entry['total_infant'] ?>" placeholder="Total Infant" title="Total Infant" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1');validate_balance(this.id);get_auto_values('balance_date1','exc_issue_amount1','payment_mode','service_charge1','markup1','update','true','service_charge');" style="width:110px"></td>
 										<td><input type="text" id="adult_cost-<?= $offset.$count ?>" name="adult_cost-<?= $offset.$count ?>" placeholder="Adult Ticket Amount" title="Adult Ticket Amount" value="<?php echo $row_entry['adult_cost'] ?>" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1'); validate_balance(this.id);" style="width:150px"></td>
 										<td><input type="text" id="child_cost-<?= $offset.$count ?>" name="child_cost-<?= $offset.$count ?>" placeholder="Child Ticket Amount" title="Child Ticket Amount" value="<?php echo $row_entry['child_cost'] ?>" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1'); validate_balance(this.id);" style="width:150px"> </td>
-										<td><input class="form-control" type="text" id="infant_cost-<?= $offset.$count ?>" name="infant_cost-<?= $offset.$count ?>" value="<?php echo $row_entry['infant_cost'] ?>" placeholder="Infant Ticket Amount" title="Infant Ticket Amount" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1');validate_balance(this.id)" style="width:145px"></td>
-										<td><input class="form-control" type="text" id="total_vehicle-<?= $offset.$count ?>" name="total_vehicle-<?= $offset.$count ?>" placeholder="Total Vehicle" title="Total Vehicle" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1');validate_balance(this.id)" style="width:125px" value="<?php echo $row_entry['total_vehicles'] ?>"></td>
+									<td><input class="form-control" type="text" id="infant_cost-<?= $offset.$count ?>" name="infant_cost-<?= $offset.$count ?>" value="<?php echo $row_entry['infant_cost'] ?>" placeholder="Infant Ticket Amount" title="Infant Ticket Amount" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1');validate_balance(this.id)" style="width:145px"></td>
+									<td><select name="vehicle_name-<?= $offset.$count ?>" id="vehicle_name-<?= $offset.$count ?>" style="width: 155px" class="form-control app_select2" title="Select Vehicle" onchange="get_excursion_update_amount(this.id);">
+											<?php
+											$vehicle_selected = '';
+											if($row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0'){
+												$sq_vehicle_sel = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_entry[vehicle_name]'"));
+												if($sq_vehicle_sel){
+													$vehicle_selected = '<option value="'.$sq_vehicle_sel['entry_id'].'" selected>'.$sq_vehicle_sel['vehicle_name'].'</option>';
+												}
+											}
+											echo $vehicle_selected;
+											?>
+											<option value=''>Select Vehicle</option>
+											<?php
+											$sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+											while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+											?>
+												<option value="<?= $row_vehicle['entry_id'] ?>"><?= $row_vehicle['vehicle_name'] ?></option>
+											<?php } ?>
+										</select></td>
+									<td><input class="form-control" type="text" id="total_vehicle-<?= $offset.$count ?>" name="total_vehicle-<?= $offset.$count ?>" placeholder="Total Vehicle" title="Total Vehicle" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1');validate_balance(this.id)" style="width:125px" value="<?php echo $row_entry['total_vehicles'] ?>"></td>
 										<td><input class="form-control" type="text" id="transfer_cost-<?= $offset.$count ?>" name="transfer_cost-<?= $offset.$count ?>" placeholder="Transfer Amount" title="Transfer Amount" onchange="excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1');validate_balance(this.id)" style="width:125px" value="<?php echo $row_entry['transfer_cost'] ?>"></td>
 										<td><input type="text" id="total_amount-<?= $offset.$count ?>" name="total_amount-<?= $offset.$count ?>" placeholder="Activity Amount" title="Activity Amount" value="<?php echo $row_entry['total_cost'] ?>" onchange="validate_balance(this.id);excursion_amount_calculate(this.id,'1');calculate_exc_expense('tbl_dynamic_exc_booking_update','1');" style="width:120px"></td>
 										<td><input type="hidden" value="<?= $row_entry['entry_id'] ?>"></td>
@@ -262,6 +330,11 @@ $('#customer_id1,#acurrency_code1').select2();
 $('#birth_date1, #issue_date1, #due_date1,#balance_date1').datetimepicker({ timepicker:false, format:'d-m-Y' });
 $('#exc_update_modal').modal('show');
 city_lzloading('.city_name_u');
+
+$('#pick_point1').select2({
+    dropdownParent: $("#exc_update_modal"),
+    minimumInputLength: 1
+});
 $(function(){
 
 $('#frm_exc_update').validate({
@@ -287,22 +360,25 @@ $('#frm_exc_update').validate({
 			var balance_date1 = $('#balance_date1').val();
 			var markup = $('#markup1').val();
 			var service_tax_markup = $('#service_tax_markup1').val();
+			var guest_name = $('#guest_name1').val();
+			var pick_point = $('#pick_point1').val();
 
-			var exc_check_arr = new Array();
-			var exc_date_arr = new Array();
-			var city_id_arr = new Array();
-			var exc_name_arr = new Array();
-			var transfer_option_arr = new Array();
-			var total_adult_arr = new Array();
-			var total_child_arr = new Array();
-			var adult_cost_arr = new Array();
-			var child_cost_arr = new Array();
-			var total_amt_arr = new Array();
-			var entry_id_arr = new Array();
-			var total_infant_arr = [];
-			var infant_cost_arr = [];
-			var total_vehicle_arr = [];
-			var transfer_cost_arr = [];
+		var exc_check_arr = new Array();
+		var exc_date_arr = new Array();
+		var city_id_arr = new Array();
+		var exc_name_arr = new Array();
+		var transfer_option_arr = new Array();
+		var total_adult_arr = new Array();
+		var total_child_arr = new Array();
+		var adult_cost_arr = new Array();
+		var child_cost_arr = new Array();
+		var total_amt_arr = new Array();
+		var entry_id_arr = new Array();
+		var total_infant_arr = [];
+		var infant_cost_arr = [];
+		var vehicle_name_arr = [];
+		var total_vehicle_arr = [];
+		var transfer_cost_arr = [];
 
 	        var table = document.getElementById("tbl_dynamic_exc_booking_update");
 	        var rowCount = table.rows.length;
@@ -322,22 +398,23 @@ $('#frm_exc_update').validate({
 	        {
 				var row = table.rows[i];
 				var status = row.cells[0].childNodes[0].checked;
-				var exc_date = row.cells[2].childNodes[0].value;
-				var city_id = row.cells[3].childNodes[0].value;
-				var exc_name = row.cells[4].childNodes[0].value;
-				var transfer_option = row.cells[5].childNodes[0].value;
-				var total_adult = row.cells[6].childNodes[0].value;
-				var total_child = row.cells[7].childNodes[0].value;
-				var total_infant = row.cells[8].childNodes[0].value;
-				var adult_cost = row.cells[9].childNodes[0].value;
-				var child_cost = row.cells[10].childNodes[0].value;
-				var infant_cost = row.cells[11].childNodes[0].value;
-				var total_vehicle = row.cells[12].childNodes[0].value;
-				var transfer_cost = row.cells[13].childNodes[0].value;
-				var total_amt = row.cells[14].childNodes[0].value;
-				
-				if(row.cells[15]){
-					var entry_id = row.cells[15].childNodes[0].value;	
+			var exc_date = row.cells[2].childNodes[0].value;
+			var city_id = row.cells[3].childNodes[0].value;
+			var exc_name = row.cells[4].childNodes[0].value;
+			var transfer_option = row.cells[5].childNodes[0].value;
+			var total_adult = row.cells[6].childNodes[0].value;
+			var total_child = row.cells[7].childNodes[0].value;
+			var total_infant = row.cells[8].childNodes[0].value;
+			var adult_cost = row.cells[9].childNodes[0].value;
+			var child_cost = row.cells[10].childNodes[0].value;
+			var infant_cost = row.cells[11].childNodes[0].value;
+			var vehicle_name = row.cells[12].childNodes[0].value;
+			var total_vehicle = row.cells[13].childNodes[0].value;
+			var transfer_cost = row.cells[14].childNodes[0].value;
+			var total_amt = row.cells[15].childNodes[0].value;
+			
+			if(row.cells[16]){
+				var entry_id = row.cells[16].childNodes[0].value;
 				}
 				else{
 					var entry_id = "";
@@ -356,21 +433,22 @@ $('#frm_exc_update').validate({
 					$('#exc_update').prop('disabled',false);
 					return false;
 				}
-				exc_check_arr.push(status);
-				exc_date_arr.push(exc_date);
-				city_id_arr.push(city_id);
-				exc_name_arr.push(exc_name);
-				total_adult_arr.push(total_adult);
-				total_child_arr.push(total_child);
-				adult_cost_arr.push(adult_cost);
-				child_cost_arr.push(child_cost);
-				total_amt_arr.push(total_amt); 
-				entry_id_arr.push(entry_id);            
-				transfer_option_arr.push(transfer_option);
-				total_infant_arr.push(total_infant);
-				infant_cost_arr.push(infant_cost);
-				total_vehicle_arr.push(total_vehicle);
-				transfer_cost_arr.push(transfer_cost);
+			exc_check_arr.push(status);
+			exc_date_arr.push(exc_date);
+			city_id_arr.push(city_id);
+			exc_name_arr.push(exc_name);
+			total_adult_arr.push(total_adult);
+			total_child_arr.push(total_child);
+			adult_cost_arr.push(adult_cost);
+			child_cost_arr.push(child_cost);
+			total_amt_arr.push(total_amt); 
+			entry_id_arr.push(entry_id);            
+			transfer_option_arr.push(transfer_option);
+			total_infant_arr.push(total_infant);
+			infant_cost_arr.push(infant_cost);
+			vehicle_name_arr.push(vehicle_name);
+			total_vehicle_arr.push(total_vehicle);
+			transfer_cost_arr.push(transfer_cost);
 			
 	        }
 	        var act_sc = $('#act_sc').val();
@@ -409,7 +487,7 @@ $('#frm_exc_update').validate({
 						$.ajax({
 							type: 'post',
 							url: base_url+'controller/excursion/exc_master_update.php',
-							data:{ exc_id : exc_id, customer_id : customer_id, exc_issue_amount : exc_issue_amount, service_charge : service_charge, service_tax_subtotal : service_tax_subtotal, exc_total_cost : exc_total_cost,old_total:old_total,due_date1 : due_date1,balance_date : balance_date1,exc_date_arr : exc_date_arr,exc_check_arr:exc_check_arr,city_id_arr : city_id_arr,exc_name_arr : exc_name_arr, total_adult_arr : total_adult_arr,total_child_arr : total_child_arr,adult_cost_arr : adult_cost_arr,child_cost_arr : child_cost_arr,total_amt_arr : total_amt_arr, entry_id_arr : entry_id_arr,transfer_option_arr:transfer_option_arr,total_infant_arr:total_infant_arr,infant_cost_arr:infant_cost_arr,total_vehicle_arr:total_vehicle_arr,transfer_cost_arr:transfer_cost_arr, markup : markup , service_tax_markup : service_tax_markup, reflections : reflections,roundoff: roundoff,bsmValues:bsmValues,currency_code:currency_code},
+							data:{ exc_id : exc_id, customer_id : customer_id, exc_issue_amount : exc_issue_amount, service_charge : service_charge, service_tax_subtotal : service_tax_subtotal, exc_total_cost : exc_total_cost,old_total:old_total,due_date1 : due_date1,balance_date : balance_date1,exc_date_arr : exc_date_arr,exc_check_arr:exc_check_arr,city_id_arr : city_id_arr,exc_name_arr : exc_name_arr, total_adult_arr : total_adult_arr,total_child_arr : total_child_arr,adult_cost_arr : adult_cost_arr,child_cost_arr : child_cost_arr,total_amt_arr : total_amt_arr, entry_id_arr : entry_id_arr,transfer_option_arr:transfer_option_arr,total_infant_arr:total_infant_arr,infant_cost_arr:infant_cost_arr,vehicle_name_arr:vehicle_name_arr,total_vehicle_arr:total_vehicle_arr,transfer_cost_arr:transfer_cost_arr, markup : markup , service_tax_markup : service_tax_markup, reflections : reflections,roundoff: roundoff,bsmValues:bsmValues,currency_code:currency_code,guest_name:guest_name,pick_point:pick_point},
 							success: function(result){
 								var msg = result.split('-');
 								if(msg[0]=='error'){

@@ -15,6 +15,9 @@ $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master wher
 $branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : $sq_booking['branch_admin_id'];
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $sq_service_voucher = mysqli_fetch_assoc(mysqlQuery("select * from excursion_service_voucher where booking_id='$booking_id' and booking_type='excursion'"));
 $sq_excname = mysqlQuery("select * from excursion_master_entries where exc_id='$booking_id'");
 $total_adl = 0;
@@ -28,9 +31,38 @@ while ($row = mysqli_fetch_assoc($sq_excname)) {
 
 $sq_traveler = mysqli_fetch_assoc(mysqlQuery("select * from customer_master where customer_id='$sq_booking[customer_id]'"));
 if ($sq_traveler['type'] == 'Corporate' || $sq_traveler['type'] == 'B2B') {
-    $name = $sq_traveler['company_name'];
+    $customer_name = $sq_traveler['company_name'];
 } else {
-    $name = $sq_traveler['first_name'] . ' ' . $sq_traveler['last_name'];
+    $customer_name = $sq_traveler['first_name'] . ' ' . $sq_traveler['last_name'];
+}
+
+// Get guest name
+$guest_name = $sq_booking['guest_name'];
+
+// Get pickup point
+$pick_point_display = '';
+if($sq_booking['pick_point'] != ''){
+  // Check if it's a city
+  $check_city = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$sq_booking[pick_point]'"));
+  if($check_city){
+    $pick_point_display = $check_city['city_name'];
+  }
+  // Check if it's an airport
+  else{
+    $check_airport = mysqli_fetch_assoc(mysqlQuery("select airport_id,airport_name,airport_code from airport_master where airport_id='$sq_booking[pick_point]'"));
+    if($check_airport){
+      $airport_nam = clean($check_airport['airport_name']);
+      $airport_code = clean($check_airport['airport_code']);
+      $pick_point_display = $airport_nam." (".$airport_code.")";
+    }
+    // Check if it's a hotel
+    else{
+      $check_hotel = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$sq_booking[pick_point]'"));
+      if($check_hotel){
+        $pick_point_display = $check_hotel['hotel_name'];
+      }
+    }
+  }
 }
 
 
@@ -76,17 +108,35 @@ if ($emp_id == '0') {
         </div>
     </div>
     <div class="row">
-        <div class="col-md-7 mg_bt_20">
+        <div class="col-md-6 mg_bt_20">
             <ul class="print_info_list no-pad noType">
-                <li><span>GUEST NAME :</span> <?= $name ?></li>
+                <li><span>CUSTOMER NAME :</span> <?= $customer_name ?></li>
             </ul>
         </div>
-        <div class="col-md-5 mg_bt_20">
+        <div class="col-md-6 mg_bt_20">
             <ul class="print_info_list no-pad noType">
                 <li><span>TOTAL GUEST(s) :</span> <?= $total_adl + $total_child + $total_infant; ?></li>
             </ul>
         </div>
     </div>
+    <?php if($guest_name != '' || $pick_point_display != ''){ ?>
+    <div class="row">
+        <div class="col-md-6 mg_bt_20">
+            <ul class="print_info_list no-pad noType">
+                <?php if($guest_name != ''){ ?>
+                <li><span>GUEST NAME :</span> <?= $guest_name ?></li>
+                <?php } ?>
+            </ul>
+        </div>
+        <div class="col-md-6 mg_bt_20">
+            <ul class="print_info_list no-pad noType">
+                <?php if($pick_point_display != ''){ ?>
+                <li><span>PICKUP POINT :</span> <?= $pick_point_display ?></li>
+                <?php } ?>
+            </ul>
+        </div>
+    </div>
+    <?php } ?>
 </section>
 
 <!-- EXC Detail -->
@@ -101,10 +151,10 @@ if ($emp_id == '0') {
                             <th>CITY NAME</th>
                             <th>Activity NAME</th>
                             <th>TRANSFER OPTION</th>
+                            <th>VEHICLE NAME</th>
                             <th>Adult</th>
                             <th>Child</th>
                             <th>Infant</th>
-                            <th>Vehicle</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,16 +163,24 @@ if ($emp_id == '0') {
                         while ($row_exc_acc = mysqli_fetch_assoc($sq_exc_acc)) {
                             $sq_city_name = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_exc_acc[city_id]'"));
                             $sq_exc_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_exc_acc[exc_name]'"));
+                            // Get vehicle name
+                            $vehicle_display = '';
+                            if(isset($row_exc_acc['vehicle_name']) && $row_exc_acc['vehicle_name'] != '' && $row_exc_acc['vehicle_name'] != '0' && $row_exc_acc['vehicle_name'] != null){
+                                $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_exc_acc['vehicle_name']."'"));
+                                if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                                    $vehicle_display = $sq_vehicle['vehicle_name'];
+                                }
+                            }
                         ?>
                         <tr>
                             <td><?= get_datetime_user($row_exc_acc['exc_date']) ?></td>
                             <td><?= $sq_city_name['city_name'] ?></td>
                             <td><?= $sq_exc_name['excursion_name'] ?></td>
                             <td><?= $row_exc_acc['transfer_option'] ?></td>
+                            <td><?= $vehicle_display ?></td>
                             <td><?= $row_exc_acc['total_adult'] ?></td>
                             <td><?= $row_exc_acc['total_child'] ?></td>
                             <td><?= $row_exc_acc['total_infant'] ?></td>
-                            <td><?= $row_exc_acc['total_vehicles'] ?></td>
                         </tr>
                         <?php } ?>
                     </tbody>

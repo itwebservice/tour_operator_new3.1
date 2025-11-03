@@ -98,7 +98,57 @@ $net_amount1 = 0;
 $net_amount1 =  ($basic_cost1 + $service_charge  + $sq_exc['markup'] + $markupservice_tax_amount + $service_tax_amount) + $roundoff;
 $net_amount2 = currency_conversion($currency, $currency_code, $net_amount1);
 $amount_in_word = $amount_to_word->convert_number_to_words($net_amount2, $currency_code);
+
+// Get guest name and pickup point
+$guest_name = $sq_exc['guest_name'];
+$pick_point_display = '';
+if($sq_exc['pick_point'] != ''){
+  // Check if it's a city
+  $check_city = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$sq_exc[pick_point]'"));
+  if($check_city){
+    $pick_point_display = $check_city['city_name'];
+  }
+  // Check if it's an airport
+  else{
+    $check_airport = mysqli_fetch_assoc(mysqlQuery("select airport_id,airport_name,airport_code from airport_master where airport_id='$sq_exc[pick_point]'"));
+    if($check_airport){
+      $airport_nam = clean($check_airport['airport_name']);
+      $airport_code = clean($check_airport['airport_code']);
+      $pick_point_display = $airport_nam." (".$airport_code.")";
+    }
+    // Check if it's a hotel
+    else{
+      $check_hotel = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$sq_exc[pick_point]'"));
+      if($check_hotel){
+        $pick_point_display = $check_hotel['hotel_name'];
+      }
+    }
+  }
+}
 ?>
+<?php if($guest_name != '' || $pick_point_display != ''){ ?>
+<div class="row mg_tp_30">
+  <div class="col-md-12">
+    <p class="border_lt"><span class="font_5">Guest Details : </span></p>
+  </div>
+</div>
+<div class="main_block">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="print_info_block">
+        <ul class="main_block noType">
+          <?php if($guest_name != ''){ ?>
+          <li class="col-md-6"><span>Guest Name :</span> <?= $guest_name ?></li>
+          <?php } ?>
+          <?php if($pick_point_display != ''){ ?>
+          <li class="col-md-6"><span>Pickup Point :</span> <?= $pick_point_display ?></li>
+          <?php } ?>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<?php } ?>
 <div class="row mg_tp_30">
   <div class="col-md-12">
     <p class="border_lt"><span class="font_5">Activity Details : </span></p>
@@ -116,6 +166,7 @@ $amount_in_word = $amount_to_word->convert_number_to_words($net_amount2, $curren
               <th>City_Name</th>
               <th>Activity_Name</th>
               <th>Transfer_Option</th>
+              <th>Vehicle_Name</th>
               <th>Adult</th>
               <th>Child</th>
               <th>Infant</th>
@@ -129,6 +180,14 @@ $amount_in_word = $amount_to_word->convert_number_to_words($net_amount2, $curren
 
               $sql_exc_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_vehicle[exc_name]'"));
               $sql_city_name = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_vehicle[city_id]'"));
+              // Get vehicle name
+              $vehicle_display = '';
+              if(isset($row_vehicle['vehicle_name']) && $row_vehicle['vehicle_name'] != '' && $row_vehicle['vehicle_name'] != '0' && $row_vehicle['vehicle_name'] != null){
+                $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_vehicle['vehicle_name']."'"));
+                if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                  $vehicle_display = $sq_vehicle['vehicle_name'];
+                }
+              }
             ?>
               <tr class="odd">
                 <td><?php echo $count; ?></td>
@@ -136,6 +195,7 @@ $amount_in_word = $amount_to_word->convert_number_to_words($net_amount2, $curren
                 <td><?php echo $sql_city_name['city_name']; ?></td>
                 <td><?= $sql_exc_name['excursion_name'] ?></td>
                 <td><?= $row_vehicle['transfer_option'] ?></td>
+                <td><?= $vehicle_display ?></td>
                 <td><?php echo $row_vehicle['total_adult']; ?></td>
                 <td><?= $row_vehicle['total_child'] ?></td>
                 <td><?= $row_vehicle['total_infant'] ?></td>

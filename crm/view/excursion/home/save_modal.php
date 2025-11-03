@@ -48,6 +48,26 @@ $branch_status = $sq['branch_status'];
 	                </div>
 	        	</div>
 
+	        	<div class="row mg_tp_10">
+	        		<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10_sm_xs">
+	                	<input class="form-control" type="text" id="guest_name" name="guest_name" placeholder="Guest Name" title="Guest Name">
+	                </div>
+	        		<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10_sm_xs">
+	        			<select name="pick_point" id="pick_point" data-toggle="tooltip" style="width:100%;" title="Pickup Point" class="form-control app_select2">
+	        				<option value="">Pickup Point</option>
+	        				<optgroup value='city' label="City Name">
+	        					<?php get_cities_dropdown('1'); ?>
+	        				</optgroup>
+	        				<optgroup value='airport' label="Airport Name">
+	        					<?php get_airport_dropdown(); ?>
+	        				</optgroup>
+	        				<optgroup value='hotel' label="Hotel Name">
+	        					<?php get_hotel_dropdown(); ?>
+	        				</optgroup>
+	        			</select>
+	        		</div>
+	        	</div>
+
 	        </div>
 
 			<div id="new_cust_div"></div>
@@ -231,6 +251,11 @@ $('#acurrency_code').select2();
 $('#customer_id').select2( {
     dropdownParent: $("#exc_save_modal")
   });
+
+$('#pick_point').select2({
+    dropdownParent: $("#exc_save_modal"),
+    minimumInputLength: 1
+});
 function business_rule_load(){
 	get_auto_values('balance_date','exc_issue_amount','payment_mode','service_charge','markup','save','true','service_charge');
 }
@@ -284,6 +309,8 @@ $('#frm_exc_save').validate({
 		var credit_charges = $('#credit_charges').val();
 		var credit_card_details = $('#credit_card_details').val();
 		var currency_code = $('#acurrency_code').val();
+		var guest_name = $('#guest_name').val();
+		var pick_point = $('#pick_point').val();
 
 		var emp_id = $('#emp_id').val();
 		var exc_issue_amount = $('#exc_issue_amount').val();	
@@ -304,19 +331,20 @@ $('#frm_exc_save').validate({
 		var markup = $('#markup').val();
 		var service_tax_markup = $('#service_tax_markup').val();
 		
-		var exc_date_arr = new Array();
-		var city_id_arr = new Array();
-		var exc_name_arr = new Array();
-		var transfer_arr = new Array();
-		var total_adult_arr = new Array();
-		var total_child_arr = new Array();
-		var adult_cost_arr = new Array();
-		var child_cost_arr = new Array();
-		var total_amt_arr = new Array();
-		var total_infant_arr = [];
-		var infant_cost_arr = [];
-		var total_vehicle_arr = [];
-		var transfer_cost_arr = [];
+	var exc_date_arr = new Array();
+	var city_id_arr = new Array();
+	var exc_name_arr = new Array();
+	var transfer_arr = new Array();
+	var total_adult_arr = new Array();
+	var total_child_arr = new Array();
+	var adult_cost_arr = new Array();
+	var child_cost_arr = new Array();
+	var total_amt_arr = new Array();
+	var total_infant_arr = [];
+	var infant_cost_arr = [];
+	var vehicle_name_arr = [];
+	var total_vehicle_arr = [];
+	var transfer_cost_arr = [];
 
 		if(payment_mode=="Advance"){
 			error_msg_alert("Please select another payment mode.");
@@ -352,19 +380,20 @@ $('#frm_exc_save').validate({
 				var row = table.rows[i];
 				if(row.cells[0].childNodes[0].checked){
 
-					var exc_date = row.cells[2].childNodes[0].value;
-					var city_id = row.cells[3].childNodes[0].value;
-					var exc_name = row.cells[4].childNodes[0].value;
-					var transfer_option = row.cells[5].childNodes[0].value;
-					var total_adult = row.cells[6].childNodes[0].value;
-					var total_child = row.cells[7].childNodes[0].value;
-					var total_infant = row.cells[8].childNodes[0].value;
-					var adult_cost = row.cells[9].childNodes[0].value;
-					var child_cost = row.cells[10].childNodes[0].value;
-					var infant_cost = row.cells[11].childNodes[0].value;
-					var total_vehicle = row.cells[12].childNodes[0].value;
-					var transfer_cost = row.cells[13].childNodes[0].value;
-					var total_amt = row.cells[14].childNodes[0].value;
+				var exc_date = row.cells[2].childNodes[0].value;
+				var city_id = row.cells[3].childNodes[0].value;
+				var exc_name = row.cells[4].childNodes[0].value;
+				var transfer_option = row.cells[5].childNodes[0].value;
+				var total_adult = row.cells[6].childNodes[0].value;
+				var total_child = row.cells[7].childNodes[0].value;
+				var total_infant = row.cells[8].childNodes[0].value;
+				var adult_cost = row.cells[9].childNodes[0].value;
+				var child_cost = row.cells[10].childNodes[0].value;
+				var infant_cost = row.cells[11].childNodes[0].value;
+				var vehicle_name = row.cells[12].childNodes[0].value;
+				var total_vehicle = row.cells[13].childNodes[0].value;
+				var transfer_cost = row.cells[14].childNodes[0].value;
+				var total_amt = row.cells[15].childNodes[0].value;
 
 					var msg = "";
 
@@ -381,19 +410,20 @@ $('#frm_exc_save').validate({
 						return false;
 					}
 
-					exc_date_arr.push(exc_date);
-					city_id_arr.push(city_id);
-					exc_name_arr.push(exc_name);
-					total_adult_arr.push(total_adult);
-					total_child_arr.push(total_child);
-					adult_cost_arr.push(adult_cost);
-					child_cost_arr.push(child_cost);
-					total_amt_arr.push(total_amt);             
-					transfer_arr.push(transfer_option);
-					total_infant_arr.push(total_infant);
-					infant_cost_arr.push(infant_cost);
-					total_vehicle_arr.push(total_vehicle);
-					transfer_cost_arr.push(transfer_cost);
+				exc_date_arr.push(exc_date);
+				city_id_arr.push(city_id);
+				exc_name_arr.push(exc_name);
+				total_adult_arr.push(total_adult);
+				total_child_arr.push(total_child);
+				adult_cost_arr.push(adult_cost);
+				child_cost_arr.push(child_cost);
+				total_amt_arr.push(total_amt);             
+				transfer_arr.push(transfer_option);
+				total_infant_arr.push(total_infant);
+				infant_cost_arr.push(infant_cost);
+				vehicle_name_arr.push(vehicle_name);
+				total_vehicle_arr.push(total_vehicle);
+				transfer_cost_arr.push(transfer_cost);
 				}
 	        }
 			//Validation for booking and payment date in login financial year
@@ -472,7 +502,7 @@ $('#frm_exc_save').validate({
 								$.ajax({
 									type: 'post',
 									url: base_url+'controller/excursion/exc_master_save.php',
-									data:{ emp_id : emp_id, customer_id : customer_id, exc_issue_amount : exc_issue_amount, service_charge : service_charge, service_tax_subtotal : service_tax_subtotal, exc_total_cost : exc_total_cost, payment_date : payment_date, payment_amount : payment_amount, payment_mode : payment_mode, bank_name : bank_name, transaction_id : transaction_id, bank_id : bank_id, due_date : due_date,balance_date : balance_date,exc_date_arr : exc_date_arr,city_id_arr : city_id_arr,exc_name_arr : exc_name_arr, total_adult_arr : total_adult_arr,total_child_arr : total_child_arr,adult_cost_arr : adult_cost_arr,child_cost_arr : child_cost_arr,total_amt_arr : total_amt_arr,total_infant_arr:total_infant_arr,infant_cost_arr:infant_cost_arr,total_vehicle_arr:total_vehicle_arr,transfer_cost_arr:transfer_cost_arr,transfer_arr:transfer_arr, branch_admin_id : branch_admin_id, markup : markup, service_tax_markup : service_tax_markup, reflections : reflections,roundoff:roundoff,bsmValues:bsmValues,credit_charges:credit_charges,credit_card_details:credit_card_details,currency_code:currency_code },
+									data:{ emp_id : emp_id, customer_id : customer_id, exc_issue_amount : exc_issue_amount, service_charge : service_charge, service_tax_subtotal : service_tax_subtotal, exc_total_cost : exc_total_cost, payment_date : payment_date, payment_amount : payment_amount, payment_mode : payment_mode, bank_name : bank_name, transaction_id : transaction_id, bank_id : bank_id, due_date : due_date,balance_date : balance_date,exc_date_arr : exc_date_arr,city_id_arr : city_id_arr,exc_name_arr : exc_name_arr, total_adult_arr : total_adult_arr,total_child_arr : total_child_arr,adult_cost_arr : adult_cost_arr,child_cost_arr : child_cost_arr,total_amt_arr : total_amt_arr,total_infant_arr:total_infant_arr,infant_cost_arr:infant_cost_arr,vehicle_name_arr:vehicle_name_arr,total_vehicle_arr:total_vehicle_arr,transfer_cost_arr:transfer_cost_arr,transfer_arr:transfer_arr, branch_admin_id : branch_admin_id, markup : markup, service_tax_markup : service_tax_markup, reflections : reflections,roundoff:roundoff,bsmValues:bsmValues,credit_charges:credit_charges,credit_card_details:credit_card_details,currency_code:currency_code,guest_name:guest_name,pick_point:pick_point },
 									success: function(result){
 										$('#btn_exc_master_save').button('reset');
 										var msg = result.split('-');
