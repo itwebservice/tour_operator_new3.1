@@ -1399,21 +1399,45 @@ class quotation_email_send
 
  *$tourname*
  * $from_date for $duration
- * $adults Adults
- * $childs Child
- * $infants Infant
+";
+				// Show passenger counts only if non-zero
+				if ($adults > 0) {
+					$maindetail .= " * $adults Adults\n";
+				}
+				if ($childs > 0) {
+					$maindetail .= " * $childs Child\n";
+				}
+				if ($infants > 0) {
+					$maindetail .= " * $infants Infant\n";
+				}
+				
+				$maindetail .= "\n";
+				
+				// Show passenger costs only if non-zero
+				if ($adults > 0 && extract_numeric($adult_cost) > 0) {
+					$maindetail .= "*Adult Amount:* $adult_cost\n";
+				}
+				if ($child_wb > 0 && extract_numeric($child_with) > 0) {
+					$maindetail .= "*Child with Bed Amount:* $child_with\n";
+				}
+				if ($child_wob > 0 && extract_numeric($child_without) > 0) {
+					$maindetail .= "*Child without Bed Amount:* $child_without\n";
+				}
+				if ($infants > 0 && extract_numeric($infant_cost) > 0) {
+					$maindetail .= "*Infant Amount:* $infant_cost\n";
+				}
 
-*Land Cost:*
-
-*Adult Amount:* $adult_cost.\n
-*Child with Bed Amount:* $child_with.\n
-*Child without Bed Amount:* $child_without.\n
-*Infant Amount:* $infant_cost.\n
-
-*Taxes:*
-
-*Tax:* $tax.\n
-*TCS:*$tcs_cost\n";
+				$maindetail .= "\n*Taxes:*\n";
+				
+				// Show taxes only if non-zero
+				if (extract_numeric($service_tax_amount_show) > 0) {
+					$maindetail .= "*Tax:* $tax\n";
+				}
+				if (extract_numeric($tcs_show1) > 0) {
+					$maindetail .= "*TCS:* $tcs_cost\n";
+				}
+				
+				$maindetail .= "";
 
 					$maindetail .= "\n";
 
@@ -1602,19 +1626,35 @@ class quotation_email_send
 
 
 
-					$maindetail = "*Quotation ID :* $quoatationid 
+				$maindetail = "*Quotation ID :* $quoatationid 
 
 *$tourname*
 * $from_date for $duration
-* $adults Adults
-* $childs Child
-* $infants Infant
-				   
+";
+				// Show passenger counts only if non-zero
+				if ($adults > 0) {
+					$maindetail .= "* $adults Adults\n";
+				}
+				if ($childs > 0) {
+					$maindetail .= "* $childs Child\n";
+				}
+				if ($infants > 0) {
+					$maindetail .= "* $infants Infant\n";
+				}
+				
+				$maindetail .= "			   
 *Tour Amount :* $newBasic
 *Travel Amount :* $travel_cost
-*Tax :* $service_tax_amount_show
-*Tcs :* $tcs_amount_show
-*Total Price :*  $currency_amount1 " . "\n";
+";
+				// Show taxes only if non-zero
+				if (extract_numeric($service_tax_amount_show) > 0) {
+					$maindetail .= "*Tax :* $service_tax_amount_show\n";
+				}
+				if (extract_numeric($tcs_amount_show) > 0) {
+					$maindetail .= "*Tcs :* $tcs_amount_show\n";
+				}
+				
+				$maindetail .= "*Total Price :*  $currency_amount1 " . "\n";
 				}
 			}
 
@@ -1815,7 +1855,7 @@ class quotation_email_send
 			$quotation_no = base64_encode($quotation_id);
 
 
-			$whatsapp_msg = rawurlencode('Hi Guest,
+			$whatsapp_msg = rawurlencode('Dear Guest,
 
 Greetings from ' . $app_name . '
 
