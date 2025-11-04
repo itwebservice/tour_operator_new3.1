@@ -37,15 +37,17 @@ $credit_card_charges = $sq_paid_amount['sumc'];
 
 			    <li role="presentation" class="active"><a href="#basic_information" aria-controls="home" role="tab" data-toggle="tab" class="tab_name">General Information</a></li>
 				
-				<?php
-				$sq_train_count = mysqli_num_rows(mysqlQuery("select * from train_master where tourwise_traveler_id='$id'")); 
-				$sq_air_count = mysqli_num_rows(mysqlQuery("select * from plane_master where tourwise_traveler_id='$id'"));
-				$sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from group_cruise_master where booking_id='$id'"));
-				$sq_gr_count = mysqli_num_rows(mysqlQuery("select * from group_tour_hotel_entries where tour_id='$tour_id'")); 
-				if($sq_train_count!='0' || $sq_air_count != '0' || $sq_cruise_count != '0' || $sq_gr_count != '0'){
-				?>
-			    <li role="presentation"><a href="#travelling_information" aria-controls="home" role="tab" data-toggle="tab" class="tab_name">Travelling Information</a></li>
-				<?php } ?>
+			<?php
+			$sq_train_count = mysqli_num_rows(mysqlQuery("select * from train_master where tourwise_traveler_id='$id'")); 
+			$sq_air_count = mysqli_num_rows(mysqlQuery("select * from plane_master where tourwise_traveler_id='$id'"));
+			$sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from group_cruise_master where booking_id='$id'"));
+			$sq_gr_count = mysqli_num_rows(mysqlQuery("select * from group_tour_hotel_entries where tour_id='$tour_id'"));
+			$traveler_group_id = $sq_group_info['traveler_group_id'];
+			$sq_transport_count = mysqli_num_rows(mysqlQuery("select * from group_tour_booking_transport_entries where traveler_group_id='$traveler_group_id'")); 
+			if($sq_train_count!='0' || $sq_air_count != '0' || $sq_cruise_count != '0' || $sq_gr_count != '0' || $sq_transport_count > 0){
+			?>
+		    <li role="presentation"><a href="#travelling_information" aria-controls="home" role="tab" data-toggle="tab" class="tab_name">Travelling Information</a></li>
+			<?php } ?>
 			    <li role="presentation"><a href="#payment_information" aria-controls="home" role="tab" data-toggle="tab" class="tab_name">Costing Information</a></li>
 
 			    <li role="presentation"><a href="#booking_costing" aria-controls="profile" role="tab" data-toggle="tab" class="tab_name">Receipt Information</a></li>

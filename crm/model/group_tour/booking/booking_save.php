@@ -103,6 +103,30 @@ public function complete_booking_information_save(){
   $cruise_seats_arr = isset($_POST['cruise_seats_arr']) ? $_POST['cruise_seats_arr']: [];
   $cruise_amount_arr = isset($_POST['cruise_amount_arr']) ? $_POST['cruise_amount_arr']: [];
 
+  // Transport
+  $transport_vehicle_arr = isset($_POST['transport_vehicle_arr']) ? $_POST['transport_vehicle_arr'] : [];
+  $transport_start_date_arr = isset($_POST['transport_start_date_arr']) ? $_POST['transport_start_date_arr'] : [];
+  $transport_end_date_arr = isset($_POST['transport_end_date_arr']) ? $_POST['transport_end_date_arr'] : [];
+  $transport_pickup_arr = isset($_POST['transport_pickup_arr']) ? $_POST['transport_pickup_arr'] : [];
+  $transport_pickup_type_arr = isset($_POST['transport_pickup_type_arr']) ? $_POST['transport_pickup_type_arr'] : [];
+  $transport_drop_arr = isset($_POST['transport_drop_arr']) ? $_POST['transport_drop_arr'] : [];
+  $transport_drop_type_arr = isset($_POST['transport_drop_type_arr']) ? $_POST['transport_drop_type_arr'] : [];
+  $transport_service_duration_arr = isset($_POST['transport_service_duration_arr']) ? $_POST['transport_service_duration_arr'] : [];
+  $transport_no_vehicles_arr = isset($_POST['transport_no_vehicles_arr']) ? $_POST['transport_no_vehicles_arr'] : [];
+  
+  // DEBUG: Log what was received in POST
+  error_log("=== TRANSPORT POST DATA RECEIVED (SAVE) ===");
+  error_log("POST Keys containing 'transport': " . implode(', ', preg_grep('/transport/i', array_keys($_POST))));
+  error_log("Vehicle arr isset: " . (isset($_POST['transport_vehicle_arr']) ? 'YES' : 'NO'));
+  error_log("Pickup arr isset: " . (isset($_POST['transport_pickup_arr']) ? 'YES' : 'NO'));
+  error_log("Vehicle count: " . count($transport_vehicle_arr));
+  error_log("Vehicles: " . print_r($transport_vehicle_arr, true));
+  error_log("Pickup: " . print_r($transport_pickup_arr, true));
+  error_log("Pickup Types: " . print_r($transport_pickup_type_arr, true));
+  error_log("Drop: " . print_r($transport_drop_arr, true));
+  error_log("Drop Types: " . print_r($transport_drop_type_arr, true));
+  error_log("Service Duration: " . print_r($transport_service_duration_arr, true));
+  error_log("Vehicle Counts: " . print_r($transport_no_vehicles_arr, true));
 
   //**Visa Details
   $visa_country_name = $_POST['visa_country_name'];
@@ -221,6 +245,8 @@ public function complete_booking_information_save(){
   $this->traveler_personal_information_save($tourwise_traveler_id,$branch_admin_id, $m_email_id, $m_mobile_no, $m_address);
   //** This function stores the traveling information
   $this->save_traveling_information( $tourwise_traveler_id, $train_travel_date, $train_from_location, $train_to_location, $train_train_no, $train_travel_class, $train_travel_priority, $train_amount, $train_seats, $plane_travel_date, $from_city_id_arr, $plane_from_location, $to_city_id_arr, $plane_to_location, $plane_amount, $plane_seats, $plane_company, $arravl_arr,$cruise_dept_date_arr, $cruise_arrival_date_arr, $route_arr, $cabin_arr, $sharing_arr, $cruise_seats_arr, $cruise_amount_arr,$flight_class_arr);
+  //** This function stores the transport information
+  $this->save_transport_information($tourwise_traveler_id, $tour_id, $transport_vehicle_arr, $transport_start_date_arr, $transport_end_date_arr, $transport_pickup_arr, $transport_pickup_type_arr, $transport_drop_arr, $transport_drop_type_arr, $transport_service_duration_arr, $transport_no_vehicles_arr);
 
 
 
@@ -1065,6 +1091,83 @@ Please contact for more details : '.$app_name.' '.$contact.'
 Thank you.');
 	$link = 'https://web.whatsapp.com/send?phone='.$contact_no.'&text='.$whatsapp_msg;
 	echo $link;
-}
+ }
+
+ //**Transport Information Save
+ public function save_transport_information($traveler_group_id, $tour_id, $transport_vehicle_arr, $transport_start_date_arr, $transport_end_date_arr, $transport_pickup_arr, $transport_pickup_type_arr, $transport_drop_arr, $transport_drop_type_arr, $transport_service_duration_arr, $transport_no_vehicles_arr){
+    
+    // Debug logging
+    error_log("Transport Save Debug - Count: " . sizeof($transport_vehicle_arr));
+    error_log("Tour ID: " . $tour_id);
+    error_log("Pickup Data: " . print_r($transport_pickup_arr, true));
+    error_log("Pickup Type: " . print_r($transport_pickup_type_arr, true));
+    error_log("Drop Data: " . print_r($transport_drop_arr, true));
+    error_log("Drop Type: " . print_r($transport_drop_type_arr, true));
+    error_log("Service Duration: " . print_r($transport_service_duration_arr, true));
+    
+    for($i=0; $i<sizeof($transport_vehicle_arr); $i++){
+        
+        // Skip if vehicle name is empty
+        if(empty($transport_vehicle_arr[$i])){
+            continue;
+        }
+        
+        $vehicle_name = mysqlREString($transport_vehicle_arr[$i]);
+        $start_date = get_date_db($transport_start_date_arr[$i]);
+        $end_date = get_date_db($transport_end_date_arr[$i]);
+        
+        // Extract pickup type and ID from value (format: "city-123" or "hotel-456") - SAME AS QUOTATION
+        if(strpos($transport_pickup_arr[$i], '-') !== false){
+            $pickup_parts = explode("-", $transport_pickup_arr[$i], 2);  // Limit to 2 parts
+            $pickup_type = $pickup_parts[0];
+            $pickup = intval($pickup_parts[1]);
+        } else {
+            // Fallback if no dash
+            $pickup = isset($transport_pickup_arr[$i]) && $transport_pickup_arr[$i] != '' ? intval($transport_pickup_arr[$i]) : 0;
+            $pickup_type = isset($transport_pickup_type_arr[$i]) && $transport_pickup_type_arr[$i] != '' ? mysqlREString($transport_pickup_type_arr[$i]) : '';
+        }
+        
+        // Extract drop type and ID from value (format: "city-123" or "hotel-456") - SAME AS QUOTATION
+        if(strpos($transport_drop_arr[$i], '-') !== false){
+            $drop_parts = explode("-", $transport_drop_arr[$i], 2);  // Limit to 2 parts
+            $drop_type = $drop_parts[0];
+            $drop_location = intval($drop_parts[1]);
+        } else {
+            // Fallback if no dash
+            $drop_location = isset($transport_drop_arr[$i]) && $transport_drop_arr[$i] != '' ? intval($transport_drop_arr[$i]) : 0;
+            $drop_type = isset($transport_drop_type_arr[$i]) && $transport_drop_type_arr[$i] != '' ? mysqlREString($transport_drop_type_arr[$i]) : '';
+        }
+        
+        // Ensure service duration is valid
+        $service_duration = isset($transport_service_duration_arr[$i]) && $transport_service_duration_arr[$i] != '' ? mysqlREString($transport_service_duration_arr[$i]) : '';
+        
+        // Vehicle count - Convert to INT
+        $vehicle_count = isset($transport_no_vehicles_arr[$i]) && $transport_no_vehicles_arr[$i] != '' ? intval($transport_no_vehicles_arr[$i]) : 0;
+        
+        // Package ID - Set to 0 if not applicable
+        $package_id = 0;
+        
+        // Tour ID
+        $tour_id_val = intval($tour_id);
+        
+        error_log("Row $i - Tour ID: $tour_id_val, Pickup RAW: " . $transport_pickup_arr[$i] . ", Parsed: $pickup ($pickup_type), Drop RAW: " . $transport_drop_arr[$i] . ", Parsed: $drop_location ($drop_type), Duration: $service_duration");
+        
+        $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from group_tour_booking_transport_entries"));
+        $id = $sq_max['max'] + 1;
+        
+        $sq_transport = mysqlQuery("insert into group_tour_booking_transport_entries 
+                                    (id, traveler_group_id, tour_id, vehicle_name, start_date, end_date, pickup, 
+                                     pickup_type, drop_location, drop_type, package_id, vehicle_count, service_duration) 
+                                    values 
+                                    ('$id', '$traveler_group_id', '$tour_id_val', '$vehicle_name', '$start_date', '$end_date', 
+                                     '$pickup', '$pickup_type', '$drop_location', '$drop_type', '$package_id', '$vehicle_count', '$service_duration')");
+        
+        if(!$sq_transport){
+            $GLOBALS['flag'] = false;
+            echo "error--Sorry, Transport details not saved! Error: " . mysqli_error($GLOBALS['con']);
+            exit;
+        }
+    }
+ }
 }
 ?>

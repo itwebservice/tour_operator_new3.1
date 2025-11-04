@@ -284,6 +284,132 @@ function update_booking_details() {
 			cruise_checkbox_arr.push(row.cells[0].childNodes[0].checked);
 	}
 
+	//**Transport travel details starts here
+	var transport_vehicle_arr = [];
+	var transport_start_date_arr = [];
+	var transport_end_date_arr = [];
+	var transport_pickup_arr = [];
+	var transport_pickup_type_arr = [];
+	var transport_drop_arr = [];
+	var transport_drop_type_arr = [];
+	var transport_service_duration_arr = [];
+	var transport_no_vehicles_arr = [];
+	var transport_entry_id_arr = [];
+
+	var table = document.getElementById('tbl_booking_transport_u');
+	if(table && table.rows && table.rows.length > 0){
+		var rowCount = table.rows.length;
+		for (var i = 0; i < rowCount; i++) {
+			var row = table.rows[i];
+			// Collect data from ALL rows (checked or not) for update
+			if (row.cells[0] && row.cells[0].childNodes[0]) {
+				// Use querySelector to find select element (in case Select2 wrapped it)
+				var vehicleSelect = row.cells[2].querySelector('select');
+				var vehicle_name = vehicleSelect ? vehicleSelect.value : '';
+				
+				// Dates use input directly
+				var start_date = (row.cells[3] && row.cells[3].querySelector('input')) ? row.cells[3].querySelector('input').value : '';
+				var end_date = (row.cells[4] && row.cells[4].querySelector('input')) ? row.cells[4].querySelector('input').value : '';
+				
+		// Extract pickup - Send FULL VALUE like "city-123", PHP will split it
+		var pickup_full = '';
+		var pickup_type = '';
+		
+		var pickupSelect = row.cells[5].querySelector('select');
+		if(pickupSelect){
+			// Get the full value like "city-123"
+			pickup_full = pickupSelect.value || '';
+			// Get the type from the parent optgroup as backup
+			var $pickupSelect = $(pickupSelect);
+			var optgroupType = $pickupSelect.find("option:selected").parent().attr('value');
+			
+			console.log('Row ' + i + ' - Pickup FULL value:', pickup_full, 'Optgroup type:', optgroupType);
+			
+			// If value doesn't have dash but we have optgroup type, construct it
+			if(pickup_full && pickup_full.indexOf('-') === -1 && optgroupType){
+				pickup_full = optgroupType + '-' + pickup_full;
+				console.log('Row ' + i + ' - Reconstructed pickup:', pickup_full);
+			}
+		}
+		
+		// Extract drop - Send FULL VALUE like "hotel-456", PHP will split it
+		var drop_full = '';
+		var drop_type = '';
+		
+		var dropSelect = row.cells[6].querySelector('select');
+		if(dropSelect){
+			// Get the full value like "hotel-456"
+			drop_full = dropSelect.value || '';
+			// Get the type from the parent optgroup as backup
+			var $dropSelect = $(dropSelect);
+			var optgroupType = $dropSelect.find("option:selected").parent().attr('value');
+			
+			console.log('Row ' + i + ' - Drop FULL value:', drop_full, 'Optgroup type:', optgroupType);
+			
+			// If value doesn't have dash but we have optgroup type, construct it
+			if(drop_full && drop_full.indexOf('-') === -1 && optgroupType){
+				drop_full = optgroupType + '-' + drop_full;
+				console.log('Row ' + i + ' - Reconstructed drop:', drop_full);
+			}
+		}
+			
+			// Get service duration text
+			var service_duration = '';
+			var durationSelect = row.cells[7].querySelector('select');
+			if(durationSelect){
+				var $serviceDuration = $(durationSelect);
+				var selectedText = $serviceDuration.find('option:selected').text();
+				var selectedValue = $serviceDuration.val();
+				console.log('Row ' + i + ' Duration - Text:', selectedText, 'Value:', selectedValue);
+				if(selectedText && selectedText != '' && selectedText != 'Service Duration'){
+					service_duration = selectedText;
+				}
+			}
+			
+			var no_vehicles = row.cells[8].querySelector('input') ? row.cells[8].querySelector('input').value : '';
+			var transport_entry_id = row.cells[9].querySelector('input') ? row.cells[9].querySelector('input').value : '';
+
+			transport_vehicle_arr.push(vehicle_name);
+			transport_start_date_arr.push(start_date);
+			transport_end_date_arr.push(end_date);
+			transport_pickup_arr.push(pickup_full);  // Send full value like "city-123"
+			transport_pickup_type_arr.push(pickup_type);  // Backup
+			transport_drop_arr.push(drop_full);  // Send full value like "hotel-456"
+			transport_drop_type_arr.push(drop_type);  // Backup
+			transport_service_duration_arr.push(service_duration);
+			transport_no_vehicles_arr.push(no_vehicles);
+			transport_entry_id_arr.push(transport_entry_id);
+			}
+		}
+	}
+
+	// Debug: Log transport data
+	console.log('\n========== TRANSPORT DATA COLLECTION (UPDATE) ==========');
+	console.log('Total Rows:', transport_vehicle_arr.length);
+	console.log('Vehicles:', transport_vehicle_arr);
+	console.log('Pickup IDs:', transport_pickup_arr);
+	console.log('Pickup Types:', transport_pickup_type_arr);
+	console.log('Drop IDs:', transport_drop_arr);
+	console.log('Drop Types:', transport_drop_type_arr);
+	console.log('Service Durations:', transport_service_duration_arr);
+	console.log('Vehicle Counts:', transport_no_vehicles_arr);
+	console.log('Entry IDs:', transport_entry_id_arr);
+	console.log('========================================================\n');
+	
+	// Alert if critical data is missing
+	if(transport_vehicle_arr.length > 0){
+		var hasEmptyPickup = transport_pickup_arr.some(function(val){ return !val || val === ''; });
+		var hasEmptyDrop = transport_drop_arr.some(function(val){ return !val || val === ''; });
+		var hasEmptyDuration = transport_service_duration_arr.some(function(val){ return !val || val === ''; });
+		
+		if(hasEmptyPickup || hasEmptyDrop || hasEmptyDuration){
+			console.warn('⚠️ WARNING: Some transport rows have empty pickup, drop, or duration values!');
+			console.warn('Empty Pickup:', hasEmptyPickup);
+			console.warn('Empty Drop:', hasEmptyDrop);
+			console.warn('Empty Duration:', hasEmptyDuration);
+		}
+	}
+
 	//**Visa Details
 	var visa_country_name = $('#visa_country_name').val();
 	var visa_amount = $('#visa_amount').val();
@@ -477,6 +603,16 @@ function update_booking_details() {
 						cruise_service_tax: cruise_service_tax,
 						cruise_service_tax_subtotal: cruise_service_tax_subtotal,
 						total_cruise_expense: total_cruise_expense,
+						transport_vehicle_arr: transport_vehicle_arr,
+						transport_start_date_arr: transport_start_date_arr,
+						transport_end_date_arr: transport_end_date_arr,
+						transport_pickup_arr: transport_pickup_arr,
+						transport_pickup_type_arr: transport_pickup_type_arr,
+						transport_drop_arr: transport_drop_arr,
+						transport_drop_type_arr: transport_drop_type_arr,
+						transport_service_duration_arr: transport_service_duration_arr,
+						transport_no_vehicles_arr: transport_no_vehicles_arr,
+						transport_entry_id_arr: transport_entry_id_arr,
 						basic_amount: basic_amount,
 						reflections: reflections, total_discount: total_discount, roundoff: roundoff, bsmValues: bsmValues,currency_code:currency_code,tcsvalue:tcsvalue,tcs:tcs,single_person:single_person,single_person_cost:single_person_cost,old_total:old_total
 					},

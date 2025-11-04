@@ -378,4 +378,144 @@ function tour_details_reflect(cmb_tour_group) {
     }
   });
 
+  /////////////// Transport ////////////////
+  var tour_id = $('#cmb_tour_name').val();  // Get tour master ID, not group ID
+  $.ajax({
+    type: 'post',
+    url: 'tab_2/get_transport_info.php',
+    data: { tour_id: tour_id },  // Send tour_id instead of group_id
+    success: function (result) {
+      var table = document.getElementById("tbl_booking_transport");
+      var transport_arr = JSON.parse(result);
+      
+      if (jQuery.isEmptyObject(transport_arr)) {
+        var f_row = table.rows[0];
+        f_row.cells[0].childNodes[0].removeAttribute('checked');
+      }
+      
+      // Clear existing rows except first
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+      
+      // Get today's date in dd-mm-yyyy format
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0');
+      var yyyy = today.getFullYear();
+      var todayDate = dd + '-' + mm + '-' + yyyy;
+      
+      // Add rows if needed
+      if (table.rows.length < transport_arr.length) {
+        for (var i = 1; i < transport_arr.length; i++) {
+          addRow('tbl_booking_transport');
+        }
+      }
+      
+      // Wait for rows to be added to DOM
+      setTimeout(function () {
+        for (var i = 0; i < transport_arr.length; i++) {
+          var row = table.rows[i];
+          
+          // Set vehicle using querySelector
+          var vehicleSelect = row.cells[2].querySelector('select');
+          if(vehicleSelect){
+            vehicleSelect.value = transport_arr[i]['vehicle_id'];
+            $(vehicleSelect).trigger('change');
+          }
+          
+          // Set dates using querySelector
+          var startDateInput = row.cells[3].querySelector('input');
+          if(startDateInput) startDateInput.value = todayDate;
+          
+          var endDateInput = row.cells[4].querySelector('input');
+          if(endDateInput) endDateInput.value = todayDate;
+          
+        // Set pickup location - Add pre-selected option then init with AJAX
+        if (transport_arr[i]['pickup_value'] && transport_arr[i]['pickup_value'] != '') {
+          var pickupSelect = row.cells[5].querySelector('select');
+          if(pickupSelect){
+            var $pickupSelect = $(pickupSelect);
+            // Add the pre-selected option
+            var pickupHtml = '<optgroup value="' + transport_arr[i]['pickup_type'] + '" label="' + ucfirst(transport_arr[i]['pickup_type']) + '">' +
+              '<option value="' + transport_arr[i]['pickup_value'] + '" selected>' + transport_arr[i]['pickup_location'] + '</option>' +
+              '</optgroup>';
+            $pickupSelect.html(pickupHtml);
+            // Initialize with AJAX so user can search for other options
+            destinationLoading($pickupSelect, 'Pickup Location');
+          }
+        }
+        
+        // Set drop location - Add pre-selected option then init with AJAX
+        if (transport_arr[i]['drop_value'] && transport_arr[i]['drop_value'] != '') {
+          var dropSelect = row.cells[6].querySelector('select');
+          if(dropSelect){
+            var $dropSelect = $(dropSelect);
+            // Add the pre-selected option
+            var dropHtml = '<optgroup value="' + transport_arr[i]['drop_type'] + '" label="' + ucfirst(transport_arr[i]['drop_type']) + '">' +
+              '<option value="' + transport_arr[i]['drop_value'] + '" selected>' + transport_arr[i]['drop_location'] + '</option>' +
+              '</optgroup>';
+            $dropSelect.html(dropHtml);
+            // Initialize with AJAX so user can search for other options
+            destinationLoading($dropSelect, 'Drop-off Location');
+          }
+        }
+        
+        // Set service duration from tour data
+        if (transport_arr[i]['service_duration'] && transport_arr[i]['service_duration'] != '') {
+          var durationSelect = row.cells[7].querySelector('select');
+          if(durationSelect){
+            var $durationSelect = $(durationSelect);
+            // Add the option if it doesn't exist, then select it
+            var durationValue = transport_arr[i]['service_duration'];
+            if ($durationSelect.find('option:contains("' + durationValue + '")').length === 0) {
+              $durationSelect.append('<option value="' + durationValue + '">' + durationValue + '</option>');
+            }
+            // Select by text match
+            $durationSelect.find('option').filter(function() {
+              return $(this).text() === durationValue;
+            }).prop('selected', true);
+          }
+        }
+        
+        // Set vehicle count from tour data
+        var vehicleCountInput = row.cells[8].querySelector('input');
+        if(vehicleCountInput){
+          vehicleCountInput.value = transport_arr[i]['vehicle_count'] || '';
+        }
+        
+        // Check the checkbox
+        var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+        if(checkbox){
+          checkbox.checked = true;
+          checkbox.setAttribute('checked', 'checked');
+        }
+      }
+      
+      // DON'T call destinationLoading on ALL dropdowns - it will clear the pre-populated options!
+      // Each dropdown was already initialized with AJAX in the loop above
+      
+      // Reinitialize datepicker for all transport date fields (including new rows)
+      $('#tbl_booking_transport').find('.app_datepicker').datetimepicker({ 
+        timepicker: false, 
+        format: 'd-m-Y' 
+      });
+      
+      // Reinitialize vehicle dropdowns (simple select2, not AJAX)
+      $('#tbl_booking_transport').find('select[name^="transport_vehicle_name"]').each(function(){
+        if(!$(this).hasClass('select2-hidden-accessible')){
+          $(this).select2();
+        }
+      });
+      
+      }, 300);
+    }
+  });
+
+}
+
+// Helper function to capitalize first letter
+function ucfirst(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

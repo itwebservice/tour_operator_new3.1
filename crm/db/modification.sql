@@ -184,3 +184,23 @@ CREATE TABLE group_tour_quotation_transport_entries (
     vehicle_count VARCHAR(50),
     PRIMARY KEY (id)
 );
+
+-- Create table for group tour booking transport entries
+CREATE TABLE group_tour_booking_transport_entries (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    traveler_group_id INT(11) NOT NULL,
+    tour_id INT(11) NOT NULL,
+    vehicle_name VARCHAR(150) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    pickup INT(11) NOT NULL,
+    drop_location INT(11) NOT NULL,
+    pickup_type VARCHAR(50) NOT NULL,
+    drop_type VARCHAR(50) NOT NULL,
+    package_id INT(11) NOT NULL,
+    vehicle_count INT(11) NOT NULL,
+    service_duration VARCHAR(30) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+

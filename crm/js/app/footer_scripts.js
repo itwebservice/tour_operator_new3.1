@@ -578,6 +578,12 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 function destinationLoading(element, placeholder = "Destination", valueasText = false) {
 	var base_url = $("#base_url").val();
 	url = base_url + '/view/load_data/generic_destination_loading.php';
+	
+	// Store current selection before destroying
+	var currentValue = $(element).val();
+	var currentText = $(element).find('option:selected').text();
+	var currentOptgroup = $(element).find('option:selected').parent().attr('value');
+	
 	if ($(element).hasClass("select2-hidden-accessible")) {
 		$(element).select2('destroy');
 	}
@@ -590,7 +596,40 @@ function destinationLoading(element, placeholder = "Destination", valueasText = 
 			type: 'GET',
 			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
 			processResults: function (data) {
-				console.log(data);
+				// If there was a pre-selected value, add it to the results
+				if(currentValue && currentText){
+					var found = false;
+					// Check if current value exists in results
+					for(var i=0; i<data.results.length; i++){
+						if(data.results[i].children){
+							for(var j=0; j<data.results[i].children.length; j++){
+								if(data.results[i].children[j].id === currentValue){
+									found = true;
+									break;
+								}
+							}
+						}
+					}
+					// If not found in results, add it
+					if(!found && currentOptgroup){
+						var groupLabel = currentOptgroup.charAt(0).toUpperCase() + currentOptgroup.slice(1) + ' Name';
+						var groupExists = false;
+						for(var i=0; i<data.results.length; i++){
+							if(data.results[i].text === groupLabel){
+								data.results[i].children.unshift({id: currentValue, text: currentText});
+								groupExists = true;
+								break;
+							}
+						}
+						if(!groupExists){
+							data.results.unshift({
+								text: groupLabel,
+								children: [{id: currentValue, text: currentText}]
+							});
+						}
+					}
+				}
+				
 				let more = data.pagination;
 				return {
 					results: data.results,
@@ -601,6 +640,11 @@ function destinationLoading(element, placeholder = "Destination", valueasText = 
 			}
 		}
 	});
+	
+	// Restore the previous selection
+	if(currentValue){
+		$(element).val(currentValue).trigger('change');
+	}
 }
 //**Generic City save modal end**//
 
