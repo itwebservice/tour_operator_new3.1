@@ -151,3 +151,9 @@ ALTER TABLE package_tour_excursion_master
 ADD COLUMN vehicle_name VARCHAR(255) NOT NULL;
 
 
+Alter table vendor_payment_master add column credit_charges varchar(255) not null,
+
+add column credit_charge_amount varchar(255) not null,
+add column credit_charge_tax varchar(255) not null,
+add column credit_card_details varchar(255) not null,
+add column credit_charge_tax_amount varchar(255) not null;

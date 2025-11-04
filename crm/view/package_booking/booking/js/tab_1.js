@@ -8,7 +8,7 @@ var date = new Date();
 var yest = date.setDate(date.getDate() - 1);
 
 $('#m_birthdate1').datetimepicker({ timepicker: false, maxDate: yest, format: 'd-m-Y' });
-$('#customer_id_p, #country_name,#currency_code').select2();
+$('#customer_id_p, #country_name,#currency_code,#quotation_id').select2();
 
 function total_days_reflect(offset = '') {
 	var from_date = $('#txt_package_from_date' + offset).val();

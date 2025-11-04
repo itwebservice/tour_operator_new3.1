@@ -9,7 +9,7 @@
 
                     <div class="row">
                         <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-                            <select name="quotation_id" id="quotation_id" title="Select Quotation" style="width:100%;"
+                            <select name="quotation_id" id="quotation_id" title="Select Quotation" style="width:100%;" class="app_select2"
                                 onchange="quotation_info_load()">
                                 <option value="">*Select Quotation</option>
                                 <option value="0"><?= "Sale Without Quotation" ?></option>
