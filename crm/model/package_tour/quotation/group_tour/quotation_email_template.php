@@ -125,12 +125,11 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
                         <ul id="menu-center" class="nav navbar-nav">
                             <li class="active"><a href="#0">Package</a></li>
                             <li><a href="#1">Costing</a></li>
-                            <!-- <li><a href="#2">Transport</a></li> -->
                             <li><a href="#3">Tour Itinerary</a></li>
-                            <!-- <li><a href="#4">Accommodations</a></li> -->
                             <li><a href="#5">Train</a></li>
                             <li><a href="#6">Flight</a></li>
                             <li><a href="#12">Hotel</a></li>
+                            <li><a href="#13">Transport</a></li>
                             <li><a href="#11">Cruise</a></li>
                             <li><a href="#7">Incl/Excl</a></li>
                         </ul>
@@ -769,6 +768,128 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
 
             <?php } ?>
 
+            <!-- Transport -->
+
+            <?php
+
+            $sq_transport_count = mysqli_num_rows(mysqlQuery("select * from group_tour_quotation_transport_entries where quotation_id='$quotation_id'"));
+
+            if ($sq_transport_count > 0) { ?>
+
+                <section id="13" class="main_block link_page_section">
+
+                    <div class="container">
+
+                        <div class="sec_heding">
+
+                            <h2>Transport</h2>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+                                <div class="table-responsive">
+
+                                    <table class="table table-bordered no-marg" id="tbl_emp_list">
+
+                                        <thead>
+
+                                            <tr class="table-heading-row">
+
+                                                <th>Vehicle Name</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Pickup Location</th>
+                                                <th>Drop Location</th>
+                                                <th>Service Duration</th>
+                                                <th>No. of Vehicles</th>
+
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody>
+
+                                            <?php
+                                            $sq_transport = mysqlQuery("select * from group_tour_quotation_transport_entries where quotation_id='$quotation_id'");
+                                            while ($row_transport = mysqli_fetch_assoc($sq_transport)) {
+                                                // Get Vehicle Name
+                                                $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id = '".$row_transport['vehicle_name']."'"));
+                                                $vehicle_name = $sq_vehicle['vehicle_name'] ? $sq_vehicle['vehicle_name'] : 'N/A';
+                                                
+                                                // Get Pickup Location
+                                                $pickup_location = '';
+                                                if($row_transport['pickup_type'] == 'city'){
+                                                    $row = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='".$row_transport['pickup']."'"));
+                                                    $pickup_location = $row['city_name'] ? $row['city_name'] : 'N/A';
+                                                }
+                                                else if($row_transport['pickup_type'] == 'hotel'){
+                                                    $row = mysqli_fetch_assoc(mysqlQuery("select hotel_name from hotel_master where hotel_id='".$row_transport['pickup']."'"));
+                                                    $pickup_location = $row['hotel_name'] ? $row['hotel_name'] : 'N/A';
+                                                }
+                                                else if($row_transport['pickup_type'] == 'airport'){
+                                                    $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code from airport_master where airport_id='".$row_transport['pickup']."'"));
+                                                    if($row){
+                                                        $pickup_location = $row['airport_name']." (".$row['airport_code'].")";
+                                                    } else {
+                                                        $pickup_location = 'N/A';
+                                                    }
+                                                }
+                                                else {
+                                                    $pickup_location = $row_transport['pickup'];
+                                                }
+                                                
+                                                // Get Drop Location
+                                                $drop_location = '';
+                                                if($row_transport['drop_type'] == 'city'){
+                                                    $row = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='".$row_transport['drop_location']."'"));
+                                                    $drop_location = $row['city_name'] ? $row['city_name'] : 'N/A';
+                                                }
+                                                else if($row_transport['drop_type'] == 'hotel'){
+                                                    $row = mysqli_fetch_assoc(mysqlQuery("select hotel_name from hotel_master where hotel_id='".$row_transport['drop_location']."'"));
+                                                    $drop_location = $row['hotel_name'] ? $row['hotel_name'] : 'N/A';
+                                                }
+                                                else if($row_transport['drop_type'] == 'airport'){
+                                                    $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code from airport_master where airport_id='".$row_transport['drop_location']."'"));
+                                                    if($row){
+                                                        $drop_location = $row['airport_name']." (".$row['airport_code'].")";
+                                                    } else {
+                                                        $drop_location = 'N/A';
+                                                    }
+                                                }
+                                                else {
+                                                    $drop_location = $row_transport['drop_location'];
+                                                }
+                                            ?>
+                                                <tr>
+                                                    <td><?= $vehicle_name ?></td>
+                                                    <td><?= get_date_user($row_transport['start_date']) ?></td>
+                                                    <td><?= get_date_user($row_transport['end_date']) ?></td>
+                                                    <td><?= $pickup_location ?></td>
+                                                    <td><?= $drop_location ?></td>
+                                                    <td><?= $row_transport['service_duration'] ?></td>
+                                                    <td><?= $row_transport['vehicle_count'] ?></td>
+                                                </tr>
+                                            <?php
+                                            } ?>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            <?php } ?>
 
             <!-- Cruise -->
 

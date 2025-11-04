@@ -65,6 +65,18 @@ public function quotation_master_update()
 	$sharing_arr = isset($_POST['sharing_arr']) ? $_POST['sharing_arr']: [];
 	$c_entry_id_arr = isset($_POST['c_entry_id_arr']) ? $_POST['c_entry_id_arr'] : [];
 
+	//Transport
+	$transport_vehicle_arr = isset($_POST['transport_vehicle_arr']) ? $_POST['transport_vehicle_arr']: [];
+	$transport_start_date_arr = isset($_POST['transport_start_date_arr']) ? $_POST['transport_start_date_arr']: [];
+	$transport_end_date_arr = isset($_POST['transport_end_date_arr']) ? $_POST['transport_end_date_arr']: [];
+	$transport_pickup_arr = isset($_POST['transport_pickup_arr']) ? $_POST['transport_pickup_arr']: [];
+	$transport_pickup_type_arr = isset($_POST['transport_pickup_type_arr']) ? $_POST['transport_pickup_type_arr']: [];
+	$transport_drop_arr = isset($_POST['transport_drop_arr']) ? $_POST['transport_drop_arr']: [];
+	$transport_drop_type_arr = isset($_POST['transport_drop_type_arr']) ? $_POST['transport_drop_type_arr']: [];
+	$transport_service_duration_arr = isset($_POST['transport_service_duration_arr']) ? $_POST['transport_service_duration_arr']: [];
+	$transport_no_vehicles_arr = isset($_POST['transport_no_vehicles_arr']) ? $_POST['transport_no_vehicles_arr']: [];
+	$transport_entry_id_arr = isset($_POST['transport_entry_id_arr']) ? $_POST['transport_entry_id_arr'] : [];
+
 	$from_date = get_date_db($from_date);
 	$to_date = get_date_db($to_date);
 	$quotation_date1 = get_date_db($quotation_date);
@@ -86,6 +98,7 @@ public function quotation_master_update()
 		$this->train_entries_update($quotation_id, $train_from_location_arr, $train_to_location_arr, $train_class_arr, $train_arrival_date_arr, $train_departure_date_arr, $train_id_arr);
 		$this->plane_entries_update($quotation_id, $from_city_id_arr, $to_city_id_arr, $plane_from_location_arr, $plane_to_location_arr, $plane_class_arr,$airline_name_arr, $arraval_arr, $dapart_arr, $plane_id_arr);
 		$this->cruise_entries_save($quotation_id,$dept_datetime_arr, $arrival_datetime_arr, $route_arr, $cabin_arr,$sharing_arr,$c_entry_id_arr);
+		$this->transport_entries_update($quotation_id,$transport_vehicle_arr,$transport_start_date_arr,$transport_end_date_arr,$transport_pickup_arr,$transport_pickup_type_arr,$transport_drop_arr,$transport_drop_type_arr,$transport_service_duration_arr,$transport_no_vehicles_arr,$transport_entry_id_arr);
 		echo "Quotation has been successfully updated.";	
 		exit;
 	}
@@ -184,6 +197,58 @@ public function cruise_entries_save($quotation_id,$dept_datetime_arr, $arrival_d
 		}
 	}
 
+}
+
+public function transport_entries_update($quotation_id,$transport_vehicle_arr,$transport_start_date_arr,$transport_end_date_arr,$transport_pickup_arr,$transport_pickup_type_arr,$transport_drop_arr,$transport_drop_type_arr,$transport_service_duration_arr,$transport_no_vehicles_arr,$transport_entry_id_arr){
+	for($i=0; $i<sizeof($transport_vehicle_arr); $i++){
+		
+		$vehicle_name = mysqlREString($transport_vehicle_arr[$i]);
+		$start_date = get_date_db($transport_start_date_arr[$i]);
+		$end_date = get_date_db($transport_end_date_arr[$i]);
+		$service_duration = mysqlREString($transport_service_duration_arr[$i]);
+		$vehicle_count = mysqlREString($transport_no_vehicles_arr[$i]);
+		
+		// Extract pickup type and ID from value (format: "city-123" or "hotel-456")
+		if(strpos($transport_pickup_arr[$i], '-') !== false){
+			$pickup_parts = explode("-", $transport_pickup_arr[$i]);
+			$pickup_type = $pickup_parts[0];
+			$pickup = $pickup_parts[1];
+		} else {
+			$pickup = mysqlREString($transport_pickup_arr[$i]);
+			$pickup_type = mysqlREString($transport_pickup_type_arr[$i]);
+		}
+		
+		// Extract drop type and ID from value (format: "city-123" or "hotel-456")
+		if(strpos($transport_drop_arr[$i], '-') !== false){
+			$drop_parts = explode("-", $transport_drop_arr[$i]);
+			$drop_type = $drop_parts[0];
+			$drop_location = $drop_parts[1];
+		} else {
+			$drop_location = mysqlREString($transport_drop_arr[$i]);
+			$drop_type = mysqlREString($transport_drop_type_arr[$i]);
+		}
+
+		// If entry_id exists, update; otherwise insert
+		if($transport_entry_id_arr[$i] != ""){
+			$sq_transport = mysqlQuery("update group_tour_quotation_transport_entries set vehicle_name = '$vehicle_name', start_date = '$start_date', end_date = '$end_date', pickup = '$pickup', pickup_type = '$pickup_type', drop_location = '$drop_location', drop_type = '$drop_type', service_duration = '$service_duration', vehicle_count = '$vehicle_count' where id='".$transport_entry_id_arr[$i]."'");
+			
+			if(!$sq_transport){
+				echo "error--Transport information not updated!";
+				exit;
+			}
+		}
+		else{
+			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from group_tour_quotation_transport_entries"));
+			$id = $sq_max['max']+intval(1);
+			
+			$sq_transport = mysqlQuery("insert into group_tour_quotation_transport_entries (id, quotation_id, vehicle_name, start_date, end_date, pickup, pickup_type, drop_location, drop_type, service_duration, vehicle_count) values ('$id','$quotation_id','$vehicle_name', '$start_date', '$end_date', '$pickup', '$pickup_type', '$drop_location', '$drop_type', '$service_duration', '$vehicle_count')");
+			
+			if(!$sq_transport){
+				echo "error--Transport information not saved!";
+				exit;
+			}
+		}
+	}
 }
 
 }

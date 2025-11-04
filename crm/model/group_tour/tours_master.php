@@ -8,7 +8,7 @@ class tours_master{
 
 ///////////// Tour Master Save Start/////////////////////////////////////////////////////////////////////////////////////////
 
-function tour_master_save($tour_type, $tour_name, $seo_slug, $tour_note, $adult_cost, $child_with_cost,$child_without_cost , $infant_cost, $with_bed_cost,$single_person_cost,$visa_country_name,$company_name, $from_date, $to_date, $capacity,$active_flag,$train_from_location_arr,$train_to_location_arr,$train_class_arr,$from_city_id_arr , $to_city_id_arr, $plane_from_location_arr,$plane_to_location_arr,$airline_name_arr,$plane_class_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$route_arr,$cabin_arr,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr,$inclusions, $exclusions,$pdf_url,$daywise_url,$dest_name,$dest_image)
+function tour_master_save($tour_type, $tour_name, $seo_slug, $tour_note, $adult_cost, $child_with_cost,$child_without_cost , $infant_cost, $with_bed_cost,$single_person_cost,$visa_country_name,$company_name, $from_date, $to_date, $capacity,$active_flag,$train_from_location_arr,$train_to_location_arr,$train_class_arr,$from_city_id_arr , $to_city_id_arr, $plane_from_location_arr,$plane_to_location_arr,$airline_name_arr,$plane_class_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$route_arr,$cabin_arr,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr,$vehicle_name_arr,$pickup_arr,$pickup_type_arr,$drop_arr,$drop_type_arr,$inclusions, $exclusions,$pdf_url,$daywise_url,$dest_name,$dest_image)
 
 {
   $tour_type = mysqlREString($tour_type);  
@@ -126,6 +126,7 @@ function tour_master_save($tour_type, $tour_name, $seo_slug, $tour_note, $adult_
       $this->train_entries_save($max_tour_id, $train_from_location_arr, $train_to_location_arr, $train_class_arr);
       $this->plane_entries_save($max_tour_id,$from_city_id_arr, $to_city_id_arr,$plane_from_location_arr, $plane_to_location_arr, $plane_class_arr,$airline_name_arr);
       $this->hotel_entries_save($max_tour_id,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr);
+      $this->transport_entries_save($max_tour_id,$vehicle_name_arr,$pickup_arr,$pickup_type_arr,$drop_arr,$drop_type_arr);
       $this->cruise_entries_save($max_tour_id, $route_arr, $cabin_arr);
 
       if($GLOBALS['flag']){
@@ -209,6 +210,45 @@ public function hotel_entries_save($max_tour_id,$city_name_arr,$hotel_name_arr,$
   }
 }
 
+public function transport_entries_save($max_tour_id,$vehicle_name_arr,$pickup_arr,$pickup_type_arr,$drop_arr,$drop_type_arr){
+  for($i=0; $i<sizeof($vehicle_name_arr); $i++){
+    $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(entry_id) as max from tour_groups_transport"));
+    $entry_id = $sq_max['max']+intval(1);
+
+    $vehicle_name = mysqlREString($vehicle_name_arr[$i]);
+    
+    // Extract pickup type and ID from value (format: "city-123" or "hotel-456")
+    if(strpos($pickup_arr[$i], '-') !== false){
+      $pickup_parts = explode("-", $pickup_arr[$i]);
+      $pickup_type = $pickup_parts[0];
+      $pickup = $pickup_parts[1];
+    } else {
+      $pickup = mysqlREString($pickup_arr[$i]);
+      $pickup_type = mysqlREString($pickup_type_arr[$i]);
+    }
+    
+    // Extract drop type and ID from value (format: "city-123" or "hotel-456")
+    if(strpos($drop_arr[$i], '-') !== false){
+      $drop_parts = explode("-", $drop_arr[$i]);
+      $drop_type = $drop_parts[0];
+      $drop_location = $drop_parts[1];
+    } else {
+      $drop_location = mysqlREString($drop_arr[$i]);
+      $drop_type = mysqlREString($drop_type_arr[$i]);
+    }
+
+    $sq_transport = mysqlQuery("insert into tour_groups_transport (entry_id, tour_id, vehicle_name, pickup, pickup_type, drop_location, drop_type) values ('$entry_id','$max_tour_id','$vehicle_name', '$pickup', '$pickup_type', '$drop_location', '$drop_type')");
+
+    if(!$sq_transport){
+
+      echo "error--Transport information not saved!";
+
+      exit;
+
+    }
+  }
+}
+
 public function plane_entries_save($max_tour_id, $from_city_id_arr,  $to_city_id_arr, $plane_from_location_arr, $plane_to_location_arr, $plane_class_arr,$airline_name_arr)
 
 {
@@ -268,7 +308,7 @@ public function cruise_entries_save($max_tour_id, $route_arr, $cabin_arr)
 
 ///////////// Tour Master Update Start/////////////////////////////////////////////////////////////////////////////////////////
 
-function tour_master_update($tour_id,$tour_type, $tour_name,$txt_tour_note, $adult_cost, $child_with_cost,$child_without_cost, $infant_cost, $with_bed_cost,$single_person_cost,$visa_country_name,$company_name, $from_date, $to_date, $capacity,$tour_group_id,$active_flag,$train_from_location_arr,$train_to_location_arr,$train_class_arr,$train_id_arr,$from_city_id_arr, $to_city_id_arr,$plane_from_location_arr,$plane_to_location_arr,$airline_name_arr,$plane_class_arr,$plane_id_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$entry_id_arr,$route_arr,$cabin_arr,$c_entry_id_arr,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr,$hotel_entry_id_arr,$inclusions,$exclusions,$daywise_url,$dest_image)
+function tour_master_update($tour_id,$tour_type, $tour_name,$txt_tour_note, $adult_cost, $child_with_cost,$child_without_cost, $infant_cost, $with_bed_cost,$single_person_cost,$visa_country_name,$company_name, $from_date, $to_date, $capacity,$tour_group_id,$active_flag,$train_from_location_arr,$train_to_location_arr,$train_class_arr,$train_id_arr,$from_city_id_arr, $to_city_id_arr,$plane_from_location_arr,$plane_to_location_arr,$airline_name_arr,$plane_class_arr,$plane_id_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$entry_id_arr,$route_arr,$cabin_arr,$c_entry_id_arr,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr,$hotel_entry_id_arr,$vehicle_name_arr,$pickup_arr,$pickup_type_arr,$drop_arr,$drop_type_arr,$transport_entry_id_arr,$inclusions,$exclusions,$daywise_url,$dest_image)
 
 {
 
@@ -440,6 +480,7 @@ function tour_master_update($tour_id,$tour_type, $tour_name,$txt_tour_note, $adu
       $this->train_entries_update($tour_id, $train_from_location_arr, $train_to_location_arr, $train_class_arr, $train_id_arr);
       $this->plane_entries_update($tour_id,$from_city_id_arr, $to_city_id_arr, $plane_from_location_arr, $plane_to_location_arr, $plane_class_arr,$airline_name_arr, $plane_id_arr);
       $this->hotel_entries_update($tour_id,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr,$hotel_entry_id_arr);
+      $this->transport_entries_update($tour_id,$vehicle_name_arr,$pickup_arr,$pickup_type_arr,$drop_arr,$drop_type_arr,$transport_entry_id_arr);
       $this->cruise_entries_update($tour_id,$route_arr, $cabin_arr, $c_entry_id_arr);
 
       if($GLOBALS['flag']){
@@ -540,6 +581,56 @@ public function hotel_entries_update($tour_id,$city_name_arr,$hotel_name_arr,$ho
       if(!$sq_hotel){
 
         echo "error--Hotel information not saved!";
+
+        exit;
+      }
+    }
+  }
+}
+
+public function transport_entries_update($tour_id,$vehicle_name_arr,$pickup_arr,$pickup_type_arr,$drop_arr,$drop_type_arr,$transport_entry_id_arr){
+  for($i=0; $i<sizeof($vehicle_name_arr); $i++){
+    $vehicle_name = mysqlREString($vehicle_name_arr[$i]);
+    
+    // Extract pickup type and ID from value (format: "city-123" or "hotel-456")
+    if(strpos($pickup_arr[$i], '-') !== false){
+      $pickup_parts = explode("-", $pickup_arr[$i]);
+      $pickup_type = $pickup_parts[0];
+      $pickup = $pickup_parts[1];
+    } else {
+      $pickup = mysqlREString($pickup_arr[$i]);
+      $pickup_type = mysqlREString($pickup_type_arr[$i]);
+    }
+    
+    // Extract drop type and ID from value (format: "city-123" or "hotel-456")
+    if(strpos($drop_arr[$i], '-') !== false){
+      $drop_parts = explode("-", $drop_arr[$i]);
+      $drop_type = $drop_parts[0];
+      $drop_location = $drop_parts[1];
+    } else {
+      $drop_location = mysqlREString($drop_arr[$i]);
+      $drop_type = mysqlREString($drop_type_arr[$i]);
+    }
+
+    if($transport_entry_id_arr[$i] != ""){
+        $sq_transport = mysqlQuery("update tour_groups_transport set vehicle_name = '$vehicle_name', pickup = '$pickup', pickup_type = '$pickup_type', drop_location = '$drop_location', drop_type = '$drop_type' where entry_id='$transport_entry_id_arr[$i]'");
+      
+      if(!$sq_transport){
+
+        echo "error--Transport information not updated!";
+
+        exit;
+      }
+    }
+    else{
+      $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(entry_id) as max from tour_groups_transport"));
+      $entry_id = $sq_max['max']+intval(1);
+      
+      $sq_transport = mysqlQuery("insert into tour_groups_transport (entry_id, tour_id, vehicle_name, pickup, pickup_type, drop_location, drop_type) values ('$entry_id','$tour_id','$vehicle_name', '$pickup', '$pickup_type', '$drop_location', '$drop_type')");
+      
+      if(!$sq_transport){
+
+        echo "error--Transport information not saved!";
 
         exit;
       }

@@ -34,7 +34,8 @@ $query = "select * from tour_master where tour_id='$tour_id'";
 				$sq_f_count = mysqli_num_rows(mysqlQuery("Select * from group_tour_plane_entries where tour_id = '$tour_id'"));
 				$sq_c_count = mysqli_num_rows(mysqlQuery("Select * from group_cruise_entries where tour_id = '$tour_id'"));
 				$sq_h_count = mysqli_num_rows(mysqlQuery("Select * from group_tour_hotel_entries where tour_id = '$tour_id'"));
-				if($sq_t_count != '0' || $sq_f_count != '0' || $sq_c_count != '0' || $sq_h_count != '0'){ ?>
+				$sq_transport_count = mysqli_num_rows(mysqlQuery("Select * from tour_groups_transport where tour_id = '$tour_id'"));
+				if($sq_t_count != '0' || $sq_f_count != '0' || $sq_c_count != '0' || $sq_h_count != '0' || $sq_transport_count != '0'){ ?>
 			    <li role="presentation"><a href="#travelling_information" aria-controls="home" role="tab" data-toggle="tab" class="tab_name">Travelling Information</a></li>
 			    <?php } ?>
 			    <li role="presentation"><a href="#costing_information" aria-controls="home" role="tab" data-toggle="tab" class="tab_name">Costing Information</a></li>

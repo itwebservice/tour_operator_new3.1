@@ -36,6 +36,22 @@
 					</div>
 				</div>
 
+				<!-- Transport Information -->
+				<div class="accordion_content main_block mg_bt_10">
+					<div class="panel panel-default main_block">
+		  				<div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+					        <div class="Normal main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse_2_5" aria-expanded="true" aria-controls="collapse_2_5" id="collapsed_2_5">                  
+					        	<div class="col-md-12"><span>Transport Information</span></div>
+					        </div>
+					    </div>
+				        <div id="collapse_2_5" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading_2_5">
+						    <div class="panel-body">
+						    	<?php include_once('transport_tbl.php') ?>	
+						    </div>
+						</div>
+					</div>
+				</div>
+
 				<!-- Flight Information -->
 				<div class="accordion_content main_block mg_bt_10">
 					<div class="panel panel-default main_block">
@@ -343,6 +359,68 @@ $(function(){
 			   c_entry_id_arr.push(c_entry_id);
 		    }      
 		  }
+
+		/* Transport Info*/
+		var transport_vehicle_arr = new Array();
+		var transport_start_date_arr = new Array();
+		var transport_end_date_arr = new Array();
+		var transport_pickup_arr = new Array();
+		var transport_pickup_type_arr = new Array();
+		var transport_drop_arr = new Array();
+		var transport_drop_type_arr = new Array();
+		var transport_service_duration_arr = new Array();
+		var transport_no_vehicles_arr = new Array();
+		var transport_entry_id_arr = new Array();
+		var pickup_type = '';
+		var pickup = '';
+		var drop_type = '';
+		var drop = '';
+
+		var table = document.getElementById("tbl_group_tour_quotation_transport_u");
+		if(table){
+			var rowCount = table.rows.length;
+			
+			for(var i=0; i<rowCount; i++)
+			{
+				var row = table.rows[i];
+				
+				if(row.cells[0].childNodes[0].checked)
+				{
+					var vehicle_name = row.cells[2].childNodes[0].value;
+					var start_date = row.cells[3].childNodes[0].value;
+					var end_date = row.cells[4].childNodes[0].value;
+					var service_duration = row.cells[7].childNodes[0].value;
+					var no_vehicles = row.cells[8].childNodes[0].value;
+					
+					$('#' + row.cells[5].childNodes[0].id).find("option:selected").each(function() {
+						pickup = row.cells[5].childNodes[0].value;
+						pickup_type = $("option:selected", $("#" + row.cells[5].childNodes[0].id)).parent().attr('value');
+					});
+					$('#' + row.cells[6].childNodes[0].id).find("option:selected").each(function() {
+						drop = row.cells[6].childNodes[0].value;
+						drop_type = $("option:selected", $("#" + row.cells[6].childNodes[0].id)).parent().attr('value');
+					});
+					
+					if(row.cells[9] && row.cells[9].childNodes[0]){
+						var transport_entry_id = row.cells[9].childNodes[0].value;
+					} else {
+						var transport_entry_id = '';
+					}
+					
+					// No mandatory validation for transport - it's optional
+					transport_vehicle_arr.push(vehicle_name);
+					transport_start_date_arr.push(start_date);
+					transport_end_date_arr.push(end_date);
+					transport_pickup_arr.push(pickup);
+					transport_pickup_type_arr.push(pickup_type);
+					transport_drop_arr.push(drop);
+					transport_drop_type_arr.push(drop_type);
+					transport_service_duration_arr.push(service_duration);
+					transport_no_vehicles_arr.push(no_vehicles);
+					transport_entry_id_arr.push(transport_entry_id);
+				}      
+			}
+		}
 
 	  $('.accordion_content').removeClass("indicator");
 

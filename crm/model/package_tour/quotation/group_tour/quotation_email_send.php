@@ -25,8 +25,58 @@ public function quotation_email()
 	else{
 		$url = explode('uploads', $app_cancel_pdf);
 		$url = BASE_URL.'uploads'.$url[1];
-	}	
+	}
 	$quotation_cost = currency_conversion($currency,$sq_quotation['currency_code'],$sq_quotation['quotation_cost']);
+
+	// Get transport summary
+	$transport_summary = '';
+	$sq_transport_count = mysqli_num_rows(mysqlQuery("select * from group_tour_quotation_transport_entries where quotation_id='$quotation_id'"));
+	if($sq_transport_count > 0){
+		$sq_transport = mysqlQuery("select * from group_tour_quotation_transport_entries where quotation_id='$quotation_id'");
+		$transport_list = array();
+		while($row_transport = mysqli_fetch_assoc($sq_transport)){
+			// Get Vehicle Name
+			$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id = '".$row_transport['vehicle_name']."'"));
+			$vehicle_name = $sq_vehicle['vehicle_name'] ? $sq_vehicle['vehicle_name'] : 'N/A';
+			
+			// Get Pickup Location
+			$pickup_location = '';
+			if($row_transport['pickup_type'] == 'city'){
+				$row = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='".$row_transport['pickup']."'"));
+				$pickup_location = $row['city_name'] ? $row['city_name'] : 'N/A';
+			}
+			else if($row_transport['pickup_type'] == 'hotel'){
+				$row = mysqli_fetch_assoc(mysqlQuery("select hotel_name from hotel_master where hotel_id='".$row_transport['pickup']."'"));
+				$pickup_location = $row['hotel_name'] ? $row['hotel_name'] : 'N/A';
+			}
+			else if($row_transport['pickup_type'] == 'airport'){
+				$row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code from airport_master where airport_id='".$row_transport['pickup']."'"));
+				if($row){
+					$pickup_location = $row['airport_name']." (".$row['airport_code'].")";
+				}
+			}
+			
+			// Get Drop Location
+			$drop_location = '';
+			if($row_transport['drop_type'] == 'city'){
+				$row = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='".$row_transport['drop_location']."'"));
+				$drop_location = $row['city_name'] ? $row['city_name'] : 'N/A';
+			}
+			else if($row_transport['drop_type'] == 'hotel'){
+				$row = mysqli_fetch_assoc(mysqlQuery("select hotel_name from hotel_master where hotel_id='".$row_transport['drop_location']."'"));
+				$drop_location = $row['hotel_name'] ? $row['hotel_name'] : 'N/A';
+			}
+			else if($row_transport['drop_type'] == 'airport'){
+				$row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code from airport_master where airport_id='".$row_transport['drop_location']."'"));
+				if($row){
+					$drop_location = $row['airport_name']." (".$row['airport_code'].")";
+				}
+			}
+			
+			$transport_list[] = $vehicle_name.' ('.$pickup_location.' → '.$drop_location.')';
+		}
+		$transport_summary = implode(', ', $transport_list);
+	}
 
 	$content = '
 	<tr>
@@ -34,8 +84,14 @@ public function quotation_email()
 			<tr><td style="text-align:left;border: 1px solid #888888;">Name</td>   <td style="text-align:left;border: 1px solid #888888;">'.$sq_quotation['customer_name'].'</td></tr>
 			<tr><td style="text-align:left;border: 1px solid #888888;">Destination Name</td>   <td style="text-align:left;border: 1px solid #888888;" >'.$sq_quotation['tour_name'].'</td></tr>
 			<tr><td style="text-align:left;border: 1px solid #888888;">Tour Date</td>   <td style="text-align:left;border: 1px solid #888888;">'.date('d-m-Y', strtotime($sq_quotation['from_date'])).' To '.date('d-m-Y', strtotime($sq_quotation['to_date'])).'</td></tr>
-			<tr><td style="text-align:left;border: 1px solid #888888;">Quotation Cost</td>   <td style="text-align:left;border: 1px solid #888888;" >'.$quotation_cost.'</td></tr>
-			<tr><td style="text-align:left;border: 1px solid #888888;">Created By</td>   <td style="text-align:left;border: 1px solid #888888;" >'.$emp_name.'</td></tr>
+			<tr><td style="text-align:left;border: 1px solid #888888;">Quotation Cost</td>   <td style="text-align:left;border: 1px solid #888888;" >'.$quotation_cost.'</td></tr>';
+	
+	// Add transport summary if exists
+	if($transport_summary != ''){
+		$content .= '<tr><td style="text-align:left;border: 1px solid #888888;">Transport</td>   <td style="text-align:left;border: 1px solid #888888;">'.$transport_summary.'</td></tr>';
+	}
+	
+	$content .= '<tr><td style="text-align:left;border: 1px solid #888888;">Created By</td>   <td style="text-align:left;border: 1px solid #888888;" >'.$emp_name.'</td></tr>
 			<tr><td style="text-align:left;border: 1px solid #888888;">View Quotation</td>   <td style="text-align:left;border: 1px solid #888888;" ><a style="color: '.$theme_color.';text-decoration: none;" href="'.BASE_URL.'model/package_tour/quotation/group_tour/quotation_email_template.php?quotation='.$quotation_no.'">View</a></td></tr>
 		</table>
 		</tr>				

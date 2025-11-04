@@ -68,6 +68,17 @@ public function quotation_master_save()
 	$cabin_arr = isset($_POST['cabin_arr']) ? $_POST['cabin_arr']: [];
 	$sharing_arr = isset($_POST['sharing_arr']) ? $_POST['sharing_arr']: [];
 
+	//Transport
+	$transport_vehicle_arr = isset($_POST['transport_vehicle_arr']) ? $_POST['transport_vehicle_arr']: [];
+	$transport_start_date_arr = isset($_POST['transport_start_date_arr']) ? $_POST['transport_start_date_arr']: [];
+	$transport_end_date_arr = isset($_POST['transport_end_date_arr']) ? $_POST['transport_end_date_arr']: [];
+	$transport_pickup_arr = isset($_POST['transport_pickup_arr']) ? $_POST['transport_pickup_arr']: [];
+	$transport_pickup_type_arr = isset($_POST['transport_pickup_type_arr']) ? $_POST['transport_pickup_type_arr']: [];
+	$transport_drop_arr = isset($_POST['transport_drop_arr']) ? $_POST['transport_drop_arr']: [];
+	$transport_drop_type_arr = isset($_POST['transport_drop_type_arr']) ? $_POST['transport_drop_type_arr']: [];
+	$transport_service_duration_arr = isset($_POST['transport_service_duration_arr']) ? $_POST['transport_service_duration_arr']: [];
+	$transport_no_vehicles_arr = isset($_POST['transport_no_vehicles_arr']) ? $_POST['transport_no_vehicles_arr']: [];
+
 	$bsmValues = json_decode(json_encode($_POST['bsmValues']));
     foreach($bsmValues[0] as $key => $value){
 		switch($key){
@@ -113,6 +124,7 @@ public function quotation_master_save()
 		$this->train_entries_save($quotation_id, $train_from_location_arr, $train_to_location_arr, $train_class_arr, $train_arrival_date_arr, $train_departure_date_arr);
 		$this->plane_entries_save($quotation_id,$from_city_id_arr, $plane_from_location_arr, $to_city_id_arr, $plane_to_location_arr, $plane_class_arr,$airline_name_arr, $arraval_arr, $dapart_arr);
 		$this->cruise_entries_save($quotation_id,$dept_datetime_arr, $arrival_datetime_arr, $route_arr, $cabin_arr,$sharing_arr);
+		$this->transport_entries_save($quotation_id,$transport_vehicle_arr,$transport_start_date_arr,$transport_end_date_arr,$transport_pickup_arr,$transport_pickup_type_arr,$transport_drop_arr,$transport_drop_type_arr,$transport_service_duration_arr,$transport_no_vehicles_arr);
 
 		echo "Quotation has been successfully saved.";
 		exit;
@@ -185,6 +197,46 @@ public function cruise_entries_save($quotation_id,$dept_datetime_arr, $arrival_d
 		}
 	}
 
+}
+
+public function transport_entries_save($quotation_id,$transport_vehicle_arr,$transport_start_date_arr,$transport_end_date_arr,$transport_pickup_arr,$transport_pickup_type_arr,$transport_drop_arr,$transport_drop_type_arr,$transport_service_duration_arr,$transport_no_vehicles_arr){
+	for($i=0; $i<sizeof($transport_vehicle_arr); $i++){
+		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from group_tour_quotation_transport_entries"));
+		$id = $sq_max['max']+intval(1);
+
+		$vehicle_name = mysqlREString($transport_vehicle_arr[$i]);
+		$start_date = get_date_db($transport_start_date_arr[$i]);
+		$end_date = get_date_db($transport_end_date_arr[$i]);
+		$service_duration = mysqlREString($transport_service_duration_arr[$i]);
+		$vehicle_count = mysqlREString($transport_no_vehicles_arr[$i]);
+		
+		// Extract pickup type and ID from value (format: "city-123" or "hotel-456")
+		if(strpos($transport_pickup_arr[$i], '-') !== false){
+			$pickup_parts = explode("-", $transport_pickup_arr[$i]);
+			$pickup_type = $pickup_parts[0];
+			$pickup = $pickup_parts[1];
+		} else {
+			$pickup = mysqlREString($transport_pickup_arr[$i]);
+			$pickup_type = mysqlREString($transport_pickup_type_arr[$i]);
+		}
+		
+		// Extract drop type and ID from value (format: "city-123" or "hotel-456")
+		if(strpos($transport_drop_arr[$i], '-') !== false){
+			$drop_parts = explode("-", $transport_drop_arr[$i]);
+			$drop_type = $drop_parts[0];
+			$drop_location = $drop_parts[1];
+		} else {
+			$drop_location = mysqlREString($transport_drop_arr[$i]);
+			$drop_type = mysqlREString($transport_drop_type_arr[$i]);
+		}
+
+		$sq_transport = mysqlQuery("insert into group_tour_quotation_transport_entries (id, quotation_id, vehicle_name, start_date, end_date, pickup, pickup_type, drop_location, drop_type, service_duration, vehicle_count) values ('$id','$quotation_id','$vehicle_name', '$start_date', '$end_date', '$pickup', '$pickup_type', '$drop_location', '$drop_type', '$service_duration', '$vehicle_count')");
+
+		if(!$sq_transport){
+			echo "error--Transport information not saved!";
+			exit;
+		}
+	}
 }
 
 

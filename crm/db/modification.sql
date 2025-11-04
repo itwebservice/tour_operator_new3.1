@@ -157,3 +157,30 @@ add column credit_charge_amount varchar(255) not null,
 add column credit_charge_tax varchar(255) not null,
 add column credit_card_details varchar(255) not null,
 add column credit_charge_tax_amount varchar(255) not null;
+
+
+CREATE TABLE tour_groups_transport (
+    entry_id INT(11) NOT NULL AUTO_INCREMENT,
+    tour_id INT(11) NOT NULL,
+    vehicle_name VARCHAR(255) NOT NULL,
+    pickup VARCHAR(500) NOT NULL,
+    pickup_type VARCHAR(50) NOT NULL,
+    drop_location VARCHAR(500) NOT NULL,
+    drop_type VARCHAR(50) NOT NULL,
+    PRIMARY KEY (entry_id)
+);
+
+CREATE TABLE group_tour_quotation_transport_entries (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    quotation_id INT(11) NOT NULL,
+    vehicle_name VARCHAR(255) NOT NULL,
+    start_date DATE,
+    end_date DATE,
+    pickup VARCHAR(500) NOT NULL,
+    pickup_type VARCHAR(50) NOT NULL,
+    drop_location VARCHAR(500) NOT NULL,
+    drop_type VARCHAR(50) NOT NULL,
+    service_duration VARCHAR(50),
+    vehicle_count VARCHAR(50),
+    PRIMARY KEY (id)
+);

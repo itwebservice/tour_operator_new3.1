@@ -440,6 +440,62 @@ $('#frm_tour_update').validate({
 
         }
 
+        //Transport Information
+        var vehicle_name_arr = new Array();
+        var drop_arr = new Array();
+        var drop_type_arr = new Array();
+        var pickup_arr = new Array();
+        var pickup_type_arr = new Array();
+        var transport_entry_id_arr = new Array();
+        var pickup_type = '';
+        var pickup = '';
+        var drop_type = '';
+        var drop = '';
+        var table = document.getElementById("tbl_package_tour_transport_update");
+        if(table){
+            var rowCount = table.rows.length;
+            for (var i = 0; i < rowCount; i++) {
+                var row = table.rows[i];
+                if (row.cells[0].childNodes[0].checked) {
+
+                    var pickupSelect = row.cells[3].childNodes[0];
+                    pickup = pickupSelect.value;
+                    // Try to get type from optgroup, if not available, get from data attribute
+                    pickup_type = $("option:selected", $("#" + pickupSelect.id)).parent().attr('value');
+                    if(!pickup_type || pickup_type == ''){
+                        pickup_type = $(pickupSelect).data('saved-type');
+                    }
+                    
+                    var dropSelect = row.cells[4].childNodes[0];
+                    drop = dropSelect.value;
+                    // Try to get type from optgroup, if not available, get from data attribute
+                    drop_type = $("option:selected", $("#" + dropSelect.id)).parent().attr('value');
+                    if(!drop_type || drop_type == ''){
+                        drop_type = $(dropSelect).data('saved-type');
+                    }
+
+                    var vehicle_name = row.cells[2].childNodes[0].value;
+                    if (vehicle_name == "") {
+                        $('#btn_quotation_update').prop('disabled', false);
+                        error_msg_alert('Transport Vehicle is mandatory in row' + (i + 1));
+                        return false;
+                    }
+                    
+                    if (row.cells[5] && row.cells[5].childNodes[0]) {
+                        var transport_entry_id = row.cells[5].childNodes[0].value;
+                    } else {
+                        var transport_entry_id = "";
+                    }
+
+                    vehicle_name_arr.push(vehicle_name);
+                    pickup_arr.push(pickup);
+                    pickup_type_arr.push(pickup_type);
+                    drop_arr.push(drop);
+                    drop_type_arr.push(drop_type);
+                    transport_entry_id_arr.push(transport_entry_id);
+                }
+            }
+        }
 
         //Cruise Information
         var route_arr = new Array();
@@ -519,6 +575,12 @@ $('#frm_tour_update').validate({
                         hotel_type_arr,
                         total_days_arr,
                         hotel_entry_id_arr,
+                        vehicle_name_arr: vehicle_name_arr,
+                        pickup_arr: pickup_arr,
+                        pickup_type_arr: pickup_type_arr,
+                        drop_arr: drop_arr,
+                        drop_type_arr: drop_type_arr,
+                        transport_entry_id_arr: transport_entry_id_arr,
                         c_entry_id_arr: c_entry_id_arr,
                         inclusions: inclusions,
                         exclusions: exclusions,

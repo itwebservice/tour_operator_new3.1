@@ -95,20 +95,73 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transport Information -->
+        <div class="accordion_content main_block mg_bt_10">
+            <div class="panel panel-default main_block">
+                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2_5" aria-expanded="false" aria-controls="collapse2_5" id="collapsed2_5">
+                        <div class="col-md-12"><span>Transport Information</span></div>
+                    </div>
+                </div>
+                <div id="collapse2_5" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2_5">
+                    <div class="panel-body">
+                        <div class="row mg_bt_10">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
+                                <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('vehicle_name1')"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                            </div>
+                            <div class="col-md-6 text-right text_center_xs">
+                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_tour_transport');destinationLoading('select[name^=pickup_from]', 'Pickup Location');destinationLoading('select[name^=drop_to]', 'Drop-off Location');" title="Add Row"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_tour_transport')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="row mg_bt_10">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table id="tbl_package_tour_transport" name="tbl_package_tour_transport" class="table table-bordered no-marg pd_bt_51">
+                                        <tbody>
+                                            <tr>
+                                                <td class="col-md-1"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
+                                                <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
+                                                <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2">
+                                                        <option value="">Select Vehicle</option>
+                                                        <?php
+                                                        $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
+                                                        while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>
+                                                            <option value="<?php echo $row_dest['entry_id']; ?>">
+                                                                <?php echo $row_dest['vehicle_name']; ?></option>
+                                                        <?php } ?>
+                                                    </select></td>
+                                                <td class="col-md-3"><select name="pickup_from1" id="pickup_from1" style="width:100%;" title="Pickup Location" class="form-control app_minselect2">
+                                                    </select></td>
+                                                <td class="col-md-3"><select name="drop_to1" id="drop_to1" style="width:100%;" title="Drop-off Location" class="form-control app_minselect2">
+                                                    </select></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <!-- Flight Information -->
-                        <div class="accordion_content main_block mg_bt_10">
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false" aria-controls="collapse3" id="collapsed3">
-                                        <div class="col-md-12"><span>Flight Information</span></div>
-                                    </div>
-                                </div>
+        <!-- Flight Information -->
+        <div class="accordion_content main_block mg_bt_10">
+            <div class="panel panel-default main_block">
+                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false" aria-controls="collapse3" id="collapsed3">
+                        <div class="col-md-12"><span>Flight Information</span></div>
+                    </div>
+                </div>
                                 <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading3">
                                     <div class="panel-body">
                                         <div class="row mg_bt_10">
@@ -213,6 +266,8 @@
         city_lzloading('.trainfrom', '*From', true);
         city_lzloading('.trainto', '*To', true);
         city_lzloading('select[name^="city_name"]');
+        destinationLoading('select[name^="pickup_from"]', 'Pickup Location');
+        destinationLoading('select[name^="drop_to"]', 'Drop-off Location');
     });
 
     function switch_to_tab1() {
@@ -455,6 +510,62 @@
 
                     }
 
+                }
+
+                //Transport Information
+                var vehicle_name_arr = new Array();
+                var drop_arr = new Array();
+                var drop_type_arr = new Array();
+                var pickup_arr = new Array();
+                var pickup_type_arr = new Array();
+                var pickup_type = '';
+                var pickup = '';
+                var drop_type = '';
+                var drop = '';
+                var table = document.getElementById("tbl_package_tour_transport");
+                var rowCount = table.rows.length;
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+
+                        $('#' + row.cells[3].childNodes[0].id).find("option:selected").each(function() {
+                            pickup = row.cells[3].childNodes[0].value;
+                            pickup_type = $("option:selected", $("#" + row.cells[3].childNodes[0].id)).parent().attr('value');
+                        });
+                        $('#' + row.cells[4].childNodes[0].id).find("option:selected").each(function() {
+                            drop = row.cells[4].childNodes[0].value;
+                            drop_type = $("option:selected", $("#" + row.cells[4].childNodes[0].id)).parent().attr('value');
+                        });
+
+                        var vehicle_name = row.cells[2].childNodes[0].value;
+                        if (vehicle_name == "") {
+                            error_msg_alert('Transport Vehicle is mandatory in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_transport').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+                        }
+                        if (pickup_type == "") {
+                            error_msg_alert('Transport pickup location is mandatory in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_transport').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+                        }
+                        if (drop_type == "") {
+                            error_msg_alert('Transport drop location is mandatory in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_transport').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+                        }
+
+                        vehicle_name_arr.push(vehicle_name);
+                        pickup_arr.push(pickup);
+                        pickup_type_arr.push(pickup_type);
+                        drop_arr.push(drop);
+                        drop_type_arr.push(drop_type);
+                    }
                 }
 
                 //Cruise Information
