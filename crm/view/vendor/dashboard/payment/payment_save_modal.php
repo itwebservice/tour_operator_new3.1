@@ -48,10 +48,10 @@ $role = $_SESSION['role'];
                   <input type="text" id="payment_date" name="payment_date" class="form-control" placeholder="*Date" title="Payment Date" value="<?= date('d-m-Y')?>" onchange="check_valid_date(this.id)">
                 </div>  
                 <div class="col-md-4">
-                  <input type="text" id="payment_amount" name="payment_amount" class="form-control" placeholder="*Payment Amount" title="Payment Amount" onchange="validate_balance(this.id);">
+                  <input type="text" id="payment_amount" name="payment_amount" class="form-control" placeholder="*Payment Amount" title="Payment Amount" onchange="validate_balance(this.id);payment_amount_validate(this.id,'payment_mode','txt_transaction_id','txt_bank_name','bank_id');get_credit_card_charges1('identifier','payment_mode','payment_amount','credit_card_details','credit_charges','tax_credit_charges','credit_charges_amt');">
                 </div>             
                 <div class="col-md-4">
-                  <select name="payment_mode" id="payment_mode" class="form-control" title="Payment Mode" onchange="payment_master_toggles(this.id, 'bank_name', 'transaction_id', 'bank_id')">
+                  <select name="payment_mode" id="payment_mode" class="form-control" title="Payment Mode" onchange="payment_master_toggles(this.id, 'bank_name', 'transaction_id', 'bank_id');payment_installment_enable_disable_fields();get_identifier_block1('identifier','payment_mode','credit_card_details','credit_charges','tax_credit_charges');get_credit_card_charges1('identifier','payment_mode','payment_amount','credit_card_details','credit_charges','tax_credit_charges','credit_charges_amt')">
                     <option value="">*Payment Mode</option>
                     <option value="Cash">Cash</option>
                     <option value="Cheque">Cheque</option>
@@ -80,6 +80,44 @@ $role = $_SESSION['role'];
                   </select>
                 </div>
               </div>
+
+<div class="row mg_bt_10">
+                        <div class="col-md-4">
+                            <select class="hidden" id="identifier"
+                                onchange="get_credit_card_data1('identifier','payment_mode','credit_card_details','tax_credit_charges')"
+                                title="Identifier(4 digit)" required>
+                                <option value=''>Select Identifier</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 ">
+                            <input class="hidden form-control" type="text" id="credit_charges" name="credit_charges" onchange="get_credit_card_charges1('identifier','payment_mode','payment_amount','credit_card_details','credit_charges','tax_credit_charges','credit_charges_amt');"
+                                title="Credit card charges in percentage" >
+                        </div>
+
+                         <div class="col-md-4 ">
+                            <input type="hidden" class="form-control" type="text" id="credit_charges_amt" name="credit_charges_amt"
+                                title="Credit card charges" >
+                        </div>
+
+                        <div class="col-md-4">
+                            <input class="hidden form-control" type="text" id="tax_credit_charges" name="tax_credit_charges" onchange="get_credit_card_charge_tax('credit_charges_amt','tax_credit_charges','tax_credit_charges_amt')"
+                                title="Tax on Credit card charges in percentage" >
+                        </div>
+
+                         <div class="col-md-4">
+                            <input type="hidden" class="form-control" type="text" id="tax_credit_charges_amt" name="tax_credit_charges_amt"
+                                title="Tax on Credit card charges in percentage" >
+                        </div>
+                  </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 col-sm-6 col-xs-12" style="margin-top:20px;margin-bottom:10px;">
+                            <input class="hidden form-control" type="text" id="credit_card_details"
+                                name="credit_card_details" title="Credit card details" disabled>
+                        </div>
+                    </div>
+
               <div class="row">
                 <div class="col-md-6">
                   <div class="div-upload pull-left" id="div_upload_button">
@@ -230,11 +268,11 @@ $(function(){
         if(typeof debit_note_amount === 'undefined') { debit_note_amount = '0'; }
         if(advance_nullify == "") { advance_nullify = '0'; }
 
-        if(payment_mode=='Credit Card'){
-          $('#payment_save').prop('disabled',false);
-          error_msg_alert("Please select another payment mode!");
-          return false; 
-        }
+        // if(payment_mode=='Credit Card'){
+        //   $('#payment_save').prop('disabled',false);
+        //   error_msg_alert("Please select another payment mode!");
+        //   return false; 
+        // }
         //Amount Validations
         if(parseFloat(advance_nullify) > 0 || parseFloat(advance_nullify) != '' || parseFloat(advance_nullify) != 0){
 
@@ -353,6 +391,33 @@ $(function(){
           }
         }
 
+  var credit_amount = $('#credit_charges_amt').val();
+			var credit_charges = $('#credit_charges').val();
+
+      var credit_charges_tax_amt = $('#tax_credit_charges_amt').val();
+
+      var credit_charges_tax = $('#tax_credit_charges').val();
+
+			var credit_card_details = $('#credit_card_details').val();
+
+      var credit_amount_arr = new Array();
+			var credit_charges_arr = new Array();
+			var credit_card_details_arr = new Array();
+
+      var credit_charges_tax_amt_arr = new Array();
+
+      var credit_charges_tax_arr =new Array();
+
+
+
+      credit_amount_arr.push(credit_amount);
+				credit_charges_arr.push(credit_charges);
+				credit_card_details_arr.push(credit_card_details);
+
+        credit_charges_tax_amt_arr.push(credit_charges_tax_amt);
+        credit_charges_tax_arr.push(credit_charges_tax);
+
+
         var base_url = $('#base_url').val();
         $('#payment_save').button('loading');
         $.post(base_url+'view/load_data/finance_date_validation.php', { check_date: payment_date }, function(data){
@@ -370,7 +435,13 @@ $(function(){
                   $.ajax({
                     type: 'post',
                     url: base_url+'controller/vendor/dashboard/payment/payment_save.php',
-                    data:{ vendor_type : vendor_type, vendor_type_id : vendor_type_id, payment_amount : payment_amount, payment_date : payment_date, payment_mode : payment_mode, bank_name : bank_name, transaction_id : transaction_id, bank_id : bank_id, payment_evidence_url :payment_evidence_url, branch_admin_id : branch_admin_id , emp_id : emp_id,advance_nullify : advance_nullify,total_payment_amount : total_payment_amount,total_purchase : total_purchase,payment_amount_arr : payment_amount_arr,purchase_type_arr : purchase_type_arr,purchase_id_arr : purchase_id_arr,estimate_id_arr:estimate_id_arr,currency_code :currency_code},
+                    data:{ vendor_type : vendor_type, vendor_type_id : vendor_type_id, payment_amount : payment_amount, payment_date : payment_date, payment_mode : payment_mode, bank_name : bank_name, transaction_id : transaction_id, bank_id : bank_id, payment_evidence_url :payment_evidence_url, branch_admin_id : branch_admin_id , emp_id : emp_id,advance_nullify : advance_nullify,total_payment_amount : total_payment_amount,total_purchase : total_purchase,payment_amount_arr : payment_amount_arr,purchase_type_arr : purchase_type_arr,purchase_id_arr : purchase_id_arr,estimate_id_arr:estimate_id_arr,currency_code :currency_code,
+                      credit_amount_arr:credit_amount_arr,
+                      credit_charges_arr:credit_charges_arr,
+                      credit_card_details_arr:credit_card_details_arr,
+                       credit_charges_tax_amt_arr: credit_charges_tax_amt_arr,
+                       credit_charges_tax_arr:credit_charges_tax_arr
+                    },
                     success: function(result){
                     $('#payment_save').button('reset');
                     $('#payment_save').prop('disabled',false);
@@ -399,3 +470,4 @@ $(function(){
   });
 });
 </script>
+<script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

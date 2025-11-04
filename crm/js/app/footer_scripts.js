@@ -1269,6 +1269,138 @@ function get_credit_card_charges(identifier, payment_mode, payment_amount, credi
 	}
 }
 
+
+function get_identifier_block1(identifier, payment_mode, credit_card_details, credit_charges,tax_credit_charges) {
+
+	var payment_mode = $('#' + payment_mode).val();
+	if (payment_mode === 'Credit Card') {
+		document.getElementById(identifier).classList.remove("hidden");
+
+		
+		
+		document.getElementById("identifier").innerHTML = '';
+		var select = document.getElementById("identifier");
+		select.options[select.options.length] = new Option('Select Identifier', '');
+
+		var cache_rules = JSON.parse($('#cache_data').val());
+		var credit_card_company = cache_rules[0]['credit_card_data'];
+
+		credit_card_company && credit_card_company.filter((data) => {
+
+			var card_memberships = [];
+			card_memberships = JSON.parse(JSON.parse(data['membership_details_arr']));
+			card_memberships.forEach(function (membership_no) {
+
+				var identifiers = membership_no['nos'];
+				identifiers && identifiers.map((i) => {
+					let i1 = i.substring(0, 4);
+					select.options[select.options.length] = new Option(i1, i1);
+				});
+			});
+		});
+	}
+	else {
+		document.getElementById(identifier).classList.add("hidden");
+		document.getElementById(credit_card_details).classList.add("hidden");
+		document.getElementById(credit_charges).classList.add("hidden");
+        document.getElementById(tax_credit_charges).classList.add("hidden");
+		
+	}
+	document.getElementById(identifier).value = '';
+	document.getElementById(credit_card_details).value = '';
+	document.getElementById(credit_charges).value = '';
+	document.getElementById(tax_credit_charges).value='';
+}
+function get_credit_card_data1(identifier, payment_mode, credit_card_details,tax_credit_charges) {
+
+	var identifier = $('#' + identifier).val();
+	var payment_mode = $('#' + payment_mode).val();
+	var cache_rules = JSON.parse($('#cache_data').val());
+	var credit_card_company = cache_rules[0]['credit_card_data'];
+
+	var identifiers1 = '';
+	credit_card_company && credit_card_company.filter((data) => {
+
+		var card_memberships = [];
+		card_memberships = JSON.parse(JSON.parse(data['membership_details_arr']));
+		card_memberships.forEach(function (membership_no) {
+
+			var identifiers = membership_no['nos'];
+			identifiers && identifiers.map((i) => {
+				let i1 = i.substring(0, 4);
+				if (identifier === i1)
+					identifiers1 = data['entry_id'] + '-' + data['company_name'] + ':' + membership_no['membership_no'] + ':' + i;
+			});
+		});
+	});
+	if (payment_mode === 'Credit Card') {
+
+		if (identifiers1 !== '') {
+			document.getElementById(credit_card_details).classList.remove("hidden");
+			document.getElementById('credit_card_details').value = identifiers1;
+
+			 document.getElementById(tax_credit_charges).classList.remove("hidden");
+		} else {
+			document.getElementById(credit_card_details).value = '';
+			document.getElementById(credit_card_details).classList.add("hidden");
+		}
+	} else {
+		document.getElementById(credit_card_details).value = '';
+		document.getElementById(credit_card_details).classList.add("hidden");
+	}
+}
+
+
+
+function get_credit_card_charges1(identifier, payment_mode, payment_amount, credit_card_details, credit_charges, tax_credit_charges, credit_charges_amt) {
+
+    var payment_mode_val = $('#' + payment_mode).val();
+    var payment_amount_val = parseFloat($('#' + payment_amount).val()) || 0;
+    var credit_card_charges_val = parseFloat($('#' + credit_charges).val()) || 0;
+
+    if (payment_mode_val === 'Credit Card') {
+        // Calculate charges = amount × %
+        var result = (payment_amount_val * (credit_card_charges_val / 100)).toFixed(2);
+
+        // Show fields
+        document.getElementById(credit_charges).classList.remove("hidden");
+        document.getElementById(tax_credit_charges).classList.remove("hidden");
+
+        // Don’t overwrite user input
+        // document.getElementById(credit_charges).value = '0.00'; ❌ removed
+        // document.getElementById(tax_credit_charges).value = '0.00'; ❌ removed
+// alert(result);
+        // Set calculated charges
+        document.getElementById(credit_charges_amt).value = result;
+    } else {
+        // Reset + hide
+        document.getElementById(credit_charges).value = '';
+        document.getElementById(credit_charges).classList.add("hidden");
+        document.getElementById(credit_card_details).value = '';
+        document.getElementById(credit_card_details).classList.add("hidden");
+        document.getElementById(identifier).value = '';
+        document.getElementById(identifier).classList.add("hidden");
+        document.getElementById(tax_credit_charges).classList.add("hidden");
+    }
+}
+
+function get_credit_card_charge_tax(credit_charges_amt,tax_credit_charges,tax_credit_charges_amt){
+
+	var credit_charges_amt= parseFloat($('#'+credit_charges_amt).val())|| 0;
+
+	var tax_credit_charges = parseFloat($('#'+tax_credit_charges).val())|| 0;
+
+	var tax_amt= (credit_charges_amt *(tax_credit_charges /100)).toFixed(2);
+
+	// var result = (payment_amount_val * (credit_card_charges_val / 100)).toFixed(2);
+
+	// document.getElementById(tax_credit_charges_amt).classList.remove("hidden");
+    
+	// alert(tax_amt);
+        document.getElementById(tax_credit_charges_amt).value = tax_amt;
+
+}
+
 function check_updated_amount(payment_old_value, payment_amount) {
 
 	if (parseFloat(payment_old_value) !== parseFloat(payment_amount)) {

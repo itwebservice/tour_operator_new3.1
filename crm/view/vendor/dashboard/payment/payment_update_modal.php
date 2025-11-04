@@ -152,8 +152,24 @@ $enable = ($sq_payment['payment_mode'] == "Cash" || $sq_payment['payment_mode'] 
                 </select>
               </div>
             </div>
+
+             <?php if($sq_payment['payment_mode'] == 'Credit Card'){?>
+                <div class="row mg_tp_10" style="margin-bottom:1px;">
+                  <div class="col-md-4 col-sm-6 col-xs-12">
+                    <input type="text" id="credit_charges1" name="credit_charges1" title="Credit card charges" value="<?=$sq_payment['credit_charges']?>" disabled>
+                    <input type="hidden" id="credit_charges_old" name="credit_charges_old" title="Credit card charges" value="<?=$sq_payment['credit_charges']?>" disabled>
+                  </div>
+                   <input type="hidden" id="credit_charge_amount" name="credit_charge_amount" title="Credit card charge amount" value="<?=$sq_payment['credit_charge_amount']?>" disabled>
+                    <input type="hidden" id="credit_charge_tax_amount" name="credit_charge_tax_amount" title="Credit card charge tax amount" value="<?=$sq_payment['credit_charge_tax_amount']?>" disabled>
+                    <input type="hidden" id="credit_card_details" name="credit_card_details" title="Credit card details" value="<?=$sq_payment['credit_card_details']?>" disabled>
+                  </div>
+                  
+                 
+                
+                <?php } ?>
+
             <div class="row">
-              <div class="col-md-8">
+              <div class="col-md-8" style="margin-top:10px !important;">
                 <div class="div-upload pull-left" id="div_upload_button1">
                   <div id="payment_evidence_upload1" class="upload-button1"><span>Payment Evidence</span></div>
                   <span id="payment_evidence_status1"></span>
@@ -192,7 +208,7 @@ $enable = ($sq_payment['payment_mode'] == "Cash" || $sq_payment['payment_mode'] 
 
           </div>
 
-          <div class="row text-center">
+          <div class="row text-center" style="margin-bottom:10px;">
             <div class="col-md-12">
               <button class="btn btn-sm btn-success" id="btn_update"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
             </div>

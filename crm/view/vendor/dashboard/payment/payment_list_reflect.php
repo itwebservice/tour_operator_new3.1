@@ -108,6 +108,9 @@ $payment_date = $row_payment['payment_date'];
 $year = $yr[0];
 		
 $payment_id = $row_payment['payment_id'];
+
+
+$total_amount = (float)($row_payment['payment_amount'] ?? 0) + (float)($row_payment['credit_charge_amount'] ?? 0);
 		
 
 	$temp_arr = array( "data" => array(
@@ -118,7 +121,7 @@ $payment_id = $row_payment['payment_id'];
 		$row_payment['vendor_type'],
 		$vendor_type_val,
 		date('d-m-Y', strtotime($row_payment['payment_date'])),
-		$row_payment['payment_amount'].$currency_amount,
+		$total_amount.$currency_amount,
 		$row_payment['payment_mode'],
 		$row_payment['bank_name'],
 		$row_payment['transaction_id'],
