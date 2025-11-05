@@ -654,7 +654,7 @@ function payment_master_toggles(payment_mode_id, bank_name_id, transaction_id_id
 
 	var payment_mode = $('#' + payment_mode_id).val();
 
-	if (payment_mode == 'Cash' || payment_mode == '' || payment_mode == 'Credit Note' || payment_mode == 'Debit Note' || payment_mode == 'Credit Card' || payment_mode == 'Advance') {
+	if (payment_mode == 'Cash' || payment_mode == '' || payment_mode == 'Credit Note' || payment_mode == 'Debit Note' || payment_mode == 'Credit Card' || payment_mode == 'Advance' || payment_mode == 'To Supplier') {
 
 		$('#' + bank_name_id).prop({ disabled: 'disabled', readonly: 'readonly', value: '' });
 		$('#' + transaction_id_id).prop({ disabled: 'disabled', readonly: 'readonly', value: '' });
