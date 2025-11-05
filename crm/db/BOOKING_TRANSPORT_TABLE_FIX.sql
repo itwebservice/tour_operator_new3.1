@@ -21,3 +21,5 @@ CREATE TABLE IF NOT EXISTS `group_tour_booking_transport_entries` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+

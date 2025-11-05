@@ -82,3 +82,5 @@ while($row_groups = mysqli_fetch_assoc($sq_groups))
 echo json_encode($array_s);
 ?>
 
+
+
