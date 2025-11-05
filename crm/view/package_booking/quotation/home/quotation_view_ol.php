@@ -451,6 +451,7 @@ if($sq_e_count != '0'){
 			<th>City_Name</th>
 			<th>Activity_Name</th>
 			<th>Transfer_Option</th>
+			<th>Vehicle_Name</th>
 			<th>Adult(s)</th>
 			<th>Child_with_Bed</th>
 			<th>Child_without_Bed</th>
@@ -464,21 +465,30 @@ if($sq_e_count != '0'){
 		$sq_ex = mysqlQuery("select * from package_tour_quotation_excursion_entries where quotation_id='$quotation_id'");
 		while($row_ex = mysqli_fetch_assoc($sq_ex)){
 			
-			$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
-			$sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
-			?>
-			<tr>
-				<td><?= ++$count ?></td>
-				<td><?= get_datetime_user($row_ex['exc_date']) ?></td>
-				<td><?= $sq_city['city_name'] ?></td>
-				<td><?= $sq_ex_name['excursion_name'] ?></td>
-				<td><?= $row_ex['transfer_option'] ?></td>
-				<td><?= $row_ex['adult'] ?></td>
-				<td><?= $row_ex['chwb'] ?></td>
-				<td><?= $row_ex['chwob'] ?></td>
-				<td><?= $row_ex['infant'] ?></td>
-				<td><?= $row_ex['vehicles'] ?></td>
-			</tr>
+		$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
+		$sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
+		// Get vehicle name (quotation table uses vehicle_id column)
+		$vehicle_display = '';
+		if(isset($row_ex['vehicle_id']) && $row_ex['vehicle_id'] != '' && $row_ex['vehicle_id'] != '0' && $row_ex['vehicle_id'] != null){
+			$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_ex['vehicle_id']."'"));
+			if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+				$vehicle_display = $sq_vehicle['vehicle_name'];
+			}
+		}
+		?>
+		<tr>
+			<td><?= ++$count ?></td>
+			<td><?= get_datetime_user($row_ex['exc_date']) ?></td>
+			<td><?= $sq_city['city_name'] ?></td>
+			<td><?= $sq_ex_name['excursion_name'] ?></td>
+			<td><?= $row_ex['transfer_option'] ?></td>
+			<td><?= $vehicle_display ?></td>
+			<td><?= $row_ex['adult'] ?></td>
+			<td><?= $row_ex['chwb'] ?></td>
+			<td><?= $row_ex['chwob'] ?></td>
+			<td><?= $row_ex['infant'] ?></td>
+			<td><?= $row_ex['vehicles'] ?></td>
+		</tr>
 			<?php
 		}	
 		?>

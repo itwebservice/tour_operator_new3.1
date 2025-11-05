@@ -94,6 +94,7 @@ public function quotation_master_save()
 	$excursion_amt_arr = isset($_POST['excursion_amt_arr']) ? $_POST['excursion_amt_arr'] : [];
 	$exc_date_arr_e = isset($_POST['exc_date_arr_e']) ? $_POST['exc_date_arr_e'] : [];
 	$transfer_option_arr = isset($_POST['transfer_option_arr']) ? $_POST['transfer_option_arr'] : [];
+	$vehicle_id_arr_e = isset($_POST['vehicle_id_arr_e']) ? $_POST['vehicle_id_arr_e'] : [];
 	$adult_arr = isset($_POST['adult_arr']) ? $_POST['adult_arr'] : [];
 	$chwb_arr = isset($_POST['chwb_arr']) ? $_POST['chwb_arr'] : [];
 	$chwob_arr = isset($_POST['chwob_arr']) ? $_POST['chwob_arr'] : [];
@@ -333,7 +334,7 @@ public function tranport_entries_save($quotation_id_arr,$vehicle_name_arr,$start
 	}
 }
 
-public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr)
+public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr,$vehicle_id_arr_e=[])
 {
 	for($i=0; $i<sizeof($quotation_id_arr); $i++){
 		for($j=0; $j<sizeof($city_name_arr_e); $j++){
@@ -341,7 +342,8 @@ public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excu
 		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_tour_quotation_excursion_entries"));
 		$id = $sq_max['max']+1;
 		$exc_date_arr_e[$j] = get_datetime_db($exc_date_arr_e[$j]);
-		$sq_plane = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles ) values ( '$id', '$quotation_id_arr[$i]', '$city_name_arr_e[$j]','$excursion_name_arr[$j]', '$excursion_amt_arr[$j]','$exc_date_arr_e[$j]','$transfer_option_arr[$j]','$adult_arr[$j]','$chwb_arr[$j]','$chwob_arr[$j]','$infant_arr[$j]','$vehicles_arr[$i]')");
+		$vehicle_id = isset($vehicle_id_arr_e[$j]) ? $vehicle_id_arr_e[$j] : '';
+		$sq_plane = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles,vehicle_id ) values ( '$id', '$quotation_id_arr[$i]', '$city_name_arr_e[$j]','$excursion_name_arr[$j]', '$excursion_amt_arr[$j]','$exc_date_arr_e[$j]','$transfer_option_arr[$j]','$adult_arr[$j]','$chwb_arr[$j]','$chwob_arr[$j]','$infant_arr[$j]','$vehicles_arr[$i]','$vehicle_id')");
 		if(!$sq_plane){
 			echo "error--Activity information not saved!";
 			exit;

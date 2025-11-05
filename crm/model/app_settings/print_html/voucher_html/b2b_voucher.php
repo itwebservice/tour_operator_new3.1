@@ -6,6 +6,12 @@ include "../print_functions.php";
 $booking_id = $_GET['booking_id'];
 
 $sq_service_voucher = mysqli_fetch_assoc(mysqlQuery("select * from b2b_booking_master where booking_id='$booking_id'"));
+
+// Get branch-wise logo
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+$branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : 1;
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $cart_list_arr = $sq_service_voucher['cart_checkout_data'];
 $cart_list_arr = ($cart_list_arr != '' && $cart_list_arr != 'null') ? json_decode($cart_list_arr) : [];
 $traveller_details = json_decode($sq_service_voucher['traveller_details']);

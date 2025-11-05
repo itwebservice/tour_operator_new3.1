@@ -116,6 +116,40 @@ else{
 		</div>
 	</div>
 </div>
+<?php 
+$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+$sq_package_count = mysqli_num_rows($sq_package_program);
+if($sq_package_count > 0){ ?>
+<div class="main_block mg_tp_30"></div>
+<h3 class="editor_title main_block">Itinerary Details</h3>
+<table class="table table-bordered no-marg">
+	<thead>
+		<tr class="table-heading-row">
+			<th>S_No.</th>
+			<th>Special_Attraction</th>
+			<th>Day-wise_Program</th>
+			<th>Overnight_Stay</th>
+			<th>Meal_Plan</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php 
+		$count = 0;
+		while($row_itinarary = mysqli_fetch_assoc($sq_package_program)){
+			?>
+			<tr>
+				<td><?= ++$count ?></td>
+				<td><?= $row_itinarary['attraction'] ?></td>
+				<td><pre class="real_text"><?= $row_itinarary['day_wise_program'] ?></pre></td>
+				<td><?= $row_itinarary['stay'] ?></td>
+				<td><?= ($row_itinarary['meal_plan']!='')?$row_itinarary['meal_plan']:'NA' ?></td>
+			</tr>
+			<?php
+		}	
+		?>
+	</tbody>
+</table>
+<?php } ?>
 </div>
 <?= end_panel() ?>
 

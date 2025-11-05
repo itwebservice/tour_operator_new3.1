@@ -6,6 +6,10 @@ global $app_quot_img, $currency;
 
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
+
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
 $sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='package_booking/quotation/car_flight/car_rental/index.php'"));
 $branch_status = $sq['branch_status'];
 
@@ -82,6 +86,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 	} else {
 	$quotation_cost = $sq_quotation['total_tour_cost'];
 	}
+
+$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+$sq_package_count = mysqli_num_rows($sq_package_program);
 ?>
 
 <section class="headerPanel main_block">
@@ -337,10 +344,10 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
                                     </span><?= ($sq_bank_count>0 || $sq_bank_branch['swift_code'] != '') ? strtoupper($sq_bank_branch['swift_code']) :  strtoupper($bank_swift_code) ?></li>
                             </ul>
                         </div>
-                        <?php if (check_qr()) {
+                        <?php if (check_qr($branch_admin_id)) {
             ?>
                         <div class="col-md-6 text-center">
-                            <?= get_qr('Protrait Standard') ?>
+                            <?= get_qr('Protrait Standard', $branch_admin_id) ?>
                             <br>
                             <h4 class="no-marg">Scan & Pay </h4>
 
@@ -352,6 +359,56 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
             </div>
         </div>
     </section>
+
+    <!-- Tour Itinerary -->
+    <?php 
+    $sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+    $sq_package_count = mysqli_num_rows($sq_package_program);
+    if($sq_package_count > 0){ ?>
+    <section class="print_sec main_block side_pad mg_tp_30">
+      <div class="section_heding mg_tp_20">
+        <h2>TOUR ITINERARY</h2>
+        <div class="section_heding_img">
+          <img src="<?php echo BASE_URL . 'images/heading_border.png'; ?>" class="img-responsive">
+        </div>
+      </div>
+      <div class="">
+        <div class="col-md-12">
+          <div class="print_itinenary main_block no-pad no-marg">
+
+            <?php
+            $count = 1;
+            while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
+              $last_child = ($sq_package_count == $count) ? 'last-child' : '';
+            ?>
+              <section class="print_single_itinenary main_block <?= $last_child ?>">
+                <div class="print_itinenary_count print_info_block" style="width:200px;">DAY - <?= $count ?></div>
+                <div class="print_itinenary_desciption print_info_block">
+                  <div class="print_itinenary_attraction">
+                    <span class="print_itinenary_attraction_icon"><i class="fa fa-map-marker"></i></span>
+                    <samp class="print_itinenary_attraction_location"><?= $row_itinarary['attraction'] ?></samp>
+                  </div>
+                  <p><?= $row_itinarary['day_wise_program'] ?></p>
+                </div>
+                <div class="print_itinenary_details">
+                  <div class="print_info_block">
+                    <ul class="main_block no-pad">
+                      <li class="col-md-12 mg_tp_10 mg_bt_10"><span><i class="fa fa-bed"></i> : </span><?= $row_itinarary['stay'] ?></li>
+                      <li class="col-md-12 mg_tp_10 mg_bt_10"><span><i class="fa fa-cutlery"></i> : </span><?= ($row_itinarary['meal_plan'] != '') ? $row_itinarary['meal_plan'] : 'NA' ?></li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            <?php $count++;
+            } ?>
+          </div>
+        </div>
+      </div>
+    </section>
+    <?php } ?>
+
+    <!-- Tour Itinenary -->
+   
 
     <!-- Terms and Conditions -->
     <section class="print_sec main_block side_pad mg_tp_30">

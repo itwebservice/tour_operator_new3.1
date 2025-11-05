@@ -4,6 +4,11 @@ include "../../../../model.php";
 include "printFunction.php";
 global $app_quot_img,$app_quot_format;
 
+// Get branch-wise logo (no branch_admin_id in B2B, use default)
+$branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : 0;
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
+
 $package_id=$_GET['package_id'];
 $sq_pckg = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_id'"));
 $sq_dest = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id='$sq_pckg[dest_id]'"));

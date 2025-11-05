@@ -17,6 +17,9 @@ $package_booking_info = mysqli_fetch_assoc(mysqlQuery("select * from package_tou
 $branch_admin_id = ($_SESSION['branch_admin_id'] != '') ? $_SESSION['branch_admin_id'] : $package_booking_info['branch_admin_id'];
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Package Sale' and active_flag ='Active'"));
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
 
@@ -97,7 +100,7 @@ $net_amount1 = currency_conversion($currency, $package_booking_info['currency_co
     <div class="col-md-6 no-pad">
         <span class="title"><i class="fa fa-file-text"></i> CONFIRMATION FORM</span>
         <div class="print_header_logo">
-            <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10">
+            <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10" style="max-width: 210px; max-height: 90px; object-fit: contain;">
         </div>
     </div>
     <div class="col-md-6 no-pad">
@@ -376,10 +379,11 @@ if ($sq_count != 0) {
                     <table class="table table-bordered no-marg" id="tbl_emp_list">
                         <thead>
                             <tr class="table-heading-row">
-                                <th>Activity_date</th>
+                                <th>Activity Date</th>
                                 <th>City_Name</th>
-                                <th>Activity_name</th>
-                                <th>Transfer_option</th>
+                                <th>Activity Name</th>
+                                <th>Transfer Option</th>
+                                <th>Vehicle Name</th>
                                 <th>Adult(s)</th>
                                 <th>CWB</th>
                                 <th>CWOB</th>
@@ -392,12 +396,21 @@ if ($sq_count != 0) {
                             while ($row_entry = mysqli_fetch_assoc($sq_entry)) {
                                 $q_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
                                 $sq_ex = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
+                                // Get vehicle name
+                                $vehicle_name = '';
+                                if(isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0' && $row_entry['vehicle_name'] != null){
+                                    $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_entry['vehicle_name']."'"));
+                                    if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+                                        $vehicle_name = $sq_vehicle['vehicle_name'];
+                                    }
+                                }
                             ?>
                                 <tr>
                                     <td><?php echo get_datetime_user($row_entry['exc_date']) ?></td>
                                     <td><?= $q_city['city_name'] ?></td>
                                     <td><?= $sq_ex['excursion_name'] ?></td>
                                     <td><?= $row_entry['transfer_option'] ?> </td>
+                                    <td><?= $vehicle_name ?></td>
                                     <td><?= $row_entry['adult'] ?> </td>
                                     <td><?= $row_entry['chwb'] ?> </td>
                                     <td><?= $row_entry['chwob'] ?> </td>

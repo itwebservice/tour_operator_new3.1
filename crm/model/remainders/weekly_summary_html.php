@@ -29,7 +29,7 @@ while ($row_enq = mysqli_fetch_assoc($sq_enquiry)) {
   if ($sq_enquiry_entry['followup_status'] == "Converted") {
     $converted_count++;
   }
-  if ($sq_enquiry_entry['followup_status'] == "Active") {
+  if ($sq_enquiry_entry['followup_status'] == "New") {
     $followup_count++;
   }
 }
@@ -614,7 +614,7 @@ $row_exp = mysqli_fetch_assoc(mysqlQuery($exp_query));
         <div class="col-md-12">
           <div class="adolence_info">
             <ul class="main_block">
-              <li class="col-md-3"><span>Active : </span><?php echo $followup_count; ?></li>
+              <li class="col-md-3"><span>New : </span><?php echo $followup_count; ?></li>
               <li class="col-md-3"><span>In-Followup : </span><?php echo $inf_count; ?></li>
               <li class="col-md-3 highlight" style="font-weight: 600; color: #016d01;"><span class="highlight">Converted : </span><?php echo $converted_count; ?></li>
               <li class="col-md-3 highlight" style="font-weight: 600; color: red;"><span class="highlight">Dropped : </span><?php echo $closed_count; ?></li>

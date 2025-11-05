@@ -663,6 +663,12 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 function destinationLoading(element, placeholder = "Destination", valueasText = false) {
 	var base_url = $("#base_url").val();
 	url = base_url + '/view/load_data/generic_destination_loading.php';
+	
+	// Store current selection before destroying
+	var currentValue = $(element).val();
+	var currentText = $(element).find('option:selected').text();
+	var currentOptgroup = $(element).find('option:selected').parent().attr('value');
+	
 	if ($(element).hasClass("select2-hidden-accessible")) {
 		$(element).select2('destroy');
 	}
@@ -675,7 +681,40 @@ function destinationLoading(element, placeholder = "Destination", valueasText = 
 			type: 'GET',
 			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
 			processResults: function (data) {
-				console.log(data);
+				// If there was a pre-selected value, add it to the results
+				if(currentValue && currentText){
+					var found = false;
+					// Check if current value exists in results
+					for(var i=0; i<data.results.length; i++){
+						if(data.results[i].children){
+							for(var j=0; j<data.results[i].children.length; j++){
+								if(data.results[i].children[j].id === currentValue){
+									found = true;
+									break;
+								}
+							}
+						}
+					}
+					// If not found in results, add it
+					if(!found && currentOptgroup){
+						var groupLabel = currentOptgroup.charAt(0).toUpperCase() + currentOptgroup.slice(1) + ' Name';
+						var groupExists = false;
+						for(var i=0; i<data.results.length; i++){
+							if(data.results[i].text === groupLabel){
+								data.results[i].children.unshift({id: currentValue, text: currentText});
+								groupExists = true;
+								break;
+							}
+						}
+						if(!groupExists){
+							data.results.unshift({
+								text: groupLabel,
+								children: [{id: currentValue, text: currentText}]
+							});
+						}
+					}
+				}
+				
 				let more = data.pagination;
 				return {
 					results: data.results,
@@ -686,6 +725,11 @@ function destinationLoading(element, placeholder = "Destination", valueasText = 
 			}
 		}
 	});
+	
+	// Restore the previous selection
+	if(currentValue){
+		$(element).val(currentValue).trigger('change');
+	}
 }
 //**Generic City save modal end**//
 
@@ -695,7 +739,7 @@ function payment_master_toggles(payment_mode_id, bank_name_id, transaction_id_id
 
 	var payment_mode = $('#' + payment_mode_id).val();
 
-	if (payment_mode == 'Cash' || payment_mode == '' || payment_mode == 'Credit Note' || payment_mode == 'Debit Note' || payment_mode == 'Credit Card' || payment_mode == 'Advance') {
+	if (payment_mode == 'Cash' || payment_mode == '' || payment_mode == 'Credit Note' || payment_mode == 'Debit Note' || payment_mode == 'Credit Card' || payment_mode == 'Advance' || payment_mode == 'To Supplier') {
 
 		$('#' + bank_name_id).prop({ disabled: 'disabled', readonly: 'readonly', value: '' });
 		$('#' + transaction_id_id).prop({ disabled: 'disabled', readonly: 'readonly', value: '' });
@@ -1352,6 +1396,138 @@ function get_credit_card_charges(identifier, payment_mode, payment_amount, credi
 		document.getElementById(identifier).value = '';
 		document.getElementById(identifier).classList.add("hidden");
 	}
+}
+
+
+function get_identifier_block1(identifier, payment_mode, credit_card_details, credit_charges,tax_credit_charges) {
+
+	var payment_mode = $('#' + payment_mode).val();
+	if (payment_mode === 'Credit Card') {
+		document.getElementById(identifier).classList.remove("hidden");
+
+		
+		
+		document.getElementById("identifier").innerHTML = '';
+		var select = document.getElementById("identifier");
+		select.options[select.options.length] = new Option('Select Identifier', '');
+
+		var cache_rules = JSON.parse($('#cache_data').val());
+		var credit_card_company = cache_rules[0]['credit_card_data'];
+
+		credit_card_company && credit_card_company.filter((data) => {
+
+			var card_memberships = [];
+			card_memberships = JSON.parse(JSON.parse(data['membership_details_arr']));
+			card_memberships.forEach(function (membership_no) {
+
+				var identifiers = membership_no['nos'];
+				identifiers && identifiers.map((i) => {
+					let i1 = i.substring(0, 4);
+					select.options[select.options.length] = new Option(i1, i1);
+				});
+			});
+		});
+	}
+	else {
+		document.getElementById(identifier).classList.add("hidden");
+		document.getElementById(credit_card_details).classList.add("hidden");
+		document.getElementById(credit_charges).classList.add("hidden");
+        document.getElementById(tax_credit_charges).classList.add("hidden");
+		
+	}
+	document.getElementById(identifier).value = '';
+	document.getElementById(credit_card_details).value = '';
+	document.getElementById(credit_charges).value = '';
+	document.getElementById(tax_credit_charges).value='';
+}
+function get_credit_card_data1(identifier, payment_mode, credit_card_details,tax_credit_charges) {
+
+	var identifier = $('#' + identifier).val();
+	var payment_mode = $('#' + payment_mode).val();
+	var cache_rules = JSON.parse($('#cache_data').val());
+	var credit_card_company = cache_rules[0]['credit_card_data'];
+
+	var identifiers1 = '';
+	credit_card_company && credit_card_company.filter((data) => {
+
+		var card_memberships = [];
+		card_memberships = JSON.parse(JSON.parse(data['membership_details_arr']));
+		card_memberships.forEach(function (membership_no) {
+
+			var identifiers = membership_no['nos'];
+			identifiers && identifiers.map((i) => {
+				let i1 = i.substring(0, 4);
+				if (identifier === i1)
+					identifiers1 = data['entry_id'] + '-' + data['company_name'] + ':' + membership_no['membership_no'] + ':' + i;
+			});
+		});
+	});
+	if (payment_mode === 'Credit Card') {
+
+		if (identifiers1 !== '') {
+			document.getElementById(credit_card_details).classList.remove("hidden");
+			document.getElementById('credit_card_details').value = identifiers1;
+
+			 document.getElementById(tax_credit_charges).classList.remove("hidden");
+		} else {
+			document.getElementById(credit_card_details).value = '';
+			document.getElementById(credit_card_details).classList.add("hidden");
+		}
+	} else {
+		document.getElementById(credit_card_details).value = '';
+		document.getElementById(credit_card_details).classList.add("hidden");
+	}
+}
+
+
+
+function get_credit_card_charges1(identifier, payment_mode, payment_amount, credit_card_details, credit_charges, tax_credit_charges, credit_charges_amt) {
+
+    var payment_mode_val = $('#' + payment_mode).val();
+    var payment_amount_val = parseFloat($('#' + payment_amount).val()) || 0;
+    var credit_card_charges_val = parseFloat($('#' + credit_charges).val()) || 0;
+
+    if (payment_mode_val === 'Credit Card') {
+        // Calculate charges = amount × %
+        var result = (payment_amount_val * (credit_card_charges_val / 100)).toFixed(2);
+
+        // Show fields
+        document.getElementById(credit_charges).classList.remove("hidden");
+        document.getElementById(tax_credit_charges).classList.remove("hidden");
+
+        // Don’t overwrite user input
+        // document.getElementById(credit_charges).value = '0.00'; ❌ removed
+        // document.getElementById(tax_credit_charges).value = '0.00'; ❌ removed
+// alert(result);
+        // Set calculated charges
+        document.getElementById(credit_charges_amt).value = result;
+    } else {
+        // Reset + hide
+        document.getElementById(credit_charges).value = '';
+        document.getElementById(credit_charges).classList.add("hidden");
+        document.getElementById(credit_card_details).value = '';
+        document.getElementById(credit_card_details).classList.add("hidden");
+        document.getElementById(identifier).value = '';
+        document.getElementById(identifier).classList.add("hidden");
+        document.getElementById(tax_credit_charges).classList.add("hidden");
+    }
+}
+
+function get_credit_card_charge_tax(credit_charges_amt,tax_credit_charges,tax_credit_charges_amt){
+
+	var credit_charges_amt= parseFloat($('#'+credit_charges_amt).val())|| 0;
+
+	var tax_credit_charges = parseFloat($('#'+tax_credit_charges).val())|| 0;
+
+	var tax_amt= (credit_charges_amt *(tax_credit_charges /100)).toFixed(2);
+
+	// var result = (payment_amount_val * (credit_card_charges_val / 100)).toFixed(2);
+
+	// document.getElementById(tax_credit_charges_amt).classList.remove("hidden");
+    
+	// alert(tax_amt);
+        document.getElementById(tax_credit_charges_amt).value = tax_amt;
+
 }
 
 function check_updated_amount(payment_old_value, payment_amount) {

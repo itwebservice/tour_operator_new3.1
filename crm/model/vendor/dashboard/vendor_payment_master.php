@@ -34,6 +34,12 @@ class vendor_payment_master
 
 		$financial_year_id = $_SESSION['financial_year_id'];
 
+		$credit_amount_arr = $_POST['credit_amount_arr'];
+                      $credit_charges_arr = $_POST['credit_charges_arr'];
+                      $credit_card_details_arr = $_POST['credit_card_details_arr'];
+                       $credit_charges_tax_amt_arr= $_POST['credit_charges_tax_amt_arr'];
+                       $credit_charges_tax_arr = $_POST['credit_charges_tax_arr'];
+
 		begin_t();
 
 		for ($i = 0; $i < sizeof($purchase_type_arr); $i++) {
@@ -46,14 +52,19 @@ class vendor_payment_master
 			$year = $yr[0];
 			$estimate_id_full = get_vendor_estimate_id($estimate_id_arr[$i], $year) . " : " . $vendor_type_val . "(" . $vendor_type . ") : " . $estimate_type_val;
 
-			$sq_payment = mysqlQuery("insert into vendor_payment_master (payment_id,estimate_id, financial_year_id, branch_admin_id, emp_id, vendor_type, vendor_type_id,estimate_type,estimate_type_id, payment_date, payment_amount, payment_mode, bank_name, transaction_id, remark, bank_id, payment_evidence_url, clearance_status, created_at,currency_code) values ('$payment_id', '$estimate_id_arr[$i]','$financial_year_id', '$branch_admin_id', '$emp_id', '$vendor_type', '$vendor_type_id', '$purchase_type_arr[$i]', '$purchase_id_arr[$i]', '$payment_date', '$payment_amount_arr[$i]', '$payment_mode', '$bank_name', '$transaction_id', '', '$bank_id', '$payment_evidence_url', '$clearance_status', '$created_at','$currency_code') ");
+			$sq_payment = mysqlQuery("insert into vendor_payment_master (payment_id,estimate_id, financial_year_id, branch_admin_id, emp_id, vendor_type, vendor_type_id,estimate_type,estimate_type_id, payment_date, payment_amount, payment_mode, bank_name, transaction_id, remark, bank_id, payment_evidence_url, clearance_status, created_at,currency_code,credit_charges ,credit_charge_amount,credit_charge_tax,credit_charge_tax_amount,credit_card_details) values ('$payment_id', '$estimate_id_arr[$i]','$financial_year_id', '$branch_admin_id', '$emp_id', '$vendor_type', '$vendor_type_id', '$purchase_type_arr[$i]', '$purchase_id_arr[$i]', '$payment_date', '$payment_amount_arr[$i]', '$payment_mode', '$bank_name', '$transaction_id', '', '$bank_id', '$payment_evidence_url', '$clearance_status', '$created_at','$currency_code','$credit_charges_arr[$i]','$credit_amount_arr[$i]','$credit_charges_tax_arr[$i]','$credit_charges_tax_amt_arr[$i]','$credit_card_details_arr[$i]') ");
 
 			$payment_date = date('Y-m-d', strtotime($payment_date));
 			$year1 = explode("-", $payment_date);
 			$yr1 = $year1[0];
 			if ($payment_mode != 'Debit Note' && $payment_mode != 'Advance') {
 				//Bank and Cash Book Save
-				$this->bank_cash_book_save($payment_id, $purchase_type_arr[$i], $payment_amount_arr[$i], get_vendor_payment_id($purchase_id_arr[$i], $yr1), $purchase_id_arr[$i], $branch_admin_id, $estimate_id_full);
+				$this->bank_cash_book_save($payment_id, $purchase_type_arr[$i], $payment_amount_arr[$i], get_vendor_payment_id($purchase_id_arr[$i], $yr1), $purchase_id_arr[$i], $branch_admin_id, $estimate_id_full,$credit_charges_arr[$i],$credit_amount_arr[$i],$credit_charges_tax_arr[$i],$credit_charges_tax_amt_arr[$i],$credit_card_details_arr[$i]);
+
+
+
+				//Finance Save
+			$this->finance_save($payment_id,$row_spec,$branch_admin_id,$credit_charges_arr[$i],$credit_amount_arr[$i],$credit_charges_tax_arr[$i],$credit_charges_tax_amt_arr[$i],$credit_card_details_arr[$i]);
 			}
 		}
 
@@ -79,16 +90,17 @@ class vendor_payment_master
 			exit;
 		} else {
 
-			if ($payment_mode != 'Debit Note' && $payment_mode != 'Advance') {
-				//Finance Save
-				$this->finance_save($payment_id, $row_spec, $branch_admin_id);
-			}
+			// if ($payment_mode != 'Debit Note' && $payment_mode != 'Advance') {
+			// 	//Finance Save
+			// 	$this->finance_save($payment_id, $row_spec, $branch_admin_id);
+			// }
 
 			if ($GLOBALS['flag']) {
 				commit_t();
 				echo "Supplier Payment has been successfully saved.";
 				exit;
 			}
+			
 		}
 	}
 	public function vendor_payment_delete()
@@ -199,7 +211,7 @@ class vendor_payment_master
 			exit;
 		}
 	}
-	public function finance_save($payment_id, $row_spec, $branch_admin_id)
+	public function finance_save($payment_id, $row_spec, $branch_admin_id,$credit_charges_arr,$credit_amount_arr,$credit_charges_tax_arr,$credit_charges_tax_amt_arr,$credit_card_details_arr)
 	{
 		$vendor_type = $_POST['vendor_type'];
 		$vendor_type_id = $_POST['vendor_type_id'];
@@ -218,6 +230,10 @@ class vendor_payment_master
 		$estimate_id_full = '';
 		global $transaction_master;
 
+		$payment_amount1 = floatval($payment_amount1) + floatval($credit_amount_arr);
+	// echo($payment_amount1);
+
+
 		//Getting cash/Bank Ledger
 		if ($payment_mode == 'Cash') {
 			$pay_gl = 20;
@@ -228,11 +244,114 @@ class vendor_payment_master
 			$type = 'BANK PAYMENT';
 		}
 
+		$credit_card_details = explode('-',$credit_card_details_arr);
+	$entry_id1 = $credit_card_details[0];
+
+	$sq_credit_charges = mysqli_fetch_assoc(mysqlQuery("select * from credit_card_company where entry_id ='$entry_id1'"));
+
+$sq_bank = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$sq_credit_charges[bank_id]' and user_type='bank'"));
+	$pay_gl1 = $sq_bank['ledger_id'];
+
 		//Getting supplier Ledger
 		$sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
 		$supplier_gl = $sq_cust['ledger_id'];
 
-		if ($total_payment_amount > $total_purchase) {
+		if($payment_mode == 'Credit Card'){
+		//////Vendor Credit charges///////
+		$module_name = $vendor_type;
+		$module_entry_id = $payment_id;
+		$transaction_id = $transaction_id1;
+		$payment_amount = $payment_amount1;
+		$payment_date = $payment_date;
+		$payment_particular = get_purchase_paid_partucular(get_vendor_payment_id($payment_id,$yr1), $payment_date, $payment_amount1, $vendor_type, $vendor_type_id,$payment_mode,$bank_id,$transaction_id);
+		$ledger_particular = get_ledger_particular('By','Cash/Bank');
+		$gl_id = $supplier_gl;
+		$payment_side = "Debit";
+		$clearance_status = ($payment_mode=="Credit Card") ? "Cleared" : "";
+		$transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id,'', $payment_side, $clearance_status, $row_spec,$branch_admin_id,$ledger_particular,$type);
+
+		//////Credit charges ledger///////
+		$module_name = $vendor_type;
+		$module_entry_id = $payment_id;
+		$transaction_id = $transaction_id1;
+		$payment_amount = $credit_amount_arr;
+		$payment_date = $payment_date;
+		$payment_particular = get_purchase_paid_partucular(get_vendor_payment_id($payment_id,$yr1), $payment_date, $credit_amount_arr, $vendor_type, $vendor_type_id,$payment_mode,$bank_id,$transaction_id);
+		$ledger_particular = get_ledger_particular('By','Cash/Bank');
+		$gl_id = 224;
+		$payment_side = "Debit";
+		$clearance_status = ($payment_mode=="Credit Card") ? "Cleared" : "";
+		$transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id,'', $payment_side, $clearance_status, $row_spec,$branch_admin_id,$ledger_particular,$type);
+
+		//////Get Credit card company Ledger///////
+		$credit_card_details_arr1 = explode('-',$credit_card_details_arr);
+		$entry_id = $credit_card_details_arr1[0];
+
+		$sq_cust1 = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$entry_id' and user_type='credit company'"));
+		$company_gl = $sq_cust1['ledger_id'];
+		//////Get Credit card company Charges///////
+		$sq_credit_charges = mysqli_fetch_assoc(mysqlQuery("select * from credit_card_company where entry_id='$entry_id'"));
+		//////company's credit card charges
+		// $company_card_charges = ($sq_credit_charges['charges_in'] =='Flat') ? $sq_credit_charges['credit_card_charges'] : ($payment_amount1 * ($sq_credit_charges['credit_card_charges']/100));
+
+		$company_card_charges=$credit_amount_arr;
+		//////company's tax on credit card charges
+		// $tax_charges = ($sq_credit_charges['tax_charges_in'] =='Flat') ? $sq_credit_charges['tax_on_credit_card_charges'] : ($company_card_charges * ($sq_credit_charges['tax_on_credit_card_charges']/100));
+
+		$tax_charges=$credit_charges_tax_amt_arr;
+		$finance_charges = $company_card_charges + $tax_charges;
+		$finance_charges = number_format($finance_charges,2);
+
+		$credit_company_amount = $payment_amount1 - $finance_charges;
+
+		//////Finance charges ledger///////
+		$module_name = $vendor_type;
+		$module_entry_id = $payment_id;
+		$transaction_id = $transaction_id1;
+		$payment_amount = $finance_charges;
+		$payment_date = $payment_date;
+		$payment_particular = get_purchase_paid_partucular(get_vendor_payment_id($payment_id,$yr1), $payment_date, $finance_charges, $vendor_type, $vendor_type_id,$payment_mode,$bank_id,$transaction_id);
+		$ledger_particular = get_ledger_particular('By','Cash/Bank');
+		$gl_id = 231;
+		$payment_side = "Credit";
+		$clearance_status = ($payment_mode=="Credit Card") ? "Cleared" : "";
+		$transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id,'', $payment_side, $clearance_status, $row_spec,$branch_admin_id,$ledger_particular,$type);
+
+		//////Credit company amount///////
+		$module_name = $vendor_type;
+		$module_entry_id = $payment_id;
+		$transaction_id = $transaction_id1;
+		$payment_amount = $credit_company_amount;
+		$payment_date = $payment_date;
+		$payment_particular = get_purchase_paid_partucular(get_vendor_payment_id($payment_id,$yr1), $payment_date, $credit_company_amount, $vendor_type, $vendor_type_id,$payment_mode,$bank_id,$transaction_id);
+		$ledger_particular = get_ledger_particular('By','Cash/Bank');
+		$gl_id = $company_gl;
+		$payment_side = "Credit";
+		$clearance_status = ($payment_mode=="Credit Card") ? "Cleared" : "";
+		$transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id,'', $payment_side, $clearance_status, $row_spec,$branch_admin_id,$ledger_particular,$type);
+
+
+
+		
+		//Bank
+	$module_name = $vendor_type;
+	$module_entry_id = $payment_id;
+	$transaction_id = $transaction_id1;
+	$payment_amount = $credit_company_amount;
+	$payment_date = $payment_date;
+	$payment_particular = get_purchase_paid_partucular(get_vendor_payment_id($payment_id,$yr1), $payment_date, $credit_company_amount, $vendor_type, $vendor_type_id,$payment_mode,$bank_id,$transaction_id);
+	$ledger_particular = get_ledger_particular('By','Cash/Bank');
+	$gl_id = $pay_gl1;
+	$payment_side = "Debit";
+	$clearance_status = "Cleared";
+	$transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id, '',$payment_side, $clearance_status, $row_spec,$branch_admin_id,$ledger_particular,$type);
+
+	
+
+
+
+	}else{
+		if($total_payment_amount > $total_purchase) {
 			$balance_amount = $total_payment_amount - $total_purchase;
 			////////Supplier Amount//////   
 			$module_name = $vendor_type;
@@ -368,8 +487,8 @@ class vendor_payment_master
 			$transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id, '', $payment_side, $clearance_status, $row_spec, $branch_admin_id, $ledger_particular, $type);
 		}
 	}
-
-	public function bank_cash_book_save($payment_id, $purchase_type, $pay_amount, $purchase_id, $suppl_type_id, $branch_admin_id, $estimate_id_full)
+	}
+	public function bank_cash_book_save($payment_id, $purchase_type, $pay_amount, $purchase_id, $suppl_type_id, $branch_admin_id, $estimate_id_full,$credit_charges_arr,$credit_amount_arr,$credit_charges_tax_arr,$credit_charges_tax_amt_arr,$credit_card_details_arr)
 	{
 		$vendor_type = $_POST['vendor_type'];
 		$vendor_type_id = $_POST['vendor_type_id'];
@@ -381,6 +500,8 @@ class vendor_payment_master
 		$canc_status = isset($_POST['canc_status']) ? $_POST['canc_status'] : '';
 		$bank_id = $_POST['bank_id'];
 
+		$payment_evidence_url = $_POST['payment_evidence_url'];
+
 		if ($payment_mode != 'Debit Note') {
 
 			$payment_date = date('Y-m-d', strtotime($payment_date1));
@@ -388,6 +509,16 @@ class vendor_payment_master
 			$yr1 = $year1[0];
 
 			global $bank_cash_book_master;
+
+			if($payment_mode == 'Credit Card')
+			{
+				$pay_amount = $pay_amount + $credit_charges_arr;
+				$credit_card_details = explode('-',$credit_card_details_arr);
+				$entry_id = $credit_card_details[0];
+
+				$sq_credit_charges = mysqli_fetch_assoc(mysqlQuery("select bank_id from credit_card_company where entry_id ='$entry_id'"));
+				$bank_id = $sq_credit_charges['bank_id'];
+			}
 
 			$module_name = $vendor_type;
 			$module_entry_id = $payment_id;
@@ -398,7 +529,14 @@ class vendor_payment_master
 			$transaction_id = $transaction_id;
 			$bank_id = $bank_id;
 			$particular = get_purchase_paid_partucular(get_vendor_payment_id($payment_id, $yr1), $payment_date1, $pay_amount, $vendor_type, $vendor_type_id, $payment_mode, $bank_id, $transaction_id, $estimate_id_full, $canc_status);
-			$clearance_status = ($payment_mode == "Cheque") ? "Pending" : "";
+			// $clearance_status = ($payment_mode == "Cheque") ? "Pending" : "";
+
+			 if($payment_mode=="Cheque"){
+                     $clearance_status =   "Pending";
+				} elseif($payment_mode=="Credit Card") {
+                    $clearance_status ="Cleared";
+				}
+				
 			$payment_side = "Credit";
 			$payment_type = ($payment_mode == "Cash") ? "Cash" : "Bank";
 

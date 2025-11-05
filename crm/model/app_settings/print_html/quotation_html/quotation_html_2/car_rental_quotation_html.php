@@ -6,6 +6,10 @@ global $app_quot_img,$currency;
 
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
+
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
 $sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='package_booking/quotation/car_flight/car_rental/index.php'"));
 $branch_status = $sq['branch_status'];
 if ($branch_admin_id != 0) {
@@ -85,8 +89,35 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 	} else {
 	$quotation_cost = $sq_quotation['total_tour_cost'];
 	}
-?>
 
+$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+$sq_package_count = mysqli_num_rows($sq_package_program);
+?>
+<style>
+
+.print_itinenary li {
+  margin: 0 !important;
+  padding: 20px 0 !important;
+}
+
+.print_itinenary li:last-child {
+  border-bottom: none !important;
+}
+
+.print_itinenary h5,
+.print_itinenary p {
+  margin: 0 0 3px 0 !important;
+  line-height: 1.3;
+}
+
+@media print {
+  .print_itinenary li {
+    page-break-inside: avoid;
+  }
+}
+
+
+</style>
 <!-- landingPage -->
 <section class="landingSec main_block">
   <div class="landingPageTop main_block">
@@ -232,7 +263,52 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
       </div>
     </section>
 </section>
-  
+
+<!-- Itinerary -->
+<?php if ($sq_package_count != 0) { ?>
+<section class="itinerarySec main_block side_pad mg_tp_20">
+    <h3 class="nrmTitle">Tour Itinerary</h3>
+    <ul class="print_itinenary main_block no-pad no-marg" 
+        style="list-style:none; margin:0; padding:0;">
+        <?php
+        $count = 1;
+        $i = 0;
+        $result = get_dates_for_itineary($sq_quotation['from_date'], $sq_quotation['to_date']);
+        $iti_dates_days = explode('=', $result);
+        $dates = json_decode($iti_dates_days[0], true);
+
+        while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
+            $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
+        ?>
+            <li style="margin:0; padding:6px 0; page-break-inside:avoid;">
+                <div style="padding:0; line-height:1.4;">
+                    
+                    <!-- Day + Attraction -->
+                    <h5 style="font-weight:600; margin:0 0 4px 0; font-size:15px;">
+                        Day <?= $count ?> (<?= $date_format ?>) – <?= $row_itinarary['attraction'] ?>
+                    </h5>
+                    
+                    <!-- Day-wise Program -->
+                    <p style="margin:0 0 4px 0; font-size:14px;">
+                        <?= trim($row_itinarary['day_wise_program']) ?>
+                    </p>
+                    
+                    <!-- Stay and Meal Info -->
+                    <p style="margin:0; font-size:13px;">
+                        <i class="fa fa-bed"></i> Overnight Stay: <?= $row_itinarary['stay'] ?> &nbsp;&nbsp;
+                        <i class="fa fa-cutlery"></i> Meal Plan: <?= $row_itinarary['meal_plan'] ?>
+                    </p>
+                </div>
+            </li>
+        <?php
+            $count++;
+            $i++;
+        } ?>
+    </ul>
+</section>
+<?php } ?>
+
+
 
   <!-- Terms and Conditions -->
   <?php if(isset($sq_terms_cond['terms_and_conditions'])){?>
@@ -376,9 +452,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
                   <p>SWIFT CODE</p>
               </div>
                 <?php 
-              if(check_qr()) { ?>
+              if(check_qr($branch_admin_id)) { ?>
                 <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px;">
-                        <?= get_qr('Landscape Standard') ?>
+                        <?= get_qr('Landscape Standard', $branch_admin_id) ?>
                         <br>
                         <h4 class="no-marg">Scan & Pay </h4>
           </div>

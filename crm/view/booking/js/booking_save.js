@@ -387,6 +387,176 @@ function save_booking_details() {
 		}
 	}
 
+	//**Transport travel details starts here
+	var transport_vehicle_arr = [];
+	var transport_start_date_arr = [];
+	var transport_end_date_arr = [];
+	var transport_pickup_arr = [];
+	var transport_pickup_type_arr = [];
+	var transport_drop_arr = [];
+	var transport_drop_type_arr = [];
+	var transport_service_duration_arr = [];
+	var transport_no_vehicles_arr = [];
+
+	var table = document.getElementById('tbl_booking_transport');
+	console.log('🚗 Transport table found:', !!table);
+	
+	if(table && table.rows && table.rows.length > 0){
+		var rowCount = table.rows.length;
+		console.log('🚗 Transport rows:', rowCount);
+		
+		for (var i = 0; i < rowCount; i++) {
+			var row = table.rows[i];
+			var isChecked = row.cells[0] && row.cells[0].childNodes[0] && row.cells[0].childNodes[0].checked;
+			console.log('🚗 Row', i, 'checked:', isChecked);
+			
+		if (isChecked) {
+			// Use querySelector to find elements (more reliable than childNodes)
+			var vehicleSelect = row.cells[2].querySelector('select');
+			var vehicle_name = vehicleSelect ? vehicleSelect.value : '';
+			
+			var start_date = row.cells[3].querySelector('input') ? row.cells[3].querySelector('input').value : '';
+			var end_date = row.cells[4].querySelector('input') ? row.cells[4].querySelector('input').value : '';
+			
+			console.log('🚗 Row', i, '- Vehicle:', vehicle_name, 'Dates:', start_date, '-', end_date);
+			
+	// Extract pickup - Send FULL VALUE like "city-123", PHP will split it
+	var pickup_full = '';
+	var pickup_type = '';
+	
+	var pickupSelect = row.cells[5].querySelector('select');
+	if(pickupSelect){
+		var $pickupSelect = $(pickupSelect);
+		
+		// Try multiple methods to get value
+		pickup_full = pickupSelect.value || '';  // Method 1: Native value
+		
+		if(!pickup_full || pickup_full === ''){
+			pickup_full = $pickupSelect.val() || '';  // Method 2: jQuery val()
+		}
+		
+		if(!pickup_full || pickup_full === ''){
+			// Method 3: Try Select2 data
+			try {
+				var select2Data = $pickupSelect.select2('data');
+				if(select2Data && select2Data.length > 0 && select2Data[0].id){
+					pickup_full = select2Data[0].id;
+				}
+			} catch(e) {
+				console.error('🚗 Row', i, '- Pickup select2 error:', e);
+			}
+		}
+		
+		// Get the type from the parent optgroup as backup
+		var optgroupType = $pickupSelect.find("option:selected").parent().attr('value');
+		
+		console.log('🚗 Row', i, '- Pickup FULL value:', pickup_full, 'Optgroup type:', optgroupType);
+		
+		// If value doesn't have dash but we have optgroup type, construct it
+		if(pickup_full && pickup_full.indexOf('-') === -1 && optgroupType){
+			pickup_full = optgroupType + '-' + pickup_full;
+			console.log('🚗 Row', i, '- Reconstructed pickup:', pickup_full);
+		}
+	}
+	
+	// Extract drop - Send FULL VALUE like "hotel-456", PHP will split it
+	var drop_full = '';
+	var drop_type = '';
+	
+	var dropSelect = row.cells[6].querySelector('select');
+	if(dropSelect){
+		var $dropSelect = $(dropSelect);
+		
+		// Try multiple methods to get value
+		drop_full = dropSelect.value || '';  // Method 1: Native value
+		
+		if(!drop_full || drop_full === ''){
+			drop_full = $dropSelect.val() || '';  // Method 2: jQuery val()
+		}
+		
+		if(!drop_full || drop_full === ''){
+			// Method 3: Try Select2 data
+			try {
+				var select2Data = $dropSelect.select2('data');
+				if(select2Data && select2Data.length > 0 && select2Data[0].id){
+					drop_full = select2Data[0].id;
+				}
+			} catch(e) {
+				console.error('🚗 Row', i, '- Drop select2 error:', e);
+			}
+		}
+		
+		// Get the type from the parent optgroup as backup
+		var optgroupType = $dropSelect.find("option:selected").parent().attr('value');
+		
+		console.log('🚗 Row', i, '- Drop FULL value:', drop_full, 'Optgroup type:', optgroupType);
+		
+		// If value doesn't have dash but we have optgroup type, construct it
+		if(drop_full && drop_full.indexOf('-') === -1 && optgroupType){
+			drop_full = optgroupType + '-' + drop_full;
+			console.log('🚗 Row', i, '- Reconstructed drop:', drop_full);
+		}
+	}
+			
+		// Get service duration text (not value)
+		var service_duration = '';
+		var durationSelect = row.cells[7].querySelector('select');
+		if(durationSelect){
+			var $serviceDuration = $(durationSelect);
+			var selectedText = $serviceDuration.find('option:selected').text();
+			var selectedValue = $serviceDuration.val();
+			
+			console.log('🚗 Row', i, '- Duration value:', selectedValue, 'text:', selectedText);
+			
+			// Only use text if it's not the default "Service Duration" placeholder
+			if(selectedText && selectedText != '' && selectedText != 'Service Duration'){
+				service_duration = selectedText;
+			} else {
+				console.warn('⚠️ Row', i, '- Duration is EMPTY or placeholder!');
+			}
+		}
+			
+			var no_vehicles = row.cells[8].querySelector('input') ? row.cells[8].querySelector('input').value : '';
+
+			transport_vehicle_arr.push(vehicle_name);
+			transport_start_date_arr.push(start_date);
+			transport_end_date_arr.push(end_date);
+			transport_pickup_arr.push(pickup_full);  // Send full value like "city-123"
+			transport_pickup_type_arr.push(pickup_type);  // Backup
+			transport_drop_arr.push(drop_full);  // Send full value like "hotel-456"
+			transport_drop_type_arr.push(drop_type);  // Backup
+			transport_service_duration_arr.push(service_duration);
+			transport_no_vehicles_arr.push(no_vehicles);
+			}
+		}
+	}
+
+	// Debug: Log transport data
+	console.log('\n========== TRANSPORT DATA COLLECTION (SAVE) ==========');
+	console.log('Total Rows Checked:', transport_vehicle_arr.length);
+	console.log('Vehicles:', transport_vehicle_arr);
+	console.log('Pickup FULL (city-123):', transport_pickup_arr);
+	console.log('Pickup Types (backup):', transport_pickup_type_arr);
+	console.log('Drop FULL (hotel-456):', transport_drop_arr);
+	console.log('Drop Types (backup):', transport_drop_type_arr);
+	console.log('Service Durations:', transport_service_duration_arr);
+	console.log('Vehicle Counts:', transport_no_vehicles_arr);
+	console.log('=====================================================\n');
+	
+	// Alert if critical data is missing
+	if(transport_vehicle_arr.length > 0){
+		var hasEmptyPickup = transport_pickup_arr.some(function(val){ return !val || val === ''; });
+		var hasEmptyDrop = transport_drop_arr.some(function(val){ return !val || val === ''; });
+		var hasEmptyDuration = transport_service_duration_arr.some(function(val){ return !val || val === ''; });
+		
+		if(hasEmptyPickup || hasEmptyDrop || hasEmptyDuration){
+			console.error('🚨 ERROR: Some transport rows have empty data!');
+			console.warn('Empty Pickup:', hasEmptyPickup, '- Values:', transport_pickup_arr);
+			console.warn('Empty Drop:', hasEmptyDrop, '- Values:', transport_drop_arr);
+			console.warn('Empty Duration:', hasEmptyDuration, '- Values:', transport_service_duration_arr);
+		}
+	}
+
 	//**Visa & Insurance Details
 	var visa_country_name = $('#visa_country_name').val();
 	var visa_amount = $('#visa_amount').val();
@@ -702,6 +872,15 @@ function save_booking_details() {
 													cruise_service_tax: cruise_service_tax,
 													cruise_service_tax_subtotal: cruise_service_tax_subtotal,
 													total_cruise_expense: total_cruise_expense,
+													transport_vehicle_arr: transport_vehicle_arr,
+													transport_start_date_arr: transport_start_date_arr,
+													transport_end_date_arr: transport_end_date_arr,
+													transport_pickup_arr: transport_pickup_arr,
+													transport_pickup_type_arr: transport_pickup_type_arr,
+													transport_drop_arr: transport_drop_arr,
+													transport_drop_type_arr: transport_drop_type_arr,
+													transport_service_duration_arr: transport_service_duration_arr,
+													transport_no_vehicles_arr: transport_no_vehicles_arr,
 													branch_admin_id1: branch_admin_id1,
 													financial_year_id: financial_year_id,
 													reflections: reflections,

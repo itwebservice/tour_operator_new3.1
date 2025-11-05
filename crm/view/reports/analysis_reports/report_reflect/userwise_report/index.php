@@ -50,7 +50,7 @@ function report_reflect(data){
 	{ title : "SR_NO."},
 	{ title : "User_Name"},
 	{ title : "Total Enquiries"},
-	{ title : "Active"},
+	{ title : "New"},
 	{ title : "In-Followup"},
 	{ title : "Dropped"},
 	{ title : "Converted"},

@@ -73,7 +73,7 @@ $to_date = $_POST['to_date'];
                             $enquiry_status2 = mysqli_fetch_assoc(mysqlQuery("select * from enquiry_master_entries where entry_id=(select max(entry_id) from enquiry_master_entries where enquiry_id='$row[enquiry_id]' and followup_status!='Dropped') "));
                             $bg = ($enquiry_status2['followup_status']=='Converted') ? "success" : "";
                             $bg = ($enquiry_status2['followup_status']=='Dropped') ? "danger" : $bg;
-                            $bg = ($enquiry_status2['followup_status']=='Active') ? "warning" : $bg;
+                            $bg = ($enquiry_status2['followup_status']=='New') ? "warning" : $bg;
 
                         }
                         else{

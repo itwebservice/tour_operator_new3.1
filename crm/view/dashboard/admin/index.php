@@ -36,7 +36,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         case "Converted":
             $converted_count++;
             break;
-        case "Active":
+        case "New":
             $followup_count++;
             break;
         case "In-Followup":
@@ -83,9 +83,9 @@ while ($row = mysqli_fetch_assoc($result)) {
 								<div class="col-xs-8 text-right">
 									<span class="single_enquiry_widget_amount dashboard-counter" data-max="<?php echo $followup_count; ?>"></span>
 								</div>
-								<div class="col-sm-12 single_enquiry_widget_amount">
-									Active
-								</div>
+							<div class="col-sm-12 single_enquiry_widget_amount">
+								New
+							</div>
 							</div>
 							<div class="col-12 col-md-6" onclick="window.open('<?= BASE_URL ?>view/attractions_offers_enquiry/enquiry/index.php', 'My Window');">
 								<div class="col-xs-4 text-left">
@@ -338,7 +338,18 @@ while ($row = mysqli_fetch_assoc($result)) {
 						<!-- Ongoing  -->
 						<div role="tabpanel" class="tab-pane" id="oncoming_tab">
 							<div class="row">
-								<div class="col-md-12 col-sm-12 mg_bt_10"></div>
+								<div class="col-md-12 col-sm-12 mg_bt_10">
+									<div class="text-center">
+										<label for="rd_ongoing" class="app_dual_button active">
+											<input type="radio" id="rd_ongoing" name="rd_tour_status" checked onchange="ongoing_tours_reflect()">
+											&nbsp;&nbsp;Ongoing
+										</label>
+										<label for="rd_upcoming" class="app_dual_button">
+											<input type="radio" id="rd_upcoming" name="rd_tour_status" onchange="ongoing_tours_reflect()">
+											&nbsp;&nbsp;Upcoming
+										</label>
+									</div>
+								</div>
 								<div class="col-md-2 col-sm-6 mg_bt_10" style="margin-left:720px !important;">
 									<input type="text" id="tfrom_date_filter" name="tfrom_date_filter" placeholder="Travel From Date" title="Travel From Date" onchange="get_to_date(this.id,'tto_date_filter')">
 								</div>
@@ -540,9 +551,43 @@ while ($row = mysqli_fetch_assoc($result)) {
 	}
 	ongoing_tours_reflect();
 	function ongoing_tours_reflect() {
-
+		var tour_status = $('input[name="rd_tour_status"]:checked').attr('id');
 		var from_date = $('#tfrom_date_filter').val();
 		var to_date = $('#tto_date_filter').val();
+
+		// Only apply automatic date logic if filter fields are empty
+		if(!from_date && !to_date) {
+			// If "ongoing" is selected, set today's date
+			if(tour_status == 'rd_ongoing') {
+				var today = new Date();
+				var dd = String(today.getDate()).padStart(2, '0');
+				var mm = String(today.getMonth() + 1).padStart(2, '0');
+				var yyyy = today.getFullYear();
+				var todayDate = dd + '-' + mm + '-' + yyyy;
+				from_date = todayDate;
+				to_date = todayDate;
+			}
+			// If "upcoming" is selected, set from_date to tomorrow
+			else if(tour_status == 'rd_upcoming') {
+				// Set from_date to tomorrow
+				var tomorrow = new Date();
+				tomorrow.setDate(tomorrow.getDate() + 1);
+				var dd = String(tomorrow.getDate()).padStart(2, '0');
+				var mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+				var yyyy = tomorrow.getFullYear();
+				var tomorrowDate = dd + '-' + mm + '-' + yyyy;
+				from_date = tomorrowDate;
+				
+				// Set to_date to 1 year from now
+				var oneYearLater = new Date();
+				oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+				var dd2 = String(oneYearLater.getDate()).padStart(2, '0');
+				var mm2 = String(oneYearLater.getMonth() + 1).padStart(2, '0');
+				var yyyy2 = oneYearLater.getFullYear();
+				to_date = dd2 + '-' + mm2 + '-' + yyyy2;
+			}
+		}
+		
 		$.post('../dashboard/tour_summary.php', {from_date: from_date, to_date: to_date }, function(data) {
 			$('#ongoing_tours_data').html(data);
 		});

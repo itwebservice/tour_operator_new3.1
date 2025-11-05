@@ -279,7 +279,88 @@ $('#frm_tab2').validate({
 				$(row.cells[5].childNodes[0]).trigger('change');
 			}
 		}
-		})
+		});
+
+		//Transport Info
+		$.ajax({
+		type:'post',
+		url: '../group_tour/save/get_transport_info.php',
+		data:{ tour_id : tour_id },
+		success:function(result){
+			var table = document.getElementById("tbl_group_tour_quotation_transport");
+			var transport_arr = JSON.parse(result);	   
+			if(jQuery.isEmptyObject(transport_arr)){
+				var f_row = table.rows[0];
+				f_row.cells[0].childNodes[0].removeAttribute('checked');
+			};
+			
+			// Add rows if needed
+			if(table.rows.length < transport_arr.length){
+				for(var i=1; i<transport_arr.length; i++){
+					addRow('tbl_group_tour_quotation_transport');
+				}	
+			}
+
+			// Get today's date in dd-mm-yyyy format
+			var today = new Date();
+			var dd = String(today.getDate()).padStart(2, '0');
+			var mm = String(today.getMonth() + 1).padStart(2, '0');
+			var yyyy = today.getFullYear();
+			var todayDate = dd + '-' + mm + '-' + yyyy;
+
+			// Wait for rows to be added to DOM
+			setTimeout(function(){
+				for(var i=0; i<transport_arr.length; i++){
+					var row = table.rows[i]; 
+					
+					// Set vehicle
+					row.cells[2].childNodes[0].value = transport_arr[i]['vehicle_id'];
+					
+					// Set start date (default to today's date)
+					row.cells[3].childNodes[0].value = todayDate;
+					
+					// Set end date (default to today's date)
+					row.cells[4].childNodes[0].value = todayDate;
+					
+					// Set pickup location with optgroup structure
+					if(transport_arr[i]['pickup_value'] && transport_arr[i]['pickup_value'] != ''){
+						var $pickupSelect = $('#'+row.cells[5].childNodes[0].id);
+						var pickupHtml = '<optgroup value="' + transport_arr[i]['pickup_type'] + '" label="' + ucfirst(transport_arr[i]['pickup_type']) + '">' +
+							'<option value="' + transport_arr[i]['pickup_value'] + '" selected>' + transport_arr[i]['pickup_location'] + '</option>' +
+							'</optgroup>';
+						$pickupSelect.html(pickupHtml);
+					}
+					
+					// Set drop location with optgroup structure
+					if(transport_arr[i]['drop_value'] && transport_arr[i]['drop_value'] != ''){
+						var $dropSelect = $('#'+row.cells[6].childNodes[0].id);
+						var dropHtml = '<optgroup value="' + transport_arr[i]['drop_type'] + '" label="' + ucfirst(transport_arr[i]['drop_type']) + '">' +
+							'<option value="' + transport_arr[i]['drop_value'] + '" selected>' + transport_arr[i]['drop_location'] + '</option>' +
+							'</optgroup>';
+						$dropSelect.html(dropHtml);
+					}
+
+					// Service duration and vehicle count left blank for user to fill
+					row.cells[7].childNodes[0].value = '';  // service_duration
+					row.cells[8].childNodes[0].value = '';  // no_of_vehicles
+
+					row.cells[0].childNodes[0].setAttribute('disabled', 'disabled');
+					$(row.cells[2].childNodes[0]).trigger('change');
+				}
+				
+				// Initialize Select2 AJAX for all dropdowns (will preserve existing options)
+				destinationLoading('select[name^=transport_pickup_from]', 'Pickup Location');
+				destinationLoading('select[name^=transport_drop_to]', 'Drop-off Location');
+			}, 300);
+		}
+		});
+
+// Helper function to capitalize first letter
+function ucfirst(str) {
+	if (!str) return '';
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 		//Cruise Info
 		$.ajax({
 			type:'post',

@@ -161,7 +161,7 @@ function get_enq_etr_active($enq='',$type='display'){
    if($type == 'display')
    {
     $query1 = "SELECT * FROM `enquiry_master` Inner JOIN enquiry_master_entries on enquiry_master.enquiry_id = enquiry_master_entries.enquiry_id
-    where enquiry_master.enquiry_type='".$enq."' and enquiry_master_entries.followup_status = 'Active'".$_SESSION['dateqry'];
+    where enquiry_master.enquiry_type='".$enq."' and enquiry_master_entries.followup_status = 'New'".$_SESSION['dateqry'];
     $res = mysqlQuery($query1);
     $budget = 0;
     $count = mysqli_num_rows($res);

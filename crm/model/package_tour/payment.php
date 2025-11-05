@@ -25,19 +25,28 @@ class payment
 
     $currency_code =$_POST['currency_code'];
 
+    $vendor_type = $_POST['vendor_type'];
+  $vendor_type_id=$_POST['vendor_type_id'];
+
     begin_t();
 
     $sq = mysqlQuery("SELECT max(payment_id) as max FROM package_payment_master");
     $value = mysqli_fetch_assoc($sq);
     $max_payment_id = $value['max'] + 1;
 
-    $sq = mysqlQuery(" insert into package_payment_master (payment_id, booking_id, financial_year_id, branch_admin_id, emp_id, date, payment_mode, amount, bank_name, transaction_id, payment_for, travel_type, bank_id, clearance_status,credit_charges,credit_card_details ,status,currency_code ) values ('$max_payment_id', '$booking_id', '$financial_year_id', '$branch_admin_id', '$emp_id', '$payment_date', '$payment_mode', '$payment_amount', '$bank_name', '$transaction_id', '$payment_for', '$p_travel_type', '$bank_id', '$clearance_status','$credit_charges','$credit_card_details','$canc_status','$currency_code') ");
+    $sq = mysqlQuery(" insert into package_payment_master (payment_id, booking_id, financial_year_id, branch_admin_id, emp_id, date, payment_mode, amount, bank_name, transaction_id, payment_for, travel_type, bank_id, clearance_status,credit_charges,credit_card_details ,status,currency_code ,vendor_type,supplier_id) values ('$max_payment_id', '$booking_id', '$financial_year_id', '$branch_admin_id', '$emp_id', '$payment_date', '$payment_mode', '$payment_amount', '$bank_name', '$transaction_id', '$payment_for', '$p_travel_type', '$bank_id', '$clearance_status','$credit_charges','$credit_card_details','$canc_status','$currency_code', '$vendor_type','$vendor_type_id') ");
 
     if (!$sq) {
       rollback_t();
       echo "Error for payment information save.";
       exit;
     } else {
+
+      $receipt_payment_id= $max_payment_id;
+    if($payment_mode == 'To Supplier'){
+      $this->vendor_payment_save($receipt_payment_id);
+
+    }
 
       $booking_save = new booking_save();
       $booking_save->package_receipt_master_save($booking_id, $max_payment_id, $payment_for);
@@ -46,7 +55,11 @@ class payment
         //Finance Save
         $this->payment_finance_save($max_payment_id);
         //Bank and Cash Book Save
-        $this->bank_cash_book_save($max_payment_id);
+        if($payment_mode != 'To Supplier'){
+          //Bank and Cash Book Save
+      $this->bank_cash_book_save($max_payment_id);
+      }
+        // $this->bank_cash_book_save($max_payment_id);
       }
       if ($GLOBALS['flag']) {
 
@@ -66,6 +79,40 @@ class payment
     }
   }
 
+  public function vendor_payment_save($receipt_payment_id){
+  $booking_id = $_POST['booking_id'];
+  $payment_date = $_POST['payment_date'];
+  $payment_mode = $_POST['payment_mode'];
+  $payment_amount = $_POST['payment_amount'];
+  $bank_name = $_POST['bank_name'];
+  $transaction_id = $_POST['transaction_id'];
+  $payment_for = isset($_POST['payment_for']) ? $_POST['payment_for'] : '';
+  $p_travel_type = isset($_POST['p_travel_type']) ? $_POST['p_travel_type'] : '';
+  $bank_id = $_POST['bank_id'];
+  $emp_id = $_POST['emp_id'];
+  $branch_admin_id = $_POST['branch_admin_id'];
+  $credit_charges = $_POST['credit_charges'];
+  $credit_card_details = $_POST['credit_card_details'];
+  $payment_date = date("Y-m-d", strtotime($payment_date));
+  $clearance_status = ($payment_mode=="Cheque" || $payment_mode=="Credit Card") ? "Pending" : "";
+  $financial_year_id = $_SESSION['financial_year_id'];
+  $canc_status = $_POST['canc_status'];
+  $vendor_type = $_POST['vendor_type'];
+  $vendor_type_id=$_POST['vendor_type_id'];
+  $estimate_id = $_POST['estimate_id'];
+  
+
+  $created_at = date('Y-m-d H:i');
+
+
+  $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(payment_id) as max from vendor_payment_master"));
+  $payment_id = $sq_max['max'] + 1;
+
+  $sq_payment = mysqlQuery("insert into vendor_payment_master (payment_id,estimate_id,receipt_payment_id, financial_year_id, branch_admin_id, emp_id, vendor_type, vendor_type_id,estimate_type,estimate_type_id, payment_date, payment_amount, payment_mode, bank_name, transaction_id, remark, bank_id, payment_evidence_url, clearance_status, created_at) values ('$payment_id', '$estimate_id','$receipt_payment_id','$financial_year_id', '$branch_admin_id', '$emp_id', '$vendor_type', '$vendor_type_id', 'Package Tour', '$booking_id', '$payment_date', '$payment_amount', '$payment_mode', '$bank_name', '$transaction_id', '', '$bank_id', '', '$clearance_status', '$created_at') ");
+
+}
+
+
   public function payment_finance_save($payment_id)
   {
     $row_spec = 'sales';
@@ -80,6 +127,8 @@ class payment
     $branch_admin_id = $_POST['branch_admin_id'];
     $canc_status = $_POST['canc_status'];
 
+    
+
     $payment_date = date('Y-m-d', strtotime($payment_date1));
     $year1 = explode("-", $payment_date);
     $yr1 = $year1[0];
@@ -93,11 +142,19 @@ class payment
     if ($payment_mode == 'Cash') {
       $pay_gl = 20;
       $type = 'CASH RECEIPT';
-    } else {
+    } elseif($payment_mode == 'To Supplier'){
+      $type= 'CUSTOMER TO SUPPLIER ';
+    }  else {
       $sq_bank = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$bank_id1' and user_type='bank'"));
       $pay_gl = isset($sq_bank['ledger_id']) ? $sq_bank['ledger_id'] : 0;
       $type = 'BANK RECEIPT';
     }
+
+    //Getting supplier Ledger
+	  $sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
+	  $supplier_gl = $sq_cust['ledger_id'];
+
+
     $payment_amount1 = (float)($payment_amount1) + (float)($credit_charges);
     //Getting customer Ledger
     $sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$customer_id' and user_type='customer'"));
@@ -170,7 +227,20 @@ class payment
         $payment_side = "Debit";
         $clearance_status = ($payment_mode == "Cheque" || $payment_mode == "Credit Card") ? "Pending" : "";
         $transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id, '', $payment_side, $clearance_status, $row_spec, $branch_admin_id, $ledger_particular, $type);
-      } else {
+      }elseif($payment_mode == 'To Supplier'){
+        ////////Supplier Amount//////
+        $module_name = "Package Booking Payment";
+        $module_entry_id = $payment_id;
+        $transaction_id = "";
+        $payment_amount = $payment_amount1;
+        $payment_date = $payment_date;
+        $payment_particular = get_purchase_paid_partucular(get_package_booking_payment_id($booking_id,$yr1), $payment_date, $payment_amount1, $customer_id, $payment_mode, get_package_booking_id($booking_id,$yr1),$bank_id1,$transaction_id1,$canc_status);
+        $ledger_particular = get_ledger_particular('By','Cash/Bank');
+        $gl_id = $supplier_gl;
+        $payment_side = "Debit";
+        $clearance_status = "";
+        $transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id,'', $payment_side, $clearance_status, $row_spec,$branch_admin_id,$ledger_particular,$type);
+    } else {
         //////Payment Amount///////
         $module_name = "Package Booking Payment";
         $module_entry_id = $payment_id;
@@ -244,13 +314,19 @@ class payment
     if ($payment_mode == 'Cash') {
       $pay_gl = 20;
       $type = 'CASH RECEIPT';
-    } else {
+    }  elseif($payment_mode == 'To Supplier'){
+    $type= 'CUSTOMER TO SUPPLIER ';
+  } else {
       $sq_bank = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$bank_id' and user_type='bank'"));
       $pay_gl = isset($sq_bank['ledger_id']) ? $sq_bank['ledger_id'] : 0;
       $type = 'BANK RECEIPT';
     }
 
     $payment_amount1 = (float)($payment_amount) + (float)($credit_charges);
+
+    //Getting supplier Ledger
+   $sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
+   $supplier_gl = $sq_cust['ledger_id'];
 
     $delete_master->delete_master_entries('Receipt(' . $payment_mode . ')', 'Package Tour Receipt', $payment_id, get_package_booking_payment_id($payment_id, $yr2), $cust_name, $payment_amount);
     //////////Payment Amount///////////
@@ -314,7 +390,20 @@ class payment
         $payment_side = "Debit";
         $clearance_status = ($payment_mode == "Cheque" || $payment_mode == "Credit Card") ? "Pending" : "";
         $transaction_master->transaction_update($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $old_gl_id, $gl_id, '', $payment_side, $clearance_status, $row_spec, $ledger_particular, $type);
-      } else {
+      }elseif($payment_mode == 'To Supplier'){
+      ////////Supplier Amount//////
+    $module_name = "Package Booking Payment";
+    $module_entry_id = $payment_id;
+    $transaction_id = $transaction_id1;
+    $payment_amount = 0;
+    $payment_date = $deleted_date;
+    $payment_particular = get_purchase_paid_partucular(get_package_booking_payment_id($booking_id,$yr1), $deleted_date, $payment_amount1, $customer_id, $payment_mode, get_package_booking_id($booking_id,$yr1),$bank_id,$transaction_id1,$canc_status);
+    $ledger_particular = get_ledger_particular('By','Cash/Bank');
+    $old_gl_id = $gl_id = $supplier_gl;
+    $payment_side = "Debit";
+    $clearance_status = "";
+    $transaction_master->transaction_update($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular,$old_gl_id, $gl_id,'', $payment_side, $clearance_status, $row_spec,$ledger_particular,$type);
+    } else {
 
         $module_name = "Package Booking Payment";
         $module_entry_id = $payment_id;
@@ -342,6 +431,7 @@ class payment
       $transaction_master->transaction_update($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $old_gl_id, $gl_id, '', $payment_side, $clearance_status, $row_spec, $ledger_particular, $type);
     }
 
+    if($payment_mode != 'To Supplier'){
     //bank cash book
     $module_name = "Package Booking Payment";
     $module_entry_id = $payment_id;
@@ -357,6 +447,7 @@ class payment
     $payment_type = ($payment_mode == "Cash") ? "Cash" : "Bank";
 
     $bank_cash_book_master->bank_cash_book_master_update($module_name, $payment_id, $payment_date, $payment_amount, $payment_mode, $bank_name, $transaction_id, $bank_id, $particular, $clearance_status, $payment_side, $payment_type);
+    }
 
     $sq_delete = mysqlQuery("update package_payment_master set amount = '0', delete_status='1',credit_charges='0' where payment_id='$payment_id'");
     if ($sq_delete) {
@@ -463,6 +554,10 @@ class payment
       echo "error--Details not updated.";
       exit;
     } else {
+
+       if($payment_mode == 'To Supplier'){
+      $this->vendor_payment_update($estimate_id,$receipt_payment_id,$vendor_type,$vendor_type_id);
+    }
       $sq_receipt = mysqlQuery("update package_receipt_master set receipt_of='$payment_for' where payment_id='$payment_id'");
       if (!$sq_receipt) {
         $GLOBALS['flag'] = false;
@@ -488,6 +583,36 @@ class payment
       }
     }
   }
+
+  public function vendor_payment_update($estimate_id,$receipt_payment_id,$vendor_type,$vendor_type_id){
+  $booking_id = $_POST['booking_id'];
+  $payment_date = $_POST['payment_date'];
+  $payment_mode = $_POST['payment_mode'];
+  $payment_amount = $_POST['payment_amount'];
+  $bank_name = $_POST['bank_name'];
+  $transaction_id = $_POST['transaction_id'];
+  $payment_for = isset($_POST['payment_for']) ? $_POST['payment_for'] : '';
+  $p_travel_type = isset($_POST['p_travel_type']) ? $_POST['p_travel_type'] : '';
+  $bank_id = $_POST['bank_id'];
+  $emp_id = $_POST['emp_id'];
+  $branch_admin_id = $_POST['branch_admin_id'];
+  $credit_charges = $_POST['credit_charges'];
+  $credit_card_details = $_POST['credit_card_details'];
+  $payment_date = date("Y-m-d", strtotime($payment_date));
+  $clearance_status = ($payment_mode=="Cheque" || $payment_mode=="Credit Card") ? "Pending" : "";
+  $financial_year_id = $_SESSION['financial_year_id'];
+  $canc_status = $_POST['canc_status'];
+  // $vendor_type = $_POST['vendor_type'];
+  // $vendor_type_id=$_POST['vendor_type_id'];
+  // $estimate_id = $_POST['estimate_id'];
+
+  $created_at = date('Y-m-d H:i');
+
+
+  
+  $sq_payment = mysqlQuery("update vendor_payment_master  set payment_amount='$payment_amount' where estimate_id='$estimate_id' and vendor_type='$vendor_type' and vendor_type_id='$vendor_type_id' and estimate_type_id='$booking_id' and estimate_type='Package Tour' and payment_mode='To Supplier' and receipt_payment_id='$receipt_payment_id'");
+
+}
 
   function finance_update($sq_payment_info, $clearance_status1)
   {
@@ -518,11 +643,22 @@ class payment
     if ($payment_mode == 'Cash') {
       $pay_gl = 20;
       $type = 'CASH RECEIPT';
+    } elseif($payment_mode == 'To Supplier'){
+      $type= 'CUSTOMER TO SUPPLIER ';
     } else {
       $sq_bank = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$bank_id' and user_type='bank'"));
       $pay_gl = isset($sq_bank['ledger_id']) ? $sq_bank['ledger_id'] : 0;
       $type = 'BANK RECEIPT';
     }
+
+
+     //Vendor Type And vendor_type Id
+  $sq_vendor = mysqli_fetch_assoc(mysqlQuery("select * from package_payment_master where booking_id='$booking_id' and payment_mode='To Supplier' and payment_id='$payment_id'"));
+  $vendor_type= $sq_vendor['vendor_type'];
+  $vendor_type_id= $sq_vendor['supplier_id']; 
+     //Getting supplier Ledger
+	$sq_supplier = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
+	$supplier_gl = $sq_supplier['ledger_id']; 
 
     //Getting customer Ledger
     $sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$customer_id' and user_type='customer'"));
@@ -599,7 +735,20 @@ class payment
           $payment_side = "Credit";
           $clearance_status = ($payment_mode == "Cheque" || $payment_mode == "Credit Card") ? "Pending" : "";
           $transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id, '', $payment_side, $clearance_status, $row_spec, $branch_admin_id, $ledger_particular, $type);
-        } else {
+        } elseif($payment_mode == 'To Supplier'){
+        ////////Supplier Amount//////
+        $module_name = "Package Booking Payment";
+        $module_entry_id = $payment_id;
+        $transaction_id = "";
+        $payment_amount = $payment_old_value;
+        $payment_date = $payment_date;
+        $payment_particular = get_purchase_paid_partucular(get_package_booking_payment_id($booking_id,$yr2), $payment_date, $payment_amount1, $customer_id, $payment_mode, get_package_booking_id($booking_id,$yr2),$bank_id,$transaction_id1,$canc_status);
+        $ledger_particular = get_ledger_particular('By','Cash/Bank');
+        $gl_id = $supplier_gl;
+        $payment_side = "Credit";
+        $clearance_status = "";
+        $transaction_master->transaction_save($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular, $gl_id,'', $payment_side, $clearance_status, $row_spec,$branch_admin_id,$ledger_particular,$type);
+    } else {
 
           $module_name = "Package Booking Payment";
           $module_entry_id = $payment_id;

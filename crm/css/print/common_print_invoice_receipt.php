@@ -48,6 +48,12 @@ border-radius: 5px;
 /*******page_style********/
 .inv_rece_header_logo {
 max-width: 210px;
+max-height: 90px;
+}
+.inv_rece_header_logo img{
+max-width: 100%;
+max-height: 90px;
+object-fit: contain;
 }
 .inv_rece_header_bottom ul li h3.title {
 margin-bottom: 5px !important;

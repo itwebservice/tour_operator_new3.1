@@ -18,6 +18,9 @@ if ($branch_admin_id != 0) {
   $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 }
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $quotation_id = $_GET['quotation_id'];
 $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Hotel Quotation' and active_flag ='Active'"));
 
@@ -370,9 +373,9 @@ $tax_show = '';
           <p>SWIFT CODE</p>
         </div>
         <?php
-        if (check_qr()) { ?>
+        if (check_qr($branch_admin_id)) { ?>
           <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px;">
-            <?= get_qr('Protrait Creative') ?>
+            <?= get_qr('Protrait Creative', $branch_admin_id) ?>
             <br>
             <h4 class="no-marg">Scan & Pay </h4>
           </div>

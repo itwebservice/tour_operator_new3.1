@@ -111,7 +111,7 @@ if (!empty($enquiry_ids)) {
             SELECT enquiry_id, MAX(entry_id) AS max_id
             FROM enquiry_master_entries
             WHERE enquiry_id IN ($enq_id_str)
-              AND followup_status != 'Dropped' AND followup_status IN ('Active', 'In-Followup')
+              AND followup_status != 'Dropped' AND followup_status IN ('New', 'In-Followup')
             GROUP BY enquiry_id
         ) t2 
           ON t1.enquiry_id = t2.enquiry_id 
@@ -178,8 +178,8 @@ if (!empty($enquiry_ids)) {
                     $back_color = ($status != 'Not Done') ? 'background: #40dbbc !important' : 'background: #ffc674 !important';
 
                     $bg = ($followup['followup_status'] == 'Converted') ? "success" :
-                          (($followup['followup_status'] == 'Dropped') ? "danger" :
-                          (($followup['followup_status'] == 'Active') ? "warning" : ""));
+                        (($followup['followup_status'] == 'Dropped') ? "danger" :
+                        (($followup['followup_status'] == 'New') ? "warning" : ""));
 
                     $count++;
                     ?>

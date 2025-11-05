@@ -45,6 +45,7 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                     <li><span onclick="show_report_reflect('Itinerary And Gift')">Itinerary And Gift</span></li>
                     <li><span onclick="show_report_reflect('Group Repeater Customer')">Repeater Customer</span></li>
                     <li><span onclick="show_report_reflect('Group Travel Tickets')">Travel Tickets</span></li>
+                    
                   </ul>
                 </li>
                 <!-- Single Menu end -->

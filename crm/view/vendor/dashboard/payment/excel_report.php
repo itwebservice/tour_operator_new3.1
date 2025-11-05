@@ -225,6 +225,8 @@ $year = $yr[0];
 		
 $payment_id = $row_payment['payment_id'];
 
+ $total_amount1 = (float)($row_payment['payment_amount'] ?? 0) + (float)($row_payment['credit_charge_amount'] ?? 0);
+
 
     $objPHPExcel->setActiveSheetIndex(0)
         ->setCellValue('B'.$row_count, ++$count)
@@ -234,7 +236,7 @@ $payment_id = $row_payment['payment_id'];
         ->setCellValue('F'.$row_count, $row_payment['vendor_type'])
         ->setCellValue('G'.$row_count, $vendor_type_val)
         ->setCellValue('H'.$row_count, date('d-m-Y', strtotime($row_payment['payment_date'])))
-        ->setCellValue('I'.$row_count, $row_payment['payment_amount'].$currency_amount)
+        ->setCellValue('I'.$row_count, $total_amount1.$currency_amount)
         ->setCellValue('J'.$row_count, $row_payment['payment_mode'])
         ->setCellValue('K'.$row_count, $row_payment['bank_name'])
         ->setCellValue('L'.$row_count, $row_payment['transaction_id']);

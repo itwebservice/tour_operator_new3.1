@@ -6,6 +6,10 @@ global $app_quot_img, $currency;
 
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
+
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
 $sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='hotel_quotation/index.php'"));
 $branch_status = $sq['branch_status'];
 
@@ -160,9 +164,9 @@ $tax_show = '';
               </ul>
             </div>
             <?php
-            if (check_qr()) { ?>
+            if (check_qr($branch_admin_id)) { ?>
               <div class="col-md-6 text-center" style="margin-top:20px;">
-                <?= get_qr('Protrait Standard') ?>
+                <?= get_qr('Protrait Standard', $branch_admin_id) ?>
                 <br>
                 <h4 class="no-marg">Scan & Pay </h4>
 

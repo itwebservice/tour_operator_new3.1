@@ -355,8 +355,8 @@ if($role!='Admin' && $role!='Branch Admin' && $role_id!='7' && $role_id<'7'){
 
 if($enquiry_status_filter!='')
 {
-	if($enquiry_status_filter=='Active'){
-		$query .= " and ef.followup_status='Active'";
+	if($enquiry_status_filter=='New'){
+		$query .= " and ef.followup_status='New'";
 	}
 	if($enquiry_status_filter=='In-Followup'){
 		$query .= " and ef.followup_status='In-Followup' ";
@@ -454,8 +454,8 @@ if ($destination_filter != '' && strtolower($destination_filter) != strtolower($
 
 	$enquiry_status1 = mysqli_fetch_assoc(mysqlQuery("select followup_date,followup_reply,followup_status from enquiry_master_entries where enquiry_id='$row[enquiry_id]' order by entry_id DESC"));
 	$followup_date1 = $enquiry_status1['followup_date'];
-	if($enquiry_status1['followup_status']=='Active')	{
-		$followup_status='Active';
+	if($enquiry_status1['followup_status']=='New')	{
+		$followup_status='New';
 	}
 	else{
 		$followup_status=$enquiry_status1['followup_status'];

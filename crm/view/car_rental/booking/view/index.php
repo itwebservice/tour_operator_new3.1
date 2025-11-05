@@ -8,6 +8,14 @@ $yr = explode("-", $date);
 $year =$yr[0];
 
 ?>
+<style>
+#visa_display_modal .modal-body {
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+</style>
+
 <div class="modal fade profile_box_modal" id="visa_display_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">

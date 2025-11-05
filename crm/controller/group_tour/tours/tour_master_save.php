@@ -48,9 +48,15 @@ $hotel_name_arr = isset($_POST['hotel_name_arr']) ? $_POST['hotel_name_arr'] : [
 $hotel_type_arr = isset($_POST['hotel_type_arr']) ? $_POST['hotel_type_arr'] : [];
 $total_days_arr = isset($_POST['total_days_arr']) ? $_POST['total_days_arr'] : [];
 
+$vehicle_name_arr = isset($_POST['vehicle_name_arr']) ? $_POST['vehicle_name_arr'] : [];
+$pickup_arr = isset($_POST['pickup_arr']) ? $_POST['pickup_arr'] : [];
+$pickup_type_arr = isset($_POST['pickup_type_arr']) ? $_POST['pickup_type_arr'] : [];
+$drop_arr = isset($_POST['drop_arr']) ? $_POST['drop_arr'] : [];
+$drop_type_arr = isset($_POST['drop_type_arr']) ? $_POST['drop_type_arr'] : [];
+
 $daywise_url = isset($_POST['daywise_url']) ? $_POST['daywise_url'] : '';
 
 $tours_master = new tours_master();
-$tours_master->tour_master_save($tour_type, $tour_name, $seo_slug,$tour_note, $adult_cost, $child_with_cost, $child_without_cost , $infant_cost, $with_bed_cost,$single_person_cost,$visa_country_name,$company_name, $from_date, $to_date, $capacity,$active_flag,$train_from_location_arr,$train_to_location_arr,$train_class_arr,$from_city_id_arr, $to_city_id_arr, $plane_from_location_arr,$plane_to_location_arr,$airline_name_arr,$plane_class_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$route_arr,$cabin_arr,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr ,$inclusions, $exclusions,$pdf_url, $daywise_url,$dest_name,$dest_image);
+$tours_master->tour_master_save($tour_type, $tour_name, $seo_slug,$tour_note, $adult_cost, $child_with_cost, $child_without_cost , $infant_cost, $with_bed_cost,$single_person_cost,$visa_country_name,$company_name, $from_date, $to_date, $capacity,$active_flag,$train_from_location_arr,$train_to_location_arr,$train_class_arr,$from_city_id_arr, $to_city_id_arr, $plane_from_location_arr,$plane_to_location_arr,$airline_name_arr,$plane_class_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$route_arr,$cabin_arr,$city_name_arr,$hotel_name_arr,$hotel_type_arr,$total_days_arr,$vehicle_name_arr,$pickup_arr,$pickup_type_arr,$drop_arr,$drop_type_arr,$inclusions, $exclusions,$pdf_url, $daywise_url,$dest_name,$dest_image);
 
 ?>

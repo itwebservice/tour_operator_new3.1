@@ -235,7 +235,7 @@ function get_enq_etr_active($id='',$type='display'){
    if($type == 'display')
    {
     $query1 = "SELECT * FROM roles INNER JOIN enquiry_master on roles.id = enquiry_master.login_id Inner JOIN enquiry_master_entries on enquiry_master.enquiry_id = enquiry_master_entries.enquiry_id
-    where enquiry_master.assigned_emp_id='".$id."' and enquiry_master_entries.followup_status = 'Active' and enquiry_master_entries.status != 'False'".$_SESSION['dateqry'];
+    where enquiry_master.assigned_emp_id='".$id."' and enquiry_master_entries.followup_status = 'New' and enquiry_master_entries.status != 'False'".$_SESSION['dateqry'];
     $res = mysqlQuery($query1);
     $budget = 0;
     $count = mysqli_num_rows($res);

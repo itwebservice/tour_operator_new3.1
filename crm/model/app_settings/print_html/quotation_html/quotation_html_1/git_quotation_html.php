@@ -5,6 +5,10 @@ include "printFunction.php";
 
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
+
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+$branch_qr_url = get_branch_qr_url($branch_admin_id);
 $sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='package_booking/quotation/group_tour/index.php'"));
 $branch_status = $sq['branch_status'];
 
@@ -176,10 +180,10 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
                     </span><?= ($sq_bank_count > 0 || $sq_bank_branch['swift_code'] != '') ? strtoupper($sq_bank_branch['swift_code']) :  strtoupper($bank_swift_code) ?></li>
                 </ul>
               </div>
-              <?php
-              if (check_qr()) { ?>
-                <div class="col-md-6 text-center" style="margin-top:20px;">
-                  <?= get_qr('Protrait Standard') ?>
+        <?php
+        if (check_qr($branch_admin_id)) { ?>
+          <div class="col-md-6 text-center" style="margin-top:20px;">
+            <?= get_qr('Protrait Standard', $branch_admin_id) ?>
                   <br>
                   <h4 class="no-marg">Scan & Pay </h4>
 
@@ -359,12 +363,19 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
           </div>
         </div>
       <?php } ?>
+      
+      <!-- Hotel and Transport Details Combined Section -->
       <?php
       $sq_h_count = mysqli_fetch_assoc(mysqlQuery("select * from group_tour_hotel_entries where tour_id='$sq_quotation[tour_group_id]'"));
-      if ($sq_h_count != '0') {
+      $sq_transport_count = mysqli_num_rows(mysqlQuery("select * from group_tour_quotation_transport_entries where quotation_id='$quotation_id'"));
+      if ($sq_h_count != '0' || $sq_transport_count > 0) {
       ?>
         <div class="main_block mg_tp_30"></div>
-        <h3 class="editor_title main_block">Hotel Details</h3>
+        <h3 class="editor_title main_block">Hotel & Transport Details</h3>
+        
+        <?php if ($sq_h_count != '0') { ?>
+        <!-- Hotel Details -->
+        <h4 class="mg_tp_10 mg_bt_10" style="font-weight: 600;">Hotel Details</h4>
         <table class="table table-bordered">
           <thead>
             <tr class="table-heading-row">
@@ -395,6 +406,68 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
             ?>
           </tbody>
         </table>
+        <?php } ?>
+
+        <?php if ($sq_transport_count > 0) { ?>
+        <!-- Transport Details -->
+        <h4 class="mg_tp_20 mg_bt_10" style="font-weight: 600;">Transport Details</h4>
+        <table class="table table-bordered">
+          <thead>
+            <tr class="table-heading-row">
+              <th>VEHICLE</th>
+              <th>START_DATE</th>
+              <th>END_DATE</th>
+              <th>PICKUP</th>
+              <th>DROP</th>
+              <th>S_DURATION</th>
+              <th>VEHICLES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $sq_transport = mysqlQuery("select * from group_tour_quotation_transport_entries where quotation_id='$quotation_id'");
+            while ($row_transport = mysqli_fetch_assoc($sq_transport)) {
+              $transport_name = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_transport[vehicle_name]'"));
+              // Pickup
+              if ($row_transport['pickup_type'] == 'city') {
+                $row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[pickup]'"));
+                $pickup = $row['city_name'];
+              } else if ($row_transport['pickup_type'] == 'hotel') {
+                $row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[pickup]'"));
+                $pickup = $row['hotel_name'];
+              } else {
+                $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[pickup]'"));
+                $airport_nam = clean($row['airport_name']);
+                $airport_code = clean($row['airport_code']);
+                $pickup = $airport_nam . " (" . $airport_code . ")";
+              }
+              //Drop-off
+              if ($row_transport['drop_type'] == 'city') {
+                $row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[drop_location]'"));
+                $drop = $row['city_name'];
+              } else if ($row_transport['drop_type'] == 'hotel') {
+                $row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[drop_location]'"));
+                $drop = $row['hotel_name'];
+              } else {
+                $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[drop_location]'"));
+                $airport_nam = clean($row['airport_name']);
+                $airport_code = clean($row['airport_code']);
+                $drop = $airport_nam . " (" . $airport_code . ")";
+              }
+            ?>
+              <tr>
+                <td><?= $transport_name['vehicle_name'] ?></td>
+                <td><?= date('d-m-Y', strtotime($row_transport['start_date'])) ?></td>
+                <td><?= date('d-m-Y', strtotime($row_transport['end_date'])) ?></td>
+                <td><?= $pickup ?></td>
+                <td><?= $drop ?></td>
+                <td><?= $row_transport['service_duration'] ?></td>
+                <td><?= $row_transport['vehicle_count'] ?></td>
+              </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+        <?php } ?>
       <?php } ?>
 
       <!-- Cruise -->

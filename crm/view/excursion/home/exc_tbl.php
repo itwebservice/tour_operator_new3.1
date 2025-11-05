@@ -32,6 +32,15 @@
         <td><input class="form-control" type="text" id="adult_cost-<?= $offset ?>1" name="adult_cost-<?= $offset ?>1" placeholder="Adult Ticket Amount" title="Adult Ticket Amount" onchange="excursion_amount_calculate(this.id);calculate_exc_expense('tbl_dynamic_exc_booking');validate_balance(this.id)" style="width:142px"></td>
         <td><input class="form-control" type="text" id="child_cost-<?= $offset ?>1" name="child_cost-<?= $offset ?>1" placeholder="Child Ticket Amount" title="Child Ticket Amount" onchange="excursion_amount_calculate(this.id);calculate_exc_expense('tbl_dynamic_exc_booking');validate_balance(this.id)" style="width:142px"></td>
         <td><input class="form-control" type="text" id="infant_cost-<?= $offset ?>1" name="infant_cost-<?= $offset ?>1" placeholder="Infant Ticket Amount" title="Infant Ticket Amount" onchange="excursion_amount_calculate(this.id);calculate_exc_expense('tbl_dynamic_exc_booking');validate_balance(this.id)" style="width:144px"></td>
+        <td><select name="vehicle_name-<?= $offset ?>1" id="vehicle_name-<?= $offset ?>1" style="width: 155px" class="form-control app_select2" title="Select Vehicle" onchange="get_excursion_amount('calculate_exc_expense');">
+                <option value=''>Select Vehicle</option>
+                <?php
+                $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                ?>
+                    <option value="<?= $row_vehicle['entry_id'] ?>"><?= $row_vehicle['vehicle_name'] ?></option>
+                <?php } ?>
+            </select></td>
         <td><input class="form-control" type="text" id="total_vehicle-<?= $offset ?>1" name="total_vehicle-<?= $offset ?>1" placeholder="Total Vehicle" title="Total Vehicle" onchange="excursion_amount_calculate(this.id);calculate_exc_expense('tbl_dynamic_exc_booking');validate_balance(this.id)" style="width:125px"></td>
         <td><input class="form-control" type="text" id="transfer_cost-<?= $offset ?>1" name="transfer_cost-<?= $offset ?>1" placeholder="Transfer Amount" title="Transfer Amount" onchange="excursion_amount_calculate(this.id);calculate_exc_expense('tbl_dynamic_exc_booking');validate_balance(this.id)" style="width:125px"></td>
         <td><input class="form-control" type="text" id="total_amount-<?= $offset ?>1" name="total_amount-<?= $offset ?>1"

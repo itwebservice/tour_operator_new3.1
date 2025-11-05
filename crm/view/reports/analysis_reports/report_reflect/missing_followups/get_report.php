@@ -28,10 +28,10 @@ while ($row_enq = mysqli_fetch_assoc($sq_enq1)) {
 
         $sq_max_count = mysqli_fetch_assoc(mysqlQuery("SELECT max(entry_id) as max_entry_id FROM enquiry_master_entries where enquiry_id='$enquiry_id'"));
         $entry_id = $sq_max_count['max_entry_id'];
-        $sq_enq_count = mysqli_num_rows(mysqlQuery("SELECT followup_date FROM enquiry_master_entries where enquiry_id='$enquiry_id' and followup_status in('Active','In-Followup') and DATE(followup_date) < '$today' and entry_id='$entry_id'"));
+        $sq_enq_count = mysqli_num_rows(mysqlQuery("SELECT followup_date FROM enquiry_master_entries where enquiry_id='$enquiry_id' and followup_status in('New','In-Followup') and DATE(followup_date) < '$today' and entry_id='$entry_id'"));
         if($sq_enq_count > 0){
 
-            $sq_enq = mysqli_fetch_assoc(mysqlQuery("SELECT followup_date FROM enquiry_master_entries where enquiry_id='$enquiry_id' and followup_status in('Active','In-Followup') and DATE(followup_date) < '$today' and entry_id='$entry_id'"));
+            $sq_enq = mysqli_fetch_assoc(mysqlQuery("SELECT followup_date FROM enquiry_master_entries where enquiry_id='$enquiry_id' and followup_status in('New','In-Followup') and DATE(followup_date) < '$today' and entry_id='$entry_id'"));
             $date = $row_enq['enquiry_date'];
             $yr = explode("-", $date);
             $year = $yr[0];

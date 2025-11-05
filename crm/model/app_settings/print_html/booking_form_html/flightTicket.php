@@ -19,6 +19,10 @@ if ($sq_customer['type'] == 'Corporate' || $sq_customer['type'] == 'B2B') {
     $name = $sq_customer['first_name'] . ' ' . $sq_customer['last_name'];
 }
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
+
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Flight E-Ticket' and active_flag ='Active'"));
 
 $sq_flight = mysqli_fetch_assoc(mysqlQuery("select first_name,last_name from ticket_master_entries where ticket_id='$ticket_id' "));
@@ -123,7 +127,7 @@ while ($row_trip = mysqli_fetch_assoc($sq_ticket_trip)) {
     <section class="print_header main_block" style="margin-bottom:0;">
         <div class="col-md-4 no-pad">
             <div class="print_header_logo">
-                <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10">
+                <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10" style="max-width: 210px; max-height: 90px; object-fit: contain;">
             </div>
         </div>
         <div class="col-md-4 no-pad">

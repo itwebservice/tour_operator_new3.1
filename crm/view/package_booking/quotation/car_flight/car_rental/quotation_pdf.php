@@ -200,6 +200,102 @@ $pdf->Multicell(86, 10, 'QUOTATION COST', 1, 1);
 $pdf->setXY(114, $y_pos);
 $pdf->Multicell(93, 10, '  '.number_format($sq_quotation['total_tour_cost'] ,2), 1, 1);
 
+// Itinerary
+$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+$sq_package_count = mysqli_num_rows($sq_package_program);
+if($sq_package_count > 0){
+	$y_pos = $pdf->getY()+11;
+	$pdf->SetFillColor(51,203,204);	
+	$pdf->setXY(28, $y_pos);
+	$pdf->rect(28,$y_pos,179,11,F);
+	$pdf->SetFont('Arial','',12);
+	$pdf->SetTextColor(225,255,255);
+	$pdf->Cell(86, 10, 'TOUR ITINERARY' , 0, 0);
+
+	$pdf->SetTextColor(40,35,35);
+	$count = 1;
+
+	while($row_itinarary = mysqli_fetch_assoc($sq_package_program)){
+
+		//Adding new page if end of page is found
+		if($pdf->GetY()+20>$pdf->PageBreakTrigger)
+		{
+			$pdf->AddPage($pdf->CurOrientation);
+			$pdf->Image($transport_service_voucher2,8,0,8,297);
+		}
+
+	$pdf->SetFont('Arial','B',8);
+	$y_pos = $pdf->getY()+13;
+	$pdf->setXY(28, $y_pos);
+	$pdf->cell(190, 7, 'DAY : ', 0, 0);
+
+	$pdf->SetFont('Arial','',9);
+	$pdf->setXY(36, $y_pos);
+	$pdf->cell(190, 7, $count, 0, 0);
+	$count++;
+
+		
+		//Adding new page if end of page is found
+		if($pdf->GetY()+20>$pdf->PageBreakTrigger)
+		{
+			$pdf->AddPage($pdf->CurOrientation);
+			$pdf->Image($transport_service_voucher2,8,0,8,297);
+		}
+
+	$pdf->SetFont('Arial','B',8);
+	$y_pos = $pdf->getY()+6;
+	$pdf->setXY(28, $y_pos);
+	$pdf->cell(190, 7, 'ATTRACTION : ', 0, 0);
+
+	$pdf->SetFont('Arial','',9);
+	$pdf->setXY(48, $y_pos);
+	$pdf->cell(190, 7, $row_itinarary['attraction'], 0, 0);
+
+		//Adding new page if end of page is found
+		if($pdf->GetY()+20>$pdf->PageBreakTrigger)
+		{
+			$pdf->AddPage($pdf->CurOrientation);
+			$pdf->Image($transport_service_voucher2,8,0,8,297);
+		}
+
+	$pdf->SetFont('Arial','B',8);
+	$y_pos = $pdf->getY()+6;
+	$pdf->setXY(28, $y_pos);
+	$pdf->cell(190, 7, 'DAY PROGRAM : ', 0, 0);
+
+	$pdf->SetFont('Arial','',8);
+	$y_pos = $pdf->getY()+6;
+	$pdf->setXY(28, $y_pos);
+	$pdf->MultiCell(179, 5, $row_itinarary['day_wise_program']);
+
+		//Adding new page if end of page is found
+		if($pdf->GetY()+20>$pdf->PageBreakTrigger)
+		{
+			$pdf->AddPage($pdf->CurOrientation);
+			$pdf->Image($transport_service_voucher2,8,0,8,297);
+		}
+
+	$pdf->SetFont('Arial','B',8);
+	$y_pos = $pdf->getY()+2;
+	$pdf->setXY(28, $y_pos);
+	$pdf->cell(190, 7, 'OVERNIGHT STAY : ', 0, 0);
+
+	$pdf->SetFont('Arial','',9);
+	$pdf->setXY(56, $y_pos);
+	$pdf->cell(190, 7, $row_itinarary['stay'], 0, 0);
+
+	$pdf->SetFont('Arial','B',8);
+	$y_pos = $pdf->getY()+6;
+	$pdf->setXY(28, $y_pos);
+	$pdf->cell(190, 7, 'MEAL PLAN : ', 0, 0);
+
+	$pdf->SetFont('Arial','',9);
+	$pdf->setXY(50, $y_pos);
+	$meal_plan_text = ($row_itinarary['meal_plan'] != '') ? $row_itinarary['meal_plan'] : 'NA';
+	$pdf->cell(190, 7, $meal_plan_text, 0, 0);
+	}
+}
+
 $pdf->AddPage($pdf->CurOrientation);
 $pdf->Image($transport_service_voucher2,8,0,8,297);
 ///// Bank details ///////

@@ -18,6 +18,9 @@ if ($branch_admin_id != 0) {
   $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 }
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $quotation_id = $_GET['quotation_id'];
 
 $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Car Rental Quotation' and active_flag ='Active'"));
@@ -99,6 +102,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 	} else {
 	$quotation_cost = $sq_quotation['total_tour_cost'];
 	}
+
+$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+$sq_package_count = mysqli_num_rows($sq_package_program);
 ?>
 
 <!-- landingPage -->
@@ -263,26 +269,86 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
     </section>
 </section>
 
+<!-- Itinerary -->
+<?php if ($sq_package_count != 0) { ?>
+<section class="itinerarySec main_block side_pad mg_tp_30">
+<div class="incluExcluTermsTabPanel main_block">
+            <h3 class="incexTitle">TOUR ITINERARY</h3>
+</div>
+  <div class="print_itinenary main_block no-pad no-marg">
+    <?php
+    $count = 1;
+    $i = 0;
+    $result = get_dates_for_itineary($sq_quotation['from_date'], $sq_quotation['to_date']);
+    $iti_dates_days = explode('=', $result);
+    $dates = json_decode($iti_dates_days[0], true);
+    while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
+      $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
+      
+      if ($count % 2 != 0) {
+    ?>
+        <section class="singleItinenrary leftItinerary col-md-12 no-pad mg_tp_30 mg_bt_30">
+          <div class="col-md-12">
+            <div class="itneraryText">
+              <div class="dayCount">
+                <span><i class="fa fa-map-marker"></i> <?= $row_itinarary['attraction'] ?> <br> <?= '(' . $date_format . ')' ?></span>
+              </div>
+              <div class="dayWiseProgramDetail">
+                <h5>Day-<?= $count ?></h5>
+                <p><?= $row_itinarary['day_wise_program'] ?></p>
+              </div>
+              <div class="itineraryDetail">
+                <ul>
+                  <li><span><i class="fa fa-bed"></i> : </span><?= $row_itinarary['stay'] ?> </li>
+                  <li><span><i class="fa fa-cutlery"></i> : </span><?= $row_itinarary['meal_plan'] ?></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      <?php } else { ?>
+        <section class="singleItinenrary rightItinerary col-md-12 no-pad mg_tp_30 mg_bt_30">
+          <div class="col-md-12">
+            <div class="itneraryText">
+              <div class="dayCount">
+                <span><i class="fa fa-map-marker"></i> <?= $row_itinarary['attraction'] ?> <br> <?= '(' . $date_format . ')' ?></span>
+              </div>
+              <div class="dayWiseProgramDetail">
+                <h5>Day-<?= $count ?></h5>
+                <p><?= $row_itinarary['day_wise_program'] ?></p>
+              </div>
+              <div class="itineraryDetail">
+                <ul>
+                  <li><span><i class="fa fa-bed"></i> : </span><?= $row_itinarary['stay'] ?> </li>
+                  <li><span><i class="fa fa-cutlery"></i> : </span><?= $row_itinarary['meal_plan'] ?></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+    <?php
+      }
+      $count++;
+      $i++;
+    } ?>
+  </div>
+</section>
+<?php } ?>
 
 <?php if(isset($sq_terms_cond['terms_and_conditions'])){?>
 <!-- Inclusion Exclusion --><!-- Terms and Conditions -->
-<section class="incluExcluTerms main_block fullHeightLand">
-
-
-  <!-- Terms and Conditions -->
-  <div class="row mg_tp_30">
-    
-    <div class="col-md-12 mg_tp_30">
-      <div class="incluExcluTermsTabPanel main_block mg_tp_30">
-          <h3 class="tncTitle">Terms &amp; Conditions</h3>
+<section class="incluExcluTerms main_block side_pad mg_tp_30">
+  <div class="row">
+    <div class="col-md-12">
+     <div class="incluExcluTermsTabPanel main_block">
+            <h3 class="incexTitle" style="margin-left:100px;margin-top:30px;">TERMS AND CONDITIONS</h3>
           <div class="tncContent">
               <pre class="real_text"><?= $sq_terms_cond['terms_and_conditions'] ?></pre>
           </div>
       </div>
     </div>
   </div>
-              
 </section>
 <?php } ?>
 
@@ -395,9 +461,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
             <p>Infant</p>
           </div>
           <?php 
-              if(check_qr()) { ?>
+              if(check_qr($branch_admin_id)) { ?>
           <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px;">
-                        <?= get_qr('Landscape Creative') ?>
+                        <?= get_qr('Landscape Creative', $branch_admin_id) ?>
                         <br>
                         <h4 class="no-marg">Scan & Pay </h4>
           </div>

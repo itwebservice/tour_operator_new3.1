@@ -400,7 +400,47 @@ $('#frm_tour_master_save').validate({
 
 	}
 
+	//Transport Information
+	var vehicle_name_arr = new Array();
+	var drop_arr = new Array();
+	var drop_type_arr = new Array();
+	var pickup_arr = new Array();
+	var pickup_type_arr = new Array();
+	var pickup_type = '';
+	var pickup = '';
+	var drop_type = '';
+	var drop = '';
+	var table = document.getElementById("tbl_package_tour_transport");
+	if(table){
+		var rowCount = table.rows.length;
+		for (var i = 0; i < rowCount; i++) {
+			var row = table.rows[i];
+			if (row.cells[0].childNodes[0].checked) {
 
+				$('#' + row.cells[3].childNodes[0].id).find("option:selected").each(function() {
+					pickup = row.cells[3].childNodes[0].value;
+					pickup_type = $("option:selected", $("#" + row.cells[3].childNodes[0].id)).parent().attr('value');
+				});
+				$('#' + row.cells[4].childNodes[0].id).find("option:selected").each(function() {
+					drop = row.cells[4].childNodes[0].value;
+					drop_type = $("option:selected", $("#" + row.cells[4].childNodes[0].id)).parent().attr('value');
+				});
+
+				var vehicle_name = row.cells[2].childNodes[0].value;
+				if (vehicle_name == "") {
+					$('#btn_save').prop('disabled',true);
+					error_msg_alert('Transport Vehicle is mandatory in row' + (i + 1));
+					return false;
+				}
+
+				vehicle_name_arr.push(vehicle_name);
+				pickup_arr.push(pickup);
+				pickup_type_arr.push(pickup_type);
+				drop_arr.push(drop);
+				drop_type_arr.push(drop_type);
+			}
+		}
+	}
 
 	//Cruise Information
 
@@ -435,7 +475,7 @@ $('#frm_tour_master_save').validate({
 				$.ajax({
 					type:'post',
 					url:  base_url+'controller/group_tour/tours/tour_master_save.php',              
-					data:   { tour_type : tour_type, tour_name : tour_name,  seo_slug:seo_slug,tour_note: tour_note, adult_cost : adult_cost, child_with_cost : child_with_cost, child_without_cost : child_without_cost, infant_cost : infant_cost, with_bed_cost : with_bed_cost,single_person_cost:single_person_cost, 'from_date[]' : from_date, 'to_date[]' : to_date, 'capacity[]' : capacity,visa_country_name : visa_country_name,company_name : company_name ,active_flag : active_flag,day_program_arr : day_program_arr, special_attaraction_arr : special_attaraction_arr,overnight_stay_arr : overnight_stay_arr,meal_plan_arr : meal_plan_arr,train_from_location_arr : train_from_location_arr, train_to_location_arr : train_to_location_arr, train_class_arr : train_class_arr, from_city_id_arr : from_city_id_arr, to_city_id_arr : to_city_id_arr, plane_from_location_arr : plane_from_location_arr, plane_to_location_arr : plane_to_location_arr,airline_name_arr : airline_name_arr , plane_class_arr : plane_class_arr,route_arr : route_arr,cabin_arr : cabin_arr, city_name_arr : city_name_arr ,hotel_name_arr : hotel_name_arr,hotel_type_arr : hotel_type_arr,total_days_arr : total_days_arr,inclusions : inclusions, exclusions : exclusions,pdf_url : pdf_url ,daywise_url:daywise_url,dest_name:dest_name,dest_image:dest_image},
+					data:   { tour_type : tour_type, tour_name : tour_name,  seo_slug:seo_slug,tour_note: tour_note, adult_cost : adult_cost, child_with_cost : child_with_cost, child_without_cost : child_without_cost, infant_cost : infant_cost, with_bed_cost : with_bed_cost,single_person_cost:single_person_cost, 'from_date[]' : from_date, 'to_date[]' : to_date, 'capacity[]' : capacity,visa_country_name : visa_country_name,company_name : company_name ,active_flag : active_flag,day_program_arr : day_program_arr, special_attaraction_arr : special_attaraction_arr,overnight_stay_arr : overnight_stay_arr,meal_plan_arr : meal_plan_arr,train_from_location_arr : train_from_location_arr, train_to_location_arr : train_to_location_arr, train_class_arr : train_class_arr, from_city_id_arr : from_city_id_arr, to_city_id_arr : to_city_id_arr, plane_from_location_arr : plane_from_location_arr, plane_to_location_arr : plane_to_location_arr,airline_name_arr : airline_name_arr , plane_class_arr : plane_class_arr,route_arr : route_arr,cabin_arr : cabin_arr, city_name_arr : city_name_arr ,hotel_name_arr : hotel_name_arr,hotel_type_arr : hotel_type_arr,total_days_arr : total_days_arr,vehicle_name_arr : vehicle_name_arr,pickup_arr : pickup_arr,pickup_type_arr : pickup_type_arr,drop_arr : drop_arr,drop_type_arr : drop_type_arr,inclusions : inclusions, exclusions : exclusions,pdf_url : pdf_url ,daywise_url:daywise_url,dest_name:dest_name,dest_image:dest_image},
 					success: function(data){
 
 						var msg = data.split('--');

@@ -349,51 +349,54 @@ $(function () {
 					service_duration_arr.push(service_duration);
 				}
 			}
-			//**Activity travel details starts here
-			var exc_date_arr = [];
-			var exc_city_arr = [];
-			var exc_name_arr = [];
-			var transfer_arr = [];
-			var exc_entry_id_arr = [];
-			var adult_arr = [];
-			var cwb_arr = [];
-			var cwob_arr = [];
-			var infant_arr = [];
+		//**Activity travel details starts here
+		var exc_date_arr = [];
+		var exc_city_arr = [];
+		var exc_name_arr = [];
+		var transfer_arr = [];
+		var vehicle_name_arr = [];
+		var exc_entry_id_arr = [];
+		var adult_arr = [];
+		var cwb_arr = [];
+		var cwob_arr = [];
+		var infant_arr = [];
 
-			var table = document.getElementById('tbl_package_exc_infomration');
-			var rowCount = table.rows.length;
+		var table = document.getElementById('tbl_package_exc_infomration');
+		var rowCount = table.rows.length;
 
-			for (var i = 0; i < rowCount; i++) {
-				var row = table.rows[i];
-				if (row.cells[0].childNodes[0].checked) {
-					var exc_date = row.cells[2].childNodes[0].value;
-					var exc_city = row.cells[3].childNodes[0].value;
-					var exc_name = row.cells[4].childNodes[0].value;
-					var transfer_option = row.cells[5].childNodes[0].value;
-					var adult = row.cells[6].childNodes[0].value;
-					var cwb = row.cells[7].childNodes[0].value;
-					var cwob = row.cells[8].childNodes[0].value;
-					var infant = row.cells[9].childNodes[0].value;
+		for (var i = 0; i < rowCount; i++) {
+			var row = table.rows[i];
+			if (row.cells[0].childNodes[0].checked) {
+				var exc_date = row.cells[2].childNodes[0].value;
+				var exc_city = row.cells[3].childNodes[0].value;
+				var exc_name = row.cells[4].childNodes[0].value;
+				var transfer_option = row.cells[5].childNodes[0].value;
+				var vehicle_name = row.cells[6].childNodes[0].value;
+				var adult = row.cells[7].childNodes[0].value;
+				var cwb = row.cells[8].childNodes[0].value;
+				var cwob = row.cells[9].childNodes[0].value;
+				var infant = row.cells[10].childNodes[0].value;
 
 
-					if (row.cells[10]) {
-						var exc_entry_id = row.cells[10].childNodes[0].value;
-					}
-					else {
-						var exc_entry_id = '';
-					}
-
-					exc_date_arr.push(exc_date);
-					exc_city_arr.push(exc_city);
-					exc_name_arr.push(exc_name);
-					transfer_arr.push(transfer_option)
-					exc_entry_id_arr.push(exc_entry_id);
-					adult_arr.push(adult);
-					cwb_arr.push(cwb);
-					cwob_arr.push(cwob);
-					infant_arr.push(infant);
+				if (row.cells[11]) {
+					var exc_entry_id = row.cells[11].childNodes[0].value;
 				}
+				else {
+					var exc_entry_id = '';
+				}
+
+				exc_date_arr.push(exc_date);
+				exc_city_arr.push(exc_city);
+				exc_name_arr.push(exc_name);
+				transfer_arr.push(transfer_option)
+				vehicle_name_arr.push(vehicle_name);
+				exc_entry_id_arr.push(exc_entry_id);
+				adult_arr.push(adult);
+				cwb_arr.push(cwb);
+				cwob_arr.push(cwob);
+				infant_arr.push(infant);
 			}
+		}
 
 			//Itinerary Table
             var tours_count = $('#sq_tours_count').val();
@@ -598,15 +601,16 @@ $(function () {
 								trans_count_arr: trans_count_arr,
 								trans_entry_id_arr: trans_entry_id_arr,
 								service_duration_arr:service_duration_arr,
-								exc_city_arr: exc_city_arr,
-								exc_name_arr: exc_name_arr,
-								exc_date_arr: exc_date_arr,
-								transfer_arr: transfer_arr,
-								exc_entry_id_arr: exc_entry_id_arr,
-								adult_arr:adult_arr,
-								cwb_arr:cwb_arr,
-								cwob_arr:cwob_arr,
-								infant_arr:infant_arr,
+							exc_city_arr: exc_city_arr,
+							exc_name_arr: exc_name_arr,
+							exc_date_arr: exc_date_arr,
+							transfer_arr: transfer_arr,
+							vehicle_name_arr: vehicle_name_arr,
+							exc_entry_id_arr: exc_entry_id_arr,
+							adult_arr:adult_arr,
+							cwb_arr:cwb_arr,
+							cwob_arr:cwob_arr,
+							infant_arr:infant_arr,
 								confirmation_no: confirmation_no,
 								'hotel_acc_id[]': hotel_acc_id,
 								visa_country_name: visa_country_name,

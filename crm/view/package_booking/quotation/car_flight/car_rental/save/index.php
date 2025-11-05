@@ -28,21 +28,25 @@ $branch_status = $_POST['branch_status'];
 
       		<div>
 
-			  <!-- Nav tabs -->
-			  <ul class="nav nav-tabs text_left_sm_xs" role="tablist">
-			    <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">Select Enquiry</a></li>
-			    <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">Costing</a></li>
-			  </ul>
+		  <!-- Nav tabs -->
+		  <ul class="nav nav-tabs text_left_sm_xs" role="tablist">
+		    <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">Select Enquiry</a></li>
+		    <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">Itinerary</a></li>
+		    <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">Costing</a></li>
+		  </ul>
 
-			  <!-- Tab panes -->
-			  <div class="tab-content" style="padding:20px 10px;">
-			    <div role="tabpanel" class="tab-pane active" id="tab1">
-			    	<?php  include_once('tab1.php'); ?>
-			    </div>
-			    <div role="tabpanel" class="tab-pane" id="tab2">
-			    	<?php  include_once('tab2.php'); ?>
-			    </div>
-			  </div>
+		  <!-- Tab panes -->
+		  <div class="tab-content" style="padding:20px 10px;">
+		    <div role="tabpanel" class="tab-pane active" id="tab1">
+		    	<?php  include_once('tab1.php'); ?>
+		    </div>
+		    <div role="tabpanel" class="tab-pane" id="tab2">
+		    	<?php  include_once('tab3.php'); ?>
+		    </div>
+		    <div role="tabpanel" class="tab-pane" id="tab3">
+		    	<?php  include_once('tab2.php'); ?>
+		    </div>
+		  </div>
 			</div>       
         </section>
       </div>  

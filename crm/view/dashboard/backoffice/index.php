@@ -22,7 +22,7 @@ $sq_enquiry = mysqlQuery("select * from enquiry_master where status!='Disabled' 
 		if($sq_enquiry_entry['followup_status']=="Converted"){
 			$converted_count++;
 		}
-		if($sq_enquiry_entry['followup_status']=="Active"){
+		if($sq_enquiry_entry['followup_status']=="New"){
 			$followup_count++;
 		}
 		if($sq_enquiry_entry['followup_status']=="In-Followup"){
@@ -61,9 +61,9 @@ $sq_enquiry = mysqlQuery("select * from enquiry_master where status!='Disabled' 
                         <div class="col-xs-8 text-right">
                           <span class="single_enquiry_widget_amount dashboard-counter" data-max="<?php echo $followup_count; ?>"></span>
                         </div>
-                        <div class="col-sm-12 single_enquiry_widget_amount">
-                          Active
-                        </div>
+                      <div class="col-sm-12 single_enquiry_widget_amount">
+                        New
+                      </div>
                       </div>
                       <div class="col-sm-6" onclick="window.open('<?= BASE_URL ?>view/attractions_offers_enquiry/enquiry/index.php', 'My Window');">
                         <div class="col-xs-4 text-left">

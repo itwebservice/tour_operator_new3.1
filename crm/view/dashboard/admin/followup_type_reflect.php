@@ -1,7 +1,7 @@
 <?php 
 $followup_status = $_POST['followup_status']; ?>
 <option value="">*Type</option>
-<?php if($followup_status=='Active'||$followup_status=='In-Followup'){  ?>
+<?php if($followup_status=='New'||$followup_status=='In-Followup'){  ?>
 	<option value="Had Call-Chat">Had Call-Chat</option>
 	<option value="Had Text Msg">Had Text Msg</option>
 	<option value="Had Whats App Chat">Had Whats App Chat</option>		

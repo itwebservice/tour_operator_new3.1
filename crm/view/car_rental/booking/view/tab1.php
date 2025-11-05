@@ -128,3 +128,46 @@
         </div>
     </div>
 </div>
+
+<?php 
+// Fetch itinerary for this booking
+$sq_package_program = mysqlQuery("select * from car_rental_booking_program where booking_id='$booking_id' ORDER BY entry_id ASC");
+$sq_package_count = mysqli_num_rows($sq_package_program);
+if($sq_package_count > 0){ ?>
+<div class="row mg_tp_20">
+	<div class="col-md-12">
+		<div class="profile_box main_block">
+			<h3>Itinerary Details</h3>
+			<div class="table-responsive">
+				<table class="table table-bordered no-marg">
+					<thead>
+						<tr class="table-heading-row">
+							<th>S_No.</th>
+							<th>Special_Attraction</th>
+							<th>Day-wise_Program</th>
+							<th>Overnight_Stay</th>
+							<th>Meal_Plan</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php 
+						$count = 0;
+						while($row_itinarary = mysqli_fetch_assoc($sq_package_program)){
+							?>
+							<tr>
+								<td><?= ++$count ?></td>
+								<td><?= $row_itinarary['attraction'] ?></td>
+								<td><pre class="real_text"><?= $row_itinarary['day_wise_program'] ?></pre></td>
+								<td><?= $row_itinarary['stay'] ?></td>
+								<td><?= ($row_itinarary['meal_plan']!='')?$row_itinarary['meal_plan']:'NA' ?></td>
+							</tr>
+							<?php
+						}	
+						?>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php } ?>

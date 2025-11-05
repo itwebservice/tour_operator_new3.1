@@ -8,6 +8,7 @@ $to_currency_rate = $sq_to['currency_rate'];
 $exc_date_arr = $_POST['exc_date_arr'];
 $exc_arr = $_POST['exc_arr'];
 $transfer_arr = $_POST['transfer_arr'];
+$vehicle_arr = isset($_POST['vehicle_arr']) ? $_POST['vehicle_arr'] : array();
 
 $amount_arr = array();
 for ($i = 0; $i < sizeof($exc_arr); $i++) {
@@ -19,7 +20,13 @@ for ($i = 0; $i < sizeof($exc_arr); $i++) {
 	$sq_from = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='$currency_id'"));
 	$from_currency_rate = $sq_from['currency_rate'];
 
-	$sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff_basics where exc_id='$exc_arr[$i]' and transfer_option='$transfer_arr[$i]' and (from_date <='$exc_date' and to_date>='$exc_date')"));
+	// Build tariff query with vehicle condition if vehicle is selected
+	$vehicle_condition = '';
+	if(isset($vehicle_arr[$i]) && $vehicle_arr[$i] != '' && $vehicle_arr[$i] != '0') {
+		$vehicle_condition = " and vehicle_id='$vehicle_arr[$i]'";
+	}
+	
+	$sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff_basics where exc_id='$exc_arr[$i]' and transfer_option='$transfer_arr[$i]' $vehicle_condition and (from_date <='$exc_date' and to_date>='$exc_date')"));
 	$adult_cost = ($from_currency_rate / $to_currency_rate) * $sq_costing['adult_cost'];
 	$child_cost = ($from_currency_rate / $to_currency_rate) * $sq_costing['child_cost'];
 	$infant_cost = ($from_currency_rate / $to_currency_rate) * $sq_costing['infant_cost'];

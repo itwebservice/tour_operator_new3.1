@@ -1,5 +1,6 @@
 <?php
 include "../../../model/model.php";
+global $encrypt_decrypt, $secret_key;
 $selectedDate = !empty($_POST['date']) ? get_date_db($_POST['date']) : null;
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
@@ -54,6 +55,13 @@ function getTodaysItenaryByPackage($id, $selectedDate)
                             $row_user = mysqli_fetch_assoc(mysqlQuery("Select name from customer_users where user_id ='$sq_quo[user_id]'"));
                             $cust_user_name = ' ('.$row_user['name'].')';
                         }
+                        global $encrypt_decrypt, $secret_key;
+                        $contact_no = $encrypt_decrypt->fnDecrypt($sq_customer['contact_no'], $secret_key);
+                        $attraction = addslashes($data['attraction']);
+                        $day_wise_program = addslashes($data['day_wise_program']);
+                        $stay = addslashes($data['stay']);
+                        $meal_plan = addslashes($data['meal_plan']);
+                        $whatsapp_btn = '<button class="btn btn-info btn-sm" onclick="send_itinerary_whatsapp(\''.$contact_no.'\',\''.$customer_name.'\',\''.$attraction.'\',\''.$day_wise_program.'\',\''.$stay.'\',\''.$meal_plan.'\')" data-toggle="tooltip" title="Send WhatsApp Message"><i class="fa fa-whatsapp"></i></button>';
                         return  $temparr = array("data" => array(
                             (int) ($i++),
                             $bookedId,
@@ -61,7 +69,8 @@ function getTodaysItenaryByPackage($id, $selectedDate)
                             $data['attraction'],
                             $data['day_wise_program'],
                             $data['stay'],
-                            $data['meal_plan']
+                            $data['meal_plan'],
+                            $whatsapp_btn
                         ), "bg" => '');
                         $usedId = $data['booking_id'];
                     }
@@ -99,6 +108,13 @@ function getTodaysItenaryByPackage($id, $selectedDate)
                             $row_user = mysqli_fetch_assoc(mysqlQuery("Select name from customer_users where user_id ='$sq_quo[user_id]'"));
                             $cust_user_name = ' ('.$row_user['name'].')';
                         }
+                        global $encrypt_decrypt, $secret_key;
+                        $contact_no = $encrypt_decrypt->fnDecrypt($sq_customer['contact_no'], $secret_key);
+                        $attraction = addslashes($data['attraction']);
+                        $day_wise_program = addslashes($data['day_wise_program']);
+                        $stay = addslashes($data['stay']);
+                        $meal_plan = addslashes($data['meal_plan']);
+                        $whatsapp_btn = '<button class="btn btn-info btn-sm" onclick="send_itinerary_whatsapp(\''.$contact_no.'\',\''.$customer_name.'\',\''.$attraction.'\',\''.$day_wise_program.'\',\''.$stay.'\',\''.$meal_plan.'\')" data-toggle="tooltip" title="Send WhatsApp Message"><i class="fa fa-whatsapp"></i></button>';
                         return  $temparr = array("data" => array(
                             (int) ($i++),
                             $bookedId,
@@ -106,7 +122,8 @@ function getTodaysItenaryByPackage($id, $selectedDate)
                             $data['attraction'],
                             $data['day_wise_program'],
                             $data['stay'],
-                            $data['meal_plan']
+                            $data['meal_plan'],
+                            $whatsapp_btn
 
                         ), "bg" => '');
                         $usedId = $data['booking_id'];
@@ -149,6 +166,14 @@ function getTodaysItenary($id, $selectedDate)
                         $yr = explode("-", $date);
                         $year = $yr[0];
                         $bookedId =  get_package_booking_id($data['booking_id'], $year);
+                        
+                        global $encrypt_decrypt, $secret_key;
+                        $contact_no = $encrypt_decrypt->fnDecrypt($sq_customer['contact_no'], $secret_key);
+                        $attraction = addslashes($data['attraction']);
+                        $day_wise_program = addslashes($data['day_wise_program']);
+                        $stay = addslashes($data['stay']);
+                        $meal_plan = addslashes($data['meal_plan']);
+                        $whatsapp_btn = '<button class="btn btn-info btn-sm" onclick="send_itinerary_whatsapp(\''.$contact_no.'\',\''.$customer_name.'\',\''.$attraction.'\',\''.$day_wise_program.'\',\''.$stay.'\',\''.$meal_plan.'\')" data-toggle="tooltip" title="Send WhatsApp Message"><i class="fa fa-whatsapp"></i></button>';
 
                         return  $temparr = array("data" => array(
                             (int) ($i++),
@@ -157,7 +182,8 @@ function getTodaysItenary($id, $selectedDate)
                             $data['attraction'],
                             $data['day_wise_program'],
                             $data['stay'],
-                            $data['meal_plan']
+                            $data['meal_plan'],
+                            $whatsapp_btn
                         ), "bg" => '');
                         $usedId = $data['booking_id'];
                     }
@@ -186,6 +212,15 @@ function getTodaysItenary($id, $selectedDate)
                         $yr = explode("-", $date);
                         $year = $yr[0];
                         $bookedId =  get_package_booking_id($data['booking_id'], $year);
+                        
+                        global $encrypt_decrypt, $secret_key;
+                        $contact_no = $encrypt_decrypt->fnDecrypt($sq_customer['contact_no'], $secret_key);
+                        $attraction = addslashes($data['attraction']);
+                        $day_wise_program = addslashes($data['day_wise_program']);
+                        $stay = addslashes($data['stay']);
+                        $meal_plan = addslashes($data['meal_plan']);
+                        $whatsapp_btn = '<button class="btn btn-info btn-sm" onclick="send_itinerary_whatsapp(\''.$contact_no.'\',\''.$customer_name.'\',\''.$attraction.'\',\''.$day_wise_program.'\',\''.$stay.'\',\''.$meal_plan.'\')" data-toggle="tooltip" title="Send WhatsApp Message"><i class="fa fa-whatsapp"></i></button>';
+                        
                         return  $temparr = array("data" => array(
                             (int) ($i++),
                             $bookedId,
@@ -193,7 +228,8 @@ function getTodaysItenary($id, $selectedDate)
                             $data['attraction'],
                             $data['day_wise_program'],
                             $data['stay'],
-                            $data['meal_plan']
+                            $data['meal_plan'],
+                            $whatsapp_btn
                         ), "bg" => '');
                         $usedId = $data['booking_id'];
                     }

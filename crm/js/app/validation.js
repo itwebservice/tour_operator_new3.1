@@ -1242,6 +1242,66 @@ function foo(tableID, quot_table_id, rowCounts) {
     );
   }
 
+  // Transport booking tables
+  if (tableID == "tbl_booking_transport") {
+    var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+    var label = row.cells[0].querySelector('label');
+    var vehicleSelect = row.cells[2].querySelector('select');
+    var startDateInput = row.cells[3].querySelector('input');
+    var endDateInput = row.cells[4].querySelector('input');
+    var pickupSelect = row.cells[5].querySelector('select');
+    var dropSelect = row.cells[6].querySelector('select');
+    var durationSelect = row.cells[7].querySelector('select');
+    var vehicleCountInput = row.cells[8].querySelector('input');
+    
+    if(checkbox) checkbox.setAttribute("id", "chk_transport" + foo.counter);
+    if(label) label.setAttribute("for", "chk_transport" + foo.counter);
+    if(vehicleSelect) vehicleSelect.setAttribute("id", "transport_vehicle_name" + foo.counter);
+    if(startDateInput) startDateInput.setAttribute("id", "transport_start_date" + foo.counter);
+    if(endDateInput) {
+      endDateInput.setAttribute("id", "transport_end_date" + foo.counter);
+      endDateInput.setAttribute("onchange", "validate_validDate('transport_start_date" + foo.counter + "','transport_end_date" + foo.counter + "');");
+    }
+    if(startDateInput) {
+      startDateInput.setAttribute("onchange", "get_to_date(this.id,'transport_end_date" + foo.counter + "');");
+    }
+    if(pickupSelect) pickupSelect.setAttribute("id", "transport_pickup_from" + foo.counter);
+    if(dropSelect) dropSelect.setAttribute("id", "transport_drop_to" + foo.counter);
+    if(durationSelect) durationSelect.setAttribute("id", "transport_service_duration" + foo.counter);
+    if(vehicleCountInput) vehicleCountInput.setAttribute("id", "transport_no_vehicles" + foo.counter);
+  }
+
+  if (tableID == "tbl_booking_transport_u") {
+    var suffix = "_u";
+    var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+    var label = row.cells[0].querySelector('label');
+    var vehicleSelect = row.cells[2].querySelector('select');
+    var startDateInput = row.cells[3].querySelector('input');
+    var endDateInput = row.cells[4].querySelector('input');
+    var pickupSelect = row.cells[5].querySelector('select');
+    var dropSelect = row.cells[6].querySelector('select');
+    var durationSelect = row.cells[7].querySelector('select');
+    var vehicleCountInput = row.cells[8].querySelector('input');
+    var entryIdInput = row.cells[9].querySelector('input');
+    
+    if(checkbox) checkbox.setAttribute("id", "chk_transport" + foo.counter + suffix);
+    if(label) label.setAttribute("for", "chk_transport" + foo.counter + suffix);
+    if(vehicleSelect) vehicleSelect.setAttribute("id", "transport_vehicle_name" + foo.counter + suffix);
+    if(startDateInput) startDateInput.setAttribute("id", "transport_start_date" + foo.counter + suffix);
+    if(endDateInput) {
+      endDateInput.setAttribute("id", "transport_end_date" + foo.counter + suffix);
+      endDateInput.setAttribute("onchange", "validate_validDate('transport_start_date" + foo.counter + suffix + "','transport_end_date" + foo.counter + suffix + "');");
+    }
+    if(startDateInput) {
+      startDateInput.setAttribute("onchange", "get_to_date(this.id,'transport_end_date" + foo.counter + suffix + "');");
+    }
+    if(pickupSelect) pickupSelect.setAttribute("id", "transport_pickup_from" + foo.counter + suffix);
+    if(dropSelect) dropSelect.setAttribute("id", "transport_drop_to" + foo.counter + suffix);
+    if(durationSelect) durationSelect.setAttribute("id", "transport_service_duration" + foo.counter + suffix);
+    if(vehicleCountInput) vehicleCountInput.setAttribute("id", "transport_no_vehicles" + foo.counter + suffix);
+    if(entryIdInput) entryIdInput.setAttribute("id", "transport_entry_id" + foo.counter + suffix);
+  }
+
   ////////Journal Entry table/////////
   if (tableID == "tbl_debited") {
     row.cells[0].childNodes[0].setAttribute("id", "chk_debit1" + foo.counter);
@@ -1939,6 +1999,8 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "excursion_amount-" + foo.counter
     );
+    row.cells[15].childNodes[0].setAttribute("id", "vehicle_id-" + foo.counter);
+    row.cells[16].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter);
 
     for (var i = row.cells[2].childNodes[0].attributes.length; i-- > 0; )
       row.cells[2].childNodes[0].removeAttributeNode(
@@ -4076,8 +4138,9 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[6].childNodes[0].setAttribute("id", "child_cost" + foo.counter);
     row.cells[7].childNodes[0].setAttribute("id", "infant_cost" + foo.counter);
     row.cells[8].childNodes[0].setAttribute("id", "transfer_cost" + foo.counter);
-    row.cells[9].childNodes[0].setAttribute("id", "markup_in" + foo.counter);
-    row.cells[10].childNodes[0].setAttribute("id", "amount" + foo.counter);
+    row.cells[9].childNodes[0].setAttribute("id", "vehicle_id" + foo.counter);
+    row.cells[10].childNodes[0].setAttribute("id", "markup_in" + foo.counter);
+    row.cells[11].childNodes[0].setAttribute("id", "amount" + foo.counter);
 
     row.cells[3].childNodes[0].value = get_date();
     dynamic_date(row.cells[3].childNodes[0].id);
@@ -4106,7 +4169,7 @@ function foo(tableID, quot_table_id, rowCounts) {
         '")'
     );
 
-    $(row.cells[11]).addClass("hidden");
+    $(row.cells[12]).addClass("hidden");
   }
   if (tableID == "table_exc_tarrif_offer") {
     row.cells[0].childNodes[0].setAttribute("id", "chk_offer" + foo.counter);
@@ -4514,6 +4577,15 @@ function foo(tableID, quot_table_id, rowCounts) {
     .each(function () {
       $(this).datetimepicker({ datepicker: false, format: "H:i" });
     });
+    
+  // Reinitialize datepicker for transport tables
+  if (tableID == "tbl_booking_transport" || tableID == "tbl_booking_transport_u") {
+    $("#" + tableID)
+      .find(".app_datepicker")
+      .each(function () {
+        $(this).datetimepicker({ timepicker: false, format: "d-m-Y" });
+      });
+  }
 }
 
 // function addRow(tableID, quot_table = "", itinerary = "") {

@@ -21,6 +21,8 @@ public function branch_master_save()
 	$bank_branch_name = addslashes($_POST['bank_branch_name']);
 	$bank_ifsc_code = $_POST['bank_ifsc_code'];
 	$branch_tax = $_POST['branch_tax'];
+	$qr_upload_url = isset($_POST['qr_upload_url']) ? $_POST['qr_upload_url'] : '';
+	$logo_upload_url = isset($_POST['logo_upload_url']) ? $_POST['logo_upload_url'] : '';
 	$active_flag = 'Active';
 	$created_at = date('Y-m-d');
 
@@ -33,7 +35,7 @@ public function branch_master_save()
 	$branch_id = mysqli_fetch_assoc(mysqlQuery("select max(branch_id) as max from branches"));
 	$branch_id = $branch_id['max']+1;
 
-	$sq_branch = mysqlQuery("insert into branches ( branch_id, branch_name, location_id, branch_address,contact_no, email_id, landline_no, address1, address2, city, pincode, bank_name,bank_account_name, acc_name, bank_acc_no, bank_branch_name, ifsc_code, active_flag, created_at, branch_tax, state ) values ( '$branch_id', '$branch_name', '$location_id', '$branch_address', '$contact_no', '$email_id', '$landline_no' , '$address1', '$address2', '$city', '$pincode', '$bank_name','$bank_account_name', '$acc_name', '$bank_acc_no', '$bank_branch_name', '$bank_ifsc_code', '$active_flag', '$created_at', '$branch_tax','$state' )");
+	$sq_branch = mysqlQuery("insert into branches ( branch_id, branch_name, location_id, branch_address,contact_no, email_id, landline_no, address1, address2, city, pincode, bank_name,bank_account_name, acc_name, bank_acc_no, bank_branch_name, ifsc_code, active_flag, created_at, branch_tax, state, qr_url, logo_url ) values ( '$branch_id', '$branch_name', '$location_id', '$branch_address', '$contact_no', '$email_id', '$landline_no' , '$address1', '$address2', '$city', '$pincode', '$bank_name','$bank_account_name', '$acc_name', '$bank_acc_no', '$bank_branch_name', '$bank_ifsc_code', '$active_flag', '$created_at', '$branch_tax','$state', '$qr_upload_url', '$logo_upload_url' )");
 	if($sq_branch){
 		echo "Your branch has been successfully saved.";
 		exit;
@@ -65,6 +67,8 @@ public function branch_master_update()
 	$bank_branch_name = addslashes($_POST['bank_branch_name']);
 	$bank_ifsc_code = $_POST['bank_ifsc_code'];
 	$branch_tax = $_POST['branch_tax'];
+	$qr_upload_url = isset($_POST['qr_upload_url']) ? $_POST['qr_upload_url'] : '';
+	$logo_upload_url = isset($_POST['logo_upload_url']) ? $_POST['logo_upload_url'] : '';
 	$active_flag = $_POST['active_flag'];
 	
 	$branch_count = mysqli_num_rows( mysqlQuery("select * from branches where branch_name='$branch_name' and location_id='$location_id' and branch_id!='$branch_id'") );
@@ -73,7 +77,7 @@ public function branch_master_update()
 		exit;
 	}
 
-	$sq_branch = mysqlQuery("update branches set branch_name='$branch_name', location_id='$location_id', branch_address='$branch_address', contact_no='$contact_no', email_id='$email_id', landline_no='$landline_no', address1='$address1', address2='$address2', city='$city', pincode='$pincode', bank_name='$bank_name',bank_account_name='$bank_account_name' ,bank_acc_no='$bank_acc_no', acc_name='$acc_name', bank_branch_name='$bank_branch_name', ifsc_code='$bank_ifsc_code', active_flag='$active_flag', branch_tax='$branch_tax',state='$state' where branch_id='$branch_id'");
+	$sq_branch = mysqlQuery("update branches set branch_name='$branch_name', location_id='$location_id', branch_address='$branch_address', contact_no='$contact_no', email_id='$email_id', landline_no='$landline_no', address1='$address1', address2='$address2', city='$city', pincode='$pincode', bank_name='$bank_name',bank_account_name='$bank_account_name' ,bank_acc_no='$bank_acc_no', acc_name='$acc_name', bank_branch_name='$bank_branch_name', ifsc_code='$bank_ifsc_code', active_flag='$active_flag', branch_tax='$branch_tax',state='$state', qr_url='$qr_upload_url', logo_url='$logo_upload_url' where branch_id='$branch_id'");
 	if($sq_branch){
 		echo "Your branch has been successfully updated.";
 		exit;

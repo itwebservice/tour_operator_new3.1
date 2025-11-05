@@ -18,6 +18,9 @@ if ($branch_admin_id != 0) {
   $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
 }
 
+// Get branch-wise logo and QR code
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
+
 $quotation_id = $_GET['quotation_id'];
 
 $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Car Rental Quotation' and active_flag ='Active'"));
@@ -95,6 +98,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 	} else {
 	$quotation_cost = $sq_quotation['total_tour_cost'];
 	}
+
+$sq_package_program = mysqlQuery("select * from car_rental_quotation_program where quotation_id='$quotation_id'");
+$sq_package_count = mysqli_num_rows($sq_package_program);
 ?>
 
 <!-- landingPage -->
@@ -236,6 +242,49 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
         </div>
       </div>
     </section>
+
+    <!-- Itinerary -->
+    <?php if ($sq_package_count != 0) {
+    $count = 1;
+    $i = 0;
+    $result = get_dates_for_itineary($sq_quotation['from_date'], $sq_quotation['to_date']);
+    $iti_dates_days = explode('=', $result);
+    $dates = json_decode($iti_dates_days[0], true);
+    ?>
+    <section class="itinerarySec main_block side_pad mg_tp_30">
+      <div style="text-align: center;">
+        <div class="font-package" style="margin-bottom: 20px;font-weight: 500;border: 2px solid #333;text-align: center;font-size: 16px;display: inline-block;padding: 8px 15px;border-radius: 20px;">
+          Day Wise Itinerary
+        </div>
+      </div>
+      
+      <?php while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
+        $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
+      ?>
+      <section class="print_single_itinenary leftItinerary">
+        <div class="itneraryImg">
+          <div class="itneraryText">
+            <div class="itneraryDayAccomodation" style="margin-bottom: 10px;">
+              <span style="font-weight: 600; font-size: 15px;">
+                <i class="fa fa-map-marker" aria-hidden="true"></i> Day <?= $count ?><small> (<?= $date_format ?>) </small> : <?= $row_itinarary['attraction'] ?> 
+              </span>
+            </div>
+            <div class="itneraryDayPlan">
+              <p><?= $row_itinarary['day_wise_program'] ?></p>
+            </div>
+            <div style="display: flex; gap: 30px; margin-top: 10px;">
+              <span><i class="fa fa-bed"></i> Overnight Stay: <?= $row_itinarary['stay'] ?></span>
+              <span><i class="fa fa-cutlery"></i> Meal Plan: <?= $row_itinarary['meal_plan'] ?></span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <?php
+        $count++;
+        $i++;
+      } ?>
+    </section>
+    <?php } ?>
 
     <?php if (isset($sq_terms_cond['terms_and_conditions'])) { ?>
       <section class="incluExcluTerms main_block mg_tp_30">
@@ -384,9 +433,9 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
         <p>SWIFT CODE</p>
       </div>
       <?php
-      if (check_qr()) { ?>
+      if (check_qr($branch_admin_id)) { ?>
         <div class="col-md-12 text-center" style="margin-top:20px; margin-bottom:20px;">
-          <?= get_qr('Protrait Advance') ?>
+          <?= get_qr('Protrait Advance', $branch_admin_id) ?>
           <br>
           <h4 class="no-marg">Scan & Pay </h4>
         </div>

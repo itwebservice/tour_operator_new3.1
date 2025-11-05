@@ -446,6 +446,19 @@
                                                             <td style="display:none"><input type="number"
                                                                     id="infant_total-1" name="infant_total-1"
                                                                     style="width:100px;display:none;"></td>
+                                                            <td><select name="vehicle_id-1" id="vehicle_id-1"
+                                                                    style="width: 155px"
+                                                                    class="form-control app_select2"
+                                                                    title="Select Vehicle">
+                                                                    <option value=''>Select Vehicle</option>
+                                                                    <?php
+                                                                    $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                                    while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                                    ?>
+                                                                        <option value="<?= $row_vehicle['entry_id'] ?>">
+                                                                            <?= $row_vehicle['vehicle_name'] ?></option>
+                                                                    <?php } ?>
+                                                                </select></td>
                                                             <td><input type="number" id="no_vehicles-1" name="no_vehicles-1" placeholder="No.Of Vehicles" title="No.Of Vehicles" style="width:150px" onchange="get_excursion_amount();">
                                                             <td style="display:none"><input type="number" id="transfer_total-1" name="transfer_total-1" style="width:100px;display:none;"></td>
                                                         </tr>

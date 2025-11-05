@@ -220,6 +220,19 @@ include "../../model/model.php";
                                                                                 name="transfer_cost"
                                                                                 placeholder="Transfer Cost"
                                                                                 title="Transfer Cost" style="width:155px"></td>
+                                                                        <td><select name="vehicle_id" id="vehicle_id"
+                                                                                style="width: 155px"
+                                                                                class="form-control app_select2"
+                                                                                title="Select Vehicle">
+                                                                                <option value=''>Select Vehicle</option>
+                                                                                <?php
+                                                                                $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                                                while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                                                ?>
+                                                                                    <option value="<?= $row_vehicle['entry_id'] ?>">
+                                                                                        <?= $row_vehicle['vehicle_name'] ?></option>
+                                                                                <?php } ?>
+                                                                            </select></td>
                                                                         <td><select name="markup_in" id="markup_in"
                                                                                 style="width: 125px"
                                                                                 class="form-control app_select2"
@@ -595,6 +608,7 @@ include "../../model/model.php";
                 var child_cost_array = new Array();
                 var infant_cost_array = new Array();
                 var transfer_cost_array = [];
+                var vehicle_id_array = [];
                 var markup_in_array = new Array();
                 var markup_cost_array = new Array();
                 var table = document.getElementById("table_exc_tarrif_basic");
@@ -611,8 +625,9 @@ include "../../model/model.php";
                         var child_cost = row.cells[6].childNodes[0].value;
                         var infant_cost = row.cells[7].childNodes[0].value;
                         var transfer_cost = row.cells[8].childNodes[0].value;
-                        var markup_in = row.cells[9].childNodes[0].value;
-                        var markup_cost = row.cells[10].childNodes[0].value;
+                        var vehicle_id = row.cells[9].childNodes[0].value;
+                        var markup_in = row.cells[10].childNodes[0].value;
+                        var markup_cost = row.cells[11].childNodes[0].value;
 
                         if (transfer_option == '') {
                             error_msg_alert('Select Transfer Option in Row-' + (i + 1));
@@ -641,6 +656,7 @@ include "../../model/model.php";
                         child_cost_array.push(child_cost);
                         infant_cost_array.push(infant_cost);
                         transfer_cost_array.push(transfer_cost);
+                        vehicle_id_array.push(vehicle_id);
                         markup_in_array.push(markup_in);
                         markup_cost_array.push(markup_cost);
                     }
@@ -745,6 +761,7 @@ include "../../model/model.php";
                         child_cost_array: child_cost_array,
                         infant_cost_array: infant_cost_array,
                         transfer_cost_array: transfer_cost_array,
+                        vehicle_id_array: vehicle_id_array,
                         markup_in_array: markup_in_array,
                         markup_cost_array: markup_cost_array,
                         type_array: type_array,

@@ -28,7 +28,7 @@ $branch_status = $_POST['branch_status'];
 
 
 
-                <form id="frm_payment_save">
+                <form id="frm_payment_save" method="post" onsubmit="return false;">
 
 
 
@@ -92,7 +92,7 @@ $branch_status = $_POST['branch_status'];
                         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
                             <select id="cmb_payment_mode" required
-                                onchange="payment_installment_enable_disable_fields();get_identifier_block('identifier','cmb_payment_mode','credit_card_details','credit_charges');get_credit_card_charges('identifier','cmb_payment_mode','txt_amount','credit_card_details','credit_charges')"
+                                onchange="payment_installment_enable_disable_fields();get_identifier_block('identifier','cmb_payment_mode','credit_card_details','credit_charges');get_credit_card_charges('identifier','cmb_payment_mode','txt_amount','credit_card_details','credit_charges');get_supplier_fields(this.id,'div_supplier_type_content');"
                                 title="Mode">
 
                                 <?php get_payment_mode_dropdown() ?>
@@ -100,6 +100,12 @@ $branch_status = $_POST['branch_status'];
                             </select>
 
                         </div>
+
+                         <div id="div_supplier_type_content"></div>
+
+                        <div  id="div_vendor_type_content"></div>
+
+                        
 
                         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
@@ -229,6 +235,78 @@ $branch_status = $_POST['branch_status'];
     $('#booking_id,#currency_code1').select2();
 
 
+    function get_purchase_outstanding(){
+  
+    var base_url = $('#base_url').val();
+    var estimate_id = $('#estimate_id').val();
+    var type= $('#cmb_payment_mode').val();  
+    // if(type=='To Supplier'){
+        $.post(base_url+'view/vendor/inc/get_payment_outstanding.php', {
+            estimate_id: estimate_id
+    }, function(data) {
+        data = data.split('=');
+        var purchase_outstanding= data[0];   
+        $('#purchase_outstanding').val(purchase_outstanding);
+    
+    });
+    // }
+   
+}
+
+    function get_supplier_fields(id,for_id){
+    var base_url = $('#base_url').val();
+    var type= $('#'+id).val();
+    if(type== 'To Supplier'){
+        $.post(base_url+'view/package_booking/payments/inc/supplier_type.php', {  }, function(data){
+    $('#'+for_id).html(data);  
+  });
+    }else{
+        $('#'+for_id).html('');
+        $('#div_vendor_type_content').html('');
+    }
+ 
+}
+
+function vendor_type_data_load_p(vendor_type, for_id, vendor_type_id='')
+{
+  var base_url = $('#base_url').val();
+  $.post(base_url+'view/package_booking/payments/inc/payment_for_supplier.php', { vendor_type : vendor_type, vendor_type_id : vendor_type_id }, function(data){
+    $('#'+for_id).html(data);  
+  });
+}
+
+function get_vendor_type_id(vendor_id, offset='')
+{
+  var vendor_type = $('#'+vendor_id).val();
+
+  if(vendor_type=="Hotel Vendor"){
+    var hotel_id = $('#hotel_id'+offset).val();
+    return hotel_id;
+  }
+  else if(vendor_type=="Transport Vendor"){
+    var transport_agency_id = $('#transport_agency_id'+offset).val();
+    return transport_agency_id;
+  }
+  else if(vendor_type=="Car Rental Vendor"){
+    var vendor_id = $('#vendor_id'+offset).val();
+    return vendor_id;
+  }
+  else if(vendor_type=="DMC Vendor"){
+    var dmc_id = $('#dmc_id'+offset).val();
+    return dmc_id;
+  }
+  else if(vendor_type=="Cruise Vendor"){
+    var cruise_id = $('#cruise_id'+offset).val();
+    return cruise_id;
+  }
+  else if(vendor_type=="Visa Vendor" || vendor_type=="Passport Vendor" || vendor_type=="Ticket Vendor" || vendor_type=="Train Ticket Vendor" || vendor_type=="Excursion Vendor" || vendor_type=="Insurance Vendor" || vendor_type=="Other Vendor"){
+    var vendor_id = $('#vendor_id'+offset).val();
+    return vendor_id;
+  }  
+  else{
+    return '';
+  }
+}
 
     $('#frm_payment_save').validate({
 
@@ -278,6 +356,20 @@ $branch_status = $_POST['branch_status'];
             var credit_card_details = $('#credit_card_details').val();
             var outstanding = $('#outstanding').val();
             var canc_status = $('#canc_status').val();
+            
+            //For To Supplier - declare variables first
+            var vendor_type = $('#vendor_type').val();
+            var vendor_type_id = get_vendor_type_id('vendor_type');
+            var estimate_id = $('#estimate_id').val();
+            var purchase_outstanding = $('#purchase_outstanding').val();
+
+            if(payment_mode=='To Supplier'){
+                if(parseFloat(payment_amount) > parseFloat(purchase_outstanding)){
+                    error_msg_alert("Payment amount cannot be greater than purchase outstanding amount.");
+                    $('#btn_payment_installment').prop('disabled',false);
+                    return false; 
+                }
+            }
 
             var bank_id = $('#bank_id').val();
             var emp_id = $("#emp_id").val();
@@ -331,7 +423,9 @@ $branch_status = $_POST['branch_status'];
                             credit_charges: credit_charges,
                             credit_card_details: credit_card_details,
                             canc_status: canc_status,
-                            currency_code:currency_code
+                            currency_code:currency_code,
+                            vendor_type : vendor_type, vendor_type_id : vendor_type_id,
+                        estimate_id: estimate_id
                         },
                         function(data) {
                             msg_alert(data);

@@ -1006,6 +1006,7 @@ $('#frm_tab4').validate({
         var infant_arr = [];
         var excursion_amt_arr = [];
         var excursion_id_arr = [];
+        var vehicle_id_arr_e = [];
         var vehicles_arr = [];
 
         for (var e = 0; e < rowCount; e++) {
@@ -1021,10 +1022,11 @@ $('#frm_tab4').validate({
             var chwob = row.cells[8].childNodes[0].value;
             var infant = row.cells[9].childNodes[0].value;
             var excursion_amount = row.cells[10].childNodes[0].value;
-            var vehicles = row.cells[15].childNodes[0].value;
+            var vehicle_id = row.cells[15].childNodes[0].value;
+            var vehicles = row.cells[16].childNodes[0].value;
 
-            if (row.cells[16] && row.cells[16].childNodes[0]) {
-                var excursion_id = row.cells[16].childNodes[0].value;
+            if (row.cells[17] && row.cells[17].childNodes[0]) {
+                var excursion_id = row.cells[17].childNodes[0].value;
             } else {
                 var excursion_id = "";
             }
@@ -1038,6 +1040,7 @@ $('#frm_tab4').validate({
             chwb_arr.push(chwb);
             chwob_arr.push(chwob);
             infant_arr.push(infant);
+            vehicle_id_arr_e.push(vehicle_id);
             vehicles_arr.push(vehicles);
             excursion_id_arr.push(excursion_id);
         }
@@ -1284,6 +1287,7 @@ $('#frm_tab4').validate({
                             exc_date_arr_e: exc_date_arr_e,
                             transfer_option_arr: transfer_option_arr,
                             excursion_amt_arr: excursion_amt_arr,
+                            vehicle_id_arr_e: vehicle_id_arr_e,
                             excursion_id_arr: excursion_id_arr,
                             excursion_cost_arr: excursion_cost_arr,
                             vehicles_arr:vehicles_arr,

@@ -10,6 +10,9 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 $year = $_GET['year'];
 $branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : 1;
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
+
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
 $total_days1 = '';
 $credit_card_charges = $_GET['credit_card_charges'];
 $charge = ($credit_card_charges != '') ? $credit_card_charges : 0;
@@ -89,7 +92,7 @@ $net_amount1 = currency_conversion($currency, $tourwise_details['currency_code']
   <div class=" col-md-4 no-pad">
     <span class="title"><i class="fa fa-file-text"></i> CONFIRMATION FORM</span>
     <div class="print_header_logo">
-      <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10">
+      <img src="<?php echo $admin_logo_url; ?>" class="img-responsive mg_tp_10" style="max-width: 210px; max-height: 90px; object-fit: contain;">
     </div>
   </div>
   <div class="col-md-8 no-pad">
@@ -380,6 +383,99 @@ if ($sq_h_count > 0) { ?>
     </div>
   </section>
 <?php } ?>
+<!-- / Hotel End -->
+
+<!-- Transport Details -->
+<?php
+$sq_transport_count = mysqli_num_rows(mysqlQuery("select * from group_tour_booking_transport_entries where traveler_group_id='$traveler_group_id'"));
+if ($sq_transport_count > 0) { ?>
+  <section class="print_sec main_block">
+    <div class="section_heding">
+      <h2>Transport Details</h2>
+      <div class="section_heding_img">
+        <img src="<?php echo BASE_URL . 'images/heading_border.png'; ?>" class="img-responsive">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="table-responsive">
+          <table class="table table-bordered no-marg" id="tbl_emp_list">
+            <thead>
+              <tr class="table-heading-row">
+                <th>S_No.</th>
+                <th>Vehicle</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Pickup Location</th>
+                <th>Drop Location</th>
+                <th>Service Duration</th>
+                <th>No. of Vehicles</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              $count = 0;
+              $sq_transport = mysqlQuery("select * from group_tour_booking_transport_entries where traveler_group_id='$traveler_group_id'");
+              while ($row_transport = mysqli_fetch_assoc($sq_transport)) {
+                $count++;
+                
+                // Get Vehicle Name
+                $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id = '".$row_transport['vehicle_name']."'"));
+                $vehicle_name = $sq_vehicle['vehicle_name'] ? $sq_vehicle['vehicle_name'] : 'N/A';
+                
+                // Get Pickup Location
+                $pickup_location = 'N/A';
+                if($row_transport['pickup_type'] == 'city'){
+                  $row = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='".$row_transport['pickup']."'"));
+                  $pickup_location = $row['city_name'] ? $row['city_name'] : 'N/A';
+                }
+                else if($row_transport['pickup_type'] == 'hotel'){
+                  $row = mysqli_fetch_assoc(mysqlQuery("select hotel_name from hotel_master where hotel_id='".$row_transport['pickup']."'"));
+                  $pickup_location = $row['hotel_name'] ? $row['hotel_name'] : 'N/A';
+                }
+                else if($row_transport['pickup_type'] == 'airport'){
+                  $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code from airport_master where airport_id='".$row_transport['pickup']."'"));
+                  if($row){
+                    $pickup_location = $row['airport_name']." (".$row['airport_code'].")";
+                  }
+                }
+                
+                // Get Drop Location
+                $drop_location = 'N/A';
+                if($row_transport['drop_type'] == 'city'){
+                  $row = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='".$row_transport['drop_location']."'"));
+                  $drop_location = $row['city_name'] ? $row['city_name'] : 'N/A';
+                }
+                else if($row_transport['drop_type'] == 'hotel'){
+                  $row = mysqli_fetch_assoc(mysqlQuery("select hotel_name from hotel_master where hotel_id='".$row_transport['drop_location']."'"));
+                  $drop_location = $row['hotel_name'] ? $row['hotel_name'] : 'N/A';
+                }
+                else if($row_transport['drop_type'] == 'airport'){
+                  $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code from airport_master where airport_id='".$row_transport['drop_location']."'"));
+                  if($row){
+                    $drop_location = $row['airport_name']." (".$row['airport_code'].")";
+                  }
+                }
+              ?>
+                <tr>
+                  <td><?php echo $count; ?></td>
+                  <td><?php echo $vehicle_name; ?></td>
+                  <td><?php echo get_date_user($row_transport['start_date']); ?></td>
+                  <td><?php echo get_date_user($row_transport['end_date']); ?></td>
+                  <td><?php echo $pickup_location; ?></td>
+                  <td><?php echo $drop_location; ?></td>
+                  <td><?php echo $row_transport['service_duration']; ?></td>
+                  <td><?php echo $row_transport['vehicle_count']; ?></td>
+                </tr>
+              <?php } ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+<?php } ?>
+<!-- / Transport End -->
 
 <?php
 //Cruise

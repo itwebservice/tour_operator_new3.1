@@ -67,6 +67,11 @@ public function quotation_master_update()
 	$sq_quotation = mysqlQuery("update car_rental_quotation_master set enquiry_id = '$enquiry_id',customer_name='$customer_name', total_pax = '$total_pax', days_of_traveling ='$days_of_traveling', traveling_date = '$traveling_date', travel_type='$travel_type', places_to_visit = '$route', vehicle_name = '$vehicle_name', from_date = '$from_date', to_date = '$to_date', route = '$route', extra_km_cost='$extra_km_cost', extra_hr_cost = '$extra_hr_cost', subtotal = '$subtotal',markup_cost ='$markup_cost',markup_cost_subtotal='$markup_cost_subtotal', taxation_id = '$taxation_id', service_charge = '$service_charge', service_tax_subtotal = '$service_tax_subtotal', permit='$permit', toll_parking='$toll_parking',driver_allowance='$driver_allowance',email_id='$email_id',mobile_no='$whatsapp_no',country_code='$country_code',whatsapp_no='$mobile_no', total_tour_cost = '$total_tour_cost', quotation_date='$quotation_date',total_hrs='$total_hrs',total_km	='$total_km',rate='$rate',total_max_km='$total_max_km',state_entry='$state_entry',other_charge='$other_charges',capacity='$capacity',local_places_to_visit='$local_places_to_visit',roundoff = '$roundoff', bsm_values = '$bsmValues',status='$active_flag',currency_code ='$currency_code',created_at=NOW() where quotation_id = '$quotation_id'");
 
 	if($sq_quotation){
+		/////////////Itinerary Update///////////////
+		if(isset($_POST['special_attraction_arr']) && !empty($_POST['special_attraction_arr'])){
+			$this->itinerary_update($quotation_id, $_POST['special_attraction_arr'], $_POST['day_program_arr'], $_POST['stay_arr'], $_POST['meal_plan_arr'], $_POST['checked_programe_arr'], $_POST['iti_entry_id_arr']);
+		}
+
 		echo "Quotation has been successfully updated.";	
 		exit;
 	}
@@ -75,6 +80,47 @@ public function quotation_master_update()
 		exit;
 	}
 
+}
+
+public function itinerary_update($quotation_id, $special_attraction_arr, $day_program_arr, $stay_arr, $meal_plan_arr, $checked_programe_arr, $iti_entry_id_arr)
+{
+	for ($i = 0; $i < sizeof($day_program_arr); $i++) {
+
+		$special_attraction_arr1 = addslashes($special_attraction_arr[$i]);
+		$day_program_arr1 = addslashes($day_program_arr[$i]);
+		$stay_arr1 = addslashes($stay_arr[$i]);
+		$meal_plan1 = mysqlREString($meal_plan_arr[$i]);
+
+		if ($checked_programe_arr[$i] == 'true') {
+			if ($iti_entry_id_arr[$i] != '') {
+				$sq = mysqlQuery("update car_rental_quotation_program set attraction = '$special_attraction_arr1', day_wise_program = '$day_program_arr1',stay='$stay_arr1',meal_plan='$meal_plan1' where id='$iti_entry_id_arr[$i]'");
+
+				if (!$sq) {
+					echo "error--Error at row " . ($i + 1) . " for Tour Itinerary information.";
+					exit;
+				}
+			} else {
+				$sq = mysqlQuery("select max(id) as max from car_rental_quotation_program");
+				$value = mysqli_fetch_assoc($sq);
+				$max_id = $value['max'] + 1;
+
+				$sq = mysqlQuery("insert into car_rental_quotation_program (id, quotation_id, attraction, day_wise_program, stay, meal_plan) values ('$max_id', '$quotation_id', '$special_attraction_arr1', '$day_program_arr1', '$stay_arr1', '$meal_plan1')");
+
+				if (!$sq) {
+					echo "error--Error at row " . ($i + 1) . " for Tour Itinerary information.";
+					exit;
+				}
+			}
+		} else {
+			if($iti_entry_id_arr[$i] != ''){
+				$sq_iti = mysqlQuery("Delete from car_rental_quotation_program where id='$iti_entry_id_arr[$i]'");
+				if (!$sq_iti) {
+					echo "error--Itinerary not deleted!";
+					exit;
+				}
+			}
+		}
+	}
 }
 
 }

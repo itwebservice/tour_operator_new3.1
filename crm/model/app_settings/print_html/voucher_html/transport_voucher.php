@@ -15,6 +15,8 @@ $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_booking_
 $branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : $sq_booking['branch_admin_id'];
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
 
+// Get branch-wise logo
+$admin_logo_url = get_branch_logo_url($branch_admin_id);
 
 $row_transport =  mysqli_fetch_assoc(mysqlQuery("select * from package_tour_transport_master where booking_id='$booking_id'")) ;
 
@@ -259,6 +261,7 @@ else { $emp_name = $sq_emp['first_name'].' ' .$sq_emp['last_name']; }
               <tr class="table-heading-row">
                 <th>City_Name</th>
                 <th>Excursion_name</th>
+                <th>Vehicle_Name</th>
               </tr>
             </thead>
             <tbody>
@@ -266,11 +269,20 @@ else { $emp_name = $sq_emp['first_name'].' ' .$sq_emp['last_name']; }
 										$sq_entry = mysqlQuery("select * from package_tour_excursion_master where booking_id='$booking_id'");
 										while($row_entry = mysqli_fetch_assoc($sq_entry)){
 											$q_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
-											$q_transport = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
+											$q_excursion = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
+											// Get vehicle name
+											$vehicle_name = '';
+											if(isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0' && $row_entry['vehicle_name'] != null){
+												$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_entry['vehicle_name']."'"));
+												if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+													$vehicle_name = $sq_vehicle['vehicle_name'];
+												}
+											}
 											?>
 											<tr>
 												<td><?= $q_city['city_name'] ?></td>
-												<td><?= $q_transport['vehicle_name'] ?></td>
+												<td><?= $q_excursion['excursion_name'] ?></td>
+												<td><?= $vehicle_name ?></td>
 											</tr>
 									<?php } ?>
             </tbody>

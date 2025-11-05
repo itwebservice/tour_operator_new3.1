@@ -41,6 +41,24 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Transport Information -->
+                        <div class="accordion_content main_block mg_bt_10">
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal main_block" role="button" data-toggle="collapse"
+                                        data-parent="#accordion" href="#collapse2_5" aria-expanded="true"
+                                        aria-controls="collapse2_5" id="collapsed2_5">
+                                        <div class="col-md-12"><span>Transport Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse2_5" class="panel-collapse collapse main_block" role="tabpanel"
+                                    aria-labelledby="heading2_5">
+                                    <div class="panel-body">
+                                        <?php include_once('transport_tbl.php'); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <!-- Flight Information -->
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
@@ -241,6 +259,65 @@ $('#frm_tab2').validate({
                 airline_name_arr.push(airline_name);
                 plane_class_arr.push(plane_class);
                 plane_id_arr.push(plane_id);
+            }
+        }
+
+        //Transport Information
+        var vehicle_name_arr = new Array();
+        var drop_arr = new Array();
+        var drop_type_arr = new Array();
+        var pickup_arr = new Array();
+        var pickup_type_arr = new Array();
+        var transport_entry_id_arr = new Array();
+        var pickup_type = '';
+        var pickup = '';
+        var drop_type = '';
+        var drop = '';
+        var table = document.getElementById("tbl_package_tour_transport_update");
+        if(table){
+            var rowCount = table.rows.length;
+            for (var i = 0; i < rowCount; i++) {
+                var row = table.rows[i];
+                if (row.cells[0].childNodes[0].checked) {
+
+                    var pickupSelect = row.cells[3].childNodes[0];
+                    pickup = pickupSelect.value;
+                    // Try to get type from optgroup, if not available, get from data attribute
+                    pickup_type = $("option:selected", $("#" + pickupSelect.id)).parent().attr('value');
+                    if(!pickup_type || pickup_type == ''){
+                        pickup_type = $(pickupSelect).data('saved-type');
+                    }
+                    
+                    var dropSelect = row.cells[4].childNodes[0];
+                    drop = dropSelect.value;
+                    // Try to get type from optgroup, if not available, get from data attribute
+                    drop_type = $("option:selected", $("#" + dropSelect.id)).parent().attr('value');
+                    if(!drop_type || drop_type == ''){
+                        drop_type = $(dropSelect).data('saved-type');
+                    }
+
+                    var vehicle_name = row.cells[2].childNodes[0].value;
+                    if (vehicle_name == "") {
+                        error_msg_alert('Transport Vehicle is mandatory in row' + (i + 1));
+                        $('.accordion_content').removeClass("indicator");
+                        $('#tbl_package_tour_transport_update').parent('div').closest('.accordion_content')
+                            .addClass("indicator");
+                        return false;
+                    }
+                    
+                    if (row.cells[5] && row.cells[5].childNodes[0]) {
+                        var transport_entry_id = row.cells[5].childNodes[0].value;
+                    } else {
+                        var transport_entry_id = "";
+                    }
+
+                    vehicle_name_arr.push(vehicle_name);
+                    pickup_arr.push(pickup);
+                    pickup_type_arr.push(pickup_type);
+                    drop_arr.push(drop);
+                    drop_type_arr.push(drop_type);
+                    transport_entry_id_arr.push(transport_entry_id);
+                }
             }
         }
 

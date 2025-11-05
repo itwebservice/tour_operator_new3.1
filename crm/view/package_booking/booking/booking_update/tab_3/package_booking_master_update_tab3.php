@@ -362,6 +362,25 @@
                                                     <option value="Sharing Transfer">Sharing Transfer</option>
                                                     <option value="SIC">SIC</option>
                                                 </select></td>
+                                            <td><select name="vehicle_name-1<?= $count_et ?>" id="vehicle_name-1<?= $count_et ?>" style="width: 200px" class="form-control app_select2" title="Select Vehicle">
+                                                    <?php
+                                                    $vehicle_selected = '';
+                                                    if($row_exc_acc['vehicle_name'] != '' && $row_exc_acc['vehicle_name'] != '0'){
+                                                        $sq_vehicle_sel = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_exc_acc[vehicle_name]'"));
+                                                        if($sq_vehicle_sel){
+                                                            $vehicle_selected = '<option value="'.$sq_vehicle_sel['entry_id'].'" selected>'.$sq_vehicle_sel['vehicle_name'].'</option>';
+                                                        }
+                                                    }
+                                                    echo $vehicle_selected;
+                                                    ?>
+                                                    <option value=''>Select Vehicle</option>
+                                                    <?php
+                                                    $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                    while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                    ?>
+                                                        <option value="<?= $row_vehicle['entry_id'] ?>"><?= $row_vehicle['vehicle_name'] ?></option>
+                                                    <?php } ?>
+                                                </select></td>
                                             <td><input type="number" id="adult-1<?= $count_et ?>"
                                                     name="adult-1<?= $count_et ?>" placeholder="Adult(s)"
                                                     title="Adult(s)" style="width:100px"
