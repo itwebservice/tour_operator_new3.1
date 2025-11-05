@@ -204,3 +204,38 @@ CREATE TABLE group_tour_booking_transport_entries (
 );
 
 
+
+Alter Table `package_payment_master`
+Add Column supplier_id int(11);
+
+Alter Table `package_payment_master`
+Add Column vendor_type varchar(100)  after delete_status;
+
+
+Alter Table `car_rental_payment`
+Add Column supplier_id int(11);
+
+Alter Table `car_rental_payment`
+Add Column vendor_type varchar(100) after delete_status;
+
+
+Alter Table `hotel_booking_payment`
+Add Column supplier_id int(11);
+
+
+Alter Table `hotel_booking_payment`
+Add Column vendor_type varchar(100) after delete_status;
+
+
+Alter Table `hotel_booking_payment`
+Add Column `estimate_id` int(11) after booking_id;
+
+Alter Table `package_payment_master`
+Add Column `estimate_id` int(11) after booking_id;
+
+
+Alter Table `car_rental_payment`
+Add Column `estimate_id` int(11) after booking_id;
+
+Alter Table `vendor_payment_master`
+Add column `receipt_payment_id` int(11) after estimate_id;	

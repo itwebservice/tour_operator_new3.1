@@ -504,6 +504,11 @@ $(function () {
 			var credit_charges = $('#credit_charges').val();
 			var credit_card_details = $('#credit_card_details').val();
 
+			if(payment_mode1 == 'To Supplier'){
+				error_msg_alert('Please Select Another Payment Mode ');
+						return false;
+			}
+
 			var payment_date2 = $('#txt_payment_date2').val();
 			var payment_mode2 = $('#cmb_payment_mode2').val();
 			var payment_amount2 = $('#txt_amount2').val();

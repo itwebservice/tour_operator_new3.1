@@ -834,6 +834,7 @@ function get_payment_mode_dropdown()
   <option value="Credit Note"> Credit Note </option>
   <option value="Advance"> Advance </option>
   <option value="Other"> Other </option>
+  <option value="To Supplier"> To Supplier</option>
 <?php }
 
 //Get Honorifics

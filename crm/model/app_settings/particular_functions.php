@@ -236,6 +236,12 @@ function get_purchase_paid_partucular($invoice_id, $date, $amount, $vendor_type,
 
 {
   $date = get_date_user($date);
+  
+  // Include vendor generic functions if not already included
+  if(!function_exists('get_vendor_name')){
+    include_once(__DIR__ . '/../../view/vendor/inc/vendor_generic_functions.php');
+  }
+  
   $vendor_name = get_vendor_name($vendor_type, $vendor_type_id);
   
   if($payment_mode == 'Cash'||$payment_mode=='Credit Card'){
