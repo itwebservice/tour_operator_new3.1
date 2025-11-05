@@ -136,6 +136,14 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                     </li>
                     <!-- Single Menu end -->
 
+					<li class="dropdown">
+                      <a href="#">Party Wise Profit & Loss Report <span class="caret"></span></a>
+                      <ul class="dropdown_menu no-pad">
+                        <li><span onclick="show_report_reflect('Party Wise Profit & Loss Report')">Party Wise Profit & Loss Report</span></li>
+                       
+                      </ul>
+                    </li>
+
                   </ul>
                   <!-- Menu End -->
                 </div><!-- /.navbar-collapse -->
@@ -243,6 +251,8 @@ function show_report_reflect(report_name){
   	if(report_name=="Bank Reconciliation"){ url = 'bank_reconcilation/index.php'; }
   	if(report_name=="Cash Reconciliation"){ url = 'cash_reconcilation/index.php'; }
   	if(report_name=="Fixed Asset Register"){ url = 'far/index.php'; }
+
+	if(report_name=="Party Wise Profit & Loss Report"){url= 'party_wise_profit_loss/index.php';}
 
 	$.post('report_reflect/'+url,{}, function(data){
         $(".dropdown_menu").addClass('hidden');
