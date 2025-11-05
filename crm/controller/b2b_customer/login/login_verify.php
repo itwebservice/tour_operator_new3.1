@@ -1,5 +1,6 @@
 <?php
 include "../../../model/model.php";
+include "../../../model/database_setup/sub_quotation_setup.php";
 global $secret_key, $encrypt_decrypt;
 $password = mysqlREString($_POST['password']);
 $username = mysqlREString($_POST['username']);
@@ -231,6 +232,21 @@ if($row_count>0){
 	$available_credit = $sq_credit['credit_amount'] - $outstanding;
 	$available_credit = ($available_credit < 0)? 0.00 : $available_credit;
 	$_SESSION['credit_amount'] = $available_credit;
+
+	// Auto-setup sub-quotation database structure on successful B2B login
+	try {
+		$sub_quotation_setup = new sub_quotation_setup();
+		$setup_result = $sub_quotation_setup->ensure_sub_quotation_ready();
+		
+		if ($setup_result) {
+			error_log("Sub-quotation database setup completed successfully for B2B user: " . $username);
+		} else {
+			error_log("Warning: Sub-quotation database setup failed for B2B user: " . $username);
+		}
+	} catch (Exception $e) {
+		error_log("Error during sub-quotation setup for B2B user: " . $e->getMessage());
+		// Don't fail login if setup fails, just log the error
+	}
 
 	$cart_data = ($sq['cart_data']!='')?json_encode($sq['cart_data']):json_encode([]);
 	echo "valid--".$cart_data;

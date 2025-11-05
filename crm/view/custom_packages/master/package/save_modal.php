@@ -216,6 +216,11 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
         </div>
     </div>
     <div id="div_modal_content"></div>
+    
+    <!-- Itinerary Modal Container -->
+    <div id="div_itinerary_modal"></div>
+    
+    <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 
 </form>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
@@ -280,11 +285,13 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
     }
 
     function generate_list() {
-
+        console.log("GENERATE_LIST: Function called");
         var total_days = $("#total_days").val();
+        console.log("GENERATE_LIST: Total days =", total_days);
         $.post('generate_program_list.php', {
             total_days: total_days
         }, function(data) {
+            console.log("GENERATE_LIST: Response received, setting HTML");
             $('#div_list1').html(data);
         });
     }
@@ -514,7 +521,16 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
             },
 
             submitHandler: function(form, event) {
+                console.log("FORM SUBMIT: Form submission started");
                 event.preventDefault();
+                
+                // Prevent double submission
+                if (window.packageSaveInProgress) {
+                    console.log("FORM SUBMIT: Already in progress, preventing double submission");
+                    return false;
+                }
+                window.packageSaveInProgress = true;
+                
                 var base_url = $('#base_url').val();
 
                 var dest_id = $("#dest_name_s").val();
@@ -559,9 +575,11 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                 var special_attaraction_arr = new Array();
                 var overnight_stay_arr = new Array();
                 var meal_plan_arr = new Array();
+                var day_image_arr = new Array();
 
                 var table = document.getElementById("dynamic_table_list");
                 var rowCount = table.rows.length;
+                console.log("PACKAGE SAVE: Table found with", rowCount, "rows");
                 for (var i = 0; i < rowCount; i++) {
                     var row = table.rows[i];
                     var special_attaraction = row.cells[0].childNodes[0].value;
@@ -585,6 +603,63 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                     special_attaraction_arr.push(special_attaraction);
                     overnight_stay_arr.push(overnight_stay);
                     meal_plan_arr.push(meal_plan);
+                    
+                    // Get image data for this row
+                    var img = '';
+                    var rowIndex = i + 1; // Convert to 1-based index
+                    
+                    console.log("PACKAGE SAVE: Processing image for row", i, "with rowIndex", rowIndex);
+                    
+                    // Check if we have a new image uploaded
+                    if (window.packageCreateImages && window.packageCreateImages[rowIndex]) {
+                        var imageData = window.packageCreateImages[rowIndex];
+                        console.log("PACKAGE SAVE: Found image data for rowIndex", rowIndex, imageData);
+                        
+                        if (imageData.file && !imageData.uploaded) {
+                            console.log("PACKAGE SAVE: Uploading new image for rowIndex", rowIndex);
+                            // Upload the image immediately
+                            var formData = new FormData();
+                            formData.append('uploadfile', imageData.file);
+                            
+                            $.ajax({
+                                url: base_url + 'view/other_masters/itinerary/upload_itinerary_image.php',
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                async: false, // Make it synchronous for data collection
+                                success: function(response) {
+                                    try {
+                                        var msg = response.split('--');
+                                        if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
+                                            img = response;
+                                            window.packageCreateImages[rowIndex].uploaded = true;
+                                            window.packageCreateImages[rowIndex].image_url = response;
+                                            console.log("PACKAGE SAVE: Image uploaded successfully for rowIndex", rowIndex, ":", img);
+                                        } else {
+                                            console.log("PACKAGE SAVE: Upload failed for rowIndex", rowIndex, ":", response);
+                                        }
+                                    } catch(e) {
+                                        console.log('PACKAGE SAVE: Upload parse error for rowIndex', rowIndex, ':', e);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.log("PACKAGE SAVE: Upload error for rowIndex", rowIndex, ":", error);
+                                }
+                            });
+                        } else if (imageData.image_url) {
+                            img = imageData.image_url;
+                            console.log("PACKAGE SAVE: Using existing image URL for rowIndex", rowIndex, ":", img);
+                        }
+                    } else {
+                        // Check hidden input for image path
+                        var imgPathInput = row.querySelector('input[id="day_image_path_' + rowIndex + '"]');
+                        img = imgPathInput ? imgPathInput.value : '';
+                        console.log("PACKAGE SAVE: Using hidden input for rowIndex", rowIndex, ":", img);
+                    }
+                    
+                    console.log("PACKAGE SAVE: Final image for row", i, ":", img);
+                    day_image_arr.push(img || '');
                 }
 
                 //Hotel information
@@ -710,6 +785,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
 
                         if (result == "yes") {
 
+                            console.log("FORM SUBMIT: Disabling save button");
                             $("#btn_save1").prop("disabled", true);
                             $("#btn_save1").val('Saving...');
 
@@ -751,11 +827,14 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                     special_attaraction_arr: special_attaraction_arr,
                                     overnight_stay_arr: overnight_stay_arr,
                                     meal_plan_arr: meal_plan_arr,
+                                    day_image_arr: day_image_arr,
                                     note: note,
                                     dest_image: dest_image
                                 },
 
                                 function(data) {
+                                    console.log("FORM SUBMIT: Response received");
+                                    window.packageSaveInProgress = false; // Reset flag
                                     var msg = data.split('--');
                                     if (msg[0] == "error") {
                                         error_msg_alert(msg[1]);
@@ -765,8 +844,14 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                         booking_save_message(data);
                                         $('#btn_save1').button('reset');
                                     }
+                                }).fail(function() {
+                                    console.log("FORM SUBMIT: AJAX failed");
+                                    window.packageSaveInProgress = false; // Reset flag on error
+                                    $('#btn_save1').button('reset');
                                 });
                         } else {
+                            console.log("FORM SUBMIT: User cancelled, resetting flag");
+                            window.packageSaveInProgress = false; // Reset flag
                             $('#btn_save1').button('reset');
                         }
                     }

@@ -25,22 +25,72 @@ function total_days_reflect(offset = '') {
 	}
 	else{
 		$('#total_days' + offset).val(total_days);
+		
+		// Store nights for package filtering (only for main form, not other offsets)
+		if (offset === '') {
+			sessionStorage.setItem('selected_nights', total_days);
+			console.log('Stored nights in sessionStorage:', total_days);
+			
+			// Reset user modification flag when dates change (allows re-sync)
+			sessionStorage.removeItem('user_modified_nights');
+			console.log('Reset user_modified_nights flag due to date change');
+			
+			// Auto-update nights filter on tab2 if it exists
+			if ($('#nights_filter').length > 0) {
+				$('#nights_filter').val(total_days);
+				$('#nights_filter').trigger('change');
+				console.log('Auto-updated nights filter to:', total_days);
+				
+				// Trigger package filtering if destination is already selected
+				if ($('#dest_name').val()) {
+					console.log('Triggering package filtering with updated nights');
+					if (typeof load_packages_with_filter === 'function') {
+						load_packages_with_filter();
+					} else if (typeof package_dynamic_reflect === 'function') {
+						package_dynamic_reflect('dest_name');
+					}
+				}
+			} else {
+				// If tab2 is not loaded yet, set up a listener for when it becomes available
+				console.log('Tab2 not loaded yet, setting up listener for nights filter');
+				$(document).on('DOMNodeInserted', function(e) {
+					if ($(e.target).find('#nights_filter').length > 0 || $(e.target).is('#nights_filter')) {
+						$('#nights_filter').val(total_days);
+						$('#nights_filter').trigger('change');
+						console.log('Auto-updated nights filter after tab2 loaded:', total_days);
+					}
+				});
+			}
+		}
 	}
 }
 
 function package_dynamic_reflect(dest_name) {
 	var dest_id = $('#' + dest_name).val();
 	var base_url = $('#base_url').val();
+	
+	// Get total_nights from multiple sources
+	var total_nights = $('#nights_filter').val() || sessionStorage.getItem('selected_nights') || $('#total_days').val() || $('#total_days12').val();
+
+	// Ensure total_nights is not null or undefined
+	if (!total_nights) {
+		total_nights = '';
+	}
+
+	var ajax_data = { 
+		dest_id: dest_id,
+		total_nights: total_nights
+	};
 
 	$.ajax({
 		type: 'post',
-		url: base_url + 'view/package_booking/quotation/inc/get_packages.php',
-		data: { dest_id: dest_id },
+		url: base_url + 'view/package_booking/quotation/inc/get_packages.php?v=' + Date.now(),
+		data: ajax_data,
 		success: function (result) {
 			$('#package_name_div').html(result);
 		},
 		error: function (result) {
-			console.log(result.responseText);
+			console.log('Package loading error:', result.responseText);
 		}
 	});
 }
@@ -204,6 +254,67 @@ function get_enquiry_details(offset = '') {
 
 			$('#tour_name' + offset).val(result.tour_name);
 			$('#total_days' + offset).val(result.total_days);
+			
+			// Update sessionStorage with enquiry data
+			if (result.tour_name) {
+				console.log('Enquiry loaded - Processing tour_name:', result.tour_name);
+				
+				// Clear existing destination storage first
+				sessionStorage.removeItem('selected_destination_id');
+				sessionStorage.removeItem('selected_destination_name');
+				
+				// Find destination ID from the destinations list
+				var destinations = JSON.parse($('#destinations').val() || '[]');
+				console.log('Enquiry loaded - Available destinations:', destinations.length);
+				console.log('Enquiry loaded - First few destinations:', destinations.slice(0, 3));
+				
+				var found = false;
+				for (var i = 0; i < destinations.length; i++) {
+					console.log('Enquiry loaded - Checking destination:', destinations[i].label, 'against:', result.tour_name);
+					if (destinations[i].label === result.tour_name) {
+						sessionStorage.setItem('selected_destination_id', destinations[i].dest_id);
+						sessionStorage.setItem('selected_destination_name', destinations[i].label);
+						console.log('Enquiry loaded - Updated sessionStorage with destination:', destinations[i].label, 'ID:', destinations[i].dest_id);
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found) {
+					console.log('Enquiry loaded - Destination not found in list:', result.tour_name);
+					console.log('Enquiry loaded - Available destinations:', destinations.map(d => d.label));
+					
+					// Try to add the destination to the dropdown and create a temporary ID
+					var tempId = 'temp_' + Date.now();
+					var newOption = $("<option selected='selected'></option>").val(tempId).text(result.tour_name);
+					$('#dest_name').append(newOption).trigger('change.select2');
+					
+					// Store with temporary ID
+					sessionStorage.setItem('selected_destination_id', tempId);
+					sessionStorage.setItem('selected_destination_name', result.tour_name);
+					console.log('Enquiry loaded - Added temporary destination with ID:', tempId);
+				}
+			}
+			
+			// Update nights in sessionStorage
+			if (result.total_days) {
+				sessionStorage.setItem('selected_nights', result.total_days);
+				sessionStorage.setItem('user_modified_nights', 'true');
+				console.log('Enquiry loaded - Updated sessionStorage with nights:', result.total_days);
+			}
+			
+			// Trigger Tab 2 sync if it exists (after sessionStorage is updated)
+			if (typeof syncDestinationFromTab1 === 'function') {
+				setTimeout(function() {
+					console.log('Enquiry loaded - Current sessionStorage before sync:');
+					console.log('selected_destination_id:', sessionStorage.getItem('selected_destination_id'));
+					console.log('selected_destination_name:', sessionStorage.getItem('selected_destination_name'));
+					console.log('selected_nights:', sessionStorage.getItem('selected_nights'));
+					
+					syncDestinationFromTab1();
+					console.log('Enquiry loaded - Triggered Tab 2 sync');
+				}, 200);
+			}
 			$('#customer_name' + offset).val(result.name);
 			$('#email_id' + offset).val(result.email_id);
 			$('#mobile_no' + offset).val(result.landline_no);

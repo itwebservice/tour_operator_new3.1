@@ -192,7 +192,7 @@ $("#customer_name").autocomplete({
         .append("<a>" + item.label + "</a>")
         .appendTo(ul);
 };
-$('#from_date,#to_date').datetimepicker({ timepicker:false,format:'d-m-Y' });
+$('#from_date,#to_date').datetimepicker({ timepicker:false,format:'d-m-Y', minDate: 0 });
 $('#traveling_date').datetimepicker({ format:'d-m-Y H:i' });
 
 $('#total_hr,#total_km,#total_max_km,#driver_allowance,#permit_charges,#toll_parking,#state_entry,#other_charges,#places_to_visit,#traveling_date').hide();

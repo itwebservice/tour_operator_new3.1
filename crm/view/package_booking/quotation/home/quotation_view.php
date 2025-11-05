@@ -1,8 +1,98 @@
 <?php
 include "../../../../model/model.php";
 /*======******Header******=======*/
-include_once('../../../layouts/fullwidth_app_header.php'); 
+include_once('../../../layouts/fullwidth_app_header.php');
 global $similar_text;
+
+// Helper function to check image existence in multiple locations
+function findImageUrl($image_path, $is_new_quotation = false) {
+    if (empty($image_path) || $image_path === 'NULL') {
+        return '';
+    }
+
+    $image_path = trim($image_path);
+
+    // Check if path already starts with http
+    if (strpos($image_path, 'http') === 0) {
+        return $image_path;
+    }
+
+    // Get project base URL
+    $project_base_url = str_replace('/crm/', '/', BASE_URL);
+    $project_base_url = rtrim($project_base_url, '/');
+
+    $image_path_clean = ltrim($image_path, '/');
+
+    // For new quotations, prioritize itinerary_images folder
+    if ($is_new_quotation) {
+        // Check itinerary_images folder first for new quotations
+        $itinerary_images_path = "../../../../../uploads/itinerary_images/" . basename($image_path_clean);
+        if (file_exists($itinerary_images_path)) {
+            error_log("QUOTATION_VIEW: Found image in itinerary_images folder (new quotation priority): " . $itinerary_images_path);
+            $itinerary_images_url = $project_base_url . '/uploads/itinerary_images/' . basename($image_path_clean);
+            return $itinerary_images_url;
+        }
+    }
+
+    // Check original path first
+    $original_url = $project_base_url . '/' . $image_path_clean;
+    $original_file_path = "../../../../" . $image_path_clean;
+
+    if (file_exists($original_file_path)) {
+        error_log("QUOTATION_VIEW: Found image in original location: " . $original_file_path);
+        return $original_url;
+    }
+
+    // Check quotation_images folder (full path as stored in database)
+    if (strpos($image_path_clean, 'uploads/quotation_images/') === 0) {
+        // For database paths like "uploads/quotation_images/filename.jpg", 
+        // we need to check in crm/uploads/quotation_images/ folder
+        $quotation_images_url = $project_base_url . '/crm/' . $image_path_clean;
+        $quotation_images_file_path = "../../../../" . $image_path_clean;
+
+        if (file_exists($quotation_images_file_path)) {
+            error_log("QUOTATION_VIEW: Found image in quotation_images folder (database path): " . $quotation_images_file_path);
+            return $quotation_images_url;
+        }
+    }
+
+    // Check quotation_images folder (with just filename, not full path)
+    $quotation_images_path = "crm/uploads/quotation_images/" . basename($image_path_clean);
+    $quotation_images_url = $project_base_url . '/' . $quotation_images_path;
+    $quotation_images_file_path = "../../../../" . $quotation_images_path;
+
+    if (file_exists($quotation_images_file_path)) {
+        error_log("QUOTATION_VIEW: Found image in quotation_images folder: " . $quotation_images_file_path);
+        return $quotation_images_url;
+    }
+
+    // Check CRM uploads folder directly
+    $crm_uploads_path = "../../../../crm/uploads/" . basename($image_path_clean);
+    if (file_exists($crm_uploads_path)) {
+        error_log("QUOTATION_VIEW: Found image in CRM uploads folder: " . $crm_uploads_path);
+        $crm_uploads_url = $project_base_url . '/crm/uploads/' . basename($image_path_clean);
+        return $crm_uploads_url;
+    }
+
+    // Check CRM uploads quotation_images folder directly
+    $crm_quotation_images_path = "../../../../crm/uploads/quotation_images/" . basename($image_path_clean);
+    if (file_exists($crm_quotation_images_path)) {
+        error_log("QUOTATION_VIEW: Found image in CRM uploads quotation_images folder: " . $crm_quotation_images_path);
+        $crm_quotation_images_url = $project_base_url . '/crm/uploads/quotation_images/' . basename($image_path_clean);
+        return $crm_quotation_images_url;
+    }
+
+    // Check itinerary_images folder as fallback (for both new and existing quotations)
+    $itinerary_images_path = "../../../../../uploads/itinerary_images/" . basename($image_path_clean);
+    if (file_exists($itinerary_images_path)) {
+        error_log("QUOTATION_VIEW: Found image in itinerary_images folder (fallback): " . $itinerary_images_path);
+        $itinerary_images_url = $project_base_url . '/uploads/itinerary_images/' . basename($image_path_clean);
+        return $itinerary_images_url;
+    }
+
+    error_log("QUOTATION_VIEW: Image not found in any location: " . $image_path);
+    return '';
+}
 $quotation_id = $_GET['quotation_id'];
 $role = $_SESSION['role'];
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
@@ -117,103 +207,10 @@ if($sq_quotation['user_id'] != 0){
 </div>
 <div class="main_block mg_tp_30">
 </div>
-<!-- Flight-->
-<?php $sq_f_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'"));
-if($sq_f_count != '0'){
-?>
-<div class="row mg_tp_30">
-<div class="col-md-12">
-<h3 class="editor_title">Flight Details</h3>
-	<div class="table-responsive">
-	<table class="table table-hover table-bordered no-marg">
-	<thead>
-		<tr class="table-heading-row">
-			<th>S_No.</th>
-			<th>Sector_From</th>
-			<th>Sector_To</th>
-			<th>Airline_Name</th>
-			<th>Class</th>
-			<th>Departure_Date_Time</th>
-			<th>Arrival_Date_Time</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php 
-		$count = 0;
-		$sq_train = mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'");
-		while($row_train = mysqli_fetch_assoc($sq_train))
-		{
-			$sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_train[airline_name]'"));
-			$airline = ($row_train['airline_name'] != '') ? $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' : 'NA';
-			?>
-			<tr>
-				<td><?= ++$count ?></td>
-				<td><?= $row_train['from_location'] ?></td>
-				<td><?= $row_train['to_location'] ?></td>
-				<td><?= $airline ?></td>
-				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
-				<td><?= get_datetime_user($row_train['dapart_time']) ?></td>
-				<td><?= get_datetime_user($row_train['arraval_time']) ?></td>
-			</tr>
-			<?php
-		}
-		?>
-	</tbody>
-</table>
-	</div>
-	</div>
-	</div>
-<?php } ?>
-
-<!-- Train-->
-<?php $sq_t_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'"));
-if($sq_t_count != '0'){
-?>
-<div class="row mg_tp_30">
-<div class="col-md-12">
-<h3 class="editor_title">Train Details</h3>
-	<div class="table-responsive">
-	<table class="table table-hover table-bordered no-marg">
-	<thead>
-		<tr class="table-heading-row">
-			<th>S_No.</th>
-			<th>Location_From</th>
-			<th>Location_To</th>
-			<th>Class</th>
-			<th>Departure_Date_Time</th>
-			<th>Arrival_Date_Time</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php 
-		$count = 0;
-		$sq_train = mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'");
-		while($row_train = mysqli_fetch_assoc($sq_train))
-		{
-			?>
-			<tr>
-				<td><?= ++$count ?></td>
-				<td><?= $row_train['from_location'] ?></td>
-				<td><?= $row_train['to_location'] ?></td>
-				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
-				<td><?= get_datetime_user($row_train['departure_date']) ?></td>
-				<td><?= get_datetime_user($row_train['arrival_date']) ?></td>
-			</tr>
-			<?php
-		}
-		?>
-	</tbody>
-</table>
-	</div>
-	</div>
-	</div>
-<?php } ?>
-
-
+<!-- Hotel -->
 <?php $sq_h_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id'"));
 if($sq_h_count != '0'){
 ?>
-<!-- Hotel -->
 <div class="row mg_tp_30">
 <div class="col-md-12">
 <h3 class="editor_title">Hotel Details</h3>
@@ -266,10 +263,10 @@ if($sq_h_count != '0'){
 </div>
 <?php } ?>
 
+<!-- Transport -->
 <?php $sq_t_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_transport_entries2 where quotation_id='$quotation_id'"));
 if($sq_t_count != '0'){
 ?>
-<!-- Transport -->
 <div class="row mg_tp_30">
 <div class="col-md-12">
 <h3 class="editor_title">Transport Details</h3>
@@ -346,6 +343,55 @@ if($sq_t_count != '0'){
 	</div>
 <?php } ?>
 
+<!-- Flight-->
+<?php $sq_f_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'"));
+if($sq_f_count != '0'){
+?>
+<div class="row mg_tp_30">
+<div class="col-md-12">
+<h3 class="editor_title">Flight Details</h3>
+	<div class="table-responsive">
+	<table class="table table-hover table-bordered no-marg">
+	<thead>
+		<tr class="table-heading-row">
+			<th>S_No.</th>
+			<th>Sector_From</th>
+			<th>Sector_To</th>
+			<th>Airline_Name</th>
+			<th>Class</th>
+			<th>Departure_Date_Time</th>
+			<th>Arrival_Date_Time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php 
+		$count = 0;
+		$sq_train = mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'");
+		while($row_train = mysqli_fetch_assoc($sq_train))
+		{
+			$sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_train[airline_name]'"));
+			$airline = ($row_train['airline_name'] != '') ? $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' : 'NA';
+			?>
+			<tr>
+				<td><?= ++$count ?></td>
+				<td><?= $row_train['from_location'] ?></td>
+				<td><?= $row_train['to_location'] ?></td>
+				<td><?= $airline ?></td>
+				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
+				<td><?= get_datetime_user($row_train['dapart_time']) ?></td>
+				<td><?= get_datetime_user($row_train['arraval_time']) ?></td>
+			</tr>
+			<?php
+		}
+		?>
+	</tbody>
+</table>
+	</div>
+	</div>
+	</div>
+<?php } ?>
+
+<!-- Activity -->
 <?php $sq_e_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_excursion_entries where quotation_id='$quotation_id'"));
 if($sq_e_count != '0'){
 ?>
@@ -399,10 +445,54 @@ if($sq_e_count != '0'){
 	</div>
 <?php } ?>
 
+<!-- Train-->
+<?php $sq_t_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'"));
+if($sq_t_count != '0'){
+?>
+<div class="row mg_tp_30">
+<div class="col-md-12">
+<h3 class="editor_title">Train Details</h3>
+	<div class="table-responsive">
+	<table class="table table-hover table-bordered no-marg">
+	<thead>
+		<tr class="table-heading-row">
+			<th>S_No.</th>
+			<th>Location_From</th>
+			<th>Location_To</th>
+			<th>Class</th>
+			<th>Departure_Date_Time</th>
+			<th>Arrival_Date_Time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php 
+		$count = 0;
+		$sq_train = mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'");
+		while($row_train = mysqli_fetch_assoc($sq_train))
+		{
+			?>
+			<tr>
+				<td><?= ++$count ?></td>
+				<td><?= $row_train['from_location'] ?></td>
+				<td><?= $row_train['to_location'] ?></td>
+				<td><?php echo ($row_train['class']!='')?$row_train['class']:'NA'; ?></td>
+				<td><?= get_datetime_user($row_train['departure_date']) ?></td>
+				<td><?= get_datetime_user($row_train['arrival_date']) ?></td>
+			</tr>
+			<?php
+		}
+		?>
+	</tbody>
+</table>
+	</div>
+	</div>
+	</div>
+<?php } ?>
+
+<!-- Cruise -->
 <?php $sq_c_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_cruise_entries where quotation_id='$quotation_id'"));
 if($sq_c_count != '0'){
 ?>
-<!-- Cruise -->
 <div class="main_block mg_tp_30"></div>
 <h3 class="editor_title main_block">Cruise Details</h3>
 <table class="table table-bordered">
@@ -449,6 +539,7 @@ if($sq_c_count != '0'){
 			<th>Day-wise_Program</th>
 			<th>Overnight_Stay</th>
 			<th>Meal_Plan</th>
+			<th>Day Image</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -469,6 +560,30 @@ if($sq_c_count != '0'){
 				<td  style="max-width: 400px; word-wrap: break-word; white-space: normal;"><pre class="real_text" tyle="white-space: pre-wrap; word-wrap: break-word; max-width: 400px; overflow-wrap: break-word;"><?= $row_itinarary['day_wise_program'] ?></pre></td>
 				<td><?= $row_itinarary['stay'] ?></td>
 				<td><?= $row_itinarary['meal_plan'] ?></td>
+				<td>
+					<?php
+					// Display day image from package_quotation_program
+					$daywise_image = '';
+					if (!empty($row_itinarary['day_image']) && trim($row_itinarary['day_image']) !== '' && trim($row_itinarary['day_image']) !== 'NULL') {
+						$image_path = trim($row_itinarary['day_image']);
+						$daywise_image = findImageUrl($image_path, false); // quotation_view is always for existing quotations
+					}
+					
+					if ($daywise_image) {
+						?>
+						<div style="width: 100px; height: 80px; overflow: hidden; border: 1px solid #ddd; border-radius: 4px;">
+							<img src="<?= $daywise_image ?>" 
+								 style="width: 100%; height: 100%; object-fit: cover;" 
+								 alt="Day <?= $count ?> Image"
+								 onerror="console.log('Quotation view image failed to load:', this.src); this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding: 20px; text-align: center; color: #999;\'>No Image</div>';"
+								 onload="console.log('Quotation view image loaded successfully:', this.src);">
+						</div>
+						<?php
+					} else {
+						echo '<div style="padding: 20px; text-align: center; color: #999;">No Image</div>';
+					}
+					?>
+				</td>
 			</tr>
 			<?php
 		}	

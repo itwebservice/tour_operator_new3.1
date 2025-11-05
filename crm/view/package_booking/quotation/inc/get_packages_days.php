@@ -35,6 +35,8 @@ $sq_tours = mysqlQuery("select * from custom_package_master where dest_id = '$de
                 <input type="button" class="btn btn-sm btnType" id="btn_image_save" onclick="daywise_image_prepare('<?= $package_id_arr[$count] ?>','day_names<?= $count ?>','image_check<?= $count ?>')" autocomplete="off" data-original-title="save" title="save" value="Save">
               </div>
               <div class="col-md-12 no-pad mg_tp_20">
+                <!-- Image Upload Instructions -->
+                
                 <?php
                 $sq_gallary = mysqlQuery("select * from gallary_master where dest_id = '$dest_id'");
                 while ($row_gallary = mysqli_fetch_assoc($sq_gallary)) {

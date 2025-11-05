@@ -28,7 +28,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
 </style>
 <div class="bk_tabs">
     <div id="tab_1" class="bk_tab active">
-        <form id="frm_package_master_update">
+        <form id="frm_package_master_update" method="post">
             <div class="app_panel">
                 <!--=======Header panel======-->
 
@@ -208,7 +208,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                         <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                             <legend>Tour Itinerary</legend>
                             <div class="col-xs-12 no-pad text-right mg_bt_10">
-                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('dynamic_table_list_update','2')"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addItineraryRowUpdate()"><i class="fa fa-plus"></i></button>
                             </div>
                             <div id="div_list1">
                                 <table style="width: 100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
@@ -238,6 +238,66 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                             </td>
                                             <td class='col-md-1 pad_8'><button type="button" id="itinerary<?php echo $count; ?>" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="border: none !important;margin-top:35px;" onClick="add_itinerary('dest_name_u','special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?php echo $count; ?>-u','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button>
                                             </td>
+                                            <td class='col-md-1 pad_8' style="width: 120px;">
+                                                <!-- Debug: Image path = <?= $sq_pckg1['day_image'] ?? 'NULL' ?> -->
+                                                <div style="margin-top: 35px;">
+                                                    <label for="day_image_<?php echo $count; ?>" class="btn btn-sm btn-success" 
+                                                           style="margin-bottom: 5px;  font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap; <?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:none;' : '' ?>;">
+                                                 <i class="fa fa-image"></i> 
+                                                  <span>Upload Image</span>
+                                                    </label>
+                                                    <input type="file" id="day_image_<?php echo $count; ?>" 
+                                                           name="day_image_<?php echo $count; ?>" accept="image/*" 
+                                                           onchange="previewDayImageUpdate(this, '<?php echo $count; ?>')" 
+                                                           style="display: none;">
+                                                </div>
+                                                <div id="day_image_preview_<?php echo $count; ?>" style="<?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?>; margin-top: 5px;">
+                                                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                                                        <img id="preview_img_<?php echo $count; ?>" src="<?php 
+                                                            if (!empty($sq_pckg1['day_image'])) {
+                                                                $image_path = trim($sq_pckg1['day_image']);
+                                                                // Debug the actual path
+                                                                error_log("PACKAGE UPDATE: Image path from DB: " . $image_path);
+                                                                
+                                                                // Check if path is valid and not empty
+                                                                if ($image_path && $image_path !== '' && $image_path !== 'NULL') {
+                                                                    // Check if path already starts with http
+                                                                    if (strpos($image_path, 'http') === 0) {
+                                                                        echo $image_path;
+                                                                    } else {
+                                                                        // For package images, use project root URL
+                                                                        $project_base_url = str_replace('/crm/', '/', BASE_URL);
+                                                                        $project_base_url = rtrim($project_base_url, '/');
+                                                                        $image_path = ltrim($image_path, '/');
+                                                                        $final_url = $project_base_url . '/' . $image_path;
+                                                                        error_log("PACKAGE UPDATE: BASE_URL: " . BASE_URL);
+                                                                        error_log("PACKAGE UPDATE: Project base URL: " . $project_base_url);
+                                                                        error_log("PACKAGE UPDATE: Image path: " . $image_path);
+                                                                        error_log("PACKAGE UPDATE: Final image URL: " . $final_url);
+                                                                        echo $final_url;
+                                                                    }
+                                                                } else {
+                                                                    // Empty or invalid path, don't output anything
+                                                                    echo '';
+                                                                }
+                                                            } else {
+                                                                echo '';
+                                                            }
+                                                        ?>" alt="Preview" 
+                                                             style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
+                                                             onerror="console.log('PACKAGE UPDATE: Image failed to load:', this.src); this.style.display='none'; this.parentElement.style.display='none'; this.parentElement.parentElement.querySelector('label').style.display='block';"
+                                                             onload="console.log('PACKAGE UPDATE: Image loaded successfully:', this.src); this.style.display='block'; this.parentElement.style.display='block'; this.parentElement.parentElement.querySelector('label').style.display='none';"
+                                                             onabort="console.log('PACKAGE UPDATE: Image load aborted:', this.src);">
+                                                        <button type="button" 
+                                                            onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
+                                                                title="Remove Image" 
+                                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($sq_pckg1['day_image']) || trim($sq_pckg1['day_image']) === '' || trim($sq_pckg1['day_image']) === 'NULL') ? 'display:none;' : '' ?>;">
+                                                            ×
+                                                        </button>
+                                                </div>
+                                                </div>
+                                                <input type="hidden" id="existing_image_path_<?php echo $count; ?>" name="existing_image_path_<?php echo $count; ?>" value="<?= $sq_pckg1['day_image'] ?? '' ?>" />
+                                            </td>
                                             <td class="hidden"><input type="text" value="<?php echo $sq_pckg1['entry_id']; ?>"></td>
                                         </tr>
                                     <?php $count++;
@@ -247,6 +307,74 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                         </div>
 
 
+                        <!-- <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
+                            <legend>Hotel Information</legend>
+                            <div class="bg_white main_block panel-default-inner">
+                                <div class="col-md-6 mg_tp_10"><button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added city wise hotel & tariff using Supplier Master"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button></div>
+                                <div class="col-xs-6 text-right mg_tp_10">
+                                    <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_package_hotel_master');"><i class="fa fa-plus"></i></button>
+                                </div>
+                                <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table border_0 table-hover" style="padding: 0 !important;">
+                                    <?php
+                                    $sq_count = mysqli_num_rows(mysqlQuery("select * from custom_package_hotels where package_id = '$package_id'"));
+                                    if ($sq_count == 0) { ?>
+                                        <tr>
+                                            <td><input id="chk_dest" type="checkbox"></td>
+                                            <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
+                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
+                                                </select></td>
+                                            <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                                    <option value="">*Hotel Name</option>
+                                                </select></td>
+                                            <td><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
+                                            <td><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" placeholder="*Total Night" title="Total Night"></td>
+                                        </tr>
+                                        <script type="text/javascript">
+                                            city_lzloading('select[name^="city_name1"]');
+                                        </script>
+                                        <?php } else {
+                                        $count_hotel = 0;
+                                        $sq_pckg_hotel = mysqlQuery("select * from custom_package_hotels where package_id = '$package_id'");
+                                        while ($row_hotel = mysqli_fetch_assoc($sq_pckg_hotel)) {
+                                            $count_hotel++;
+                                            $sq_pckgh = mysqli_fetch_assoc(mysqlQuery("select * from hotel_master where hotel_id = '$row_hotel[hotel_name]'"));
+                                            $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id = '$row_hotel[city_name]'"));
+                                        ?>
+                                            <tr>
+                                                <td><input id="chk_dest<?php echo $count_hotel; ?>-u" type="checkbox" checked>
+                                                </td>
+                                                <td><input maxlength="15" value="<?php echo $count_hotel; ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                <td><select id="city_name<?php echo $count_hotel; ?>-u" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
+                                                        <option value="<?php echo $sq_city['city_id']; ?>">
+                                                            <?php echo $sq_city['city_name']; ?></option>
+                                                    </select></td>
+                                                <td><select id="hotel_name<?php echo $count_hotel; ?>-u" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                                        <?php
+                                                        $rowsHotel = mysqlQuery("SELECT * FROM `hotel_master` WHERE `city_id`=" . $sq_city['city_id']);
+                                                        while ($rows = mysqli_fetch_assoc($rowsHotel)) {
+                                                            if ($sq_pckgh['hotel_id'] == $rows['hotel_id']) {
+                                                                $selected = "selected";
+                                                            } else {
+                                                                $selected = "";
+                                                            }
+                                                        ?>
+                                                            <option value="<?php echo $rows['hotel_id']; ?>" <?= $selected ?>>
+                                                                <?php echo $rows['hotel_name']; ?></option>
+                                                        <?php } ?>
+                                                    </select></td>
+                                                <td><input type="text" id="hotel_type<?php echo $count_hotel; ?>-u" name="hotel_type1" value="<?php echo $row_hotel['hotel_type']; ?>" placeholder="Hotel Category" title="Hotel Category" readonly></td>
+                                                <td><input type="text" id="hotel_tota_days1" value="<?php echo $row_hotel['total_days']; ?>" name="hotel_tota_days1" placeholder="Total Night" onchange="validate_balance(this.id);" title="Total Night"></td>
+                                                <td class="hidden"><input type="text" value="<?php echo $row_hotel['entry_id']; ?>">
+                                                </td>
+                                            </tr>
+                                            <script type="text/javascript">
+                                                city_lzloading('select[name^=city_name1]')
+                                            </script>
+                                    <?php }
+                                    } ?>
+                                </table>
+                            </div>
+                        </div> -->
                         <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                             <legend>Hotel Information</legend>
                             <div class="bg_white main_block panel-default-inner">
@@ -315,7 +443,6 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                 </table>
                             </div>
                         </div>
-
                         <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                             <legend>Transport Information</legend>
                             <div class="bg_white main_block panel-default-inner">
@@ -446,9 +573,317 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
     </form>
 </div>
 </div>
+
+<!-- Itinerary Modal Container -->
+<div id="div_itinerary_modal"></div>
+
+<input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script>
+// Day image preview functions for update modal
+function previewDayImageUpdate(input, offset) {
+    console.log("PACKAGE UPDATE: Preview triggered for row:", offset);
+    console.log("PACKAGE UPDATE: Input file:", input.files[0]);
+    
+    var file = input.files[0];
+    if (!file) {
+        console.log("PACKAGE UPDATE: No file selected");
+        return;
+    }
+    
+    // Validate file type
+    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        error_msg_alert('Only JPG, JPEG, PNG, WEBP files are allowed');
+        input.value = ''; // Clear the input
+        return;
+    }
+    
+    console.log("PACKAGE UPDATE: File validation passed, showing preview for row:", offset);
+    
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        console.log("PACKAGE UPDATE: FileReader loaded, setting image src for row:", offset);
+        var previewImg = $('#preview_img_' + offset);
+        var previewDiv = $('#day_image_preview_' + offset);
+        
+        if (previewImg.length === 0) {
+            console.error("PACKAGE UPDATE: Preview image element not found for row:", offset);
+            return;
+        }
+        
+        if (previewDiv.length === 0) {
+            console.error("PACKAGE UPDATE: Preview div element not found for row:", offset);
+            return;
+        }
+        
+        // Set the image source and show preview
+        previewImg.attr('src', e.target.result);
+        previewDiv.show();
+        
+        // Show the remove button when image is selected
+        previewDiv.find('button[onclick*="removeDayImageUpdate"]').css('display', 'flex');
+        
+        // Hide the upload button after image selection
+        $('#day_image_' + offset).parent().find('label').hide();
+        
+        console.log("PACKAGE UPDATE: Preview displayed successfully for row:", offset);
+    };
+    
+    reader.onerror = function(e) {
+        console.error("PACKAGE UPDATE: FileReader error for row:", offset, e);
+        error_msg_alert('Error reading the selected file');
+    };
+    
+    reader.readAsDataURL(file);
+    
+    // Store file for later upload with the correct offset key
+    if (!window.packageImages) {
+        window.packageImages = {};
+    }
+    window.packageImages[offset] = {
+        file: file,
+        uploaded: false
+    };
+    
+    console.log("PACKAGE UPDATE: Image stored in window.packageImages[" + offset + "]");
+    console.log("PACKAGE UPDATE: Current packageImages object:", window.packageImages);
+}
+
+function removeDayImageUpdate(offset) {
+    console.log("PACKAGE UPDATE: Removing image for row:", offset);
+    
+    // Clear file input
+    $('#day_image_' + offset).val('');
+    
+    // Hide preview and remove button
+    var previewDiv = $('#day_image_preview_' + offset);
+    previewDiv.hide();
+    previewDiv.find('button[onclick*="removeDayImageUpdate"]').hide();
+    
+    // Clear the image src
+    $('#preview_img_' + offset).attr('src', '');
+    
+    // Show the upload button again
+    $('#day_image_' + offset).parent().find('label').show();
+    
+    // Clear existing image path
+    $('#existing_image_path_' + offset).val('');
+    
+    // Clear stored file
+    if (window.packageImages && window.packageImages[offset]) {
+        delete window.packageImages[offset];
+    }
+    
+    console.log("PACKAGE UPDATE: Image removed successfully for row:", offset);
+}
+
+// Debug function to test image processing
+function debugImageProcessing() {
+    console.log("DEBUG: Manual debug triggered");
+    console.log("DEBUG: window.selectedItineraryImage =", window.selectedItineraryImage);
+    
+    // Check all existing image previews
+    $('[id^="preview_img_"]').each(function() {
+        var img = $(this);
+        var src = img.attr('src');
+        var id = img.attr('id');
+        console.log("DEBUG: Image element", id, "src:", src);
+        console.log("DEBUG: Image visible:", img.is(':visible'));
+        console.log("DEBUG: Parent div visible:", img.parent().is(':visible'));
+        console.log("DEBUG: Parent parent visible:", img.parent().parent().is(':visible'));
+    });
+    
+    // Simulate image data for testing
+    if (!window.selectedItineraryImage) {
+        window.selectedItineraryImage = {
+            dayId: '1',
+            img: 'uploads/itinerary_images/20250920_103312_1bc5f39f_assam1.jpeg'
+        };
+        console.log("DEBUG: Set test image data:", window.selectedItineraryImage);
+    }
+    
+    processSelectedItineraryImageUpdate();
+}
+
+// Function to fix image preview display issues
+function fixImagePreviewDisplay() {
+    console.log("PACKAGE UPDATE: Fixing image preview display...");
+    
+    $('[id^="preview_img_"]').each(function() {
+        var img = $(this);
+        var src = img.attr('src');
+        var id = img.attr('id');
+        
+        if (src && src !== '') {
+            console.log("PACKAGE UPDATE: Checking image", id, "with src:", src);
+            
+            // Test if image loads
+            var testImg = new Image();
+            testImg.onload = function() {
+                console.log("PACKAGE UPDATE: Image", id, "loads successfully");
+                img.show();
+                img.parent().show();
+                img.parent().parent().find('label').hide();
+            };
+            testImg.onerror = function() {
+                console.log("PACKAGE UPDATE: Image", id, "failed to load, trying alternative URL");
+                
+                // Try alternative URL construction
+                var altSrc = src;
+                if (src.indexOf('http') === -1) {
+                    // Try with different base URL
+                    var baseUrl = $('#base_url').val();
+                    if (baseUrl) {
+                        altSrc = baseUrl.replace('/crm/', '/') + src;
+                        console.log("PACKAGE UPDATE: Trying alternative URL:", altSrc);
+                        img.attr('src', altSrc);
+                    }
+                }
+            };
+            testImg.src = src;
+        }
+    });
+}
+
+// Function to process selected itinerary image after modal closes
+function processSelectedItineraryImageUpdate() {
+    console.log("PACKAGE UPDATE: processSelectedItineraryImageUpdate called");
+    console.log("PACKAGE UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
+    
+    if (window.selectedItineraryImage) {
+        var dayId = window.selectedItineraryImage.dayId;
+        var img = window.selectedItineraryImage.img;
+        
+        console.log("PACKAGE UPDATE: Processing selected itinerary image for day:", dayId, "img:", img);
+        
+        // Set the image path in hidden input
+        $('#existing_image_path_' + dayId).val(img);
+        console.log("PACKAGE UPDATE: Set hidden input value for day", dayId);
+        
+        // Show image preview if image exists
+        if (img && img !== '' && img !== 'NULL') {
+            var imageUrl = img;
+            
+            // Check if path already starts with http
+            if (img.indexOf('http') !== 0) {
+                // For package images, use project root URL
+                var project_base_url = $('#base_url').val().replace('/crm/', '/');
+                project_base_url = project_base_url.replace(/\/$/, '');
+                var image_path = img.replace(/^\//, '');
+                imageUrl = project_base_url + '/' + image_path;
+            }
+            
+            console.log("PACKAGE UPDATE: Final image URL:", imageUrl);
+            
+            // Update the image preview
+            var previewImg = $('#preview_img_' + dayId);
+            var previewDiv = $('#day_image_preview_' + dayId);
+            
+            console.log("PACKAGE UPDATE: Looking for elements - previewImg:", previewImg.length, "previewDiv:", previewDiv.length);
+            console.log("PACKAGE UPDATE: Selectors used - #preview_img_" + dayId + ", #day_image_preview_" + dayId);
+            
+            if (previewImg.length && previewDiv.length) {
+                previewImg.attr('src', imageUrl);
+                previewDiv.show();
+                
+                // Show the remove button
+                previewDiv.find('button[onclick*="removeDayImageUpdate"]').show();
+                
+                // Hide the upload button
+                $('#day_image_' + dayId).parent().find('label').hide();
+                
+                console.log("PACKAGE UPDATE: Image preview updated for day", dayId);
+            } else {
+                console.log("PACKAGE UPDATE: Preview elements not found for day", dayId);
+                console.log("PACKAGE UPDATE: Available preview elements:", $('[id^="preview_img_"]').length);
+                console.log("PACKAGE UPDATE: Available preview divs:", $('[id^="day_image_preview_"]').length);
+            }
+        } else {
+            console.log("PACKAGE UPDATE: No valid image to process for day", dayId);
+        }
+        
+        // Clear the stored data
+        window.selectedItineraryImage = null;
+        console.log("PACKAGE UPDATE: Image processing completed and data cleared");
+    } else {
+        console.log("PACKAGE UPDATE: No selectedItineraryImage data found");
+    }
+}
+
+// Add new itinerary row function for update modal
+function addItineraryRowUpdate() {
+    var table = document.getElementById('dynamic_table_list_update');
+    if (!table) {
+        console.error('Table not found: dynamic_table_list_update');
+        return;
+    }
+    
+    var rowCount = table.rows.length;
+    var newRow = table.insertRow(rowCount);
+    
+    // Get the next count number
+    var count = rowCount + 1;
+    
+    // Create the new row HTML
+    newRow.innerHTML = `
+        <td width="27px;">
+            <input class="css-checkbox mg_bt_10 labelauty" id="chk_program${count}" type="checkbox" checked autocomplete="off" data-original-title="" title="" aria-hidden="true" style="display: none;">
+            <label for="chk_program${count}" style="margin-top:55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label>
+            <label class="css-label" for="chk_program${count}"></label>
+        </td>
+        <td class='hidden col-md-1 pad_8'>
+            <input maxlength="15" value="${count}" type="text" name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled="" autocomplete="off" data-original-title="" title="" style='width:10px;margin-top:35px;'>
+        </td>
+        <td style='width:140px'>
+            <input type="text" id="special_attaraction${count}-u" name="special_attaraction" class="form-control mg_bt_10" placeholder="*Special Attraction" title="Special Attraction" onchange="validate_spaces(this.id);validate_spattration(this.id);" style='width:150px;margin-top:35px;'>
+        </td>
+        <td class='col-md-7 pad_8' style="max-width: 594px;overflow: hidden;position: relative;">
+            <textarea id="day_program${count}-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style='width:100%;height:900px;'></textarea>
+            <span class="style_text">
+                <span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span>
+                <span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span>
+            </span>
+        </td>
+        <td class='col-md-1/2 pad_8' style='width:100px'>
+            <input type="text" id="overnight_stay${count}-u" name="overnight_stay" class="form-control mg_bt_10" onchange="validate_spaces(this.id);validate_onstay(this.id);" placeholder="*Overnight Stay" title="Overnight Stay" style='width:150px;margin-top:35px;'>
+        </td>
+        <td class='col-md-1/2 pad_8'>
+            <select id="meal_plan${count}" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style='width:125px;margin-top:35px;'>
+                <option value="">Meal Plan</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="All Meals">All Meals</option>
+            </select>
+        </td>
+        <td class='col-md-1 pad_8'>
+            <button type="button" id="itinerary${count}" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="border: none !important;margin-top:35px;" onClick="add_itinerary('dest_name_u','special_attaraction${count}-u','day_program${count}-u','overnight_stay${count}-u','Day-${count}')">
+                <i class="fa fa-plus"></i>
+            </button>
+        </td>
+        <td class='col-md-1 pad_8' style="width: 120px;">
+            <div style="margin-top: 35px;">
+                <label for="day_image_${count}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 8px 16px; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap;">
+                    <span>Upload Image</span>
+                </label>
+                <input type="file" id="day_image_${count}" name="day_image_${count}" accept="image/*" onchange="previewDayImageUpdate(this, '${count}')" style="display: none;">
+            </div>
+            <div id="day_image_preview_${count}" style="display: none; margin-top: 5px;">
+                <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <img id="preview_img_${count}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                    <button type="button" onclick="removeDayImageUpdate('${count}')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>
+            </div>
+            </div>
+            <input type="hidden" id="existing_image_path_${count}" name="existing_image_path_${count}" value="" />
+        </td>
+        <td class="hidden">
+            <input type="text" value="">
+        </td>
+    `;
+}
+
 $(document).on("click", ".style_text_b, .style_text_u", function() {
     var wrapper = $(this).data("wrapper");
     
@@ -572,6 +1007,11 @@ $('#seo_slug').val(generateSlug(packageName));
     }
 
     $(function() {
+        // Prevent form submission
+        $('#frm_package_master_update').on('submit', function(e) {
+            e.preventDefault();
+            return false;
+        });
 
         $('#frm_package_master_update').validate({
 
@@ -592,17 +1032,22 @@ $('#seo_slug').val(generateSlug(packageName));
                 },
             },
 
-            submitHandler: function(form) {
-
+            submitHandler: function(form, event) {
+                // Prevent default form submission
+                if (event) {
+                    event.preventDefault();
+                }
+                
                 var base_url = $('#base_url').val();
                 var currency_id = $('#currency_code1').val();
-                var taxation_type = $('#taxation_type1').val();
-                var taxation_id = $('#taxation_id1').val();
-                var service_tax = $('#service_tax1').val();
-                if (service_tax == '') {
-                    error_msg_alert('Select Tax(%)!');
-                    return false;
-                }
+                var taxation_type = $('#taxation_type1').val() || '';
+                var taxation_id = $('#taxation_id1').val() || '';
+                var service_tax = $('#service_tax1').val() || '';
+                // Remove the service_tax validation since it might not be required
+                // if (service_tax == '') {
+                //     error_msg_alert('Select Tax(%)!');
+                //     return false;
+                // }
                 var package_id = $("#package_id1").val();
                 var package_code = $("#package_code1").val();
                 var package_name = $("#package_name1").val();
@@ -621,7 +1066,7 @@ $('#seo_slug').val(generateSlug(packageName));
                 var child_without = $("#child_without1").val();
                 var extra_bed = $("#extra_bed1").val();
                 var status = $("#status1").val();
-                var transport_id = $("#transport_name2").val();
+                var transport_id = $("#transport_name2").val() || '';
                 var note = $('#note1').val();
                 var dest_image = $('#dest_image1').val();
 
@@ -636,22 +1081,38 @@ $('#seo_slug').val(generateSlug(packageName));
                 var overnight_stay_arr = new Array();
                 var meal_plan_arr = new Array();
                 var entry_id_arr = new Array();
+                var day_image_arr = new Array();
 
                 var table = document.getElementById("dynamic_table_list_update");
                 var rowCount = table.rows.length;
+                console.log("Total rows in itinerary table:", rowCount);
                 for (var i = 0; i < rowCount; i++) {
 
                     var row = table.rows[i];
-                    var checked_programe = row.cells[0].childNodes[0].checked;
-                    var special_attaraction = row.cells[2].childNodes[0].value;
-                    var day_program = row.cells[3].childNodes[0].value;
-                    var overnight_stay = row.cells[4].childNodes[0].value;
-                    var meal_plan = row.cells[5].childNodes[0].value;
-                    if (row.cells[7]) {
-                        var entry_id = row.cells[7].childNodes[0].value;
-                    } else {
-                        var entry_id = '';
+                    var rowNum = i + 1; // Row numbers start from 1 in the IDs
+                    
+                    // Get elements by their IDs instead of relying on cell positions
+                    var checkboxElement = document.getElementById("chk_program" + rowNum);
+                    var attractionElement = document.getElementById("special_attaraction" + rowNum + "-u");
+                    var programElement = document.getElementById("day_program" + rowNum + "-u"); 
+                    var stayElement = document.getElementById("overnight_stay" + rowNum + "-u");
+                    var mealPlanElement = document.getElementById("meal_plan" + rowNum);
+                    // Get entry_id from the hidden cell (cell 8)
+                    var entryIdElement = null;
+                    if (row.cells[8]) {
+                        var entryIdInput = row.cells[8].querySelector('input[type="text"]');
+                        entryIdElement = entryIdInput;
                     }
+                    
+                    var checked_programe = checkboxElement ? checkboxElement.checked : false;
+                    var special_attaraction = attractionElement ? attractionElement.value : '';
+                    var day_program = programElement ? programElement.value : '';
+                    var overnight_stay = stayElement ? stayElement.value : '';
+                    var meal_plan = mealPlanElement ? mealPlanElement.value : '';
+                    var entry_id = entryIdElement ? entryIdElement.value : '';
+                    
+                    console.log("Row " + i + " - Checked:", checked_programe, "Attraction:", special_attaraction, "Program:", (day_program || '').substring(0, 50) + "...", "Entry ID:", entry_id);
+                    console.log("Row " + i + " - Entry ID element found:", !!entryIdElement, "Entry ID raw value:", entryIdElement ? '"' + entryIdElement.value + '"' : 'null');
                     if (checked_programe === true) {
 
                         if (special_attaraction == "") {
@@ -666,9 +1127,9 @@ $('#seo_slug').val(generateSlug(packageName));
                             error_msg_alert('Overnight stay is mandatory in row' + (i + 1));
                             return false;
                         }
-                        var flag1 = validate_spattration(row.cells[2].childNodes[0].id);
-                        var flag2 = validate_dayprogram(row.cells[3].childNodes[0].id);
-                        var flag3 = validate_onstay(row.cells[4].childNodes[0].id);
+                        var flag1 = validate_spattration("special_attaraction" + rowNum + "-u");
+                        var flag2 = validate_dayprogram("day_program" + rowNum + "-u");
+                        var flag3 = validate_onstay("overnight_stay" + rowNum + "-u");
                         if (!flag1 || !flag2 || !flag3) {
                             return false;
                         }
@@ -680,7 +1141,72 @@ $('#seo_slug').val(generateSlug(packageName));
                     overnight_stay_arr.push(overnight_stay);
                     meal_plan_arr.push(meal_plan);
                     entry_id_arr.push(entry_id);
+                    
+                    // Get image path - check both stored images and upload if needed
+                    var img = '';
+                    var rowIndex = i + 1; // Convert 0-based index to 1-based for matching PHP count
+                    
+                    console.log("PACKAGE UPDATE: Processing image for row", i, "with rowIndex", rowIndex);
+                    
+                    // First check if we have a new image in window.packageImages
+                    if (window.packageImages && window.packageImages[rowIndex]) {
+                        var imageData = window.packageImages[rowIndex];
+                        console.log("PACKAGE UPDATE: Found image data for rowIndex", rowIndex, imageData);
+                        
+                        if (imageData.file && !imageData.uploaded) {
+                            console.log("PACKAGE UPDATE: Uploading new image for rowIndex", rowIndex);
+                            // Upload the image immediately
+                            var formData = new FormData();
+                            formData.append('uploadfile', imageData.file);
+                            
+                            $.ajax({
+                                url: $('#base_url').val() + 'view/other_masters/itinerary/upload_itinerary_image.php',
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                async: false, // Make it synchronous for data collection
+                                success: function(response) {
+                                    try {
+                                        var msg = response.split('--');
+                                        if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
+                                            img = response;
+                                            window.packageImages[rowIndex].uploaded = true;
+                                            window.packageImages[rowIndex].image_url = response;
+                                            console.log("PACKAGE UPDATE: Image uploaded successfully for rowIndex", rowIndex, ":", img);
+                                        } else {
+                                            console.log("PACKAGE UPDATE: Upload failed for rowIndex", rowIndex, ":", response);
+                                        }
+                                    } catch(e) {
+                                        console.log('PACKAGE UPDATE: Upload parse error for rowIndex', rowIndex, ':', e);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.log("PACKAGE UPDATE: Upload error for rowIndex", rowIndex, ":", error);
+                                }
+                            });
+                        } else if (imageData.image_url) {
+                            img = imageData.image_url;
+                            console.log("PACKAGE UPDATE: Using existing image URL for rowIndex", rowIndex, ":", img);
+                        }
+                    } else {
+                        // Fallback to existing image from hidden input
+                        var existingImgInput = row.querySelector('input[id="existing_image_path_' + rowIndex + '"]');
+                        img = existingImgInput ? existingImgInput.value : '';
+                        console.log("PACKAGE UPDATE: Using existing image for rowIndex", rowIndex, ":", img);
+                    }
+                    
+                    console.log("PACKAGE UPDATE: Final image for row", i, ":", img);
+                    day_image_arr.push(img || '');
                 }
+                
+                console.log("Arrays being sent:");
+                console.log("checked_programe_arr:", checked_programe_arr);
+                console.log("special_attaraction_arr:", special_attaraction_arr);
+                console.log("day_program_arr:", day_program_arr);
+                console.log("day_image_arr:", day_image_arr);
+                console.log("entry_id_arr:", entry_id_arr);
+                console.log("window.packageImages:", window.packageImages);
 
                 //Hotel information
                 var hotel_check_arr = new Array();
@@ -822,6 +1348,7 @@ $('#seo_slug').val(generateSlug(packageName));
                         special_attaraction_arr: special_attaraction_arr,
                         overnight_stay_arr: overnight_stay_arr,
                         meal_plan_arr: meal_plan_arr,
+                        day_image_arr: day_image_arr,
                         entry_id_arr: entry_id_arr,
                         hotel_entry_id_arr: hotel_entry_id_arr,
                         vehicle_name_arr: vehicle_name_arr,
@@ -852,6 +1379,7 @@ $('#seo_slug').val(generateSlug(packageName));
                             $('#btn_update').button('reset');
                         }
                     });
+                return false; // Prevent default form submission
             }
         });
     });
@@ -873,26 +1401,130 @@ $('#seo_slug').val(generateSlug(packageName));
     // /**Hotel Name load start**/
     function hotel_name_list_load(id) {
         var city_id = $("#" + id).val();
-        var count = id.substring(9);
-        $.get("package/hotel/hotel_name_load.php", {
-            city_id: city_id
-        }, function(data) {
-            $("#hotel_name" + count).html(data);
-        });
+        console.log("Hotel loading for city_id:", city_id, "from element:", id);
+        
+        // Extract counter from city ID - handle different ID patterns
+        var count = "";
+        if (id.includes("city_name")) {
+            // For existing rows: city_name1, city_name2, etc.
+            count = id.replace("city_name", "");
+        } else if (id.includes("city_name-")) {
+            // For dynamic rows: city_name-1, city_name-2, etc.
+            count = id.replace("city_name-", "");
+        }
+        
+        console.log("Extracted count:", count);
+        
+        // Find the corresponding hotel dropdown
+        var hotelSelectId = "hotel_name" + count;
+        var hotelSelect = $("#" + hotelSelectId);
+        
+        // If not found by ID, try to find it in the same row
+        if (hotelSelect.length === 0) {
+            var cityElement = $("#" + id);
+            var row = cityElement.closest('tr');
+            hotelSelect = row.find('select[name^="hotel_name"]');
+            console.log("Found hotel select in same row:", hotelSelect.length > 0);
+        }
+        
+        if (hotelSelect.length > 0) {
+            $.get("package/hotel/hotel_name_load.php", {
+                city_id: city_id
+            }, function(data) {
+                hotelSelect.html(data);
+                console.log("Hotel options loaded for", hotelSelectId);
+            });
+        } else {
+            console.log("Hotel select not found for ID:", hotelSelectId);
+        }
     }
 
     function hotel_type_load(id) {
         var hotel_id = $("#" + id).val();
-        var count = id.substring(10);
-
-        $.get("package/hotel/hotel_type_load.php", {
-            hotel_id: hotel_id
-        }, function(data) {
-            $("#hotel_type" + count).val(data);
-        });
+        console.log("Hotel type loading for hotel_id:", hotel_id, "from element:", id);
+        
+        // Extract counter from hotel ID - handle different ID patterns
+        var count = "";
+        if (id.includes("hotel_name")) {
+            // For existing rows: hotel_name1, hotel_name2, etc.
+            count = id.replace("hotel_name", "");
+        } else if (id.includes("hotel_name-")) {
+            // For dynamic rows: hotel_name-1, hotel_name-2, etc.
+            count = id.replace("hotel_name-", "");
+        }
+        
+        console.log("Extracted count for hotel type:", count);
+        
+        // Find the corresponding hotel type input
+        var hotelTypeId = "hotel_type" + count;
+        var hotelTypeInput = $("#" + hotelTypeId);
+        
+        // If not found by ID, try to find it in the same row
+        if (hotelTypeInput.length === 0) {
+            var hotelElement = $("#" + id);
+            var row = hotelElement.closest('tr');
+            hotelTypeInput = row.find('input[name^="hotel_type"]');
+            console.log("Found hotel type input in same row:", hotelTypeInput.length > 0);
+        }
+        
+        if (hotelTypeInput.length > 0) {
+            $.get("package/hotel/hotel_type_load.php", {
+                hotel_id: hotel_id
+            }, function(data) {
+                hotelTypeInput.val(data);
+                console.log("Hotel type loaded:", data, "for", hotelTypeId);
+            });
+        } else {
+            console.log("Hotel type input not found for ID:", hotelTypeId);
+        }
     }
 
     /////////////********** Tour Master Information Save end**********/////////////
+    
+    // Listen for modal close event and process selected image
+    $(document).ready(function() {
+        console.log("PACKAGE UPDATE: Setting up modal event listeners");
+        
+        // Fix image preview display on page load
+        setTimeout(function() {
+            fixImagePreviewDisplay();
+        }, 1000);
+        
+        // Use a more reliable approach - check for image data periodically
+        var imageCheckInterval = setInterval(function() {
+            if (window.selectedItineraryImage) {
+                console.log("PACKAGE UPDATE: Found pending image data, processing...");
+                processSelectedItineraryImageUpdate();
+            }
+        }, 500);
+        
+        // Also set up event listeners for modal close
+        $(document).on('hidden.bs.modal', '#itinerary_detail_modal', function() {
+            console.log("PACKAGE UPDATE: Modal closed (hidden.bs.modal), processing selected image");
+            console.log("PACKAGE UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
+            setTimeout(function() {
+                processSelectedItineraryImageUpdate();
+            }, 100);
+        });
+        
+        $(document).on('hide.bs.modal', '#itinerary_detail_modal', function() {
+            console.log("PACKAGE UPDATE: Modal closing (hide.bs.modal), processing selected image");
+            console.log("PACKAGE UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
+            setTimeout(function() {
+                processSelectedItineraryImageUpdate();
+            }, 200);
+        });
+        
+        // Debug: Log when modal is shown
+        $(document).on('show.bs.modal', '#itinerary_detail_modal', function() {
+            console.log("PACKAGE UPDATE: Itinerary modal opened");
+        });
+        
+        // Clean up interval when page unloads
+        $(window).on('beforeunload', function() {
+            clearInterval(imageCheckInterval);
+        });
+    });
 </script>
 
 <?php

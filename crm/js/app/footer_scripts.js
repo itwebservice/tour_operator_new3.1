@@ -25,6 +25,89 @@ $(function () {
 	});
 });
 
+//**Smart Dropdown Positioning
+// Automatically position dropdowns above when near bottom of viewport
+function adjustDropdownPosition() {
+    $('.btn-group, .dropdown').each(function() {
+        var $btnGroup = $(this);
+        var $dropdown = $btnGroup.find('.dropdown-menu');
+        
+        if ($dropdown.length === 0) return;
+        
+        // Skip if dropdown is not visible or about to be shown
+        if (!$btnGroup.hasClass('open') && !$btnGroup.hasClass('show')) return;
+        
+        // Reset classes
+        $btnGroup.removeClass('dropup');
+        
+        // Get button position and viewport height
+        var buttonOffset = $btnGroup.offset();
+        if (!buttonOffset) return; // Element not visible
+        
+        var buttonHeight = $btnGroup.outerHeight();
+        var dropdownHeight = $dropdown.outerHeight() || 200; // Estimate if not visible
+        var viewportHeight = $(window).height();
+        var scrollTop = $(window).scrollTop();
+        
+        // Calculate space below and above
+        var spaceBelow = viewportHeight - (buttonOffset.top - scrollTop + buttonHeight);
+        var spaceAbove = buttonOffset.top - scrollTop;
+        
+        // If not enough space below but enough space above, use dropup
+        if (spaceBelow < dropdownHeight + 20 && spaceAbove > dropdownHeight + 20) {
+            $btnGroup.addClass('dropup');
+            console.log('Smart positioning: Dropdown positioned above for button at', buttonOffset.top);
+        }
+    });
+}
+
+// Apply smart positioning globally
+$(document).ready(function() {
+    // Adjust positioning when dropdown is about to be shown
+    $(document).on('show.bs.dropdown', '.btn-group, .dropdown', function() {
+        var $this = $(this);
+        setTimeout(function() {
+            adjustDropdownPosition();
+        }, 10);
+    });
+    
+    // Also adjust on window resize and scroll
+    $(window).on('resize scroll', function() {
+        if ($('.btn-group.open, .btn-group.show, .dropdown.open, .dropdown.show').length > 0) {
+            adjustDropdownPosition();
+        }
+    });
+});
+
+// Add global CSS for smart dropdown positioning
+if (!document.getElementById('smart-dropdown-css')) {
+    var css = `
+    <style id="smart-dropdown-css">
+    /* Smart dropdown positioning */
+    .btn-group .dropdown-menu {
+        transition: all 0.2s ease;
+    }
+    
+    /* Dropup positioning - show above when near bottom */
+    .btn-group.dropup .dropdown-menu {
+        top: auto !important;
+        bottom: 100% !important;
+        margin: 0 0 2px !important;
+        box-shadow: 0 -6px 12px rgba(0,0,0,.175) !important;
+    }
+    
+    /* Ensure dropdown arrow points in correct direction for dropup */
+    .btn-group.dropup .dropdown-toggle::after {
+        border-top: 0 !important;
+        border-bottom: 4px solid !important;
+        border-right: 4px solid transparent !important;
+        border-left: 4px solid transparent !important;
+    }
+    </style>
+    `;
+    $('head').append(css);
+}
+
 $(function () {
 	$('input[type="text"], input[type="number"], select, textarea').addClass('form-control');
 	$('.no_form_control').removeClass('form-control');
@@ -556,7 +639,7 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 	});
 }else{
 	$(element).select2({
-		placeholder: placeholder,	
+		placeholder: placeholder,
 		ajax: {
 			url: url,
 			dataType: 'json',
@@ -575,6 +658,8 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 	});
 }
 }
+
+
 function destinationLoading(element, placeholder = "Destination", valueasText = false) {
 	var base_url = $("#base_url").val();
 	url = base_url + '/view/load_data/generic_destination_loading.php';

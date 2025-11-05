@@ -519,13 +519,24 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
   $dates = (array) get_dates_for_package_itineary($_GET['quotation_id']);
   $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
-  $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]'"));
-  $day_url1 = explode(',', $sq_day_image['image_url']);
+  
+  // Use day_image from package_quotation_program table
   $daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
-  for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
-    $day_url2 = explode('=', $day_url1[$count1]);
-    if (isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count'] && isset($day_url2[0]) && $day_url2[0] == $row_itinarary['package_id']) {
-      $daywise_image = $day_url2[2];
+  if (!empty($row_itinarary['day_image'])) {
+    // Construct full URL for the image (remove /crm from BASE_URL for images)
+    $base_url_for_images = str_replace('/crm', '', BASE_URL);
+    $daywise_image = $base_url_for_images . $row_itinarary['day_image'];
+  } else {
+    // Fallback to old system if day_image is empty
+    $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]'"));
+    if ($sq_day_image && !empty($sq_day_image['image_url'])) {
+      $day_url1 = explode(',', $sq_day_image['image_url']);
+      for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
+        $day_url2 = explode('=', $day_url1[$count1]);
+        if (isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count'] && isset($day_url2[0]) && $day_url2[0] == $row_itinarary['package_id']) {
+          $daywise_image = $day_url2[2];
+        }
+      }
     }
   }
   if ($checkPageEnd % 100 == 0 || $checkPageEnd == 0) {
@@ -553,9 +564,9 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
       }
       ?>
       <section class="print_single_itinenary leftItinerary">
-        <div class="itneraryImg">
-          <div class="itneraryImgblock">
-            <img src="<?= $daywise_image ?>" class="img-responsive">
+        <div class="itneraryImg" style="background: none !important;">
+          <div class="itneraryImgblock" style="background: none !important;">
+            <img src="<?= $daywise_image ?>" class="img-responsive" style="background: none !important;">
           </div>
           <div class="itneraryText">
             <!-- <div class="itneraryDayInfo">

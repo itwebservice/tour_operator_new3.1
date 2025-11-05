@@ -1,0 +1,42 @@
+# Upload folders
+uploads/
+upload/
+crm/uploads/
+crm/upload/
+
+# Cache files
+cache/
+cache.txt
+crm/cache.txt
+
+# Log files
+error_log
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production

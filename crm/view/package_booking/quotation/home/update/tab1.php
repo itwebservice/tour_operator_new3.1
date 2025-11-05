@@ -60,10 +60,10 @@
                 </div>
 
                 <div class="col-md-4 col-sm-6 col-xs-12">
-
                     <input type="text" id="tour_name12" name="tour_name12" placeholder="Tour Name" title="Tour Name"
-                        value="<?= $sq_quotation['tour_name'] ?>">
-
+                        value="<?= $sq_quotation['tour_name'] ?>" onchange="store_destination_update()">
+                    <input type="hidden" id="destinations12" name="destinations12" placeholder="destinations"
+                        value='<?= get_destinations() ?>'>
                 </div>
 
                 <div class="col-md-4 col-sm-6 col-xs-12">
@@ -138,10 +138,12 @@
                         onchange="total_passangers_calculate('12'); validate_balance(this.id)"
                         value="<?= $sq_quotation['total_adult'] ?>">
                 </div>
+       
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" id="total_infant12" name="total_infant12" placeholder="*Total Infant(s)"
-                        title="Total Infant(s)" onchange="total_passangers_calculate('12'); validate_balance(this.id)"
-                        value="<?= $sq_quotation['total_infant'] ?>">
+                    <input type="text" class="form-control" id="children_with_bed12" name="children_with_bed12"
+                        onchange="validate_balance(this.id);total_passangers_calculate('12');"
+                        placeholder="Child With Bed(s)" title="Child With Bed(s)"
+                        value="<?= $sq_quotation['children_with_bed'] ?>">
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" class="form-control" id="children_without_bed12" name="children_without_bed12"
@@ -150,11 +152,11 @@
                         value="<?= $sq_quotation['children_without_bed'] ?>">
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" class="form-control" id="children_with_bed12" name="children_with_bed12"
-                        onchange="validate_balance(this.id);total_passangers_calculate('12');"
-                        placeholder="Child With Bed(s)" title="Child With Bed(s)"
-                        value="<?= $sq_quotation['children_with_bed'] ?>">
+                    <input type="text" id="total_infant12" name="total_infant12" placeholder="*Total Infant(s)"
+                        title="Total Infant(s)" onchange="total_passangers_calculate('12'); validate_balance(this.id)"
+                        value="<?= $sq_quotation['total_infant'] ?>">
                 </div>
+              
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" id="total_passangers12" name="total_passangers12" placeholder="Total Member(s)"
                         title="Total Member(s)" disabled value="<?= $sq_quotation['total_passangers'] ?>">
@@ -192,6 +194,49 @@
 <script>
 $('#enquiry_id12,#country_code1').select2();
 $('#country_code1').val($('#cc_value').val()).select2();
+
+// Add autocomplete for tour name in update
+$("#tour_name12").autocomplete({
+    source: JSON.parse($('#destinations12').val()),
+    select: function (event, ui) {
+        $("#tour_name12").val(ui.item.label);
+        console.log('Selected destination for update - ID:', ui.item.dest_id, 'Name:', ui.item.label);
+        
+        // Store selected destination for package filtering
+        sessionStorage.setItem('selected_destination_id', ui.item.dest_id);
+        sessionStorage.setItem('selected_destination_name', ui.item.label);
+    },
+    open: function(event, ui) {
+        $(this).autocomplete("widget").css({
+            "width": document.getElementById("tour_name12").offsetWidth
+        });
+    }
+}).data("ui-autocomplete")._renderItem = function(ul, item) {
+    return $("<li disabled>")
+        .append("<a>" + item.label +"</a>")
+        .appendTo(ul);
+};
+
+// Function to store destination when manually changed
+function store_destination_update() {
+    var destination_name = $('#tour_name12').val();
+    if (destination_name) {
+        // Try to find destination ID from the destinations data
+        var destinations = JSON.parse($('#destinations12').val());
+        var destination_id = null;
+        for (var i = 0; i < destinations.length; i++) {
+            if (destinations[i].label === destination_name) {
+                destination_id = destinations[i].dest_id;
+                break;
+            }
+        }
+        if (destination_id) {
+            sessionStorage.setItem('selected_destination_id', destination_id);
+            sessionStorage.setItem('selected_destination_name', destination_name);
+            console.log('Stored destination for update (manual) - ID:', destination_id, 'Name:', destination_name);
+        }
+    }
+}
 $('#frm_tab_u_1').validate({
     rules: {
 
@@ -237,10 +282,69 @@ $('#frm_tab_u_1').validate({
             error_msg_alert("Enter atleast adult count!");
             return false;
         }
+        
+        // Store selected nights for package filtering
+        var total_nights = $('#total_days12').val();
+        if (total_nights) {
+            sessionStorage.setItem('selected_nights', total_nights);
+        }
+        
+        // Store destination for package filtering
+        var destination_name = $('#tour_name12').val();
+        if (destination_name) {
+            // Try to find destination ID from the destinations data
+            var destinations = JSON.parse($('#destinations12').val());
+            var destination_id = null;
+            for (var i = 0; i < destinations.length; i++) {
+                if (destinations[i].label === destination_name) {
+                    destination_id = destinations[i].dest_id;
+                    break;
+                }
+            }
+            if (destination_id) {
+                sessionStorage.setItem('selected_destination_id', destination_id);
+                sessionStorage.setItem('selected_destination_name', destination_name);
+                console.log('Stored destination for update - ID:', destination_id, 'Name:', destination_name);
+            }
+        }
+        
+        // Reset user modification flag when submitting Tab1 (going to Tab2)
+        sessionStorage.removeItem('user_modified_nights');
+        console.log('Reset user_modified_nights flag - submitting Tab1 (update)');
+        
         $('#tab1_head').addClass('done');
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');
         $('#tab2').addClass('active');
+        
+        // Sync nights filter and destination when switching to tab2
+        setTimeout(function() {
+            var total_days = $('#total_days12').val();
+            var destination_id = sessionStorage.getItem('selected_destination_id');
+            var destination_name = sessionStorage.getItem('selected_destination_name');
+            
+            console.log('Syncing on tab switch (update) - total_days:', total_days, 'destination_id:', destination_id, 'destination_name:', destination_name);
+            
+            // Sync nights filter (always sync when coming from Tab1)
+            if (total_days && total_days > 0) {
+                if ($('#nights_filter').length > 0) {
+                    $('#nights_filter').val(total_days);
+                    $('#nights_filter').trigger('change');
+                    sessionStorage.setItem('selected_nights', total_days);
+                    console.log('Synced nights filter (update):', total_days);
+                }
+            }
+            
+            // Sync destination
+            if (destination_id && destination_name) {
+                if ($('#dest_name').length > 0) {
+                    $('#dest_name').val(destination_id);
+                    $('#dest_name').trigger('change');
+                    console.log('Synced destination (update):', destination_name);
+                }
+            }
+        }, 100);
+        
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);

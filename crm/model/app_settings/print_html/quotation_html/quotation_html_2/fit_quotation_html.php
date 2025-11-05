@@ -496,21 +496,32 @@ if ($sq_quotation['discount'] != 0) {
             while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
                 $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
+                
+                // Use day_image from package_quotation_program table
                 $daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
-                $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]' "));
-                $day_url1 = explode(',', $sq_day_image['image_url']);
-                for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
-                    $day_url2 = isset($day_url1[$count1]) ? explode('=', $day_url1[$count1]) : [];
-                    if (isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count'] && isset($day_url2[0]) && $day_url2[0] == $row_itinarary['package_id']) {
-                        $daywise_image = $day_url2[2];
+                if (!empty($row_itinarary['day_image'])) {
+                    // Construct full URL for the image (remove /crm from BASE_URL for images)
+                    $base_url_for_images = str_replace('/crm', '', BASE_URL);
+                    $daywise_image = $base_url_for_images . $row_itinarary['day_image'];
+                } else {
+                    // Fallback to old system if day_image is empty
+                    $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]' "));
+                    if ($sq_day_image && !empty($sq_day_image['image_url'])) {
+                        $day_url1 = explode(',', $sq_day_image['image_url']);
+                        for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
+                            $day_url2 = isset($day_url1[$count1]) ? explode('=', $day_url1[$count1]) : [];
+                            if (isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count'] && isset($day_url2[0]) && $day_url2[0] == $row_itinarary['package_id']) {
+                                $daywise_image = $day_url2[2];
+                            }
+                        }
                     }
                 }
                 if ($count % 2 != 0) {
             ?>
                     <li class="singleItinenrary leftItinerary col-md-12 no-pad">
                         <div class="itneraryContent col-md-11 no-pad text-right mg_tp_20 mg_bt_20">
-                            <div class="itneraryImg col-md-4">
-                                <img src="<?= $daywise_image ?>" class="img-responsive" style="border:6px solid #eaeaea;">
+                            <div class="itneraryImg col-md-4" style="background: none !important;">
+                                <img src="<?= $daywise_image ?>" class="img-responsive" style="border:6px solid #eaeaea; background: none !important;">
                                 <div class="dayCount" style="position: static; top: unset; left: unset; margin: 0; text-align: left; padding-left: 15px; margin-top:5px;">
                                     <span>Day-<?= $count . '(' . $date_format . ')' ?> </span>
                                     <span style="margin-right:5px;"><i class="fa fa-bed"></i> </span><?= $row_itinarary['stay'] ?>
@@ -531,9 +542,9 @@ if ($sq_quotation['discount'] != 0) {
 
                     <li class="singleItinenrary leftItinerary col-md-12 no-pad">
                         <div class="itneraryContent col-md-11 no-pad text-right mg_tp_20 mg_bt_20">
-                            <div class="itneraryImg col-md-4">
+                            <div class="itneraryImg col-md-4" style="background: none !important;">
                                 <!--<div style="width: 100%;">-->
-                                <img src="<?= $daywise_image ?>" class="img-responsive" style="border:6px solid #eaeaea;">
+                                <img src="<?= $daywise_image ?>" class="img-responsive" style="border:6px solid #eaeaea; background: none !important;">
                                 <!--</div>-->
                                 <div class="dayCount" style="position: static; top: unset; left: unset; margin: 0; text-align: left; padding-left: 15px; margin-top:5px;">
                                     <span>Day-<?= $count . '(' . $date_format . ')' ?> </span>

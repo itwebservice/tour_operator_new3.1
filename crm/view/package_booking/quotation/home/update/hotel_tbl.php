@@ -34,7 +34,10 @@
                     <td><select id="hotel_name-1" name="hotel_name-1" onchange="hotel_type_load(this.id);get_hotel_cost();" style="width:160px" title="Select Hotel Name">
                         <option value="">Hotel Name</option>
                         </select></td>
-                    <td><select name="room_cat-1" id="room_cat-1" style="width:145px;" title="Room Category" class="form-control app_select2" onchange="get_hotel_cost();"></select></td>
+                    <td><select name="room_cat-1" id="room_cat-1" style="width:145px;" title="Room Category" class="form-control app_select2" onchange="get_hotel_cost();">
+                        <option value="">Room Category</option>
+                        <option value="Deluxe Room" selected>Deluxe Room</option>
+                    </select></td>
                     <td><input type="text" style="width:150px;" class="app_datepicker" id="check_in-1" name="check_in-1" placeholder="*Check-In Date" title="Check-In Date"  onchange="get_auto_to_date(this.id);get_hotel_cost();"></td>
                     <td><input type="text" style="width:150px;" class="app_datepicker" id="check_out-1" name="check_out-1" placeholder="*Check-Out Date" title="Check-Out Date" onchange="calculate_total_nights(this.id);validate_validDates(this.id);get_hotel_cost();"></td>
                     <td><input type="text" id="hotel_type-1" name="hotel_type-1" placeholder="Hotel Category" title="Hotel Category" style="width:150px" readonly></td>
