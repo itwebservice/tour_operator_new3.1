@@ -51,7 +51,7 @@ $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from group_tour_quotatio
 <script>
 $('#quotation_update_modal').modal('show');
 $('#enquiry_id, #currency_code').select2();
-$('#from_date1, #to_date1, #quotation_date1, #train_arrival_date,#train_departure_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
+$('#from_date1, #to_date1, #quotation_date1, #train_arrival_date,#train_departure_date').datetimepicker({ timepicker:false, format:'d-m-Y', minDate: 0 });
 $('#txt_arrval1,#txt_dapart1').datetimepicker({ format:'d-m-Y H:i' });
 
 </script>

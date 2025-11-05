@@ -1,3 +1,4 @@
+
 <form id="frm_tab4">
 
     <div class="app_panel">
@@ -592,6 +593,13 @@ $('#frm_tab4').validate({
     submitHandler: function(form, e) {
 
         e.preventDefault();
+        
+        // Prevent double submission
+        if (window.quotationUpdateInProgress) {
+            console.log("QUOTATION UPDATE: Already in progress, preventing double submission");
+            return false;
+        }
+        window.quotationUpdateInProgress = true;
 
         $('#btn_quotation_update').prop('disabled', true);
         var quotation_id = $('#quotation_id1').val();
@@ -640,32 +648,106 @@ $('#frm_tab4').validate({
         var price_str_url = $("#upload_url1").val();
         var currency_code = $('#currency_code1').val();
 
+        // Try to get data from stored tab2 form data first
         var checked_programe_arr = [];
         var day_count_arr = [];
         var attraction_arr = [];
         var program_arr = [];
         var stay_arr = [];
         var meal_plan_arr = [];
+        var day_image_arr = [];
         var package_p_id_arr = [];
 
-        var table = document.getElementById("dynamic_table_list_update");
-        var rowCount = table.rows.length;
-        for (var i = 0; i < rowCount; i++) {
-            var row = table.rows[i];
-            var checked_programe = row.cells[0].childNodes[0].checked;
-            var day_count = row.cells[1].childNodes[0].value;
-            var attraction = row.cells[2].childNodes[0].value;
-            var program = row.cells[3].childNodes[0].value;
-            var stay = row.cells[4].childNodes[0].value;
-            var meal_plan = row.cells[5].childNodes[0].value;
-            var package_id1 = row.cells[7].childNodes[0].value;
-            checked_programe_arr.push(checked_programe);
-            day_count_arr.push(day_count);
-            attraction_arr.push(attraction);
-            program_arr.push(program);
-            stay_arr.push(stay);
-            meal_plan_arr.push(meal_plan);
+        if (window.tab2FormData) {
+            console.log("UPDATE TAB4: Using stored tab2 form data:", window.tab2FormData);
+            checked_programe_arr = window.tab2FormData.checked_programe_arr || [];
+            day_count_arr = window.tab2FormData.day_count_arr || [];
+            attraction_arr = window.tab2FormData.attraction_arr || [];
+            program_arr = window.tab2FormData.program_arr || [];
+            stay_arr = window.tab2FormData.stay_arr || [];
+            meal_plan_arr = window.tab2FormData.meal_plan_arr || [];
+            day_image_arr = window.tab2FormData.day_image_arr || [];
+            package_p_id_arr = window.tab2FormData.package_p_id_arr || [];
+        } else {
+            console.log("UPDATE TAB4: No stored tab2 data, reading from table");
+            // Fallback to reading from table if no stored data
+            var table = document.getElementById("dynamic_table_list_update");
+            var rowCount = table.rows.length;
+            for (var i = 0; i < rowCount; i++) {
+                var row = table.rows[i];
+                var checked_programe = row.cells[0].childNodes[0].checked;
+                var day_count = row.cells[1].childNodes[0].value;
+                var attraction = row.cells[2].childNodes[0].value;
+                var program = row.cells[3].childNodes[0].value;
+                var stay = row.cells[4].childNodes[0].value;
+                var meal_plan = row.cells[5].childNodes[0].value;
+                var package_id1 = row.cells[7].childNodes[0].value;
+                checked_programe_arr.push(checked_programe);
+                day_count_arr.push(day_count);
+                attraction_arr.push(attraction);
+                program_arr.push(program);
+                stay_arr.push(stay);
+                meal_plan_arr.push(meal_plan);
+            
+            // Get image data for this row - check both new uploads and existing images
+            var img = '';
+            var rowIndex = i + 1; // Convert to 1-based index
+            
+            console.log("UPDATE TAB4: Processing image for row", i, "with rowIndex", rowIndex);
+            
+            // First check if we have a new image uploaded via previewDayImage
+            if (window.quotationImages && window.quotationImages[rowIndex]) {
+                var imageData = window.quotationImages[rowIndex];
+                console.log("UPDATE TAB4: Found new image data for rowIndex", rowIndex, imageData);
+                
+                if (imageData.file && !imageData.uploaded) {
+                    console.log("UPDATE TAB4: Uploading new image for rowIndex", rowIndex);
+                    // Upload the image immediately
+                    var formData = new FormData();
+                    formData.append('uploadfile', imageData.file);
+                    
+                    $.ajax({
+                        url: $('#base_url').val() + 'view/other_masters/itinerary/upload_itinerary_image.php',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        async: false, // Make it synchronous for data collection
+                        success: function(response) {
+                            try {
+                                var msg = response.split('--');
+                                if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
+                                    img = response;
+                                    window.quotationImages[rowIndex].uploaded = true;
+                                    window.quotationImages[rowIndex].image_url = response;
+                                    console.log("UPDATE TAB4: Image uploaded successfully for rowIndex", rowIndex, ":", img);
+                                } else {
+                                    console.log("UPDATE TAB4: Upload failed for rowIndex", rowIndex, ":", response);
+                                }
+                            } catch(e) {
+                                console.log('UPDATE TAB4: Upload parse error for rowIndex', rowIndex, ':', e);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("UPDATE TAB4: Upload error for rowIndex", rowIndex, ":", error);
+                        }
+                    });
+                } else if (imageData.image_url) {
+                    img = imageData.image_url;
+                    console.log("UPDATE TAB4: Using existing uploaded image URL for rowIndex", rowIndex, ":", img);
+                }
+            } else {
+                // Fallback to existing image from hidden input
+                var existingImgInput = row.querySelector('input[id^="existing_image_path_"]');
+                img = existingImgInput ? existingImgInput.value : '';
+                console.log("UPDATE TAB4: Using existing image for rowIndex", rowIndex, ":", img);
+            }
+            
+            console.log("UPDATE TAB4: Final image for row", i, ":", img);
+            day_image_arr.push(img || '');
+            
             package_p_id_arr.push(package_id1);
+            }
         }
 
         //Train Information
@@ -1101,6 +1183,21 @@ $('#frm_tab4').validate({
                 if (result == "yes") {
                     $('#btn_quotation_update').button('loading');
                     $('#btn_quotation_update').prop('disabled', false);
+                    
+                    // Debug: Log the data being sent
+                    console.log("DEBUG: Sending quotation update data:");
+                    console.log("attraction_arr:", attraction_arr);
+                    console.log("program_arr:", program_arr);
+                    console.log("day_count_arr:", day_count_arr);
+                    console.log("day_image_arr:", day_image_arr);
+                    console.log("checked_programe_arr:", checked_programe_arr);
+                    console.log("window.quotationImages:", window.quotationImages);
+                    
+                    // Additional debugging for image data
+                    console.log("DEBUG: day_image_arr length:", day_image_arr.length);
+                    for (var idx = 0; idx < day_image_arr.length; idx++) {
+                        console.log("DEBUG: day_image_arr[" + idx + "]:", day_image_arr[idx]);
+                    }
                     $.ajax({
 
                         type: 'post',
@@ -1206,6 +1303,7 @@ $('#frm_tab4').validate({
                             program_arr: program_arr,
                             stay_arr: stay_arr,
                             meal_plan_arr: meal_plan_arr,
+                            day_image_arr: day_image_arr,
                             package_p_id_arr: package_p_id_arr,
                             inclusions: inclusions,
                             exclusions: exclusions,
@@ -1233,6 +1331,9 @@ $('#frm_tab4').validate({
                         },
 
                         success: function(message) {
+                            console.log("DEBUG: Quotation update response:", message);
+                            console.log("QUOTATION UPDATE: Response received");
+                            window.quotationUpdateInProgress = false; // Reset flag
                             $('#btn_quotation_update').button('reset');
                             $('#btn_quotation_update').prop('disabled', false);
                             var msg = message.split('--');
@@ -1240,6 +1341,23 @@ $('#frm_tab4').validate({
                                 error_msg_alert(msg[1]);
                                 $('#btn_quotation_update').prop('disabled', false);
                             } else {
+                                // Extract quotation ID from success message for image uploads
+                                console.log("DEBUG: Update success message:", message);
+                                var quotationIdMatch = message.match(/Quotation ID:\s*(\d+)/i);
+                                var quotationId = quotationIdMatch ? quotationIdMatch[1] : quotation_id;
+                                console.log("DEBUG: Using quotation ID for image upload:", quotationId);
+                                
+                                // Collect stored images from itinerary interface
+                                var storedImages = collectStoredImages();
+                                console.log("DEBUG: Collected " + storedImages.length + " stored images for upload");
+                                
+                                // Upload itinerary images if any exist
+                                if (storedImages && storedImages.length > 0) {
+                                    console.log("DEBUG: Uploading " + storedImages.length + " itinerary images for quotation " + quotationId);
+                                    uploadItineraryImages(quotationId, storedImages);
+                                } else {
+                                    console.log("DEBUG: No images to upload");
+                                }
                                 $('#vi_confirm_box').vi_confirm_box({
                                     false_btn: false,
                                     message: message,
@@ -1268,9 +1386,20 @@ $('#frm_tab4').validate({
                                     }
                                 });
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("DEBUG: AJAX Error - Status:", status, "Error:", error);
+                            console.error("DEBUG: Response Text:", xhr.responseText);
+                            console.log("QUOTATION UPDATE: AJAX failed, resetting flag");
+                            window.quotationUpdateInProgress = false; // Reset flag on error
+                            $('#btn_quotation_update').button('reset');
+                            $('#btn_quotation_update').prop('disabled', false);
+                            error_msg_alert("Failed to update quotation: " + error);
                         }
                     });
                 } else {
+                    console.log("QUOTATION UPDATE: User cancelled, resetting flag");
+                    window.quotationUpdateInProgress = false; // Reset flag
                     $('#btn_quotation_update').button('reset');
                     $('#btn_quotation_update').prop('disabled', false);
                 }
@@ -1460,4 +1589,166 @@ function customTcsTax(rowId) {
     total_tour_cost_field.val(total_tour_cost.toFixed(2));
 }
 
+// Function to collect all stored images from itinerary interface
+function collectStoredImages() {
+    var storedImages = [];
+    
+    console.log("DEBUG: Checking window.quotationImages:", window.quotationImages);
+    
+    if (window.quotationImages) {
+        console.log("DEBUG: quotationImages object exists, checking properties...");
+        for (var offset in window.quotationImages) {
+            console.log("DEBUG: Checking offset", offset, ":", window.quotationImages[offset]);
+            if (window.quotationImages[offset] && !window.quotationImages[offset].uploaded) {
+                console.log("DEBUG: Adding image for offset", offset, "to upload list");
+                storedImages.push(window.quotationImages[offset]);
+            }
+        }
+    } else {
+        console.log("DEBUG: window.quotationImages does not exist");
+    }
+    
+    console.log("DEBUG: Collected " + storedImages.length + " stored images for upload");
+    console.log("DEBUG: Stored images details:", storedImages);
+    return storedImages;
+}
+
+// Function to upload itinerary images after quotation is updated
+function uploadItineraryImages(quotationId, images) {
+    var base_url = $('#base_url').val();
+    var uploadPromises = [];
+
+    images.forEach(function(imageData) {
+        // If this is a replacement, first delete the old image
+        if (imageData.is_replacement) {
+            console.log("This is a replacement image for day " + imageData.day_number + ", deleting old image first");
+            
+            // Find the existing image URL for this day
+            var existingImageUrl = $('#saved_image_' + imageData.offset + ' img').attr('src');
+            if (existingImageUrl) {
+                // Extract the relative path from the full URL
+                var relativePath = existingImageUrl.replace(base_url, '');
+                
+                // Delete the old image first
+                var deletePromise = $.ajax({
+                    type: 'POST',
+                    url: base_url + 'controller/package_tour/quotation/delete_itinerary_image.php',
+                    data: {
+                        quotation_id: quotationId,
+                        package_id: imageData.package_id,
+                        day_number: imageData.day_number,
+                        image_url: relativePath
+                    }
+                });
+                
+                // Chain the delete operation before upload
+                uploadPromises.push(deletePromise.then(function(deleteResponse) {
+                    console.log("Old image deleted successfully:", deleteResponse);
+                    return uploadSingleImage(imageData, quotationId, base_url);
+                }).catch(function(error) {
+                    console.log("Error deleting old image, proceeding with upload anyway:", error);
+                    return uploadSingleImage(imageData, quotationId, base_url);
+                }));
+            } else {
+                // No existing image, just upload
+                uploadPromises.push(uploadSingleImage(imageData, quotationId, base_url));
+            }
+        } else {
+            // Regular upload (not a replacement)
+            uploadPromises.push(uploadSingleImage(imageData, quotationId, base_url));
+        }
+    });
+
+    // Wait for all uploads to complete
+    Promise.all(uploadPromises).then(function() {
+        console.log("All images uploaded successfully");
+    }).catch(function(error) {
+        console.error("Some images failed to upload:", error);
+    });
+}
+
+// Helper function to upload a single image
+function uploadSingleImage(imageData, quotationId, base_url) {
+    var formData = new FormData();
+    formData.append('quotation_id', quotationId);
+    formData.append('package_id', imageData.package_id);
+    formData.append('day_number', imageData.day_number);
+    formData.append('image', imageData.file);
+    
+    console.log("Uploading image for day " + imageData.day_number + ", package " + imageData.package_id + ", file: " + imageData.file.name);
+    
+    return $.ajax({
+        url: base_url + 'controller/package_tour/quotation/upload_itinerary_image.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log("Image upload successful for offset " + imageData.offset + ":", response);
+            // Mark as uploaded
+            if (window.quotationImages && window.quotationImages[imageData.offset]) {
+                window.quotationImages[imageData.offset].uploaded = true;
+                window.quotationImages[imageData.offset].image_url = response;
+            }
+            
+            // Refresh the image preview with the new URL
+            if (typeof window.refreshImageAfterUpload === 'function') {
+                console.log("TAB4: Calling refreshImageAfterUpload for offset", imageData.offset);
+                window.refreshImageAfterUpload(imageData.offset, response);
+            } else {
+                console.log("TAB4: refreshImageAfterUpload function not found, using fallback");
+                // Fallback: manually update the image
+                var previewImg = $('#preview_img_' + imageData.offset);
+                var previewDiv = $('#day_image_preview_' + imageData.offset);
+                
+                if (previewImg.length && previewDiv.length) {
+                    // Add cache-busting parameter to ensure new image loads
+                    var cacheBuster = '?t=' + new Date().getTime();
+                    var imageUrl = response + cacheBuster;
+                    
+                    previewImg.attr('src', imageUrl);
+                    $('#existing_image_path_' + imageData.offset).val(response);
+                    previewDiv.show();
+                    $('.upload-btn-' + imageData.offset).hide();
+                    console.log("Image preview updated for offset", imageData.offset, "with URL:", imageUrl);
+                } else {
+                    console.log("TAB4: Preview elements not found for offset", imageData.offset);
+                }
+            }
+            
+            // Force refresh all images after this upload
+            setTimeout(function() {
+                if (typeof window.refreshAllImagesAfterUpload === 'function') {
+                    console.log("TAB4: Calling refreshAllImagesAfterUpload");
+                    window.refreshAllImagesAfterUpload();
+                }
+            }, 500);
+        },
+        error: function(xhr, status, error) {
+            console.error("Image upload failed for offset " + imageData.offset + ":", error);
+            alert("Failed to upload image for day " + imageData.day_number + ". Please try again.");
+        }
+    });
+}
+
+// Load form data from sessionStorage when tab4 loads
+$(document).ready(function() {
+    var storedData = sessionStorage.getItem('tab2_form_data');
+    if (storedData) {
+        try {
+            var formData = JSON.parse(storedData);
+            console.log("TAB4: Loading stored form data:", formData);
+            
+            // Store the data in global variables for use in form submission
+            window.tab2FormData = formData;
+            
+            // Clear the stored data after loading
+            sessionStorage.removeItem('tab2_form_data');
+        } catch (e) {
+            console.error("TAB4: Error parsing stored form data:", e);
+        }
+    }
+});
+
+</script>
 </script>

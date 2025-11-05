@@ -18,7 +18,7 @@ if($enquiry_type == 'Air Ticket' or $enquiry_type == 'Train Ticket'){
 ?>
 <script>
 	$('#enquiry_id, #currency_code').select2();
-	$('#from_date, #to_date, #quotation_date, #train_arrival_date,#train_departure_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
+	$('#from_date, #to_date, #quotation_date, #train_arrival_date,#train_departure_date').datetimepicker({ timepicker:false, format:'d-m-Y', minDate: 0 });
 	$('#txt_arrval1,#txt_dapart1').datetimepicker({ format:'d-m-Y H:i' });
 	$('#quotation_save_modal').modal('show');
 </script>

@@ -524,21 +524,32 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
     while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
       $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
-      $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]' and package_id='$sq_quotation[package_id]'"));
-      $day_url1 = explode(',', $sq_day_image['image_url']);
+      
+      // Use day_image from package_quotation_program table
       $daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
-      for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
-        $day_url2 = explode('=', $day_url1[$count1]);
-        if (isset($day_url2[0]) && $day_url2[0] == $sq_quotation['package_id'] && isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count']) {
-          $daywise_image = $day_url2[2];
+      if (!empty($row_itinarary['day_image'])) {
+        // Construct full URL for the image (remove /crm from BASE_URL for images)
+        $base_url_for_images = str_replace('/crm', '', BASE_URL);
+        $daywise_image = $base_url_for_images . $row_itinarary['day_image'];
+      } else {
+        // Fallback to old system if day_image is empty
+        $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]' and package_id='$sq_quotation[package_id]'"));
+        if ($sq_day_image && !empty($sq_day_image['image_url'])) {
+          $day_url1 = explode(',', $sq_day_image['image_url']);
+          for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
+            $day_url2 = explode('=', $day_url1[$count1]);
+            if (isset($day_url2[0]) && $day_url2[0] == $sq_quotation['package_id'] && isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count']) {
+              $daywise_image = $day_url2[2];
+            }
+          }
         }
       }
       if ($count % 2 != 0) {
     ?>
         <section class="singleItinenrary leftItinerary col-md-12 no-pad mg_tp_30 mg_bt_30">
           <div class="col-md-5">
-            <div class="itneraryImg">
-              <img src="<?= $daywise_image ?>" class="img-responsive">
+            <div class="itneraryImg" style="background: none !important;">
+              <img src="<?= $daywise_image ?>" class="img-responsive" style="background: none !important;">
               <h5>Day-<?= $count  ?>
               </h5>
               <div class="itineraryDetail">
@@ -574,8 +585,8 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
             </div>
           </div>
           <div class="col-md-6">
-            <div class="itneraryImg">
-              <img src="<?= $daywise_image ?>" class="img-responsive">
+            <div class="itneraryImg" style="background: none !important;">
+              <img src="<?= $daywise_image ?>" class="img-responsive" style="background: none !important;">
               <h5>Day-<?= $count  ?>
               </h5>
               <div class="itineraryDetail">

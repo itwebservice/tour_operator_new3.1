@@ -144,7 +144,7 @@ padding: 15px 8px 10px 25px !important;
 }
 .table .btn-info{
 background: transparent !important;
-color: <?= $theme_color ?>;
+color: <?= $theme_color ?> !important;
 padding: 0;
 height: fit-content;
 /* padding-left: 5px; */

@@ -123,6 +123,11 @@ $financial_year_id = $_SESSION['financial_year_id'];
             <div id="backoffice_mail"></div>
             <div id="view_request"></div>
             
+            <!-- Hidden fields to store modal parameters for refresh -->
+            <input type="hidden" id="modal_email_id" value="">
+            <input type="hidden" id="modal_mobile_no" value="">
+            <input type="hidden" id="modal_quotation_id" value="">
+            
             
 <!-- Modal Structure -->
 <div class="modal fade" id="contentModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -138,6 +143,97 @@ $financial_year_id = $_SESSION['financial_year_id'];
             </div>
             <div class="modal-footer">
               
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions Modal -->
+<div class="modal fade" id="actionsModal" tabindex="-1" role="dialog" aria-labelledby="actionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="actionsModalLabel">Quotation Actions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="quotation-info mb-3">
+                            <h6>Quotation Details:</h6>
+                            <p><strong>Quotation ID:</strong> <span id="modal_quotation_id"></span></p>
+                            <p><strong>Customer:</strong> <span id="modal_customer_name"></span></p>
+                            <p><strong>Package:</strong> <span id="modal_package_name"></span></p>
+                            <p><strong>Amount:</strong> <span id="modal_amount"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6>Available Actions:</h6>
+                        <div class="action-buttons-container">
+                            <!-- PDF Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Download Options</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_pdf_download" title="Download Quotation PDF">
+                                        <i class="fa fa-print"></i> PDF
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_word_download" title="Download Quotation Word">
+                                        <i class="fa fa-file-word-o"></i> Word
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Communication Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Communication</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_email_customer" title="Email Quotation to Customer">
+                                        <i class="fa fa-envelope-o"></i> Email Customer
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_whatsapp" title="WhatsApp Quotation to Customer">
+                                        <i class="fa fa-whatsapp"></i> WhatsApp
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_email_backoffice" title="Email Quotation to Backoffice">
+                                        <i class="fa fa-paper-plane-o"></i> Email Backoffice
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Management Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Management</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_update" title="Update Details">
+                                        <i class="fa fa-pencil-square-o"></i> Update
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" id="modal_clone" title="Create Copy of this Quotation">
+                                        <i class="fa fa-files-o"></i> Clone
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_view" title="View Details" target="_blank">
+                                        <i class="fa fa-eye"></i> View
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Hotel Actions -->
+                            <div class="action-group mb-3">
+                                <h6 class="text-primary">Hotel Management</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="modal_hotel_request" title="Send Hotel Availability Request">
+                                        <i class="fa fa-paper-plane-o"></i> Hotel Request
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -258,14 +354,35 @@ quotation_list_reflect();
     function quotation_email_send(btn_id, quotation_id, email_id, mobile_no) {
         $('#' + btn_id).button('loading');
         var base_url = $('#base_url').val();
+        
+        // Add timestamp to prevent caching
+        var timestamp = new Date().getTime();
+        
+        console.log('Loading specific quotation:', quotation_id, 'for email:', email_id);
+        
         $.post('send_quotation.php', {
+            quotation_id: quotation_id,  // Pass specific quotation_id
             email_id: email_id,
-            mobile_no: mobile_no
+            mobile_no: mobile_no,
+            _t: timestamp
         }, function(data) {
+            console.log('Modal response for quotation:', quotation_id);
             $('#div_quotation_form').html(data);
             $('#' + btn_id).button('reset');
+            
+            // Store modal parameters in hidden fields for refresh functionality
+            $('#modal_email_id').val(email_id);
+            $('#modal_mobile_no').val(mobile_no);
+            $('#modal_quotation_id').val(quotation_id);
+            
+            // Show the modal after content is loaded
+            $('#quotation_send_modal').modal('show');
+        }).fail(function(xhr, status, error) {
+            console.error('Error loading modal for quotation:', quotation_id, error);
+            console.error('Response text:', xhr.responseText);
+            $('#' + btn_id).button('reset');
+            error_msg_alert('Error loading quotation modal. Please try again.');
         });
-
     }
 
     function get_tour_typewise_packages(tour_type) {
@@ -302,6 +419,254 @@ function save_modal() {
         $('#quot_save').button('reset');
     });
 }
+
+// Modal action functions
+function openActionsModal(quotationData) {
+    // Populate modal with quotation data
+    $('#modal_quotation_id').text(quotationData.quotation_id);
+    $('#modal_customer_name').text(quotationData.customer_name);
+    $('#modal_package_name').text(quotationData.package_name);
+    $('#modal_amount').text(quotationData.amount);
+    
+    // Store quotation data for use in modal actions
+    window.currentQuotationData = quotationData;
+    
+    // Show modal
+    $('#actionsModal').modal('show');
+    
+    // Ensure modal scrolls into view and is accessible
+    $('#actionsModal').on('shown.bs.modal', function() {
+        // Scroll to top of page to ensure modal is visible
+        $('html, body').animate({
+            scrollTop: 0
+        }, 300);
+        
+        // Focus on modal for accessibility
+        $(this).find('.modal-content').focus();
+        
+        // Ensure modal is centered
+        var modal = $(this);
+        var modalDialog = modal.find('.modal-dialog');
+        modalDialog.css({
+            'margin': '30px auto',
+            'max-width': '90%',
+            'width': 'auto'
+        });
+    });
+}
+
+// Modal action handlers
+$(document).ready(function() {
+    // PDF Download
+    $('#modal_pdf_download').click(function() {
+        if (window.currentQuotationData) {
+            loadOtherPage(window.currentQuotationData.pdf_url);
+        }
+    });
+    
+    // Word Download
+    $('#modal_word_download').click(function() {
+        if (window.currentQuotationData) {
+            exportHTML(window.currentQuotationData.word_url);
+        }
+    });
+    
+    // Email Customer
+    $('#modal_email_customer').click(function() {
+        if (window.currentQuotationData) {
+            quotation_email_send('modal_email_customer', window.currentQuotationData.quotation_id, window.currentQuotationData.email_id, window.currentQuotationData.mobile_no);
+        }
+    });
+    
+    // WhatsApp
+    $('#modal_whatsapp').click(function() {
+        if (window.currentQuotationData) {
+            quotation_whatsapp(window.currentQuotationData.quotation_id);
+        }
+    });
+    
+    // Email Backoffice
+    $('#modal_email_backoffice').click(function() {
+        if (window.currentQuotationData) {
+            quotation_email_send_backoffice_modal(window.currentQuotationData.quotation_id);
+        }
+    });
+    
+    // Update
+    $('#modal_update').click(function() {
+        if (window.currentQuotationData) {
+            // Create and submit the update form
+            var form = $('<form>', {
+                'method': 'POST',
+                'action': 'update/index.php',
+                'style': 'display: inline-block'
+            });
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': 'quotation_id',
+                'value': window.currentQuotationData.quotation_id
+            }));
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': 'package_id',
+                'value': window.currentQuotationData.package_id
+            }));
+            $('body').append(form);
+            form.submit();
+        }
+    });
+    
+    // Clone
+    $('#modal_clone').click(function() {
+        if (window.currentQuotationData) {
+            quotation_clone(window.currentQuotationData.quotation_id);
+            $('#actionsModal').modal('hide');
+        }
+    });
+    
+    // View
+    $('#modal_view').click(function() {
+        if (window.currentQuotationData) {
+            window.open('quotation_view.php?quotation_id=' + window.currentQuotationData.quotation_id, '_blank');
+        }
+    });
+    
+    // Hotel Request
+    $('#modal_hotel_request').click(function() {
+        if (window.currentQuotationData) {
+            view_request(window.currentQuotationData.quotation_id);
+            $('#actionsModal').modal('hide');
+        }
+    });
+});
+
+// Function to add actions button to each row
+function addActionsButton(quotationData) {
+    return '<button class="btn btn-primary btn-sm" onclick="openActionsModal(' + JSON.stringify(quotationData).replace(/"/g, '&quot;') + ')" title="View All Actions"><i class="fa fa-cogs"></i> Actions</button>';
+}
+
+// Smart dropdown positioning function for Actions modal and other dropdowns
+function adjustDropdownPosition() {
+    $('.btn-group, .dropdown').each(function() {
+        var $btnGroup = $(this);
+        var $dropdown = $btnGroup.find('.dropdown-menu');
+        
+        if ($dropdown.length === 0) return;
+        
+        // Reset classes
+        $btnGroup.removeClass('dropup');
+        
+        // Get button position and viewport height
+        var buttonOffset = $btnGroup.offset();
+        var buttonHeight = $btnGroup.outerHeight();
+        var dropdownHeight = $dropdown.outerHeight() || 200; // Estimate if not visible
+        var viewportHeight = $(window).height();
+        var scrollTop = $(window).scrollTop();
+        
+        // Calculate space below and above
+        var spaceBelow = viewportHeight - (buttonOffset.top - scrollTop + buttonHeight);
+        var spaceAbove = buttonOffset.top - scrollTop;
+        
+        // If not enough space below but enough space above, use dropup
+        if (spaceBelow < dropdownHeight + 20 && spaceAbove > dropdownHeight + 20) {
+            $btnGroup.addClass('dropup');
+            console.log('QUOTATION INDEX: Dropdown positioned above for button at', buttonOffset.top);
+        }
+    });
+}
+
+// Apply smart positioning for all dropdowns
+$(document).ready(function() {
+    // Adjust positioning when dropdown is about to be shown
+    $(document).on('show.bs.dropdown', '.btn-group, .dropdown', function() {
+        var $this = $(this);
+        setTimeout(function() {
+            adjustDropdownPosition();
+        }, 10);
+    });
+    
+    // Also adjust on window resize and scroll
+    $(window).on('resize scroll', function() {
+        adjustDropdownPosition();
+    });
+    
+    // Initial adjustment
+    adjustDropdownPosition();
+    
+    // Enhanced modal positioning for long lists
+    $(document).on('show.bs.modal', '.modal', function() {
+        // Store current scroll position
+        var scrollTop = $(window).scrollTop();
+        
+        // Add class to body to prevent background scrolling
+        $('body').addClass('modal-open');
+        
+        // Ensure modal is positioned correctly
+        var modal = $(this);
+        var modalDialog = modal.find('.modal-dialog');
+        
+        // Reset any previous positioning
+        modalDialog.css({
+            'margin': '30px auto',
+            'max-width': '90%',
+            'width': 'auto',
+            'position': 'relative',
+            'top': 'auto',
+            'left': 'auto',
+            'transform': 'none'
+        });
+    });
+    
+    // Handle modal shown event
+    $(document).on('shown.bs.modal', '.modal', function() {
+        var modal = $(this);
+        
+        // Scroll to top to ensure modal is visible
+        $('html, body').animate({
+            scrollTop: 0
+        }, 300);
+        
+        // Focus on modal for accessibility
+        modal.find('.modal-content').focus();
+        
+        // Ensure modal is properly centered
+        var modalDialog = modal.find('.modal-dialog');
+        var windowHeight = $(window).height();
+        var modalHeight = modalDialog.outerHeight();
+        
+        if (modalHeight > windowHeight - 60) {
+            modalDialog.css({
+                'margin-top': '30px',
+                'margin-bottom': '30px',
+                'max-height': (windowHeight - 60) + 'px',
+                'overflow-y': 'auto'
+            });
+        }
+    });
+    
+    // Handle modal hidden event
+    $(document).on('hidden.bs.modal', '.modal', function() {
+        // Remove modal-open class from body
+        $('body').removeClass('modal-open');
+    });
+    
+    // Add keyboard navigation support for modal
+    $(document).on('keydown', '.modal', function(e) {
+        // Close modal on Escape key
+        if (e.keyCode === 27) { // Escape key
+            $(this).modal('hide');
+        }
+    });
+    
+    // Ensure modal is properly focused when shown
+    $(document).on('shown.bs.modal', '.modal', function() {
+        // Focus on the first focusable element in the modal
+        var focusableElements = $(this).find('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusableElements.length > 0) {
+            focusableElements.first().focus();
+        }
+    });
+});
 </script>
 <style>
     .action_width {
@@ -313,8 +678,153 @@ function save_modal() {
         background-color: #fcf8e3;
     }
 
+    /* Smart dropdown positioning */
+    .btn-group .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: auto;
+        z-index: 1000;
+        transition: all 0.2s ease;
+    }
+    
+    /* Dropup positioning - show above when near bottom */
+    .btn-group.dropup .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin: 0 0 2px;
+        box-shadow: 0 -6px 12px rgba(0,0,0,.175);
+    }
+    
+    /* Ensure dropdown arrow points in correct direction for dropup */
+    .btn-group.dropup .dropdown-toggle::after {
+        border-top: 0;
+        border-bottom: 4px solid;
+        border-right: 4px solid transparent;
+        border-left: 4px solid transparent;
+    }
+
     .table-hover>tbody>tr.warning:hover {
         background-color: #faf2cc;
+    }
+    
+    /* Modal Styles */
+    .quotation-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #007bff;
+    }
+    
+    .quotation-info p {
+        margin-bottom: 5px;
+    }
+    
+    .action-group {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        background-color: #ffffff;
+    }
+    
+    .action-group h6 {
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .btn-group .btn {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .action-buttons-container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    #actionsModal .modal-body {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    /* Fix modal positioning for long lists */
+    .modal {
+        z-index: 1055 !important;
+    }
+    
+    .modal-backdrop {
+        z-index: 1050 !important;
+    }
+    
+    /* Ensure modal stays centered and accessible */
+    .modal-dialog {
+        margin: 30px auto !important;
+        max-width: 90% !important;
+        width: auto !important;
+    }
+    
+    /* Force modal to scroll into view when opened */
+    .modal.show {
+        display: block !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Ensure modal content is visible */
+    .modal-content {
+        position: relative !important;
+        z-index: 1056 !important;
+    }
+    
+    /* Fix for long lists - ensure modal appears in viewport */
+    .modal.fade .modal-dialog {
+        transform: translate(0, 0) !important;
+        transition: transform 0.3s ease-out !important;
+    }
+    
+    .modal.show .modal-dialog {
+        transform: none !important;
+    }
+    
+    /* Fix modal backdrop and body scrolling */
+    body.modal-open {
+        overflow: hidden !important;
+        padding-right: 0 !important;
+    }
+    
+    .modal-backdrop {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        z-index: 1050 !important;
+    }
+    
+    /* Ensure modal is always visible and accessible */
+    .modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1055 !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Responsive modal sizing */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 10px !important;
+            max-width: calc(100% - 20px) !important;
+        }
+    }
+    
+    /* Ensure modal content is scrollable if needed */
+    .modal-content {
+        border-radius: 6px !important;
+        box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5) !important;
     }
 </style>
 <?php

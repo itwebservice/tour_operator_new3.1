@@ -9,183 +9,6 @@
                 <div class="col-md-12 app_accordion">
                     <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
 
-                        <!-- Flight Information -->
-                        <div class="accordion_content main_block mg_bt_10 <?= $hide_flight ?>">
-
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse"
-                                        data-parent="#accordion" href="#collapse2" aria-expanded="true"
-                                        aria-controls="collapse2" id="collapsed2">
-                                        <div class="col-md-12"><span>Flight Information</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapse2" class="panel-collapse collapse in main_block" role="tabpanel"
-                                    aria-labelledby="heading2">
-                                    <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                            <div class="col-xs-6 text-right mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm"
-                                                    onClick="addRow('tbl_package_tour_quotation_dynamic_plane')"><i
-                                                        class="fa fa-plus"></i></button>
-                                                <button type="button" class="btn btn-pdf btn-sm"
-                                                    onClick="deleteRow('tbl_package_tour_quotation_dynamic_plane')"><i
-                                                        class="fa fa-trash"></i></button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <div class="table-responsive">
-                                                    <table id="tbl_package_tour_quotation_dynamic_plane"
-                                                        name="tbl_package_tour_quotation_dynamic_plane"
-                                                        class="table mg_bt_0 table-bordered pd_bt_51">
-                                                        <tr>
-                                                            <td><input class="css-checkbox" id="chk_plan1"
-                                                                    type="checkbox"><label class="css-label"
-                                                                    for="chk_plan1"> <label></td>
-                                                            <td><input maxlength="15" value="1" type="text"
-                                                                    name="username" placeholder="Sr. No."
-                                                                    class="form-control" disabled /></td>
-                                                            <td><input type="text" name="from_sector-1"
-                                                                    id="from_sector-1" placeholder="*From Sector"
-                                                                    title="From Sector" style="width: 300px;">
-                                                            </td>
-                                                            <td><input type="text" name="to_sector-1" id="to_sector-1"
-                                                                    placeholder="*To Sector" title="To Sector"
-                                                                    style="width: 300px;">
-                                                            </td>
-                                                            <td><select id="airline_name1"
-                                                                    class="app_select2 form-control"
-                                                                    name="airline_name1" title="Airline Name"
-                                                                    style="width: 120px;">
-                                                                    <option value="">Airline Name</option>
-                                                                    <?php get_airline_name_dropdown(); ?>
-                                                                </select></td>
-                                                            <td><select name="plane_class" id="plane_class1"
-                                                                    title="Class" style="width: 170px !important;">
-                            	                                        <?php get_flight_class_dropdown(); ?>
-                                                                </select></td>
-                                                            <td><input type="text" id="txt_dapart1" name="txt_dapart"
-                                                                    class="app_datetimepicker"
-                                                                    placeholder="*Departure Date and time"
-                                                                    title="Departure Date and time"
-                                                                    onchange="get_to_datetime(this.id,'txt_arrval1')"
-                                                                    value="<?= date('d-m-Y H:i') ?>"
-                                                                    style="width: 150px;" /></td>
-                                                            <td><input type="text" id="txt_arrval1" name="txt_arrval"
-                                                                    class="app_datetimepicker"
-                                                                    placeholder="*Arrival Date and time"
-                                                                    title="Arrival Date and time"
-                                                                    value="<?= date('d-m-Y H:i') ?>"
-                                                                    style="width: 150px;"
-                                                                    onchange="validate_validDatetime('txt_dapart1',this.id)" />
-                                                            </td>
-                                                            <td><input type="hidden" id="from_city-1"></td>
-                                                            <td><input type="hidden" id="to_city-1"></td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Train Information -->
-                        <div class="accordion_content main_block mg_bt_10 <?= $hide_train ?>">
-
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading1">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse"
-                                        data-parent="#accordion" href="#collapse1" aria-expanded="true"
-                                        aria-controls="collapse1" id="collapsed1">
-                                        <div class="col-md-12"><span>Train Information</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapse1" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading1">
-                                    <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add City" onclick="city_ssave_modal()"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                            <div class="col-xs-6 text-right mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm"
-                                                    onClick="addRow('tbl_package_tour_quotation_dynamic_train');city_lzloading('.train_from','*From', true);city_lzloading('.train_to','*To', true)"><i
-                                                        class="fa fa-plus"></i></button>
-                                                <button type="button" class="btn btn-pdf btn-sm"
-                                                    onClick="deleteRow('tbl_package_tour_quotation_dynamic_train')"><i
-                                                        class="fa fa-trash"></i></button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <div class="table-responsive">
-                                                    <table id="tbl_package_tour_quotation_dynamic_train"
-                                                        name="tbl_package_tour_quotation_dynamic_train"
-                                                        class="table mg_bt_0 table-bordered pd_bt_51 no-marg " >
-                                                        <tr>
-                                                            <td><input class="css-checkbox" id="chk_tour_group1"
-                                                                    type="checkbox"><label class="css-label"
-                                                                    for="chk_tour_group1"> <label></td>
-                                                            <td><input maxlength="15" value="1" type="text"
-                                                                    name="username" placeholder="Sr. No."
-                                                                    class="form-control" disabled /></td>
-                                                            <td class="col-md-3 no-pad"><select id="train_from_location1"
-                                                                    onchange="validate_location('train_to_location1','train_from_location1');"
-                                                                    class="app_select2 form-control train_from"
-                                                                    name="train_from_location1" title="From Location"
-                                                                    style="width:100%">
-                                                                    <option value="" selected="selected">*From</option>
-                                                                </select></td>
-                                                            <td class="col-md-3 no-pad"><select id="train_to_location1"
-                                                                    onchange="validate_location('train_from_location1','train_to_location1');"
-                                                                    class="app_select2 form-control train_to"
-                                                                    title="To Location" name="train_to_location1"
-                                                                    style="width:100%">
-                                                                    <option value="" selected="selected">*To</option>
-                                                                </select></td>
-                                                            <td class="col-md-2 no-pad"><select name="train_class"
-                                                                    id="train_class1" title="Class" style="width:100%">
-                                                                    <option value="">Class</option>
-                                                                    <option value="1A">1A</option>
-                                                                    <option value="2A">2A</option>
-                                                                    <option value="3A">3A</option>
-                                                                    <option value="FC">FC</option>
-                                                                    <option value="CC">CC</option>
-                                                                    <option value="SL">SL</option>
-                                                                    <option value="2S">2S</option>
-                                                                </select></td>
-                                                            <td class="col-md-2 no-pad"><input type="text"
-                                                                    id="train_departure_date"
-                                                                    name="train_departure_date"
-                                                                    placeholder="Departure Date and time"
-                                                                    title="Departure Date and time"
-                                                                    class="app_datetimepicker" style="width:100% !important;"
-                                                                    onchange="get_to_datetime(this.id,'train_arrival_date')"
-                                                                    value="<?= date('d-m-Y H:i') ?>">
-                                                            </td>
-                                                            <td class="col-md-2 no-pad"><input type="text"
-                                                                    id="train_arrival_date" name="train_arrival_date"
-                                                                    placeholder="Arrival Date and time"
-                                                                    title="Arrival Date and time"
-                                                                    class="app_datetimepicker"
-                                                                    value="<?= date('d-m-Y H:i') ?>" style="width:100% !important;"
-                                                                onchange="validate_validDatetime('train_departure_date',this.id)">
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Hotel Information -->
                         <div class="accordion_content main_block mg_bt_10">
 
@@ -197,18 +20,34 @@
                                         <div class="col-md-12"><span>Hotel Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse4" class="panel-collapse collapse main_block" role="tabpanel"
+                                <div id="collapse4" class="panel-collapse in collapse main_block" role="tabpanel"
                                     aria-labelledby="heading4">
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
                                             </div>
-                                            <div class="col-xs-6 text-right mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm"
-                                                    onClick="addRow('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');"><i class="fa fa-plus"></i></button>
+
+                                            <div class="col-xs-6 mg_bt_20_sm_xs"
+                                                style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+
+                                                <select id="package_type" name="package_type"
+                                                    class="form-control"
+                                                    style="width:160px; text-align-last:center; -moz-text-align-last:center; -ms-text-align-last:center;"
+                                                    title="Select Package Type" onchange="syncPackageType(this)">
+                                                    <?php echo get_package_type_dropdown(); ?>
+                                                </select>
+
+                                                <button type="button" id="addHotelInfobtnsubmit" class="btn btn-excel btn-sm"
+                                                    onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+
                                             </div>
                                         </div>
+
                                         <div class="row">
                                             <div class="col-xs-12">
                                                 <div class="table-responsive">
@@ -216,15 +55,13 @@
                                                         name="tbl_package_tour_quotation_dynamic_hotel"
                                                         class="table mg_bt_0 table-bordered mg_bt_10">
                                                         <tr>
-                                                            <td><input class="css-checkbox" id="chk_hotel1"
-                                                                    type="checkbox" onchange="get_hotel_cost();" checked
-                                                                    readonly><label class="css-label" for="chk_hotel1">
-                                                                    <label></td>
+                                                            <td><input class="css-checkbox" id="chk_hotel1" type="checkbox" checked><label class="css-label" for="chk_hotel1"></label></td>
+
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td><select id="package_type-1" name="package_type-1"
-                                                                    class="form-control app_select2" style="width:160px"
+                                                            <td class="package_type_td"><select id="package_type-1" name="package_type-1"
+                                                                    class="form-control app_select2 package_type_select" style="width:160px"
                                                                     title="Select Package Type">
                                                                     <?php echo get_package_type_dropdown(); ?>
                                                                 </select></td>
@@ -301,6 +138,7 @@
                             </div>
                         </div>
 
+
                         <!-- Transport Information -->
                         <div class="accordion_content main_block mg_bt_10">
 
@@ -343,12 +181,12 @@
                                                                     style="width:200px">
                                                                     <option value="">Transport Vehicle</option>
                                                                     <?php
-																	$sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive' order by vehicle_name asc");
-																	while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>
-                                                                    <option
-                                                                        value="<?php echo $row_dest['entry_id']; ?>">
-                                                                        <?php echo $row_dest['vehicle_name']; ?>
-                                                                    </option>
+                                                                    $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive' order by vehicle_name asc");
+                                                                    while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>
+                                                                        <option
+                                                                            value="<?php echo $row_dest['entry_id']; ?>">
+                                                                            <?php echo $row_dest['vehicle_name']; ?>
+                                                                        </option>
                                                                     <?php } ?>
                                                                 </select></td>
                                                             <td><input type="text" id="transport_start_date-"
@@ -377,7 +215,7 @@
                                                                 </select></td>
                                                             <td><select name="duration-" id="duration-" style="width:170px;" title="*Service Duration" data-toggle="tooltip" class="form-control app_select2" onchange="get_transport_cost();">
                                                                     <option value="">*Service Duration</option>
-                                                                <?php echo get_service_duration_dropdown(); ?>
+                                                                    <?php echo get_service_duration_dropdown(); ?>
                                                                 </select></td>
                                                             <td><input type="text" id="no_vehicles-" name="no_vehicles-"
                                                                     placeholder="*No.Of vehicles" title="No.Of vehicles"
@@ -399,6 +237,94 @@
                                                                     name="pickup_type-" style="display:none;"></td>
                                                             <td><input type="hidden" id="drop_type" name="drop_type"
                                                                     style="display:none;"></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Flight Information -->
+                        <div class="accordion_content main_block mg_bt_10 <?= $hide_flight ?>">
+
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal main_block" role="button" data-toggle="collapse"
+                                        data-parent="#accordion" href="#collapse2" aria-expanded="true"
+                                        aria-controls="collapse2" id="collapsed2">
+                                        <div class="col-md-12"><span>Flight Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel"
+                                    aria-labelledby="heading2">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-xs-6 mg_bt_20_sm_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-xs-6 text-right mg_bt_20_sm_xs">
+                                                <button type="button" class="btn btn-excel btn-sm"
+                                                    onClick="addRow('tbl_package_tour_quotation_dynamic_plane')"><i
+                                                        class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm"
+                                                    onClick="deleteRow('tbl_package_tour_quotation_dynamic_plane')"><i
+                                                        class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_package_tour_quotation_dynamic_plane"
+                                                        name="tbl_package_tour_quotation_dynamic_plane"
+                                                        class="table mg_bt_0 table-bordered pd_bt_51">
+                                                        <tr>
+                                                            <td><input class="css-checkbox" id="chk_plan1"
+                                                                    type="checkbox"><label class="css-label"
+                                                                    for="chk_plan1"> <label></td>
+                                                            <td><input maxlength="15" value="1" type="text"
+                                                                    name="username" placeholder="Sr. No."
+                                                                    class="form-control" disabled /></td>
+                                                            <td><input type="text" name="from_sector-1"
+                                                                    id="from_sector-1" placeholder="*From Sector"
+                                                                    title="From Sector" style="width: 300px;">
+                                                            </td>
+                                                            <td><input type="text" name="to_sector-1" id="to_sector-1"
+                                                                    placeholder="*To Sector" title="To Sector"
+                                                                    style="width: 300px;">
+                                                            </td>
+                                                            <td><select id="airline_name1"
+                                                                    class="app_select2 form-control"
+                                                                    name="airline_name1" title="Airline Name"
+                                                                    style="width: 120px;">
+                                                                    <option value="">Airline Name</option>
+                                                                    <?php get_airline_name_dropdown(); ?>
+                                                                </select></td>
+                                                            <td><select name="plane_class" id="plane_class1"
+                                                                    title="Class" style="width: 170px !important;">
+                                                                    <?php get_flight_class_dropdown(); ?>
+                                                                </select></td>
+                                                            <td><input type="text" id="txt_dapart1" name="txt_dapart"
+                                                                    class="app_datetimepicker"
+                                                                    placeholder="*Departure Date and time"
+                                                                    title="Departure Date and time"
+                                                                    onchange="get_to_datetime(this.id,'txt_arrval1')"
+                                                                    value="<?= date('d-m-Y H:i') ?>"
+                                                                    style="width: 150px;" /></td>
+                                                            <td><input type="text" id="txt_arrval1" name="txt_arrval"
+                                                                    class="app_datetimepicker"
+                                                                    placeholder="*Arrival Date and time"
+                                                                    title="Arrival Date and time"
+                                                                    value="<?= date('d-m-Y H:i') ?>"
+                                                                    style="width: 150px;"
+                                                                    onchange="validate_validDatetime('txt_dapart1',this.id)" />
+                                                            </td>
+                                                            <td><input type="hidden" id="from_city-1"></td>
+                                                            <td><input type="hidden" id="to_city-1"></td>
                                                         </tr>
                                                     </table>
                                                 </div>
@@ -544,6 +470,101 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        <!-- Train Information -->
+                        <div class="accordion_content main_block mg_bt_10 <?= $hide_train ?>">
+
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading1">
+                                    <div class="Normal main_block" role="button" data-toggle="collapse"
+                                        data-parent="#accordion" href="#collapse1" aria-expanded="true"
+                                        aria-controls="collapse1" id="collapsed1">
+                                        <div class="col-md-12"><span>Train Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse1" class="panel-collapse collapse main_block" role="tabpanel"
+                                    aria-labelledby="heading1">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-xs-6 mg_bt_20_sm_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" title="Add City" onclick="city_ssave_modal()"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-xs-6 text-right mg_bt_20_sm_xs">
+                                                <button type="button" class="btn btn-excel btn-sm"
+                                                    onClick="addRow('tbl_package_tour_quotation_dynamic_train');city_lzloading('.train_from','*From', true);city_lzloading('.train_to','*To', true)"><i
+                                                        class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm"
+                                                    onClick="deleteRow('tbl_package_tour_quotation_dynamic_train')"><i
+                                                        class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_package_tour_quotation_dynamic_train"
+                                                        name="tbl_package_tour_quotation_dynamic_train"
+                                                        class="table mg_bt_0 table-bordered pd_bt_51 no-marg ">
+                                                        <tr>
+                                                            <td><input class="css-checkbox" id="chk_tour_group1"
+                                                                    type="checkbox"><label class="css-label"
+                                                                    for="chk_tour_group1"> <label></td>
+                                                            <td><input maxlength="15" value="1" type="text"
+                                                                    name="username" placeholder="Sr. No."
+                                                                    class="form-control" disabled /></td>
+                                                            <td class="col-md-3 no-pad"><select id="train_from_location1"
+                                                                    onchange="validate_location('train_to_location1','train_from_location1');"
+                                                                    class="app_select2 form-control train_from"
+                                                                    name="train_from_location1" title="From Location"
+                                                                    style="width:100%">
+                                                                    <option value="" selected="selected">*From</option>
+                                                                </select></td>
+                                                            <td class="col-md-3 no-pad"><select id="train_to_location1"
+                                                                    onchange="validate_location('train_from_location1','train_to_location1');"
+                                                                    class="app_select2 form-control train_to"
+                                                                    title="To Location" name="train_to_location1"
+                                                                    style="width:100%">
+                                                                    <option value="" selected="selected">*To</option>
+                                                                </select></td>
+                                                            <td class="col-md-2 no-pad"><select name="train_class"
+                                                                    id="train_class1" title="Class" style="width:100%">
+                                                                    <option value="">Class</option>
+                                                                    <option value="1A">1A</option>
+                                                                    <option value="2A">2A</option>
+                                                                    <option value="3A">3A</option>
+                                                                    <option value="FC">FC</option>
+                                                                    <option value="CC">CC</option>
+                                                                    <option value="SL">SL</option>
+                                                                    <option value="2S">2S</option>
+                                                                </select></td>
+                                                            <td class="col-md-2 no-pad"><input type="text"
+                                                                    id="train_departure_date"
+                                                                    name="train_departure_date"
+                                                                    placeholder="Departure Date and time"
+                                                                    title="Departure Date and time"
+                                                                    class="app_datetimepicker" style="width:100% !important;"
+                                                                    onchange="get_to_datetime(this.id,'train_arrival_date')"
+                                                                    value="<?= date('d-m-Y H:i') ?>">
+                                                            </td>
+                                                            <td class="col-md-2 no-pad"><input type="text"
+                                                                    id="train_arrival_date" name="train_arrival_date"
+                                                                    placeholder="Arrival Date and time"
+                                                                    title="Arrival Date and time"
+                                                                    class="app_datetimepicker"
+                                                                    value="<?= date('d-m-Y H:i') ?>" style="width:100% !important;"
+                                                                    onchange="validate_validDatetime('train_departure_date',this.id)">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <!-- Cruise Information -->
                         <div class="accordion_content main_block mg_bt_10 <?= $hide_cruise ?>">
 
@@ -642,935 +663,2018 @@
 <?= end_panel() ?>
 
 <script>
-$('#airline_name1,#room_cat1,#pickup_from-,#drop_to-,#transport_vehicle-,#excursion-1').select2();
-$('#cruise_departure_date,#cruise_arrival_date,#exc_date-1').datetimepicker({
-    format: "d-m-Y H:i"
-});
-$('#check_in-1, #check_out-1,#transport_start_date-,#transport_end_date-').datetimepicker({
-    format: 'd-m-Y',
-    timepicker: false
-});
-destinationLoading("#pickup_from-", 'Pickup Location');
-destinationLoading("#drop_to-", 'Drop-off Location');
-city_lzloading('#city_name1,#city_name-1');
-city_lzloading('#train_to_location1', "*To", true);
-city_lzloading('#train_from_location1', "*From", true);
-event_airport('tbl_package_tour_quotation_dynamic_plane');
-// App_accordion
-jQuery(document).ready(function() {
-    jQuery(".panel-heading").click(function() {
-        jQuery('#accordion .panel-heading').not(this).removeClass('isOpen');
-        jQuery('#accordionl .panel-heading').not(this).removeClass('isOpen');
-        jQuery(this).toggleClass('isOpen');
-        jQuery(this).next(".panel-collapse").addClass('thePanel');
-        jQuery('#accordion .panel-collapse').not('.thePanel').slideUp("slow");
-        jQuery('#accordionl .panel-collapse').not('.thePanel').slideUp("slow");
-        jQuery(".thePanel").slideToggle("slow").removeClass('thePanel');
+    $('#airline_name1,#room_cat1,#pickup_from-,#drop_to-,#transport_vehicle-,#excursion-1').select2();
+    $('#cruise_departure_date,#cruise_arrival_date,#exc_date-1').datetimepicker({
+        format: "d-m-Y H:i"
     });
-});
+    $('#check_in-1, #check_out-1,#transport_start_date-,#transport_end_date-').datetimepicker({
+        format: 'd-m-Y',
+        timepicker: false
+    });
+    destinationLoading("#pickup_from-", 'Pickup Location');
+    destinationLoading("#drop_to-", 'Drop-off Location');
+    city_lzloading('#city_name1,#city_name-1');
+    city_lzloading('#train_to_location1', "*To", true);
+    city_lzloading('#train_from_location1', "*From", true);
 
-//Get Hotel Cost
-function get_hotel_cost() {
+    // Event handler removed - using inline onchange attributes instead
 
-    var hotel_id_arr = [];
-    var room_cat_arr = [];
-    var check_in_arr = [];
-    var check_out_arr = [];
-    var total_nights_arr = [];
-    var total_rooms_arr = [];
-    var extra_bed_arr = [];
-    var meal_plan_arr = [];
-    var checked_arr = [];
-    var package_id_arr = [];
-    var child_with_bed = $('#children_with_bed').val();
-    var child_without_bed = $('#children_without_bed').val();
-    var adult_count = $('#total_adult').val();
-    adult_count = (adult_count == '') ? 0 : adult_count;
-    child_without_bed = (child_without_bed == '') ? 0 : child_without_bed;
-    child_with_bed = (child_with_bed == '') ? 0 : child_with_bed;
+    event_airport('tbl_package_tour_quotation_dynamic_plane');
+    // App_accordion
+    jQuery(document).ready(function() {
+        jQuery(".panel-heading").click(function() {
+            jQuery('#accordion .panel-heading').not(this).removeClass('isOpen');
+            jQuery('#accordionl .panel-heading').not(this).removeClass('isOpen');
+            jQuery(this).toggleClass('isOpen');
+            jQuery(this).next(".panel-collapse").addClass('thePanel');
+            jQuery('#accordion .panel-collapse').not('.thePanel').slideUp("slow");
+            jQuery('#accordionl .panel-collapse').not('.thePanel').slideUp("slow");
+            jQuery(".thePanel").slideToggle("slow").removeClass('thePanel');
+        });
+    });
 
-	var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-	var rowCount = table.rows.length;
-	for(var i=0; i<rowCount; i++){
+    //Get Hotel Cost
+    function get_hotel_cost() {
 
-		var row = table.rows[i];
-		var hotel_id = row.cells[4].childNodes[0].value;
-		var room_category = row.cells[5].childNodes[0].value;
-		var check_in = row.cells[6].childNodes[0].value;
-		var check_out = row.cells[7].childNodes[0].value;
-		var total_nights = row.cells[9].childNodes[0].value;
-		var total_rooms = row.cells[10].childNodes[0].value;
-		var extra_bed = row.cells[11].childNodes[0].value;
-		var package_id = row.cells[14].childNodes[0].value;
-		var meal_plan = row.cells[16].childNodes[0].value;
-		
-		hotel_id_arr.push(hotel_id);
-		room_cat_arr.push(room_category);
-		check_in_arr.push(check_in);
-		check_out_arr.push(check_out);
-		total_nights_arr.push(total_nights);
-		total_rooms_arr.push(total_rooms);
-		extra_bed_arr.push(extra_bed);
-        meal_plan_arr.push(meal_plan);
-		package_id_arr.push(package_id);
-		checked_arr.push(row.cells[0].childNodes[0].checked);
-	}
-	var base_url = $('#base_url').val();
-	$.ajax({
-		type:'post',
-		url: base_url+'view/package_booking/quotation/home/hotel/get_hotel_cost.php',
-		data:{ hotel_id_arr : hotel_id_arr,check_in_arr : check_in_arr,check_out_arr:check_out_arr,room_cat_arr:room_cat_arr,total_nights_arr:total_nights_arr,total_rooms_arr:total_rooms_arr,extra_bed_arr:extra_bed_arr,child_with_bed:child_with_bed,child_without_bed:child_without_bed,adult_count:adult_count,package_id_arr:package_id_arr,checked_arr:checked_arr,meal_plan_arr:meal_plan_arr },
-		success:function(result){
+        var hotel_id_arr = [];
+        var room_cat_arr = [];
+        var check_in_arr = [];
+        var check_out_arr = [];
+        var total_nights_arr = [];
+        var total_rooms_arr = [];
+        var extra_bed_arr = [];
+        var meal_plan_arr = [];
+        var checked_arr = [];
+        var package_id_arr = [];
+        var child_with_bed = $('#children_with_bed').val();
+        var child_without_bed = $('#children_without_bed').val();
+        var adult_count = $('#total_adult').val();
+        adult_count = (adult_count == '') ? 0 : adult_count;
+        child_without_bed = (child_without_bed == '') ? 0 : child_without_bed;
+        child_with_bed = (child_with_bed == '') ? 0 : child_with_bed;
 
-			var hotel_arr = JSON.parse(result);
-			var pp_arr = [];
-            if(hotel_arr.length === 0){
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        var rowCount = table.rows.length;
+        for (var i = 0; i < rowCount; i++) {
 
-                for(var i=0; i<rowCount; i++){
+            var row = table.rows[i];
+            var hotel_id = row.cells[4].childNodes[0].value;
+            var room_category = row.cells[5].childNodes[0].value;
+            var check_in = row.cells[6].childNodes[0].value;
+            var check_out = row.cells[7].childNodes[0].value;
+            var total_nights = row.cells[9].childNodes[0].value;
+            var total_rooms = row.cells[10].childNodes[0].value;
+            var extra_bed = row.cells[11].childNodes[0].value;
+            var package_id = row.cells[14].childNodes[0].value;
+            var meal_plan = row.cells[16].childNodes[0].value;
 
-                    var row = table.rows[i];
-                    row.cells[13].childNodes[0].value = 0;
-                }
-            }else{
-                
-                for(var i=0; i<hotel_arr.length; i++){
+            hotel_id_arr.push(hotel_id);
+            room_cat_arr.push(room_category);
+            check_in_arr.push(check_in);
+            check_out_arr.push(check_out);
+            total_nights_arr.push(total_nights);
+            total_rooms_arr.push(total_rooms);
+            extra_bed_arr.push(extra_bed);
+            meal_plan_arr.push(meal_plan);
+            package_id_arr.push(package_id);
+            checked_arr.push(row.cells[0].childNodes[0].checked);
+        }
+        var base_url = $('#base_url').val();
+        $.ajax({
+            type: 'post',
+            url: base_url + 'view/package_booking/quotation/home/hotel/get_hotel_cost.php',
+            data: {
+                hotel_id_arr: hotel_id_arr,
+                check_in_arr: check_in_arr,
+                check_out_arr: check_out_arr,
+                room_cat_arr: room_cat_arr,
+                total_nights_arr: total_nights_arr,
+                total_rooms_arr: total_rooms_arr,
+                extra_bed_arr: extra_bed_arr,
+                child_with_bed: child_with_bed,
+                child_without_bed: child_without_bed,
+                adult_count: adult_count,
+                package_id_arr: package_id_arr,
+                checked_arr: checked_arr,
+                meal_plan_arr: meal_plan_arr
+            },
+            success: function(result) {
 
-                    var row = table.rows[i];
-                    if(row.cells[0].childNodes[0].checked){
+                var hotel_arr = JSON.parse(result);
+                var pp_arr = [];
+                if (hotel_arr.length === 0) {
 
-                        row.cells[13].childNodes[0].value = hotel_arr[i]['hotel_cost'];
-                        pp_arr.push({
-                            'adult_cost':hotel_arr[i]['adult_cost'],
-                            'child_with_bed':hotel_arr[i]['child_with_bed'],
-                            'child_without_bed':hotel_arr[i]['child_without_bed'],
-                            'package_id':hotel_arr[i]['package_id'],
-                            'flag':hotel_arr[i]['flag'],
-                            'package_type':row.cells[2].childNodes[0].value,
-                            'checked':true
-                        });
-                    }
-                    else{
+                    for (var i = 0; i < rowCount; i++) {
+
+                        var row = table.rows[i];
                         row.cells[13].childNodes[0].value = 0;
-                        pp_arr.push({
-                            'adult_cost':0,
-                            'child_with_bed':0,
-                            'child_without_bed':0,
-                            'package_id':hotel_arr[i]['package_id'],
-                            'package_type':row.cells[2].childNodes[0].value,
-                            'checked':false
-                        });
+                    }
+                } else {
+
+                    for (var i = 0; i < hotel_arr.length; i++) {
+
+                        var row = table.rows[i];
+                        if (row.cells[0].childNodes[0].checked) {
+
+                            row.cells[13].childNodes[0].value = hotel_arr[i]['hotel_cost'];
+                            pp_arr.push({
+                                'adult_cost': hotel_arr[i]['adult_cost'],
+                                'child_with_bed': hotel_arr[i]['child_with_bed'],
+                                'child_without_bed': hotel_arr[i]['child_without_bed'],
+                                'package_id': hotel_arr[i]['package_id'],
+                                'flag': hotel_arr[i]['flag'],
+                                'package_type': row.cells[2].childNodes[0].value,
+                                'checked': true
+                            });
+                        } else {
+                            row.cells[13].childNodes[0].value = 0;
+                            pp_arr.push({
+                                'adult_cost': 0,
+                                'child_with_bed': 0,
+                                'child_without_bed': 0,
+                                'package_id': hotel_arr[i]['package_id'],
+                                'package_type': row.cells[2].childNodes[0].value,
+                                'checked': false
+                            });
+                        }
+                        // Don't force checkboxes to be checked - let user control them
+                        // $(row.cells[0].childNodes[0]).prop('checked', true) /* .trigger('change') */ ;
+                        $(row.cells[2].childNodes[0]).prop('disabled', true);
+                        hideHotelPackage(row.cells[2].childNodes[0].value);
                     }
                 }
+                //Tab-4 Per person costing
+                $('#hotel_pp_costing').val(JSON.stringify(pp_arr));
             }
-			//Tab-4 Per person costing
-			$('#hotel_pp_costing').val(JSON.stringify(pp_arr));
-		}
-	});
-}
-$('#tbl_package_tour_quotation_dynamic_hotel').on('change', 'select[name="city_name1"]', function() {
-    hotel_name_list_load(this.id);
-});
-//Get Transport Cost
-function get_transport_cost() {
-
-    var transport_id_arr = [];
-    var travel_date_arr = [];
-    var pickup_arr = [];
-    var drop_arr = [];
-    var pickup_id_arr = [];
-    var drop_id_arr = [];
-    var vehicle_count_arr = [];
-    var ppackage_id_arr = [];
-    var ppackage_name_arr = [];
-    var service_duration_arr = [];
-    var table = document.getElementById("tbl_package_tour_quotation_dynamic_transport");
-
-    var rowCount = table.rows.length;
-    for (var i = 0; i < rowCount; i++) {
-
-        var row = table.rows[i];
-        var transport_id = row.cells[2].childNodes[0].value;
-        var travel_date = row.cells[3].childNodes[0].value;
-        var pickup = row.cells[5].childNodes[0].value;
-        var drop = row.cells[6].childNodes[0].value;
-        var pickup1 = pickup.split("-")[1];
-        var drop1 = drop.split("-")[1];
-
-        var pickup_type = pickup.split("-")[0];
-        var drop_type = drop.split("-")[0];
-        var service_duration = row.cells[7].childNodes[0].value;
-        var vehicle_count = row.cells[8].childNodes[0].value;
-        var pname = row.cells[10].childNodes[0].value;
-        var pid = row.cells[11].childNodes[0].value;
-
-        transport_id_arr.push(transport_id);
-        travel_date_arr.push(travel_date);
-        pickup_arr.push(pickup1);
-        drop_arr.push(drop1);
-        pickup_id_arr.push(pickup_type);
-        drop_id_arr.push(drop_type);
-        vehicle_count_arr.push(vehicle_count);
-        ppackage_id_arr.push(pid);
-        ppackage_name_arr.push(pname);
-        service_duration_arr.push(service_duration);
+        });
     }
-    $.ajax({
-        type: 'post',
-        url: '../hotel/get_transport_cost.php',
-        data: {
-            transport_id_arr: transport_id_arr,
-            travel_date_arr: travel_date_arr,
-            pickup_arr: pickup_arr,
-            drop_arr: drop_arr,
-            vehicle_count_arr: vehicle_count_arr,
-            pickup_id_arr: pickup_id_arr,
-            drop_id_arr: drop_id_arr,
-            ppackage_id_arr: ppackage_id_arr,
-            ppackage_name_arr: ppackage_name_arr,
-            service_duration_arr : service_duration_arr
-        },
-        success: function(result) {
-            var transport_arr = JSON.parse(result);
-            var pp_arr = [];
-            for (var i = 0; i < transport_arr.length; i++) {
+    // Hotel name list load function
+    function hotel_name_list_load(id) {
+        var base_url = $("#base_url").val();
+        var city_id = $("#" + id).val();
+        var count = id.substring(9); // Extract number from city_name1, city_name2, etc.
 
-                var row = table.rows[i];
-                if (row.cells[0].childNodes[0].checked) {
-                    row.cells[9].childNodes[0].value = transport_arr[i]['total_cost'];
-                    pp_arr.push({
-                        'total_cost': transport_arr[i]['total_cost'],
-                        'package_id': transport_arr[i]['package_id'],
-                        'checked': true
-                    });
-                } else {
-                    row.cells[9].childNodes[0].value = 0;
-                    pp_arr.push({
-                        'total_cost': 0,
-                        'package_id': transport_arr[i]['package_id'],
-                        'checked': false
-                    });
-                }
+        console.log("Loading hotels for city_id:", city_id, "count:", count);
+        console.log("AJAX URL:", base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php");
 
-            }
+        // Clear existing options first
+        $("#hotel_name-" + count).html('<option value="">Loading hotels...</option>');
+
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", {
+                city_id: city_id
+            })
+            .done(function(data) {
+                console.log("Hotel data received:", data);
+                $("#hotel_name-" + count).html(data);
+
+                // Re-initialize Select2 for the updated dropdown
+                $("#hotel_name-" + count).select2({
+                    placeholder: "Select Hotel",
+                    allowClear: true
+                });
+            })
+            .fail(function(xhr, status, error) {
+                console.error("Error loading hotels:", status, error);
+                console.error("Response:", xhr.responseText);
+                console.error("Status Code:", xhr.status);
+                console.error("Ready State:", xhr.readyState);
+
+                // Try alternative URL structure
+                var altUrl = base_url + "crm/view/package_booking/quotation/home/hotel/hotel_name_load.php";
+                console.log("Trying alternative URL:", altUrl);
+
+                $.get(altUrl, {
+                        city_id: city_id
+                    })
+                    .done(function(data) {
+                        console.log("Hotel data received from alternative URL:", data);
+                        $("#hotel_name-" + count).html(data);
+                        $("#hotel_name-" + count).select2({
+                            placeholder: "Select Hotel",
+                            allowClear: true
+                        });
+                    })
+                    .fail(function(xhr2, status2, error2) {
+                        console.error("Alternative URL also failed:", status2, error2);
+                        $("#hotel_name-" + count).html('<option value="">Error loading hotels</option>');
+                    });
+            });
+    }
+
+    // Hotel type load function
+    function hotel_type_load(id) {
+        var base_url = $("#base_url").val();
+        var hotel_id = $("#" + id).val();
+        var count = id.substring(10); // Extract number from hotel_name-1, hotel_name-2, etc.
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_type_load.php", {
+            hotel_id: hotel_id
+        }, function(data) {
+            $("#hotel_type-" + count).val(data);
+        });
+    }
+
+    // Event handlers for city and hotel dropdowns
+    $('#tbl_package_tour_quotation_dynamic_hotel').on('change', 'select[name^="city_name"]', function() {
+        console.log("City dropdown changed:", this.id, "Value:", $(this).val());
+        hotel_name_list_load(this.id);
+    });
+
+    // Additional event handler for manual trigger
+    $(document).on('change', 'select[name^="city_name"]', function() {
+        if ($(this).closest('#tbl_package_tour_quotation_dynamic_hotel').length > 0) {
+            console.log("Manual city dropdown change detected:", this.id, "Value:", $(this).val());
+            hotel_name_list_load(this.id);
         }
     });
-}
 
-$(function() {
-    $('#frm_tab3').validate({
-        rules: {},
-        submitHandler: function(form, e) {
-            e.preventDefault();
+    $('#tbl_package_tour_quotation_dynamic_hotel').on('change', 'select[name^="hotel_name"]', function() {
+        hotel_type_load(this.id);
+    });
+    //Get Transport Cost
+    function get_transport_cost() {
 
-            var child_with_bed = $('#children_with_bed').val();
-            var child_without_bed = $('#children_without_bed').val();
-            var adult_count = $('#total_adult').val();
-            var total_infant = $('#total_infant').val();
-            
-            //Train Info
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_train");
-            var rowCount = table.rows.length;
+        var transport_id_arr = [];
+        var travel_date_arr = [];
+        var pickup_arr = [];
+        var drop_arr = [];
+        var pickup_id_arr = [];
+        var drop_id_arr = [];
+        var vehicle_count_arr = [];
+        var ppackage_id_arr = [];
+        var ppackage_name_arr = [];
+        var service_duration_arr = [];
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_transport");
 
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
+        var rowCount = table.rows.length;
+        for (var i = 0; i < rowCount; i++) {
 
-                if (row.cells[0].childNodes[0].checked) {
-                    var train_from_location1 = row.cells[2].childNodes[0].value;
-                    var train_to_location1 = row.cells[3].childNodes[0].value;
-                    var train_class = row.cells[4].childNodes[0].value;
-                    var train_arrival_date = row.cells[5].childNodes[0].value;
-                    var train_departure_date = row.cells[6].childNodes[0].value;
+            var row = table.rows[i];
+            var transport_id = row.cells[2].childNodes[0].value;
+            var travel_date = row.cells[3].childNodes[0].value;
+            var pickup = row.cells[5].childNodes[0].value;
+            var drop = row.cells[6].childNodes[0].value;
+            var pickup1 = pickup.split("-")[1];
+            var drop1 = drop.split("-")[1];
 
-                    if (train_from_location1 == "") {
-                        error_msg_alert('Enter train from location in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_train').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
+            var pickup_type = pickup.split("-")[0];
+            var drop_type = drop.split("-")[0];
+            var service_duration = row.cells[7].childNodes[0].value;
+            var vehicle_count = row.cells[8].childNodes[0].value;
+            var pname = row.cells[10].childNodes[0].value;
+            var pid = row.cells[11].childNodes[0].value;
 
-                    if (train_to_location1 == "") {
-                        error_msg_alert('Enter train to location in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_train').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
+            transport_id_arr.push(transport_id);
+            travel_date_arr.push(travel_date);
+            pickup_arr.push(pickup1);
+            drop_arr.push(drop1);
+            pickup_id_arr.push(pickup_type);
+            drop_id_arr.push(drop_type);
+            vehicle_count_arr.push(vehicle_count);
+            ppackage_id_arr.push(pid);
+            ppackage_name_arr.push(pname);
+            service_duration_arr.push(service_duration);
+        }
+        $.ajax({
+            type: 'post',
+            url: '../hotel/get_transport_cost.php',
+            data: {
+                transport_id_arr: transport_id_arr,
+                travel_date_arr: travel_date_arr,
+                pickup_arr: pickup_arr,
+                drop_arr: drop_arr,
+                vehicle_count_arr: vehicle_count_arr,
+                pickup_id_arr: pickup_id_arr,
+                drop_id_arr: drop_id_arr,
+                ppackage_id_arr: ppackage_id_arr,
+                ppackage_name_arr: ppackage_name_arr,
+                service_duration_arr: service_duration_arr
+            },
+            success: function(result) {
+                var transport_arr = JSON.parse(result);
+                var pp_arr = [];
+                for (var i = 0; i < transport_arr.length; i++) {
 
-                }
-            }
-
-            // Flight Info
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_plane");
-            var rowCount = table.rows.length;
-
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-
-                if (row.cells[0].childNodes[0].checked) {
-
-                    var plane_from_location1 = row.cells[2].childNodes[0].value;
-                    var plane_to_location1 = row.cells[3].childNodes[0].value;
-                    var airline_name = row.cells[4].childNodes[0].value;
-                    var plane_class = row.cells[5].childNodes[0].value;
-                    var dapart1 = row.cells[6].childNodes[0].value;
-                    var arraval1 = row.cells[7].childNodes[0].value;
-                    var plane_from_city = row.cells[8].childNodes[0].value;
-                    var plane_to_city = row.cells[9].childNodes[0].value;
-
-                    if (plane_from_location1 == "") {
-                        error_msg_alert('Enter from sector in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-
-                    if (plane_to_location1 == "") {
-                        error_msg_alert('Enter to sector in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-
-                    if (dapart1 == "") {
-                        error_msg_alert("Departure Datetime is required in row:" + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-
-                    if (arraval1 == "") {
-                        error_msg_alert('Arrival Datetime is required in row:' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                }
-            }
-
-
-            //Cruise Information
-            var table = document.getElementById("tbl_dynamic_cruise_quotation");
-            var rowCount = table.rows.length;
-
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                if (row.cells[0].childNodes[0].checked) {
-                    var cruise_from_date = row.cells[2].childNodes[0].value;
-                    var cruise_to_date = row.cells[3].childNodes[0].value;
-                    var route = row.cells[4].childNodes[0].value;
-                    var cabin = row.cells[5].childNodes[0].value;
-                    var sharing = row.cells[6].childNodes[0].value;
-
-                    if (cruise_from_date == "") {
-                        error_msg_alert('Enter cruise Departure datetime in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_dynamic_cruise_quotation').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-
-                    if (cruise_to_date == "") {
-                        error_msg_alert('Enter cruise Arrival datetime  in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_dynamic_cruise_quotation').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (route == "") {
-                        error_msg_alert('Enter route in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_dynamic_cruise_quotation').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (cabin == "") {
-                        error_msg_alert('Enter cabin in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_dynamic_cruise_quotation').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+                        row.cells[9].childNodes[0].value = transport_arr[i]['total_cost'];
+                        pp_arr.push({
+                            'total_cost': transport_arr[i]['total_cost'],
+                            'package_id': transport_arr[i]['package_id'],
+                            'checked': true
+                        });
+                    } else {
+                        row.cells[9].childNodes[0].value = 0;
+                        pp_arr.push({
+                            'total_cost': 0,
+                            'package_id': transport_arr[i]['package_id'],
+                            'checked': false
+                        });
                     }
 
                 }
             }
+        });
+    }
 
-            //Hotel Information 
-            var package_id_arr = [];
-            var package_type_arr = [];
-            var hotel_cost_arr = [];
-            var extra_bed_cost_arr = [];
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-            var rowCount = table.rows.length;
+    $(function() {
+        $('#frm_tab3').validate({
+            rules: {},
+            submitHandler: function(form, e) {
+                e.preventDefault();
 
-            for (var i = 0; i < rowCount; i++) {
+                // Before validation, ensure all hotel dropdowns have proper values
+                ensureHotelSelections();
 
-                var row = table.rows[i];
-                if (row.cells[0].childNodes[0].checked) {
+                var child_with_bed = $('#children_with_bed').val();
+                var child_without_bed = $('#children_without_bed').val();
+                var adult_count = $('#total_adult').val();
+                var total_infant = $('#total_infant').val();
 
-                    var package_type = row.cells[2].childNodes[0].value;
-                    var city_name = row.cells[3].childNodes[0].value;
-                    var hotel_id = row.cells[4].childNodes[0].value;
-                    var hotel_cat = row.cells[5].childNodes[0].value;
-                    var check_in = row.cells[6].childNodes[0].value;
-                    var checkout = row.cells[7].childNodes[0].value;
-                    var hotel_stay_days1 = row.cells[9].childNodes[0].value;
-                    var total_rooms = row.cells[10].childNodes[0].value;
-                    var package_name1 = row.cells[12].childNodes[0].value;
-                    var hotel_cost = row.cells[13].childNodes[0].value;
-                    var package_id1 = row.cells[14].childNodes[0].value;
-                    var extra_bed_cost = row.cells[15].childNodes[0].value;
+                //Train Info
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_train");
+                var rowCount = table.rows.length;
 
-                    if (package_type == "") {
-                        error_msg_alert('Select Package Type in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (city_name == "") {
-                        error_msg_alert('Select Hotel city in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (hotel_id == "") {
-                        error_msg_alert('Enter Hotel in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (hotel_cat == "") {
-                        error_msg_alert('Enter Room Category in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (check_in == "") {
-                        error_msg_alert('Select Check-In date in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (checkout == "") {
-                        error_msg_alert('Select Check-Out date in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (hotel_stay_days1 == "") {
-                        error_msg_alert('Enter Hotel total days in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (total_rooms == "") {
-                        error_msg_alert('Enter Hotel total rooms in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    package_id_arr.push(package_id1);
-                    package_type_arr.push(package_type);
-                    extra_bed_cost_arr.push(extra_bed_cost);
-                    hotel_cost_arr.push(hotel_cost);
-                }
-            }
-            var unique_package_type_arr = [];
-            for (var ptype_i = 0; ptype_i < package_type_arr.length; ptype_i++) {
-                var cost = 0;
-                if (ptype_i == 0) {
-                    unique_package_type_arr.push(package_type_arr[ptype_i]);
-                } else {
-                    if (unique_package_type_arr.indexOf(package_type_arr[ptype_i]) == -1) {
-                        unique_package_type_arr.push(package_type_arr[ptype_i]);
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
+
+                    if (row.cells[0].childNodes[0].checked) {
+                        var train_from_location1 = row.cells[2].childNodes[0].value;
+                        var train_to_location1 = row.cells[3].childNodes[0].value;
+                        var train_class = row.cells[4].childNodes[0].value;
+                        var train_arrival_date = row.cells[5].childNodes[0].value;
+                        var train_departure_date = row.cells[6].childNodes[0].value;
+
+                        if (train_from_location1 == "") {
+                            error_msg_alert('Enter train from location in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_train').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
+                        if (train_to_location1 == "") {
+                            error_msg_alert('Enter train to location in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_train').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
                     }
                 }
-            }
 
-            var uniquepackages = [];
-            $('input[name="custom_package"]:checked').each(function() {
-                uniquepackages.push($(this).val());
-            });
+                // Flight Info
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_plane");
+                var rowCount = table.rows.length;
 
-            var unique_package_id_arr = [];
-            var hotel_main_arr = [];
-            var hotel_per_person_arr = [];
-            var per_person_costing = JSON.parse($('#hotel_pp_costing').val());
-
-            //Creating unique package id wise array
-            for (var i = 0; i < unique_package_type_arr.length; i++) {
-
-                var hotel_cost_total = 0;
-                var hotel_data_arr = [];
-                var checked_arr = [];
-                var hotel_cost1 = 0;
-                // if(!added){
-                for (var k = 0; k < rowCount; k++) {
-
-                    var row = table.rows[k];
-                    var hotel_cost = row.cells[13].childNodes[0].value;
-                    var package_type = row.cells[2].childNodes[0].value;
-                    if (hotel_cost == '') {
-                        hotel_cost = 0;
-                    }
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
 
                     if (row.cells[0].childNodes[0].checked) {
 
-                        if (package_type === unique_package_type_arr[i]) {
-                            if (hotel_cost == 0) {
-                                hotel_cost1 = 0;
-                                break;
-                            } else {
-                                hotel_cost1 += parseFloat(hotel_cost);
-                            }
+                        var plane_from_location1 = row.cells[2].childNodes[0].value;
+                        var plane_to_location1 = row.cells[3].childNodes[0].value;
+                        var airline_name = row.cells[4].childNodes[0].value;
+                        var plane_class = row.cells[5].childNodes[0].value;
+                        var dapart1 = row.cells[6].childNodes[0].value;
+                        var arraval1 = row.cells[7].childNodes[0].value;
+                        var plane_from_city = row.cells[8].childNodes[0].value;
+                        var plane_to_city = row.cells[9].childNodes[0].value;
+
+                        if (plane_from_location1 == "") {
+                            error_msg_alert('Enter from sector in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
+                        if (plane_to_location1 == "") {
+                            error_msg_alert('Enter to sector in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
+                        if (dapart1 == "") {
+                            error_msg_alert("Departure Datetime is required in row:" + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
+                        if (arraval1 == "") {
+                            error_msg_alert('Arrival Datetime is required in row:' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
                         }
                     }
                 }
+
+
+                //Cruise Information
+                var table = document.getElementById("tbl_dynamic_cruise_quotation");
+                var rowCount = table.rows.length;
+
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+                        var cruise_from_date = row.cells[2].childNodes[0].value;
+                        var cruise_to_date = row.cells[3].childNodes[0].value;
+                        var route = row.cells[4].childNodes[0].value;
+                        var cabin = row.cells[5].childNodes[0].value;
+                        var sharing = row.cells[6].childNodes[0].value;
+
+                        if (cruise_from_date == "") {
+                            error_msg_alert('Enter cruise Departure datetime in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_dynamic_cruise_quotation').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
+                        if (cruise_to_date == "") {
+                            error_msg_alert('Enter cruise Arrival datetime  in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_dynamic_cruise_quotation').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (route == "") {
+                            error_msg_alert('Enter route in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_dynamic_cruise_quotation').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (cabin == "") {
+                            error_msg_alert('Enter cabin in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_dynamic_cruise_quotation').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
+                    }
+                }
+
+                //Hotel Information 
+                var package_id_arr = [];
+                var package_type_arr = [];
+                var hotel_cost_arr = [];
+                var extra_bed_cost_arr = [];
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+                var rowCount = table.rows.length;
+
+                for (var i = 0; i < rowCount; i++) {
+
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+
+                        var package_type = row.cells[2].childNodes[0].value;
+                        var city_name = row.cells[3].childNodes[0].value;
+                        // Force refresh the hotel value from Select2
+                        var $hotelSelect = $(row.cells[4].childNodes[0]);
+                        if ($hotelSelect.data('select2')) {
+                            row.cells[4].childNodes[0].value = $hotelSelect.val();
+                        }
+                        var hotel_id = row.cells[4].childNodes[0].value;
+                        var hotel_cat = row.cells[5].childNodes[0].value;
+
+                        // Debug logging
+                        console.log('Row ' + (i + 1) + ' - Package Type:', package_type, 'City:', city_name, 'Hotel ID:', hotel_id, 'Hotel Cat:', hotel_cat);
+                        console.log('Row ' + (i + 1) + ' - Hotel dropdown options:', $(row.cells[4].childNodes[0]).html());
+                        console.log('Row ' + (i + 1) + ' - Selected hotel value:', $(row.cells[4].childNodes[0]).val());
+                        console.log('Row ' + (i + 1) + ' - City dropdown options:', $(row.cells[3].childNodes[0]).html());
+                        console.log('Row ' + (i + 1) + ' - Selected city value:', $(row.cells[3].childNodes[0]).val());
+                        var check_in = row.cells[6].childNodes[0].value;
+                        var checkout = row.cells[7].childNodes[0].value;
+                        var hotel_stay_days1 = row.cells[9].childNodes[0].value;
+                        var total_rooms = row.cells[10].childNodes[0].value;
+                        var package_name1 = row.cells[12].childNodes[0].value;
+                        var hotel_cost = row.cells[13].childNodes[0].value;
+                        var package_id1 = row.cells[14].childNodes[0].value;
+                        var extra_bed_cost = row.cells[15].childNodes[0].value;
+
+                        if (package_type == "" || package_type == "*Package Type") {
+                            error_msg_alert('Select Package Type in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (city_name == "" || city_name == "*City Name") {
+                            error_msg_alert('Select Hotel city in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (hotel_id == "" || hotel_id == "*Hotel Name") {
+                            error_msg_alert('Select Hotel in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (hotel_cat == "" || hotel_cat == "*Room Category") {
+                            error_msg_alert('Select Room Category in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (check_in == "") {
+                            error_msg_alert('Select Check-In date in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (checkout == "") {
+                            error_msg_alert('Select Check-Out date in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (hotel_stay_days1 == "") {
+                            error_msg_alert('Enter Hotel total days in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (total_rooms == "") {
+                            error_msg_alert('Enter Hotel total rooms in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_hotel').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        package_id_arr.push(package_id1);
+                        package_type_arr.push(package_type);
+                        extra_bed_cost_arr.push(extra_bed_cost);
+                        hotel_cost_arr.push(hotel_cost);
+                    }
+                }
+                var unique_package_type_arr = [];
+                for (var ptype_i = 0; ptype_i < package_type_arr.length; ptype_i++) {
+                    var cost = 0;
+                    if (ptype_i == 0) {
+                        unique_package_type_arr.push(package_type_arr[ptype_i]);
+                    } else {
+                        if (unique_package_type_arr.indexOf(package_type_arr[ptype_i]) == -1) {
+                            unique_package_type_arr.push(package_type_arr[ptype_i]);
+                        }
+                    }
+                }
+
+                var uniquepackages = [];
+                $('input[name="custom_package"]:checked').each(function() {
+                    uniquepackages.push($(this).val());
+                });
+
+                var unique_package_id_arr = [];
+                var hotel_main_arr = [];
+                var hotel_per_person_arr = [];
+                var per_person_costing = JSON.parse($('#hotel_pp_costing').val());
+
+                //Creating unique package id wise array
+                for (var i = 0; i < unique_package_type_arr.length; i++) {
+
+                    var hotel_cost_total = 0;
+                    var hotel_data_arr = [];
+                    var checked_arr = [];
+                    var hotel_cost1 = 0;
+                    // if(!added){
+                    for (var k = 0; k < rowCount; k++) {
+
+                        var row = table.rows[k];
+                        var hotel_cost = row.cells[13].childNodes[0].value;
+                        var package_type = row.cells[2].childNodes[0].value;
+                        if (hotel_cost == '') {
+                            hotel_cost = 0;
+                        }
+
+                        if (row.cells[0].childNodes[0].checked) {
+
+                            if (package_type === unique_package_type_arr[i]) {
+                                if (hotel_cost == 0) {
+                                    hotel_cost1 = 0;
+                                    break;
+                                } else {
+                                    hotel_cost1 += parseFloat(hotel_cost);
+                                }
+                            }
+                        }
+                    }
+                    var adult_cost_total = 0;
+                    var cwb_cost_total = 0;
+                    var cwob_cost_total = 0;
+                    var adult_cost_total1 = 0;
+                    var cwb_cost_total1 = 0;
+                    var cwob_cost_total1 = 0;
+                    var hotel_perperson_data_arr = [];
+                    for (var k = 0; k < per_person_costing.length; k++) {
+
+                        if (per_person_costing[k]['checked'] === true) {
+                            adult_cost_total = (parseInt(adult_count) > 0) ? parseFloat(per_person_costing[k]['adult_cost']) : 0;
+                            cwb_cost_total = (parseInt(child_with_bed) > 0) ? parseFloat(per_person_costing[k]['child_with_bed']) : 0;
+                            cwob_cost_total = (parseInt(child_without_bed) > 0) ? parseFloat(per_person_costing[k]['child_without_bed']) : 0;
+
+                            adult_cost_total = (isNaN(adult_cost_total)) ? 0 : adult_cost_total;
+                            cwb_cost_total = (isNaN(cwb_cost_total)) ? 0 : cwb_cost_total;
+                            cwob_cost_total = (isNaN(cwob_cost_total)) ? 0 : cwob_cost_total;
+                            if (per_person_costing[k]['package_type'] == unique_package_type_arr[i]) {
+                                if (adult_cost_total == 0) {
+                                    adult_cost_total1 = 0;
+                                    cwb_cost_total1 = 0;
+                                    cwob_cost_total1 = 0;
+                                    // break;
+                                } else {
+                                    adult_cost_total1 += parseFloat(adult_cost_total);
+                                    cwb_cost_total1 += parseFloat(cwb_cost_total);
+                                    cwob_cost_total1 += parseFloat(cwob_cost_total);
+                                }
+                            }
+                        }
+                    }
+                    hotel_per_person_arr.push({
+                        'package_id': package_id1,
+                        'adult_cost': adult_cost_total1,
+                        'cwb_cost': cwb_cost_total1,
+                        'cwob_cost': cwob_cost_total1,
+                        'type': unique_package_type_arr[i],
+                        'checked': false
+                    });
+                    hotel_main_arr.push({
+                        'id': package_id1,
+                        'type': unique_package_type_arr[i],
+                        'cost': parseFloat(hotel_cost1),
+                        'checked': true
+                    });
+                }
+                if (hotel_per_person_arr.length === 0) {
+                    var package_type_arr = 1;
+                } else {
+                    var package_type_arr = hotel_per_person_arr.length;
+                }
+                //Group Costing
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+                if (table.rows.length == 1) {
+                    for (var k = 1; k < table.rows.length; k++) {
+                        document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(
+                            k);
+                    }
+                } else {
+                    while (table.rows.length > 1) {
+                        document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(
+                            (table.rows.length - 1));
+                        table.rows.length--;
+                    }
+                }
+                if (table.rows.length != hotel_main_arr.length) {
+                    for (var i = 1; i < hotel_main_arr.length; i++) {
+                        addRow('tbl_package_tour_quotation_dynamic_costing');
+                    }
+                }
+                if (hotel_per_person_arr.length === 0) {
+                    var row = table.rows[0];
+                    row.cells[2].childNodes[1].value = 'NA';
+                    row.cells[3].childNodes[1].value = 0;
+                }
+                for (var k = 0; k < hotel_main_arr.length; k++) {
+                    var row = table.rows[k];
+                    row.cells[2].childNodes[1].value = hotel_main_arr[k]['type'];
+                    row.cells[3].childNodes[1].value = hotel_main_arr[k]['cost'];
+                }
+                var per_adult = [];
+                var per_cwb = [];
+                var per_cwob = [];
+                var per_infant = [];
+
+                //Adult & Child Per Person Costing
+                var table = document.getElementById("tbl_package_tour_quotation_adult_child");
+                if (table.rows.length == 1) {
+                    for (var k = 1; k < table.rows.length; k++) {
+                        document.getElementById("tbl_package_tour_quotation_adult_child").deleteRow(k);
+                    }
+                } else {
+                    while (table.rows.length > 1) {
+                        document.getElementById("tbl_package_tour_quotation_adult_child").deleteRow((
+                            table.rows.length - 1));
+                        table.rows.length--;
+                    }
+                }
+                if (table.rows.length != hotel_per_person_arr.length) {
+                    for (var i = 1; i < hotel_per_person_arr.length; i++) {
+
+                        addRow('tbl_package_tour_quotation_adult_child');
+                    }
+                }
+                if (hotel_per_person_arr.length === 0) {
+                    var row = table.rows[0];
+                    row.cells[0].childNodes[0].value = 'NA';
+                    row.cells[1].childNodes[0].value = 0;
+                }
+                for (var k = 0; k < hotel_per_person_arr.length; k++) {
+
+                    var row = table.rows[k];
+                    row.cells[0].childNodes[0].value = hotel_per_person_arr[k]['type'];
+                    row.cells[1].childNodes[0].value = hotel_per_person_arr[k]['adult_cost'];
+                    row.cells[2].childNodes[0].value = hotel_per_person_arr[k]['cwb_cost'];
+                    row.cells[3].childNodes[0].value = hotel_per_person_arr[k]['cwob_cost'];
+                    row.cells[4].childNodes[0].value = 0;
+                    per_adult.push(hotel_per_person_arr[k]['adult_cost']);
+                    per_cwb.push(hotel_per_person_arr[k]['cwb_cost']);
+                    per_cwob.push(hotel_per_person_arr[k]['cwob_cost']);
+                    per_infant.push(0);
+                }
+                ////////////////////Hotel End//////////////////////////
+                //Transport Information
+                var package_id_arr1 = [];
+
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_transport");
+                var rowCount = table.rows.length;
+                for (var i = 0; i < rowCount; i++) {
+
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+
+                        var transport_id = row.cells[2].childNodes[0].value;
+                        var travel_date = row.cells[3].childNodes[0].value;
+                        var end_date = row.cells[4].childNodes[0].value;
+                        var pickup = row.cells[5].childNodes[0].value;
+                        var drop = row.cells[6].childNodes[0].value;
+                        var service_duration = row.cells[7].childNodes[0].value;
+                        var vehicle_count = row.cells[8].childNodes[0].value;
+                        var vehicle_cost = row.cells[9].childNodes[0].value;
+                        var pname = row.cells[10].childNodes[0].value;
+                        var pid = row.cells[11].childNodes[0].value;
+
+                        if (transport_id == "") {
+                            error_msg_alert('Select Transport Vehicle in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (travel_date == "") {
+                            error_msg_alert('Enter Start date in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (end_date == "") {
+                            error_msg_alert('Enter End date in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (pickup == "") {
+                            error_msg_alert('Select pickup location in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (drop == "") {
+                            error_msg_alert('Select drop location in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (service_duration == "") {
+                            error_msg_alert('Select service duration in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (vehicle_count == "") {
+                            error_msg_alert('Enter vehicle count in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (vehicle_cost == "") {
+                            error_msg_alert('Enter vehicle cost in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        package_id_arr1.push(pid);
+                    }
+                }
+
+                var unique_package_id_arr = [];
+                var transport_cost_total = 0;
+                for (var k = 0; k < rowCount; k++) {
+
+                    var row = table.rows[k];
+                    var package_id1 = row.cells[11].childNodes[0].value;
+                    if (row.cells[0].childNodes[0].checked) {
+
+                        var transport_cost1 = row.cells[9].childNodes[0].value;
+                        transport_cost_total = parseFloat(transport_cost_total) + parseFloat(
+                            transport_cost1);
+                    }
+                }
+                unique_package_id_arr.push({
+                    package_id: uniquepackages[i],
+                    transport_cost: (isNaN(transport_cost_total) ? 0 : transport_cost_total)
+                });
+                var total_passangers = $('#total_passangers').val();
+                var per_person_tr_arr = [];
+                for (var t = 0; t < unique_package_id_arr.length; t++) {
+                    per_person_tr_arr.push(parseFloat(unique_package_id_arr[t]['transport_cost']) /
+                        parseInt(total_passangers));
+                }
+                var table = document.getElementById("tbl_package_tour_quotation_adult_child");
+                var rowCount = table.rows.length;
+                if (per_adult.length == 0) {
+
+                    for (var j = 0; j < rowCount; j++) {
+                        per_adult.push(0);
+                        per_cwb.push(0);
+                        per_cwob.push(0);
+                        per_infant.push(0);
+                    }
+                }
+                for (var j = 0; j < package_type_arr; j++) {
+
+                    var row = table.rows[j];
+                    var adult_cost_total1 = (per_adult[j]) ? per_adult[j] : 0;
+                    var cwb_cost_total1 = (per_cwb[j]) ? per_cwb[j] : 0;
+                    var cwob_cost_total1 = (per_cwob[j]) ? per_cwob[j] : 0;
+                    var infant_cost_total1 = (per_infant[j]) ? per_infant[j] : 0;
+
+                    var hadult_cost = (parseInt(adult_count) !== 0) ? per_person_tr_arr[0] : 0;
+                    var child_with_bed_coste = (parseInt(child_with_bed) !== 0) ? per_person_tr_arr[0] :
+                        0;
+                    var child_without_bede = (parseInt(child_without_bed) !== 0) ? per_person_tr_arr[
+                        0] : 0;
+                    var exc_infant_coste = (parseInt(total_infant) !== 0) ? per_person_tr_arr[0] : 0;
+                    row.cells[1].childNodes[0].value = parseFloat(hadult_cost) + parseFloat(
+                        adult_cost_total1);
+                    row.cells[2].childNodes[0].value = parseFloat(child_with_bed_coste) + parseFloat(
+                        cwb_cost_total1);
+                    row.cells[3].childNodes[0].value = parseFloat(child_without_bede) + parseFloat(
+                        cwob_cost_total1);
+                    row.cells[4].childNodes[0].value = parseFloat(exc_infant_coste) + parseFloat(
+                        infant_cost_total1);
+                }
+
+                if (unique_package_id_arr.length !== 0) {
+                    per_adult = [];
+                    per_cwb = [];
+                    per_cwob = [];
+                    per_infant = [];
+                    for (var j = 0; j < rowCount; j++) {
+                        var row = table.rows[j];
+                        per_adult.push(row.cells[1].childNodes[0].value);
+                        per_cwb.push(row.cells[2].childNodes[0].value);
+                        per_cwob.push(row.cells[3].childNodes[0].value);
+                        per_infant.push(row.cells[4].childNodes[0].value);
+                    }
+                }
+                ////////////////// Transport End ///////////////////////
+                var children_with_bed = $('#children_with_bed').val();
+                var children_without_bed = $('#children_without_bed').val();
+                var total_infant = $('#total_infant').val();
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
+                var rowCount = table.rows.length;
+                var total_amount = 0;
+                var exc_adult_cost = 0;
+                var exc_child_cot = 0;
+                var exc_childwo_cot = 0;
+                var exc_infant_cost = 0;
+                var exc_transfer_cost = 0;
+                for (var e = 0; e < rowCount; e++) {
+                    var row = table.rows[e];
+                    if (row.cells[0].childNodes[0].checked) {
+
+                        var exc_date = row.cells[2].childNodes[0].value;
+                        var city_name = row.cells[3].childNodes[0].value;
+                        var excursion_name = row.cells[4].childNodes[0].value;
+                        var transfer_option = row.cells[5].childNodes[0].value;
+
+                        if (exc_date == "") {
+                            error_msg_alert('Select Activity date in row' + (e + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (city_name == "") {
+                            error_msg_alert('Select Activity city in row' + (e + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (excursion_name == "") {
+                            error_msg_alert('Select Activity name in row' + (e + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (transfer_option == "") {
+                            error_msg_alert('Select Transfer option in row' + (e + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        var e_amount = row.cells[10].childNodes[0].value;
+                        total_amount = parseFloat(total_amount) + parseFloat(e_amount);
+                        //For per person costing
+                        exc_adult_cost = parseFloat(exc_adult_cost) + parseFloat(row.cells[11]
+                            .childNodes[0].value);
+                        exc_child_cot = parseFloat(exc_child_cot) + parseFloat(row.cells[12].childNodes[
+                            0].value);
+                        exc_childwo_cot = parseFloat(exc_childwo_cot) + parseFloat(row.cells[13]
+                            .childNodes[0].value);
+                        exc_infant_cost = parseFloat(exc_infant_cost) + parseFloat(row.cells[14]
+                            .childNodes[0].value);
+                        exc_transfer_cost = parseFloat(exc_transfer_cost) + parseFloat(row.cells[16]
+                            .childNodes[0].value);
+                    }
+                }
+                //Group costing
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+                var rowCount = table.rows.length;
+                for (var j = 0; j < package_type_arr; j++) {
+                    var row = table.rows[j];
+                    row.cells[5].childNodes[1].value = total_amount;
+                }
+                //Per person costing//Adult/Child costing
                 var adult_cost_total = 0;
                 var cwb_cost_total = 0;
                 var cwob_cost_total = 0;
-                var adult_cost_total1 = 0;
-                var cwb_cost_total1 = 0;
-                var cwob_cost_total1 = 0;
-                var hotel_perperson_data_arr = [];
-                for (var k = 0; k < per_person_costing.length; k++) {
+                var infant_cost_total = 0;
 
-                    if (per_person_costing[k]['checked'] === true) {
-                        adult_cost_total = (parseInt(adult_count) > 0) ? parseFloat(per_person_costing[k]['adult_cost']) : 0;
-                        cwb_cost_total = (parseInt(child_with_bed) > 0) ? parseFloat(per_person_costing[k]['child_with_bed']) : 0;
-                        cwob_cost_total = (parseInt(child_without_bed) > 0) ? parseFloat(per_person_costing[k]['child_without_bed']) : 0;
+                var hadult_cost = parseFloat(exc_adult_cost) / parseInt(adult_count);
+                var child_with_bed_coste = (parseInt(child_with_bed) !== 0) ? parseFloat(
+                    exc_child_cot) / parseInt(child_with_bed) : 0;
+                var child_without_bede = (parseInt(child_without_bed) !== 0) ? parseFloat(
+                    exc_childwo_cot) / parseInt(child_without_bed) : 0;
+                var exc_infant_coste = (parseInt(total_infant) !== 0) ? parseFloat(exc_infant_cost) /
+                    parseInt(total_infant) : 0;
+                var exc_ftransfer_cost = (parseInt(adult_count) !== 0) ? parseFloat(exc_transfer_cost) /
+                    (parseInt(adult_count) + parseInt(child_with_bed)) : 0;
 
-                        adult_cost_total = (isNaN(adult_cost_total)) ? 0 : adult_cost_total;
-                        cwb_cost_total = (isNaN(cwb_cost_total)) ? 0 : cwb_cost_total;
-                        cwob_cost_total = (isNaN(cwob_cost_total)) ? 0 : cwob_cost_total;
-                        if (per_person_costing[k]['package_type'] == unique_package_type_arr[i]) {
-                            if (adult_cost_total == 0) {
-                                adult_cost_total1 = 0;
-                                cwb_cost_total1 = 0;
-                                cwob_cost_total1 = 0;
-                                // break;
-                            } else {
-                                adult_cost_total1 += parseFloat(adult_cost_total);
-                                cwb_cost_total1 += parseFloat(cwb_cost_total);
-                                cwob_cost_total1 += parseFloat(cwob_cost_total);
-                            }
-                        }
+                var exc_atransfer_cost = (parseInt(adult_count) !== 0) ? exc_ftransfer_cost : 0;
+                var exc_cwtransfer_cost = (parseInt(child_with_bed) !== 0) ? exc_ftransfer_cost : 0;
+
+                var table = document.getElementById("tbl_package_tour_quotation_adult_child");
+                var rowCount = table.rows.length;
+                if (per_adult.length == 0) {
+
+                    for (var j = 0; j < rowCount; j++) {
+                        per_adult.push(0);
+                        per_cwb.push(0);
+                        per_cwob.push(0);
+                        per_infant.push(0);
                     }
                 }
-                hotel_per_person_arr.push({
-                    'package_id': package_id1,
-                    'adult_cost': adult_cost_total1,
-                    'cwb_cost': cwb_cost_total1,
-                    'cwob_cost': cwob_cost_total1,
-                    'type': unique_package_type_arr[i],
-                    'checked': false
-                });
-                hotel_main_arr.push({
-                    'id': package_id1,
-                    'type': unique_package_type_arr[i],
-                    'cost': parseFloat(hotel_cost1),
-                    'checked': true
-                });
-            }
-            if (hotel_per_person_arr.length === 0) {
-                var package_type_arr = 1;
-            } else {
-                var package_type_arr = hotel_per_person_arr.length;
-            }
-            //Group Costing
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-            if (table.rows.length == 1) {
-                for (var k = 1; k < table.rows.length; k++) {
-                    document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(
-                        k);
-                }
-            } else {
-                while (table.rows.length > 1) {
-                    document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(
-                        (table.rows.length - 1));
-                    table.rows.length--;
-                }
-            }
-            if (table.rows.length != hotel_main_arr.length) {
-                for (var i = 1; i < hotel_main_arr.length; i++) {
-                    addRow('tbl_package_tour_quotation_dynamic_costing');
-                }
-            }
-            if (hotel_per_person_arr.length === 0) {
-                var row = table.rows[0];
-                row.cells[2].childNodes[1].value = 'NA';
-                row.cells[3].childNodes[1].value = 0;
-            }
-            for (var k = 0; k < hotel_main_arr.length; k++) {
-                var row = table.rows[k];
-                row.cells[2].childNodes[1].value = hotel_main_arr[k]['type'];
-                row.cells[3].childNodes[1].value = hotel_main_arr[k]['cost'];
-            }
-            var per_adult = [];
-            var per_cwb = [];
-            var per_cwob = [];
-            var per_infant = [];
+                for (var j = 0; j < package_type_arr; j++) {
 
-            //Adult & Child Per Person Costing
-            var table = document.getElementById("tbl_package_tour_quotation_adult_child");
-            if (table.rows.length == 1) {
-                for (var k = 1; k < table.rows.length; k++) {
-                    document.getElementById("tbl_package_tour_quotation_adult_child").deleteRow(k);
-                }
-            } else {
-                while (table.rows.length > 1) {
-                    document.getElementById("tbl_package_tour_quotation_adult_child").deleteRow((
-                        table.rows.length - 1));
-                    table.rows.length--;
-                }
-            }
-            if (table.rows.length != hotel_per_person_arr.length) {
-                for (var i = 1; i < hotel_per_person_arr.length; i++) {
-
-                    addRow('tbl_package_tour_quotation_adult_child');
-                }
-            }
-            if (hotel_per_person_arr.length === 0) {
-                var row = table.rows[0];
-                row.cells[0].childNodes[0].value = 'NA';
-                row.cells[1].childNodes[0].value = 0;
-            }
-            for (var k = 0; k < hotel_per_person_arr.length; k++) {
-
-                var row = table.rows[k];
-                row.cells[0].childNodes[0].value = hotel_per_person_arr[k]['type'];
-                row.cells[1].childNodes[0].value = hotel_per_person_arr[k]['adult_cost'];
-                row.cells[2].childNodes[0].value = hotel_per_person_arr[k]['cwb_cost'];
-                row.cells[3].childNodes[0].value = hotel_per_person_arr[k]['cwob_cost'];
-                row.cells[4].childNodes[0].value = 0;
-                per_adult.push(hotel_per_person_arr[k]['adult_cost']);
-                per_cwb.push(hotel_per_person_arr[k]['cwb_cost']);
-                per_cwob.push(hotel_per_person_arr[k]['cwob_cost']);
-                per_infant.push(0);
-            }
-            ////////////////////Hotel End//////////////////////////
-            //Transport Information
-            var package_id_arr1 = [];
-
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_transport");
-            var rowCount = table.rows.length;
-            for (var i = 0; i < rowCount; i++) {
-
-                var row = table.rows[i];
-                if (row.cells[0].childNodes[0].checked) {
-
-                    var transport_id = row.cells[2].childNodes[0].value;
-                    var travel_date = row.cells[3].childNodes[0].value;
-                    var end_date = row.cells[4].childNodes[0].value;
-                    var pickup = row.cells[5].childNodes[0].value;
-                    var drop = row.cells[6].childNodes[0].value;
-                    var service_duration = row.cells[7].childNodes[0].value;
-                    var vehicle_count = row.cells[8].childNodes[0].value;
-                    var vehicle_cost = row.cells[9].childNodes[0].value;
-                    var pname = row.cells[10].childNodes[0].value;
-                    var pid = row.cells[11].childNodes[0].value;
-
-                    if (transport_id == "") {
-                        error_msg_alert('Select Transport Vehicle in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (travel_date == "") {
-                        error_msg_alert('Enter Start date in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (end_date == "") {
-                        error_msg_alert('Enter End date in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (pickup == "") {
-                        error_msg_alert('Select pickup location in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (drop == "") {
-                        error_msg_alert('Select drop location in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (service_duration == "") {
-                        error_msg_alert('Select service duration in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (vehicle_count == "") {
-                        error_msg_alert('Enter vehicle count in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (vehicle_cost == "") {
-                        error_msg_alert('Enter vehicle cost in row' + (i + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    package_id_arr1.push(pid);
-                }
-            }
-
-            var unique_package_id_arr = [];
-            var transport_cost_total = 0;
-            for (var k = 0; k < rowCount; k++) {
-
-                var row = table.rows[k];
-                var package_id1 = row.cells[11].childNodes[0].value;
-                if (row.cells[0].childNodes[0].checked) {
-
-                    var transport_cost1 = row.cells[9].childNodes[0].value;
-                    transport_cost_total = parseFloat(transport_cost_total) + parseFloat(
-                        transport_cost1);
-                }
-            }
-            unique_package_id_arr.push({
-                package_id: uniquepackages[i],
-                transport_cost: (isNaN(transport_cost_total) ? 0 : transport_cost_total)
-            });
-            var total_passangers = $('#total_passangers').val();
-            var per_person_tr_arr = [];
-            for (var t = 0; t < unique_package_id_arr.length; t++) {
-                per_person_tr_arr.push(parseFloat(unique_package_id_arr[t]['transport_cost']) /
-                    parseInt(total_passangers));
-            }
-            var table = document.getElementById("tbl_package_tour_quotation_adult_child");
-            var rowCount = table.rows.length;
-            if (per_adult.length == 0) {
-
-                for (var j = 0; j < rowCount; j++) {
-                    per_adult.push(0);
-                    per_cwb.push(0);
-                    per_cwob.push(0);
-                    per_infant.push(0);
-                }
-            }
-            for (var j = 0; j < package_type_arr; j++) {
-
-                var row = table.rows[j];
-                var adult_cost_total1 = (per_adult[j]) ? per_adult[j] : 0;
-                var cwb_cost_total1 = (per_cwb[j]) ? per_cwb[j] : 0;
-                var cwob_cost_total1 = (per_cwob[j]) ? per_cwob[j] : 0;
-                var infant_cost_total1 = (per_infant[j]) ? per_infant[j] : 0;
-
-                var hadult_cost = (parseInt(adult_count) !== 0) ? per_person_tr_arr[0] : 0;
-                var child_with_bed_coste = (parseInt(child_with_bed) !== 0) ? per_person_tr_arr[0] :
-                    0;
-                var child_without_bede = (parseInt(child_without_bed) !== 0) ? per_person_tr_arr[
-                    0] : 0;
-                var exc_infant_coste = (parseInt(total_infant) !== 0) ? per_person_tr_arr[0] : 0;
-                row.cells[1].childNodes[0].value = parseFloat(hadult_cost) + parseFloat(
-                    adult_cost_total1);
-                row.cells[2].childNodes[0].value = parseFloat(child_with_bed_coste) + parseFloat(
-                    cwb_cost_total1);
-                row.cells[3].childNodes[0].value = parseFloat(child_without_bede) + parseFloat(
-                    cwob_cost_total1);
-                row.cells[4].childNodes[0].value = parseFloat(exc_infant_coste) + parseFloat(
-                    infant_cost_total1);
-            }
-
-            if (unique_package_id_arr.length !== 0) {
-                per_adult = [];
-                per_cwb = [];
-                per_cwob = [];
-                per_infant = [];
-                for (var j = 0; j < rowCount; j++) {
                     var row = table.rows[j];
-                    per_adult.push(row.cells[1].childNodes[0].value);
-                    per_cwb.push(row.cells[2].childNodes[0].value);
-                    per_cwob.push(row.cells[3].childNodes[0].value);
-                    per_infant.push(row.cells[4].childNodes[0].value);
+                    var adult_cost_total1 = (per_adult[j]) ? per_adult[j] : 0;
+                    var cwb_cost_total1 = (per_cwb[j]) ? per_cwb[j] : 0;
+                    var cwob_cost_total1 = (per_cwob[j]) ? per_cwob[j] : 0;
+                    var infant_cost_total1 = (per_infant[j]) ? per_infant[j] : 0;
+                    row.cells[1].childNodes[0].value = parseFloat(parseFloat(hadult_cost) + parseFloat(
+                        adult_cost_total1) + parseFloat(exc_atransfer_cost)).toFixed(2);
+                    row.cells[2].childNodes[0].value = parseFloat(parseFloat(child_with_bed_coste) +
+                        parseFloat(cwb_cost_total1) + parseFloat(exc_cwtransfer_cost)).toFixed(2);
+                    row.cells[3].childNodes[0].value = parseFloat(parseFloat(child_without_bede) +
+                        parseFloat(cwob_cost_total1)).toFixed(2);
+                    row.cells[4].childNodes[0].value = parseFloat(parseFloat(exc_infant_coste) +
+                        parseFloat(infant_cost_total1)).toFixed(2);
                 }
-            }
-            ////////////////// Transport End ///////////////////////
-            var children_with_bed = $('#children_with_bed').val();
-            var children_without_bed = $('#children_without_bed').val();
-            var total_infant = $('#total_infant').val();
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
-            var rowCount = table.rows.length;
-            var total_amount = 0;
-            var exc_adult_cost = 0;
-            var exc_child_cot = 0;
-            var exc_childwo_cot = 0;
-            var exc_infant_cost = 0;
-            var exc_transfer_cost = 0;
-            for (var e = 0; e < rowCount; e++) {
-                var row = table.rows[e];
-                if (row.cells[0].childNodes[0].checked) {
 
-                    var exc_date = row.cells[2].childNodes[0].value;
-                    var city_name = row.cells[3].childNodes[0].value;
-                    var excursion_name = row.cells[4].childNodes[0].value;
-                    var transfer_option = row.cells[5].childNodes[0].value;
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+                var rowCount = table.rows.length;
+                for (var j = 0; j < package_type_arr; j++) {
 
-                    if (exc_date == "") {
-                        error_msg_alert('Select Activity date in row' + (e + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (city_name == "") {
-                        error_msg_alert('Select Activity city in row' + (e + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (excursion_name == "") {
-                        error_msg_alert('Select Activity name in row' + (e + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    if (transfer_option == "") {
-                        error_msg_alert('Select Transfer option in row' + (e + 1));
-                        $('.accordion_content').removeClass("indicator");
-                        $('#tbl_package_tour_quotation_dynamic_excursion').parent('div').closest(
-                            '.accordion_content').addClass("indicator");
-                        return false;
-                    }
-                    var e_amount = row.cells[10].childNodes[0].value;
-                    total_amount = parseFloat(total_amount) + parseFloat(e_amount);
-                    //For per person costing
-                    exc_adult_cost = parseFloat(exc_adult_cost) + parseFloat(row.cells[11]
-                        .childNodes[0].value);
-                    exc_child_cot = parseFloat(exc_child_cot) + parseFloat(row.cells[12].childNodes[
-                        0].value);
-                    exc_childwo_cot = parseFloat(exc_childwo_cot) + parseFloat(row.cells[13]
-                        .childNodes[0].value);
-                    exc_infant_cost = parseFloat(exc_infant_cost) + parseFloat(row.cells[14]
-                        .childNodes[0].value);
-                    exc_transfer_cost = parseFloat(exc_transfer_cost) + parseFloat(row.cells[16]
-                        .childNodes[0].value);
+                    var row = table.rows[j];
+                    var package_id2 = row.cells[11].childNodes[1].value;
+                    var hotel_cost = row.cells[3].childNodes[1].value;
+                    row.cells[4].childNodes[1].value = unique_package_id_arr[0]['transport_cost'];
+                    var total_tour_cost = parseFloat(unique_package_id_arr[0]['transport_cost']) +
+                        parseFloat(hotel_cost);
+
+                    row.cells[13].childNodes[1].value = total_tour_cost;
+
+                    var total_cost = (row.cells[11].childNodes[1].value == '') ? row.cells[11].childNodes[1].value : 0;
+                    var exc_cost = (row.cells[5].childNodes[1].value == '') ? row.cells[5].childNodes[1].value : 0;
+                    row.cells[6].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
+                    row.cells[13].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
+                    $(row.cells[6].childNodes[1]).trigger('change');
+                    get_business(row.cells[3].childNodes[1].id, 'true');
                 }
+
+                // Populate tab4 costing table before switching
+                populateTab4CostingTable();
+
+                $('.accordion_content').removeClass("indicator");
+                $('#tab3_head').addClass('done');
+                $('#tab4_head').addClass('active');
+                $('.bk_tab').removeClass('active');
+                $('#tab4').addClass('active');
+                $('html, body').animate({
+                    scrollTop: $('.bk_tab_head').offset().top
+                }, 200);
             }
-            //Group costing
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-            var rowCount = table.rows.length;
-            for (var j = 0; j < package_type_arr; j++) {
-                var row = table.rows[j];
-                row.cells[5].childNodes[1].value = total_amount;
-            }
-            //Per person costing//Adult/Child costing
-            var adult_cost_total = 0;
-            var cwb_cost_total = 0;
-            var cwob_cost_total = 0;
-            var infant_cost_total = 0;
+        });
+    });
 
-            var hadult_cost = parseFloat(exc_adult_cost) / parseInt(adult_count);
-            var child_with_bed_coste = (parseInt(child_with_bed) !== 0) ? parseFloat(
-                exc_child_cot) / parseInt(child_with_bed) : 0;
-            var child_without_bede = (parseInt(child_without_bed) !== 0) ? parseFloat(
-                exc_childwo_cot) / parseInt(child_without_bed) : 0;
-            var exc_infant_coste = (parseInt(total_infant) !== 0) ? parseFloat(exc_infant_cost) /
-                parseInt(total_infant) : 0;
-            var exc_ftransfer_cost = (parseInt(adult_count) !== 0) ? parseFloat(exc_transfer_cost) /
-                (parseInt(adult_count)+parseInt(child_with_bed)) : 0;
+    function switch_to_tab2() {
+        // Save hotel table state before switching away
+        saveHotelTableState();
 
-            var exc_atransfer_cost = (parseInt(adult_count) !== 0) ? exc_ftransfer_cost : 0;
-            var exc_cwtransfer_cost = (parseInt(child_with_bed) !== 0) ? exc_ftransfer_cost : 0;
+        $('#tab3_head').removeClass('active');
+        $('#tab2_head').addClass('active');
+        $('.bk_tab').removeClass('active');
+        $('#tab2').addClass('active');
+        $('html, body').animate({
+            scrollTop: $('.bk_tab_head').offset().top
+        }, 200);
+    }
 
-            var table = document.getElementById("tbl_package_tour_quotation_adult_child");
-            var rowCount = table.rows.length;
-            if (per_adult.length == 0) {
+    // Function to switch to tab3 and restore packages
+    function switch_to_tab3() {
+        $('#tab2_head').removeClass('active');
+        $('#tab3_head').addClass('active');
+        $('.bk_tab').removeClass('active');
+        $('#tab3').addClass('active');
+        $('html, body').animate({
+            scrollTop: $('.bk_tab_head').offset().top
+        }, 200);
 
-                for (var j = 0; j < rowCount; j++) {
-                    per_adult.push(0);
-                    per_cwb.push(0);
-                    per_cwob.push(0);
-                    per_infant.push(0);
+        // Restore saved packages after a short delay to ensure tab is loaded
+        setTimeout(function() {
+            restoreSavedPackages();
+        }, 300);
+    }
+
+    // Function to restore saved packages when tab3 is loaded
+    function restoreSavedPackages() {
+        var savedPackages = sessionStorage.getItem('selected_packages_tab3');
+        if (savedPackages) {
+            try {
+                var packageIds = JSON.parse(savedPackages);
+                console.log('Restoring saved packages:', packageIds);
+
+                // Check if packages are already loaded in the hotel table
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+                if (table && table.rows.length > 1) {
+                    console.log('Hotel table already has data, skipping restoration');
+                    return;
                 }
+
+                // If no data in hotel table, restore the packages
+                if (packageIds.length > 0) {
+                    // Simulate the addHotelInfo function call
+                    addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');
+                }
+            } catch (e) {
+                console.log('Error restoring saved packages:', e);
             }
-            for (var j = 0; j < package_type_arr; j++) {
+        }
+    }
 
-                var row = table.rows[j];
-                var adult_cost_total1 = (per_adult[j]) ? per_adult[j] : 0;
-                var cwb_cost_total1 = (per_cwb[j]) ? per_cwb[j] : 0;
-                var cwob_cost_total1 = (per_cwob[j]) ? per_cwob[j] : 0;
-                var infant_cost_total1 = (per_infant[j]) ? per_infant[j] : 0;
-                row.cells[1].childNodes[0].value = parseFloat(parseFloat(hadult_cost) + parseFloat(
-                    adult_cost_total1) + parseFloat(exc_atransfer_cost)).toFixed(2);
-                row.cells[2].childNodes[0].value = parseFloat(parseFloat(child_with_bed_coste) +
-                    parseFloat(cwb_cost_total1) + parseFloat(exc_cwtransfer_cost)).toFixed(2);
-                row.cells[3].childNodes[0].value = parseFloat(parseFloat(child_without_bede) +
-                    parseFloat(cwob_cost_total1)).toFixed(2);
-                row.cells[4].childNodes[0].value = parseFloat(parseFloat(exc_infant_coste) +
-                    parseFloat(infant_cost_total1)).toFixed(2);
+    // Function to save hotel table state
+    function saveHotelTableState() {
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        if (table && table.rows.length > 1) {
+            var tableData = [];
+            for (var i = 1; i < table.rows.length; i++) {
+                var row = table.rows[i];
+                var rowData = {
+                    checked: row.cells[0].childNodes[0].checked,
+                    package_type: row.cells[2].childNodes[0].value,
+                    hotel_name: row.cells[4].childNodes[0].value,
+                    room_category: row.cells[5].childNodes[0].value,
+                    check_in: row.cells[6].childNodes[0].value,
+                    check_out: row.cells[7].childNodes[0].value,
+                    hotel_type: row.cells[8].childNodes[0].value,
+                    total_rooms: row.cells[9].childNodes[0].value,
+                    extra_bed: row.cells[10].childNodes[0].value,
+                    meal_plan: row.cells[11].childNodes[0].value,
+                    package_id: row.cells[14].childNodes[0].value
+                };
+                tableData.push(rowData);
             }
+            sessionStorage.setItem('hotel_table_state_tab3', JSON.stringify(tableData));
+            console.log('Hotel table state saved:', tableData.length, 'rows');
+        }
+    }
 
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-            var rowCount = table.rows.length;
-            for (var j = 0; j < package_type_arr; j++) {
+    // Function to restore hotel table state
+    function restoreHotelTableState() {
+        var savedState = sessionStorage.getItem('hotel_table_state_tab3');
+        if (savedState) {
+            try {
+                var tableData = JSON.parse(savedState);
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
 
-                var row = table.rows[j];
-                var package_id2 = row.cells[11].childNodes[1].value;
-                var hotel_cost = row.cells[3].childNodes[1].value;
-                row.cells[4].childNodes[1].value = unique_package_id_arr[0]['transport_cost'];
-                var total_tour_cost = parseFloat(unique_package_id_arr[0]['transport_cost']) +
-                    parseFloat(hotel_cost);
+                if (table && tableData.length > 0) {
+                    // Clear existing rows except header
+                    while (table.rows.length > 1) {
+                        table.deleteRow(table.rows.length - 1);
+                    }
 
-                row.cells[13].childNodes[1].value = total_tour_cost;
+                    // Restore each row with a single timeout to ensure all rows are created first
+                    setTimeout(function() {
+                        for (var i = 0; i < tableData.length; i++) {
+                            addRow('tbl_package_tour_quotation_dynamic_hotel');
+                        }
 
-                var total_cost = (row.cells[11].childNodes[1].value == '') ? row.cells[11].childNodes[1].value : 0;
-                var exc_cost = (row.cells[5].childNodes[1].value == '') ? row.cells[5].childNodes[1].value : 0;
-                row.cells[6].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
-                row.cells[13].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
-                $(row.cells[6].childNodes[1]).trigger('change');
-                get_business(row.cells[3].childNodes[1].id,'true');
+                        // Then restore data after all rows are created
+                        setTimeout(function() {
+                            for (var i = 0; i < tableData.length; i++) {
+                                var row = table.rows[i + 1]; // +1 because first row is header
+                                var data = tableData[i];
+
+                                if (row && row.cells && row.cells.length > 14) {
+                                    try {
+                                        // Restore row data with safety checks
+                                        if (row.cells[0] && row.cells[0].childNodes && row.cells[0].childNodes[0]) {
+                                            row.cells[0].childNodes[0].checked = data.checked;
+                                        }
+                                        if (row.cells[2] && row.cells[2].childNodes && row.cells[2].childNodes[0]) {
+                                            row.cells[2].childNodes[0].value = data.package_type;
+                                        }
+                                        if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[0]) {
+                                            row.cells[4].childNodes[0].value = data.hotel_name;
+                                        }
+                                        if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[0]) {
+                                            row.cells[5].childNodes[0].value = data.room_category;
+                                        }
+                                        if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[0]) {
+                                            row.cells[6].childNodes[0].value = data.check_in;
+                                        }
+                                        if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
+                                            row.cells[7].childNodes[0].value = data.check_out;
+                                        }
+                                        if (row.cells[8] && row.cells[8].childNodes && row.cells[8].childNodes[0]) {
+                                            row.cells[8].childNodes[0].value = data.hotel_type;
+                                        }
+                                        if (row.cells[9] && row.cells[9].childNodes && row.cells[9].childNodes[0]) {
+                                            row.cells[9].childNodes[0].value = data.total_rooms;
+                                        }
+                                        if (row.cells[10] && row.cells[10].childNodes && row.cells[10].childNodes[0]) {
+                                            row.cells[10].childNodes[0].value = data.extra_bed;
+                                        }
+                                        if (row.cells[11] && row.cells[11].childNodes && row.cells[11].childNodes[0]) {
+                                            row.cells[11].childNodes[0].value = data.meal_plan;
+                                        }
+                                        if (row.cells[14] && row.cells[14].childNodes && row.cells[14].childNodes[0]) {
+                                            row.cells[14].childNodes[0].value = data.package_id;
+                                        }
+                                    } catch (cellError) {
+                                        console.log('Error setting cell values for row', i, ':', cellError);
+                                    }
+                                }
+                            }
+                            console.log('Hotel table state restored:', tableData.length, 'rows');
+                        }, 200); // Wait for rows to be fully created
+
+                    }, 100);
+                }
+            } catch (e) {
+                console.log('Error restoring hotel table state:', e);
             }
+        }
+    }
 
-            $('.accordion_content').removeClass("indicator");
-            $('#tab3_head').addClass('done');
-            $('#tab4_head').addClass('active');
-            $('.bk_tab').removeClass('active');
-            $('#tab4').addClass('active');
-            $('html, body').animate({
-                scrollTop: $('.bk_tab_head').offset().top
-            }, 200);
+    // Restore packages when tab3 is initially loaded
+    $(document).ready(function() {
+        // Check if we're on tab3 and restore packages
+        if ($('#tab3').hasClass('active')) {
+            setTimeout(function() {
+                restoreHotelTableState();
+            }, 500);
         }
     });
-});
 
-function switch_to_tab2() {
-    $('#tab3_head').removeClass('active');
-    $('#tab_daywise_head').addClass('active');
-    $('.bk_tab').removeClass('active');
-    $('#tab_daywise').addClass('active');
-    $('html, body').animate({
-        scrollTop: $('.bk_tab_head').offset().top
-    }, 200);
+    function populateTab4CostingTable() {
+        // Get the costing data from tab3
+        var hotel_main_arr = [];
+        var unique_package_type_arr = [];
+
+        // Collect package data from hotel table
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        var rowCount = table.rows.length;
+
+        for (var i = 0; i < rowCount; i++) {
+            var row = table.rows[i];
+            if (row.cells[0].childNodes[0].checked) {
+                var package_type = row.cells[2].childNodes[0].value;
+                var hotel_cost = parseFloat(row.cells[13].childNodes[0].value) || 0;
+                var package_id = row.cells[14].childNodes[0].value;
+
+                if (package_type && package_type !== "*Package Type") {
+                    // Add to unique package types
+                    if (unique_package_type_arr.indexOf(package_type) === -1) {
+                        unique_package_type_arr.push(package_type);
+                    }
+
+                    // Add to hotel main array
+                    hotel_main_arr.push({
+                        'id': package_id,
+                        'type': package_type,
+                        'cost': hotel_cost,
+                        'checked': true
+                    });
+                }
+            }
+        }
+
+        // Get the tab4 costing table
+        var costingTable = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+        if (!costingTable) {
+            console.log("Costing table not found in tab4");
+            return;
+        }
+
+        // Clear existing rows (except header)
+        while (costingTable.rows.length > 1) {
+            costingTable.deleteRow(costingTable.rows.length - 1);
+        }
+
+        // Add rows for each unique package type
+        for (var i = 0; i < unique_package_type_arr.length; i++) {
+            if (i > 0) { // Add row for each package type after the first one
+                addRow('tbl_package_tour_quotation_dynamic_costing');
+            }
+
+            var row = costingTable.rows[i];
+            var packageType = unique_package_type_arr[i];
+
+            // Find the total cost for this package type
+            var totalCost = 0;
+            for (var j = 0; j < hotel_main_arr.length; j++) {
+                if (hotel_main_arr[j]['type'] === packageType) {
+                    totalCost += hotel_main_arr[j]['cost'];
+                }
+            }
+
+            // Populate the row
+            if (row.cells[2].childNodes[1]) {
+                row.cells[2].childNodes[1].value = packageType; // Package Type
+            }
+            if (row.cells[3].childNodes[1]) {
+                row.cells[3].childNodes[1].value = totalCost; // Hotel Cost
+            }
+            if (row.cells[5].childNodes[1]) {
+                row.cells[5].childNodes[1].value = 0; // Activity Cost (default)
+            }
+            if (row.cells[6].childNodes[1]) {
+                row.cells[6].childNodes[1].value = totalCost; // Basic Amount
+            }
+            if (row.cells[7].childNodes[1]) {
+                row.cells[7].childNodes[1].value = 0; // Service Charge (default)
+            }
+            // Find the last cell in the row which should be the Total Cost
+            var lastCellIndex = row.cells.length - 1;
+            if (row.cells[lastCellIndex] && row.cells[lastCellIndex].childNodes[1]) {
+                row.cells[lastCellIndex].childNodes[1].value = totalCost; // Total Tour Cost
+            }
+
+            // Also try setting it in cell 16 if it exists
+            if (row.cells[16] && row.cells[16].childNodes[1]) {
+                row.cells[16].childNodes[1].value = totalCost; // Total Tour Cost
+            }
+
+            // Trigger change events to calculate totals
+            if (row.cells[3].childNodes[1]) {
+                $(row.cells[3].childNodes[1]).trigger('change');
+            }
+
+            // Force calculation of total cost
+            setTimeout(function() {
+                quotation_cost_calculate(row.cells[3].childNodes[1].id);
+
+                // Also manually set the total cost in the correct field
+                // Find the total_tour_cost input by name pattern
+                var $totalCostInput = $(row).find('input[name^="total_tour_cost"]');
+                if ($totalCostInput.length > 0) {
+                    $totalCostInput.val(totalCost);
+                }
+
+                // Debug: log all inputs in the row to find the correct one
+                console.log('Row inputs:', $(row).find('input').map(function() {
+                    return this.name + ' = ' + this.value;
+                }).get());
+            }, 100);
+        }
+
+        console.log("Tab4 costing table populated with", unique_package_type_arr.length, "package types");
+    }
+
+
+    // function addHotelInfo(tableID, quot_table = "", itinerary = "") {
+    //     var base_url = $('#base_url').val();
+
+    //     var incl_arr = new Array();
+    //     var excl_arr = new Array();
+    //     var package_id_arr = new Array();
+    //     var rowLenth = $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').length;
+
+    //     console.log("rowLenth", rowLenth);
+    //     $('input[name="custom_package"]:checked').each(function() {
+
+    //         package_id_arr.push($(this).val());
+    //         var package_id = $(this).val();
+    //         //Incl & Excl
+    //         var table = document.getElementById("dynamic_table_incl" + package_id);
+    //         var rowCount = table.rows.length;
+    //         for (var i = 0; i < rowCount; i++) {
+    //             var row = table.rows[i];
+    //             var inclusion = $('#inclusions' + package_id).val();
+    //             var exclusion = $('#exclusions' + package_id).val();
+
+    //             incl_arr.push(inclusion);
+    //             excl_arr.push(exclusion);
+    //         }
+
+    //     });
+    //     if (package_id_arr.length == 0) {
+    //         error_msg_alert('Please select at least one Package!');
+    //         return false;
+    //     }
+
+    //     // Save selected packages to sessionStorage for persistence
+    //     sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
+
+    //     // Also save the current hotel table state
+    //     saveHotelTableState();
+
+    //     var attraction_arr = new Array();
+    //     var program_arr = new Array();
+    //     var stay_arr = new Array();
+    //     var meal_plan_arr = new Array();
+    //     var package_p_id_arr = new Array();
+    //     var day_count_arr = new Array();
+    //     var count = 0;
+
+
+    //     for (var j = 0; j < package_id_arr.length; j++) {
+    //         var table = document.getElementById("dynamic_table_list_p_" + package_id_arr[j]);
+    //         var rowCount = table.rows.length;
+    //         for (var i = 0; i < rowCount; i++) {
+    //             var row = table.rows[i];
+    //             if (row.cells[0].childNodes[0].checked) {
+
+    //                 count++;
+    //                 var attraction = row.cells[2].childNodes[0].value;
+    //                 var program = row.cells[3].childNodes[0].value;
+    //                 var stay = row.cells[4].childNodes[0].value;
+    //                 var meal_plan = row.cells[5].childNodes[0].value;
+    //                 var package_id1 = row.cells[7].childNodes[0].value;
+
+    //                 if (attraction == "") {
+    //                     error_msg_alert('Special Attraction is mandatory in row' + (i + 1));
+    //                     return false;
+    //                 }
+    //                 if (program == "") {
+    //                     error_msg_alert('Daywise program is mandatory in row' + (i + 1));
+    //                     return false;
+    //                 }
+    //                 if (stay == "") {
+    //                     error_msg_alert('Overnight Stay is mandatory in row' + (i + 1));
+    //                     return false;
+    //                 }
+
+    //                 var flag1 = validate_spattration(row.cells[2].childNodes[0].id);
+    //                 var flag2 = validate_dayprogram(row.cells[3].childNodes[0].id);
+    //                 var flag3 = validate_onstay(row.cells[4].childNodes[0].id);
+    //                 if (!flag1 || !flag2 || !flag3) {
+    //                     return false;
+    //                 }
+    //                 attraction_arr.push(attraction);
+    //                 program_arr.push(program);
+    //                 stay_arr.push(stay);
+    //                 meal_plan_arr.push(meal_plan);
+    //                 package_p_id_arr.push(package_id1);
+    //             }
+    //         }
+    //         day_count_arr.push(count);
+    //         count = 0;
+    //     }
+
+    //     var total_adult = $('#total_adult').val();
+    //     var total_children = $('#total_children').val();
+    //     var from_date = $('#from_date').val();
+    //     var to_date = $('#to_date').val();
+    //     var total_days = $('#total_days').val();
+
+
+    //     $.ajax({
+
+    //         type: 'post',
+
+    //         url: '../save/package_hotel_info.php',
+
+    //         data: {
+    //             package_id_arr: package_id_arr,
+    //             from_date: from_date
+    //         },
+    //         success: function(result) {
+    //             var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+    //             var hotel_arr = JSON.parse(result);
+
+    //             // Find current max row number (column 1 of existing rows) with safety checks
+    //             var lastIndex = 0;
+    //             for (var r = 1; r < table.rows.length; r++) {
+    //                 var row = table.rows[r];
+    //                 if (row && row.cells && row.cells[1] && row.cells[1].childNodes && row.cells[1].childNodes[0]) {
+    //                     var val = parseInt(row.cells[1].childNodes[0].value);
+    //                     if (!isNaN(val) && val > lastIndex) lastIndex = val;
+    //                 }
+    //             }
+
+    //             var rowCopyFrom = table.rows;
+    //             var startingRowIndex = table.rows.length; // remember table length before adding new rows
+
+    //             // 1️⃣ Append all new rows
+    //             for (var i = 0; i < hotel_arr.length; i++) {
+    //                 addRow('tbl_package_tour_quotation_dynamic_hotel'); // Add new row
+    //                 var rowIndex = table.rows.length - 1; // Get the new row index
+    //                 var row = table.rows[rowIndex];
+
+    //                 // Safety check for row and cells
+    //                 if (!row || !row.cells || row.cells.length < 17) {
+    //                     console.log('Row not properly created, skipping row', i);
+    //                     continue;
+    //                 }
+
+    //                 // Continuous numbering
+    //                 if (row.cells[1] && row.cells[1].childNodes && row.cells[1].childNodes[0]) {
+    //                     row.cells[1].childNodes[0].value = ++lastIndex;
+    //                 }
+
+    //                 // Populate hotel dropdown with available options
+    //                 if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[0]) {
+    //                     $(row.cells[4].childNodes[0]).html(
+    //                         '<option value="">*Hotel Name</option>' +
+    //                         hotel_arr.map(function(hotel) {
+    //                             return `<option value="${hotel.hotel_id1}">${hotel.hotel_name}</option>`;
+    //                         }).join('')
+    //                     );
+
+    //                     // Set the selected hotel based on the previous row's selection (if any)
+    //                     var previousHotelId = hotel_arr[i] ? hotel_arr[i].hotel_id1 : null;
+    //                     if (previousHotelId) {
+    //                         $(row.cells[4].childNodes[0]).val(previousHotelId).trigger('change'); // Select the hotel
+    //                     }
+    //                 }
+
+    //                 // Set room category if available
+    //                 if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[0]) {
+    //                     var roomCatValue = '';
+    //                     if (table.rows[i] && table.rows[i].cells && table.rows[i].cells[5] && table.rows[i].cells[5].childNodes && table.rows[i].cells[5].childNodes[0]) {
+    //                         roomCatValue = $('#' + table.rows[i].cells[5].childNodes[0].id).val().trim();
+    //                     }
+
+    //                     if (roomCatValue && roomCatValue !== "") {
+    //                         $('#' + row.cells[5].childNodes[0].id).val(roomCatValue); // Set room category
+    //                     } else {
+    //                         if ($('#' + row.cells[5].childNodes[0].id).find('option[value=""]').length === 0) {
+    //                             $('#' + row.cells[5].childNodes[0].id).prepend('<option value="">Room Category</option>');
+    //                         }
+    //                     }
+    //                 }
+
+    //                 // Fill other fields (dates, package details, etc.) with safety checks
+    //                 if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[0]) {
+    //                     row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
+    //                 }
+    //                 if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
+    //                     row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
+    //                 }
+    //                 if (row.cells[8] && row.cells[8].childNodes && row.cells[8].childNodes[0]) {
+    //                     row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
+    //                 }
+    //                 if (row.cells[9] && row.cells[9].childNodes && row.cells[9].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[9] && table.rows[i].cells[9].childNodes && table.rows[i].cells[9].childNodes[0]) {
+    //                     row.cells[9].childNodes[0].value = table.rows[i].cells[9].childNodes[0].value;
+    //                 }
+    //                 if (row.cells[10] && row.cells[10].childNodes && row.cells[10].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[10] && table.rows[i].cells[10].childNodes && table.rows[i].cells[10].childNodes[0]) {
+    //                     row.cells[10].childNodes[0].value = table.rows[i].cells[10].childNodes[0].value;
+    //                 }
+    //                 if (row.cells[11] && row.cells[11].childNodes && row.cells[11].childNodes[0] && table.rows[i] && table.rows[i].cells && table.rows[i].cells[11] && table.rows[i].cells[11].childNodes && table.rows[i].cells[11].childNodes[0]) {
+    //                     row.cells[11].childNodes[0].value = table.rows[i].cells[11].childNodes[0].value;
+    //                 }
+    //                 if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[0] && rowCopyFrom[i] && rowCopyFrom[i].cells && rowCopyFrom[i].cells[16] && rowCopyFrom[i].cells[16].childNodes && rowCopyFrom[i].cells[16].childNodes[0]) {
+    //                     $('#' + row.cells[16].childNodes[0].id).val(rowCopyFrom[i].cells[16].childNodes[0].value);
+    //                 }
+    //                 if (row.cells[12] && row.cells[12].childNodes && row.cells[12].childNodes[0]) {
+    //                     row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
+    //                 }
+    //                 if (row.cells[14] && row.cells[14].childNodes && row.cells[14].childNodes[0]) {
+    //                     row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
+    //                 }
+
+    //                 if (row.cells[2] && row.cells[2].childNodes && row.cells[2].childNodes[0]) {
+    //                     if ($('#package_type').val() != '') {
+    //                         $('#' + row.cells[2].childNodes[0].id).val($('#package_type').val());
+    //                     } else {
+    //                         document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
+    //                     }
+
+    //                     // Init select2s for other dropdowns (except city)
+    //                     $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
+    //                 }
+
+    //                 if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[0]) {
+    //                     $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
+
+    //                     // After hotel selection, load hotel type
+    //                     setTimeout(function() {
+    //                         hotel_type_load($('#' + row.cells[4].childNodes[0].id).attr('id'));
+    //                     }, 100); // Adjust timeout as needed for your setup
+    //                 }
+
+    //                 if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[0]) {
+    //                     $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
+    //                 }
+
+    //                 if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[0]) {
+    //                     $('#' + row.cells[16].childNodes[0].id).select2().trigger("change");
+    //                 }
+
+    //                 if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
+    //                     calculate_total_nights(row.cells[7].childNodes[0].id);
+    //                 }
+    //             }
+
+    //             // 2️⃣ Initialize city dropdowns ONLY for newly added rows (starting from startingRowIndex)
+    //             for (var i = startingRowIndex; i < table.rows.length; i++) {
+    //                 var row = table.rows[i];
+
+    //                 // Safety check for row and cells
+    //                 if (!row || !row.cells || row.cells.length < 4) {
+    //                     console.log('Row not properly created for city initialization, skipping row', i);
+    //                     continue;
+    //                 }
+
+    //                 var $citySelect = $(row.cells[3].childNodes[0]);
+
+    //                 // Initialize city dropdown for new row
+    //                 city_lzloading($citySelect);
+
+    //                 // Get city from hotel_arr data
+    //                 var cityId = hotel_arr[i - startingRowIndex] ? hotel_arr[i - startingRowIndex]['city_id'] : null;
+    //                 var cityName = hotel_arr[i - startingRowIndex] ? hotel_arr[i - startingRowIndex]['city_name'] : null;
+
+    //                 // If no city data from server, copy from previous row
+    //                 if (!cityId && !cityName && i > 0) {
+    //                     var prevRow = table.rows[i - 1];
+    //                     var prevCitySelect = $(prevRow.cells[3].childNodes[0]);
+    //                     cityId = prevCitySelect.val();
+    //                     cityName = prevCitySelect.find('option:selected').text();
+    //                 }
+
+    //                 if (cityId && cityName) {
+    //                     var newOption = new Option(cityName, cityId, true, true);
+    //                     $citySelect.append(newOption);
+
+    //                     // Set the value and trigger change after Select2 is initialized
+    //                     $citySelect.val(cityId).trigger('change');
+
+    //                     // Load hotel dropdown for the new row
+    //                     setTimeout(function() {
+    //                         var currentRow = row;
+    //                         var currentCitySelect = $citySelect;
+
+    //                         hotel_name_list_load(currentCitySelect.attr('id'));
+
+    //                         // If we need to copy hotel from previous row
+    //                         if (i > 0 && !hotel_arr[i - startingRowIndex]) {
+    //                             setTimeout(function() {
+    //                                 var prevRow = table.rows[i - 1];
+    //                                 var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
+    //                                 var prevHotelId = prevHotelSelect.val();
+    //                                 var prevHotelName = prevHotelSelect.find('option:selected').text();
+
+    //                                 if (prevHotelId && prevHotelName && prevHotelName !== "Select Hotel" && prevHotelName !== "*Hotel Name") {
+    //                                     var $hotelSelect = $(currentRow.cells[4].childNodes[0]);
+
+    //                                     // Wait a bit for hotels to load, then select
+    //                                     setTimeout(function() {
+    //                                         if ($hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
+    //                                             $hotelSelect.val(prevHotelId).trigger('change');
+    //                                             hotel_type_load($hotelSelect.attr('id'));
+    //                                         }
+    //                                     }, 300);
+    //                                 }
+    //                             }, 200);
+    //                         }
+    //                     }, 200);
+    //                 }
+    //             }
+
+    //             // 3️⃣ Additional logic to copy hotels to rows that don't have hotels selected
+    //             setTimeout(function() {
+    //                 $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').each(function(index, row) {
+    //                     if (index) { // Skip first row
+    //                         var $hotelSelect = $(row.cells[4].childNodes[0]);
+    //                         var currentHotelId = $hotelSelect.val();
+    //                         var prevRowIndex = index - rowLenth;
+
+    //                         // If current row doesn't have a hotel selected, copy from previous row
+    //                         if (!currentHotelId || currentHotelId === '') {
+    //                             var prevRow = table.rows[prevRowIndex];
+    //                             var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
+    //                             var prevHotelId = prevHotelSelect.val();
+    //                             var prevHotelName = prevHotelSelect.find('option:selected').text();
+
+
+    //                             if (prevHotelId && prevHotelName) {
+    //                                 // Check if the hotel option exists in the current row's options
+    //                                 var hotelExists = $hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0;
+
+    //                                 if (hotelExists) {
+    //                                     // Hotel exists in options, just select it
+    //                                     console.log('DEBUG: Selecting existing hotel in row', index, ':', prevHotelId);
+    //                                     $hotelSelect.val(prevHotelId).trigger('change');
+
+    //                                     // Trigger hotel type load
+    //                                     setTimeout(function() {
+    //                                         hotel_type_load($hotelSelect.attr('id'));
+    //                                     }, 100);
+    //                                 } else {
+    //                                     // Hotel doesn't exist in options, add it manually
+    //                                     console.log('DEBUG: Adding hotel manually in row', index, ':', prevHotelId, prevHotelName);
+    //                                     var hotelOption = new Option(prevHotelName, prevHotelId, true, true);
+    //                                     $hotelSelect.append(hotelOption);
+    //                                     $hotelSelect.val(prevHotelId).trigger('change');
+
+    //                                     // Trigger hotel type load
+    //                                     setTimeout(function() {
+    //                                         hotel_type_load($hotelSelect.attr('id'));
+    //                                     }, 100);
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 });
+    //             }, 1000); // Wait 1 second to ensure all dropdowns are loaded
+
+    //             // Hide hotel package if needed
+    //             var selectedPackagevalue = table.rows[1] ? table.rows[1].cells[2].childNodes[0].value : '';
+    //             hideHotelPackage(selectedPackagevalue);
+    //         }
+
+
+
+
+
+    //     });
+    // }
+
+
+
+    function hideHotelPackage(pkgValue) {
+        // var selectedVal = $('#package_type').val();
+        $('#package_type').find('option[value="' + pkgValue + '"]').remove();
+        $('#package_type').trigger('change');
+        if ($('#package_type').val() === null) {
+            $('#addHotelInfobtnsubmit').prop('disabled', true);
+        }
+    }
+
+    function syncPackageType(mainSelect) {
+        var selectedVal = $(mainSelect).val();
+        // $(mainSelect).find('option[value="' + selectedVal + '"]').prop('disabled', true);
+        // $(mainSelect).find('option[value="' + selectedValue + '"]').css('display', 'none');
+        // return false;
+
+        // Update all row selects (but skip the main one itself)
+        //$(".package_type_select").not(mainSelect).val(selectedVal).trigger("change.select2");
+    }
+
+    // Function to ensure all hotel dropdowns have selected values
+    function ensureHotelSelections() {
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        var rowCount = table.rows.length;
+
+        for (var i = 0; i < rowCount; i++) {
+            var row = table.rows[i];
+            var chk = row.cells[0].childNodes[0].checked;
+
+            if (chk) {
+                var $hotelSelect = $(row.cells[4].childNodes[0]);
+                var hotelValue = $hotelSelect.val();
+
+                console.log('Ensuring hotel selection for row', i + 1, '- Current value:', hotelValue);
+
+                // If no hotel selected but there are options available
+                if ((!hotelValue || hotelValue === '') && i > 0) {
+                    // Try to copy from previous row
+                    var prevRow = table.rows[i - 1];
+                    var $prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
+                    var prevHotelId = $prevHotelSelect.val();
+
+                    if (prevHotelId && $hotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
+                        console.log('Setting hotel value to:', prevHotelId);
+                        $hotelSelect.val(prevHotelId);
+                        // Force the value to stick
+                        row.cells[4].childNodes[0].value = prevHotelId;
+                    }
+                }
+            }
+        }
+    }
+
+    // Simple function to add a hotel row and copy data from previous row
+    function addSimpleHotelRow() {
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        var rowCount = table.rows.length;
+
+        if (rowCount < 1) return; // No rows to copy from
+
+        // Add new row
+        addRow('tbl_package_tour_quotation_dynamic_hotel');
+
+        var newRowIndex = table.rows.length - 1;
+        var newRow = table.rows[newRowIndex];
+        var prevRow = table.rows[newRowIndex - 1];
+
+        // Copy city from previous row
+        var prevCitySelect = $(prevRow.cells[3].childNodes[0]);
+        var prevCityId = prevCitySelect.val();
+        var prevCityName = prevCitySelect.find('option:selected').text();
+
+        if (prevCityId && prevCityName) {
+            var $newCitySelect = $(newRow.cells[3].childNodes[0]);
+
+            // Initialize city dropdown
+            city_lzloading($newCitySelect);
+
+            // Set city value after a short delay
+            setTimeout(function() {
+                var cityOption = new Option(prevCityName, prevCityId, true, true);
+                $newCitySelect.append(cityOption);
+                $newCitySelect.val(prevCityId).trigger('change');
+
+                // Copy hotel from previous row after city is set
+                setTimeout(function() {
+                    var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
+                    var prevHotelId = prevHotelSelect.val();
+                    var prevHotelName = prevHotelSelect.find('option:selected').text();
+
+                    if (prevHotelId && prevHotelName) {
+                        // Load hotels for the city
+                        hotel_name_list_load($newCitySelect.attr('id'));
+
+                        // Set hotel after hotels are loaded
+                        setTimeout(function() {
+                            var $newHotelSelect = $(newRow.cells[4].childNodes[0]);
+
+                            // Check if hotel exists in loaded options
+                            if ($newHotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
+                                $newHotelSelect.val(prevHotelId).trigger('change');
+                            } else {
+                                // Add hotel option if it doesn't exist
+                                var hotelOption = new Option(prevHotelName, prevHotelId, true, true);
+                                $newHotelSelect.append(hotelOption);
+                                $newHotelSelect.val(prevHotelId).trigger('change');
+                            }
+
+                            // Load hotel type
+                            hotel_type_load($newHotelSelect.attr('id'));
+                        }, 500);
+                    }
+                }, 200);
+            }, 100);
+        }
+
+        // Copy other fields from previous row
+        $(newRow.cells[2].childNodes[0]).val($(prevRow.cells[2].childNodes[0]).val()).trigger('change'); // Package type
+        $(newRow.cells[5].childNodes[0]).val($(prevRow.cells[5].childNodes[0]).val()).trigger('change'); // Room category
+        $(newRow.cells[8].childNodes[0]).val($(prevRow.cells[8].childNodes[0]).val()); // Hotel type
+        $(newRow.cells[16].childNodes[0]).val($(prevRow.cells[16].childNodes[0]).val()).trigger('change'); // Meal plan
+
+        // Set row number
+        $(newRow.cells[1].childNodes[0]).val(parseInt($(prevRow.cells[1].childNodes[0]).val()) + 1);
+
+        // Initialize select2
+        $(newRow).find('.app_select2').select2();
+
+        // Calculate hotel cost
+        get_hotel_cost();
+    }
+
+
+function addHotelInfo(tableID, quot_table = "", itinerary = "") {
+    const base_url = $('#base_url').val();
+    let incl_arr = [], excl_arr = [], package_id_arr = [];
+    const rowLenth = $('#tbl_package_tour_quotation_dynamic_hotel tbody tr').length;
+
+    console.log("rowLenth", rowLenth);
+
+    // Collect selected package IDs and inclusions/exclusions
+    $('input[name="custom_package"]:checked').each(function() {
+        const package_id = $(this).val();
+        package_id_arr.push(package_id);
+        const table = document.getElementById(`dynamic_table_incl${package_id}`);
+        const rowCount = table.rows.length;
+        const inclusion = $(`#inclusions${package_id}`).val();
+        const exclusion = $(`#exclusions${package_id}`).val();
+
+        // Push inclusion/exclusion for each row (although only one value will be stored)
+        incl_arr.push(inclusion);
+        excl_arr.push(exclusion);
+    });
+
+    if (package_id_arr.length === 0) {
+        error_msg_alert('Please select at least one Package!');
+        return false;
+    }
+
+    // Save selected packages to sessionStorage
+    sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
+
+    // Save hotel table state
+    saveHotelTableState();
+
+    // Collect data arrays for each row in selected packages
+    let attraction_arr = [], program_arr = [], stay_arr = [], meal_plan_arr = [], package_p_id_arr = [], day_count_arr = [];
+    let count = 0;
+
+    package_id_arr.forEach(package_id => {
+        const table = document.getElementById(`dynamic_table_list_p_${package_id}`);
+        const rowCount = table.rows.length;
+
+        for (let i = 0; i < rowCount; i++) {
+            const row = table.rows[i];
+            if (row.cells[0].childNodes[0].checked) {
+                count++;
+                const attraction = row.cells[2].childNodes[0].value;
+                const program = row.cells[3].childNodes[0].value;
+                const stay = row.cells[4].childNodes[0].value;
+                const meal_plan = row.cells[5].childNodes[0].value;
+                const package_id1 = row.cells[7].childNodes[0].value;
+
+                // Validation
+                if (!attraction || !program || !stay) {
+                    error_msg_alert(`Special Attraction, Daywise Program, and Overnight Stay are mandatory in row ${i + 1}`);
+                    return false;
+                }
+
+                // Validate inputs
+                if (!validate_spattration(row.cells[2].childNodes[0].id) || 
+                    !validate_dayprogram(row.cells[3].childNodes[0].id) ||
+                    !validate_onstay(row.cells[4].childNodes[0].id)) {
+                    return false;
+                }
+
+                // Push valid values into arrays
+                attraction_arr.push(attraction);
+                program_arr.push(program);
+                stay_arr.push(stay);
+                meal_plan_arr.push(meal_plan);
+                package_p_id_arr.push(package_id1);
+            }
+        }
+        day_count_arr.push(count);
+        count = 0;
+    });
+
+    const total_adult = $('#total_adult').val();
+    const total_children = $('#total_children').val();
+    const from_date = $('#from_date').val();
+    const to_date = $('#to_date').val();
+    const total_days = $('#total_days').val();
+
+    // Ajax to save data and update the table
+    $.ajax({
+        type: 'post',
+        url: '../save/package_hotel_info.php',
+        data: { package_id_arr, from_date },
+        success: function(result) {
+            const hotel_arr = JSON.parse(result);
+            const table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+
+            // Find current max row number
+            let lastIndex = Math.max(...Array.from(table.rows).slice(1).map(row => parseInt(row.cells[1].childNodes[0].value) || 0));
+
+            // Append new rows from hotel data
+            hotel_arr.forEach((hotel, i) => {
+                addRow('tbl_package_tour_quotation_dynamic_hotel'); // Add new row
+                const rowIndex = table.rows.length - 1;
+                const row = table.rows[rowIndex];
+
+                if (!row || !row.cells || row.cells.length < 17) return;
+
+                // Continuous numbering for new row
+                row.cells[1].childNodes[0].value = ++lastIndex;
+
+                // Populate dropdowns and fields with hotel data
+                populateHotelRow(row, hotel, i, hotel_arr);
+            });
+
+            // Initialize city dropdowns ONLY for newly added rows
+            initializeCityDropdowns(table, hotel_arr);
+
+            // Hide hotel package if needed
+            const selectedPackagevalue = table.rows[1]?.cells[2]?.childNodes[0]?.value || '';
+            hideHotelPackage(selectedPackagevalue);
+        }
+    });
 }
+
+// Helper function to populate hotel row
+// Helper function to populate hotel row
+function populateHotelRow(row, hotel, i, hotel_arr) {
+    const hotelSelect = $(row.cells[4].childNodes[0]);
+    const roomCatSelect = $(row.cells[5].childNodes[0]);
+
+    // Set hotel dropdown options
+    hotelSelect.html('<option value="">*Hotel Name</option>' + hotel_arr.map(h => `<option value="${h.hotel_id1}">${h.hotel_name}</option>`).join(''));
+
+    // Set hotel selection based on previous row's selection
+    const prevHotelId = hotel_arr[i]?.hotel_id1 || null;
+    if (prevHotelId) {
+        hotelSelect.val(prevHotelId).trigger('change');
+    }
+
+    // Set room category if available
+    const prevRoomCatValue = roomCatSelect.val();
+    if (prevRoomCatValue) {
+        roomCatSelect.val(prevRoomCatValue);
+    }
+
+    // Set other fields (dates, package details, etc.)
+    row.cells[6].childNodes[0].value = hotel.check_in_date;
+    row.cells[7].childNodes[0].value = hotel.check_out_date;
+    row.cells[8].childNodes[0].value = hotel.hotel_type;
+    row.cells[9].childNodes[0].value = hotel.package_name;
+    row.cells[14].childNodes[0].value = hotel.package_id;
+
+    // Set the package type (make sure this is properly set for new rows)
+    const packageTypeSelect = $(row.cells[2].childNodes[0]);
+    if ($('#package_type').val()) {
+        packageTypeSelect.val($('#package_type').val()).trigger('change');
+    } else {
+        packageTypeSelect.selectedIndex = 0; // Default to the first option
+    }
+
+    // Initialize select2 for dropdowns
+    $('#'+row.cells[2].childNodes[0].id).select2().trigger("change");
+    hotelSelect.select2().trigger("change");
+    roomCatSelect.select2().trigger("change");
+}
+
+
+// Helper function to initialize city dropdowns
+function initializeCityDropdowns(table, hotel_arr) {
+    const startingRowIndex = table.rows.length;
+    for (let i = startingRowIndex; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        const citySelect = $(row.cells[3].childNodes[0]);
+
+        city_lzloading(citySelect);
+
+        const cityId = hotel_arr[i - startingRowIndex]?.city_id || null;
+        const cityName = hotel_arr[i - startingRowIndex]?.city_name || null;
+
+        if (cityId && cityName) {
+            const newOption = new Option(cityName, cityId, true, true);
+            citySelect.append(newOption);
+            citySelect.val(cityId).trigger('change');
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>

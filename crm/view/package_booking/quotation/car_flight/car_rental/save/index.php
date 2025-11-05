@@ -57,7 +57,7 @@ $branch_status = $_POST['branch_status'];
 
 <script>
 $('#enquiry_id').select2();
-$('#quotation_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
+$('#quotation_date').datetimepicker({ timepicker:false, format:'d-m-Y', minDate: 0 });
 $('#traveling_date').datetimepicker({ format:'d-m-Y H:i' });
 
 $('#quotation_save_modal').modal('show');

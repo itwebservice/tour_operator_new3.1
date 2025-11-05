@@ -124,7 +124,7 @@
 <script>
 $('#country_code').select2();
 $('#travel_datetime').datetimepicker({format:'d-m-Y H:i' });
-$('#quotation_date').datetimepicker({timepicker:false, format:'d-m-Y' });
+$('#quotation_date').datetimepicker({timepicker:false, format:'d-m-Y', minDate: 0 });
 $("#customer_name").autocomplete({
     // source: JSON.parse($('#cust_data').val()),
     select: function(event, ui) {

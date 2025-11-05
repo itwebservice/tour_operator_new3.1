@@ -37,7 +37,6 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                   <ul class="dropdown_menu no-pad">
                     <li><span onclick="show_report_reflect('Group Passenger Report')">Group Passenger Report</span></li>
                     <li><span onclick="show_report_reflect('Room Allocation')">Room Allocation</span></li>
-                    <li><span onclick="show_report_reflect('Inventory Report')">Inventory Report</span></li>
                     <li><span onclick="show_report_reflect('Booking wise Total Selling Report')">Booking wise Total Selling Report</span></li>
                     <!-- <li><span onclick="show_report_reflect('Payment Collection')">Payment Collection</span></li> -->
                     <li><span onclick="show_report_reflect('Group Purchase Payment Summary')">Purchase Payment Summary</span></li>
@@ -125,9 +124,6 @@ function show_report_reflect(report_name){
     if(report_name=="Group Repeater Customer"){ url = 'reports_content/group_tour/repeater_tourist_report/index.php'; }
     if(report_name=="Group Travel Tickets"){ url = 'reports_content/group_tour/booking_tickets/index.php'; }
     if(report_name=="Group Purchase Payment Summary"){ url = 'reports_content/group_tour/purchase_payment_summary/index.php'; }
-
-    if(report_name=="Inventory Report"){ url = 'reports_content/group_tour/inventory_report/index.php'; }
-    
 
     //FIT Report
     if(report_name=="Passenger Report"){ url = 'reports_content/package_tour/tourwise_report/index.php'; }

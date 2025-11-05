@@ -131,20 +131,23 @@ $role_id = $_SESSION['role_id'];
                     <input type="text" id="total_adult" name="total_adult" placeholder="Total Adult(s)" title="Total Adult(s)"
                         onchange="total_passangers_calculate(); validate_balance(this.id)" required>
                 </div>
+              
+              
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" id="total_infant" name="total_infant" placeholder="Total Infant(s)"
-                        title="Total Infant(s)" onchange="total_passangers_calculate(); validate_balance(this.id);"
-                        required>
+                    <input type="text" class="form-control" id="children_with_bed" name="children_with_bed"
+                        onchange="validate_balance(this.id);total_passangers_calculate();" placeholder="Child With Bed(s)"
+                        title="Child With Bed(s)" required>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" class="form-control" id="children_without_bed" name="children_without_bed"
                         onchange="validate_balance(this.id);total_passangers_calculate();"
                         placeholder="Child Without Bed(s)" title="Child Without Bed(s)" required>
                 </div>
+                
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                    <input type="text" class="form-control" id="children_with_bed" name="children_with_bed"
-                        onchange="validate_balance(this.id);total_passangers_calculate();" placeholder="Child With Bed(s)"
-                        title="Child With Bed(s)" required>
+                    <input type="text" id="total_infant" name="total_infant" placeholder="Total Infant(s)"
+                        title="Total Infant(s)" onchange="total_passangers_calculate(); validate_balance(this.id);"
+                        required>
                 </div>
                 <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
                     <input type="text" id="total_passangers" name="total_passangers" value="0"
@@ -214,6 +217,16 @@ $("#tour_name").autocomplete({
     select: function (event, ui) {
 		$("#tour_name").val(ui.item.label);
         var newOption = $("<option selected='selected'></option>").val(ui.item.dest_id).text(ui.item.label);
+        
+        // Store selected destination for package filtering
+        sessionStorage.setItem('selected_destination_id', ui.item.dest_id);
+        sessionStorage.setItem('selected_destination_name', ui.item.label);
+        console.log('Tab1 - Stored destination - ID:', ui.item.dest_id, 'Name:', ui.item.label);
+        
+        // Debug: Verify storage
+        console.log('Tab1 - Verification - stored ID:', sessionStorage.getItem('selected_destination_id'));
+        console.log('Tab1 - Verification - stored Name:', sessionStorage.getItem('selected_destination_name'));
+        
         $('#dest_name').append(newOption).trigger('change.select2');
         // $('#dest_name').prepend('<option value="' + ui.item.dest_id + '">' +ui.item.label +'</option>');
         // $('#dest_name').select2().trigger("change");
@@ -239,6 +252,7 @@ $(document).ready(function() {
         $('#enquiry_id').trigger('change');
     }
 });
+
 // New Customization ----end
 $('#frm_tab1').validate({
 
@@ -301,10 +315,52 @@ $('#frm_tab1').validate({
             error_msg_alert("Enter atleast adult count!");
             return false;
         }
+        
         $('#tab1_head').addClass('done');
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');
         $('#tab2').addClass('active');
+        
+        // Reset user modification flag when submitting Tab1 (going to Tab2)
+        // This ensures fresh sync from Tab1 values
+        sessionStorage.removeItem('user_modified_nights');
+        console.log('Reset user_modified_nights flag - submitting Tab1');
+        
+        // Sync nights filter and destination when switching to tab2
+        setTimeout(function() {
+            var total_days = $('#total_days').val();
+            var destination_id = sessionStorage.getItem('selected_destination_id');
+            var destination_name = sessionStorage.getItem('selected_destination_name');
+            
+            console.log('Syncing on tab switch - total_days:', total_days, 'destination_id:', destination_id, 'destination_name:', destination_name);
+            
+            // Sync nights filter (always sync when coming from Tab1)
+            if (total_days && total_days > 0) {
+                if ($('#nights_filter').length > 0) {
+                    $('#nights_filter').val(total_days);
+                    $('#nights_filter').trigger('change');
+                    sessionStorage.setItem('selected_nights', total_days);
+                    console.log('Synced nights filter:', total_days);
+                }
+            }
+            
+            // Sync destination
+            if (destination_id && destination_name) {
+                if ($('#dest_name').length > 0) {
+                    $('#dest_name').val(destination_id);
+                    $('#dest_name').trigger('change');
+                    console.log('Synced destination:', destination_name);
+                    
+                    // Trigger package filtering with both destination and nights
+                    if (typeof load_packages_with_filter === 'function') {
+                        load_packages_with_filter();
+                    } else if (typeof package_dynamic_reflect === 'function') {
+                        package_dynamic_reflect('dest_name');
+                    }
+                }
+            }
+        }, 100);
+        
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);

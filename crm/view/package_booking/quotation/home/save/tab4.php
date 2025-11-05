@@ -390,9 +390,34 @@
 
 
         },
+        
+        invalidHandler: function(event, validator) {
+            console.log("QUOTATION SAVE: Form validation failed");
+            console.log("Validation errors:", validator.numberOfInvalids());
+            console.log("Invalid fields:", validator.invalid);
+        },
 
         submitHandler: function(form, e) {
             e.preventDefault();
+            
+            console.log("QUOTATION SAVE: Form submission started");
+            
+            // Prevent double submission
+            if (window.quotationSaveInProgress) {
+                console.log("QUOTATION SAVE: Already in progress, preventing double submission");
+                return false;
+            }
+            window.quotationSaveInProgress = true;
+            
+            // Add timeout to reset flag in case of issues
+            setTimeout(function() {
+                if (window.quotationSaveInProgress) {
+                    console.log("QUOTATION SAVE: Timeout reached, resetting flag");
+                    window.quotationSaveInProgress = false;
+                    $('#btn_quotation_save').prop('disabled', false);
+                }
+            }, 30000); // 30 second timeout
+            
             $('#btn_quotation_save').prop('disabled', true);
             var login_id = $("#login_id").val();
 
@@ -1073,37 +1098,91 @@
                 }
             });
 
+            // Get itinerary data from sessionStorage (saved in tab2)
+            var itineraryData = sessionStorage.getItem('itinerary_data');
             var attraction_arr = [];
             var program_arr = [];
             var stay_arr = [];
             var meal_plan_arr = [];
+            var day_image_arr = [];
             var package_p_id_arr = [];
 
-            for (var j = 0; j < package_id_arr1.length; j++) {
-                var table = document.getElementById("dynamic_table_list_p_" + package_id_arr1[j]);
-                var rowCount = table.rows.length;
-                for (var i = 0; i < rowCount; i++) {
-                    var row = table.rows[i];
-                    if (row.cells[0].childNodes[0].checked) {
-                        var attraction = row.cells[2].childNodes[0].value;
-                        var program = row.cells[3].childNodes[0].value;
-                        var stay = row.cells[4].childNodes[0].value;
-                        var meal_plan = row.cells[5].childNodes[0].value;
-                        var package_id1 = row.cells[7].childNodes[0].value;
+            if (itineraryData) {
+                var data = JSON.parse(itineraryData);
+                attraction_arr = data.attraction_arr || [];
+                program_arr = data.program_arr || [];
+                stay_arr = data.stay_arr || [];
+                meal_plan_arr = data.meal_plan_arr || [];
+                day_image_arr = data.day_image_arr || [];
+                package_p_id_arr = data.package_p_id_arr || [];
+                
+                console.log("Using stored itinerary data:", {
+                    attraction_arr: attraction_arr,
+                    program_arr: program_arr,
+                    stay_arr: stay_arr,
+                    meal_plan_arr: meal_plan_arr,
+                    day_image_arr: day_image_arr,
+                    package_p_id_arr: package_p_id_arr
+                });
+                
+                // Debug: Check if arrays have data
+                console.log("Itinerary data counts - attractions: " + attraction_arr.length + ", programs: " + program_arr.length + ", stays: " + stay_arr.length);
+            } else {
+                console.log("No stored itinerary data found, collecting from tables...");
+                // Fallback: collect from tables if no stored data
+                for (var j = 0; j < package_id_arr1.length; j++) {
+                    var table = document.getElementById("dynamic_table_list_p_" + package_id_arr1[j]);
+                    if (!table) {
+                        console.error("Table not found: dynamic_table_list_p_" + package_id_arr1[j]);
+                        continue;
+                    }
+                    var rowCount = table.rows.length;
+                    for (var i = 0; i < rowCount; i++) {
+                        var row = table.rows[i];
+                        if (row.cells[0].childNodes[0] && row.cells[0].childNodes[0].checked) {
+                            var attraction = row.cells[2].childNodes[0] ? row.cells[2].childNodes[0].value : '';
+                            var program = row.cells[3].childNodes[0] ? row.cells[3].childNodes[0].value : '';
+                            var stay = row.cells[4].childNodes[0] ? row.cells[4].childNodes[0].value : '';
+                            var meal_plan = row.cells[5].childNodes[0] ? row.cells[5].childNodes[0].value : '';
+                            var package_id1 = row.cells[7].childNodes[0] ? row.cells[7].childNodes[0].value : '';
 
-                        if (program == "") {
-                            error_msg_alert('Daywise program is mandatory in row' + (i + 1));
-                            $('#btn_quotation_save').prop('disabled', false);
-                            return false;
+                            if (program == "") {
+                                error_msg_alert('Daywise program is mandatory in row' + (i + 1));
+                                $('#btn_quotation_save').prop('disabled', false);
+                                return false;
+                            }
+                            
+                            attraction_arr.push(attraction);
+                            program_arr.push(program);
+                            stay_arr.push(stay);
+                            meal_plan_arr.push(meal_plan);
+                            
+                            // Get image data for this row
+                            var img = '';
+                            var existingImgInput = row.querySelector('input[id^="existing_image_path_"]');
+                            if (existingImgInput) {
+                                img = existingImgInput.value || '';
+                            }
+                            day_image_arr.push(img);
+                            
+                            package_p_id_arr.push(package_id1);
                         }
-                        attraction_arr.push(attraction);
-                        program_arr.push(program);
-                        stay_arr.push(stay);
-                        meal_plan_arr.push(meal_plan);
-                        package_p_id_arr.push(package_id1);
                     }
                 }
             }
+
+            console.log("Final itinerary arrays:", {
+                attraction_arr: attraction_arr,
+                program_arr: program_arr,
+                stay_arr: stay_arr,
+                meal_plan_arr: meal_plan_arr,
+                day_image_arr: day_image_arr,
+                package_p_id_arr: package_p_id_arr
+            });
+
+            // Get the temporary quotation ID from sessionStorage
+            var temp_quotation_id = sessionStorage.getItem('temp_quotation_id');
+            console.log("Using temporary quotation ID:", temp_quotation_id);
 
             var price_str_url = $("#upload_url").val();
             var pckg_daywise_url = $('#pckg_daywise_url').val();
@@ -1218,6 +1297,7 @@
                                 program_arr: program_arr,
                                 stay_arr: stay_arr,
                                 hotel_meal_plan_arr: hotel_meal_plan_arr,
+                                day_image_arr: day_image_arr,
                                 package_p_id_arr: package_p_id_arr,
                                 branch_admin_id: branch_admin_id,
                                 c_package_id_arr: c_package_id_arr,
@@ -1246,16 +1326,58 @@
                                 cruise_acost: cruise_acost,
                                 cruise_ccost: cruise_ccost,
                                 cruise_icost: cruise_icost,
-                                other_desc: other_desc
+                                other_desc: other_desc,
+                                temp_quotation_id: temp_quotation_id
                             },
                             success: function(message) {
-
+                                console.log("QUOTATION SAVE: Response received");
+                                window.quotationSaveInProgress = false; // Reset flag
                                 $('#btn_quotation_save').button('reset');
                                 $('#btn_quotation_save').prop('disabled', false);
                                 var msg = message.split('--');
                                 if (msg[0] == "error") {
                                     error_msg_alert(msg[1]);
                                 } else {
+                                    // Extract quotation ID from success message for image uploads
+                                    console.log("DEBUG: Success message:", message);
+                                    var quotationIdMatch = message.match(/Quotation ID:\s*(\d+)/i);
+                                    var quotationId = quotationIdMatch ? quotationIdMatch[1] : null;
+                                    console.log("DEBUG: Extracted quotation ID:", quotationId);
+                                    
+                                    // Try alternative patterns if first one fails
+                                    if (!quotationId) {
+                                        var altMatch1 = message.match(/quotation\s+(\d+)/i);
+                                        var altMatch2 = message.match(/(\d+)/);
+                                        console.log("DEBUG: Alternative matches - pattern1:", altMatch1, "pattern2:", altMatch2);
+                                        quotationId = altMatch1 ? altMatch1[1] : (altMatch2 ? altMatch2[1] : null);
+                                        console.log("DEBUG: Final quotation ID:", quotationId);
+                                    }
+                                    
+                                    // Collect stored images from itinerary interface
+                                    var storedImages = collectStoredImages();
+                                    console.log("Collected " + storedImages.length + " stored images for upload");
+                                    
+                                    // Upload itinerary images if any exist
+                                    if (storedImages && storedImages.length > 0) {
+                                        if (quotationId) {
+                                            console.log("DEBUG: Uploading " + storedImages.length + " itinerary images for quotation " + quotationId);
+                                            uploadItineraryImages(quotationId, storedImages);
+                                        } else {
+                                            console.error("DEBUG: Could not extract quotation ID from message:", message);
+                                            // Try alternative ID extraction methods
+                                            var altMatch = message.match(/(\d+)/);
+                                            if (altMatch) {
+                                                console.log("DEBUG: Using alternative quotation ID:", altMatch[1]);
+                                                uploadItineraryImages(altMatch[1], storedImages);
+                                            } else {
+                                                console.error("DEBUG: No quotation ID found, cannot upload images");
+                                                alert("Images could not be uploaded - quotation ID not found");
+                                            }
+                                        }
+                                    } else {
+                                        console.log("DEBUG: No images to upload");
+                                    }
+                                    
                                     $('#vi_confirm_box').vi_confirm_box({
 
                                         false_btn: false,
@@ -1285,10 +1407,17 @@
                             }
                         });
                     } else {
+                        console.log("QUOTATION SAVE: User cancelled, resetting flag");
+                        window.quotationSaveInProgress = false; // Reset flag
                         $('#btn_quotation_save').button('reset');
                         $('#btn_quotation_save').prop('disabled', false);
                     }
                 }
+            }).fail(function() {
+                console.log("QUOTATION SAVE: AJAX failed, resetting flag");
+                window.quotationSaveInProgress = false; // Reset flag on error
+                $('#btn_quotation_save').button('reset');
+                $('#btn_quotation_save').prop('disabled', false);
             });
         }
     });
@@ -1365,5 +1494,96 @@ function customTcsTax(id)
          $("#total_tour_cost-" + offset[1]).val(txt_actual_tour_cost1total.toFixed(2));
     }    
 
+}
+
+// Function to collect all stored images from itinerary interface
+function collectStoredImages() {
+    var storedImages = [];
+    
+    console.log("DEBUG: Checking window.quotationImages:", window.quotationImages);
+    
+    if (window.quotationImages) {
+        console.log("DEBUG: quotationImages object exists, checking properties...");
+        for (var offset in window.quotationImages) {
+            console.log("DEBUG: Checking offset", offset, ":", window.quotationImages[offset]);
+            if (window.quotationImages[offset] && !window.quotationImages[offset].uploaded) {
+                console.log("DEBUG: Adding image for offset", offset, "to upload list");
+                storedImages.push(window.quotationImages[offset]);
+            }
+        }
+    } else {
+        console.log("DEBUG: window.quotationImages does not exist");
+    }
+    
+    console.log("DEBUG: Collected " + storedImages.length + " stored images for upload");
+    console.log("DEBUG: Stored images details:", storedImages);
+    return storedImages;
+}
+
+// Function to upload itinerary images after quotation is saved
+function uploadItineraryImages(quotationId, images) {
+    var base_url = $('#base_url').val();
+    var uploadPromises = [];
+    
+    console.log("Starting upload of " + images.length + " images for quotation " + quotationId);
+    
+    images.forEach(function(imageData, index) {
+        // Extract simple day number from offset (handles both "1" and "18_1" formats)
+        var dayNumber = imageData.offset || imageData.day_number;
+        if (typeof dayNumber === 'string' && dayNumber.includes('_')) {
+            dayNumber = dayNumber.split('_').pop(); // Extract "1" from "18_1"
+        }
+        
+        console.log("DEBUG: Uploading image for day", dayNumber, "from offset", imageData.offset);
+        
+        var formData = new FormData();
+        formData.append('image', imageData.file);
+        formData.append('quotation_id', quotationId);
+        formData.append('package_id', imageData.package_id);
+        formData.append('day_number', dayNumber);
+        
+        console.log("Uploading image for day " + dayNumber + ", package " + imageData.package_id + ", file: " + imageData.file.name);
+        
+        var promise = $.ajax({
+            url: base_url + 'controller/package_tour/quotation/upload_itinerary_image.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(response) {
+                console.log("Image upload response for day " + imageData.day_number + ":", response);
+                if (response && response.success) {
+                    console.log("Image uploaded successfully: " + response.image_url);
+                    // Mark as uploaded using the correct offset key
+                    var offsetKey = imageData.offset || dayNumber;
+                    if (window.quotationImages && window.quotationImages[offsetKey]) {
+                        window.quotationImages[offsetKey].uploaded = true;
+                        window.quotationImages[offsetKey].image_url = response.image_url;
+                    }
+                } else {
+                    console.error("Image upload failed: " + (response ? response.message : 'Unknown error'));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Image upload AJAX error for day " + imageData.day_number + ":", {
+                    status: status,
+                    error: error,
+                    responseText: xhr.responseText
+                });
+            }
+        });
+        
+        uploadPromises.push(promise);
+    });
+    
+    // Wait for all uploads to complete
+    Promise.all(uploadPromises).then(function() {
+        console.log("All itinerary images uploaded successfully");
+        // Clear the stored images
+        window.quotationImages = [];
+    }).catch(function(error) {
+        console.error("Some image uploads failed:", error);
+    });
 }
 </script>

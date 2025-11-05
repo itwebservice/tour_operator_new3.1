@@ -872,52 +872,73 @@ function foo(tableID, quot_table_id, rowCounts) {
     $(row.cells[14]).addClass("hidden");
   }
   if (tableID == "dynamic_table_list_update") {
-    row.cells[0].childNodes[0].setAttribute("id", "chk_program1" + foo.counter);
-    row.cells[0].childNodes[1].setAttribute(
-      "for",
-      "chk_program1" + foo.counter
-    );
-
-    row.cells[2].childNodes[0].setAttribute(
-      "id",
-      "special_attaraction" + foo.counter
-    );
-    row.cells[3].childNodes[0].setAttribute("id", "day_program" + foo.counter);
-    row.cells[3].setAttribute("style", "position: relative !important;");
-    row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
-   );
-
-    row.cells[4].childNodes[0].setAttribute(
-      "id",
-      "overnight_stay" + foo.counter
-    );
-    row.cells[5].childNodes[0].setAttribute("id", "meal_plan" + foo.counter);
-    for (var i = row.cells[6].childNodes[0].attributes.length; i-- > 0; )
-      row.cells[6].childNodes[0].removeAttribute(
-        row.cells[6].childNodes[0].attributes[i]
+    // Add null checks to prevent errors
+    if (row.cells[0] && row.cells[0].childNodes[0]) {
+      row.cells[0].childNodes[0].setAttribute("id", "chk_program1" + foo.counter);
+    }
+    if (row.cells[0] && row.cells[0].childNodes[1]) {
+      row.cells[0].childNodes[1].setAttribute(
+        "for",
+        "chk_program1" + foo.counter
       );
-    row.cells[6].childNodes[0].setAttribute(
-      "id",
-      "itinerary" + (rowCounts + 1)
-    );
-    row.cells[6].childNodes[0].setAttribute(
-      "onclick",
-      'add_itinerary("dest_name_u","special_attaraction' +
-        foo.counter +
-        '","day_program' +
-        foo.counter +
-        '","overnight_stay' +
-        foo.counter +
-        '","Day-' +
-        (rowCounts + 1) +
-        '")'
-    );
+    }
+
+    if (row.cells[2] && row.cells[2].childNodes[0]) {
+      row.cells[2].childNodes[0].setAttribute(
+        "id",
+        "special_attaraction" + foo.counter
+      );
+    }
+    if (row.cells[3] && row.cells[3].childNodes[0]) {
+      row.cells[3].childNodes[0].setAttribute("id", "day_program" + foo.counter);
+      row.cells[3].setAttribute("style", "position: relative !important;");
+    }
+    if (row.cells[3] && row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;");
+    }
+
+    if (row.cells[4] && row.cells[4].childNodes[0]) {
+      row.cells[4].childNodes[0].setAttribute(
+        "id",
+        "overnight_stay" + foo.counter
+      );
+    }
+    if (row.cells[5] && row.cells[5].childNodes[0]) {
+      row.cells[5].childNodes[0].setAttribute("id", "meal_plan" + foo.counter);
+    }
+    if (row.cells[6] && row.cells[6].childNodes[0]) {
+      for (var i = row.cells[6].childNodes[0].attributes.length; i-- > 0; )
+        row.cells[6].childNodes[0].removeAttribute(
+          row.cells[6].childNodes[0].attributes[i]
+        );
+      row.cells[6].childNodes[0].setAttribute(
+        "id",
+        "itinerary" + (rowCounts + 1)
+      );
+      row.cells[6].childNodes[0].setAttribute(
+        "onclick",
+        'add_itinerary("dest_name_u","special_attaraction' +
+          foo.counter +
+          '","day_program' +
+          foo.counter +
+          '","overnight_stay' +
+          foo.counter +
+          '","Day-' +
+          (rowCounts + 1) +
+          '")'
+      );
+    }
 
     if (row.cells[7]) {
       $(row.cells[7]).addClass("hidden");
-      row.cells[7].childNodes[0].setAttribute("value", "");
+      if (row.cells[7].childNodes[0]) {
+        row.cells[7].childNodes[0].setAttribute("value", "");
+      }
     }
-    $(row.cells[1]).addClass("hidden");
+    
+    if (row.cells[1]) {
+      $(row.cells[1]).addClass("hidden");
+    }
   }
   //Package Sale Itinerary
   if (tableID == "package_program_list") {
@@ -1731,7 +1752,7 @@ function foo(tableID, quot_table_id, rowCounts) {
 
     row.cells[0].childNodes[0].setAttribute(
       "id",
-      "chk_hotel1" + prefix + foo.counter
+      "chk_hotel" + foo.counter
     );
     row.cells[2].childNodes[0].setAttribute(
       "id",
@@ -1828,7 +1849,7 @@ function foo(tableID, quot_table_id, rowCounts) {
       "onchange",
       "calculate_total_nights(id);validate_validDates(id);get_hotel_cost();"
     );
-    row.cells[0].childNodes[0].setAttribute("onchange", "get_hotel_cost();");
+    // row.cells[0].childNodes[0].setAttribute("onchange", "get_hotel_cost();");
     row.cells[4].childNodes[0].setAttribute(
       "onchange",
       "hotel_type_load(id);get_hotel_cost();"
@@ -2187,81 +2208,110 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[3].childNodes[0].setAttribute("title","City Name");
   }
   if (tableID == "tbl_package_tour_quotation_dynamic_costing") {
-    row.cells[0].childNodes[1].setAttribute("id", "chk_costing1" + foo.counter);
-    row.cells[2].childNodes[1].setAttribute(
-      "id",
-      "package_type-" + foo.counter
-    );
-    row.cells[3].childNodes[1].setAttribute("id", "tour_cost-" + foo.counter);
-    row.cells[4].childNodes[1].setAttribute(
-      "id",
-      "transport_cost1-" + foo.counter
-    );
-    row.cells[5].childNodes[1].setAttribute(
-      "id",
-      "excursion_cost-" + foo.counter
-    );
-    row.cells[6].childNodes[1].setAttribute(
-      "id",
-      "basic_amount-" + foo.counter
-    );
-    row.cells[6].childNodes[0].setAttribute("id", "basic_show-" + foo.counter);
-    row.cells[6].childNodes[1].setAttribute("value", "0.00");
-    row.cells[7].childNodes[1].setAttribute(
-      "id",
-      "service_charge-" + foo.counter
-    );
-    row.cells[7].childNodes[0].setAttribute(
-      "id",
-      "service_show-" + foo.counter
-    );
-    row.cells[7].childNodes[1].setAttribute("value", "0.00");
-    row.cells[8].childNodes[3].setAttribute(
-      "id",
-      "discount_in-" + foo.counter
-    );
-    row.cells[9].childNodes[1].setAttribute(
-      "id",
-      "discount_amt-" + foo.counter
-    );
-    row.cells[10].childNodes[3].setAttribute(
-      "id",
-      "tax_apply_on-" + foo.counter
-    );
-    row.cells[11].childNodes[3].setAttribute(
-      "id",
-      "tax_value-" + foo.counter
-    );
-    row.cells[12].childNodes[1].setAttribute(
-      "id",
-      "service_tax_subtotal-" + foo.counter
-    );
-    row.cells[13].childNodes[3].setAttribute(
-      "id",
-      "tcs_tax-" + foo.counter
-    );
-
-   
-    row.cells[14].childNodes[3].setAttribute(
-      "id",
-      "tcs1-" + foo.counter
-    );
-    // row.cells[13].childNodes[3].setAttribute("onchange", "quotation_cost_calculate(id)");
-    row.cells[13].childNodes[3].setAttribute("onchange", "customTcsTax()")
-    row.cells[15].childNodes[3].setAttribute(
-      "id",
-      "tds-" + foo.counter
-    );
-
-    row.cells[16].childNodes[3].setAttribute(
-      "id",
-      "total_tour_cost-" + foo.counter
-    );
-    row.cells[17].childNodes[1].setAttribute(
-      "id",
-      "package_name1" + foo.counter
-    );
-    row.cells[18].childNodes[1].setAttribute("id", "package_id1" + foo.counter);
+    console.log("Setting up costing table row, counter:", foo.counter);
+    console.log("Row cells count:", row.cells.length);
+    
+    // Cell 0: checkbox (childNodes[0] = input, childNodes[1] = span)
+    if (row.cells[0] && row.cells[0].childNodes && row.cells[0].childNodes[0]) {
+      row.cells[0].childNodes[0].setAttribute("id", "chk_costing1" + foo.counter);
+    }
+    if (row.cells[0] && row.cells[0].childNodes && row.cells[0].childNodes[1]) {
+      row.cells[0].childNodes[1].setAttribute("for", "chk_costing1" + foo.counter);
+    }
+    
+    // Cell 2: package type (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[2] && row.cells[2].childNodes && row.cells[2].childNodes[1]) {
+      row.cells[2].childNodes[1].setAttribute("id", "package_type-" + foo.counter);
+    }
+    
+    // Cell 3: tour cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[3] && row.cells[3].childNodes && row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("id", "tour_cost-" + foo.counter);
+    }
+    
+    // Cell 4: transport cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[4] && row.cells[4].childNodes && row.cells[4].childNodes[1]) {
+      row.cells[4].childNodes[1].setAttribute("id", "transport_cost1-" + foo.counter);
+    }
+    
+    // Cell 5: excursion cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[5] && row.cells[5].childNodes && row.cells[5].childNodes[1]) {
+      row.cells[5].childNodes[1].setAttribute("id", "excursion_cost-" + foo.counter);
+    }
+    
+    // Cell 6: basic amount (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[0]) {
+      row.cells[6].childNodes[0].setAttribute("id", "basic_show-" + foo.counter);
+    }
+    if (row.cells[6] && row.cells[6].childNodes && row.cells[6].childNodes[1]) {
+      row.cells[6].childNodes[1].setAttribute("id", "basic_amount-" + foo.counter);
+      row.cells[6].childNodes[1].setAttribute("value", "0.00");
+    }
+    
+    // Cell 7: service charge (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[0]) {
+      row.cells[7].childNodes[0].setAttribute("id", "service_show-" + foo.counter);
+    }
+    if (row.cells[7] && row.cells[7].childNodes && row.cells[7].childNodes[1]) {
+      row.cells[7].childNodes[1].setAttribute("id", "service_charge-" + foo.counter);
+      row.cells[7].childNodes[1].setAttribute("value", "0.00");
+    }
+    
+    // Cell 8: discount in (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[8] && row.cells[8].childNodes && row.cells[8].childNodes[1]) {
+      row.cells[8].childNodes[1].setAttribute("id", "discount_in-" + foo.counter);
+    }
+    
+    // Cell 9: discount amount (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[9] && row.cells[9].childNodes && row.cells[9].childNodes[1]) {
+      row.cells[9].childNodes[1].setAttribute("id", "discount_amt-" + foo.counter);
+    }
+    
+    // Cell 10: tax apply on (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[10] && row.cells[10].childNodes && row.cells[10].childNodes[1]) {
+      row.cells[10].childNodes[1].setAttribute("id", "tax_apply_on-" + foo.counter);
+    }
+    
+    // Cell 11: tax value (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[11] && row.cells[11].childNodes && row.cells[11].childNodes[1]) {
+      row.cells[11].childNodes[1].setAttribute("id", "tax_value-" + foo.counter);
+    }
+    
+    // Cell 12: service tax subtotal (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[12] && row.cells[12].childNodes && row.cells[12].childNodes[1]) {
+      row.cells[12].childNodes[1].setAttribute("id", "service_tax_subtotal-" + foo.counter);
+    }
+    
+    // Cell 13: tcs tax (childNodes[0] = small, childNodes[1] = select)
+    if (row.cells[13] && row.cells[13].childNodes && row.cells[13].childNodes[1]) {
+      row.cells[13].childNodes[1].setAttribute("id", "tcs_tax-" + foo.counter);
+      row.cells[13].childNodes[1].setAttribute("onchange", "customTcsTax()");
+    }
+    
+    // Cell 14: tcs1 (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[14] && row.cells[14].childNodes && row.cells[14].childNodes[1]) {
+      row.cells[14].childNodes[1].setAttribute("id", "tcs1-" + foo.counter);
+    }
+    
+    // Cell 15: tds (hidden)
+    if (row.cells[15] && row.cells[15].childNodes && row.cells[15].childNodes[1]) {
+      row.cells[15].childNodes[1].setAttribute("id", "tds-" + foo.counter);
+    }
+    
+    // Cell 16: total tour cost (childNodes[0] = small, childNodes[1] = input, childNodes[2] = span)
+    if (row.cells[16] && row.cells[16].childNodes && row.cells[16].childNodes[1]) {
+      row.cells[16].childNodes[1].setAttribute("id", "total_tour_cost-" + foo.counter);
+    }
+    
+    // Cell 17: package name (hidden)
+    if (row.cells[17] && row.cells[17].childNodes && row.cells[17].childNodes[1]) {
+      row.cells[17].childNodes[1].setAttribute("id", "package_name1" + foo.counter);
+    }
+    
+    // Cell 18: package id (hidden)
+    if (row.cells[18] && row.cells[18].childNodes && row.cells[18].childNodes[1]) {
+      row.cells[18].childNodes[1].setAttribute("id", "package_id1" + foo.counter);
+    }
 
     $(row.cells[0]).addClass("header_btn");
     $(row.cells[1]).addClass("header_btn");
@@ -4538,81 +4588,81 @@ function foo(tableID, quot_table_id, rowCounts) {
   }
 }
 
-function addRow(tableID, quot_table = "", itinerary = "") {
-  var table = document.getElementById(tableID);
-  var rowCount = table.rows.length;
-  var row = table.insertRow(rowCount);
+// function addRow(tableID, quot_table = "", itinerary = "") {
+//   var table = document.getElementById(tableID);
+//   var rowCount = table.rows.length;
+//   var row = table.insertRow(rowCount);
 
-  var colCount = table.rows[0].cells.length;
+//   var colCount = table.rows[0].cells.length;
 
-  $("#" + tableID)
-    .find(".app_select2")
-    .each(function () {
-      $(this).select2();
-      $(this).select2("destroy");
-    });
-  $("#" + tableID)
-    .find(".app_minselect2")
-    .each(function () {
-      $(this).select2({ minimumInputLength: 1 });
-      $(this).select2("destroy");
-    });
-  for (var i = 0; i < colCount; i++) {
-    var newcell = row.insertCell(i);
-    var val_data = table.rows[0].cells[i].childNodes[0].value;
+//   $("#" + tableID)
+//     .find(".app_select2")
+//     .each(function () {
+//       $(this).select2();
+//       $(this).select2("destroy");
+//     });
+//   $("#" + tableID)
+//     .find(".app_minselect2")
+//     .each(function () {
+//       $(this).select2({ minimumInputLength: 1 });
+//       $(this).select2("destroy");
+//     });
+//   for (var i = 0; i < colCount; i++) {
+//     var newcell = row.insertCell(i);
+//     var val_data = table.rows[0].cells[i].childNodes[0].value;
 
-    newcell.innerHTML = table.rows[0].cells[i].innerHTML;
-    newcell.childNodes[0].title =
-      table.rows[0].cells[i].childNodes[0].title != ""
-        ? table.rows[0].cells[i].childNodes[0].title
-        : table.rows[0].cells[i].childNodes[0].getAttribute(
-            "data-original-title"
-          );
+//     newcell.innerHTML = table.rows[0].cells[i].innerHTML;
+//     newcell.childNodes[0].title =
+//       table.rows[0].cells[i].childNodes[0].title != ""
+//         ? table.rows[0].cells[i].childNodes[0].title
+//         : table.rows[0].cells[i].childNodes[0].getAttribute(
+//             "data-original-title"
+//           );
 
-    $(newcell.childNodes[0]).tooltip({ placement: "bottom" });
-    $(newcell.childNodes[0]).click(function () {
-      $(".tooltip").remove();
-    });
-    switch (newcell.childNodes[0].type) {
-      case "text":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-        break;
+//     $(newcell.childNodes[0]).tooltip({ placement: "bottom" });
+//     $(newcell.childNodes[0]).click(function () {
+//       $(".tooltip").remove();
+//     });
+//     switch (newcell.childNodes[0].type) {
+//       case "text":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//         break;
 
-      case "number":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-        break;
-      case "hidden":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-        break;
-      case "checkbox":
-        newcell.childNodes[0].checked = true;
-        newcell.childNodes[0].disabled = false;
-        break;
-      case "select-one":
-        newcell.childNodes[0].selectedIndex = 0;
-        break;
-      case "textarea":
-        if (quot_table == "" || quot_table == "2" || itinerary != "") {
-          newcell.childNodes[0].value = "";
-        } else {
-          newcell.childNodes[0].value = val_data;
-        }
-    }
-  }
-  foo(tableID, quot_table, rowCount);
-}
+//       case "number":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//         break;
+//       case "hidden":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//         break;
+//       case "checkbox":
+//         newcell.childNodes[0].checked = true;
+//         newcell.childNodes[0].disabled = false;
+//         break;
+//       case "select-one":
+//         newcell.childNodes[0].selectedIndex = 0;
+//         break;
+//       case "textarea":
+//         if (quot_table == "" || quot_table == "2" || itinerary != "") {
+//           newcell.childNodes[0].value = "";
+//         } else {
+//           newcell.childNodes[0].value = val_data;
+//         }
+//     }
+//   }
+//   foo(tableID, quot_table, rowCount);
+// }
 
 function deleteRow(tableID) {
   try {
@@ -4646,3 +4696,235 @@ function deleteRow(tableID) {
 }
 
 /// **** Dynamic Table Entries ***********************//////////////////////////////
+function addRow(tableID, quot_table = "", itinerary = "") {
+    console.log("DEBUG: addRow called with tableID:", tableID, "quot_table:", quot_table, "itinerary:", itinerary);
+    
+    var table = document.getElementById(tableID);
+    if (!table) {
+        console.error("DEBUG: Table not found with ID:", tableID);
+        alert("Error: Table not found. Please refresh the page and try again.");
+        return;
+    }
+    
+    var rowCount = table.rows.length; // index for new row
+    console.log("DEBUG: Current row count:", rowCount);
+    console.log("DEBUG: Table structure before adding row:");
+    for (var debugI = 0; debugI < table.rows.length; debugI++) {
+        console.log("  Row", debugI, ":", debugI === 0 ? "(HEADER)" : "(DATA ROW, should have ID " + debugI + ")");
+    }
+    
+    var row = table.insertRow(rowCount);
+    console.log("DEBUG: New row created at index", rowCount);
+
+    var colCount = table.rows[0].cells.length;
+    console.log("DEBUG: Column count:", colCount);
+
+    for (var i = 0; i < colCount; i++) {
+        var newcell = row.insertCell(i);
+        var oldCell = table.rows[table.rows.length - 2].cells[i]; // copy from last row
+        
+        // Special handling for checkbox cell (index 0) - copy complete HTML structure
+        if (i === 0) {
+            console.log("DEBUG: Special handling for checkbox cell");
+            var cellContent = oldCell.innerHTML;
+            // Replace IDs to be unique for the new row
+            cellContent = cellContent.replace(/chk_programd[0-9]+/g, 'chk_programd' + rowCount);
+            // Ensure checkbox is checked by default
+            cellContent = cellContent.replace(/<input[^>]*type="checkbox"[^>]*>/g, function(match) {
+                if (match.includes('checked')) {
+                    return match; // Already has checked
+                } else {
+                    return match.replace('>', ' checked>');
+                }
+            });
+            newcell.innerHTML = cellContent;
+            continue;
+        }
+        
+        // Special handling for image upload cell (cell index 5 for itinerary table)
+        if (tableID === "default_program_list" && i === 5) {
+            console.log("DEBUG: Special handling for image cell during cloning");
+            // For image cell, just create empty cell - handleItineraryAddRow will fix it
+            newcell.innerHTML = '';
+            continue;
+        }
+        
+        var oldInput = oldCell.querySelector("input, select, textarea");
+
+        // 🔹 If this column is Package Type, add class & hide
+        if (oldCell.classList.contains("package_type_td")) {
+            newcell.classList.add("package_type_td");
+            //newcell.style.display = "none"; // hide column
+        }
+
+        if (!oldInput) {
+            newcell.innerHTML = oldCell.innerHTML;
+            continue;
+        }
+
+        var cloned = oldInput.cloneNode(true);
+
+        // 🔹 Generate unique ID/Name for new row
+        if (cloned.id) {
+            var baseId = cloned.id.replace(/[0-9]+$/, "");
+            cloned.id = baseId + rowCount;
+        }
+        if (cloned.name) {
+            var baseName = cloned.name.replace(/[0-9]+$/, "");
+            cloned.name = baseName + rowCount;
+        }
+
+        // reset values properly
+        if (cloned.tagName === "SELECT") {
+            cloned.value = "";
+            cloned.classList.add("app_select2");
+        } else if (["text","number","hidden","textarea"].includes(cloned.type)) {
+            cloned.value = "";
+        } else if (cloned.type === "checkbox") {
+            cloned.checked = false;
+            cloned.disabled = false;
+        }
+
+        newcell.appendChild(cloned);
+    }
+
+    // ✅ Initialize Select2 only for the new row selects
+    $(row).find('.app_select2').select2({ width: "100%" });
+
+    // ✅ Initialize datepicker for new row
+    $(row).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
+
+    // Special handling for costing table
+    if (tableID === "tbl_package_tour_quotation_dynamic_costing") {
+        console.log("DEBUG: Special handling for costing table");
+        // For costing table, we need to ensure proper structure
+        // The table should have the same structure as the header row
+        var headerRow = table.rows[0];
+        for (var i = 0; i < colCount; i++) {
+            if (row.cells[i] && headerRow.cells[i]) {
+                // Copy the innerHTML structure from header row
+                row.cells[i].innerHTML = headerRow.cells[i].innerHTML;
+            }
+        }
+    }
+
+    // Special handling for itinerary tables
+    if (itinerary === "itinerary") {
+        console.log("DEBUG: Handling itinerary addRow for table:", tableID);
+        handleItineraryAddRow(table, row, rowCount);
+    }
+
+    // Update serial numbers or custom logic
+    foo(tableID, quot_table, rowCount);
+    
+    // Ensure checkbox has onchange handler for hotel table
+    if (tableID === "tbl_package_tour_quotation_dynamic_hotel") {
+        // Remove any existing onchange handlers first
+        $(row).find('input[type="checkbox"]').removeAttr('onchange');
+        // Add the onchange handler
+        $(row).find('input[type="checkbox"]').attr('onchange', 'get_hotel_cost();');
+        
+        // Also update the label to match the new ID
+        var checkboxId = $(row).find('input[type="checkbox"]').attr('id');
+        $(row).find('label').attr('for', checkboxId);
+        
+        // Copy city selection from previous row
+        var previousRow = table.rows[table.rows.length - 2]; // Previous row (current row - 1)
+        if (previousRow && previousRow.cells[3] && previousRow.cells[3].childNodes[0]) {
+            var previousCitySelect = previousRow.cells[3].childNodes[0];
+            var newCitySelect = row.cells[3].childNodes[0];
+            
+            // Get the selected city value and text from previous row
+            var selectedCityValue = $(previousCitySelect).val();
+            var selectedCityText = $(previousCitySelect).find('option:selected').text();
+            
+            // If there's a selected city in the previous row, copy it to the new row
+            if (selectedCityValue && selectedCityValue !== "" && selectedCityText && selectedCityText !== "*City Name") {
+                // Initialize city dropdown first
+                city_lzloading($(newCitySelect));
+                
+                // Add the selected city option to the new dropdown
+                var newOption = new Option(selectedCityText, selectedCityValue, true, true);
+                $(newCitySelect).append(newOption).trigger('change');
+            } else {
+                // Initialize city dropdown without pre-selection
+                city_lzloading($(newCitySelect));
+            }
+        } else {
+            // Initialize city dropdown without pre-selection if no previous row
+            city_lzloading($(row.cells[3].childNodes[0]));
+        }
+    }
+    
+    // Handle city dropdown initialization for custom package hotel master table
+    if (tableID === "tbl_package_hotel_master") {
+        // Initialize city dropdown for the new row
+        var citySelect = $(row).find('select[name^="city_name"]');
+        if (citySelect.length > 0) {
+            city_lzloading(citySelect);
+            
+            // Add onchange handler for hotel loading
+            citySelect.attr('onchange', 'hotel_name_list_load(this.id);');
+        }
+    }
+}
+
+// Static counter for itinerary row IDs (starts from 2 because row 1 is default)
+if (typeof window.itineraryRowIdCounter === 'undefined') {
+    window.itineraryRowIdCounter = 2;
+}
+
+// Special function to handle itinerary table row addition
+function handleItineraryAddRow(table, row, rowCount) {
+    console.log("DEBUG: handleItineraryAddRow called for row", rowCount);
+    console.log("DEBUG: Row has", row.cells.length, "cells");
+    
+    // Use static counter for data row ID (starts from 2)
+    var dataRowId = window.itineraryRowIdCounter;
+    window.itineraryRowIdCounter++; // Increment for next row
+    console.log("DEBUG: Data row ID will be:", dataRowId, "(static counter, next will be:", window.itineraryRowIdCounter, ")");
+    
+    // Always work with cell index 5 for image upload
+    var imageCell = row.cells[5];
+    if (!imageCell) {
+        console.log("DEBUG: Creating missing image cell at index 5");
+        imageCell = row.insertCell(5);
+    }
+    
+    console.log("DEBUG: Working with image cell at index 5");
+    
+    // Always replace the image cell content with complete upload UI
+    imageCell.setAttribute("class", "col-md-2 no-pad");
+    imageCell.setAttribute("style", "padding-left:5px !important;");
+    
+    imageCell.innerHTML = `
+        <div style="margin-top:35px;">
+            <label for="day_image_${dataRowId}" class="btn btn-sm btn-success" 
+                   style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
+                Upload Image
+            </label>
+            <input type="file" id="day_image_${dataRowId}" 
+                   name="day_image_${dataRowId}" accept="image/*" 
+                   onchange="previewDayImage(this, '${dataRowId}')" 
+                   style="display: none;">
+            <div id="day_image_preview_${dataRowId}" style="display: none; margin-top: 5px;">
+                <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <img id="preview_img_${dataRowId}" src="" alt="Preview" 
+                         style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
+                                    <button type="button" 
+                                            onclick="removeDayImage('${dataRowId}')" 
+                                            title="Remove Image" 
+                                            style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                        ×
+                                    </button>
+                </div>
+            </div>
+            <input type="hidden" id="itinerary_image_path_${dataRowId}" name="itinerary_image_path_${dataRowId}" />
+        </div>
+    `;
+    console.log("DEBUG: Image upload structure FORCED for row", rowCount, "with data row ID", dataRowId);
+
+    // Image upload is now handled by the onchange event directly
+    console.log("DEBUG: Image upload structure ready for row", rowCount, "with data row ID", dataRowId);
+}
+
