@@ -37,7 +37,7 @@ $password = "";
 
 // $db_name = "tour_operator_theme";
 
-$db_name = "tour_operator_new_2_2";
+$db_name = "tour_operator_new_3_1";
 
 global $conn;
 $conn = new mysqli($servername, $username, $password, $db_name);
