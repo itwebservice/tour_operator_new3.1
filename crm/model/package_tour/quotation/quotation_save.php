@@ -37,6 +37,7 @@ public function quotation_master_save()
 	$costing_type = $_POST['costing_type'];
 	$currency_code = $_POST['currency_code'];
 
+	$pp_costing_arr = isset($_POST['pp_costing_arr']) ? json_decode($_POST['pp_costing_arr'], true) : [];
 	//Train
 	$train_from_location_arr = isset($_POST['train_from_location_arr']) ? $_POST['train_from_location_arr'] : [];
 	$train_to_location_arr = isset($_POST['train_to_location_arr']) ? $_POST['train_to_location_arr'] : [];
@@ -198,6 +199,7 @@ public function quotation_master_save()
 		$this->tranport_entries_save($quotation_id_arr,$vehicle_name_arr,$start_date_arr,$pickup_arr,$drop_arr,$vehicle_count_arr,$transport_cost_arr1,$package_name_arr1,$end_date_arr,$service_duration_arr);	
 
 		$this->costing_entries_save($tcs_arr,$tcsvalue_arr,$quotation_id,$tour_cost_arr,$basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr,$transport_cost_arr,$excursion_cost_arr,$adult_cost_arr,$infant_cost_arr,$child_with_arr,$child_without_arr,$bsmValues,$package_type_c_arr,$discount_in_arr,$discount_arr);
+		$this->pp_costing_save($quotation_id_arr, $pp_costing_arr);
 		$this->excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr);
 		// Update temporary quotation IDs with actual quotation IDs
 		$this->update_temporary_quotation_ids($quotation_id_arr, $temp_quotation_id);
@@ -481,6 +483,49 @@ public function program_entries_save($quotation_id_arr,$attraction_arr, $program
 		}
 	}
 
+}public function pp_costing_save($quotation_id_arr, $pp_costing_arr)
+{
+    for($i = 0; $i < sizeof($quotation_id_arr); $i++)
+    {
+        $quotation_id = $quotation_id_arr[$i];
+
+        foreach ($pp_costing_arr as $row)
+        {
+            $type = $row['type'];
+
+            $sq = "INSERT INTO package_quotation_pp_costing SET 
+                quotation_id= '$quotation_id',
+                pax_type = '$type',
+
+                hotel_cost = '{$row['hotel']}',
+                transfer_cost = '{$row['transfer']}',
+                activity_cost = '{$row['activity']}',
+                land_cost = '{$row['land_cost']}',
+
+                service_charge = '{$row['service_charge']}',
+                discount_in = '{$row['discount_in']}',
+                discount_amount = '{$row['discount_amount']}',
+
+                flight_cost = '{$row['flight']}',
+                train_cost = '{$row['train']}',
+                cruise_cost = '{$row['cruise']}',
+                visa_cost = '{$row['visa']}',
+                guide_cost = '{$row['guide']}',
+                misc_cost = '{$row['misc']}',
+
+                tax_apply_on = '{$row['tax_apply_on']}',
+                tax_value = '{$row['tax_value']}',
+                tax_amount = '{$row['tax_amount']}',
+
+                tcs = '{$row['tcs']}',
+                tcs_amount = '{$row['tcs_amount']}',
+
+                total_cost = '{$row['total']}'
+            ";
+
+            mysqlQuery($sq);
+        }
+    }
 }
     public function costing_entries_save($tcs_arr,$tcsvalue_arr,$quotation_id,$tour_cost_arr,$basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr,$transport_cost_arr,$excursion_cost_arr,$adult_cost_arr,$infant_cost_arr,$child_with_arr,$child_without_arr,$bsmValues,$package_type_c_arr,$discount_in_arr,$discount_arr)
     {

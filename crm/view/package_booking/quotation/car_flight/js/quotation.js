@@ -57,6 +57,7 @@ function quotation_cost_calculate() {
 	service_charge = ($('#service_show').html() == '&nbsp;') ? service_charge : parseFloat($('#service_show').text().split(' : ')[1]);
 	markup_cost = ($('#markup_show').html() == '&nbsp;') ? markup_cost : parseFloat($('#markup_show').text().split(' : ')[1]);
 
+	
 	total_tour_cost =
 		parseFloat(subtotal) +
 		parseFloat(markupservice_tax_amount) +
@@ -84,6 +85,30 @@ $('#roundoff').val(roundoff.toFixed(2));
 var total_cost = quotation_cost;
 $('#total_tour_cost').val(total_cost.toFixed(2));
 
+ calculate_per_person_cost();
+
+}
+
+function calculate_per_person_cost() {
+
+    let adults = parseInt($('#total_adult').val()) || 0;
+    let child_wb = parseInt($('#children_with_bed').val()) || 0;
+    let child_wob = parseInt($('#children_without_bed').val()) || 0;
+
+    let total_pax = adults + child_wb + child_wob;
+
+    let total_cost = parseFloat($('#total_tour_cost').val()) || 0;
+
+    let per_person = 0;
+
+    if (total_pax > 0) {
+        per_person = total_cost / total_pax;
+    }
+
+    console.log("TOTAL:", total_cost, "PAX:", total_pax, "PP:", per_person);
+
+    // 👉 Update UI (adjust selector if needed)
+    $('#per_person_cost').text('₹ ' + per_person.toFixed(2));
 }
 
 function get_enquiry_details(offset = '') {
@@ -370,3 +395,7 @@ quotation_cost = parseFloat(total_tour_cost);
 $('#total_tour_cost' + offset).val(quotation_cost.toFixed(2));
 
 }
+
+
+
+

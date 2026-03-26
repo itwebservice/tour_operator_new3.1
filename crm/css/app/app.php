@@ -2458,3 +2458,69 @@ border-radius: 0 10px 0 0;
 height: 40px;
 border: 1px solid #d8d6de;
 }
+
+
+.costing-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid #d1d0d4;
+    margin-bottom: 25px;
+}
+.costing-card-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #009898 ;
+    border-radius: 50%;
+    font-size: 20px;
+    color: #fff;
+}
+.costing-card-detail {
+    width: calc(100% - 70px);
+}
+.costing-card-price {
+    font-weight: 500;
+}
+.costing-card-label {
+    margin-bottom: 0;
+    color: #212529;
+}
+.costing-card-table .table th {
+    background-color: #edf6f3;
+    font-weight: 500;
+    border-bottom: 0 !important;
+    border-top: 0 !important;
+    text-transform: capitalize;
+
+}
+.costing-card-table th, .costing-card-table td {
+    padding: 12px !important;
+    font-size: 12px;
+    font-weight: 500;
+    border-top: 1px solid #ddd !important;
+    width:50%;
+}
+.costing-card-table th:last-child, .costing-card-table td:last-child {
+    text-align: center;
+    
+}
+
+.costing-card-table th:first-child, .costing-card-table td:first-child {
+    border-right: 1px solid #ddd !important;
+
+}
+
+.costing-card-table td:last-child {
+    color: #565da6;
+}
+
+.totalcost-input{
+        color: rgb(48, 130, 92);
+    font-weight: 500;
+    background: rgb(150, 209, 182);
+}

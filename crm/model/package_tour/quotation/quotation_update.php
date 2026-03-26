@@ -211,6 +211,51 @@ public function quotation_master_update()
 		// Copy image entries from original quotation to new quotation
 		$this->copy_image_entries($quotation_id, $package_id);
 
+		if(isset($_POST['adult_hotel_pp_update'])){
+
+    $pax_types = ['adult','cweb','cwnb','infant'];
+
+    foreach($pax_types as $type){
+
+        $hotel = $_POST[$type.'_hotel_pp_update'];
+        $transfer = $_POST[$type.'_transfer_pp_update'];
+        $activity = $_POST[$type.'_activity_pp_update'];
+        $land_cost = $_POST[$type.'_land_cost_pp_update'];
+        $service_charge = $_POST[$type.'_service_charge_pp_update'];
+        $discount_amount = $_POST[$type.'_discount_amount_pp_update'];
+        $total = $_POST[$type.'_total_amount_pp_update'];
+
+        $sq_check = mysqlQuery("SELECT * FROM package_quotation_pp_costing 
+            WHERE quotation_id='$quotation_id' AND pax_type='$type'");
+
+        if(mysqli_num_rows($sq_check) > 0){
+
+            mysqlQuery("UPDATE package_quotation_pp_costing SET 
+                hotel_cost='$hotel',
+                transfer_cost='$transfer',
+                activity_cost='$activity',
+                land_cost='$land_cost',
+                service_charge='$service_charge',
+                discount_amount='$discount_amount',
+                total_cost='$total'
+            WHERE quotation_id='$quotation_id' AND pax_type='$type'");
+
+        } else {
+
+            mysqlQuery("INSERT INTO package_quotation_pp_costing SET 
+                quotation_id='$quotation_id',
+                pax_type='$type',
+                hotel_cost='$hotel',
+                transfer_cost='$transfer',
+                activity_cost='$activity',
+                land_cost='$land_cost',
+                service_charge='$service_charge',
+                discount_amount='$discount_amount',
+                total_cost='$total'");
+        }
+    }
+}
+
 		echo "Quotation has been successfully updated.";	
 		exit;
 	}

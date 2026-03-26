@@ -30,8 +30,8 @@ if (!$connection) {
 }
 
 
-define('BASE_URL', 'http://localhost/itoursdemo/crm/');
-define('BASE_URL_B2C', 'http://localhost/itoursdemo/');
+define('BASE_URL', 'http://localhost/itours/crm/');
+define('BASE_URL_B2C', 'http://localhost/itours/');
 mysqli_query($connection, "SET SESSION sql_mode = ''");
 
 

@@ -659,6 +659,7 @@
                 </div>
             </div>
             <input type="hidden" id="hotel_pp_costing" name="hotel_pp_costing" />
+            <input type="hidden" id="travel_pp_costing" name="travel_pp_costing" />
 </form>
 <?= end_panel() ?>
 
@@ -778,6 +779,7 @@
 
                             row.cells[13].childNodes[0].value = hotel_arr[i]['hotel_cost'];
                             pp_arr.push({
+                                'hotel_cost': hotel_arr[i]['hotel_cost'],
                                 'adult_cost': hotel_arr[i]['adult_cost'],
                                 'child_with_bed': hotel_arr[i]['child_with_bed'],
                                 'child_without_bed': hotel_arr[i]['child_without_bed'],
@@ -789,6 +791,7 @@
                         } else {
                             row.cells[13].childNodes[0].value = 0;
                             pp_arr.push({
+                                'hotel_cost':0,
                                 'adult_cost': 0,
                                 'child_with_bed': 0,
                                 'child_without_bed': 0,
@@ -803,8 +806,11 @@
                         hideHotelPackage(row.cells[2].childNodes[0].value);
                     }
                 }
+                console.log("hotel_cost"+row.cells[13].childNodes[0].value);
                 //Tab-4 Per person costing
                 $('#hotel_pp_costing').val(JSON.stringify(pp_arr));
+
+                calculateCostingCards();
             }
         });
     }
@@ -972,6 +978,11 @@
                     }
 
                 }
+                console.log("transport_cost"+row.cells[9].childNodes[0].value);
+                //Tab-4 Per person costing
+                $('#travel_pp_costing').val(JSON.stringify(pp_arr));
+
+                calculateCostingCards();
             }
         });
     }
@@ -1602,14 +1613,19 @@
                         //For per person costing
                         exc_adult_cost = parseFloat(exc_adult_cost) + parseFloat(row.cells[11]
                             .childNodes[0].value);
+                         
                         exc_child_cot = parseFloat(exc_child_cot) + parseFloat(row.cells[12].childNodes[
                             0].value);
+                          
                         exc_childwo_cot = parseFloat(exc_childwo_cot) + parseFloat(row.cells[13]
                             .childNodes[0].value);
+                          
                         exc_infant_cost = parseFloat(exc_infant_cost) + parseFloat(row.cells[14]
                             .childNodes[0].value);
+                          
                         exc_transfer_cost = parseFloat(exc_transfer_cost) + parseFloat(row.cells[16]
                             .childNodes[0].value);
+                            
                     }
                 }
                 //Group costing
@@ -1638,6 +1654,9 @@
                 var exc_atransfer_cost = (parseInt(adult_count) !== 0) ? exc_ftransfer_cost : 0;
                 var exc_cwtransfer_cost = (parseInt(child_with_bed) !== 0) ? exc_ftransfer_cost : 0;
 
+                $("#adult_activity_pp").val(hadult_cost);
+               
+              
                 var table = document.getElementById("tbl_package_tour_quotation_adult_child");
                 var rowCount = table.rows.length;
                 if (per_adult.length == 0) {
@@ -2670,6 +2689,127 @@ function initializeCityDropdowns(table, hotel_arr) {
 
 
 
+
+function calculateCostingCards() {
+   
+    console.log('Run');
+ 
+    // LAND COST
+    let hotel = parseFloat($('#hotel_cost').val()) || 0;
+    let transfer = parseFloat($('#transfer_cost').val()) || 0;
+    let activity = parseFloat($('#activity_cost').val()) || 0;
+    console.log(hotel);
+    console.log(transfer);
+    console.log(activity);
+ 
+    let land_cost = hotel + transfer + activity;
+    console.log(land_cost);
+ 
+    // SERVICE
+    let service = parseFloat($('#service_charge').val()) || 0;
+    let discount_percent = parseFloat($('#discount_percent').val()) || 0;
+ 
+    // TRAVEL
+    let flight = parseFloat($('#flight_cost').val()) || 0;
+    let train = parseFloat($('#train_cost').val()) || 0;
+    let cruise = parseFloat($('#cruise_cost').val()) || 0;
+ 
+    let travel_cost = flight + train + cruise;
+ 
+    // OTHER
+    let visa = parseFloat($('#visa_cost').val()) || 0;
+    let guide = parseFloat($('#guide_cost').val()) || 0;
+    let misc = parseFloat($('#misc_cost').val()) || 0;
+ 
+    let total_pax = parseInt($('#total_pax').val()) || 1;
+ 
+    let guide_pp = guide / total_pax;
+    let misc_pp = misc / total_pax;
+ 
+    let other_cost = visa + guide_pp + misc_pp;
+ 
+    // BASE
+    let base = land_cost + service;
+ 
+    // DISCOUNT
+    let discount = (service * discount_percent)/100;
+ 
+    let subtotal = base - discount;
+ 
+    // ADD TRAVEL
+    subtotal += travel_cost;
+ 
+    // ADD OTHER
+    subtotal += other_cost;
+ 
+    // TAX
+    let tax_percent = parseFloat($('#tax_percent').val()) || 0;
+    let tax_apply = $('#tax_apply').val();
+ 
+    let tax = 0;
+ 
+    if(tax_apply == "service")
+        tax = (service * tax_percent)/100;
+ 
+    if(tax_apply == "basic")
+        tax = (land_cost * tax_percent)/100;
+ 
+    if(tax_apply == "total")
+        tax = (subtotal * tax_percent)/100;
+ 
+    let subtotal_with_tax = subtotal + tax;
+ 
+    // TCS
+    let tcs_percent = parseFloat($('#tcs_percent').val()) || 0;
+ 
+    let tcs = (subtotal_with_tax * tcs_percent)/100;
+ 
+    // FINAL
+    let final = subtotal_with_tax + tcs;
+ 
+    console.log(hotel);
+    return {
+          hotel: hotel,
+    transfer: transfer,
+    activity: activity,
+        land: land_cost,
+        service: service,
+        discount: discount,
+        travel: travel_cost,
+        other: other_cost,
+        tax: tax,
+        tcs: tcs,
+        final: final
+    };
+}
+
+// =========================
+// UPDATE TABLE FUNCTION
+// =========================
+function updateCard(data) {
+
+    let table = $('.table'); // or give ID if multiple tables
+
+    // Individual components
+    table.find('tr[data-type="hotel"] .price').text('₹ ' + (data.hotel || 0).toFixed(2));
+    table.find('tr[data-type="transfer"] .price').text('₹ ' + (data.transfer || 0).toFixed(2));
+    table.find('tr[data-type="activity"] .price').text('₹ ' + (data.activity || 0).toFixed(2));
+
+    // Land total
+    table.find('tr[data-type="land"] .price').text('₹ ' + data.land.toFixed(2));
+
+    // Other
+    table.find('tr[data-type="misc"] .price').text('₹ ' + data.other.toFixed(2));
+
+    // Service / Markup
+    table.find('tr[data-type="markup"] .price').text('₹ ' + data.service.toFixed(2));
+
+    // Tax
+    table.find('tr[data-type="tax"] .price').text('₹ ' + data.tax.toFixed(2));
+
+    // Final
+    table.find('tr[data-type="total"] .price').text('₹ ' + data.final.toFixed(2));
+}
 
 
 
