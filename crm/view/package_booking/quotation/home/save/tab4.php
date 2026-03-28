@@ -237,7 +237,7 @@
                                                                                 </select></td>
                                                                         </tr>
                                                                         <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
+                                                                            <td  class="price">Discount </td>
                                                                             <td ><input type="number"  id="adult_discount_amount_pp" name="adult_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="flight_acost">
@@ -268,7 +268,7 @@
                                                                            <tr data-type="tax_apply_on">
                                                                             <td>Tax Apply On</td>
                                                                             <td ><select id="adult_tax_apply_on_pp" name="adult_tax_apply_on_pp"  class="form-control">
-                                                                                     <option value="1">Tax Apply On</option>
+                                                                                    <option value="1">Tax Apply On</option>
                                                                                      <option value="2">Basic Amount</option>
                                                                                      <option value="3">Service Charge</option>
                                                                                      <option value="4">Total</option>
@@ -286,7 +286,7 @@
                                                                         </tr>
                                                                           <tr data-type="tax_value">
                                                                             <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number" id="adult_tax_amt_pp" name="adult_tax_amt_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" id="adult_tax_amount_pp" name="adult_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                              <tr data-type="tcs">
                                                                             <td>TCS</td>
@@ -360,7 +360,7 @@
                                                                                 </select></td>
                                                                         </tr>
                                                                         <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
+                                                                            <td  class="price">Discount </td>
                                                                             <td ><input type="number"  id="cweb_discount_amount_pp" name="cweb_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="flight_acost">
@@ -407,7 +407,7 @@
                                                                         </tr>
                                                                           <tr data-type="tax_value">
                                                                             <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number" id="cweb_tax_amt_pp" name="cweb_tax_amt_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" id="cweb_tax_amount_pp" name="cweb_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                              <tr data-type="tcs">
                                                                             <td>TCS</td>
@@ -483,7 +483,7 @@
                                                                                 </select></td>
                                                                         </tr>
                                                                         <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
+                                                                            <td  class="price">Discount </td>
                                                                             <td ><input type="number"  id="cwnb_discount_amount_pp" name="cwnb_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="flight_acost">
@@ -530,7 +530,7 @@
                                                                         </tr>
                                                                           <tr data-type="tax_value">
                                                                             <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number" id="cwnb_tax_amt_pp" name="cwnb_tax_amt_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" id="cwnb_tax_amount_pp" name="cwnb_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                              <tr data-type="tcs">
                                                                             <td>TCS</td>
@@ -605,7 +605,7 @@
                                                                                 </select></td>
                                                                         </tr>
                                                                         <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
+                                                                            <td  class="price">Discount </td>
                                                                             <td ><input type="number"  id="infant_discount_amount_pp" name="infant_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="flight_acost">
@@ -652,7 +652,7 @@
                                                                         </tr>
                                                                           <tr data-type="tax_value">
                                                                             <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number" id="infant_tax_amt_pp" name="infant_tax_amt_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" id="infant_tax_amount_pp" name="infant_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                              <tr data-type="tcs">
                                                                             <td>TCS</td>
@@ -1787,7 +1787,7 @@ if (input) {
 
             tax_apply_on: $('#' + prefix + '_tax_apply_on_pp').val(),
             tax_value: $('#' + prefix + '_select_tax_pp').val(),
-            tax_amount: +$('#' + prefix + '_tax_amt_pp').val() || 0,
+            tax_amount: +$('#' + prefix + '_tax_amount_pp').val() || 0,
 
             tcs: $('#' + prefix + '_select_tcs_pp').val(),
             tcs_amount: +$('#' + prefix + '_tcs_amount_pp').val() || 0,
@@ -2212,7 +2212,6 @@ function uploadItineraryImages(quotationId, images) {
     });
 }
 
-
 function calculateCostingCards() {
 
     let hotelData = $('#hotel_pp_costing').val();
@@ -2221,6 +2220,7 @@ function calculateCostingCards() {
     if (!hotelData || !travelData) return;
 
     let pp_arr = JSON.parse(hotelData);
+    console.log(pp_arr);
     let pp_arr_travelData = JSON.parse(travelData);
 
     // ===== PAX COUNT =====
@@ -2245,20 +2245,21 @@ function calculateCostingCards() {
     $('#cwnb_hotel_pp').val(pp_arr[0]['child_without_bed'] || 0);
     $('#cwnb_transfer_pp').val(transport_pp.toFixed(2));
 
-    $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || 0);
+    if (!$('#infant_hotel_pp').val()) {
+    $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || '');
+}
     $('#infant_transfer_pp').val(transport_pp.toFixed(2));
 
     // ===== COMMON FUNCTION =====
     function calculateCard(type, count) {
 
-        // ❌ IF NO PAX
         if (count === 0) {
             $('#' + type + '_hotel_pp').val(0);
             $('#' + type + '_transfer_pp').val(0);
             $('#' + type + '_activity_pp').val(0);
             $('#' + type + '_land_cost_pp').val(0);
             $('#' + type + '_service_charge_pp').val(0);
-            $('#' + type + '_tax_amt_pp').val(0);
+            $('#' + type + '_tax_amount_pp').val(0);
             $('#' + type + '_tcs_amount_pp').val(0);
             $('#' + type + '_total_amount_pp').val(0);
             return;
@@ -2275,7 +2276,10 @@ function calculateCostingCards() {
         // ===== SERVICE CHARGE (10%) =====
         let service_charge = land_cost * 0.10;
 
-        // ===== DISCOUNT ON SERVICE CHARGE =====
+        // 🔥 IMPORTANT: Show ORIGINAL service charge in UI
+        $('#' + type + '_service_charge_pp').val(service_charge.toFixed(2));
+
+        // ===== DISCOUNT (APPLY INTERNALLY ONLY) =====
         let discount_type = $('#' + type + '_discount_in_pp').val();
         let discount_val  = +$('#' + type + '_discount_amount_pp').val() || 0;
 
@@ -2283,12 +2287,11 @@ function calculateCostingCards() {
             ? (service_charge * discount_val) / 100
             : discount_val;
 
-        // ensure discount does not exceed service charge
+        // prevent over-discount
         if (discount_amount > service_charge) discount_amount = service_charge;
 
+        // 👉 INTERNAL VALUE ONLY (DO NOT SHOW IN UI)
         let final_service_charge = service_charge - discount_amount;
-
-        $('#' + type + '_service_charge_pp').val(final_service_charge.toFixed(2));
 
         // ===== EXTRA COST =====
         let flight = +$('#' + type + '_flight_pp').val() || 0;
@@ -2300,7 +2303,7 @@ function calculateCostingCards() {
 
         let extra_cost = flight + train + cruise + visa + guide + misc;
 
-        // ===== BASE AMOUNT AFTER DISCOUNT =====
+        // ===== BASE AMOUNT (USE DISCOUNTED SERVICE CHARGE) =====
         let base_amount = land_cost + final_service_charge + extra_cost;
 
         // ===== TAX =====
@@ -2316,7 +2319,7 @@ function calculateCostingCards() {
         else if (tax_apply_on == "4") tax_base = base_amount;
 
         let tax_amount = (tax_base * tax_percent) / 100;
-        $('#' + type + '_tax_amt_pp').val(tax_amount.toFixed(2));
+        $('#' + type + '_tax_amount_pp').val(tax_amount.toFixed(2));
 
         // ===== TCS =====
         let tcs_val = $('#' + type + '_select_tcs_pp').val();

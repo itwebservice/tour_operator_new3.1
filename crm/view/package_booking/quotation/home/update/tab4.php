@@ -405,7 +405,8 @@ function get_pp_val($pp_costing, $type, $field){
                                                                         </tr>
                                                                            <tr data-type="tax_apply_on">
                                                                             <td>Tax Apply On</td>
-                                                                            <td ><select id="adult_tax_apply_on_pp_update" name="adult_tax_apply_on_pp_update"  class="form-control">
+                                                                        <td ><select id="adult_tax_apply_on_pp_update" name="adult_tax_apply_on_pp_update"  class="form-control">
+                                                                              <option value="<?php get_pp_val($pp_costing,'adult','tax_apply_on') ?>"><?php echo $tax_apply_on ?></option>
                                                                                      <option value="1">Tax Apply On</option>
                                                                                      <option value="2">Basic Amount</option>
                                                                                      <option value="3">Service Charge</option>
@@ -710,68 +711,68 @@ function get_pp_val($pp_costing, $type, $field){
                                                                     <tbody>
                                                                          <tr data-type="hotel">
                                                                             <td>Hotel</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','hotel_cost') ?>" id="infant_hotel_pp_update" name="infant_hotel_pp_update"  placeholder="Hotel" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','hotel_cost') ?>" id="adult_hotel_pp_update" name="adult_hotel_pp_update"  placeholder="Hotel" title="" class="form-control" ></td>
                                                                         </tr>
 
                                                                         <tr data-type="transfer">
                                                                             <td>Transfer</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','transfer_cost') ?>" id="infant_transfer_pp_update" name="infant_transfer_pp_update"  placeholder="Transfer" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','transfer_cost') ?>" id="adult_transfer_pp_update" name="adult_transfer_pp_update"  placeholder="Transfer" title="" class="form-control" ></td>
                                                                         </tr>
 
                                                                         <tr data-type="activity">
                                                                             <td>Activity</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','activity_cost') ?>" id="infant_activity_pp_update" name="infant_activity_pp_update"  placeholder="Activity" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','activity_cost') ?>" id="adult_activity_pp_update" name="adult_activity_pp_update"  placeholder="Activity" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
                                                                             <td  class="price">
-                                                                                <input type="text" value="<?= get_pp_val($pp_costing,'infant','land_cost') ?>"onchange=";" id="infant_land_cost_pp_update" name="infant_land_cost_pp_update" placeholder="infant Cost" title="infant Cost">
+                                                                                <input type="text" value="<?= get_pp_val($pp_costing,'adult','land_cost') ?>"onchange=";" id="adult_land_cost_pp_update" name="adult_land_cost_pp_update" placeholder="Adult Cost" title="Adult Cost">
                                                                             </td>
                                                                         </tr>
                                                                         <tr data-type="service_charge">
                                                                             <td>Service Charges </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','service_charge') ?>" id="infant_service_charge_pp_update" name="infant_service_charge_pp_update" placeholder="Service Charges" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','service_charge') ?>" id="adult_service_charge_pp_update" name="adult_service_charge_pp_update" placeholder="Service Charges" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="discount">
                                                                             <td>Discount In</td>
-                                                                            <td ><select name="infant_discount_in_pp_update" id="infant_discount_in_pp_update"  class="form-control">
+                                                                            <td ><select name="adult_discount_in_pp_update" id="adult_discount_in_pp_update"  class="form-control">
                                                                                      <option value="1">Percentage</option>
                                                                                      <option value="2">Flat</option>
                                                                                 </select></td>
                                                                         </tr>
                                                                         <tr data-type="discount_amount">
                                                                             <td  class="price">Discount Amount </td>
-                                                                            <td ><input type="number" value="<?= get_pp_val($pp_costing,'infant','discount_amount') ?>"  id="infant_discount_amount_pp_update" name="infant_discount_amount_pp_update" placeholder="Discount Amount" title="" class="form-control" ></td>
+                                                                            <td ><input type="number" value="<?= get_pp_val($pp_costing,'adult','discount_amount') ?>"  id="adult_discount_amount_pp_update" name="adult_discount_amount_pp_update" placeholder="Discount Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="flight_acost">
                                                                             <td>Flight Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','flight_cost') ?>" id="infant_flight_pp_update" name="infant_flight_pp_update" placeholder="Flight Cost" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','flight_cost') ?>" id="adult_flight_pp_update" name="adult_flight_pp_update" placeholder="Flight Cost" title="" class="form-control" ></td>
                                                                         </tr>
                                                                        
                                                                         <tr data-type="train_acost">
                                                                             <td>Train Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','train_cost') ?>" id="infant_train_pp_update" name="infant_train_pp_update"  placeholder="Train Cost" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','train_cost') ?>" id="adult_train_pp_update" name="adult_train_pp_update"  placeholder="Train Cost" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td>Cruise Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','cruise_cost') ?>" id="infant_cruise_pp_update" name="infant_cruise_pp_update"  placeholder="Cruise Cost" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','cruise_cost') ?>" id="adult_cruise_pp_update" name="adult_cruise_pp_update"  placeholder="Cruise Cost" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="visa_acost">
                                                                             <td>Visa Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','visa_cost') ?>"  id="infant_visa_pp_update" name="infant_visa_pp_update"  placeholder="Visa Cost" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','visa_cost') ?>"  id="adult_visa_pp_update" name="adult_visa_pp_update"  placeholder="Visa Cost" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="guide_acost">
                                                                             <td>Guide Cost </td> 
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','guide_cost') ?>" id="infant_guide_pp_update" name="infant_guide_pp_update"  placeholder="Guide Cost" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','guide_cost') ?>" id="adult_guide_pp_update" name="adult_guide_pp_update"  placeholder="Guide Cost" title="" class="form-control" ></td>
                                                                         </tr>
                                                                         <tr data-type="miscellaneous_acost">
                                                                             <td>Miscellaneous Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','misc_cost') ?>" id="infant_misc_pp_update" name="infant_misc_pp_update"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','misc_cost') ?>" id="adult_misc_pp_update" name="adult_misc_pp_update"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
                                                                         </tr>
                                                                            <tr data-type="tax_apply_on">
                                                                             <td>Tax Apply On</td>
-                                                                            <td ><select id="infant_tax_apply_on_pp_update" name="infant_tax_apply_on_pp_update"  class="form-control">
-                                                                                     <option value="1">Tax Apply On</option>
+                                                                            <td ><select id="adult_tax_apply_on_pp_update" name="adult_tax_apply_on_pp_update"  class="form-control">
+                                                                                       <option value="1">Tax Apply On</option>
                                                                                      <option value="2">Basic Amount</option>
                                                                                      <option value="3">Service Charge</option>
                                                                                      <option value="4">Total</option>
@@ -779,7 +780,7 @@ function get_pp_val($pp_costing, $type, $field){
                                                                         </tr>
                                                                            <tr data-type="tax">
                                                                             <td>Select Tax</td>
-                                                                            <td ><select id="infant_select_tax_pp_update" name="infant_select_tax_pp_update" class="form-control">
+                                                                            <td ><select id="adult_select_tax_pp_update" name="adult_select_tax_pp_update" class="form-control">
                                                                                     <option value="">*Select Tax</option>
                                                                                 <?php get_tax_dropdown('Income') ?>
                                                                                    
@@ -787,11 +788,11 @@ function get_pp_val($pp_costing, $type, $field){
                                                                         </tr>
                                                                           <tr data-type="tax_value">
                                                                             <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number"  value="<?= get_pp_val($pp_costing,'infant','tax_amount') ?>" id="infant_tax_amt_pp_update" name="infant_tax_amt_pp_update"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number"  value="<?= get_pp_val($pp_costing,'adult','tax_amount') ?>" id="adult_tax_amt_pp_update" name="adult_tax_amt_pp_update"  placeholder="Tax Amount" title="" class="form-control" ></td>
                                                                         </tr>
                                                                              <tr data-type="tcs">
                                                                             <td>TCS</td>
-                                                                            <td ><select id="infant_select_tcs_pp_update" name="infant_select_tcs_pp_update"  class="form-control">
+                                                                            <td ><select id="adult_select_tcs_pp_update" name="adult_select_tcs_pp_update"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
                                                                                      <option value="2">5% TCS</option>
                                                                                      <option value="3">20% TCS</option>
@@ -799,11 +800,11 @@ function get_pp_val($pp_costing, $type, $field){
                                                                         </tr>
                                                                            <tr data-type="tcs_value">
                                                                             <td>TCS Amount </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','tcs_amount') ?>" id="infant_tcs_amount_pp_update" name="infant_tcs_amount_pp_update"  placeholder="TCS" title="" class="form-control" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','tcs_amount') ?>" id="adult_tcs_amount_pp_update" name="adult_tcs_amount_pp_update"  placeholder="TCS" title="" class="form-control" ></td>
                                                                         </tr>
                                                                            <tr data-type="total">
                                                                             <td>Total Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'infant','total_cost') ?>" id="infant_total_amount_pp_update" name="infant_total_amount_pp_update" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
+                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','total_cost') ?>" id="adult_total_amount_pp_update" name="adult_total_amount_pp_update" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
                                                                         </tr>
                                                                        
                                                                     </tbody>

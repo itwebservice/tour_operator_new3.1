@@ -810,7 +810,7 @@
                 //Tab-4 Per person costing
                 $('#hotel_pp_costing').val(JSON.stringify(pp_arr));
 
-                calculateCostingCards();
+                calculateCostingCardsTab3();
             }
         });
     }
@@ -982,7 +982,7 @@
                 //Tab-4 Per person costing
                 $('#travel_pp_costing').val(JSON.stringify(pp_arr));
 
-                calculateCostingCards();
+                calculateCostingCardsTab3();
             }
         });
     }
@@ -1654,7 +1654,34 @@
                 var exc_atransfer_cost = (parseInt(adult_count) !== 0) ? exc_ftransfer_cost : 0;
                 var exc_cwtransfer_cost = (parseInt(child_with_bed) !== 0) ? exc_ftransfer_cost : 0;
 
-                $("#adult_activity_pp").val(hadult_cost);
+              // ===== TOTAL COUNT =====
+var final_count = 
+    parseInt(adult_count) + 
+    parseInt(child_with_bed) + 
+    parseInt(child_without_bed) + 
+    parseInt(total_infant);
+
+if (final_count === 0) final_count = 1;
+
+// ===== PER PERSON TRANSFER =====
+var final_tranfer_cost = parseFloat(exc_ftransfer_cost) / final_count;
+
+// ===== FINAL VALUES =====
+$("#adult_activity_pp").val(
+    (hadult_cost + (parseInt(adult_count) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
+);
+
+$("#cweb_activity_pp").val(
+    (child_with_bed_coste + (parseInt(child_with_bed) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
+);
+
+$("#cwnb_activity_pp").val(
+    (child_without_bede + (parseInt(child_without_bed) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
+);
+
+$("#infant_activity_pp").val(
+    (exc_infant_coste + (parseInt(total_infant) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
+);
                
               
                 var table = document.getElementById("tbl_package_tour_quotation_adult_child");
@@ -2690,91 +2717,120 @@ function initializeCityDropdowns(table, hotel_arr) {
 
 
 
-function calculateCostingCards() {
-   
-    console.log('Run');
- 
+function calculateCostingCardsTab3(type = '') {
+
+    console.log('Run:', type);
+
+    // =========================
     // LAND COST
-    let hotel = parseFloat($('#hotel_cost').val()) || 0;
+    // =========================
+
+    let hotel = 0;
+
+    // 👉 Infant: take manual value (no override logic)
+    if (type === 'infant') {
+        hotel = parseFloat($('#hotel_cost').val()) || 0;
+    } else {
+        // 👉 Others: normal (can be auto or manual as per your system)
+        hotel = parseFloat($('#hotel_cost').val()) || 0;
+    }
+
     let transfer = parseFloat($('#transfer_cost').val()) || 0;
     let activity = parseFloat($('#activity_cost').val()) || 0;
-    console.log(hotel);
-    console.log(transfer);
-    console.log(activity);
- 
+
     let land_cost = hotel + transfer + activity;
-    console.log(land_cost);
- 
-    // SERVICE
+
+    // =========================
+    // SERVICE CHARGE
+    // =========================
     let service = parseFloat($('#service_charge').val()) || 0;
     let discount_percent = parseFloat($('#discount_percent').val()) || 0;
- 
-    // TRAVEL
+
+    // 👉 Discount calculation (internal only)
+    let discount = (service * discount_percent) / 100;
+
+    if (discount > service) discount = service;
+
+    let service_used = service - discount;
+
+    if (service_used < 0) service_used = 0;
+
+    // =========================
+    // TRAVEL COST
+    // =========================
     let flight = parseFloat($('#flight_cost').val()) || 0;
     let train = parseFloat($('#train_cost').val()) || 0;
     let cruise = parseFloat($('#cruise_cost').val()) || 0;
- 
+
     let travel_cost = flight + train + cruise;
- 
-    // OTHER
+
+    // =========================
+    // OTHER COST
+    // =========================
     let visa = parseFloat($('#visa_cost').val()) || 0;
     let guide = parseFloat($('#guide_cost').val()) || 0;
     let misc = parseFloat($('#misc_cost').val()) || 0;
- 
+
     let total_pax = parseInt($('#total_pax').val()) || 1;
- 
+
+    if (total_pax <= 0) total_pax = 1;
+
     let guide_pp = guide / total_pax;
     let misc_pp = misc / total_pax;
- 
+
     let other_cost = visa + guide_pp + misc_pp;
- 
-    // BASE
-    let base = land_cost + service;
- 
-    // DISCOUNT
-    let discount = (service * discount_percent)/100;
- 
-    let subtotal = base - discount;
- 
-    // ADD TRAVEL
-    subtotal += travel_cost;
- 
-    // ADD OTHER
-    subtotal += other_cost;
- 
+
+    // =========================
+    // BASE + SUBTOTAL
+    // =========================
+    let base = land_cost + service_used;
+
+    let subtotal = base + travel_cost + other_cost;
+
+    // =========================
     // TAX
+    // =========================
     let tax_percent = parseFloat($('#tax_percent').val()) || 0;
     let tax_apply = $('#tax_apply').val();
- 
+
     let tax = 0;
- 
-    if(tax_apply == "service")
-        tax = (service * tax_percent)/100;
- 
-    if(tax_apply == "basic")
-        tax = (land_cost * tax_percent)/100;
- 
-    if(tax_apply == "total")
-        tax = (subtotal * tax_percent)/100;
- 
+
+    if (tax_apply == "service") {
+        tax = (service_used * tax_percent) / 100;
+    } 
+    else if (tax_apply == "basic") {
+        tax = (land_cost * tax_percent) / 100;
+    } 
+    else if (tax_apply == "total") {
+        tax = (subtotal * tax_percent) / 100;
+    }
+
     let subtotal_with_tax = subtotal + tax;
- 
+
+    // =========================
     // TCS
+    // =========================
     let tcs_percent = parseFloat($('#tcs_percent').val()) || 0;
- 
-    let tcs = (subtotal_with_tax * tcs_percent)/100;
- 
-    // FINAL
+
+    let tcs = (subtotal_with_tax * tcs_percent) / 100;
+
+    // =========================
+    // FINAL AMOUNT
+    // =========================
     let final = subtotal_with_tax + tcs;
- 
-    console.log(hotel);
+
+    // =========================
+    // RETURN VALUES
+    // =========================
     return {
-          hotel: hotel,
-    transfer: transfer,
-    activity: activity,
+        type: type,
+        hotel: hotel,
+        transfer: transfer,
+        activity: activity,
         land: land_cost,
-        service: service,
+        service: service,            // UI value
         discount: discount,
+        service_used: service_used,  // internal value
         travel: travel_cost,
         other: other_cost,
         tax: tax,
