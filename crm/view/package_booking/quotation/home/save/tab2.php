@@ -47,233 +47,62 @@
                 </div>
             </div>
 
+            <!-- ai chat container start -->
             <div class="ai-chat-container">
-             <style>
-                /* ------Ai Button------- */
-                .ai-chat-container{
-                    position:relative;
-                    padding: 15px 0;
-                }
-.ai-toggle-btn {
-  position: absolute;
-  top: 8px;
-  right: 14px;
-  z-index: 1001;
-  height: 30px;
-  padding: 0 12px;
-  border: none;
-  border-radius: 15px;
-  background: linear-gradient(90deg, #8d3cff 0%, #d533a8 100%);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
+                <button class="btn btn-info btn-sm ico_left" id="aiToggleBtn" type="button" aria-label="Toggle AI assistant">
+                    <span class="ai-toggle-icon"><i class="fa fa-tachometer"></i></span>
+                    <span>AI</span>
+                </button>
+                        
+                <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
+                    <textarea placeholder="Type your message..."></textarea>
 
-.ai-toggle-icon {
-  font-size: 10px;
-  line-height: 1;
-}
+                    <button class="send-btn">
+                        <!-- Send Icon -->
+                        <svg viewBox="0 0 24 24">
+                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
+                        </svg>
+                    </button>
+                </div>
 
-.ai-chat-box {
-  position: relative;
-  z-index: 1000;
-  width: 80%;
-  /* height: 200px; */
-  background: #fff;
-  border: 1px solid #e2e4ea;
-  border-radius: 22px;
-  padding: 20px 20px 56px;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  margin: 30px auto 15px !important;
-}
+                <div class="ai-itinerary-row" id="aiItineraryRow" aria-hidden="true">
+                    <label class="ai-check-wrap" for="chk-program">
+                        <input id="chk-program" type="checkbox">
+                    </label>
+                    <input type="text" class="ai-field ai-special" placeholder="*Special Attraction" value="">
+                    <textarea class="ai-field ai-day-program" placeholder="*Day-wise Program"></textarea>
+                    <input type="text" class="ai-field ai-stay" placeholder="*Overnight Stay" value="">
+                    <select class="ai-field ai-meal">
+                        <option selected>Meal Plan</option>
+                        <option>Breakfast</option>
+                        <option>Lunch</option>
+                        <option>Dinner</option>
+                        <option>B+L</option>
+                        <option>B+D</option>
+                        <option>L+D</option>
+                        <option>B+L+D</option>
+                        <option>Room Only</option>
+                        <option>No Meals</option>
+                        <option>All Inclusive</option>
+                    </select>
+                    <button type="button" class="ai-plus-btn" aria-label="Add itinerary">+</button>
+                </div>
 
-.ai-chat-box.show {
-  opacity: 1;
-  visibility: visible;
-}
+                <script>
+                    const aiToggleBtn = document.getElementById("aiToggleBtn");
+                    const aiChatBox = document.getElementById("aiChatBox");
+                    const aiItineraryRow = document.getElementById("aiItineraryRow");
 
-.ai-chat-textarea {
-  width: 100%;
-  height: 200px !important;
-  border: none;
-  background: transparent;
-  padding: 0;
-  font-size: 18px;
-  color: #2a2f3a;
-  resize: none;
-  outline: none;
-}
-textarea .ai-chat-textarea.form-control:focus{
-    box-shadow: transparent !important;
-}
-
-.ai-chat-textarea::placeholder {
-  color: #a4a9b6;
-}
-
-.ai-send-btn {
-  position: absolute;
-  right: 16px;
-  bottom: 12px;
-  width: 38px;
-  height: 38px;
-  border: none;
-  border-radius: 50%;
-  background: #eef1f7;
-  color: #1f2737;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.ai-itinerary-row {
-  position: relative;
-  width: 90%;
-  height: 135px;
-  background: #f9f9f9;
-  border: 1px solid #e1e3e8;
-  border-radius: 2px;
-  padding: 10px 12px;
-  display: flex !important;
-  align-items: center;
-  gap: 25px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease;
-  margin: 50px auto 15px;
-  border-radius : 15px;
-}
-
-.ai-itinerary-row.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-.ai-check-wrap {
-  width: 24px;
-  display: flex;
-  justify-content: center;
-}
-
-.ai-check-wrap input {
-  width: 16px;
-  height: 16px;
-  accent-color: #b406c1;
-  cursor: pointer;
-}
-
-.ai-field {
-  border: 1px solid #d8dbe3;
-  background: #fff;
-  height: 40px;
-  padding: 6px 10px;
-  font-size: 12px;
-  color: #3b3f47;
-  outline: none;
-}
-
-.ai-special {
-  width: 220px;
-  border-radius: 4px;
-}
-
-.ai-day-program {
-  width: 50%;
-  height: 80px !important;
-  resize: vertical;
-  line-height: 1.4;
-}
-
-.ai-stay {
-  width: 170px;
-}
-
-.ai-meal {
-  width: 140px;
-}
-
-.ai-plus-btn {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #b406c1;
-  border-radius: 50%;
-  background: #fff;
-  color: #b406c1;
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@media (max-width: 1100px) {
-  .ai-itinerary-row {
-    flex-wrap: wrap;
-    top: calc(50% + 170px);
-  }
-
-  .ai-day-program {
-    width: 100%;
-  }
-}
-             </style>
-            <button class="ai-toggle-btn" id="aiToggleBtn" type="button" aria-label="Toggle AI assistant">
-                <span class="ai-toggle-icon"><i class="fa fa-tachometer"></i></span>
-                <span>AI</span>
-            </button>
-
-            <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
-        <textarea class="ai-chat-textarea" placeholder="Type your message..."></textarea>
-        <button class="ai-send-btn" type="button" aria-label="Send message">&#10148;</button>
-    </div>
-
-    <div class="ai-itinerary-row" id="aiItineraryRow" aria-hidden="true">
-        <label class="ai-check-wrap" for="chk-program">
-            <input id="chk-program" type="checkbox">
-        </label>
-        <input type="text" class="ai-field ai-special" placeholder="*Special Attraction" value="">
-        <textarea class="ai-field ai-day-program" placeholder="*Day-wise Program"></textarea>
-        <input type="text" class="ai-field ai-stay" placeholder="*Overnight Stay" value="">
-        <select class="ai-field ai-meal">
-            <option selected>Meal Plan</option>
-            <option>Breakfast</option>
-            <option>Lunch</option>
-            <option>Dinner</option>
-            <option>B+L</option>
-            <option>B+D</option>
-            <option>L+D</option>
-            <option>B+L+D</option>
-            <option>Room Only</option>
-            <option>No Meals</option>
-            <option>All Inclusive</option>
-        </select>
-        <button type="button" class="ai-plus-btn" aria-label="Add itinerary">+</button>
-    </div>
-
-    <script>
-        const aiToggleBtn = document.getElementById("aiToggleBtn");
-        const aiChatBox = document.getElementById("aiChatBox");
-        const aiItineraryRow = document.getElementById("aiItineraryRow");
-
-        aiToggleBtn.addEventListener("click", function () {
-            aiChatBox.classList.toggle("show");
-            const isVisible = aiChatBox.classList.contains("show");
-            aiChatBox.setAttribute("aria-hidden", String(!isVisible));
-            aiItineraryRow.classList.toggle("show", isVisible);
-            aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
-        });
-    </script>
+                    aiToggleBtn.addEventListener("click", function () {
+                        aiChatBox.classList.toggle("show");
+                        const isVisible = aiChatBox.classList.contains("show");
+                        aiChatBox.setAttribute("aria-hidden", String(!isVisible));
+                        aiItineraryRow.classList.toggle("show", isVisible);
+                        aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
+                    });
+                </script>
             </div>
+            <!-- ai chat container end -->
 
             <div class="row text-center mg_tp_20">
                 <div class="col-xs-12">
