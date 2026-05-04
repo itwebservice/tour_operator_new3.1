@@ -1,7 +1,7 @@
 <?php
 class GeminiController
 {
-    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyAbQxyFrfnSJvIFvC_GtP8RP0DxQhiX7qo';
+    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyC9diotLu1KA4NvNz5vzh6a1HD-nIppOFY';
     
     private $promptTemplate = 
         'You are an AI that extracts structured travel itinerary data from raw, unstructured text.
@@ -69,7 +69,15 @@ class GeminiController
         If both highlights and title are missing → use null
 
         day_wise_program → full cleaned itinerary description of the day
-        overnight_stay → city/place where night stay is planned
+
+        overnight_stay →
+        Extract the city/place where night stay is planned.
+        If it is the LAST day of the itinerary:
+
+        If overnight stay content is available → use it
+        If NOT available → return "Tour End"
+        For all other days, return the actual overnight stay location or null if not available
+
         meal_plan → normalized readable version (e.g., Breakfast, Breakfast + Dinner)
 
         MEALS PLAN:
@@ -121,15 +129,18 @@ class GeminiController
         Identify sections using keywords (case-insensitive):
         Inclusions → inclusion, inclusions, package includes, cost includes, price includes
         Exclusions → exclusion, exclusions, package excludes, cost excludes, price excludes
+
         STANDARD EXTRACTION
         If sections exist:
         Extract all bullet points or lines under each section
         Stop when a new unrelated section begins
         Clean symbols (•, -, *, !!), trim spaces, remove duplicates
+
         PARAGRAPH-BASED EXTRACTION
         If written in sentence form (e.g., “includes hotel, meals… not includes airfare…”):
         Split into inclusions and exclusions correctly
         Convert into clean bullet points
+
         INFERENCE RULES (ONLY IF SECTION MISSING)
         Infer inclusions from itinerary content ONLY when clearly supported:
         Hotel stay → "Accommodation"
@@ -140,19 +151,23 @@ class GeminiController
         For exclusions:
         Extract ONLY if explicitly stated (e.g., airfare not included, personal expenses, taxes extra)
         DO NOT guess exclusions
+
         NORMALIZATION
         Convert short forms: B/F → Breakfast
         Merge duplicates (e.g., Hotel stay & Accommodation → keep one)
         Keep entries concise and readable
+
         STRICT OUTPUT RULE
         Always return arrays
         If nothing found → []
         NEVER return null for inclusions/exclusions
+
         NOISE FILTERING
         Ignore:
         Terms & conditions
         Payment or cancellation text
         Marketing/promotional lines
+
         EDGE CASE HANDLING
         If inclusions & exclusions are merged → split using keywords (include/exclude)
         If unclear → return empty arrays (do NOT guess)
