@@ -17,7 +17,7 @@ include 'crm/model/app_settings/dropdown_master.php';
 $servername = "localhost";
 $username = "root";
 $password = "";
-$db_name = "tour_operator_new_2_2";
+$db_name = "tour_operator_new_3_1";
 
 // $db_name = "tour_operator_theme";
 global $connection;

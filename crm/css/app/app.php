@@ -2584,7 +2584,7 @@ textarea.ai-chat-textarea.form-control:focus,
 	background: #f9f9f9;
 	border: 1px solid #e1e3e8;
 	border-radius: 15px;
-	padding: 10px 12px;
+	padding: 20px 12px 10px 12px;
 	align-items: center;
 	gap: 25px;
 	opacity: 0;
@@ -2629,7 +2629,7 @@ textarea.ai-chat-textarea.form-control:focus,
 }
 
 .ai-day-program {
-	width: 50%;
+	width: 100%;
 	height: 80px !important;
 	resize: vertical;
 	line-height: 1.4;
@@ -2708,4 +2708,14 @@ textarea.ai-chat-textarea.form-control:focus,
 	width: 18px;
 	height: 18px;
 	fill: #111827;
+}
+
+#aiApiInfo{
+    margin-left: 115px !important;
+    margin-bottom: 20px;
+}
+
+#ai-inclusions-exclusions-info{
+	display: flex;
+    margin: 0px 80px;
 }
