@@ -55,13 +55,18 @@
                 </button>
                 <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
                     <textarea id="aiMessageInput" placeholder="Type your message..."></textarea>
-                    <button class="send-btn" id="btnAnalyseMessage">
+                    <button type="button" class="send-btn" id="btnAnalyseMessage">
                         <svg viewBox="0 0 24 24">
                         <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
                         </svg>
                     </button>
                 </div>
                 <div id="aiApiInfo"></div>
+                
+                <div id="aiItineraryLegend" style="display: none; margin: 0px 75px;">
+                    <legend>Tour Itinerary</legend>
+                </div>
+                
                 <div class="ai-itinerary-row" id="aiItineraryRow" aria-hidden="true">
                     <label class="ai-check-wrap" for="chk-program">
                         <input id="chk-program" type="checkbox">
@@ -121,6 +126,7 @@
                     const aiToggleBtn = document.getElementById("aiToggleBtn");
                     const aiChatBox = document.getElementById("aiChatBox");
                     const aiItineraryRow = document.getElementById("aiItineraryRow");
+                    const aiItineraryLegend = document.getElementById("aiItineraryLegend");
 
                     aiToggleBtn.addEventListener("click", function () {
                         aiChatBox.classList.toggle("show");
@@ -128,6 +134,7 @@
                         aiChatBox.setAttribute("aria-hidden", String(!isVisible));
                         aiItineraryRow.classList.toggle("show", isVisible);
                         aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
+                        aiItineraryLegend.style.display = isVisible ? "block" : "none";
                     });
 
                     function selectMealPlan($mealSelect, mealValue) {

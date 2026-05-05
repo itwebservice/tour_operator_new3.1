@@ -65,7 +65,7 @@ class GeminiController
         DETAILED PROGRAM FIELD RULES:
         special_attraction →
         Extract key highlights, major experiences, or unique attractions of the day
-        If highlights are NOT clearly available, use the Day title (e.g., "Arrival in Srinagar", "Excursion to Sonmarg")
+        If highlights are NOT clearly available, use the Day title
         If both highlights and title are missing → use null
 
         day_wise_program → full cleaned itinerary description of the day
@@ -73,16 +73,79 @@ class GeminiController
         overnight_stay →
         Extract the city/place where night stay is planned.
         If it is the LAST day of the itinerary:
-
         If overnight stay content is available → use it
         If NOT available → return "Tour End"
-        For all other days, return the actual overnight stay location or null if not available
+        For all other days, return the actual overnight stay location or null
 
-        meal_plan → normalized readable version (e.g., Breakfast, Breakfast + Dinner)
+        meal_plan → normalized readable version
 
-        MEALS PLAN:
-        If N/A → null
-        Normalize as: Breakfast, Lunch, Dinner, B+L, B+D, L+D, B+L+D, Room Only, No Meals, All Inclusive
+        MEALS PLAN (FINAL FIX - BLOCK BASED EXTRACTION):
+
+        CRITICAL RULE:
+        Hotel data is in structured blocks. Treat the following as ONE unit:
+
+        Nights line (e.g., "1st, 2nd Nights at Shimla")
+        Check-in / Check-out
+        Hotel name
+        Meal line
+
+        Do NOT break this structure.
+
+        STEP 1: IDENTIFY HOTEL BLOCK
+        Group lines until next "Nights at" appears
+
+        STEP 2: EXTRACT MEAL FROM SAME BLOCK ONLY
+        Extract ONLY meal portion from the last line
+        Ignore room details after meal
+
+        Example:
+        "Dinner + Breakfast • 1 Executive with balcony (2 Pax)" → "Dinner + Breakfast"
+
+        STEP 3: CLEAN TEXT
+        Lowercase
+        Remove symbols: + / - , . • |
+        Remove words: room, pax, balcony, executive, deluxe, etc.
+
+        STEP 4: DETECT KEYWORDS
+        breakfast → B
+        lunch → L
+        dinner → D
+
+        STEP 5: NORMALIZE (ORDER FIXED)
+        Always: Breakfast → Lunch → Dinner
+
+        Mappings:
+        Breakfast + Dinner → B+D
+        Breakfast + Lunch → B+L
+        Lunch + Dinner → L+D
+        All three → B+L+D
+
+        Single:
+        Breakfast → Breakfast
+        Lunch → Lunch
+        Dinner → Dinner
+
+        STEP 6: MAP TO ITINERARY DAYS
+        Use check-in and check-out
+
+        Rule:
+        Apply from check-in date to (check-out - 1 day)
+
+        Example:
+        09-11 → Day 1, Day 2
+        11-14 → Day 3, 4, 5
+
+        STEP 7: PRIORITY
+        Hotel meals override itinerary meals
+
+        STEP 8: FALLBACK
+        If not in hotel → check itinerary → else null
+
+        STRICT RULES:
+        Do NOT mix meals between hotels
+        Do NOT extract from room text
+        Do NOT skip mapping
+        Always bind meal to correct hotel block
 
         HOTELS:
         Extract city, hotel, category

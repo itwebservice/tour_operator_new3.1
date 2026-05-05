@@ -2687,7 +2687,7 @@ textarea.ai-chat-textarea.form-control:focus,
 .send-btn {
 	position: absolute;
 	right: 20px;
-	bottom: 20px;
+	bottom: 10px;
 	width: 44px;
 	height: 44px;
 	border-radius: 50%;
