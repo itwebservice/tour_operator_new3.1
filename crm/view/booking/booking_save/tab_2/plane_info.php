@@ -25,10 +25,26 @@
             <td class="col-md-1"><input maxlength="15" type="text" id="txt_plane_sr" name="txt_plane_sr" value="1" placeholder="Sr.No." disabled /></td>
             <td><input type="text" id="txt_plane_date-1" name="txt_plane_date-1" placeholder="*Departure Date and Time" Title="Departure Date and Time" value="<?= date('d-m-Y H:i') ?>"  onchange="get_to_datetime(this.id,'txt_arravl-1');" style="width:156px"></td>
             <td><input type="text" id="txt_arravl-1" name="txt_arravl-1" class="app_datetimepicker" placeholder="Arrival Date & Time" title="Arrival Date & Time" onchange="validate_validDatetime('txt_plane_date-1',this.id)" value="<?= date('d-m-Y') ?>" style="width:156px"></td>
-            <td><input type="text" name="from_sector-1" id="from_sector-1" style="width:300px" placeholder="From Sector" title="From Sector"></td>
+            <!-- <td><input type="text" name="from_sector-1" id="from_sector-1" style="width:300px" placeholder="From Sector" title="From Sector"></td>
 			<td><input type="text" name="to_sector-1" id="to_sector-1" style="width:300px" placeholder="To Sector" title="To Sector">
-			</td> 
-            <td><select id="txt_plane_company-1" name="txt_plane_company-1" class="app_select2" style="width:150px" title="Airline Name">
+			</td>  -->
+
+            <td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 "
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 "
+                                                                    data-sector-type="to" title="To Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
+                                                            </td>
+
+            <td><select id="txt_plane_company-1" name="txt_plane_company-1" class="app_select2" style="width:150px" title="Airline Name" data-add-new-option="true">
                 <option value="">*Airline Name</option>
                 <?php get_airline_name_dropdown(); ?>
             </select></td>
@@ -71,4 +87,16 @@
     </div>
     <script>
         event_airport('tbl_plane_travel_details_dynamic_row',4,5);
+        $('#txt_plane_company-1').select2({
+
+        });
+
+        $('#from_sector-1').select2({
+width: '300px'
+});
+$('#to_sector-1').select2({
+	
+	width: '300px'
+        });
+       
     </script>

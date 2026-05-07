@@ -51,12 +51,12 @@ $nofquotation = $_REQUEST['nofquotation'];
                                         </td>
                                         <td><select id="city_name-<?= $i ?>-1" name="city_name-<?= $i ?>-1"
                                                 class="city_master_dropdown form-control" style="width:160px"
-                                                onchange="hotel_name_list_load(this.id);" title="Select City Name">
+                                                onchange="hotel_name_list_load(this.id);" title="Select City Name" data-add-new-option="true" >
                                             </select>
                                         </td>
                                         <td><select id="hotel_name-<?= $i ?>-1" name="hotel_name-<?= $i ?>-1"
                                                 onchange="hotel_type_load(this.id);get_hotel_cost('dynamic_table_list_h_<?= $i ?>');"
-                                                style="width:160px" title="Select Hotel Name">
+                                                class="form-control app_select2" style="width:160px" title="Select Hotel Name" data-add-new-option="true">
                                                 <option value="">Hotel Name</option>
                                             </select>
                                         </td>
@@ -64,13 +64,13 @@ $nofquotation = $_REQUEST['nofquotation'];
                                         <td><select name="room_cat-<?= $i ?>-1" id="room_cat-<?= $i ?>-1"
                                                 style="width:162px;" title="Room Category"
                                                 class="form-control app_select2"
-                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');"><?php get_room_category_dropdown(); ?></select>
+                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');" data-add-new-option="true"><?php get_room_category_dropdown(); ?></select>
                                         </td>
                                         <?php } else{?>
                                         <td><select name="room_cat-<?= $i ?>-1" id="room_cat-<?= $i ?>-1"
                                                 style="width:162px;" title="Room Category"
                                                 class="form-control app_select2"
-                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');">
+                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');" data-add-new-option="true">
                                                 <option value="">Room Category</option></select>
                                         </td>
                                         <?php }?>
@@ -130,5 +130,11 @@ $('.app_datepicker').datetimepicker({
 
 $('select[id^="room_cat-"]').each(function() {
     $(this).select2();
+});
+
+$('select[id^="hotel_name-"]').each(function() {
+    if (!$(this).data('select2')) {
+        $(this).select2({ width: '160px', minimumResultsForSearch: 0 });
+    }
 });
 </script>

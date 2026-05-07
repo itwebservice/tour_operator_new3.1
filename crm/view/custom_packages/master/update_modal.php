@@ -323,7 +323,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                             <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                                             <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
                                                 </select></td>
-                                            <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                            <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="form-control app_select2" data-add-new-option="true">
                                                     <option value="">*Hotel Name</option>
                                                 </select></td>
                                             <td><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
@@ -348,7 +348,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                         <option value="<?php echo $sq_city['city_id']; ?>">
                                                             <?php echo $sq_city['city_name']; ?></option>
                                                     </select></td>
-                                                <td><select id="hotel_name<?php echo $count_hotel; ?>-u" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                                <td><select id="hotel_name<?php echo $count_hotel; ?>-u" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="form-control app_select2" data-add-new-option="true">
                                                         <?php
                                                         $rowsHotel = mysqlQuery("SELECT * FROM `hotel_master` WHERE `city_id`=" . $sq_city['city_id']);
                                                         while ($rows = mysqli_fetch_assoc($rowsHotel)) {
@@ -389,9 +389,10 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                         <tr>
                                             <td><input id="chk_dest" type="checkbox"></td>
                                             <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
+                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
                                                 </select></td>
-                                            <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+
+                                            <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true">
                                                     <option value="">*Hotel Name</option>
                                                 </select></td>
                                             <td><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
@@ -412,11 +413,11 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                 <td><input id="chk_dest<?php echo $count_hotel; ?>-u" type="checkbox" checked>
                                                 </td>
                                                 <td><input maxlength="15" value="<?php echo $count_hotel; ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                <td><select id="city_name<?php echo $count_hotel; ?>-u" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
+                                                <td><select id="city_name<?php echo $count_hotel; ?>-u" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
                                                         <option value="<?php echo $sq_city['city_id']; ?>">
                                                             <?php echo $sq_city['city_name']; ?></option>
                                                     </select></td>
-                                                <td><select id="hotel_name<?php echo $count_hotel; ?>-u" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                                <td><select id="hotel_name<?php echo $count_hotel; ?>-u" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" data-add-new-option="true">
                                                         <?php
                                                         $rowsHotel = mysqlQuery("SELECT * FROM `hotel_master` WHERE `city_id`=" . $sq_city['city_id']);
                                                         while ($rows = mysqli_fetch_assoc($rowsHotel)) {
@@ -458,7 +459,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                         <tr>
                                             <td><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" autocomplete="off" data-original-title="" title="" aria-hidden="true" style="display: none;"><label for="chk_transport1"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label><label class="css-label" for="chk_transport1"> </label></td>
                                             <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off" data-original-title="" title=""></td>
-                                            <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" style="width:100%" class="form-control app_select2" title="Select Vehicle">
+                                            <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" style="width:100%" class="form-control app_select2" title="Select Vehicle" data-add-new-option="true">
                                                     <option value="">Select Vehicle</option>
                                                     <?php
                                                     $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -485,7 +486,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                 <td><input id="chk_transport1<?php echo $count_hotel; ?>-u" type="checkbox" checked>
                                                 </td>
                                                 <td><input maxlength="15" value="<?php echo $count_hotel; ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                <td class="col-md-3"><select name="vehicle_name1-u" id="vehicle_name1<?php echo $count_hotel; ?>-u" style="width:250px" class="form-control app_select2" title="Select Vehicle">
+                                                <td class="col-md-3"><select name="vehicle_name1-u" id="vehicle_name1<?php echo $count_hotel; ?>-u" style="width:250px" class="form-control app_select2" title="Select Vehicle" data-add-new-option="true">
                                                         <option value="<?php echo $sq_transport['entry_id']; ?>">
                                                             <?php echo $sq_transport['vehicle_name']; ?></option>
                                                         <option value="">Select Vehicle</option>
@@ -581,6 +582,8 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script>
+
+
 // Day image preview functions for update modal
 function previewDayImageUpdate(input, offset) {
     console.log("PACKAGE UPDATE: Preview triggered for row:", offset);
@@ -920,6 +923,14 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
     $('#vehicle_name1,#currency_code1,#dest_image1').select2();
     destinationLoading('.pickup_from_u', "Pickup Location");
     destinationLoading('.drop_to_u', "Drop-off Location");
+    $('#tbl_package_hotel_master select[id^="hotel_name"]').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({
+                width: '100%',
+                minimumResultsForSearch: 0
+            });
+        }
+    });
 
 
     function generateSlug(packageName) {
@@ -1431,13 +1442,52 @@ $('#seo_slug').val(generateSlug(packageName));
             $.get("package/hotel/hotel_name_load.php", {
                 city_id: city_id
             }, function(data) {
+                var hadSelect2 = !!hotelSelect.data('select2');
+                if (hadSelect2) {
+                    hotelSelect.select2('destroy');
+                }
                 hotelSelect.html(data);
+                hotelSelect.select2({
+                    width: '100%',
+                    minimumResultsForSearch: 0
+                });
                 console.log("Hotel options loaded for", hotelSelectId);
             });
         } else {
             console.log("Hotel select not found for ID:", hotelSelectId);
         }
     }
+
+    // Select2 "+ Add New" for Hotel Name => open Hotel Supplier Details popup (if available)
+    $(document).off('select2:add_new.customHotelSupplierU').on('select2:add_new.customHotelSupplierU', 'select[id^="hotel_name"]', function() {
+        var $hotelSelect = $(this);
+        var hotelId = $hotelSelect.attr('id') || '';
+
+        // For cloned rows, ids are like: hotel_name2 / city_name2
+        var suffix = hotelId.replace(/^hotel_name/, '');
+        var citySelectId = 'city_name' + suffix;
+        var $citySelect = $('#' + citySelectId);
+        var cityId = $citySelect.length ? $citySelect.val() : $('#city_name').val();
+
+        if ($('#Hotelsupplierdetails_modal').length) {
+            $('#Hotelsupplierdetails_modal').data('trigger-city-id', citySelectId);
+            if ($('#city_filter_hotel').length) {
+                $('#city_filter_hotel').val(cityId).trigger('change');
+            }
+            $('#Hotelsupplierdetails_modal input[title="Hotel Name"]').val('');
+            $('#Hotelsupplierdetails_modal').modal('show');
+        } else if (typeof hotel_save_modal === 'function') {
+            hotel_save_modal();
+        }
+    });
+
+    // Reload hotel dropdown after hotel-supplier modal closes
+    $(document).off('hidden.bs.modal.customHotelSupplierU').on('hidden.bs.modal.customHotelSupplierU', '#Hotelsupplierdetails_modal', function() {
+        if (typeof hotel_name_list_load === 'function') {
+            var citySelectId = $(this).data('trigger-city-id') || 'city_name';
+            hotel_name_list_load(citySelectId);
+        }
+    });
 
     function hotel_type_load(id) {
         var hotel_id = $("#" + id).val();

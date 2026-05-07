@@ -67,18 +67,18 @@
                                                                 </select></td>
                                                             <td><select id="city_name1" name="city_name1"
                                                                     class="city_master_dropdown city_name1 form-control app_select2"
-                                                                    style="width:160px" title="Select City Name">
+                                                                    style="width:160px" title="Select City Name" data-add-new-option="true">
                                                                 </select></td>
                                                             <td><select id="hotel_name-1" name="hotel_name-1"
                                                                     onchange="hotel_type_load(this.id);get_hotel_cost();"
                                                                     class="form-control app_select2" style="width:160px"
-                                                                    title="Select Hotel Name">
+                                                                    title="Select Hotel Name" data-add-new-option="true">
                                                                     <option value="">*Hotel Name</option>
                                                                 </select></td>
                                                             <td><select name="room_cat-1" id="room_cat-1"
                                                                     style="width:145px;" title="Room Category"
                                                                     class="form-control app_select2"
-                                                                    onchange="get_hotel_cost();">
+                                                                    onchange="get_hotel_cost();" data-add-new-option="true">
                                                                     <option value="">Room Category</option>
                                                                 </select>
                                                             </td>
@@ -289,18 +289,24 @@
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td><input type="text" name="from_sector-1"
-                                                                    id="from_sector-1" placeholder="*From Sector"
-                                                                    title="From Sector" style="width: 300px;">
+                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="from" title="From Sector"
+                                                                    style="width: 300px;" data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
                                                             </td>
-                                                            <td><input type="text" name="to_sector-1" id="to_sector-1"
-                                                                    placeholder="*To Sector" title="To Sector"
-                                                                    style="width: 300px;">
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="to" title="To Sector"
+                                                                    style="width: 300px;" data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
                                                             </td>
                                                             <td><select id="airline_name1"
                                                                     class="app_select2 form-control"
                                                                     name="airline_name1" title="Airline Name"
-                                                                    style="width: 120px;">
+                                                                    style="width: 120px;" data-add-new-option="true">
                                                                     <option value="">Airline Name</option>
                                                                     <?php get_airline_name_dropdown(); ?>
                                                                 </select></td>
@@ -385,7 +391,7 @@
                                                             <td><select id="city_name-1" class="form-control exc_city"
                                                                     name="city_name-1" title="City Name"
                                                                     style="width:150px"
-                                                                    onchange="get_excursion_list(this.id);">
+                                                                    onchange="get_excursion_list(this.id);" data-add-new-option="true">
                                                                 </select>
                                                             </td>
                                                             <td><select id="excursion-1"
@@ -679,7 +685,77 @@
 
     // Event handler removed - using inline onchange attributes instead
 
-    event_airport('tbl_package_tour_quotation_dynamic_plane');
+    init_plane_airport_select2();
+    // Preserve default behavior for all other tables, but use Select2 loader for plane sectors here.
+    var original_event_airport = event_airport;
+    event_airport = function(id, fromSectornum = 2, toSectornum = 3) {
+        if (id === 'tbl_package_tour_quotation_dynamic_plane') {
+            init_plane_airport_select2();
+            return;
+        }
+        original_event_airport(id, fromSectornum, toSectornum);
+    };
+
+    function init_plane_airport_select2() {
+        var base_url = $('#base_url').val();
+        $('#tbl_package_tour_quotation_dynamic_plane .plane-airport-select').each(function() {
+            if ($(this).data('select2')) {
+                return;
+            }
+            $(this).select2({
+                width: '300px',
+                minimumInputLength: 2,
+                placeholder: $(this).data('sector-type') === 'from' ? '*From Sector' : '*To Sector',
+                ajax: {
+                    url: base_url + '/view/visa_passport_ticket/ticket/home/airport_list.php',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { request: params.term || '' };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id: item.value,
+                                    text: item.value,
+                                    city_id: item.city_id
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+        });
+    }
+
+    $(document).on('focus', '#tbl_package_tour_quotation_dynamic_plane .plane-airport-select', function() {
+        if (!$(this).data('select2')) {
+            init_plane_airport_select2();
+        }
+    });
+
+    $(document).on('select2:select', '#tbl_package_tour_quotation_dynamic_plane .plane-airport-select', function(e) {
+        var currentId = this.id || '';
+        var suffix = currentId.split('-').pop();
+        var cityId = e.params && e.params.data ? e.params.data.city_id : '';
+        if ($(this).data('sector-type') === 'from') {
+            $('#from_city-' + suffix).val(cityId);
+        } else {
+            $('#to_city-' + suffix).val(cityId);
+        }
+    });
+
+    $(document).on('select2:clear', '#tbl_package_tour_quotation_dynamic_plane .plane-airport-select', function() {
+        var currentId = this.id || '';
+        var suffix = currentId.split('-').pop();
+        if ($(this).data('sector-type') === 'from') {
+            $('#from_city-' + suffix).val('');
+        } else {
+            $('#to_city-' + suffix).val('');
+        }
+    });
     // App_accordion
     jQuery(document).ready(function() {
         jQuery(".panel-heading").click(function() {

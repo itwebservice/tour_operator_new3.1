@@ -9,7 +9,7 @@
                     <?php
                     $sq_tours = mysqlQuery("select * from custom_package_master where status !='Inactive'"); ?>
                     <select name="dest_name" id="dest_name" title="Select Destination"
-                        onchange="load_packages_with_filter()" style="width:100%">
+                        onchange="load_packages_with_filter()" style="width:100%" data-add-new-option="true">
                         <option value="">*Select Destination</option>
                         <?php
                         $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");
@@ -47,6 +47,71 @@
                 </div>
             </div>
 
+<<<<<<< Updated upstream
+=======
+            <!-- ai chat container start -->
+            <div class="ai-chat-container">
+                <button class="btn btn-info btn-sm ico_left" id="aiToggleBtn" type="button" aria-label="Toggle AI assistant">
+                    <span class="ai-toggle-icon"><i class=""><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.6838 0L10.8879 2.38783L8.50006 3.18377V4.13245L10.8879 4.9284L11.6838 7.31623H12.6325L13.4285 4.9284L15.8163 4.13245V3.18377L13.4285 2.38783L12.6325 0H11.6838Z" fill="white"/>
+<path d="M5.01289 8.51283L6.18383 5H7.13251L8.30346 8.51283L11.8163 9.68377V10.6325L8.30346 11.8034L7.13251 15.3162H6.18383L5.01289 11.8034L1.50006 10.6325V9.68377L5.01289 8.51283Z" fill="white"/>
+<path d="M2.17582 1L1.63186 2.63186L0 3.17582V3.82416L1.63186 4.36811L2.17582 5.99997H2.82416L3.36811 4.36811L4.99997 3.82416V3.17582L3.36811 2.63186L2.82416 1H2.17582Z" fill="white"/>
+</svg>
+</i></span>
+                    <span>AI</span>
+                </button>
+                        
+                <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
+                    <textarea placeholder="Type your message..."></textarea>
+
+                    <button class="send-btn">
+                        <!-- Send Icon -->
+                        <svg viewBox="0 0 24 24">
+                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="ai-itinerary-row" id="aiItineraryRow" aria-hidden="true">
+                    <label class="ai-check-wrap" for="chk-program">
+                        <input id="chk-program" type="checkbox">
+                    </label>
+                    <input type="text" class="ai-field ai-special" placeholder="*Special Attraction" value="">
+                    <textarea class="ai-field ai-day-program" placeholder="*Day-wise Program"></textarea>
+                    <input type="text" class="ai-field ai-stay" placeholder="*Overnight Stay" value="">
+                    <select class="ai-field ai-meal">
+                        <option selected>Meal Plan</option>
+                        <option>Breakfast</option>
+                        <option>Lunch</option>
+                        <option>Dinner</option>
+                        <option>B+L</option>
+                        <option>B+D</option>
+                        <option>L+D</option>
+                        <option>B+L+D</option>
+                        <option>Room Only</option>
+                        <option>No Meals</option>
+                        <option>All Inclusive</option>
+                    </select>
+                    <button type="button" class="ai-plus-btn" aria-label="Add itinerary">+</button>
+                </div>
+
+                <script>
+                    const aiToggleBtn = document.getElementById("aiToggleBtn");
+                    const aiChatBox = document.getElementById("aiChatBox");
+                    const aiItineraryRow = document.getElementById("aiItineraryRow");
+
+                    aiToggleBtn.addEventListener("click", function () {
+                        aiChatBox.classList.toggle("show");
+                        const isVisible = aiChatBox.classList.contains("show");
+                        aiChatBox.setAttribute("aria-hidden", String(!isVisible));
+                        aiItineraryRow.classList.toggle("show", isVisible);
+                        aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
+                    });
+                </script>
+            </div>
+            <!-- ai chat container end -->
+
+>>>>>>> Stashed changes
             <div class="row text-center mg_tp_20">
                 <div class="col-xs-12">
                     <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab1()"><i

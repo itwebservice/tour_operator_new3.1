@@ -390,7 +390,7 @@ $package_name = $sq_package['package_name'];
                                                                         class="form-control app_select2 act_city"
                                                                         name="city_name-1" title="City Name"
                                                                         style="width:150px"
-                                                                        onchange="get_excursion_list(this.id);">
+                                                                        onchange="get_excursion_list(this.id);" data-add-new-option="true">
                                                                         <option value="">*City</option>
                                                                     </select></td>
                                                                 <td><select id="excursion-1"

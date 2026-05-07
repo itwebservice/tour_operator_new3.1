@@ -5473,7 +5473,7 @@ S2.define('select2/core',[
 
   Select2.prototype.render = function () {
     var $container = $(
-      '<span class="select2 select2-container">' +
+      '<span class="select2 select2-container testing">' +
         '<span class="selection"></span>' +
         '<span class="dropdown-wrapper" aria-hidden="true"></span>' +
       '</span>'
@@ -6285,6 +6285,43 @@ S2.define('jquery.select2',[
   // This allows Select2 to use the internal loader outside of this file, such
   // as in the language files.
   jQuery.fn.select2.amd = S2;
+
+  // Add support for a custom "Add New" action row in Select2 dropdowns.
+  // Enable per select by adding: data-add-new-option="true"
+  $(document).off('select2:open.select2AddNewOption').on('select2:open.select2AddNewOption', function () {
+    var $select = $('.select2-hidden-accessible').filter(function () {
+      return $(this).data('select2') && $(this).data('select2').isOpen();
+    }).last();
+
+    if (!$select.length || $select.attr('data-add-new-option') !== 'true') {
+      return;
+    }
+
+    var $results = $('.select2-container--open .select2-results');
+
+    if ($results.length && $results.find('.add-new-option').length === 0) {
+      $results.append($('<div class="add-new-option" style="padding:8px;cursor:pointer;background:#f2f2f2;border-top:1px solid #ddd;"><svg xmlns="http://www.w3.org/2000/svg" height="12" width="10.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(103, 107, 174)" d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg> Add New </div>'));
+    }
+  });
+
+  
+
+  $(document).off('mousedown.select2AddNewOption').on('mousedown.select2AddNewOption', '.add-new-option', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var $select = $('.select2-hidden-accessible').filter(function () {
+      return $(this).data('select2') && $(this).data('select2').isOpen();
+    }).last();
+
+    if ($select.length) {
+      $select.trigger('select2:add_new');
+      $select.select2('close');
+    }
+  });
+
+
+  
 
   // Return the Select2 instance for anyone who is importing it.
   return select2;

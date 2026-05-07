@@ -12,7 +12,7 @@ include "../../../model/model.php";
 </div>
     <div class="app_panel_content Filter-panel">
         <div class="col-md-3 col-sm-6">
-            <select id="dest_name"  name="dest_name" title="Select Destination" class="form-control" onchange="list_reflect(this.value)"  style="width:100%"> 
+            <select id="dest_name"  name="dest_name" title="Select Destination" class="form-control" onchange="list_reflect(this.value)"  style="width:100%" data-add-new-option="true"> 
             <option value="">Destination</option>
             <?php
             $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'"); 

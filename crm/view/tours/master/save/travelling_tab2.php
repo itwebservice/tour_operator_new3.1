@@ -32,10 +32,10 @@
                                                         <tr>
                                                             <td><input class="css-checkbox" id="chk_train1" type="checkbox"><label class="css-label" for="chk_train1"><label></td>
                                                             <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                            <td class="col-md-4"><select onchange="validate_location('train_from_location1','train_to_location1')" id="train_from_location1" class="app_select2 form-control trainfrom" name="train_from_location1" title="From Location" style="width: 100%;">
+                                                            <td class="col-md-4"><select onchange="validate_location('train_from_location1','train_to_location1')" id="train_from_location1" class="app_select2 form-control trainfrom" name="train_from_location1" title="From Location" style="width: 100%;" >
                                                                     <option value="">*From</option>
                                                                 </select></td>
-                                                            <td class="col-md-4"><select id="train_to_location1" class="app_select2 form-control trainto" onchange="validate_location('train_to_location1','train_from_location1')" title="To Location" name="train_to_location1" style="width: 100%;">
+                                                            <td class="col-md-4"><select id="train_to_location1" class="app_select2 form-control trainto" onchange="validate_location('train_to_location1','train_from_location1')" title="To Location" name="train_to_location1" style="width: 100%;" >
                                                                     <option value="">*To</option>
                                                                 </select></td>
                                                             <td class="col-md-4"><select name="train_class" id="train_class1" title="Class">
@@ -83,9 +83,9 @@
                                                         <tr>
                                                             <td><input id="chk_dest" type="checkbox" checked></td>
                                                             <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:250px;" title="Select City Name">
+                                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:250px;" title="Select City Name" data-add-new-option="true">
                                                                 </select></td>
-                                                            <td class="col-md-4"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100% !important" title="Select Hotel Name">
+                                                            <td class="col-md-4"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" class="app_select2 form-control" style="width:100% !important" title="Select Hotel Name" data-add-new-option="true">
                                                                     <option value="">*Hotel Name</option>
                                                                 </select></td>
                                                             <td class="col-md-4"><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
@@ -180,11 +180,22 @@
                                                         <tr>
                                                             <td><input class="css-checkbox" id="chk_plan-" type="checkbox"><label class="css-label" for="chk_plan-"> <label></td>
                                                             <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                            <td class="col-md-4 no-pad"><input type="text" name="from_sector" id="from_sector-1" placeholder="From Sector" title="From Sector" style="width:100%;">
+                                                           
+                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
                                                             </td>
-                                                            <td class="col-md-4 no-pad"><input type="text" name="to_sector" id="to_sector-1" placeholder="To Sector" title="To Sector" style="width:100%;">
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="to" title="To Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
                                                             </td>
-                                                            <td class="col-md-2 no-pad"><select id="airline_name-1" class="app_select2 form-control" title="Airline Name" name="airline_name-1" style="width:100%;">
+                                                            <td class="col-md-2 no-pad"><select id="airline_name-1" class="app_select2 form-control" title="Airline Name" name="airline_name-1" style="width:100%;" data-add-new-option="true">
                                                                     <option value="">*Airline Name</option>
                                                                     <?php get_airline_name_dropdown(); ?>
                                                                 </select>
@@ -252,7 +263,132 @@
     </div>
 </form>
 
+<!-- Add Airport -->
+<div class="modal fade" id="Addairport_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog w-65pr" style="width: 60%;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Airport</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frm_hotel_save">
+                    <div class="panel panel-default panel-body app_panel_style feildset-panel">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <select class="form-control app_select2" id="addcity_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                   <option value="">Select City</option>
+                                   <option value="1">City 1</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Name" title="Airport Name" required>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Code" title="Airport Code" required>
+                            </div>                                                      
+
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row mg_tp_20 text-center">
+                        <div class="col-md-12">
+                            <button class="btn btn-sm btn-success" id=""><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Airport -->
+<div class="modal fade" id="Updateairport_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog w-65pr" style="width: 80%;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Update Airport</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frm_hotel_save">
+                    <div class="panel panel-default panel-body app_panel_style feildset-panel">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <select class="form-control app_select2" id="updatecity_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                   <option value="">Select City</option>
+                                   <option value="1">City 1</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Name" title="Airport Name" required>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Code" title="Airport Code" required>
+                            </div>  
+                           
+
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row mg_tp_20 text-center">
+                        <div class="col-md-12">
+                            <button class="btn btn-sm btn-success" id=""><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+
+function AddNewfrom_sector(selector) {
+            const $select = $(selector);
+            if (!$select.length) return;
+            if ($select.find('option[data-open-modal]').length) return;
+            $select.on('select2:open', function () {
+                if (!$('.add-new-option').length) {
+                    const addNewBtn = $('<div class="add-new-option" data-bs-toggle="modal" style="padding: 6px; cursor:pointer; background:#f2f2f2; font-size:14px;"> <svg xmlns="http://www.w3.org/2000/svg" height="12" width="10.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(103, 107, 174)" d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg> Add New</div>');
+                    $('.select2-results').append(addNewBtn);
+
+                    addNewBtn.on('click', function () {
+                        $('#Addairport_modal').modal('show');
+                        $select.select2('close');
+                    });
+                }
+            });
+        }
+
+        AddNewfrom_sector('#from_sector-1');
+
+function AddNewto_sector(selector) {
+            const $select = $(selector);
+            if (!$select.length) return;
+            if ($select.find('option[data-open-modal]').length) return;
+            $select.on('select2:open', function () {
+                if (!$('.add-new-option').length) {
+                    const addNewBtn = $('<div class="add-new-option" data-bs-toggle="modal" style="padding: 6px; cursor:pointer; background:#f2f2f2; font-size:14px;"> <svg xmlns="http://www.w3.org/2000/svg" height="12" width="10.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(103, 107, 174)" d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg> Add New</div>');
+                    $('.select2-results').append(addNewBtn);
+
+                    addNewBtn.on('click', function () {
+                        $('#Addairport_modal').modal('show');
+                        $select.select2('close');
+                    });
+                }
+            });
+        }
+
+        AddNewto_sector('#to_sector-1');
+
+
+
+
+
+
     $('#airline_name-1').select2();
     // App_accordion
     jQuery(document).ready(function() {
@@ -266,6 +402,10 @@
         city_lzloading('.trainfrom', '*From', true);
         city_lzloading('.trainto', '*To', true);
         city_lzloading('select[name^="city_name"]');
+        $('#hotel_name').select2({
+            width: '100%',
+            minimumResultsForSearch: 0
+        });
         destinationLoading('select[name^="pickup_from"]', 'Pickup Location');
         destinationLoading('select[name^="drop_to"]', 'Drop-off Location');
     });
@@ -279,7 +419,78 @@
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
     }
-    event_airport('tbl_group_tour_quotation_dynamic_plane');
+    init_plane_airport_select2();
+
+    // Override autocomplete airport loader for this table, since sector fields use Select2 now.
+    var original_event_airport = event_airport;
+    event_airport = function(id, fromSectornum = 2, toSectornum = 3) {
+        if (id === 'tbl_group_tour_quotation_dynamic_plane') {
+            init_plane_airport_select2();
+            return;
+        }
+        original_event_airport(id, fromSectornum, toSectornum);
+    };
+
+    function init_plane_airport_select2() {
+        var base_url = $('#base_url').val();
+        $('#tbl_group_tour_quotation_dynamic_plane .plane-airport-select').each(function() {
+            if ($(this).data('select2')) {
+                return;
+            }
+            $(this).select2({
+                width: '100%',
+                minimumInputLength: 2,
+                placeholder: $(this).data('sector-type') === 'from' ? '*From Sector' : '*To Sector',
+                ajax: {
+                    url: base_url + '/view/visa_passport_ticket/ticket/home/airport_list.php',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { request: params.term || '' };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id: item.value,
+                                    text: item.value,
+                                    city_id: item.city_id
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+        });
+    }
+
+    $(document).on('focus', '#tbl_group_tour_quotation_dynamic_plane .plane-airport-select', function() {
+        if (!$(this).data('select2')) {
+            init_plane_airport_select2();
+        }
+    });
+
+    $(document).on('select2:select', '#tbl_group_tour_quotation_dynamic_plane .plane-airport-select', function(e) {
+        var currentId = this.id || '';
+        var suffix = currentId.split('-')[1] || '';
+        var cityId = e.params && e.params.data ? e.params.data.city_id : '';
+        if ($(this).data('sector-type') === 'from') {
+            $('#from_city-' + suffix).val(cityId);
+        } else {
+            $('#to_city-' + suffix).val(cityId);
+        }
+    });
+
+    $(document).on('select2:clear', '#tbl_group_tour_quotation_dynamic_plane .plane-airport-select', function() {
+        var currentId = this.id || '';
+        var suffix = currentId.split('-')[1] || '';
+        if ($(this).data('sector-type') === 'from') {
+            $('#from_city-' + suffix).val('');
+        } else {
+            $('#to_city-' + suffix).val('');
+        }
+    });
 
     $(function() {
         $('#frm_tour_master_save2').validate({

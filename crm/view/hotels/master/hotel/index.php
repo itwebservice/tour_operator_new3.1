@@ -2,6 +2,9 @@
 include "../../../../model/model.php";
 ?>
 
+<script src="<?php echo BASE_URL ?>js/select2.full.js"></script>
+
+
 <div class="row text-right mg_bt_10">
     <div class="col-sm-6 text-left">
         <button class="btn btn-info btn-sm ico_left pull-left" data-toggle='tooltip' title="Download CSV Format" style="margin-right:10px" onclick="display_format_modal();"><i class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;CSV Format</button>
@@ -23,7 +26,7 @@ include "../../../../model/model.php";
 <div class="app_panel_content Filter-panel">
     <div class="row">
         <div class="col-md-3 col-sm-6 mg_bt_10_xs">
-            <select id="city_id_filter" name="city_id_filter" style="width:100%" title="Select City Name" onchange="list_reflect()">
+            <select id="city_id_filter" name="city_id_filter" style="width:100%" title="Select City Name" onchange="list_reflect()" data-add-new-option="true" >
             </select>
         </div>
         <div class="col-md-3 col-sm-6">
@@ -42,6 +45,93 @@ include "../../../../model/model.php";
         </table>
     </div>
 </div>
+
+
+
+
+<!-- Add Airport -->
+<div class="modal fade" id="Addairport_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog w-65pr" style="width: 60%;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Airport</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frm_hotel_save">
+                    <div class="panel panel-default panel-body app_panel_style feildset-panel">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <select class="form-control app_select2" id="addcity_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                   <option value="">Select City</option>
+                                   <option value="1">City 1</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Name" title="Airport Name" required>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Code" title="Airport Code" required>
+                            </div>                                                      
+
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row mg_tp_20 text-center">
+                        <div class="col-md-12">
+                            <button class="btn btn-sm btn-success" id=""><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Airport -->
+<div class="modal fade" id="Updateairport_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog w-65pr" style="width: 80%;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Update Airport</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frm_hotel_save">
+                    <div class="panel panel-default panel-body app_panel_style feildset-panel">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <select class="form-control app_select2" id="updatecity_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                   <option value="">Select City</option>
+                                   <option value="1">City 1</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Name" title="Airport Name" required>
+                            </div>
+                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Airport Code" title="Airport Code" required>
+                            </div>  
+                           
+
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row mg_tp_20 text-center">
+                        <div class="col-md-12">
+                            <button class="btn btn-sm btn-success" id=""><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <div id="div_modal_content"></div>
 <div id="div_view_modal"></div>
 
@@ -49,12 +139,45 @@ include "../../../../model/model.php";
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
 <script>
     $(function() {
-        $('form').attr('autocomplete', 'off');
-        $('input').attr('autocomplete', 'off');
+
+        
+
+        $('#addcity_filter_hotel').select2({    
+            dropdownParent: $('#Addairpot_modal'),
+            width: '100%'
+        });
+        $('#updatecity_filter_hotel').select2({
+            dropdownParent: $('#Updateairport_modal'),
+            width: '100%'
+        });
+       
     });
     // $('#city_id_filter').select2({minimumInputLength: 1});
     city_lzloading('#city_id_filter');
+    init_city_filter_add_new_fallback();
+    $('#city_id_filter').on('select2:add_new', function() {
+        generic_city_save_modal();
+    });
     vendor_csv_upload();
+
+    function init_city_filter_add_new_fallback() {
+   
+
+    
+
+        // Re-append after every search render.
+        $(document).off('keyup.city_filter_add_new').on('keyup.city_filter_add_new', '.select2-search__field', function() {
+            setTimeout(function() {
+                appendAddNew();
+            }, 0);
+        });
+
+        $(document).off('mousedown.city_filter_add_new').on('mousedown.city_filter_add_new', '.add-new-city-option', function(e) {
+            e.preventDefault();
+            $('#city_id_filter').select2('close');
+            generic_city_save_modal();
+        });
+    }
 
     function vendor_csv_upload() {
 

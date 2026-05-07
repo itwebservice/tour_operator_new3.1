@@ -29,9 +29,9 @@
                             echo $package_type_options;
                         } ?>
                         </select></td>
-                    <td><select id="city_name1" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_name1 city_master_dropdown" style="width:100%" title="Select City Name">
+                    <td><select id="city_name1" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_name1 city_master_dropdown" style="width:100%" title="Select City Name" data-add-new-option="true">
                         </select></td>
-                    <td><select id="hotel_name-1" name="hotel_name-1" onchange="hotel_type_load(this.id);get_hotel_cost();" style="width:160px" title="Select Hotel Name">
+                    <td><select id="hotel_name-1" name="hotel_name-1" onchange="hotel_type_load(this.id);get_hotel_cost();" class="form-control app_select2" style="width:160px" title="Select Hotel Name" data-add-new-option="true">
                         <option value="">Hotel Name</option>
                         </select></td>
                     <td><select name="room_cat-1" id="room_cat-1" style="width:145px;" title="Room Category" class="form-control app_select2" onchange="get_hotel_cost();">
@@ -76,10 +76,10 @@
                                 echo $package_type_options;
                             } ?>
                         </select></td>
-                        <td><select id="city_name<?= $count ?>" name="city_name<?= $count ?>" class="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown" style="width:100%" title="Select City Name">
+                        <td><select id="city_name<?= $count ?>" name="city_name<?= $count ?>" class="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown" style="width:100%" title="Select City Name" data-add-new-option="true">
                             <option value="<?php echo $sq_city['city_id']; ?>"><?php echo $sq_city['city_name']; ?></option>
                                 </select></td>
-                        <td><select id="hotel_name-<?= $count ?>" name="hotel_name-<?= $count ?>" onchange="hotel_type_load(this.id);get_hotel_cost();" style="width:160px" title="Select Hotel Name">
+                        <td><select id="hotel_name-<?= $count ?>" name="hotel_name-<?= $count ?>" onchange="hotel_type_load(this.id);get_hotel_cost();" class="form-control app_select2" style="width:160px" title="Select Hotel Name" data-add-new-option="true">
                             <option value="<?php echo $sq_hotel['hotel_id']; ?>"><?php echo $sq_hotel['hotel_name']; ?></option>
                             <option value="">Hotel Name</option>
                             </select></td>
@@ -106,6 +106,7 @@
                     </tr>
                     <script>
                     $('#package_type-1<?= $count ?>').select2();
+                    $('#hotel_name-<?= $count ?>').select2({ width: '160px', minimumResultsForSearch: 0 });
                     $('#check_in-<?= $count ?>_u, #check_out-<?= $count ?>_u').datetimepicker({ format:'d-m-Y',timepicker:false });
                     </script>
                     <?php
@@ -120,5 +121,6 @@
 $('#check_in-1, #check_out-1').datetimepicker({ format:'d-m-Y',timepicker:false });
 $(document).ready(function(){
     city_lzloading('.city_name1');
+    $('#hotel_name-1').select2({ width: '160px', minimumResultsForSearch: 0 });
 });
 </script>

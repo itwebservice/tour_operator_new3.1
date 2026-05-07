@@ -9,12 +9,12 @@
                 </select>
         </td>
         <td><select id="city_id<?= $prefix ?>1" style="width:170px" name="city_id<?= $prefix ?>1" title="City"
-                onchange="hotel_name_list_load(this.id);" data-toggle="tooltip" class="city_id" style="width:100%">
+                onchange="hotel_name_list_load(this.id);" data-toggle="tooltip" class="city_id" style="width:100%" data-add-new-option="true">
                 </select>
         </td>
         <td><select id="hotel_id1" name="hotel_id1" title="Hotel" style="width:170px"
                 onchange="hotel_type_load_cate(this.id);get_hotel_cost();"
-                data-toggle="tooltip">
+                data-toggle="tooltip" class="form-control app_select2" data-add-new-option="true">
                 <option value="">*Select Hotel</option>
                 </select>
         </td>
@@ -42,10 +42,12 @@
                 <option value="AC">AC</option>
                 <option value="Non AC">Non AC</option>
                 </select></td>
-        <td><select data-toggle="tooltip" style="width:140px" name="category<?= $prefix ?>1" id="category<?= $prefix ?>1"
-                title="Category" onchange="get_hotel_cost();">
+                
+        <td><select data-toggle="tooltip" style="width:140px" class="category_select2" name="category<?= $prefix ?>1" id="category<?= $prefix ?>1"
+                title="Category" onchange="get_hotel_cost();" data-add-new-option="true">
                 <option value="">Room Category</option>
                 </select></td>
+
         <td><select data-toggle="tooltip" style="width:185px" name="accomodation_type<?= $prefix ?>1"
                 id="accomodation_type<?= $prefix ?>1" title="Accommodation Type">
                 <option value="">Accommodation Type</option>
@@ -65,3 +67,9 @@
         <td><input type="text" style="width:150px" data-toggle="tooltip" id="conf_no<?= $prefix ?>1"
         name="conf_no<?= $prefix ?>1" placeholder="Confirmation No." title="Confirmation No."></td>
 </tr>
+
+<script>
+ $('#hotel_id1').select2({
+            width: '170px'
+        });
+</script>

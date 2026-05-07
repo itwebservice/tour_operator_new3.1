@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-md-3 col-sm-6 mg_bt_10 ">
                         <select id="dest_name_s" name="dest_name_s" title="Select Destination" class="form-control"
-                            style="width:100%" onchange="get_dest_image(this.id)" required>
+                            style="width:100%" onchange="get_dest_image(this.id)" required data-add-new-option="true">
                             <option value="">*Destination</option>
                             <?php
                             $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");

@@ -36,7 +36,7 @@
                                             <td><select id="city_name1<?php echo $count_ht . "_h" ?>" class="city_name"
                                                     name="city_name1<?php echo $count_ht . "_h" ?>" style="width:150px"
                                                     title="Select City Name" class="form-control app_select2"
-                                                    onchange="hotel_name_list_load1(this.id)">
+                                                    onchange="hotel_name_list_load1(this.id)" data-add-new-option="true">
                                                     <?php
                                                             $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_hotel_acc[city_id]'"));
                                                             ?>
@@ -45,8 +45,8 @@
                                                 </select></td>
                                             <?php if($room_category_switch == 'No' ){?>
                                             <td><select id="hotel_name1<?php echo $count_ht . "_h" ?>"
-                                                    name="hotel_name1<?php echo $count_ht . "_h" ?>" style="width:150px"
-                                                    title="Select Hotel Name">
+                                                    name="hotel_name1<?php echo $count_ht . "_h" ?>" class="form-control app_select2" style="width:170px"
+                                                    title="Select Hotel Name" data-add-new-option="true">
                                                     <option value="">Hotel Name</option>
                                                     <?php
                                                             $sq_hotel = mysqlQuery("select * from hotel_master where city_id = " . $row_hotel_acc['city_id']);
@@ -63,8 +63,8 @@
                                                 </select></td>
                                             <?php }else {?>
                                             <td><select id="hotel_name1<?php echo $count_ht . "_h" ?>"
-                                                    name="hotel_name1<?php echo $count_ht . "_h" ?>" style="width:150px"
-                                                    title="Select Hotel Name" onchange="hotel_type_load_cate2(this.id);">
+                                                    name="hotel_name1<?php echo $count_ht . "_h" ?>" class="form-control app_select2" style="width:170px"
+                                                    title="Select Hotel Name" onchange="hotel_type_load_cate2(this.id);" data-add-new-option="true">
                                                     <option value="">Hotel Name</option>
                                                     <?php
                                                             $sq_hotel = mysqlQuery("select * from hotel_master where city_id = " . $row_hotel_acc['city_id']);
@@ -97,14 +97,14 @@
                                                     style="width:110px"></td>
                                             <?php if($room_category_switch == 'No' ){?>
                                             <td><select name="txt_catagory1" id="txt_catagory1" title="Category"
-                                                    class="form-control app_select2" style="width:180px">
+                                                    class="form-control app_select2" style="width:180px" data-add-new-option="true">
                                                     <option value="<?= $row_hotel_acc['catagory'] ?>">
                                                         <?= $row_hotel_acc['catagory'] ?></option>
                                                     <?php get_room_category_dropdown(); ?>
                                                 </select></td>
                                             <?php } else{?>
                                             <td><select name="txt_catagory1" id="txt_catagory<?php echo $count_ht . "_h" ?>" title="Category"
-                                                    class="form-control app_select2" style="width:180px">
+                                                    class="form-control app_select2" style="width:180px" data-add-new-option="true">
                                                     <option value="<?= $row_hotel_acc['catagory'] ?>">
                                                         <?= $row_hotel_acc['catagory'] ?></option>
                                                 </select></td>
@@ -324,7 +324,7 @@
                                                     style="width:200px"></td>
                                             <td><select id="city_name-1<?= $count_et ?>" class="form-control city_name"
                                                     name="city_name-1<?= $count_et ?>" title="City Name"
-                                                    style="width:100%" onchange="get_excursion_list(this.id);">
+                                                    style="width:100%" onchange="get_excursion_list(this.id);" data-add-new-option="true">
                                                     <?php
                                                             $sq_transport = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_exc_acc[city_id]'"));
                                                             ?>
@@ -446,6 +446,14 @@ $(document).ready(function() {
     city_lzloading('.city_name');
     destinationLoading(".pickup_from", 'Pickup Location');
     destinationLoading(".drop_to", 'Drop-off Location');
+    $('#tbl_package_hotel_infomration select[id^="hotel_name1"]').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({
+                width: '170px',
+                minimumResultsForSearch: 0
+            });
+        }
+    });
 })
 
 function generating_hotel_acc_date() {
@@ -459,6 +467,13 @@ function generating_hotel_acc_date() {
         });
 
         $("#city_name1" + i + "_h").select2();
+        var $hotelRow = $("#hotel_name1" + i + "_h");
+        if ($hotelRow.length && !$hotelRow.data("select2")) {
+            $hotelRow.select2({
+                width: "170px",
+                minimumResultsForSearch: 0
+            });
+        }
     }
 }
 generating_hotel_acc_date();
@@ -506,10 +521,21 @@ function disabled_transport_details(id) {
 function hotel_name_list_load1(id) {
     var city_id = $("#" + id).val();
     var count = id.substring(10);
+    var $hotel = $("#hotel_name1" + count);
     $.get("../../booking/inc/hotel_name_load.php", {
         city_id: city_id
     }, function(data) {
-        $("#hotel_name1" + count).html(data);
+        var hadSelect2 = $hotel.length && !!$hotel.data("select2");
+        if (hadSelect2) {
+            $hotel.select2("destroy");
+        }
+        $hotel.html(data);
+        if ($hotel.length && ($hotel.hasClass("app_select2") || hadSelect2)) {
+            $hotel.select2({
+                width: "170px",
+                minimumResultsForSearch: 0
+            });
+        }
     });
 }
 //roomcategory load
@@ -517,8 +543,19 @@ function hotel_type_load_cate2(id)
 {
   var hotel_id = $("#"+id).val();
   var count = id.substring(11);
+  var $cat = $("#txt_catagory" + count);
   $.get( "../../booking/inc/hotel_category.php" , { hotel_id : hotel_id } , function ( data ) {
-        $ ("#txt_catagory"+count).html( data ) ;  
+        var hadSelect2 = $cat.length && !!$cat.data("select2");
+        if (hadSelect2) {
+          $cat.select2("destroy");
+        }
+        $cat.html(data);
+        if ($cat.length) {
+          $cat.select2({
+            width: "180px",
+            minimumResultsForSearch: 0
+          }).trigger("change");
+        }
   } ) ;   
 }
 </script>

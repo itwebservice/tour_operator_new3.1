@@ -17,7 +17,7 @@ require_once('../../../layouts/admin_header.php');
 <div class="app_panel_content Filter-panel">
 	<div class="row">
         <div class="col-md-3 col-sm-6 mg_bt_10_sm_xs">
-            <select id="city_id_filter" name="city_id_filter" style="width:100%" title="Select City Name" onchange="list_reflect()">
+            <select id="city_id_filter" name="city_id_filter" style="width:100%" title="Select City Name" onchange="list_reflect()" data-add-new-option="true">
             </select>
         </div>
 		<div class="col-md-3 col-sm-6">

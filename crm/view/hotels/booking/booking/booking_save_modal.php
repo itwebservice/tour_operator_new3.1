@@ -353,12 +353,36 @@ $.get('../booking/inc/get_currency_dropdown.php', {quotation_id:''}, function (d
     $('#currency_div').html(data);
 });
 city_lzloading('.city_id');
+init_hotel_booking_row_select2();
 $('#payment_date,#due_date,#booking_date').datetimepicker({
     timepicker: false,
     format: 'd-m-Y'
 });
 $('#check_in1, #check_out1').datetimepicker({
     format: 'd-m-Y H:i'
+});
+
+function init_hotel_booking_row_select2() {
+    $('#tbl_hotel_booking .category_select2').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({
+                dropdownParent: $('#booking_save_modal'),
+                width: '140px',
+                minimumResultsForSearch: 0
+            });
+        }
+    });
+}
+
+// Re-initialize when dynamic rows are appended.
+$(document).on('focus', '#tbl_hotel_booking .category_select2', function() {
+    if (!$(this).data('select2')) {
+        $(this).select2({
+            dropdownParent: $('#booking_save_modal'),
+            width: '140px',
+            minimumResultsForSearch: 0
+        });
+    }
 });
 
 //Get Hotel Cost
