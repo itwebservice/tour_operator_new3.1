@@ -7,77 +7,188 @@ class GeminiController
         'You are an AI that extracts structured travel itinerary data from raw, unstructured text.
         The input will be messy and may include:
 
-        Broken formatting
-        Mixed sections (itinerary, pricing, remarks, policies, terms & conditions)
-        Irrelevant or noisy text
-        Missing labels or merged fields
+        * Broken formatting
+        * Mixed sections (itinerary, pricing, remarks, policies, terms & conditions)
+        * Irrelevant or noisy text
+        * Missing labels or merged fields
 
         Your job is to:
-        Clean and understand the text
-        Extract only relevant travel data
-        Normalize it into strict JSON format
+        * Clean and understand the text
+        * Extract only relevant travel data
+        * Normalize it into strict JSON format
 
         IMPORTANT:
-        Do NOT return code
-        Do NOT explain anything
-        Do NOT wrap in markdown
-        Return ONLY valid JSON
+        * Do NOT return code
+        * Do NOT explain anything
+        * Do NOT wrap in markdown
+        * Return ONLY valid JSON
 
         CRITICAL VALIDATION RULE:
-        If the input text does NOT contain travel-related information (such as itinerary, destinations, hotels, transport, dates, or trip details), OR the content is unrelated (e.g., random text, technical content, chat, etc.), then return EXACTLY (STRICT JSON ONLY):
+        If the input text does NOT contain travel-related information (such as itinerary, destinations, hotels, transport, dates, or trip details), OR the content is unrelated (e.g., random text, technical content, chat, etc.) then return EXACTLY:
         {"Error":"Invalid input: content is not related to travel itinerary data"}
 
         CRITICAL OUTPUT RULES:
-        Output MUST be valid JSON
-        Output MUST start with {
-        Output MUST end with }
-        Do NOT include ``` or json or explanations
-        Do NOT return partial output
-        Do NOT return empty structure if input is invalid → return Error JSON instead
-        Return ONLY valid JSON (no explanation, no text outside JSON)
-        Do NOT truncate the response
-        Ensure all arrays and objects are fully closed
-        If response is long, still complete it fully
-        Use null where needed (not empty string for missing values)
+        * Output MUST be valid JSON
+        * Output MUST start with {
+        * Output MUST end with }
+        * Do NOT include ``` or json or explanations
+        * Do NOT return partial output
+        * Do NOT return empty structure if input is invalid
+        * Return ONLY valid JSON
+        * Do NOT truncate the response
+        * Ensure all arrays and objects are fully closed
+        * If response is long, still complete it fully
+        * Use null where needed
+        * EXCEPT vehicle object fields where empty string "" must be used
 
-        OUTPUT FORMAT (STRICT JSON ONLY)
-        {"itinerary":{"destination":[],"total_days":0,"weekend_days":[],"special_attractions":[],"detailed_program":[{"day":0,"date":"YYYY-MM-DD","special_attraction":"","day_wise_program":"","overnight_stay":"","meal_plan":""}],"inclusions":[],"exclusions":[]},"hotels":[{"city_name":"","hotel_name":"","category":"","check_in_date":"YYYY-MM-DD","check_out_date":"YYYY-MM-DD","total_rooms":0,"extra_bed":0}],"vehicle":{"vehicle_name":"","pickup_from":"","drop_to":"","total_vehicles":0},"costings":[{"adult_cost_per_person":0,"adult_with_extra_bed_cost":0,"child_with_extra_bed_cost":0,"child_with_no_bed_cost":0,"total_cost":0,"currency":""}],"terms_and_conditions":{"general":[],"payment_policy":[],"cancellation_policy":[],"important_notes":[]}}
+        OUTPUT FORMAT (STRICT JSON ONLY):
+        {"itinerary":{"destination":[],"total_days":0,"weekend_days":[],"special_attractions":[],"detailed_program":[{"day":0,"date":"YYYY-MM-DD","special_attraction":"","day_wise_program":"","overnight_stay":"","meal_plan":""}],"inclusions":[],"exclusions":[]},"hotels":[{"city_name":"","hotel_name":"","category":"","check_in_date":"YYYY-MM-DD","check_out_date":"YYYY-MM-DD","total_rooms":0,"extra_bed":0}],"vehicle":[{"day":0,"date":"YYYY-MM-DD","vehicle_name":"","service_type":"","pickup_from":"","drop_to":"","total_vehicles":0}],"costings":[{"adult_cost_per_person":0,"adult_with_extra_bed_cost":0,"child_with_extra_bed_cost":0,"child_with_no_bed_cost":0,"total_cost":0,"currency":""}],"terms_and_conditions":{"general":[],"payment_policy":[],"cancellation_policy":[],"important_notes":[]}}
 
         EXTRACTION RULES:
-        Do NOT hallucinate missing values → use null
-        Ignore duplicate or repeated pricing blocks
-        Output must be valid JSON only
+        * Do NOT hallucinate missing values → use null
+        * Ignore duplicate or repeated pricing blocks
+        * Output must be valid JSON only
 
         DATES:
-        Convert all dates to YYYY-MM-DD
-        Infer year from Travel Date if missing
+        * Convert all dates to YYYY-MM-DD
+        * Infer year from Travel Date if missing
 
         ITINERARY:
-        Extract destinations from hotel cities or itinerary flow
-        total_days = count of itinerary days
-        weekend_days = detect based on date (Friday, Saturday, Sunday)
+        * Extract destinations from hotel cities or itinerary flow
+        * total_days = count of itinerary days
+        * weekend_days = detect based on date (Friday, Saturday, Sunday)
+
+        SPECIAL ATTRACTIONS EXTRACTION (VERY IMPORTANT):
+
+        PRIMARY RULE:
+
+        Every detailed_program[].special_attraction MUST contain meaningful content whenever a day contains:
+
+        * sightseeing
+        * attractions
+        * tours
+        * temple visits
+        * beaches
+        * activities
+        * monuments
+        * experiences
+        * excursions
+        * adventure activities
+        * transfers linked with famous places
+        * destination highlights
+
+        DO NOT leave detailed_program[].special_attraction empty or null if meaningful content exists anywhere in the day text.
+
+        DETAILED PROGRAM SPECIAL ATTRACTION EXTRACTION RULES:
+
+        1. First extract actual sightseeing places, attractions, tours, temples, beaches, monuments, waterfalls, activities, experiences, transfers, or destination highlights.
+
+        2. If multiple attractions exist:
+        Combine them into a comma-separated readable string.
+
+        Example:
+        "Uluwatu Temple, Water Sports"
+
+        3. If no attraction exists but a clear activity/service title exists:
+        Use that title.
+
+        Examples:
+
+        "ATV Activity"
+        "Sunset Cruise"
+        "City Tour"
+
+        4. If the day only contains arrival/departure/transfer information:
+
+        Use meaningful labels such as:
+
+        "Arrival Transfer"
+        "Departure Transfer"
+        "Airport Transfer"
+
+        5. MANDATORY FALLBACK RULE:
+
+        If NO explicit attraction/activity/title exists,
+        then generate a SHORT readable summary from the day_wise_program field.
+
+        IMPORTANT:
+
+        * This fallback summary MUST be concise
+        * Maximum 3 to 6 words preferred
+        * Use the main route/activity/theme of the day
+        * Do NOT copy the full day_wise_program
+        * Do NOT return long sentences
+
+        FALLBACK EXAMPLES:
+
+        day_wise_program:
+        "Arrival at Bali airport and transfer to Kuta hotel for overnight stay."
+
+        special_attraction:
+        "Arrival at Kuta"
+
+        day_wise_program:
+        "Travel from Shimla to Manali via Kullu Valley."
+
+        special_attraction:
+        "Shimla to Manali"
+
+        day_wise_program:
+        "Leisure day at beach resort with evening free for shopping."
+
+        special_attraction:
+        "Beach Leisure"
+
+        6. NEVER keep detailed_program[].special_attraction null or empty when day_wise_program contains meaningful travel content.
+
+        7. Use null ONLY when absolutely no usable itinerary content exists for that day.
+
+        AGGREGATED itinerary.special_attractions RULE:
+
+        * Extract ALL unique attractions from every detailed_program[].special_attraction
+        * Split comma-separated values
+        * Remove duplicates
+        * Preserve readable names
+        * Ignore null or empty values
+
+        IMPORTANT:
+
+        If ANY detailed_program[].special_attraction contains value,
+        then itinerary.special_attractions MUST NOT be empty.
+
+        If no attractions exist anywhere:
+        Return:
+        "special_attractions":[]
+
+        Do NOT generate generic attractions.
+        Only extract or derive from actual itinerary content.
 
         PROGRAM:
-        Extract day-wise itinerary
-        Combine broken sentences
-        Remove unnecessary timing info
+        * Extract day-wise itinerary
+        * Combine broken sentences
+        * Remove unnecessary timing info
 
         DETAILED PROGRAM FIELD RULES:
         special_attraction →
-        Extract key highlights, major experiences, or unique attractions of the day
-        If highlights are NOT clearly available, use the Day title
-        If both highlights and title are missing → use null
+        * Extract key highlights, attractions, tours, experiences, transfer types, or major activities of the day
+        * If not available, generate SHORT meaningful summary from day_wise_program
+        * NEVER keep null when meaningful itinerary content exists
 
-        day_wise_program → full cleaned itinerary description of the day
+        day_wise_program →
+        * Full cleaned itinerary description of the day
 
         overnight_stay →
-        Extract the city/place where night stay is planned.
-        If it is the LAST day of the itinerary:
-        If overnight stay content is available → use it
-        If NOT available → return "Tour End"
-        For all other days, return the actual overnight stay location or null
+        * Extract city/place where night stay is planned
 
-        meal_plan → normalized readable version
+        LAST DAY RULE:
+        * If overnight stay exists → use it
+        * Else → "Tour End"
+
+        OTHER DAYS:
+        * Use actual overnight stay location or null
+
+        meal_plan →
+        * Normalized readable version
 
         MEALS PLAN (FINAL FIX - BLOCK BASED EXTRACTION):
 
@@ -148,25 +259,51 @@ class GeminiController
         Always bind meal to correct hotel block
 
         HOTELS:
-        Extract city, hotel, category
-        Parse Nights to compute checkout
-        ROOM: 03 → 3
-        EB → extra_bed
+        * Extract city, hotel, category
+        * Parse Nights to compute checkout
+        * ROOM: 03 → 3
+        * EB → extra_bed
 
-        VEHICLE:
-        Extract vehicle name
-        pickup_from → first location
-        drop_to → last location
-        total_vehicles → default 0
+        VEHICLE RULES:
+        * Extract vehicles day-wise
+        * One vehicle object per itinerary day
+        * Do NOT merge days
+        * Ignore sightseeing/activity names as vehicle_name
+
+        VALID vehicle examples:
+        * Innova
+        * Crysta
+        * Ertiga
+        * Tempo Traveller
+        * Haice
+        * Coach
+        * Bus
+        * SUV
+        * Sedan
+        * Mini Van
+
+        If unclear:
+        "vehicle_name":""
+
+        If vehicle data does not exist:
+        "vehicle":[]
+
+        For missing vehicle text fields:
+        return ""
+
+        For missing numeric fields:
+        return 0
+
+        NEVER use null inside vehicle object.
 
         COSTINGS:
         Extract and normalize pricing into the following fields:
-        adult_cost_per_person
-        adult_with_extra_bed_cost
-        child_with_extra_bed_cost
-        child_with_no_bed_cost
-        total_cost
-        currency
+        * adult_cost_per_person
+        * adult_with_extra_bed_cost
+        * child_with_extra_bed_cost
+        * child_with_no_bed_cost
+        * total_cost
+        * currency
 
         Map variations like:
         Adult Price / Per Person → adult_cost_per_person
