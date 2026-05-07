@@ -33,25 +33,16 @@ $localIP = getHostByName(getHostName());
 $servername = "localhost";
 $username = "root";
 $password = "";
-// $db_name = "tour_operator";
 
-// $db_name = "tour_operator_theme";
-
-<<<<<<< Updated upstream
-$db_name = "tour_operator_new_3_1";
-=======
 $db_name = "itours_database_latest";
->>>>>>> Stashed changes
+
 
 global $conn;
 $conn = new mysqli($servername, $username, $password, $db_name);
 
-<<<<<<< Updated upstream
-define('BASE_URL', 'http://localhost:8080/tour_operator_new3.1/crm/');
-=======
+
 define('BASE_URL', 'http://localhost/tour_operator_new3.1/crm/');
->>>>>>> Stashed changes
-// >>>>>>> Stashed changes
+
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");
 $b2b_index_url = BASE_URL . 'Tours_B2B/view/index.php';
