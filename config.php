@@ -29,14 +29,8 @@ if (!$connection) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-
-<<<<<<< Updated upstream
-define('BASE_URL', 'http://localhost/itoursdemo/crm/');
-define('BASE_URL_B2C', 'http://localhost/itoursdemo/');
-=======
 define('BASE_URL', 'http://localhost/tour_operator_new3.1/crm/');
 define('BASE_URL_B2C', 'http://localhost/tour_operator_new3.1/');
->>>>>>> Stashed changes
 mysqli_query($connection, "SET SESSION sql_mode = ''");
 
 
