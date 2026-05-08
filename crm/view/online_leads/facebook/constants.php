@@ -3,7 +3,7 @@
 session_start();
 
 //  Facebook Variables--------------------
-define('BASEURL', 'https://itoursdemo.co.in/demo-6/crm/');
+define('BASEURL', 'htthttp://localhost/tour_operator_new3.1-7-5/crm/');
 
 define('FB_APP_ID', '1136255048306440');
 
@@ -25,7 +25,7 @@ define('ACCESS_TOKEN_EXPIRY_MINUTES', 60);
 $host = "localhost";
 $username = "itourjh2_demo6_u";
 $password = "eNPmMwgQ#IVk";
-$db_name = "itourjh2_demo6";
+$db_name = "itours_database_latest";
 
 $conn = new mysqli($host, $username, $password, $db_name);
 

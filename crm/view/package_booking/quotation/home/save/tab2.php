@@ -47,7 +47,6 @@
                 </div>
             </div>
 
-
             <!-- ai chat container start -->
             <div class="ai-chat-container">
                 <button class="btn btn-info btn-sm ico_left" id="aiToggleBtn" type="button" aria-label="Toggle AI assistant">
@@ -110,7 +109,6 @@
             </div>
             <!-- ai chat container end -->
 
-
             <div class="row text-center mg_tp_20">
                 <div class="col-xs-12">
                     <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab1()"><i
@@ -120,6 +118,8 @@
                             class="fa fa-arrow-right"></i></button>
                 </div>
             </div>
+
+
             <input type="hidden" id="pckg_daywise_url" name="pckg_daywise_url" />
 
 </form>

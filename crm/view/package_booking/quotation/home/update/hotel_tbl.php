@@ -123,4 +123,10 @@ $(document).ready(function(){
     city_lzloading('.city_name1');
     $('#hotel_name-1').select2({ width: '160px', minimumResultsForSearch: 0 });
 });
+
+$('select[id^="room_cat-"]').select2({
+    width: '145px'
+});
+
+
 </script>

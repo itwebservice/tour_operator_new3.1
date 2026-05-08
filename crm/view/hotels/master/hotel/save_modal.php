@@ -16,7 +16,7 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
                         <legend>Basic Information</legend>
                         <div class="row">
                             <div class="col-md-2 col-sm-6 mg_bt_10">
-                                <select id="cmb_city_id" name="cmb_city_id" class="form-control app_select2" style="width:100%" title="Select City Name">
+                                <select id="cmb_city_id" name="cmb_city_id" class="form-control app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
                                     <?php //get_cities_dropdown(); 
                                     ?>
                                 </select>

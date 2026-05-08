@@ -230,7 +230,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                                 </select></td>
                                                 <?php if($room_category_switch == 'No' ){?>
                                             <td><select name="category<?= $prefix . $count ?>_f" style="width:130px;" class="category_select2"
-                                                    id="category<?= $prefix . $count ?>_f" title="Category">
+                                                    id="category<?= $prefix . $count ?>_f" title="Category" data-add-new-option="true">
                                                     <?php if ($row_entry['category'] != '') { ?>
                                                     <option value="<?= $row_entry['category'] ?>">
                                                         <?= $row_entry['category'] ?></option>
@@ -239,7 +239,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                                 </select></td>
                                             <?php } else{?>
                                             <td><select name="category<?= $prefix . $count ?>_f" style="width:130px;" class="category_select2"
-                                                    id="category<?= $prefix . $count ?>_f" title="Category">
+                                                    id="category<?= $prefix . $count ?>_f" title="Category" data-add-new-option="true">
                                                     <?php if ($row_entry['category'] != '') { ?>
                                                     <option value="<?= $row_entry['category'] ?>">
                                                         <?= $row_entry['category'] ?></option>

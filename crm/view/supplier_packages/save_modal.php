@@ -16,7 +16,7 @@ include "../../model/model.php";
 		<div class="modal-body">        	
 			<div class="row mg_bt_10">
 				<div class="col-sm-6 mg_bt_10_xs">
-					<select name="city_id" id="city_id" title="Select City" style="width:100%">
+					<select name="city_id" id="city_id" title="Select City" style="width:100%" data-add-new-option="true">
 		            </select>
 				</div>
 				<div class="col-sm-6 mg_bt_10_xs">

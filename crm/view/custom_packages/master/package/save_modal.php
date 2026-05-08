@@ -12,7 +12,7 @@ $vehcile_id_str = "vehicle_name1";
                     <div class="row mg_bt_10">
                         <div class="col-xs-12 no-pad mg_bt_20 mg_tp_20">
                             <div class="col-md-3 col-sm-3">
-                                <select id="dest_name_s" name="dest_name_s" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_image(this.id)">
+                                <select id="dest_name_s" name="dest_name_s" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_image(this.id)" data-add-new-option="true">
                                     <option value="">*Destination</option>
                                     <?php
                                     $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");
@@ -229,7 +229,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
 
 <!-- Hotel Supplier Details -->
 <div class="modal fade" id="Hotelsupplierdetails_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog w-65pr" style="width: 80%;" role="document">
+    <div class="modal-dialog w-65pr" style="width: 60%;" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -240,34 +240,24 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                     <div class="panel panel-default panel-body app_panel_style feildset-panel">
                         <legend>Basic Information</legend>
                         <div class="row">
-                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                            <div class="col-md-3 col-sm-6 mg_bt_10">
                                 <select class="form-control app_select2" id="city_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
                                    <option value="">Select City</option>
-                                   <option value="1">City 1</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 col-sm-6 mg_bt_10">
-                                <input type="text" class="form-control"  placeholder="*Hotel Name" title="Hotel Name" required>
+                            <div class="col-md-3 col-sm-6 mg_bt_10">
+                                <input type="text" class="form-control"  placeholder="*Hotel Name" title="Hotel Name" >
                             </div>
 
-                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                            <div class="col-md-3 col-sm-6 mg_bt_10">
                                 
                                 <select name="state_filter_hotel" id="state_filter_hotel" title="Select State/Country Name" style="width:100%" required class="app_select2">
                                     <option value="">Select State/Country</option>
-                                    <option value="1">Andaman and Nicobar Islands(35)</option>
-                                    <option value="2"> Arunachal Pradesh(12)</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 col-sm-6 mg_bt_10">
+                            <div class="col-md-3 col-sm-6 mg_bt_10">
 					<select id="hotel_Category" name="room_type" title="*Category" class="app_select2" ">
                         <option value="">Select Hotel Category</option>
-                        <option value="1">Hotel</option>
-                        <option value="2">Motel</option>
-                        <option value="3">Resort</option>
-                        <option value="4">Guest House</option>
-                        <option value="5">Hostel</option>
-                        <option value="6">Apartment</option>
-                        <option value="7">Other</option>
 					</select>
                             </div>
 
@@ -304,7 +294,6 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                             <div class="col-md-3 col-sm-6 mg_bt_10">
                                 <select class="form-control app_select2" id="Updatecity_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
                                    <option value="">Select City</option>
-                                   <option value="1">City 1</option>
                                 </select>
                             </div>
                             <div class="col-md-3 col-sm-6 mg_bt_10">
@@ -315,20 +304,12 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                 
                                 <select name="Update_state_filter_hotel" id="Update_state_filter_hotel" title="Select State/Country Name" style="width:100%" required class="app_select2">
                                     <option value="">Select State/Country</option>
-                                    <option value="1">Andaman and Nicobar Islands(35)</option>
-                                    <option value="2"> Arunachal Pradesh(12)</option>
+                           
                                 </select>
                             </div>
                             <div class="col-md-3 col-sm-6 mg_bt_10">
 					<select id="Update_hotel_Category" name="Update_room_type" title="*Category" class="app_select2" ">
                         <option value="">Select Hotel Category</option>
-                        <option value="1">Hotel</option>
-                        <option value="2">Motel</option>
-                        <option value="3">Resort</option>
-                        <option value="4">Guest House</option>
-                        <option value="5">Hostel</option>
-                        <option value="6">Apartment</option>
-                        <option value="7">Other</option>
 					</select>
                             </div>
                            
@@ -356,11 +337,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
 
 <script>
     $('#dest_name_s,#vehicle_name1,#currency_code,#dest_image').select2();
-    $('#hotel_name').select2({
-        width: '100%',
-        minimumResultsForSearch: 0
-
-    });
+   
     city_lzloading('select[name^="city_name1"]');
     destinationLoading('select[name^="pickup_from"]', "Pickup Location");
     destinationLoading('select[name^="drop_to"]', "Drop-off Location");
@@ -393,24 +370,74 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
             width: '100%'
         });
 
-        function AddNewHotelSupplier(selector) {
-            const $select = $(selector);
-            if (!$select.length) return;
-            if ($select.find('option[data-open-modal]').length) return;
-            $select.on('select2:open', function () {
-                if (!$('.add-new-option').length) {
-                    const addNewBtn = $('<div class="add-new-option" data-bs-toggle="modal" style="padding: 6px; cursor:pointer; background:#f2f2f2; font-size:14px;"> <svg xmlns="http://www.w3.org/2000/svg" height="12" width="10.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(103, 107, 174)" d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg> Add New</div>');
-                    $('.select2-results').append(addNewBtn);
+   // Initialize Select2
+$('#hotel_name').select2({
+    width: '100%',
+    minimumResultsForSearch: 0,
+    dropdownParent: $('body')
+});
 
-                    addNewBtn.on('click', function () {
-                        $('#Hotelsupplierdetails_modal').modal('show');
-                        $select.select2('close');
-                    });
-                }
+// Add "Add New" option inside Select2 dropdown
+function AddNewHotelSupplier(selector) {
+
+    const $select = $(selector);
+
+    if (!$select.length) return;
+
+    $select.on('select2:open', function () {
+
+        setTimeout(function () {
+
+            // Remove old button if already exists
+            $('.add-new-option').remove();
+
+            // Create button
+            const addNewBtn = $(`
+                <div class="add-new-option"
+                    style="
+                        padding:8px 10px;
+                        cursor:pointer;
+                        background:#f5f5f5;
+                        border-top:1px solid #ddd;
+                        font-size:14px;
+                    ">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        height="12"
+                        width="10.5"
+                        viewBox="0 0 448 512"
+                        style="margin-right:5px;">
+
+                        <path fill="rgb(103, 107, 174)"
+                            d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/>
+                    </svg>
+
+                    Add New 
+                </div>
+            `);
+
+            // Append inside dropdown
+            $('.select2-results').append(addNewBtn);
+
+            // Click event
+            addNewBtn.off('click').on('click', function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Close Select2
+                $select.select2('close');
+
+                // Open Bootstrap Modal
+                $('#Hotelsupplierdetails_modal').modal('show');
             });
-        }
 
-    AddNewHotelSupplier('#hotel_name');
+        }, 1);
+    });
+}
+
+// Call Function
+AddNewHotelSupplier('#hotel_name');
 
     // --------------------------------------
     // $('#dest_name_s').on('change', function() {

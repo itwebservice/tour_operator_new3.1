@@ -154,11 +154,7 @@
                                                             <div class="table-responsive">
                                                                 <table id="tbl_adult_child_head" name="tbl_adult_child_head" class="table border_0 no-marg">
                                                                     <tr>
-                                                                        <td class="col-md-3"><span>Package Type</span></th>
-                                                                        <td><span>Adult_Cost</span></td>
-                                                                        <td><span>Child_with_bed</span></td>
-                                                                        <td><span>Child_w/o_bed</span></td>
-                                                                        <td><span>Infant_Cost</span></td>
+                                                                        <td class="col-md-3 " style="padding-left: 0 !important;"><span>Package Type</span></th>
                                                                     </tr>
                                                                 </table>
                                                                 <div>
@@ -168,75 +164,527 @@
                                                             <div class="row">
                                                                 <div class="col-xs-12">
                                                                     <div class="table-responsive">
-                                                                        <table id="tbl_package_tour_quotation_adult_child" name="tbl_package_tour_quotation_adult_child" class="table border_0 no-marg">
+                                                                       <table id="tbl_package_tour_quotation_adult_child" name="tbl_package_tour_quotation_adult_child" class="table border_0 no-marg">
                                                                             <tr>
-                                                                                <td class="col-md-3"><input type="text" id="ppackage_type1" name="ppackage_type1" placeholder="Package Type" title="Package Type" readonly></td>
-                                                                                <td><input type="text" onchange=";" id="adult_cost" name="adult_cost" placeholder="Adult Cost" title="Adult Cost"></td>
-                                                                                <td><input type="text" onchange=";" id="child_with" name="child_with" placeholder="Child with Bed Cost" title="Child with Bed Cost"></td>
-                                                                                <td><input type="text" onchange=";" id="child_without" name="child_without" placeholder="Child w/o Bed Cost" title="Child w/o Bed Cost">
+                                                                                <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;"><input type="text" id="ppackage_type1" name="ppackage_type1" placeholder="Package Type" title="Package Type" readonly></td>
+                                                                                <td><input type="text" onchange=";" id="adult_cost" name="adult_cost" placeholder="Adult Cost" title="Adult Cost" style="display:none;"></td>
+                                                                                <td><input type="text" onchange=";" id="child_with" name="child_with" placeholder="Child with Bed Cost" title="Child with Bed Cost" style="display:none;"></td>
+                                                                                <td><input type="text" onchange=";" id="child_without" name="child_without" placeholder="Child w/o Bed Cost" title="Child w/o Bed Cost"style="display:none;"></td>
                                                                                 </td>
-                                                                                <td><input type="text" onchange=";" id="infant_cost" name="infant_cost" placeholder="Infant Cost" title="Infant Cost"></td>
+                                                                                <td><input type="text" onchange=";" id="infant_cost" name="infant_cost" placeholder="Infant Cost" title="Infant Cost"style="display:none;"></td>
                                                                                 <td><input type="hidden" id="pacakge_id2" name="pacakge_id2" placeholder="Package Id" title="Package Id"></td>
+                                                                                <td><input type="hidden" id="adult_landcost" name="adult_landcost" ></td>
+                                                                                <td><input type="hidden" id="cweb_landcost" name="cweb_landcost"></td>
+                                                                                <td><input type="hidden" id="cwnb_landcost" name="cwnb_landcost"></td>
+                                                                                <td><input type="hidden" id="infant_landcost" name="infant_landcost"></td>
                                                                             </tr>
                                                                         </table>
                                                                     </div>
                                                                 </div>
+
+                                                            </div>
+
+                                                                    <div class="costing-content-wp">
+                                                <div class="costing-card-wp">
+                                                    <div class="row">
+                                                        <div class="col-md-3">
+                                                            <div class="costing-card">
+                                                                <div class="costing-card-icon">
+                                                                    <i class="fa fa-regular fa-user icon"></i>
+                                                                </div>
+                                                                <div class="costing-card-detail" >
+                                                                    <p class="costing-card-label">Adult<br> (Double Sharing)</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="costing-card-table" style="display: block;">
+                                                                <table class="table table-bordered costing-table " id="" name="">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Components</th>
+                                                                            <th>Cost</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                         <tr data-type="hotel">
+                                                                            <td>Hotel</td>
+                                                                            <td  class="price"><input type="number" id="adult_hotel_pp" name="adult_hotel_pp"  placeholder="Hotel" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="transfer">
+                                                                            <td>Transfer</td>
+                                                                            <td  class="price"><input type="number" id="adult_transfer_pp" name="transfer_pp"  placeholder="Transfer" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="activity">
+                                                                            <td>Activity</td>
+                                                                            <td  class="price"><input type="number" id="adult_activity_pp" name="adult_activity_pp"  placeholder="Activity" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
+                                                                            <td  class="price">
+                                                                                <input type="text" onchange=";" id="adult_land_cost_pp" name="adult_land_cost_pp" placeholder="Adult Cost" title="Adult Cost">
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr data-type="service_charge">
+                                                                            <td>Service Charges </td>
+                                                                            <td  class="price"><input type="number" id="adult_service_charge_pp" name="adult_service_charge_pp" placeholder="Service Charges" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount">
+                                                                            <td>Discount In</td>
+                                                                            <td ><select name="adult_discount_in_pp" id="adult_discount_in_pp"  class="form-control">
+                                                                                     <option value="1">Percentage</option>
+                                                                                     <option value="2">Flat</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount_amount">
+                                                                            <td  class="price">Discount </td>
+                                                                            <td ><input type="number"  id="adult_discount_amount_pp" name="adult_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="flight_acost">
+                                                                            <td>Flight Cost </td>
+                                                                            <td  class="price"><input type="number" id="adult_flight_pp" name="adult_flight_pp" placeholder="Flight Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                       
+                                                                        <tr data-type="train_acost">
+                                                                            <td>Train Cost </td>
+                                                                            <td  class="price"><input type="number" id="adult_train_pp" name="adult_train_pp"  placeholder="Train Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Cruise Cost </td>
+                                                                            <td  class="price"><input type="number"id="adult_cruise_pp" name="adult_cruise_pp"  placeholder="Cruise Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="visa_acost">
+                                                                            <td>Visa Cost </td>
+                                                                            <td  class="price"><input type="number" id="adult_visa_pp" name="adult_visa_pp"  placeholder="Visa Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="guide_acost">
+                                                                            <td>Guide Cost </td> 
+                                                                            <td  class="price"><input type="number" id="adult_guide_pp" name="adult_guide_pp"  placeholder="Guide Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="miscellaneous_acost">
+                                                                            <td>Miscellaneous Cost </td>
+                                                                            <td  class="price"><input type="number" id="adult_misc_pp" name="adult_misc_pp"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax_apply_on">
+                                                                            <td>Tax Apply On</td>
+                                                                            <td ><select id="adult_tax_apply_on_pp" name="adult_tax_apply_on_pp"  class="form-control">
+                                                                                    <option value="1">Tax Apply On</option>
+                                                                                     <option value="2">Basic Amount</option>
+                                                                                     <option value="3">Service Charge</option>
+                                                                                     <option value="4">Total</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax">
+                                                                            <td>Select Tax</td>
+                                                                            <td ><select id="adult_select_tax_pp" name="adult_select_tax_pp" class="form-control">
+                                                                                    <option value="">*Select Tax</option>
+                                                                                    
+                                                                                <?php get_tax_dropdown('Income') ?>
+                                                                                   
+                                                                                </select></td>
+                                                                                <input type="hidden" name="tax_id" />
+                                                                        </tr>
+                                                                          <tr data-type="tax_value">
+                                                                            <td>Tax Amount </td>
+                                                                            <td  class="price"><input type="number" id="adult_tax_amount_pp" name="adult_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                             <tr data-type="tcs">
+                                                                            <td>TCS</td>
+                                                                            <td ><select id="adult_select_tcs_pp" name="adult_select_tcs_pp"  class="form-control">
+                                                                                     <option value="1">*TCS Tax</option>
+                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="3">20% TCS</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tcs_value">
+                                                                            <td>TCS Amount </td>
+                                                                            <td  class="price"><input type="number" id="adult_tcs_amount_pp" name="adult_tcs_amount_pp"  placeholder="TCS" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="total">
+                                                                            <td>Total Cost </td>
+                                                                            <td  class="price"><input type="number" id="adult_total_amount_pp" name="adult_total_amount_pp" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
+                                                                        </tr>
+                                                                       
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-3">
+                                                            <div class="costing-card">
+                                                                <div class="costing-card-icon">
+                                                                    <i class="fa fa-regular fa-user icon"></i>
+                                                                </div>
+                                                                <div class="costing-card-detail" >
+                                                                   <p class="costing-card-label">CWEB<br> (Child With Extra Bed)</p>
+                                                                </div>
+                                                            </div>
+                                                           <div class="costing-card-table" style="display: block;">
+                                                                <table class="table table-bordered costing-table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Components</th>
+                                                                            <th>Cost</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                      <tbody>
+                                                                         <tr data-type="hotel">
+                                                                            <td>Hotel</td>
+                                                                            <td  class="price"><input type="number" id="cweb_hotel_pp" name="cweb_hotel_pp"  placeholder="Hotel" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="transfer">
+                                                                            <td>Transfer</td>
+                                                                            <td  class="price"><input type="number" id="cweb_transfer_pp" name="transfer_pp"  placeholder="Transfer" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="activity">
+                                                                            <td>Activity</td>
+                                                                            <td  class="price"><input type="number" id="cweb_activity_pp" name="cweb_activity_pp"  placeholder="Activity" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
+                                                                            <td  class="price">
+                                                                                <input type="text" onchange=";" id="cweb_land_cost_pp" name="cweb_land_cost_pp" placeholder="Adult Cost" title="Adult Cost">
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr data-type="service_charge">
+                                                                            <td>Service Charges </td>
+                                                                            <td  class="price"><input type="number" id="cweb_service_charge_pp" name="cweb_service_charge_pp" placeholder="Service Charges" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount">
+                                                                            <td>Discount In</td>
+                                                                            <td ><select name="cweb_discount_in_pp" id="cweb_discount_in_pp"  class="form-control">
+                                                                                     <option value="1">Percentage</option>
+                                                                                     <option value="2">Flat</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount_amount">
+                                                                            <td  class="price">Discount </td>
+                                                                            <td ><input type="number"  id="cweb_discount_amount_pp" name="cweb_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="flight_acost">
+                                                                            <td>Flight Cost </td>
+                                                                            <td  class="price"><input type="number" id="cweb_flight_pp" name="cweb_flight_pp" placeholder="Flight Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                       
+                                                                        <tr data-type="train_acost">
+                                                                            <td>Train Cost </td>
+                                                                            <td  class="price"><input type="number" id="cweb_train_pp" name="cweb_train_pp"  placeholder="Train Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Cruise Cost </td>
+                                                                            <td  class="price"><input type="number"id="cweb_cruise_pp" name="cweb_cruise_pp"  placeholder="Cruise Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="visa_acost">
+                                                                            <td>Visa Cost </td>
+                                                                            <td  class="price"><input type="number" id="cweb_visa_pp" name="cweb_visa_pp"  placeholder="Visa Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="guide_acost">
+                                                                            <td>Guide Cost </td> 
+                                                                            <td  class="price"><input type="number" id="cweb_guide_pp" name="cweb_guide_pp"  placeholder="Guide Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="miscellaneous_acost">
+                                                                            <td>Miscellaneous Cost </td>
+                                                                            <td  class="price"><input type="number" id="cweb_misc_pp" name="cweb_misc_pp"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax_apply_on">
+                                                                            <td>Tax Apply On</td>
+                                                                            <td ><select id="cweb_tax_apply_on_pp" name="cweb_tax_apply_on_pp"  class="form-control">
+                                                                                     <option value="1">Tax Apply On</option>
+                                                                                     <option value="2">Basic Amount</option>
+                                                                                     <option value="3">Service Charge</option>
+                                                                                     <option value="4">Total</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax">
+                                                                            <td>Select Tax</td>
+                                                                            <td ><select id="cweb_select_tax_pp" name="cweb_select_tax_pp" class="form-control">
+                                                                                    <option value="">*Select Tax</option>
+                                                                                <?php get_tax_dropdown('Income') ?>
+                                                                                   
+                                                                                </select></td>
+                                                                        </tr>
+                                                                          <tr data-type="tax_value">
+                                                                            <td>Tax Amount </td>
+                                                                            <td  class="price"><input type="number" id="cweb_tax_amount_pp" name="cweb_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                             <tr data-type="tcs">
+                                                                            <td>TCS</td>
+                                                                            <td ><select id="cweb_select_tcs_pp" name="cweb_select_tcs_pp"  class="form-control">
+                                                                                     <option value="1">*TCS Tax</option>
+                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="3">20% TCS</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tcs_value">
+                                                                            <td>TCS Amount </td>
+                                                                            <td  class="price"><input type="number" id="cweb_tcs_amount_pp" name="cweb_tcs_amount_pp"  placeholder="TCS" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="total">
+                                                                            <td>Total Cost </td>
+                                                                            <td  class="price"><input type="number" id="cweb_total_amount_pp" name="cweb_total_amount_pp" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
+                                                                        </tr>
+                                                                       
+                                                                    </tbody>
+                                                                    
+                                                                </table>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-3">
+                                                            <div class="costing-card">
+                                                                <div class="costing-card-icon">
+                                                                    <i class="fa fa-regular fa-user icon"></i>
+                                                                </div>
+                                                                <div class="costing-card-detail" >
+                                                                   
+                                                                    <p class="costing-card-label">CWNB<br> (Child With No Bed)</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="costing-card-table" style="display: block;">
+                                                                <table class="table table-bordered costing-table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Components</th>
+                                                                            <th>Cost</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                      <tbody>
+                                                                         <tr data-type="hotel">
+                                                                            <td>Hotel</td>
+                                                                            <td  class="price"><input type="number" id="cwnb_hotel_pp" name="cwnb_hotel_pp"  placeholder="Hotel" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="transfer">
+                                                                            <td>Transfer</td>
+                                                                            <td  class="price"><input type="number" id="cwnb_transfer_pp" name="transfer_pp"  placeholder="Transfer" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="activity">
+                                                                            <td>Activity</td>
+                                                                            <td  class="price"><input type="number" id="cwnb_activity_pp" name="cwnb_activity_pp"  placeholder="Activity" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
+                                                                            <td  class="price">
+                                                                                <input type="text" onchange=";" id="cwnb_land_cost_pp" name="cwnb_land_cost_pp" placeholder="Adult Cost" title="Adult Cost">
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr data-type="service_charge">
+                                                                            <td>Service Charges </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_service_charge_pp" name="cwnb_service_charge_pp" placeholder="Service Charges" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount">
+                                                                            <td>Discount In</td>
+                                                                            <td ><select name="cwnb_discount_in_pp" id="cwnb_discount_in_pp"  class="form-control">
+                                                                                     <option value="1">Percentage</option>
+                                                                                     <option value="2">Flat</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount_amount">
+                                                                            <td  class="price">Discount </td>
+                                                                            <td ><input type="number"  id="cwnb_discount_amount_pp" name="cwnb_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="flight_acost">
+                                                                            <td>Flight Cost </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_flight_pp" name="cwnb_flight_pp" placeholder="Flight Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                       
+                                                                        <tr data-type="train_acost">
+                                                                            <td>Train Cost </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_train_pp" name="cwnb_train_pp"  placeholder="Train Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Cruise Cost </td>
+                                                                            <td  class="price"><input type="number"id="cwnb_cruise_pp" name="cwnb_cruise_pp"  placeholder="Cruise Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="visa_acost">
+                                                                            <td>Visa Cost </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_visa_pp" name="cwnb_visa_pp"  placeholder="Visa Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="guide_acost">
+                                                                            <td>Guide Cost </td> 
+                                                                            <td  class="price"><input type="number" id="cwnb_guide_pp" name="cwnb_guide_pp"  placeholder="Guide Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="miscellaneous_acost">
+                                                                            <td>Miscellaneous Cost </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_misc_pp" name="cwnb_misc_pp"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax_apply_on">
+                                                                            <td>Tax Apply On</td>
+                                                                            <td ><select id="cwnb_tax_apply_on_pp" name="cwnb_tax_apply_on_pp"  class="form-control">
+                                                                                     <option value="1">Tax Apply On</option>
+                                                                                     <option value="2">Basic Amount</option>
+                                                                                     <option value="3">Service Charge</option>
+                                                                                     <option value="4">Total</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax">
+                                                                            <td>Select Tax</td>
+                                                                            <td ><select id="cwnb_select_tax_pp" name="cwnb_select_tax_pp" class="form-control">
+                                                                                    <option value="">*Select Tax</option>
+                                                                                <?php get_tax_dropdown('Income') ?>
+                                                                                   
+                                                                                </select></td>
+                                                                        </tr>
+                                                                          <tr data-type="tax_value">
+                                                                            <td>Tax Amount </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_tax_amount_pp" name="cwnb_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                             <tr data-type="tcs">
+                                                                            <td>TCS</td>
+                                                                            <td ><select id="cwnb_select_tcs_pp" name="cwnb_select_tcs_pp"  class="form-control">
+                                                                                     <option value="1">*TCS Tax</option>
+                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="3">20% TCS</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tcs_value">
+                                                                            <td>TCS Amount </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_tcs_amount_pp" name="cwnb_tcs_amount_pp"  placeholder="TCS" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="total">
+                                                                            <td>Total Cost </td>
+                                                                            <td  class="price"><input type="number" id="cwnb_total_amount_pp" name="cwnb_total_amount_pp" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
+                                                                        </tr>
+                                                                       
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-md-3">
+                                                            <div class="costing-card">
+                                                                <div class="costing-card-icon">
+                                                                    <i class="fa fa-regular fa-user icon"></i>
+                                                                </div>
+                                                                <div class="costing-card-detail">
+                                                                    
+                                                                    <p class="costing-card-label">Infant</p>
+                                                                </div>
+                                                            </div>
+                                                          <div class="costing-card-table" style="display: block;">
+                                                                <table class="table table-bordered costing-table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Components</th>
+                                                                            <th>Cost</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                          <tbody>
+                                                                         <tr data-type="hotel">
+                                                                            <td>Hotel</td>
+                                                                            <td  class="price"><input type="number" id="infant_hotel_pp" name="infant_hotel_pp"  placeholder="Hotel" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="transfer">
+                                                                            <td>Transfer</td>
+                                                                            <td  class="price"><input type="number" id="infant_transfer_pp" name="transfer_pp"  placeholder="Transfer" title="" class="form-control" ></td>
+                                                                        </tr>
+
+                                                                        <tr data-type="activity">
+                                                                            <td>Activity</td>
+                                                                            <td  class="price"><input type="number" id="infant_activity_pp" name="infant_activity_pp"  placeholder="Activity" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
+                                                                            <td  class="price">
+                                                                                <input type="text" onchange=";" id="infant_land_cost_pp" name="infant_land_cost_pp" placeholder="Adult Cost" title="Adult Cost">
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr data-type="service_charge">
+                                                                            <td>Service Charges </td>
+                                                                            <td  class="price"><input type="number" id="infant_service_charge_pp" name="infant_service_charge_pp" placeholder="Service Charges" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount">
+                                                                            <td>Discount In</td>
+                                                                            <td ><select name="infant_discount_in_pp" id="infant_discount_in_pp"  class="form-control">
+                                                                                     <option value="1">Percentage</option>
+                                                                                     <option value="2">Flat</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                        <tr data-type="discount_amount">
+                                                                            <td  class="price">Discount </td>
+                                                                            <td ><input type="number"  id="infant_discount_amount_pp" name="infant_discount_amount_pp" placeholder="Discount Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="flight_acost">
+                                                                            <td>Flight Cost </td>
+                                                                            <td  class="price"><input type="number" id="infant_flight_pp" name="infant_flight_pp" placeholder="Flight Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                       
+                                                                        <tr data-type="train_acost">
+                                                                            <td>Train Cost </td>
+                                                                            <td  class="price"><input type="number" id="infant_train_pp" name="infant_train_pp"  placeholder="Train Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Cruise Cost </td>
+                                                                            <td  class="price"><input type="number"id="infant_cruise_pp" name="infant_cruise_pp"  placeholder="Cruise Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="visa_acost">
+                                                                            <td>Visa Cost </td>
+                                                                            <td  class="price"><input type="number" id="infant_visa_pp" name="infant_visa_pp"  placeholder="Visa Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="guide_acost">
+                                                                            <td>Guide Cost </td> 
+                                                                            <td  class="price"><input type="number" id="infant_guide_pp" name="infant_guide_pp"  placeholder="Guide Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                        <tr data-type="miscellaneous_acost">
+                                                                            <td>Miscellaneous Cost </td>
+                                                                            <td  class="price"><input type="number" id="infant_misc_pp" name="infant_misc_pp"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax_apply_on">
+                                                                            <td>Tax Apply On</td>
+                                                                            <td ><select id="infant_tax_apply_on_pp" name="infant_tax_apply_on_pp"  class="form-control">
+                                                                                     <option value="1">Tax Apply On</option>
+                                                                                     <option value="2">Basic Amount</option>
+                                                                                     <option value="3">Service Charge</option>
+                                                                                     <option value="4">Total</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tax">
+                                                                            <td>Select Tax</td>
+                                                                            <td ><select id="infant_select_tax_pp" name="infant_select_tax_pp" class="form-control">
+                                                                                    <option value="">*Select Tax</option>
+                                                                                <?php get_tax_dropdown('Income') ?>
+                                                                                   
+                                                                                </select></td>
+                                                                        </tr>
+                                                                          <tr data-type="tax_value">
+                                                                            <td>Tax Amount </td>
+                                                                            <td  class="price"><input type="number" id="infant_tax_amount_pp" name="infant_tax_amount_pp"  placeholder="Tax Amount" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                             <tr data-type="tcs">
+                                                                            <td>TCS</td>
+                                                                            <td ><select id="infant_select_tcs_pp" name="infant_select_tcs_pp"  class="form-control">
+                                                                                     <option value="1">*TCS Tax</option>
+                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="3">20% TCS</option>
+                                                                                </select></td>
+                                                                        </tr>
+                                                                           <tr data-type="tcs_value">
+                                                                            <td>TCS Amount </td>
+                                                                            <td  class="price"><input type="number" id="infant_tcs_amount_pp" name="infant_tcs_amount_pp"  placeholder="TCS" title="" class="form-control" ></td>
+                                                                        </tr>
+                                                                           <tr data-type="total">
+                                                                            <td>Total Cost </td>
+                                                                            <td  class="price"><input type="number" id="infant_total_amount_pp" name="infant_total_amount_pp" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
+                                                                        </tr>
+                                                                       
+                                                                    </tbody>
+                                                                </table>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row mg_tp_20">
-                                            <div class="col-xs-12">
-                                                <h3 class="editor_title">Travel Cost</h3>
-                                                <div class="panel panel-default panel-body app_panel_style">
-                                                    <!-- Other costs -->
-                                                    <div class="row">
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Flight Adult Cost</span>
-                                                            <input type="number" id="flight_acost" name="flight_acost" placeholder="Flight Adult Cost" title="Flight Adult Cost">
-                                                        </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Flight Child Cost</span>
-                                                            <input type="number" id="flight_ccost" name="flight_ccost" placeholder="Flight Child Cost" title="Flight Child Cost">
-                                                        </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Flight Infant Cost</span>
-                                                            <input type="number" id="flight_icost" name="flight_icost" placeholder="Flight Infant Cost" title="Flight Infant Cost">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mg_tp_10">
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Train Adult Cost</span>
-                                                            <input type="number" id="train_acost" name="train_acost" placeholder="Train Adult Cost" title="Train Adult Cost">
-                                                        </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Train Child Cost</span>
-                                                            <input type="number" id="train_ccost" name="train_ccost" placeholder="Train Child Cost" title="Train Child Cost">
-                                                        </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Train Infant Cost</span>
-                                                            <input type="number" id="train_icost" name="train_icost" placeholder="Train Infant Cost" title="Train Infant Cost">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mg_tp_10">
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Cruise Adult Cost</span>
-                                                            <input type="number" id="cruise_acost" name="cruise_acost" placeholder="Cruise Adult Cost" title="Cruise Adult Cost">
-                                                        </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Cruise Child Cost</span>
-                                                            <input type="number" id="cruise_ccost" name="cruise_ccost" placeholder="Cruise Child Cost" title="Cruise Child Cost">
-                                                        </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
-                                                            <span>Cruise Infant Cost</span>
-                                                            <input type="number" id="cruise_icost" name="cruise_icost" placeholder="Cruise Infant Cost" title="Cruise Infant Cost">
+
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                       
                                     </div>
                                 </div>
                             </div>
@@ -336,6 +784,134 @@
 <?= end_panel() ?>
 
 <script>
+
+
+function get_hotel_cost() {
+
+        var hotel_id_arr = [];
+        var room_cat_arr = [];
+        var check_in_arr = [];
+        var check_out_arr = [];
+        var total_nights_arr = [];
+        var total_rooms_arr = [];
+        var extra_bed_arr = [];
+        var meal_plan_arr = [];
+        var checked_arr = [];
+        var package_id_arr = [];
+        var child_with_bed = $('#children_with_bed').val();
+        var child_without_bed = $('#children_without_bed').val();
+        var adult_count = $('#total_adult').val();
+        // alert(adult_count);
+        adult_count = (adult_count == '') ? 0 : adult_count;
+        child_without_bed = (child_without_bed == '') ? 0 : child_without_bed;
+        child_with_bed = (child_with_bed == '') ? 0 : child_with_bed;
+
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        var rowCount = table.rows.length;
+        for (var i = 0; i < rowCount; i++) {
+
+            var row = table.rows[i];
+            var hotel_id = row.cells[4].childNodes[0].value;
+            var room_category = row.cells[5].childNodes[0].value;
+            var check_in = row.cells[6].childNodes[0].value;
+            var check_out = row.cells[7].childNodes[0].value;
+            var total_nights = row.cells[9].childNodes[0].value;
+            var total_rooms = row.cells[10].childNodes[0].value;
+            var extra_bed = row.cells[11].childNodes[0].value;
+            var package_id = row.cells[14].childNodes[0].value;
+            var meal_plan = row.cells[16].childNodes[0].value;
+
+            hotel_id_arr.push(hotel_id);
+            room_cat_arr.push(room_category);
+            check_in_arr.push(check_in);
+            check_out_arr.push(check_out);
+            total_nights_arr.push(total_nights);
+            total_rooms_arr.push(total_rooms);
+            extra_bed_arr.push(extra_bed);
+            meal_plan_arr.push(meal_plan);
+            package_id_arr.push(package_id);
+            checked_arr.push(row.cells[0].childNodes[0].checked);
+        }
+        var base_url = $('#base_url').val();
+        $.ajax({
+            type: 'post',
+            url: base_url + 'view/package_booking/quotation/home/hotel/get_hotel_cost.php',
+            data: {
+                hotel_id_arr: hotel_id_arr,
+                check_in_arr: check_in_arr,
+                check_out_arr: check_out_arr,
+                room_cat_arr: room_cat_arr,
+                total_nights_arr: total_nights_arr,
+                total_rooms_arr: total_rooms_arr,
+                extra_bed_arr: extra_bed_arr,
+                child_with_bed: child_with_bed,
+                child_without_bed: child_without_bed,
+                adult_count: adult_count,
+                package_id_arr: package_id_arr,
+                checked_arr: checked_arr,
+                meal_plan_arr: meal_plan_arr
+            },
+            success: function(result) {
+
+                var hotel_arr = JSON.parse(result);
+                var pp_arr = [];
+                if (hotel_arr.length === 0) {
+
+                    for (var i = 0; i < rowCount; i++) {
+
+                        var row = table.rows[i];
+                        row.cells[13].childNodes[0].value = 0;
+                    }
+                } else {
+
+                    for (var i = 0; i < hotel_arr.length; i++) {
+
+                        var row = table.rows[i];
+                        
+                        if (row.cells[0].childNodes[0].checked) {
+console.log("hotel_cost"+hotel_arr[i]);
+                            // row.cells[13].childNodes[0].value = hotel_arr[i]['hotel_cost'];
+                            let input = row.cells[13].querySelector('input');
+
+if (input) {
+    input.value = hotel_arr[i]['hotel_cost'];
+}
+                            pp_arr.push({
+                                'hotel_cost': hotel_arr[i]['hotel_cost'],
+                                'adult_cost': hotel_arr[i]['adult_cost'],
+                                'child_with_bed': hotel_arr[i]['child_with_bed'],
+                                'child_without_bed': hotel_arr[i]['child_without_bed'],
+                                'package_id': hotel_arr[i]['package_id'],
+                                'flag': hotel_arr[i]['flag'],
+                                'package_type': row.cells[2].childNodes[0].value,
+                                'checked': true
+                            });
+                        } else {
+                            row.cells[13].childNodes[0].value = 0;
+                            pp_arr.push({
+                                'hotel_cost':0,
+                                'adult_cost': 0,
+                                'child_with_bed': 0,
+                                'child_without_bed': 0,
+                                'package_id': hotel_arr[i]['package_id'],
+                                'package_type': row.cells[2].childNodes[0].value,
+                                'checked': false
+                            });
+                        }
+                        // Don't force checkboxes to be checked - let user control them
+                        // $(row.cells[0].childNodes[0]).prop('checked', true) /* .trigger('change') */ ;
+                        $(row.cells[2].childNodes[0]).prop('disabled', true);
+                        hideHotelPackage(row.cells[2].childNodes[0].value);
+                    }
+                }
+                
+                //Tab-4 Per person costing
+                $('#hotel_pp_costing').val(JSON.stringify(pp_arr));
+              
+            }
+        });
+    }
+
     $('#currency_code').select2();
 
     upload_price_struct();
@@ -369,6 +945,7 @@
     function get_business(id, flag, change = false) {
 
         var offset = id.split('-');
+        // console.log("offset" + offset[1]);
         get_auto_values('quotation_date', 'basic_amount-' + offset[1], 'payment_mode', 'service_charge-' + offset[1],
             'markup', 'save', flag, 'markup', 'discount_amt-'+ offset[1], offset[1], change);
     }
@@ -1024,6 +1601,7 @@
                     package_type_c_arr.push(package_type_c);
                 }
             }
+            
             //BSM value Costing Information  
             var bsmValues = [];
             var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
@@ -1180,6 +1758,52 @@
                 package_p_id_arr: package_p_id_arr
             });
 
+            // ==============================
+// PER PERSON COSTING (SAVE)
+// ==============================
+
+        var pp_costing_arr = [];
+
+    function getPP(prefix) {
+        return {
+            type: prefix,
+
+            hotel: +$('#' + prefix + '_hotel_pp').val() || 0,
+            transfer: +$('#' + prefix + '_transfer_pp').val() || 0,
+            activity: +$('#' + prefix + '_activity_pp').val() || 0,
+            land_cost: +$('#' + prefix + '_land_cost_pp').val() || 0,
+
+            service_charge: +$('#' + prefix + '_service_charge_pp').val() || 0,
+
+            discount_in: $('#' + prefix + '_discount_in_pp').val(),
+            discount_amount: +$('#' + prefix + '_discount_amount_pp').val() || 0,
+
+            flight: +$('#' + prefix + '_flight_pp').val() || 0,
+            train: +$('#' + prefix + '_train_pp').val() || 0,
+            cruise: +$('#' + prefix + '_cruise_pp').val() || 0,
+            visa: +$('#' + prefix + '_visa_pp').val() || 0,
+            guide: +$('#' + prefix + '_guide_pp').val() || 0,
+            misc: +$('#' + prefix + '_misc_pp').val() || 0,
+
+            tax_apply_on: $('#' + prefix + '_tax_apply_on_pp').val(),
+            tax_value: $('#' + prefix + '_select_tax_pp').val(),
+            tax_amount: +$('#' + prefix + '_tax_amount_pp').val() || 0,
+
+            tcs: $('#' + prefix + '_select_tcs_pp').val(),
+            tcs_amount: +$('#' + prefix + '_tcs_amount_pp').val() || 0,
+
+            total: +$('#' + prefix + '_total_amount_pp').val() || 0
+        };
+    }
+
+    // push all
+    pp_costing_arr.push(getPP('adult'));
+    pp_costing_arr.push(getPP('cweb'));
+    pp_costing_arr.push(getPP('cwnb'));
+    pp_costing_arr.push(getPP('infant'));
+
+    
+
             // Get the temporary quotation ID from sessionStorage
             var temp_quotation_id = sessionStorage.getItem('temp_quotation_id');
             console.log("Using temporary quotation ID:", temp_quotation_id);
@@ -1327,6 +1951,7 @@
                                 cruise_ccost: cruise_ccost,
                                 cruise_icost: cruise_icost,
                                 other_desc: other_desc,
+                                pp_costing_arr: JSON.stringify(pp_costing_arr),
                                 temp_quotation_id: temp_quotation_id
                             },
                             success: function(message) {
@@ -1586,4 +2211,170 @@ function uploadItineraryImages(quotationId, images) {
         console.error("Some image uploads failed:", error);
     });
 }
+
+function calculateCostingCards() {
+
+    let hotelData = $('#hotel_pp_costing').val();
+    let travelData = $("#travel_pp_costing").val();
+
+    if (!hotelData || !travelData) return;
+
+    let pp_arr = JSON.parse(hotelData);
+    console.log(pp_arr);
+    let pp_arr_travelData = JSON.parse(travelData);
+
+    // ===== PAX COUNT =====
+    let adult_count  = +$('#total_adult').val() || 0;
+    let cwnb_count   = +$('#children_without_bed').val() || 0;
+    let cweb_count   = +$('#children_with_bed').val() || 0;
+    let infant_count = +$('#total_infant').val() || 0;
+
+    let total_number = adult_count + cwnb_count + cweb_count + infant_count;
+    if (total_number === 0) total_number = 1;
+
+    // ===== TRANSPORT PER PERSON =====
+    let transport_pp = (pp_arr_travelData[0]['total_cost'] / total_number) || 0;
+
+    // ===== SET DEFAULT VALUES =====
+    $('#adult_hotel_pp').val(pp_arr[0]['adult_cost'] || 0);
+    $('#adult_transfer_pp').val(transport_pp.toFixed(2));
+
+    $('#cweb_hotel_pp').val(pp_arr[0]['child_with_bed'] || 0);
+    $('#cweb_transfer_pp').val(transport_pp.toFixed(2));
+
+    $('#cwnb_hotel_pp').val(pp_arr[0]['child_without_bed'] || 0);
+    $('#cwnb_transfer_pp').val(transport_pp.toFixed(2));
+
+    if (!$('#infant_hotel_pp').val()) {
+    $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || '');
+}
+    $('#infant_transfer_pp').val(transport_pp.toFixed(2));
+
+    // ===== COMMON FUNCTION =====
+    function calculateCard(type, count) {
+
+        if (count === 0) {
+            $('#' + type + '_hotel_pp').val(0);
+            $('#' + type + '_transfer_pp').val(0);
+            $('#' + type + '_activity_pp').val(0);
+            $('#' + type + '_land_cost_pp').val(0);
+            $('#' + type + '_service_charge_pp').val(0);
+            $('#' + type + '_tax_amount_pp').val(0);
+            $('#' + type + '_tcs_amount_pp').val(0);
+            $('#' + type + '_total_amount_pp').val(0);
+            return;
+        }
+
+        // ===== BASE =====
+        let hotel    = +$('#' + type + '_hotel_pp').val() || 0;
+        let transfer = +$('#' + type + '_transfer_pp').val() || 0;
+        let activity = +$('#' + type + '_activity_pp').val() || 0;
+
+        let land_cost = hotel + transfer + activity;
+        $('#' + type + '_land_cost_pp').val(land_cost.toFixed(2));
+
+        // ===== SERVICE CHARGE (10%) =====
+        let service_charge = land_cost * 0.10;
+
+        // 🔥 IMPORTANT: Show ORIGINAL service charge in UI
+        $('#' + type + '_service_charge_pp').val(service_charge.toFixed(2));
+
+        // ===== DISCOUNT (APPLY INTERNALLY ONLY) =====
+        let discount_type = $('#' + type + '_discount_in_pp').val();
+        let discount_val  = +$('#' + type + '_discount_amount_pp').val() || 0;
+
+        let discount_amount = (discount_type == "1")
+            ? (service_charge * discount_val) / 100
+            : discount_val;
+
+        // prevent over-discount
+        if (discount_amount > service_charge) discount_amount = service_charge;
+
+        // 👉 INTERNAL VALUE ONLY (DO NOT SHOW IN UI)
+        let final_service_charge = service_charge - discount_amount;
+
+        // ===== EXTRA COST =====
+        let flight = +$('#' + type + '_flight_pp').val() || 0;
+        let train  = +$('#' + type + '_train_pp').val() || 0;
+        let cruise = +$('#' + type + '_cruise_pp').val() || 0;
+        let visa   = +$('#' + type + '_visa_pp').val() || 0;
+        let guide  = +$('#' + type + '_guide_pp').val() || 0;
+        let misc   = +$('#' + type + '_misc_pp').val() || 0;
+
+        let extra_cost = flight + train + cruise + visa + guide + misc;
+
+        // ===== BASE AMOUNT (USE DISCOUNTED SERVICE CHARGE) =====
+        let base_amount = land_cost + final_service_charge + extra_cost;
+
+        // ===== TAX =====
+        let tax_text = $('#' + type + '_select_tax_pp option:selected').text();
+        let tax_match = tax_text.match(/\d+(\.\d+)?/);
+        let tax_percent = tax_match ? parseFloat(tax_match[0]) : 0;
+
+        let tax_apply_on = $('#' + type + '_tax_apply_on_pp').val();
+
+        let tax_base = 0;
+        if (tax_apply_on == "2") tax_base = land_cost;
+        else if (tax_apply_on == "3") tax_base = final_service_charge;
+        else if (tax_apply_on == "4") tax_base = base_amount;
+
+        let tax_amount = (tax_base * tax_percent) / 100;
+        $('#' + type + '_tax_amount_pp').val(tax_amount.toFixed(2));
+
+        // ===== TCS =====
+        let tcs_val = $('#' + type + '_select_tcs_pp').val();
+        let tcs_percent = (tcs_val == "2") ? 5 : (tcs_val == "3") ? 20 : 0;
+
+        let tcs_amount = ((base_amount + tax_amount) * tcs_percent) / 100;
+        $('#' + type + '_tcs_amount_pp').val(tcs_amount.toFixed(2));
+
+        // ===== FINAL TOTAL =====
+        let total = base_amount + tax_amount + tcs_amount;
+
+        $('#' + type + '_total_amount_pp').val(total.toFixed(2));
+    }
+
+    // ===== RUN =====
+    calculateCard('adult', adult_count);
+    calculateCard('cweb', cweb_count);
+    calculateCard('cwnb', cwnb_count);
+    calculateCard('infant', infant_count);
+}
+$(document).on('input change', '.costing-table input, .costing-table select', function () {
+    calculateCostingCards();
+});
+
+// =========================
+// EVENTS
+// =========================
+$(document).ready(function () {
+
+    console.log("READY RUNNING");
+
+    quotation_cost_calculate();
+    calculateCostingCards();
+
+  
+    $(document).on('keyup change',
+        '#adult_cost, #child_with, #child_without, ' +
+        '#flight_acost, #train_acost, #cruise_acost, ' +
+        '#flight_ccost, #train_ccost, #cruise_ccost, ' +
+        '#visa_cost, #guide_cost, #misc_cost, #total_pax',
+        function () {
+            console.log("INPUT CHANGED");
+            quotation_cost_calculate();
+            calculateCostingCards();
+        }
+    );
+
+});
+
+
+$(document).on('shown.bs.collapse', '#collapse2', function () {
+    console.log('Collapse 2 opened');
+
+    calculateCostingCards();
+});
+
+
 </script>

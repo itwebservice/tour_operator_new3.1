@@ -214,6 +214,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <!-- Cruise Information -->
                         <div class="accordion_content main_block">
                             <div class="panel panel-default main_block">
@@ -278,7 +279,6 @@
                             <div class="col-md-4 col-sm-6 mg_bt_10">
                                 <select class="form-control app_select2" id="addcity_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
                                    <option value="">Select City</option>
-                                   <option value="1">City 1</option>
                                 </select>
                             </div>
                             <div class="col-md-4 col-sm-6 mg_bt_10">
@@ -318,7 +318,6 @@
                             <div class="col-md-4 col-sm-6 mg_bt_10">
                                 <select class="form-control app_select2" id="updatecity_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
                                    <option value="">Select City</option>
-                                   <option value="1">City 1</option>
                                 </select>
                             </div>
                             <div class="col-md-4 col-sm-6 mg_bt_10">
@@ -346,46 +345,70 @@
 
 <script>
 
-function AddNewfrom_sector(selector) {
-            const $select = $(selector);
-            if (!$select.length) return;
-            if ($select.find('option[data-open-modal]').length) return;
-            $select.on('select2:open', function () {
-                if (!$('.add-new-option').length) {
-                    const addNewBtn = $('<div class="add-new-option" data-bs-toggle="modal" style="padding: 6px; cursor:pointer; background:#f2f2f2; font-size:14px;"> <svg xmlns="http://www.w3.org/2000/svg" height="12" width="10.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(103, 107, 174)" d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg> Add New</div>');
-                    $('.select2-results').append(addNewBtn);
+        $('#addcity_filter_hotel').select2({    
+            dropdownParent: $('#Addairport_modal'),
+            width: '100%'
+        });
+        $('#updatecity_filter_hotel').select2({
+            dropdownParent: $('#Updateairport_modal'),
+            width: '100%'
+        });
 
-                    addNewBtn.on('click', function () {
-                        $('#Addairport_modal').modal('show');
-                        $select.select2('close');
-                    });
-                }
+function AddNewSector(selector, modalId) {
+
+    const $select = $(selector);
+
+    if (!$select.length) return;
+
+    $select.off('select2:open.addNew');
+
+    $select.on('select2:open.addNew', function () {
+
+        setTimeout(function () {
+            $('.add-new-option').remove();
+
+            const addNewBtn = $(`
+                <div class="add-new-option"
+                    style="
+                        padding:8px 10px;
+                        cursor:pointer;
+                        background:#f5f5f5;
+                        border-top:1px solid #ddd;
+                        font-size:14px;
+                    ">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        height="12"
+                        width="10.5"
+                        viewBox="0 0 448 512"
+                        style="margin-right:5px;">
+
+                        <path fill="rgb(103, 107, 174)"
+                            d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/>
+                    </svg>
+
+                    Add New
+                </div>
+            `);
+
+            $('.select2-results').append(addNewBtn);
+
+            addNewBtn.off('click').on('click', function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                $select.select2('close');
+
+                $(modalId).modal('show');
             });
-        }
 
-        AddNewfrom_sector('#from_sector-1');
+        }, 1);
+    });
+}
 
-function AddNewto_sector(selector) {
-            const $select = $(selector);
-            if (!$select.length) return;
-            if ($select.find('option[data-open-modal]').length) return;
-            $select.on('select2:open', function () {
-                if (!$('.add-new-option').length) {
-                    const addNewBtn = $('<div class="add-new-option" data-bs-toggle="modal" style="padding: 6px; cursor:pointer; background:#f2f2f2; font-size:14px;"> <svg xmlns="http://www.w3.org/2000/svg" height="12" width="10.5" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path fill="rgb(103, 107, 174)" d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg> Add New</div>');
-                    $('.select2-results').append(addNewBtn);
-
-                    addNewBtn.on('click', function () {
-                        $('#Addairport_modal').modal('show');
-                        $select.select2('close');
-                    });
-                }
-            });
-        }
-
-        AddNewto_sector('#to_sector-1');
-
-
-
+AddNewSector('#from_sector-1', '#Addairport_modal');
+AddNewSector('#to_sector-1', '#Addairport_modal');
 
 
 

@@ -207,7 +207,7 @@
                                                     value="<?= $count_tt ?>" placeholder="Sr. No." disabled /></td>
                                             <td><select name="vehicle_name1<?= $count_tt ?>-u"
                                                     id="vehicle_name1<?= $count_tt ?>-u" title="Vehicle Name"
-                                                    style="width:200px">
+                                                    style="width:200px" data-add-new-option="true">
                                                     <?php
                                                             $sq_transport = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_trans_acc[transport_bus_id]'"));
                                                             ?>
@@ -441,6 +441,9 @@
 
 <?= end_panel() ?>
 <script>
+    $('select[id^="vehicle_name1"]').select2({
+    width: '300px'
+});
 $('#transport_bus_id').select2();
 $(document).ready(function() {
     city_lzloading('.city_name');

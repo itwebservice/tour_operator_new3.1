@@ -15,7 +15,7 @@
                 <tr>
                     <td><input id="check-btn-tr-acm-1" type="checkbox" ></td>
                     <td><input maxlength="15" type="text" name="username"  value="1" placeholder="Sr. No." disabled/></td>
-                    <td><select name="vehicle_name1" id="vehicle_name1" title="Vehicle Name" style="width:250px">
+                    <td><select name="vehicle_name1" id="vehicle_name1" title="Vehicle Name" style="width:250px" data-add-new-option="true">
                         <option value="">*Select Vehicle</option>
                             <?php
                             $sq_transport_buses = mysqlQuery("select * from b2b_transfer_master where status!='Inactive' order by vehicle_name asc");
@@ -40,3 +40,10 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('#vehicle_name1').select2({
+	
+	width: '250px'
+        });
+</script>

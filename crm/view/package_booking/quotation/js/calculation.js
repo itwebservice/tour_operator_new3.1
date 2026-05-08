@@ -11,6 +11,7 @@ function get_auto_values(
 	offset,
 	change
 ) {
+	// alert(sub_total);
 	$('#service_show-' + offset).html('&nbsp;');
 	$('#markup_show-' + offset).html('&nbsp;');
 
@@ -38,7 +39,7 @@ function get_auto_values(
 			service_charge1 =
 
 				service_charge1 == '' ||
-					typeof service_charge1 === NaN ||
+					isNaN(service_charge1) ||
 					service_charge1 === undefined ? parseFloat(0).toFixed(2) :
 					parseFloat(service_charge1).toFixed(2);
 			// $('#' + service_charge).val(service_charge1);
@@ -144,7 +145,7 @@ function get_auto_values(
 		tax_on_amount = (new_service_charge1=='') ? 0 : new_service_charge1;
 	}
 	else if(tax_apply_on == 3){
-		tax_on_amount = parseFloat(basic_amount) + parseFloat(new_service_charge1);
+		tax_on_amount = parseFloat(basic_amount) || 0; + parseFloat(new_service_charge1);
 	}
 	if(tax_apply_on!="" && tax_value!=""){
 		var service_tax_subtotal1 = tax_value.split("+");
@@ -957,7 +958,7 @@ function calculate_charges(rules_array, type, basic_amount, markup_amount1) {
 			var child_wb = $('#children_with_bed').val();
 			if (child_wob == '') { child_wob = 0; }
 			if (child_wb == '') { child_wb = 0; }
-			var child = child_wb + child_wob;
+			var child = (parseInt(child_wb) || 0) + (parseInt(child_wob) || 0);
 			var hotel_table = 'tbl_package_tour_quotation_dynamic_costing';
 		}
 		else {
@@ -968,7 +969,7 @@ function calculate_charges(rules_array, type, basic_amount, markup_amount1) {
 			var child_wb = $('#children_with_bed12').val();
 			if (child_wob == '') { child_wob = 0; }
 			if (child_wb == '') { child_wb = 0; }
-			var child = child_wb + child_wob;
+			var child = (parseInt(child_wb) || 0) + (parseInt(child_wob) || 0);
 		}
 
 		var table = document.getElementById(hotel_table);
@@ -990,6 +991,7 @@ function calculate_charges(rules_array, type, basic_amount, markup_amount1) {
 				total_rooms = parseInt(total_rooms) + parseInt(rooms);
 			}
 		}
+		
 		switch (apply_on) {
 			case '1':
 				//Per pax
@@ -1045,4 +1047,8 @@ function calculate_charges(rules_array, type, basic_amount, markup_amount1) {
 				break;
 		}
 	}
+
+	
 }
+
+
