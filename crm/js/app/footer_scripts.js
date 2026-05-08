@@ -638,24 +638,64 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 		}
 	});
 }else{
+	// $(element).select2({
+	// 	placeholder: placeholder,
+	// 	ajax: {
+	// 		url: url,
+	// 		dataType: 'json',
+	// 		type: 'GET',
+	// 		data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
+	// 		processResults: function (data) {
+	// 			let more = data.pagination;
+	// 			return {
+	// 				results: data.results,
+	// 				pagination: {
+	// 					more: more.more,
+	// 				}
+	// 			};
+	// 		}
+	// 	}
+	// });
+
 	$(element).select2({
-		placeholder: placeholder,
-		ajax: {
-			url: url,
-			dataType: 'json',
-			type: 'GET',
-			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
-			processResults: function (data) {
-				let more = data.pagination;
-				return {
-					results: data.results,
-					pagination: {
-						more: more.more,
-					}
-				};
-			}
-		}
-	});
+    placeholder: placeholder,
+
+    language: {
+        noResults: function () {
+            return "No data found";
+        }
+    },
+
+    ajax: {
+        url: url,
+        dataType: 'json',
+        type: 'GET',
+
+        data: function (params) {
+            return {
+                term: params.term,
+                page: params.page || 0,
+                valueasText: valueasText
+            };
+        },
+
+        processResults: function (data) {
+
+            if (!data.results || data.results.length === 0) {
+                return {
+                    results: []
+                };
+            }
+
+            return {
+                results: data.results,
+                pagination: {
+                    more: data.pagination ? data.pagination.more : false
+                }
+            };
+        }
+    }
+});
 }
 }
 
@@ -1605,4 +1645,3 @@ function btnDisableEnable(id)
 	setTimeout(function () {btnEnable(id)}, 1500);
 	
 }
-
