@@ -661,8 +661,8 @@ if ($type == 'save') {
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script>
 
-$('#from_sector-1').select2({
-
+$('select[id^="from_sector-"]').select2({
+    width: '100%'
 });
 $('#to_sector-1').select2({
 	

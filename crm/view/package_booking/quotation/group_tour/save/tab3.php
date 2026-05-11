@@ -120,7 +120,7 @@
 										<tr>
 												<td><input class="css-checkbox" id="chk_transport1" type="checkbox" checked><label class="css-label" for="chk_transport1"> </label></td>
 												<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
-												<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2">
+												<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
 														<option value="">Select Vehicle</option>
 														<?php
 														$sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -183,20 +183,23 @@
 												<td><input type="text" name="to_sector-1" id="to_sector-1" placeholder="To Sector" title="To Sector" style="width: 360px;">
 												</td> -->
 
-												<td><select name="from_sector-1" id="from_sector-1"
+												<td >
+													           <select name="from_sector-1" id="from_sector-1"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="from" title="From Sector"
                                                                      data-add-new-option="true">
                                                                     <option value="">*From Sector</option>
                                                                 </select>
-                                                            </td>
-                                                            <td><select name="to_sector-1" id="to_sector-1"
-                                                                    class="form-control app_select2 "
-                                                                    data-sector-type="to" title="To Sector"
-                                                                     data-add-new-option="true">
-                                                                    <option value="">*To Sector</option>
-                                                                </select>
-                                                            </td>
+                                                </td>
+
+                                                <td>
+												      <select name="to_sector-1" id="to_sector-1"
+                                                          class="form-control app_select2 "
+                                                          data-sector-type="to" title="To Sector"
+                                                           data-add-new-option="true">
+                                                          <option value="">*To Sector</option>
+                                                      </select>
+                                                </td>
 
 
 												<td><select id="airline_name1" class="app_select2 form-control"  title="Airline Name" name="airline_name1" style="width: 300px;" data-add-new-option="true">
@@ -292,6 +295,8 @@ $('#to_sector-1').select2({
 	
 	width: '360px'
         });
+$('#transport_vehicle_name1').select2({
+	        });
        
 
 $('#plane_from_location1,#plane_to_location1,#train_from_location1,#train_to_location1').select2({

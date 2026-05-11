@@ -163,7 +163,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                             <td><select id="city_id<?= $prefix . $count ?>_f" style="width:150px"
                                                     class="city_id_u" name="city_id<?= $prefix . $count ?>_f"
                                                     title="City" onchange="hotel_name_list_load(this.id)"
-                                                    class="app_select2" style="width:100%">
+                                                    class="app_select2" style="width:100%" data-add-new-option="true">
                                                     <?php
                                                     $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
                                                     ?>

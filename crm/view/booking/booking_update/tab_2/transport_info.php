@@ -153,5 +153,8 @@ $(document).ready(function(){
         });
     }, 200);
 });
+
+ $('#transport_vehicle_name1_u').select2({});
+
 </script>
 

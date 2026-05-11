@@ -61,17 +61,17 @@
                                                             style="width: 350px;">
                                                     </td> -->
 
-                                                    <td><select name="from_sector-1" id="from_sector-1"
-                                                                    class="form-control app_select2 "
+                                                    <td style="min-width:360px;"><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 " style="width:100%"
                                                                     data-sector-type="from" title="From Sector"
                                                                      data-add-new-option="true">
                                                                     <option value="">*From Sector</option>
                                                                 </select>
                                                             </td>
-                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                            <td style="min-width:360px;"><select name="to_sector-1" id="to_sector-1"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="to" title="To Sector"
-                                                                     data-add-new-option="true">
+                                                                     data-add-new-option="true" style="width:100%">
                                                                     <option value="">*To Sector</option>
                                                                 </select>
                                                             </td>

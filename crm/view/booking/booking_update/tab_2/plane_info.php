@@ -37,17 +37,17 @@ else{
                 <td><input type="text" name="to_sector-1" id="to_sector-<?= $count_p ?>p" placeholder="To Sector" title="To Sector" style="width: 250px;" value="<?php echo ($sq_city2['city_name']) ? $sq_city2['city_name']." - ".$row_plane_details['to_location'] : ''; ?>">
                 </td> -->
 
-                <td><select name="from_sector-1" id="from_sector-1"
+                <td style="min-width:300px;"><select name="from_sector-1" id="from_sector-1"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="from" title="From Sector"
-                                                                     data-add-new-option="true">
+                                                                     data-add-new-option="true" style="width:100%">
                                                                     <option value="">*From Sector</option>
                                                                 </select>
                                                             </td>
-                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                            <td style="min-width:300px;"><select name="to_sector-1" id="to_sector-1"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="to" title="To Sector"
-                                                                     data-add-new-option="true">
+                                                                     data-add-new-option="true" style="width:100%">
                                                                     <option value="">*To Sector</option>
                                                                 </select>
                                                             </td>
