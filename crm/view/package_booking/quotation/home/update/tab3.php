@@ -207,7 +207,7 @@ $package_name = $sq_package['package_name'];
                                                                                 value="<?= $sq_transport_bus_agency1['entry_id'] ?>">
                                                                                 <?= $sq_transport_bus_agency1['vehicle_name'] ?>
                                                                             </option>
-                                                                            <option value="">Transport Vehicle</option>
+                                                                            <option value="">Select Vehicle</option>
                                                                             <?php
                                                                             $sq_transport_bus_agency = mysqlQuery("select * from b2b_transfer_master where status!='Inactive' order by vehicle_name asc");
                                                                             while ($row_transport_bus_agency = mysqli_fetch_assoc($sq_transport_bus_agency)) { ?>

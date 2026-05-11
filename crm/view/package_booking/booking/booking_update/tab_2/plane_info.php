@@ -82,14 +82,16 @@
 	        </td>
 	        <td><input type="text" name="to_sector-1" id="to_sector-<?= $offset.$count ?>_d" placeholder="*To Sector" title="To Sector" style="width: 250px;" value="<?php echo ($sq_city2['city_name']) ? $sq_city2['city_name']." - ".$row_plane_details['to_location'] : ''; ?>">
 	        </td> -->
-            <td style="min-width:360px;"><select name="from_sector-1" id="from_sector-1"
+            <td style="min-width:360px;"><select name="from_sector-<?= $offset.$count ?>_d"
+id="from_sector-<?= $offset.$count ?>_d"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="from" title="From Sector"
                                                                      data-add-new-option="true" style="width:100%">
                                                                     <option value="">*From Sector</option>
                                                                 </select>
                                                             </td>
-                                                            <td style="min-width:360px;"><select name="to_sector-1" id="to_sector-1"
+                                                            <td style="min-width:360px;"><select name="to_sector-<?= $offset.$count ?>_d"
+id="to_sector-<?= $offset.$count ?>_d"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="to" title="To Sector"
                                                                      data-add-new-option="true" style="width:100%">
@@ -159,11 +161,15 @@ function generating_plane_date()
 }
 generating_plane_date();
 
-$('#from_sector-1').select2({
-width: '300px'
+$(document).ready(function () {
+
+    $('select[id^="from_sector-"]').select2({
+        width: '100%'
+    });
+
+    $('select[id^="to_sector-"]').select2({
+        width: '100%'
+    });
+
 });
-$('#to_sector-1').select2({
-	
-	width: '300px'
-        });
 </script>

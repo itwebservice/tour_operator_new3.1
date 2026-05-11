@@ -179,7 +179,7 @@
                                                                     onchange="get_transport_cost();"
                                                                     class="form-control app_select2"
                                                                     style="width:200px" data-add-new-option="true">
-                                                                    <option value="">Transport Vehicle</option>
+                                                                    <option value="">Select Vehicle</option>
                                                                     <?php
                                                                     $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive' order by vehicle_name asc");
                                                                     while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>

@@ -61,18 +61,19 @@
                                                             style="width: 350px;">
                                                     </td> -->
 
-                                                    <td style="min-width:360px;"><select name="from_sector-1" id="from_sector-1"
+                                                    <td style="min-width:360px;">
+                                                        <select name="from_sector-1" id="from_sector-1"
                                                                     class="form-control app_select2 " style="width:100%"
-                                                                    data-sector-type="from" title="From Sector"
+                                                                    data-sector-type="from" 
                                                                      data-add-new-option="true">
-                                                                    <option value="">*From Sector</option>
+                                                                    <option value=""></option>
                                                                 </select>
                                                             </td>
                                                             <td style="min-width:360px;"><select name="to_sector-1" id="to_sector-1"
                                                                     class="form-control app_select2 "
-                                                                    data-sector-type="to" title="To Sector"
+                                                                    data-sector-type="to" 
                                                                      data-add-new-option="true" style="width:100%">
-                                                                    <option value="">*To Sector</option>
+                                                                    <option value=""></option>
                                                                 </select>
                                                             </td>
 
@@ -164,12 +165,14 @@ $('#txt_dapart-1,#txt_arrval-1').datetimepicker({
 });
 
 $('#from_sector-1').select2({
-width: '360px'
+    width: '360px',
+    placeholder: '*From Sector',
 });
+
 $('#to_sector-1').select2({
-	
-	width: '360px'
-        });
+    width: '360px',
+    placeholder: '*To Sector',
+});
 
 function switch_to_tab1() {
     $('a[href="#tab1"]').tab('show');
