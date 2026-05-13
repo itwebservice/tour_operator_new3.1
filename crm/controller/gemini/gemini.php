@@ -637,8 +637,37 @@ class GeminiController
         STANDARD EXTRACTION
         If sections exist:
         Extract all bullet points or lines under each section
-        Stop when a new unrelated section begins
-        Clean symbols (•, -, *, !!), trim spaces, remove duplicates
+        Extract each inclusion or exclusion as a complete logical item.
+        Treat each bullet point OR each non-empty line under the section as one item.
+        Preserve the FULL content of the line, including all sentences separated by periods (.).
+        Do NOT split an item at periods (.).
+        Do NOT split an item at commas (,), semicolons (;), or parentheses.
+        Continue capturing text until:
+        - the next bullet point
+        - the next non-empty line
+        - or a new unrelated section begins.
+        - If a line contains multiple sentences, keep them together as a single array item.
+        - Remove only the leading bullet markers such as: (•, -, *, !!)
+        - Trim extra spaces.
+        - Remove duplicate items.
+        - Preserve text exactly as written.
+
+        EXAMPLES:
+
+        Input:
+        All other transportation as per itinerary. Transfers as per the itinerary (Sprinter PVT)
+        Output:
+        "All other transportation as per itinerary. Transfers as per the itinerary (Sprinter PVT)"
+
+        Input:
+        International airfare and airport taxes. Airfares or VISA charges.
+        Output:
+        "International airfare and airport taxes. Airfares or VISA charges."
+
+        Input:
+        Local city/tourist tax (to be paid upon check in hotel)
+        Output:
+        "Local city/tourist tax (to be paid upon check in hotel)"
 
         PARAGRAPH-BASED EXTRACTION
         If written in sentence form (e.g., “includes hotel, meals… not includes airfare…”):
