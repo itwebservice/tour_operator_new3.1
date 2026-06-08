@@ -27,7 +27,7 @@ $nofquotation = $_REQUEST['nofquotation'];
                                     <button type="button" class="btn btn-excel btn-sm" onclick="hotel_save_modal()"><i class="fa fa-plus" title="Add Hotel"></i></button>
                                 </div>
                                 <div class="col-xs-6 text-right text_center_xs">
-                                    <button type="button" class="btn btn-excel btn-sm" onClick="addRow('dynamic_table_list_h_<?= $i ?>','<?= $i ?>');city_lzloading('.city_master_dropdown')"><i class="fa fa-plus"></i></button>
+                                    <button type="button" class="btn btn-excel btn-sm" onClick="addRow('dynamic_table_list_h_<?= $i ?>','<?= $i ?>');city_lzloading('.city_master_dropdown');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#dynamic_table_list_h_<?= $i ?>');}if(typeof initAllRoomCategorySelectAddNew==='function'){initAllRoomCategorySelectAddNew('#dynamic_table_list_h_<?= $i ?>');}"><i class="fa fa-plus"></i></button>
                                     <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('dynamic_table_list_h_<?= $i ?>')"><i class="fa fa-trash"></i></button>
                                 </div>
                             </div>
@@ -51,12 +51,12 @@ $nofquotation = $_REQUEST['nofquotation'];
                                         </td>
                                         <td><select id="city_name-<?= $i ?>-1" name="city_name-<?= $i ?>-1"
                                                 class="city_master_dropdown form-control" style="width:160px"
-                                                onchange="hotel_name_list_load(this.id);" title="Select City Name">
+                                                onchange="hotel_name_list_load(this.id);" title="Select City Name" data-add-new-option="true" >
                                             </select>
                                         </td>
                                         <td><select id="hotel_name-<?= $i ?>-1" name="hotel_name-<?= $i ?>-1"
                                                 onchange="hotel_type_load(this.id);get_hotel_cost('dynamic_table_list_h_<?= $i ?>');"
-                                                style="width:160px" title="Select Hotel Name">
+                                                class="form-control app_select2" style="width:160px" title="Select Hotel Name" data-add-new-option="true">
                                                 <option value="">Hotel Name</option>
                                             </select>
                                         </td>
@@ -64,13 +64,13 @@ $nofquotation = $_REQUEST['nofquotation'];
                                         <td><select name="room_cat-<?= $i ?>-1" id="room_cat-<?= $i ?>-1"
                                                 style="width:162px;" title="Room Category"
                                                 class="form-control app_select2"
-                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');"><?php get_room_category_dropdown(); ?></select>
+                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');" data-add-new-option="true"><?php get_room_category_dropdown(); ?></select>
                                         </td>
                                         <?php } else{?>
                                         <td><select name="room_cat-<?= $i ?>-1" id="room_cat-<?= $i ?>-1"
                                                 style="width:162px;" title="Room Category"
                                                 class="form-control app_select2"
-                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');">
+                                                onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');" data-add-new-option="true">
                                                 <option value="">Room Category</option></select>
                                         </td>
                                         <?php }?>
@@ -121,6 +121,9 @@ $nofquotation = $_REQUEST['nofquotation'];
 <script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script>
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+    hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/package_booking/quotation/home/hotel/hotel_name_load.php';
+}
 city_lzloading('.city_master_dropdown');
 $('.app_datepicker').datetimepicker({
     format: 'd-m-Y',
@@ -130,5 +133,17 @@ $('.app_datepicker').datetimepicker({
 
 $('select[id^="room_cat-"]').each(function() {
     $(this).select2();
+    if (typeof initRoomCategoryAddNewInline === 'function') {
+        initRoomCategoryAddNewInline(this);
+    }
+});
+
+$('select[id^="hotel_name-"]').each(function() {
+    if (!$(this).data('select2')) {
+        $(this).select2({ width: '160px', minimumResultsForSearch: 0 });
+    }
+    if (typeof initHotelSelectAddNew === 'function') {
+        initHotelSelectAddNew(this);
+    }
 });
 </script>

@@ -80,7 +80,7 @@ $package_name = $sq_package['package_name'];
                                                                         name="transport_vehicle-" title="Select Transport"
                                                                         onchange="get_transport_cost_update(this.id);"
                                                                         class="form-control app_select2"
-                                                                        style="width:200px">
+                                                                        style="width:200px" data-add-new-option="true">
                                                                         <option value="">Transport Vehicle</option>
                                                                         <?php
                                                                         $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive' order by vehicle_name asc");
@@ -202,12 +202,12 @@ $package_name = $sq_package['package_name'];
                                                                             name="transport_vehicle-<?= $count ?>_u"
                                                                             id="transport_vehicle-<?= $count ?>_u"
                                                                             style="width:150px" class="app_select2 form-control"
-                                                                            onchange="get_transport_cost_update(this.id)">
+                                                                            onchange="get_transport_cost_update(this.id)" data-add-new-option="true">
                                                                             <option
                                                                                 value="<?= $sq_transport_bus_agency1['entry_id'] ?>">
                                                                                 <?= $sq_transport_bus_agency1['vehicle_name'] ?>
                                                                             </option>
-                                                                            <option value="">Transport Vehicle</option>
+                                                                            <option value="">Select Vehicle</option>
                                                                             <?php
                                                                             $sq_transport_bus_agency = mysqlQuery("select * from b2b_transfer_master where status!='Inactive' order by vehicle_name asc");
                                                                             while ($row_transport_bus_agency = mysqli_fetch_assoc($sq_transport_bus_agency)) { ?>
@@ -390,7 +390,7 @@ $package_name = $sq_package['package_name'];
                                                                         class="form-control app_select2 act_city"
                                                                         name="city_name-1" title="City Name"
                                                                         style="width:150px"
-                                                                        onchange="get_excursion_list(this.id);">
+                                                                        onchange="get_excursion_list(this.id);" data-add-new-option="true">
                                                                         <option value="">*City</option>
                                                                     </select></td>
                                                                 <td><select id="excursion-1"

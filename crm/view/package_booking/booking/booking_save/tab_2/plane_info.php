@@ -24,11 +24,34 @@
         <td><input maxlength="15" type="text" id="" name="username" value="1" placeholder="Sr.No." disabled/></td>
         <td><input type="text" id="txt_plane_date-1" name="txt_plane_date-1" onchange="get_to_datetime(this.id,'txt_arravl-1')" title="Departure Date & Time" placeholder="Departure Date & Time" value="<?= Date('d-m-Y  H:i')?>" style="width: 156px !important;"/></td>
         <td><input type="text" id="txt_arravl-1" onchange="validate_validDatetime('txt_plane_date-1',this.id)" name="txt_arravl-1" class="app_datetimepicker" placeholder="Arrival Date & Time" value="<?= Date('d-m-Y H:i')?>" title="Arrival Date & Time" style="width: 154px !important;"></td>
-        <td><input type="text" name="from_sector-1" id="from_sector-1" style="width:300px" placeholder="*From Sector" title="From Sector">
+        <!-- <td><input type="text" name="from_sector-1" id="from_sector-1" style="width:300px" placeholder="*From Sector" title="From Sector">
 		</td>
 		<td><input type="text" name="to_sector-1" id="to_sector-1" style="width:300px" placeholder="*To Sector" title="To Sector">
-		</td>             
-        <td><select id="txt_plane_company-1" name="txt_plane_company-1" class="app_select2" style="width:150px" title="Airline Name">
+		</td>              -->
+
+        <td style="min-width:300px;">
+    <select name="from_sector-1" id="from_sector-1"
+        class="form-control app_select2 plane-airport-select"
+        data-sector-type="from"
+        title="From Sector"
+        data-add-new-option="true"
+        style="width:100%;">
+        <option value="">*From Sector</option>
+    </select>
+</td>
+
+<td style="min-width:300px;">
+    <select name="to_sector-1" id="to_sector-1"
+        class="form-control app_select2 plane-airport-select"
+        data-sector-type="to"
+        title="To Sector"
+        data-add-new-option="true"
+        style="width:100%;">
+        <option value="">*To Sector</option>
+    </select>
+</td>
+
+        <td><select id="txt_plane_company-1" name="txt_plane_company-1" class="app_select2" style="width:150px" title="Airline Name" data-add-new-option="true">
             <option value="">*Airline Name</option>
             <?php get_airline_name_dropdown(); ?>
         </select></td>
@@ -69,11 +92,27 @@
         <input type="text" id="txt_plane_total_expense" name="txt_plane_total_expense" placeholder="Air Expense" title="Air Expense" class="text-right amount_feild_highlight" value="0.00" disabled />
     </div>
 </div>
+
+
     
 <script type="text/javascript">
+
     $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 
     $('#txt_plane_company-1').select2();
+    if (typeof initAllAirlineSelectAddNew === 'function') {
+        initAllAirlineSelectAddNew('#tbl_plane_travel_details_dynamic_row');
+    }
 $('#txt_plane_date-1,#txt_arravl-1').datetimepicker({ format:'d-m-Y H:i' });
-event_airport('tbl_plane_travel_details_dynamic_row',4,5);
+    function initSalePackagePlaneAirports() {
+        if (typeof initPlaneAirportSelect2 === 'function') {
+            initPlaneAirportSelect2('#tbl_plane_travel_details_dynamic_row');
+            event_airport('tbl_plane_travel_details_dynamic_row', 4, 5);
+        } else {
+            setTimeout(initSalePackagePlaneAirports, 200);
+        }
+    }
+    initSalePackagePlaneAirports();
+
+
 </script>

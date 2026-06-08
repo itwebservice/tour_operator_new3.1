@@ -28,7 +28,7 @@ if($role!='Admin' && $role!="Branch Admin"){ $value="readonly"; }
         	<legend>Activity Supplier Information</legend>
 			<div class="row">
 				<div class="col-md-3 col-sm-6 mg_bt_10">
-					<select name="city_id" id="city_id" title="City Name" style="width:100%">
+					<select name="city_id" id="city_id" title="City Name" style="width:100%" data-add-new-option="true">
 						<?php 
 						$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$sq_vendor[city_id]'"));
 						?>

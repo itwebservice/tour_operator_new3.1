@@ -15,11 +15,17 @@
 				<tr>
 	                <td><input class="css-checkbox" id="chk_plan1" type="checkbox"><label class="css-label" for="chk_plan1"> </label></td>
 	                <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-	                <td><input type="text" name="from_sector-1" id="from_sector-1" placeholder="*From Sector" title="From Sector" style="width: 150px;">
+	                <td>
+						<select name="from_sector-1" id="from_sector-1" class="form-control app_select2 plane-airport-select" data-sector-type="from" title="From Sector" style="width: 150px;" data-add-new-option="true">
+							<option value="">*From Sector</option>
+						</select>
 					</td>
-					<td><input type="text" name="to_sector-1" id="to_sector-1" placeholder="*To Sector" title="To Sector" style="width: 150px;">
+					<td>
+						<select name="to_sector-1" id="to_sector-1" class="form-control app_select2 plane-airport-select" data-sector-type="to" title="To Sector" style="width: 150px;" data-add-new-option="true">
+							<option value="">*To Sector</option>
+						</select>
 					</td>            
-		            <td title="Airline Name"><select id="airline_name1" class="form-control app_select2"  title="Airline Name" name="airline_name1" style="width: 160px;">
+		            <td title="Airline Name"><select id="airline_name1" class="form-control app_select2"  title="Airline Name" name="airline_name1" style="width: 160px;" data-add-new-option="true">
 		                    <option value="">Airline Name</option>
 		                    <?php get_airline_name_dropdown(); ?>
 		            </select></td>
@@ -49,11 +55,23 @@
 					<tr>
 						<td><input class="css-checkbox" id="chk_plan<?= $count ?>_1" type="checkbox" checked><label class="css-label" for="chk_plan<?= $count ?>_1"> </label></td>
 		                <td><input maxlength="15" value="<?= $count ?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-		                <td><input type="text" name="from_sector-1" id="from_sector-<?= $count ?>_1" placeholder="*From Sector" title="From Sector" style="width: 250px;" value="<?php echo ($sq_city['city_name']) ? $sq_city['city_name']." - ".$row_q_plane['from_location'] : ''; ?>">
+		                <td>
+							<select name="from_sector-1" id="from_sector-<?= $count ?>_1" class="form-control app_select2 plane-airport-select" data-sector-type="from" title="From Sector" style="width: 250px;" data-add-new-option="true">
+								<?php if(($sq_city['city_name']) && ($row_q_plane['from_location']!='')){ ?>
+									<option value="<?= $sq_city['city_name']." - ".$row_q_plane['from_location'] ?>" selected><?= $sq_city['city_name']." - ".$row_q_plane['from_location'] ?></option>
+								<?php } ?>
+								<option value="">*From Sector</option>
+							</select>
 						</td>
-						<td><input type="text" name="to_sector-1" id="to_sector-<?= $count ?>_1" placeholder="*To Sector" title="To Sector" style="width: 250px;" value="<?php echo ($sq_city2['city_name']) ? $sq_city2['city_name']." - ".$row_q_plane['to_location'] : ''; ?>">
+						<td>
+							<select name="to_sector-1" id="to_sector-<?= $count ?>_1" class="form-control app_select2 plane-airport-select" data-sector-type="to" title="To Sector" style="width: 250px;" data-add-new-option="true">
+								<?php if(($sq_city2['city_name']) && ($row_q_plane['to_location']!='')){ ?>
+									<option value="<?= $sq_city2['city_name']." - ".$row_q_plane['to_location'] ?>" selected><?= $sq_city2['city_name']." - ".$row_q_plane['to_location'] ?></option>
+								<?php } ?>
+								<option value="">*To Sector</option>
+							</select>
 						</td>
-			            <td title="Airline Name"><select id="airline_name<?= $count ?>_1" class="form-control app_select2" title="Airline Name" name="airline_name1" style="width: 110px;">
+			            <td title="Airline Name"><select id="airline_name<?= $count ?>_1" class="form-control app_select2" title="Airline Name" name="airline_name1" style="width: 110px;" data-add-new-option="true">
 			            	<?php if($row_q_plane['airline_name']!=''){
 			            	$sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_q_plane[airline_name]'"));?>
 			            	    <option value="<?= $sq_airline['airline_id'] ?>"><?= $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' ?></option>
@@ -87,5 +105,74 @@
     </div>
 </div>
 <script>
-	event_airport('tbl_package_tour_quotation_dynamic_plane');
+	init_plane_airport_select2_update();
+
+	// Keep default event_airport for other tables. For this table use Select2 airport search.
+	var original_event_airport_update = event_airport;
+	event_airport = function(id, fromSectornum = 2, toSectornum = 3) {
+		if (id === 'tbl_package_tour_quotation_dynamic_plane') {
+			init_plane_airport_select2_update();
+			return;
+		}
+		original_event_airport_update(id, fromSectornum, toSectornum);
+	};
+
+	function init_plane_airport_select2_update() {
+		var base_url = $('#base_url').val();
+		$('#tbl_package_tour_quotation_dynamic_plane .plane-airport-select').each(function() {
+			if ($(this).data('select2')) {
+				return;
+			}
+			$(this).select2({
+				width: $(this).attr('style') && $(this).attr('style').indexOf('250px') !== -1 ? '250px' : '150px',
+				minimumInputLength: 2,
+				placeholder: $(this).data('sector-type') === 'from' ? '*From Sector' : '*To Sector',
+				ajax: {
+					url: base_url + '/view/visa_passport_ticket/ticket/home/airport_list.php',
+					dataType: 'json',
+					delay: 250,
+					data: function(params) {
+						return { request: params.term || '' };
+					},
+					processResults: function(data) {
+						return {
+							results: $.map(data, function(item) {
+								return {
+									id: item.value,
+									text: item.value,
+									city_id: item.city_id
+								};
+							})
+						};
+					},
+					cache: true
+				}
+			});
+		});
+	}
+
+	$(document).off('focus.planeAirportUpdate').on('focus.planeAirportUpdate', '#tbl_package_tour_quotation_dynamic_plane .plane-airport-select', function() {
+		if (!$(this).data('select2')) {
+			init_plane_airport_select2_update();
+		}
+	});
+
+	$(document).off('select2:select.planeAirportUpdate').on('select2:select.planeAirportUpdate', '#tbl_package_tour_quotation_dynamic_plane .plane-airport-select', function(e) {
+		var cityId = e.params && e.params.data ? e.params.data.city_id : '';
+		var $row = $(this).closest('tr');
+		if ($(this).data('sector-type') === 'from') {
+			$row.find('input[id^="from_city-"]').val(cityId);
+		} else {
+			$row.find('input[id^="to_city-"]').val(cityId);
+		}
+	});
+
+	$(document).off('select2:clear.planeAirportUpdate').on('select2:clear.planeAirportUpdate', '#tbl_package_tour_quotation_dynamic_plane .plane-airport-select', function() {
+		var $row = $(this).closest('tr');
+		if ($(this).data('sector-type') === 'from') {
+			$row.find('input[id^="from_city-"]').val('');
+		} else {
+			$row.find('input[id^="to_city-"]').val('');
+		}
+	});
 </script>

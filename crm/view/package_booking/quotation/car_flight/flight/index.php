@@ -180,6 +180,11 @@ function save_modal() {
     }, function(data) {
         $('#div_quotation_form').html(data);
         $('#fquot_save').button('reset');
+        if (typeof refreshPlaneAirportSelect2In === 'function') {
+            setTimeout(function () {
+                refreshPlaneAirportSelect2In('#div_quotation_form');
+            }, 400);
+        }
     });
 }
 

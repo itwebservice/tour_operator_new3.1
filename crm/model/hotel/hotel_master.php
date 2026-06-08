@@ -266,6 +266,80 @@ function hotel_master_save($city_id, $hotel_name, $mobile_no, $landline_no, $ema
 
 ///////////////////////***Hotel Master save end*********//////////////
 
+///////////////////////***Hotel quick save (minimal popup, JSON) start*********//////////////
+function hotel_quick_save($city_id, $hotel_name, $state_id, $rating_star){
+  $city_id = mysqlREString($city_id);
+  $state_id = mysqlREString($state_id);
+  $rating_star = mysqlREString($rating_star);
+  $hotel_name = addslashes(ltrim($hotel_name));
+
+  if($city_id == '' || !preg_match('/^[0-9]+$/', $city_id)){
+    echo json_encode(array('status' => 'error', 'message' => 'City is required.'));
+    exit;
+  }
+  if($hotel_name == ''){
+    echo json_encode(array('status' => 'error', 'message' => 'Hotel name is required.'));
+    exit;
+  }
+  if($state_id == '' || !preg_match('/^[0-9]+$/', $state_id)){
+    echo json_encode(array('status' => 'error', 'message' => 'State/Country is required.'));
+    exit;
+  }
+  if($rating_star == ''){
+    echo json_encode(array('status' => 'error', 'message' => 'Hotel category is required.'));
+    exit;
+  }
+
+  $hotel_name_count = mysqli_num_rows(mysqlQuery("select hotel_id from hotel_master where hotel_name='$hotel_name' and city_id='$city_id'"));
+  if($hotel_name_count > 0){
+    echo json_encode(array('status' => 'error', 'message' => 'Hotel name already exist in this city!'));
+    exit;
+  }
+
+  global $encrypt_decrypt, $secret_key;
+  $mobile_no = $encrypt_decrypt->fnEncrypt('9999999999', $secret_key);
+  $email_id = $encrypt_decrypt->fnEncrypt('', $secret_key);
+  $opening_balance = 0;
+  $side = 'Credit';
+  $active_flag = 'Active';
+  $as_of_date = date('Y-m-d');
+
+  begin_t();
+
+  $max_hotel_id1 = mysqli_fetch_assoc(mysqlQuery("select max(hotel_id) as max from hotel_master"));
+  $max_hotel_id = $max_hotel_id1['max'] + 1;
+
+  $sq = mysqlQuery("insert into hotel_master ( hotel_id, city_id, hotel_name, mobile_no, landline_no, email_id,alternative_email_1,alternative_email_2, contact_person_name, immergency_contact_no, hotel_address, website, opening_balance, rating_star,meal_plan,hotel_type, bank_name,account_name, account_no, branch, ifsc_code, service_tax_no,active_flag, state_id,side,pan_no,as_of_date,description,policies,amenities, `cwb_from`, `cwb_to`, `cwob_from`, `cwob_to`) values ( '$max_hotel_id', '$city_id', '$hotel_name', '$mobile_no', '', '$email_id', '', '', '', '', '', '', '$opening_balance','$rating_star','','', '', '','','','', '', '$active_flag','$state_id','$side','','$as_of_date','','','', '0', '0', '0', '0')");
+
+  if(!$sq){
+    rollback_t();
+    echo json_encode(array('status' => 'error', 'message' => 'Hotel supplier details not saved!'));
+    exit;
+  }
+
+  $vendor_login_master = new vendor_login_master;
+  ob_start();
+  $vendor_login_master->vendor_login_save($hotel_name, $mobile_no, 'Hotel Vendor', $max_hotel_id, $active_flag, $email_id, $opening_balance, $side, $as_of_date);
+  ob_end_clean();
+
+  if($GLOBALS['flag']){
+    commit_t();
+    echo json_encode(array(
+      'status' => 'success',
+      'hotel_id' => $max_hotel_id,
+      'hotel_name' => stripslashes($hotel_name),
+      'rating_star' => $rating_star,
+      'message' => 'Hotel supplier has been successfully saved.'
+    ));
+    exit;
+  }
+
+  rollback_t();
+  echo json_encode(array('status' => 'error', 'message' => 'Hotel supplier details not saved!'));
+  exit;
+}
+///////////////////////***Hotel quick save (minimal popup, JSON) end*********//////////////
+
 ///////////////////////***Hotel Master update start*********//////////////
 function hotel_master_update( $hotel_id, $vendor_login_id, $city_id, $hotel_name, $mobile_no, $landline_no, $email_id,$email_id_1,$email_id_2, $contact_person_name, $immergency_contact_no, $hotel_address,  $website, $opening_balance,$rating_star, $active_flag, $bank_name,$account_name ,$account_no, $branch, $ifsc_code, $service_tax_no,$state,$side1,$supp_pan,$as_of_date,$description,$policies,$amenities,$hotel_type,$meal_plan,$cwb_from,$cwb_to,$cwob_from,$cwob_to)
 {

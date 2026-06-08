@@ -15,11 +15,27 @@
 				<tr>
 	                <td><input class="css-checkbox" id="chk_plan-1" type="checkbox" checked><label class="css-label" for="chk_plan-"> </label></td>
 	                <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-					<td><input type="text" name="from_sector-1" id="from_sector-1" placeholder="*From Sector" title="*From Sector" style="width: 150px;">
+					<!-- <td><input type="text" name="from_sector-1" id="from_sector-1" placeholder="*From Sector" title="*From Sector" style="width: 150px;">
 					</td>
 					<td><input type="text" name="to_sector-1" id="to_sector-1" placeholder="*To Sector" title="*To Sector" style="width: 150px;">
-					</td>   
-					<td><select id="airline_name-1" class="app_select2 form-control"  title="Airline Name" name="airline_name-1" style="width: 200px;">
+					</td>    -->
+
+					<td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 "
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 "
+                                                                    data-sector-type="to" title="To Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
+                                                            </td>
+
+					<td><select id="airline_name-1" class="app_select2 form-control"  title="Airline Name" name="airline_name-1" style="width: 200px;" data-add-new-option="true">
 		                    <option value="">Airline Name</option>
 		                    <?php get_airline_name_dropdown(); ?>
 						    </select></td>
@@ -57,7 +73,7 @@
 						</td>
 						<td><input type="text" name="to_sector-1" id="to_sector-<?= $offset.$count ?>_d" placeholder="*To Sector" title="To Sector" style="width: 250px;" value="<?php echo ($sq_city2['city_name']) ? $sq_city2['city_name']." - ".$row_q_plane['to_location'] : ''; ?>">
 						</td>			            	            
-						<td><select id="airline_name-<?= $offset.$count ?>_d" class="app_select2 form-control" style="width:160px" title="Airline Name" name="airline_name-<?= $offset.$count ?>_d">
+						<td><select id="airline_name-<?= $offset.$count ?>_d" class="app_select2 form-control" style="width:160px" title="Airline Name" name="airline_name-<?= $offset.$count ?>_d" data-add-new-option="true">
 							<?php if($row_q_plane['airline_name']!=''){ ?>
 							<option value="<?= $row_q_plane['airline_name'] ?>"><?= $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' ?></option>
 		                    <option value="">Airline Name</option>
@@ -102,4 +118,11 @@ $('select[id^="airline_name-"]').each(function() {
     $(this).select2();
 });
 
+$('#from_sector-1').select2({
+width: '250px'
+});
+$('#to_sector-1').select2({
+	
+	width: '250px'
+        });
 </script>

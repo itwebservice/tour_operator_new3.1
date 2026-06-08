@@ -12,7 +12,7 @@ include "../../../../model/model.php";
 <div class="app_panel_content Filter-panel">
     <div class="row">
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
-            <select id="city_id_filter" name="city_id_filter" onchange="hotel_name_list_load(this.id);" class="form-control" style="width:100%" title="Select City Name" data-toggle="tooltip">
+            <select id="city_id_filter" name="city_id_filter" onchange="hotel_name_list_load(this.id);" class="form-control" style="width:100%" title="Select City Name" data-toggle="tooltip" >
             </select>
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">

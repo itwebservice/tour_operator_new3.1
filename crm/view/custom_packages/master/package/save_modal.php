@@ -12,7 +12,7 @@ $vehcile_id_str = "vehicle_name1";
                     <div class="row mg_bt_10">
                         <div class="col-xs-12 no-pad mg_bt_20 mg_tp_20">
                             <div class="col-md-3 col-sm-3">
-                                <select id="dest_name_s" name="dest_name_s" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_image(this.id)">
+                                <select id="dest_name_s" name="dest_name_s" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_image(this.id)" data-add-new-option="true">
                                     <option value="">*Destination</option>
                                     <?php
                                     $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");
@@ -129,7 +129,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                             <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
                         </div>
                         <div class="col-xs-6 col-md-6 text-right mg_tp_10">
-                            <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name1]')"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name1]');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_master');}"><i class="fa fa-plus"></i></button>
                             <button type="button" class="btn btn-pdf btn-sm" title="Delete Row" onclick="deleteRow('tbl_package_hotel_master')"><i class="fa fa-trash"></i></button>
                         </div>
                         <div class="col-xs-12">
@@ -138,11 +138,20 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                     <tr>
                                         <td><input id="chk_dest1" type="checkbox" checked></td>
                                         <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                        <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name">
-                                            </select></td>
-                                        <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name">
+                                        <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true">
                                                 <option value="">*Hotel Name</option>
-                                            </select></td>
+                                                <?php 
+                                                    $query = "select hotel_id, hotel_name from hotel_master where 1";
+                                                    $sq_hotel = mysqlQuery($query);
+                                                    while($row_hotel = mysqli_fetch_assoc($sq_hotel)){ ?>
+                                                    <option value="<?php echo $row_hotel['hotel_id'] ?>"><?php echo $row_hotel['hotel_name'] ?></option>
+                                                    <?php } ?>
+                                            </select>
+                                        </td>
                                         <td><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
                                         <td><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" placeholder="*Total Night" title="Total Night"></td>
                                         </td>
@@ -173,7 +182,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                         <tr>
                                             <td class="col-md-1"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off" data-original-title="" title="" aria-hidden="true" style="display: none;"><label for="chk_transport1"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label><label class="css-label" for="chk_transport1"> </label></td>
                                             <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off" data-original-title="" title=""></td>
-                                            <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2">
+                                            <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
                                                     <option value="">Select Vehicle</option>
                                                     <?php
                                                     $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -208,8 +217,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                         <textarea class="feature_editor" id="exclusions" name="exclusions" class="form-control" placeholder="Exclusions" title="Exclusions" rows="4"></textarea>
                     </div>
                 </div>
-                <div class="panel panel-default main_block bg_light pad_8 text-center mg_bt_0" style="background-color: #fff; border: none;
-">
+                <div class="panel panel-default main_block bg_light pad_8 text-center mg_bt_0" style="background-color: #fff; border: none;">
                     <button class="btn btn-sm btn-success" id="btn_save1"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
                 </div>
             </div>
@@ -223,14 +231,41 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
     <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 
 </form>
+
+
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/field_validation.js"></script>
 
 <script>
+    var packageHotelLoadUrl = $('#base_url').val() + 'view/custom_packages/master/package/hotel/hotel_name_load.php';
+    if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+        hotelSupplierQuickLoadUrl = packageHotelLoadUrl;
+    }
     $('#dest_name_s,#vehicle_name1,#currency_code,#dest_image').select2();
+    if (typeof initAllDestinationSelectAddNew === 'function') {
+        initAllDestinationSelectAddNew('#frm_package_master_save');
+    }
+    if (typeof initAllVehicleSelectAddNew === 'function') {
+        initAllVehicleSelectAddNew('#frm_package_master_save');
+    }
+   
     city_lzloading('select[name^="city_name1"]');
     destinationLoading('select[name^="pickup_from"]', "Pickup Location");
     destinationLoading('select[name^="drop_to"]', "Drop-off Location");
+
+   // Initialize Select2
+$('#hotel_name').select2({
+    width: '100%',
+    minimumResultsForSearch: 0,
+    dropdownParent: $('body')
+});
+captureHotelSelect2Config($('#hotel_name'));
+initHotelSelectAddNew('#hotel_name');
+
+$(function () {
+    initAllHotelSelectAddNew('#tbl_package_hotel_master');
+    setTimeout(function () { initAllHotelSelectAddNew('#tbl_package_hotel_master'); }, 400);
+});
 
     // --------------------------------------
     // $('#dest_name_s').on('change', function() {
@@ -469,13 +504,35 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
     function hotel_name_list_load(id) {
 
         var city_id = $("#" + id).val();
+        if (!city_id) {
+            return;
+        }
 
         var count = id.substring(9);
+        var $hotel = $("#hotel_name" + count);
+        if (!$hotel.length) {
+            $hotel = $('#hotel_name');
+        }
 
-        $.get("hotel/hotel_name_load.php", {
+        if (typeof hotelDropdownLoadByCity === 'function') {
+            hotelDropdownLoadByCity(city_id, $hotel);
+            return;
+        }
+
+        $.get(packageHotelLoadUrl, {
             city_id: city_id
         }, function(data) {
-            $("#hotel_name" + count).html(data);
+            if ($hotel.data('select2')) {
+                $hotel.select2('destroy');
+            }
+            $hotel.html(data);
+            $hotel.select2({
+                width: '100%',
+                minimumResultsForSearch: 0,
+                dropdownParent: $('body')
+            });
+            captureHotelSelect2Config($hotel);
+            initHotelSelectAddNew($hotel);
         });
 
     }

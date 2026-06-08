@@ -67,18 +67,18 @@
                                                                 </select></td>
                                                             <td><select id="city_name1" name="city_name1"
                                                                     class="city_master_dropdown city_name1 form-control app_select2"
-                                                                    style="width:160px" title="Select City Name">
+                                                                    style="width:160px" title="Select City Name" data-add-new-option="true">
                                                                 </select></td>
                                                             <td><select id="hotel_name-1" name="hotel_name-1"
                                                                     onchange="hotel_type_load(this.id);get_hotel_cost();"
                                                                     class="form-control app_select2" style="width:160px"
-                                                                    title="Select Hotel Name">
+                                                                    title="Select Hotel Name" data-add-new-option="true">
                                                                     <option value="">*Hotel Name</option>
                                                                 </select></td>
                                                             <td><select name="room_cat-1" id="room_cat-1"
                                                                     style="width:145px;" title="Room Category"
                                                                     class="form-control app_select2"
-                                                                    onchange="get_hotel_cost();">
+                                                                    onchange="get_hotel_cost();" data-add-new-option="true">
                                                                     <option value="">Room Category</option>
                                                                 </select>
                                                             </td>
@@ -178,8 +178,8 @@
                                                                     name="transport_vehicle-" title="Select Transport"
                                                                     onchange="get_transport_cost();"
                                                                     class="form-control app_select2"
-                                                                    style="width:200px">
-                                                                    <option value="">Transport Vehicle</option>
+                                                                    style="width:200px" data-add-new-option="true">
+                                                                    <option value="">Select Vehicle</option>
                                                                     <?php
                                                                     $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive' order by vehicle_name asc");
                                                                     while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>
@@ -289,18 +289,24 @@
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td><input type="text" name="from_sector-1"
-                                                                    id="from_sector-1" placeholder="*From Sector"
-                                                                    title="From Sector" style="width: 300px;">
+                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="from" title="From Sector"
+                                                                    style="width: 300px;" data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
                                                             </td>
-                                                            <td><input type="text" name="to_sector-1" id="to_sector-1"
-                                                                    placeholder="*To Sector" title="To Sector"
-                                                                    style="width: 300px;">
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="to" title="To Sector"
+                                                                    style="width: 300px;" data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
                                                             </td>
                                                             <td><select id="airline_name1"
                                                                     class="app_select2 form-control"
                                                                     name="airline_name1" title="Airline Name"
-                                                                    style="width: 120px;">
+                                                                    style="width: 120px;" data-add-new-option="true">
                                                                     <option value="">Airline Name</option>
                                                                     <?php get_airline_name_dropdown(); ?>
                                                                 </select></td>
@@ -385,7 +391,7 @@
                                                             <td><select id="city_name-1" class="form-control exc_city"
                                                                     name="city_name-1" title="City Name"
                                                                     style="width:150px"
-                                                                    onchange="get_excursion_list(this.id);">
+                                                                    onchange="get_excursion_list(this.id);" data-add-new-option="true">
                                                                 </select>
                                                             </td>
                                                             <td><select id="excursion-1"
@@ -664,7 +670,13 @@
 <?= end_panel() ?>
 
 <script>
+    if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+        hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/package_booking/quotation/home/hotel/hotel_name_load.php';
+    }
     $('#airline_name1,#room_cat1,#pickup_from-,#drop_to-,#transport_vehicle-,#excursion-1').select2();
+    if (typeof initAllAirlineSelectAddNew === 'function') {
+        initAllAirlineSelectAddNew('#tbl_package_tour_quotation_dynamic_plane');
+    }
     $('#cruise_departure_date,#cruise_arrival_date,#exc_date-1').datetimepicker({
         format: "d-m-Y H:i"
     });
@@ -678,9 +690,42 @@
     city_lzloading('#train_to_location1', "*To", true);
     city_lzloading('#train_from_location1', "*From", true);
 
+    $('#hotel_name-1').select2({ width: '160px', minimumResultsForSearch: 0 });
+    function initPackageQuotationHotelAddNew() {
+        if (typeof initHotelSelectAddNew !== 'function') {
+            return;
+        }
+        initHotelSelectAddNew('#hotel_name-1');
+        initAllHotelSelectAddNew('#tbl_package_tour_quotation_dynamic_hotel');
+    }
+    $(function () {
+        initPackageQuotationHotelAddNew();
+        setTimeout(initPackageQuotationHotelAddNew, 400);
+    });
+    if (typeof initAllRoomCategorySelectAddNew === 'function') {
+        initAllRoomCategorySelectAddNew('#tbl_package_tour_quotation_dynamic_hotel');
+        setTimeout(function () {
+            initAllRoomCategorySelectAddNew('#tbl_package_tour_quotation_dynamic_hotel');
+        }, 400);
+    }
+    if (typeof initAllVehicleSelectAddNew === 'function') {
+        initAllVehicleSelectAddNew('#tbl_package_tour_quotation_dynamic_transport');
+        setTimeout(function () {
+            initAllVehicleSelectAddNew('#tbl_package_tour_quotation_dynamic_transport');
+        }, 400);
+    }
+
     // Event handler removed - using inline onchange attributes instead
 
-    event_airport('tbl_package_tour_quotation_dynamic_plane');
+    function initPackageQuotationPlaneAirports() {
+        if (typeof initPlaneAirportSelect2 === 'function') {
+            initPlaneAirportSelect2('#tbl_package_tour_quotation_dynamic_plane');
+        } else {
+            setTimeout(initPackageQuotationPlaneAirports, 200);
+        }
+    }
+    jQuery(initPackageQuotationPlaneAirports);
+
     // App_accordion
     jQuery(document).ready(function() {
         jQuery(".panel-heading").click(function() {
@@ -816,54 +861,38 @@
     }
     // Hotel name list load function
     function hotel_name_list_load(id) {
-        var base_url = $("#base_url").val();
         var city_id = $("#" + id).val();
-        var count = id.substring(9); // Extract number from city_name1, city_name2, etc.
-
-        console.log("Loading hotels for city_id:", city_id, "count:", count);
-        console.log("AJAX URL:", base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php");
-
-        // Clear existing options first
-        $("#hotel_name-" + count).html('<option value="">Loading hotels...</option>');
-
+        if (!city_id) {
+            return;
+        }
+        var count = id.substring(9);
+        var $hotel = $("#hotel_name-" + count);
+        if (!$hotel.length) {
+            $hotel = $("#hotel_name" + count);
+        }
+        if (typeof hotelDropdownLoadByCity === 'function') {
+            hotelDropdownLoadByCity(city_id, $hotel);
+            return;
+        }
+        var base_url = $("#base_url").val();
         $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", {
                 city_id: city_id
             })
             .done(function(data) {
-                console.log("Hotel data received:", data);
-                $("#hotel_name-" + count).html(data);
-
-                // Re-initialize Select2 for the updated dropdown
-                $("#hotel_name-" + count).select2({
+                if ($hotel.data('select2')) {
+                    $hotel.select2('destroy');
+                }
+                $hotel.html(data);
+                $hotel.select2({
                     placeholder: "Select Hotel",
-                    allowClear: true
+                    allowClear: true,
+                    width: '160px',
+                    minimumResultsForSearch: 0
                 });
-            })
-            .fail(function(xhr, status, error) {
-                console.error("Error loading hotels:", status, error);
-                console.error("Response:", xhr.responseText);
-                console.error("Status Code:", xhr.status);
-                console.error("Ready State:", xhr.readyState);
-
-                // Try alternative URL structure
-                var altUrl = base_url + "crm/view/package_booking/quotation/home/hotel/hotel_name_load.php";
-                console.log("Trying alternative URL:", altUrl);
-
-                $.get(altUrl, {
-                        city_id: city_id
-                    })
-                    .done(function(data) {
-                        console.log("Hotel data received from alternative URL:", data);
-                        $("#hotel_name-" + count).html(data);
-                        $("#hotel_name-" + count).select2({
-                            placeholder: "Select Hotel",
-                            allowClear: true
-                        });
-                    })
-                    .fail(function(xhr2, status2, error2) {
-                        console.error("Alternative URL also failed:", status2, error2);
-                        $("#hotel_name-" + count).html('<option value="">Error loading hotels</option>');
-                    });
+                if (typeof captureHotelSelect2Config === 'function') {
+                    captureHotelSelect2Config($hotel);
+                }
+                initHotelSelectAddNew($hotel);
             });
     }
 
@@ -2684,8 +2713,12 @@ function populateHotelRow(row, hotel, i, hotel_arr) {
 
     // Initialize select2 for dropdowns
     $('#'+row.cells[2].childNodes[0].id).select2().trigger("change");
-    hotelSelect.select2().trigger("change");
+    hotelSelect.select2({ width: '160px', minimumResultsForSearch: 0 }).trigger("change");
     roomCatSelect.select2().trigger("change");
+    hotelSelect.attr('data-add-new-option', 'true');
+    if (typeof initHotelSelectAddNew === 'function') {
+        initHotelSelectAddNew(hotelSelect);
+    }
 }
 
 

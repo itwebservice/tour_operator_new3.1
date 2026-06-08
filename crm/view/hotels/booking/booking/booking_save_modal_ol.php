@@ -337,6 +337,12 @@ $.get('../booking/inc/get_currency_dropdown.php', {quotation_id:''}, function (d
     $('#currency_div').html(data);
 });
 city_lzloading('.city_id');
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+    hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/hotels/booking/booking/inc/hotel_name_load.php';
+}
+if (typeof initAllHotelSelectAddNew === 'function') {
+    initAllHotelSelectAddNew('#tbl_hotel_booking');
+}
 $('#payment_date,#due_date,#booking_date').datetimepicker({
     timepicker: false,
     format: 'd-m-Y'

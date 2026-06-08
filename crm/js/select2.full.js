@@ -5473,7 +5473,7 @@ S2.define('select2/core',[
 
   Select2.prototype.render = function () {
     var $container = $(
-      '<span class="select2 select2-container">' +
+      '<span class="select2 select2-container testing">' +
         '<span class="selection"></span>' +
         '<span class="dropdown-wrapper" aria-hidden="true"></span>' +
       '</span>'
@@ -6285,6 +6285,111 @@ S2.define('jquery.select2',[
   // This allows Select2 to use the internal loader outside of this file, such
   // as in the language files.
   jQuery.fn.select2.amd = S2;
+
+  // Add support for a custom "Add New" action row in Select2 dropdowns.
+  // Enable per select by adding: data-add-new-option="true"
+$(document)
+  .off('select2:open.select2AddNewOption')
+  .on('select2:open.select2AddNewOption', function () {
+
+    setTimeout(function () {
+
+      var $select = $('.select2-hidden-accessible').filter(function () {
+        return $(this).data('select2') && $(this).data('select2').isOpen();
+      }).last();
+
+      if (
+        !$select.length ||
+        $select.attr('data-add-new-option') !== 'true'
+      ) {
+        return;
+      }
+
+      // Hotel dropdowns use initHotelSelectAddNew() in footer_scripts.js
+      var selectId = $select.attr('id') || '';
+      if (selectId.indexOf('hotel_name') === 0 || selectId.indexOf('hotel_id') === 0) {
+        return;
+      }
+      // Airport sector dropdowns use initAirportSectorAddNew() in footer_scripts.js
+      if (selectId.indexOf('from_sector') === 0 || selectId.indexOf('to_sector') === 0) {
+        return;
+      }
+      // Airline dropdowns use initAirlineAddNewInline() in footer_scripts.js
+      if (selectId.indexOf('airline_name') === 0 || selectId.indexOf('airlines_name') === 0 || selectId.indexOf('txt_plane_company') === 0) {
+        return;
+      }
+      // Room category dropdowns use initRoomCategoryAddNewInline() in footer_scripts.js
+      if (selectId.indexOf('room_cat') === 0 || selectId.indexOf('txt_catagory') === 0 || $select.hasClass('category_select2')) {
+        return;
+      }
+      // Destination dropdowns use initDestinationAddNewInline() in footer_scripts.js
+      if (selectId === 'dest_name' || selectId === 'dest_name_s' || /^dest_name-\d/.test(selectId) || /^dest_name\d+$/.test(selectId)) {
+        return;
+      }
+      // Vehicle dropdowns use initVehicleAddNewInline() in footer_scripts.js
+      if (selectId === 'vehicle_name1' || selectId.indexOf('vehicle_name1') === 0 || selectId.indexOf('transport_vehicle-') === 0 || selectId.indexOf('transport_vehicle_name') === 0) {
+        return;
+      }
+
+      var $results = $('.select2-container--open .select2-results');
+
+      // Remove old button if already exists
+      $results.find('.add-new-option').remove();
+
+      // Add button
+      $results.append(`
+        <div class="add-new-option"
+             style="
+                padding:10px;
+                cursor:pointer;
+                background:#f2f2f2;
+                border-top:1px solid #ddd;
+                display:flex;
+                align-items:center;
+                gap:6px;
+             ">
+             
+          <svg xmlns="http://www.w3.org/2000/svg"
+               height="12"
+               width="10.5"
+               viewBox="0 0 448 512">
+            <path fill="rgb(103, 107, 174)"
+                  d="M256 64c0-17.7-14.3-32-32-32s-32
+                  14.3-32 32l0 160-160 0c-17.7
+                  0-32 14.3-32 32s14.3 32 32 32l160
+                  0 0 160c0 17.7 14.3 32 32
+                  32s32-14.3 32-32l0-160 160
+                  0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160
+                  0 0-160z"/>
+          </svg>
+
+          <span>Add New</span>
+        </div>
+      `);
+
+    }, 0);
+  });
+
+
+$(document)
+  .off('mousedown.select2AddNewOption')
+  .on('mousedown.select2AddNewOption', '.add-new-option', function (e) {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    var $select = $('.select2-hidden-accessible').filter(function () {
+      return $(this).data('select2') && $(this).data('select2').isOpen();
+    }).last();
+
+    if ($select.length) {
+      $select.trigger('select2:add_new');
+      $select.select2('close');
+    }
+  });
+
+
+  
 
   // Return the Select2 instance for anyone who is importing it.
   return select2;

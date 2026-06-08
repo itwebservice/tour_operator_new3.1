@@ -8,7 +8,7 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Hotel Supplier Details</h4>
+                <h4 class="modal-title" id="myModalLabel"> Details</h4>
             </div>
             <div class="modal-body">
                 <form id="frm_hotel_save">
@@ -16,7 +16,8 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
                         <legend>Basic Information</legend>
                         <div class="row">
                             <div class="col-md-2 col-sm-6 mg_bt_10">
-                                <select id="cmb_city_id" name="cmb_city_id" class="form-control app_select2" style="width:100%" title="Select City Name">
+                                <select id="cmb_city_id" name="cmb_city_id" class="form-control app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                    
                                     <?php //get_cities_dropdown(); 
                                     ?>
                                 </select>
@@ -436,6 +437,7 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
 </div>
 
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
+<script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script>
     $('#save_modal').modal('show');

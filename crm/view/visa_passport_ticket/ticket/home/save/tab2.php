@@ -28,7 +28,7 @@
 						<input type="text" id="arrival_datetime-1" name="arrival_datetime" class="app_datetimepicker arrival_datetime" placeholder="*Arrival Date-Time" onchange="validate_validDatetimeFlight(this.id)" title="Arrival Date-Time" value="<?php echo date('d-m-Y H:i') ?>" data-dyn-valid="required">
 					</div>
 					<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-						<select id="airlines_name-1" name="airlines_name" title="Airlines Name" style="width:100%" data-dyn-valid="required" class="app_select" onchange="get_auto_values('booking_date','basic_cost','payment_mode','service_charge','markup','save','true','service_charge','discount');">
+						<select id="airlines_name-1" name="airlines_name" title="Airlines Name" style="width:100%" data-dyn-valid="required" class="app_select" data-add-new-option="true" onchange="get_auto_values('booking_date','basic_cost','payment_mode','service_charge','markup','save','true','service_charge','discount');">
 							<option value="">Airline Name</option>
 						<?php $sq_airline = mysqlQuery("SELECT airline_name,airline_code FROM airline_master WHERE active_flag!='Inactive' ORDER BY airline_name ASC");
 							while($row_airline = mysqli_fetch_assoc($sq_airline)){
@@ -58,7 +58,12 @@
 						<input type="text" id="airlin_pnr-1" style="text-transform: uppercase;" onchange=" validate_specialChar(this.id)" name="airlin_pnr" placeholder="Airline PNR" title="Airline PNR" data-dyn-valid="">
 					</div>
 					<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
+						<div class="input-group">
 						<input id="airpf-1" name="airpf" title="Enter Departure Airport" data-toggle="tooltip" class="form-control autocomplete airpf" placeholder="*Enter Departure Airport" data-dyn-valid="required">
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-excel btn-sm btn-airport-input-add" data-input-id="airpf-1" title="Add Airport"><i class="fa fa-plus"></i></button>
+						</span>
+						</div>
 						<input type="hidden" name="from_city" id="from_city-1" data-dyn-valid="required"/>
 						<input type="hidden" name="departure_city" id="departure_city-1" data-dyn-valid="required">
 					</div>
@@ -66,7 +71,12 @@
 						<input type="text" id="dterm-1" name="dterm" onchange="validate_specialChar(this.id)" placeholder="Departure Terminal" title="Departure Terminal" data-dyn-valid="">
 					</div>
 					<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10 ">
+						<div class="input-group">
 						<input id="airpt-1" name="airpt" class="form-control autocomplete airpt" title="Enter Arrival Airport" data-toggle="tooltip" placeholder="*Enter Arrival Airport" data-dyn-valid="required">
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-excel btn-sm btn-airport-input-add" data-input-id="airpt-1" title="Add Airport"><i class="fa fa-plus"></i></button>
+						</span>
+						</div>
 						<input type="hidden" name="to_city" id="to_city-1" data-dyn-valid="required"/>
 						<input type="hidden" name="arrival_city" id="arrival_city-1" data-dyn-valid="required">
 					</div>
@@ -132,6 +142,9 @@
 <script>
 $('#departure_datetime-1, #arrival_datetime-1').datetimepicker({ format:'d-m-Y H:i:s' });
 $('#airlines_name-1,#plane_from_location-1,#plane_to_location-1').select2();
+if (typeof initAllAirlineSelectAddNew === 'function') {
+	initAllAirlineSelectAddNew('#frm_tab2');
+}
 $('#frm_tab2').validate({
 	submitHandler:function(form, e){
 		e.preventDefault();

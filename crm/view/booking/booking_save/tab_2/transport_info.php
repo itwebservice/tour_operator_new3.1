@@ -16,7 +16,7 @@
                     <td><input class="css-checkbox" id="chk_transport1" type="checkbox" checked><label class="css-label" for="chk_transport1"> </label></td>
                     <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled autocomplete="off"></td>
                     <td class="col-md-2">
-                        <select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2">
+                        <select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
                             <option value="">Select Vehicle</option>
                             <?php
                             $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -48,4 +48,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('#transport_vehicle_name1').select2({});
+    if (typeof initAllVehicleSelectAddNew === 'function') {
+        initAllVehicleSelectAddNew('#tbl_booking_transport');
+    }
+</script>
 

@@ -27,7 +27,7 @@ if($role!='Admin' && $role!="Branch Admin"){ $value="readonly"; }
         <legend>Visa Supplier Information</legend>
         <div class="row">
           <div class="col-md-3 col-sm-6 mg_bt_10">
-            <select id="cmb_city_id1" name="cmb_city_id1" style="width:100%" title="City Name">
+            <select id="cmb_city_id1" name="cmb_city_id1" style="width:100%" title="City Name" data-add-new-option="true">
                 <?php $sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name, city_id from city_master where city_id='$sq_vendor[city_id]'")); ?>
                 <option value="<?php echo $sq_city['city_id'] ?>" selected="selected"><?php echo $sq_city['city_name'] ?></option>
             </select>

@@ -14,7 +14,7 @@
                     <td><input id="check-btn-exc" type="checkbox" ></td>
                     <td><input maxlength="15" type="text" name="username"  value="1" placeholder="Sr. No." disabled/></td>
                     <td><input type="text" id="exc_date-1" name="exc_date-1" placeholder="Activity Date & Time" title="Activity Date & Time" class="app_datetimepicker" value="<?= date('d-m-Y H:i') ?>" style="width:200px"></td>
-                    <td><select id="city_name-1" class="form-control" name="city_name-1" title="City Name" style="width:200px" onchange="get_excursion_list(this.id);">
+                    <td><select id="city_name-1" class="form-control" name="city_name-1" title="City Name" style="width:200px" onchange="get_excursion_list(this.id);" data-add-new-option="true">
                         </select>
                     </td>
                     <td><select id="excursion-1" class="form-control" title="Activity Name" name="excursion-1" style="width:200px">
@@ -25,7 +25,7 @@
                         <option value="Sharing Transfer">Sharing Transfer</option>
                         <option value="SIC">SIC</option>
                         </select></td>
-                    <td><select name="vehicle_name-1" id="vehicle_name-1" style="width: 200px" class="form-control app_select2" title="Select Vehicle">
+                    <td><select name="vehicle_name-1" id="vehicle_name-1" style="width: 200px" class="form-control app_select2" title="Select Vehicle" data-add-new-option="true">
                         <option value=''>Select Vehicle</option>
                         <?php
                         $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
@@ -45,4 +45,8 @@
 </div>
 <script>
     city_lzloading('select[name="city_name-1"]');
+
+    $('#vehicle_name-1').select2({
+            width: '200px'
+        });
 </script>

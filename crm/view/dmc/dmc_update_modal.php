@@ -27,7 +27,7 @@ $email_id = $encrypt_decrypt->fnDecrypt($sq_dmc_info['email_id'], $secret_key);
               <input type="hidden" id="vendor_login_id" name="vendor_login_id" value="<?= $sq_vendor_login['login_id'] ?>">
               <div class="row">
                   <div class="col-md-3 col-sm-6 mg_bt_10">
-                     <select id="cmb_city_id1" name="cmb_city_id1" style="width:100%" title="City Name">
+                     <select id="cmb_city_id1" name="cmb_city_id1" style="width:100%" title="City Name" data-add-new-option="true">
                         <?php $sq_city = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$sq_dmc_info[city_id]'")); ?>
                         <option value="<?php echo $sq_city['city_id']; ?>" selected="selected"><?php echo $sq_city['city_name']; ?></option>
                     </select>

@@ -37,12 +37,12 @@ $password = "";
 
 // $db_name = "tour_operator_theme";
 
-$db_name = "tour_operator_new_2_2";
+$db_name = "itours_latest";
 
 global $conn;
 $conn = new mysqli($servername, $username, $password, $db_name);
 
-define('BASE_URL', 'http://localhost/itours/crm/');
+define('BASE_URL', 'http://localhost/tour_operator_new3.1-add-new-ui/crm/');
 // >>>>>>> Stashed changes
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");

@@ -64,6 +64,45 @@ function destination_update()
 	}
 
 }
+
+	public function destination_quick_save($dest_name, $status = 'Active')
+	{
+		$dest_name1 = trim(addslashes($dest_name));
+		if ($dest_name1 == '') {
+			echo json_encode(array('status' => 'error', 'message' => 'Destination name is required.'));
+			exit;
+		}
+
+		$sq_existing = mysqlQuery("select dest_id, dest_name from destination_master where dest_name='$dest_name1' limit 1");
+		if (mysqli_num_rows($sq_existing) > 0) {
+			$row = mysqli_fetch_assoc($sq_existing);
+			echo json_encode(array(
+				'status' => 'success',
+				'dest_id' => $row['dest_id'],
+				'dest_name' => $row['dest_name'],
+				'existing' => true
+			));
+			exit;
+		}
+
+		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(dest_id) as max from destination_master"));
+		$dest_id = $sq_max['max'] + 1;
+
+		$sq_insert = mysqlQuery("insert into destination_master (dest_id, dest_name, status) values ('$dest_id', '$dest_name1', '$status')");
+		if (!$sq_insert) {
+			echo json_encode(array('status' => 'error', 'message' => $dest_name1 . ' not saved!'));
+			exit;
+		}
+
+		echo json_encode(array(
+			'status' => 'success',
+			'dest_id' => $dest_id,
+			'dest_name' => $dest_name1,
+			'existing' => false
+		));
+		exit;
+	}
+
 }
 
 ?>
