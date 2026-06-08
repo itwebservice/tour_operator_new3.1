@@ -114,15 +114,42 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                 <input type="text" id="extra_bed" name="extra_bed" onchange="validate_balance(this.id);" class="form-control" placeholder="Extra Bed Cost" title="Extra Bed Cost" />
                             </div>
                         </div>
+
+                          <div class="col-xs-12 no-pad">
+                        <div class="ai-chat-container">
+                            <div class="touraiToggleBtn_div">
+                                <button class="btn btn-info btn-sm ico_left" id="touraiToggleBtn" type="button" aria-label="Toggle AI assistant">
+                                    <span class="ai-toggle-icon"><i class=""><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11.6838 0L10.8879 2.38783L8.50006 3.18377V4.13245L10.8879 4.9284L11.6838 7.31623H12.6325L13.4285 4.9284L15.8163 4.13245V3.18377L13.4285 2.38783L12.6325 0H11.6838Z" fill="white"/>
+                                        <path d="M5.01289 8.51283L6.18383 5H7.13251L8.30346 8.51283L11.8163 9.68377V10.6325L8.30346 11.8034L7.13251 15.3162H6.18383L5.01289 11.8034L1.50006 10.6325V9.68377L5.01289 8.51283Z" fill="white"/>
+                                        <path d="M2.17582 1L1.63186 2.63186L0 3.17582V3.82416L1.63186 4.36811L2.17582 5.99997H2.82416L3.36811 4.36811L4.99997 3.82416V3.17582L3.36811 2.63186L2.82416 1H2.17582Z" fill="white"/>
+                                        </svg>
+                                        </i></span>
+                                    <span>AI</span>
+                                </button>
+                            </div>
+                        
+                            <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
+                                <textarea id="aiMessageInput" placeholder="Type your message..."></textarea>
+                                <button type="button" class="send-btn" id="btnAnalyseMessage" aria-label="Analyse message">
+                                    <svg viewBox="0 0 24 24">
+                                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="aiApiInfo"></div>
+                        </div>
+                    </div>
+
+
+
                     </div>
                 </div>
-
                 <div class="row">
-                    <div class="col-md-12" id="div_list1">
-                    </div>
+                    <div class="col-md-12" id="div_list1"></div>
                 </div>
 
-                <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
+                <div id="aiHotelInfo" class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                     <legend>Hotel Information</legend>
                     <div class="row mg_bt_20">
                         <div class="col-md-6 mg_tp_10"> <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added city wise hotel & tariff using Supplier Master"><i class="fa fa-question-circle"></i></button>
@@ -163,7 +190,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                 </div>
                 <div class="row mg_bt_20">
                 </div>
-                <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
+                <div id="aiTransportInfo" class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
                     <legend>Transport Information</legend>
                     <div class="row mg_bt_20">
                         <div class="col-md-6 mg_tp_10">
@@ -214,7 +241,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                     </div>
                     <div class="col-md-6 col-sm-6">
                         <h3 class="editor_title">Exclusions</h3>
-                        <textarea class="feature_editor" id="exclusions" name="exclusions" class="form-control" placeholder="Exclusions" title="Exclusions" rows="4"></textarea>
+                        <textarea class="feature_editor" id="exclusions" name="exclusions" placeholder="Exclusions" title="Exclusions" rows="4"></textarea>
                     </div>
                 </div>
                 <div class="panel panel-default main_block bg_light pad_8 text-center mg_bt_0" style="background-color: #fff; border: none;">
@@ -932,4 +959,772 @@ $(function () {
             }
         });
     }
+
+    (function ($) {
+        var aiToggleBtn = document.getElementById('touraiToggleBtn');
+        var aiChatBox = document.getElementById('aiChatBox');
+
+        if (aiToggleBtn && aiChatBox) {
+            aiToggleBtn.addEventListener('click', function () {
+                aiChatBox.classList.toggle('show');
+                var isVisible = aiChatBox.classList.contains('show');
+                aiChatBox.setAttribute('aria-hidden', String(!isVisible));
+            });
+        }
+
+        function cleanSimilarSuffix(text) {
+            return String(text || '').replace(/\s*\/\s*similar/gi, '').trim();
+        }
+
+        function normalizeAiList(items) {
+            if (Array.isArray(items)) {
+                return items.filter(function (item) {
+                    return item !== null && item !== undefined && String(item).trim() !== '';
+                });
+            }
+            if (typeof items === 'string' && items.trim() !== '') {
+                return [items.trim()];
+            }
+            if (items && typeof items === 'object') {
+                return Object.values(items).filter(function (item) {
+                    return item !== null && item !== undefined && String(item).trim() !== '';
+                });
+            }
+            return [];
+        }
+
+        function escapeHtml(text) {
+            return $('<div/>').text(text || '').html();
+        }
+
+        function buildListHtml(items) {
+            var list = normalizeAiList(items);
+            if (!list.length) {
+                return '';
+            }
+            return '<ul>' + list.map(function (item) {
+                return '<li>' + escapeHtml(item) + '</li>';
+            }).join('') + '</ul>';
+        }
+
+        function setWysiwygContent(textareaId, items) {
+            var html = buildListHtml(items);
+            var list = normalizeAiList(items);
+            var $target = $('#' + textareaId);
+            if (!$target.length) {
+                return false;
+            }
+            if ($target.data('wysiwyg')) {
+                $target.wysiwyg('setContent', html);
+            } else {
+                var iframe = document.getElementById(textareaId + '-wysiwyg-iframe');
+                if (iframe && iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.body) {
+                    iframe.contentWindow.document.body.innerHTML = html;
+                } else {
+                    $target.val(list.join('\n'));
+                }
+            }
+            $target.trigger('change');
+            return list.length > 0;
+        }
+
+        function showAiJsonResponse(response) {
+            var raw = (response && response.reply) ? response.reply : '';
+            $('#aiApiInfo').text(raw || '');
+        }
+
+        function getHotelRowElements(row) {
+            var $row = $(row);
+            return {
+                $citySelect: $row.find('select[name^="city_name"]'),
+                $hotelSelect: $row.find('select[name^="hotel_name"]'),
+                $hotelType: $row.find('input[name^="hotel_type"]'),
+                $totalNights: $row.find('input[name^="hotel_tota_days"]')
+            };
+        }
+
+        function getTransportRowElements(row) {
+            var $row = $(row);
+            return {
+                $vehicleSelect: $row.find('select[name^="vehicle_name"]'),
+                $pickupSelect: $row.find('select[name^="pickup_from"]'),
+                $dropSelect: $row.find('select[name^="drop_to"]')
+            };
+        }
+
+        function matchHotelInSelect($hotelSelect, hotelName) {
+            var search = cleanSimilarSuffix(hotelName);
+            if (!$hotelSelect.length || !search) {
+                return '';
+            }
+            var bestVal = '';
+            var bestScore = 0;
+            $hotelSelect.find('option').each(function () {
+                var val = $(this).val();
+                var text = $(this).text();
+                if (!val) {
+                    return;
+                }
+                var score = fuzzyMatchScore(search, text);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestVal = val;
+                }
+            });
+            return bestScore >= 30 ? bestVal : '';
+        }
+
+        function isValidLocationName(name) {
+            var cleaned = cleanSimilarSuffix(name);
+            return cleaned && cleaned !== '()' && cleaned !== '() ()';
+        }
+
+        function selectMealPlan($mealSelect, mealValue) {
+            if (!$mealSelect || !$mealSelect.length) {
+                return;
+            }
+            if (!mealValue) {
+                $mealSelect.val('');
+                return;
+            }
+            var target = String(mealValue).trim().toLowerCase();
+            if (target === 'n/a' || target === 'na' || target === 'no meal' || target === 'no meals') {
+                $mealSelect.val('No Meals');
+                return;
+            }
+            var matchedValue = null;
+            $mealSelect.find('option').each(function () {
+                var optionText = String($(this).text() || '').trim().toLowerCase();
+                if (optionText === target) {
+                    matchedValue = $(this).val();
+                    return false;
+                }
+            });
+            if (matchedValue !== null) {
+                $mealSelect.val(matchedValue);
+            }
+        }
+
+        function stripPasteContent(text) {
+            var value = String(text || '').trim();
+            if (!value) {
+                return '';
+            }
+            if (value.indexOf('<') !== -1 && value.indexOf('>') !== -1) {
+                var tmp = document.createElement('div');
+                tmp.innerHTML = value;
+                value = tmp.textContent || tmp.innerText || value;
+            }
+            return value.replace(/\u00a0/g, ' ').replace(/\s+\n/g, '\n').trim();
+        }
+
+        function fuzzyMatchScore(needle, haystack) {
+            needle = cleanSimilarSuffix(String(needle || '')).toLowerCase();
+            haystack = String(haystack || '').toLowerCase();
+            if (!needle || !haystack) {
+                return 0;
+            }
+            if (haystack === needle) {
+                return 100;
+            }
+            if (haystack.indexOf(needle) >= 0 || needle.indexOf(haystack) >= 0) {
+                return 80;
+            }
+            var needleParts = needle.split(/[\s,–-]+/).filter(Boolean);
+            var hits = 0;
+            needleParts.forEach(function (part) {
+                if (part.length > 2 && haystack.indexOf(part) >= 0) {
+                    hits++;
+                }
+            });
+            return hits > 0 ? 50 + hits * 5 : 0;
+        }
+
+        var aiResolveUrl = $('#base_url').val() + 'view/custom_packages/master/package/ai_resolve_masters.php';
+
+        function buildLocationSearchTerms(name) {
+            var terms = [];
+            var search = cleanSimilarSuffix(name);
+            if (!search) {
+                return terms;
+            }
+            terms.push(search);
+            search.split(/\s+to\s+/i).forEach(function (part) {
+                part = cleanSimilarSuffix(part);
+                if (part && terms.indexOf(part) === -1) {
+                    terms.push(part);
+                }
+            });
+            search.replace(/\s*\([^)]*\)\s*/g, ' ').trim().split(/[\s,]+/).forEach(function (part) {
+                if (part.length > 2 && terms.indexOf(part) === -1) {
+                    terms.push(part);
+                }
+            });
+            return terms;
+        }
+
+        function resolveMaster(action, term, extraData) {
+            return $.ajax({
+                type: 'post',
+                url: aiResolveUrl,
+                dataType: 'json',
+                data: $.extend({ action: action, term: term }, extraData || {})
+            });
+        }
+
+        function lookupCity(cityName, extraTerms) {
+            var deferred = $.Deferred();
+            var terms = buildLocationSearchTerms(cityName);
+            (extraTerms || []).forEach(function (term) {
+                buildLocationSearchTerms(term).forEach(function (part) {
+                    if (part && terms.indexOf(part) === -1) {
+                        terms.push(part);
+                    }
+                });
+            });
+            if (!terms.length) {
+                deferred.resolve(null);
+                return deferred.promise();
+            }
+
+            function tryTerm(index) {
+                if (index >= terms.length) {
+                    deferred.resolve(null);
+                    return;
+                }
+                resolveMaster('city', terms[index]).done(function (item) {
+                    if (item && item.id) {
+                        deferred.resolve(item);
+                    } else {
+                        tryTerm(index + 1);
+                    }
+                }).fail(function () {
+                    tryTerm(index + 1);
+                });
+            }
+
+            tryTerm(0);
+            return deferred.promise();
+        }
+
+        function getHotelCityFallbacks(parsed) {
+            var list = [];
+            var itinerary = parsed && parsed.itinerary ? parsed.itinerary : {};
+            normalizeAiList(itinerary.destination).forEach(function (dest) {
+                if (list.indexOf(dest) === -1) {
+                    list.push(dest);
+                }
+            });
+            (itinerary.detailed_program || []).forEach(function (day) {
+                if (day && day.overnight_stay && list.indexOf(day.overnight_stay) === -1) {
+                    list.push(day.overnight_stay);
+                }
+            });
+            return list;
+        }
+
+        function lookupDestinationLocation(name) {
+            var deferred = $.Deferred();
+            var terms = buildLocationSearchTerms(name);
+            if (!terms.length || !isValidLocationName(terms[0])) {
+                deferred.resolve(null);
+                return deferred.promise();
+            }
+
+            function tryTerm(index) {
+                if (index >= terms.length) {
+                    deferred.resolve(null);
+                    return;
+                }
+                resolveMaster('destination', terms[index]).done(function (item) {
+                    if (item && item.id) {
+                        deferred.resolve(item);
+                    } else {
+                        tryTerm(index + 1);
+                    }
+                }).fail(function () {
+                    tryTerm(index + 1);
+                });
+            }
+
+            tryTerm(0);
+            return deferred.promise();
+        }
+
+        function lookupHotel(cityId, hotelName) {
+            return resolveMaster('hotel', cleanSimilarSuffix(hotelName), {
+                city_id: cityId || ''
+            });
+        }
+
+        function setCitySelectValue($select, city) {
+            if (!$select.length || !city || city.id === null || city.id === undefined || city.id === '') {
+                return;
+            }
+            var idStr = String(city.id);
+            if (!$select.find('option').filter(function () { return this.value === idStr; }).length) {
+                $select.append(new Option(city.text || idStr, idStr, true, true));
+            }
+            $select.val(idStr);
+            if ($select.data('select2')) {
+                $select.trigger('change.select2');
+            } else {
+                $select.trigger('change');
+            }
+        }
+
+        function getDestinationGroupMeta(group) {
+            var g = String(group || 'city').toLowerCase();
+            if (g === 'hptel') {
+                g = 'hotel';
+            }
+            return {
+                value: g,
+                label: g.charAt(0).toUpperCase() + g.slice(1) + ' Name'
+            };
+        }
+
+        function setDestinationSelectValue($select, item) {
+            if (!$select.length || !item || !item.id) {
+                return;
+            }
+            var idStr = String(item.id);
+            var groupMeta = getDestinationGroupMeta(item.group || idStr.split('-')[0]);
+            var $group = $select.find('optgroup[value="' + groupMeta.value + '"]');
+            if (!$group.length) {
+                $group = $('<optgroup></optgroup>').attr('value', groupMeta.value).attr('label', groupMeta.label);
+                $select.append($group);
+            }
+            if (!$group.find('option').filter(function () { return this.value === idStr; }).length) {
+                $group.append(new Option(item.text || idStr, idStr, true, true));
+            }
+            $select.val(idStr);
+            if ($select.data('select2')) {
+                $select.trigger('change.select2');
+            } else {
+                $select.trigger('change');
+            }
+        }
+
+        function matchVehicleInSelect($select, vehicleName) {
+            var search = cleanSimilarSuffix(vehicleName).toLowerCase();
+            if (!$select.length || !search) {
+                return '';
+            }
+            var matched = '';
+            var bestScore = 0;
+            $select.find('option').each(function () {
+                var val = $(this).val();
+                var text = $(this).text();
+                if (!val) {
+                    return;
+                }
+                var score = fuzzyMatchScore(search, text);
+                if (score > bestScore) {
+                    bestScore = score;
+                    matched = val;
+                }
+            });
+            return bestScore >= 30 ? matched : '';
+        }
+
+        function calcNightsFromDates(checkIn, checkOut) {
+            if (!checkIn || !checkOut) {
+                return '';
+            }
+            var inDate = new Date(checkIn);
+            var outDate = new Date(checkOut);
+            if (isNaN(inDate.getTime()) || isNaN(outDate.getTime())) {
+                return '';
+            }
+            var diff = Math.round((outDate - inDate) / (1000 * 60 * 60 * 24));
+            return diff > 0 ? String(diff) : '';
+        }
+
+        function matchDestinationSelect(destName) {
+            if (!destName) {
+                return;
+            }
+            var bestVal = '';
+            var bestScore = 0;
+            $('#dest_name_s option').each(function () {
+                var val = $(this).val();
+                var text = $(this).text();
+                if (!val) {
+                    return;
+                }
+                var score = fuzzyMatchScore(destName, text);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestVal = val;
+                }
+            });
+            if (bestVal && bestScore >= 50) {
+                $('#dest_name_s').val(bestVal).trigger('change');
+            }
+        }
+
+        function ensureTableRows(tableId, neededCount, afterAddRow) {
+            var deferred = $.Deferred();
+            var table = document.getElementById(tableId);
+            if (!table) {
+                deferred.resolve();
+                return deferred.promise();
+            }
+
+            function step() {
+                if (table.rows.length >= neededCount) {
+                    deferred.resolve();
+                    return;
+                }
+                addRow(tableId);
+                if (typeof afterAddRow === 'function') {
+                    afterAddRow(table.rows[table.rows.length - 1], table.rows.length);
+                }
+                setTimeout(step, 120);
+            }
+
+            step();
+            return deferred.promise();
+        }
+
+        function ensureItineraryTable(dayCount) {
+            var nights = Math.max(parseInt(dayCount, 10) - 1, 0);
+            $('#total_nights').val(nights);
+            $('#total_days').val(dayCount);
+            return $.post('generate_program_list.php', { total_days: dayCount });
+        }
+
+        function fillItineraryRows(programs) {
+            var table = document.getElementById('dynamic_table_list');
+            if (!table || !Array.isArray(programs) || !programs.length) {
+                return false;
+            }
+            programs.forEach(function (item, index) {
+                var row = table.rows[index];
+                if (!row) {
+                    return;
+                }
+                var $row = $(row);
+                $row.find('input[name="special_attaraction"], input[id^="special_attaraction"]').val(item && item.special_attraction ? item.special_attraction : '');
+                $row.find('textarea[name="day_program"], textarea[id^="day_program"]').val(item && item.day_wise_program ? item.day_wise_program : '');
+                $row.find('input[name="overnight_stay"], input[id^="overnight_stay"]').val(item && item.overnight_stay ? item.overnight_stay : '');
+                selectMealPlan($row.find('select[name="meal_plan"], select[id^="meal_plan"]'), item ? item.meal_plan : null);
+            });
+            return true;
+        }
+
+        function applyHotelSelectMatch($hotelSelect, hotelName, hotelData, $hotelType, $totalNights, nights) {
+            var bestVal = matchHotelInSelect($hotelSelect, hotelName);
+            if (bestVal) {
+                $hotelSelect.val(bestVal).trigger('change');
+            } else if (hotelData && hotelData.category) {
+                $hotelType.val(hotelData.category);
+            }
+            if (nights) {
+                $totalNights.val(nights);
+            }
+        }
+
+        function reloadHotelSelectOptions($hotelSelect, optionsHtml) {
+            if ($hotelSelect.data('select2')) {
+                $hotelSelect.select2('destroy');
+            }
+            $hotelSelect.html(optionsHtml);
+            $hotelSelect.select2({
+                width: '100%',
+                minimumResultsForSearch: 0,
+                dropdownParent: $('body')
+            });
+            captureHotelSelect2Config($hotelSelect);
+            initHotelSelectAddNew($hotelSelect);
+        }
+
+        function setHotelSelectValue($hotelSelect, hotel, hotelData, $hotelType, $totalNights, nights) {
+            if (hotel && hotel.id) {
+                if (!$hotelSelect.find('option').filter(function () { return this.value === String(hotel.id); }).length) {
+                    $hotelSelect.append(new Option(hotel.text || hotel.id, hotel.id, true, true));
+                }
+                $hotelSelect.val(String(hotel.id));
+                if ($hotelSelect.data('select2')) {
+                    $hotelSelect.trigger('change.select2');
+                } else {
+                    $hotelSelect.trigger('change');
+                }
+                if (hotel.category) {
+                    $hotelType.val(hotel.category);
+                } else if (hotelData && hotelData.category) {
+                    $hotelType.val(hotelData.category);
+                }
+            } else {
+                applyHotelSelectMatch($hotelSelect, hotelData.hotel_name, hotelData, $hotelType, $totalNights, nights);
+            }
+            if (nights) {
+                $totalNights.val(nights);
+            }
+        }
+
+        function fillHotelRow(row, hotelData, parsed) {
+            var deferred = $.Deferred();
+            var els = getHotelRowElements(row);
+            var cityName = hotelData && hotelData.city_name ? hotelData.city_name : '';
+            var hotelName = hotelData && hotelData.hotel_name ? hotelData.hotel_name : '';
+            var nights = calcNightsFromDates(hotelData.check_in_date, hotelData.check_out_date);
+            var cityFallbacks = getHotelCityFallbacks(parsed);
+
+            if (hotelData && hotelData.category) {
+                els.$hotelType.val(hotelData.category);
+            }
+            if (nights) {
+                els.$totalNights.val(nights);
+            }
+
+            lookupCity(cityName, cityFallbacks).done(function (city) {
+                var cityId = '';
+                if (city) {
+                    setCitySelectValue(els.$citySelect, city);
+                    cityId = els.$citySelect.val();
+                }
+
+                if (!hotelName) {
+                    deferred.resolve();
+                    return;
+                }
+
+                lookupHotel(cityId, hotelName).done(function (hotel) {
+                    if (cityId) {
+                        $.get(packageHotelLoadUrl, { city_id: cityId }).done(function (optionsHtml) {
+                            reloadHotelSelectOptions(els.$hotelSelect, optionsHtml);
+                            setHotelSelectValue(els.$hotelSelect, hotel, hotelData, els.$hotelType, els.$totalNights, nights);
+                            deferred.resolve();
+                        }).fail(function () {
+                            setHotelSelectValue(els.$hotelSelect, hotel, hotelData, els.$hotelType, els.$totalNights, nights);
+                            deferred.resolve();
+                        });
+                    } else {
+                        setHotelSelectValue(els.$hotelSelect, hotel, hotelData, els.$hotelType, els.$totalNights, nights);
+                        deferred.resolve();
+                    }
+                }).fail(function () {
+                    applyHotelSelectMatch(els.$hotelSelect, hotelName, hotelData, els.$hotelType, els.$totalNights, nights);
+                    deferred.resolve();
+                });
+            });
+
+            return deferred.promise();
+        }
+
+        function fillHotelsFromParsed(hotels, parsed) {
+            hotels = (hotels || []).filter(function (hotel) {
+                return hotel && (hotel.city_name || hotel.hotel_name);
+            });
+            if (!hotels.length) {
+                return $.Deferred().resolve().promise();
+            }
+
+            return ensureTableRows('tbl_package_hotel_master', hotels.length, function (row, rowIndex) {
+                if (rowIndex <= 1) {
+                    return;
+                }
+                var $row = $(row);
+                var $citySelect = $row.find('select[name^="city_name"]');
+                city_lzloading($citySelect);
+                $citySelect.attr('onchange', 'hotel_name_list_load(this.id);');
+                var $hotelSelect = $row.find('select[name^="hotel_name"]');
+                if ($hotelSelect.length && !$hotelSelect.data('select2')) {
+                    $hotelSelect.select2({
+                        width: '100%',
+                        minimumResultsForSearch: 0,
+                        dropdownParent: $('body')
+                    });
+                    captureHotelSelect2Config($hotelSelect);
+                    initHotelSelectAddNew($hotelSelect);
+                }
+            }).then(function () {
+                var table = document.getElementById('tbl_package_hotel_master');
+                var chain = $.Deferred().resolve().promise();
+                hotels.forEach(function (hotel, index) {
+                    chain = chain.then(function () {
+                        return fillHotelRow(table.rows[index], hotel, parsed);
+                    });
+                });
+                return chain;
+            });
+        }
+
+        function initTransportRowSelects(row) {
+            var els = getTransportRowElements(row);
+            destinationLoading(els.$pickupSelect, 'Pickup Location');
+            destinationLoading(els.$dropSelect, 'Drop-off Location');
+            if (els.$vehicleSelect.length && !els.$vehicleSelect.data('select2')) {
+                els.$vehicleSelect.select2({ width: '100%' });
+            }
+            if (typeof initAllVehicleSelectAddNew === 'function') {
+                initAllVehicleSelectAddNew($(row));
+            }
+        }
+
+        function fillTransportRow(row, vehicleData) {
+            var deferred = $.Deferred();
+            var els = getTransportRowElements(row);
+            var vehicleId = matchVehicleInSelect(els.$vehicleSelect, vehicleData.vehicle_name);
+
+            if (vehicleId) {
+                els.$vehicleSelect.val(vehicleId).trigger('change');
+            }
+
+            $.when(
+                lookupDestinationLocation(vehicleData.pickup_from),
+                lookupDestinationLocation(vehicleData.drop_to)
+            ).done(function (pickup, drop) {
+                if (pickup && pickup.id) {
+                    setDestinationSelectValue(els.$pickupSelect, pickup);
+                }
+                if (drop && drop.id) {
+                    setDestinationSelectValue(els.$dropSelect, drop);
+                }
+                deferred.resolve();
+            }).fail(function () {
+                deferred.resolve();
+            });
+
+            return deferred.promise();
+        }
+
+        function fillTransportFromParsed(vehicles) {
+            vehicles = (vehicles || []).filter(function (vehicle) {
+                if (!vehicle) {
+                    return false;
+                }
+                return vehicle.vehicle_name || isValidLocationName(vehicle.pickup_from) || isValidLocationName(vehicle.drop_to);
+            });
+            if (!vehicles.length) {
+                return $.Deferred().resolve().promise();
+            }
+
+            var table = document.getElementById('tbl_package_tour_transport');
+
+            return ensureTableRows('tbl_package_tour_transport', vehicles.length, function (row, rowIndex) {
+                if (rowIndex > 1) {
+                    initTransportRowSelects(row);
+                }
+            }).then(function () {
+                var chain = $.Deferred().resolve().promise();
+                vehicles.forEach(function (vehicle, index) {
+                    chain = chain.then(function () {
+                        return fillTransportRow(table.rows[index], vehicle);
+                    });
+                });
+                return chain;
+            });
+        }
+
+        function applyParsedData(parsed) {
+            var itinerary = parsed && parsed.itinerary ? parsed.itinerary : {};
+            var programs = itinerary.detailed_program || [];
+            var destinations = normalizeAiList(itinerary.destination);
+            var dayCount = programs.length || parseInt(itinerary.total_days, 10) || 0;
+
+            if (destinations.length) {
+                matchDestinationSelect(destinations[0]);
+            } else if (parsed.hotels && parsed.hotels.length && parsed.hotels[0].city_name) {
+                matchDestinationSelect(parsed.hotels[0].city_name);
+            }
+
+            setWysiwygContent('inclusions', itinerary.inclusions);
+            setWysiwygContent('exclusions', itinerary.exclusions);
+
+            var chain = $.Deferred().resolve().promise();
+
+            if (dayCount > 0) {
+                chain = chain.then(function () {
+                    return ensureItineraryTable(dayCount).then(function (html) {
+                        $('#div_list1').html(html);
+                        fillItineraryRows(programs);
+                    });
+                });
+            }
+
+            return chain
+                .then(function () {
+                    return fillHotelsFromParsed(parsed.hotels || [], parsed);
+                })
+                .then(function () {
+                    return fillTransportFromParsed(parsed.vehicle || []);
+                });
+        }
+
+        $('#btnAnalyseMessage').on('click', function () {
+            var message = stripPasteContent($('#aiMessageInput').val());
+            var base_url = $('#base_url').val();
+
+            if (!message) {
+                $('#aiApiInfo').text('Please paste quotation or itinerary text.');
+                return;
+            }
+
+            $('#aiApiInfo').text('Please Wait Analysing...');
+            $('#btnAnalyseMessage').prop('disabled', true);
+
+            $.ajax({
+                type: 'post',
+                url: base_url + 'controller/gemini/gemini.php',
+                dataType: 'json',
+                data: { text: message },
+                success: function (response) {
+                    if (response && response.error) {
+                        $('#aiApiInfo').text(response.error);
+                        return;
+                    }
+                    
+
+                    if (!(response && response.status)) {
+                        var errorMsg = (response && (response.error || response.Error))
+                            ? (response.error || response.Error)
+                            : 'Failed to analyse message.';
+                        $('#aiApiInfo').text(errorMsg);
+                        if (response && response.reply) {
+                            showAiJsonResponse(response);
+                        }
+                        return;
+                    }
+
+                    var parsed = null;
+                    try {
+                        parsed = JSON.parse(response.reply || '{}');
+                    } catch (e) {
+                        parsed = null;
+                    }
+                    if (!parsed && response.raw) {
+                        parsed = response.raw;
+                    }
+                    if (!parsed || parsed.Error) {
+                        $('#aiApiInfo').text((parsed && parsed.Error) ? parsed.Error : 'Invalid AI response.');
+                        showAiJsonResponse(response);
+                        return;
+                    }
+
+                    showAiJsonResponse(response);
+                    applyParsedData(parsed);
+                },
+                error: function (xhr) {
+                    var errorMsg = 'Request failed.';
+                    if (xhr && xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg = xhr.responseJSON.error;
+                    } else if (xhr && xhr.responseText) {
+                        errorMsg = xhr.responseText;
+                    }
+                    $('#aiApiInfo').text(errorMsg);
+                },
+                complete: function () {
+                    $('#btnAnalyseMessage').prop('disabled', false);
+                }
+            });
+        });
+
+        $('#aiMessageInput').on('input', function () {
+            $('#aiApiInfo').text('');
+        });
+    })(jQuery);
+
 </script>
