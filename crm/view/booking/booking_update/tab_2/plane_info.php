@@ -32,10 +32,26 @@ else{
                 <td><input maxlength="15" type="text" id="" name="username" value="<?php echo $count_p ?>" placeholder="Sr.No."/></td>
                 <td><input type="text" id="<?php echo 'txt_plane_date-'.$count_p.'p' ?>" name="<?php echo 'txt_plane_date-'.$count_p.'p' ?>" placeholder="Departure Date & Time" title="Departure Date & Time" value="<?php echo date("d-m-Y H:i", strtotime($row_plane_details['date'])) ?>" class="app_datetimepicker" onchange="get_to_datetime(this.id,'txt_arravl<?= $count_p?>p');validate_travelingDates(this.id);" style="width:156px"/></td>
                 <td><input type="text" id="<?php echo 'txt_arravl'.$count_p.'p' ?>" name="<?php echo 'txt_arravl-'.$count_p.'p' ?>" placeholder="Arrival date & time" title="Arrival date & time" class="app_datetimepicker" value="<?php echo date("d-m-Y H:i", strtotime($row_plane_details['arraval_time'])) ?>" style="width:156px" onchange="validate_travelingDates(this.id);"/></td>
-                <td><input type="text" name="from_sector-1" id="from_sector-<?= $count_p ?>p" placeholder="From Sector" title="From Sector" style="width: 250px;" value="<?php echo ($sq_city['city_name']) ? $sq_city['city_name']." - ".$row_plane_details['from_location'] : ''; ?>">
+                <!-- <td><input type="text" name="from_sector-1" id="from_sector-<?= $count_p ?>p" placeholder="From Sector" title="From Sector" style="width: 250px;" value="<?php echo ($sq_city['city_name']) ? $sq_city['city_name']." - ".$row_plane_details['from_location'] : ''; ?>">
                 </td>
                 <td><input type="text" name="to_sector-1" id="to_sector-<?= $count_p ?>p" placeholder="To Sector" title="To Sector" style="width: 250px;" value="<?php echo ($sq_city2['city_name']) ? $sq_city2['city_name']." - ".$row_plane_details['to_location'] : ''; ?>">
-                </td>
+                </td> -->
+
+                <td style="min-width:300px;"><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 "
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true" style="width:100%">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td style="min-width:300px;"><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 "
+                                                                    data-sector-type="to" title="To Sector"
+                                                                     data-add-new-option="true" style="width:100%">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
+                                                            </td>
+
                 <td><select id="<?php echo 'txt_plane_company-'.$count_p.'p' ?>" title="Airline Name" name="<?php echo 'txt_plane_company-'.$count_p.'p' ?>" class="app_select2" style="width:150px">
                     <?php 
                     $sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_plane_details[company]'"));
@@ -104,4 +120,12 @@ function generating_plane_date(){
     }             
 }
 generating_plane_date();
+
+$('#from_sector-1').select2({
+width: '300px'
+});
+$('#to_sector-1').select2({
+	
+	width: '300px'
+        });
 </script>

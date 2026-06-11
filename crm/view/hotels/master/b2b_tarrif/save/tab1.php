@@ -14,7 +14,7 @@ $role_id = $_SESSION['role_id'];
 
                     <div class="row mg_bt_10">
                         <div class="col-md-3 col-sm-6 col-xs-12">
-                            <select id="cmb_city_id1" name="cmb_city_id1" onchange="hotel_name_list_load(this.id)" class="city_master_dropdown" style="width:100%" title="Select City Name" required>
+                            <select id="cmb_city_id1" name="cmb_city_id1" onchange="hotel_name_list_load(this.id)" class="city_master_dropdown" style="width:100%" title="Select City Name" required data-add-new-option="true">
                             </select>
                         </div>
                         <div class="col-md-3 col-sm-6 col-xs-12">

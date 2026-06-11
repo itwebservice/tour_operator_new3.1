@@ -178,7 +178,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                             </td>
                                             <?php if($room_category_switch == 'No' ){?>
                                             <td><select id="hotel_id<?= $prefix . $count ?>_f" style="width:150px"
-                                                    name="hotel_id<?= $prefix . $count ?>_f" title="Hotel"
+                                                    name="hotel_id<?= $prefix . $count ?>_f" title="Hotel" class="form-control app_select2"
                                                     onchange="get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','service_charge','discount1',true);">
                                                     <?php
                                                     $sq_hotel = mysqli_fetch_assoc(mysqlQuery("select hotel_id, hotel_name from hotel_master where hotel_id='$row_entry[hotel_id]'"));
@@ -188,7 +188,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                             </td>
                                             <?php } else{?>
                                             <td><select id="hotel_id<?= $prefix . $count ?>_f" style="width:150px"
-                                                    name="hotel_id<?= $prefix . $count ?>_f" title="Hotel"
+                                                    name="hotel_id<?= $prefix . $count ?>_f" title="Hotel" class="form-control app_select2"
                                                     onchange="hotel_type_load_cate(this.id);get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','service_charge','discount1',true);">
                                                     <?php
                                                     $sq_hotel = mysqli_fetch_assoc(mysqlQuery("select hotel_id, hotel_name from hotel_master where hotel_id='$row_entry[hotel_id]'"));
@@ -460,6 +460,7 @@ else if($reflections[0]->tax_apply_on == '3') {
 <script>
 $('#booking_update_modal').modal('show');
 $('#city_id_u1, #city_id_u1_f, #customer_id1,#acurrency_code1').select2();
+init_update_hotel_select2();
 $('#booking_date1,#due_date1,#booking_date1').datetimepicker({
     timepicker: false,
     format: 'd-m-Y'
@@ -468,6 +469,18 @@ $('#check_in_u1, #check_out_u1, #check_in_u1_f, #check_out_u1_f').datetimepicker
     format: 'd-m-Y H:i'
 });
 city_lzloading(".city_id_u");
+
+function init_update_hotel_select2() {
+    $('#tbl_hotel_booking_update select[id^="hotel_id"]').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({
+                dropdownParent: $('#booking_update_modal'),
+                width: '150px',
+                minimumResultsForSearch: 0
+            });
+        }
+    });
+}
 
 function customer_details_update() {
     var customer_id = $('#customer_id1').val();

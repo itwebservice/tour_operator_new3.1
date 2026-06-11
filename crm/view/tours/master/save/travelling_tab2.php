@@ -32,10 +32,10 @@
                                                         <tr>
                                                             <td><input class="css-checkbox" id="chk_train1" type="checkbox"><label class="css-label" for="chk_train1"><label></td>
                                                             <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                            <td class="col-md-4"><select onchange="validate_location('train_from_location1','train_to_location1')" id="train_from_location1" class="app_select2 form-control trainfrom" name="train_from_location1" title="From Location" style="width: 100%;">
+                                                            <td class="col-md-4"><select onchange="validate_location('train_from_location1','train_to_location1')" id="train_from_location1" class="app_select2 form-control trainfrom" name="train_from_location1" title="From Location" style="width: 100%;" >
                                                                     <option value="">*From</option>
                                                                 </select></td>
-                                                            <td class="col-md-4"><select id="train_to_location1" class="app_select2 form-control trainto" onchange="validate_location('train_to_location1','train_from_location1')" title="To Location" name="train_to_location1" style="width: 100%;">
+                                                            <td class="col-md-4"><select id="train_to_location1" class="app_select2 form-control trainto" onchange="validate_location('train_to_location1','train_from_location1')" title="To Location" name="train_to_location1" style="width: 100%;" >
                                                                     <option value="">*To</option>
                                                                 </select></td>
                                                             <td class="col-md-4"><select name="train_class" id="train_class1" title="Class">
@@ -72,7 +72,7 @@
                                                 <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
                                             </div>
                                             <div class="col-md-6 text-right text_center_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name]')" title="Add Row"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name]');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_master');}" title="Add Row"><i class="fa fa-plus"></i></button>
                                                 <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_hotel_master')" title="Delete Row"><i class="fa fa-trash"></i></button>
                                             </div>
                                         </div>
@@ -83,9 +83,9 @@
                                                         <tr>
                                                             <td><input id="chk_dest" type="checkbox" checked></td>
                                                             <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:250px;" title="Select City Name">
+                                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:250px;" title="Select City Name" data-add-new-option="true">
                                                                 </select></td>
-                                                            <td class="col-md-4"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100% !important" title="Select Hotel Name">
+                                                            <td class="col-md-4"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" class="app_select2 form-control" style="width:100% !important" title="Select Hotel Name" data-add-new-option="true">
                                                                     <option value="">*Hotel Name</option>
                                                                 </select></td>
                                                             <td class="col-md-4"><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
@@ -130,7 +130,7 @@
                                             <tr>
                                                 <td class="col-md-1"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
                                                 <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
-                                                <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2">
+                                                <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
                                                         <option value="">Select Vehicle</option>
                                                         <?php
                                                         $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -180,11 +180,22 @@
                                                         <tr>
                                                             <td><input class="css-checkbox" id="chk_plan-" type="checkbox"><label class="css-label" for="chk_plan-"> <label></td>
                                                             <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                            <td class="col-md-4 no-pad"><input type="text" name="from_sector" id="from_sector-1" placeholder="From Sector" title="From Sector" style="width:100%;">
+                                                           
+                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
                                                             </td>
-                                                            <td class="col-md-4 no-pad"><input type="text" name="to_sector" id="to_sector-1" placeholder="To Sector" title="To Sector" style="width:100%;">
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="to" title="To Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
                                                             </td>
-                                                            <td class="col-md-2 no-pad"><select id="airline_name-1" class="app_select2 form-control" title="Airline Name" name="airline_name-1" style="width:100%;">
+                                                            <td class="col-md-2 no-pad"><select id="airline_name-1" class="app_select2 form-control" title="Airline Name" name="airline_name-1" style="width:100%;" data-add-new-option="true">
                                                                     <option value="">*Airline Name</option>
                                                                     <?php get_airline_name_dropdown(); ?>
                                                                 </select>
@@ -203,6 +214,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <!-- Cruise Information -->
                         <div class="accordion_content main_block">
                             <div class="panel panel-default main_block">
@@ -253,7 +265,17 @@
 </form>
 
 <script>
+
+        $('#vehicle_name1').select2({            
+        });
+        if (typeof initAllVehicleSelectAddNew === 'function') {
+            initAllVehicleSelectAddNew('#tbl_package_tour_transport');
+        }
+
     $('#airline_name-1').select2();
+    if (typeof initAllAirlineSelectAddNew === 'function') {
+        initAllAirlineSelectAddNew('#tbl_group_tour_quotation_dynamic_plane');
+    }
     // App_accordion
     jQuery(document).ready(function() {
         jQuery(".panel-heading").click(function() {
@@ -266,6 +288,28 @@
         city_lzloading('.trainfrom', '*From', true);
         city_lzloading('.trainto', '*To', true);
         city_lzloading('select[name^="city_name"]');
+        $('#hotel_name').select2({
+            width: '100%',
+            minimumResultsForSearch: 0
+        });
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($('#hotel_name'));
+        }
+        if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+            hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/custom_packages/master/package/hotel/hotel_name_load.php';
+        }
+        $(function () {
+            if (typeof initHotelSelectAddNew === 'function') {
+                initHotelSelectAddNew('#hotel_name');
+                initAllHotelSelectAddNew('#tbl_package_hotel_master');
+            } else {
+                setTimeout(function () {
+                    initHotelSelectAddNew('#hotel_name');
+                    initAllHotelSelectAddNew('#tbl_package_hotel_master');
+                }, 400);
+            }
+        });
+
         destinationLoading('select[name^="pickup_from"]', 'Pickup Location');
         destinationLoading('select[name^="drop_to"]', 'Drop-off Location');
     });
@@ -279,7 +323,16 @@
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
     }
-    event_airport('tbl_group_tour_quotation_dynamic_plane');
+    function initGroupTourPlaneAirports() {
+        if (typeof refreshPlaneAirportSelect2In === 'function') {
+            refreshPlaneAirportSelect2In('#tbl_group_tour_quotation_dynamic_plane');
+        } else if (typeof initPlaneAirportSelect2 === 'function') {
+            initPlaneAirportSelect2('#tbl_group_tour_quotation_dynamic_plane');
+        } else {
+            setTimeout(initGroupTourPlaneAirports, 200);
+        }
+    }
+    jQuery(initGroupTourPlaneAirports);
 
     $(function() {
         $('#frm_tour_master_save2').validate({

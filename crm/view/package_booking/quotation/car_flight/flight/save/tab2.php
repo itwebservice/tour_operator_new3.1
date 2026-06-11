@@ -51,7 +51,7 @@
                                                     <td><input maxlength="15" value="1" type="text" name="username"
                                                             placeholder="Sr. No." class="form-control" disabled /></td>
 
-                                                    <td><input type="text" name="from_sector" id="from_sector-1"
+                                                    <!-- <td><input type="text" name="from_sector" id="from_sector-1"
                                                             placeholder="*From Sector" title="*From Sector"
                                                             style="width: 350px;">
                                                     </td>
@@ -59,11 +59,27 @@
                                                     <td><input type="text" name="to_sector" id="to_sector-1"
                                                             placeholder="*To Sector" title="*To Sector"
                                                             style="width: 350px;">
-                                                    </td>
+                                                    </td> -->
+
+                                                    <td style="min-width:360px;">
+                                                        <select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select" style="width:100%"
+                                                                    data-sector-type="from" 
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td style="min-width:360px;"><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="to" 
+                                                                     data-add-new-option="true" style="width:100%">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
+                                                            </td>
 
                                                     <td><select id="airline_name-1" class="app_select2 form-control"
                                                             title="Airline Name" name="airline_name-1"
-                                                            style="width: 200px;">
+                                                            style="width: 200px;" data-add-new-option="true">
                                                             <option value="">Airline Name</option>
                                                             <?php get_airline_name_dropdown(); ?>
                                                         </select></td>
@@ -147,6 +163,20 @@ $('#plane_from_location-1,#plane_to_location-1,#airline_name-1').select2();
 $('#txt_dapart-1,#txt_arrval-1').datetimepicker({
     format: 'd-m-Y H:i'
 });
+
+function initFlightQuotationPlaneAirports() {
+    if (typeof refreshPlaneAirportSelect2In === 'function') {
+        refreshPlaneAirportSelect2In('#tbl_flight_quotation_dynamic_plane');
+    } else if (typeof initPlaneAirportSelect2 === 'function') {
+        initPlaneAirportSelect2('#tbl_flight_quotation_dynamic_plane');
+    } else {
+        setTimeout(initFlightQuotationPlaneAirports, 200);
+    }
+}
+initFlightQuotationPlaneAirports();
+if (typeof initAllAirlineSelectAddNew === 'function') {
+    initAllAirlineSelectAddNew('#tbl_flight_quotation_dynamic_plane');
+}
 
 function switch_to_tab1() {
     $('a[href="#tab1"]').tab('show');

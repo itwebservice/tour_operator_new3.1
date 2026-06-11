@@ -2,6 +2,9 @@
 include "../../../../model/model.php";
 ?>
 
+<script src="<?php echo BASE_URL ?>js/select2.full.js"></script>
+
+
 <div class="row text-right mg_bt_10">
     <div class="col-sm-6 text-left">
         <button class="btn btn-info btn-sm ico_left pull-left" data-toggle='tooltip' title="Download CSV Format" style="margin-right:10px" onclick="display_format_modal();"><i class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;CSV Format</button>
@@ -23,7 +26,7 @@ include "../../../../model/model.php";
 <div class="app_panel_content Filter-panel">
     <div class="row">
         <div class="col-md-3 col-sm-6 mg_bt_10_xs">
-            <select id="city_id_filter" name="city_id_filter" style="width:100%" title="Select City Name" onchange="list_reflect()">
+            <select id="city_id_filter" name="city_id_filter" style="width:100%" title="Select City Name" onchange="list_reflect()"  >
             </select>
         </div>
         <div class="col-md-3 col-sm-6">
@@ -42,6 +45,12 @@ include "../../../../model/model.php";
         </table>
     </div>
 </div>
+
+
+
+
+
+
 <div id="div_modal_content"></div>
 <div id="div_view_modal"></div>
 
@@ -49,12 +58,38 @@ include "../../../../model/model.php";
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
 <script>
     $(function() {
-        $('form').attr('autocomplete', 'off');
-        $('input').attr('autocomplete', 'off');
+
+        
+
+    
+       
     });
     // $('#city_id_filter').select2({minimumInputLength: 1});
     city_lzloading('#city_id_filter');
+    init_city_filter_add_new_fallback();
+    $('#city_id_filter').on('select2:add_new', function() {
+        generic_city_save_modal();
+    });
     vendor_csv_upload();
+
+    function init_city_filter_add_new_fallback() {
+   
+
+    
+
+        // Re-append after every search render.
+        $(document).off('keyup.city_filter_add_new').on('keyup.city_filter_add_new', '.select2-search__field', function() {
+            setTimeout(function() {
+                appendAddNew();
+            }, 0);
+        });
+
+        $(document).off('mousedown.city_filter_add_new').on('mousedown.city_filter_add_new', '.add-new-city-option', function(e) {
+            e.preventDefault();
+            $('#city_id_filter').select2('close');
+            generic_city_save_modal();
+        });
+    }
 
     function vendor_csv_upload() {
 

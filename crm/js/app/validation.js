@@ -1595,6 +1595,10 @@ function foo(tableID, quot_table_id, rowCounts) {
       .select2()
       .trigger("change");
 
+    if (typeof initRoomCategoryAddNewInline === "function") {
+      initRoomCategoryAddNewInline(row.cells[7].childNodes[0]);
+    }
+
     if (row.cells[11]) {
       row.cells[11].style.display = "none";
     }
@@ -4552,11 +4556,56 @@ function foo(tableID, quot_table_id, rowCounts) {
     label: false,
     maximum_width: "20px",
   });
+  var planeAirportTableIds = [
+    "tbl_group_tour_quotation_dynamic_plane",
+    "tbl_group_tour_quotation_dynamic_plane_update",
+    "tbl_package_tour_quotation_dynamic_plane",
+    "tbl_package_tour_quotation_dynamic_plane_update",
+    "tbl_flight_quotation_dynamic_plane",
+    "tbl_flight_quotation_dynamic_plane_update",
+    "tbl_plane_travel_details_dynamic_row",
+    "tbl_plane_travel_details_dynamic_row_update"
+  ];
+
   $("#" + tableID)
     .find(".app_select2")
+    .filter(function () {
+      var id = this.id || "";
+      return (
+        !$(this).hasClass("plane-airport-select") &&
+        id.indexOf("from_sector") !== 0 &&
+        id.indexOf("to_sector") !== 0
+      );
+    })
     .each(function () {
+      if ($(this).data("select2")) {
+        return;
+      }
       $(this).select2();
     });
+  if (
+    planeAirportTableIds.indexOf(tableID) !== -1 &&
+    typeof initPlaneAirportSelect2 === "function"
+  ) {
+    setTimeout(function () {
+      initPlaneAirportSelect2("#" + tableID);
+    }, 0);
+  }
+  if (typeof initAllAirlineSelectAddNew === "function") {
+    setTimeout(function () {
+      initAllAirlineSelectAddNew("#" + tableID);
+    }, 0);
+  }
+  if (typeof initAllRoomCategorySelectAddNew === "function") {
+    setTimeout(function () {
+      initAllRoomCategorySelectAddNew("#" + tableID);
+    }, 0);
+  }
+  if (typeof initAllVehicleSelectAddNew === "function") {
+    setTimeout(function () {
+      initAllVehicleSelectAddNew("#" + tableID);
+    }, 0);
+  }
   $("#" + tableID)
     .find(".app_minselect2")
     .each(function () {

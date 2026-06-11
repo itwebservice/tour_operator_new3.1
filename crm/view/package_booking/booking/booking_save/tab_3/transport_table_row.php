@@ -5,7 +5,7 @@
     </div>
     <div class="col-xs-6 text-right mg_bt_20_sm_xs">
         <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_transport_infomration');destinationLoading('select[name^=pickup_from]', 'Pickup Location');
-            destinationLoading('select[name^=drop_to]', 'Drop-off Location');"><i class="fa fa-plus"></i></button>
+            destinationLoading('select[name^=drop_to]', 'Drop-off Location');if(typeof initAllVehicleSelectAddNew==='function'){initAllVehicleSelectAddNew('#tbl_package_transport_infomration');}"><i class="fa fa-plus"></i></button>
         <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_transport_infomration')"><i class="fa fa-trash"></i></button>
 </div> </div>
 <div class="row main_block">
@@ -15,7 +15,7 @@
                 <tr>
                     <td><input id="check-btn-tr-acm-1" type="checkbox" ></td>
                     <td><input maxlength="15" type="text" name="username"  value="1" placeholder="Sr. No." disabled/></td>
-                    <td><select name="vehicle_name1" id="vehicle_name1" title="Vehicle Name" style="width:250px">
+                    <td><select name="vehicle_name1" id="vehicle_name1" title="Vehicle Name" style="width:250px" data-add-new-option="true">
                         <option value="">*Select Vehicle</option>
                             <?php
                             $sq_transport_buses = mysqlQuery("select * from b2b_transfer_master where status!='Inactive' order by vehicle_name asc");
@@ -40,3 +40,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('#vehicle_name1').select2({
+	
+	width: '250px'
+        });
+    if (typeof initAllVehicleSelectAddNew === 'function') {
+        initAllVehicleSelectAddNew('#tbl_package_transport_infomration');
+    }
+</script>

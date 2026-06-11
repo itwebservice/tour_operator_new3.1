@@ -1,4 +1,10 @@
 $('#transport_agency_id, #transport_bus_id,#city_name,#txt_catagory1,#hotel_name').select2();
+if (typeof initAllRoomCategorySelectAddNew === 'function') {
+  initAllRoomCategorySelectAddNew('#tbl_package_hotel_infomration');
+}
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+  hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/package_booking/booking/inc/hotel_name_load.php';
+}
 $('#txt_tsp_from_date,#txt_tsp_end_date').datetimepicker({ timepicker:true, format:'d-m-Y H:i' });
 $('#txt_tsp_to_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
 $('#txt_hotel_from_date1, #txt_hotel_to_date1,#exc_date-1').datetimepicker({  format:'d-m-Y H:i' });
@@ -15,11 +21,29 @@ function back_to_tab_2(){
 /**Hotel Name load start**/
 function load_hotel_list(id){
   var city_id = $("#"+id).val();
+  if (!city_id) {
+    return;
+  }
   var count = id.substring(10);
-  var quotation_id = $("#quotation_id").val();
-  console.log(quotation_id);
-  $.get( "../../booking/inc/hotel_name_load.php" , { city_id : city_id } , function ( data ) {
-        $ ("#hotel_name1"+count).html( data ) ;                            
+  var $hotel = $("#hotel_name1"+count);
+  if (!$hotel.length) {
+    $hotel = $("#hotel_name" + count);
+  }
+  if (typeof hotelDropdownLoadByCity === 'function') {
+    hotelDropdownLoadByCity(city_id, $hotel);
+    return;
+  }
+  var base_url = $('#base_url').val();
+  $.get(base_url + 'view/package_booking/booking/inc/hotel_name_load.php', { city_id : city_id }, function ( data ) {
+        if ($hotel.data('select2')) {
+            $hotel.select2('destroy');
+        }
+        $hotel.html( data );
+        $hotel.select2({ width: '170px', minimumResultsForSearch: 0 });
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($hotel);
+        }
+        initHotelSelectAddNew($hotel);
   } ) ;   
 }
 //Room Category
@@ -33,7 +57,10 @@ function hotel_type_load_cate(id)
   console.log('check');
   var count = id.substring(11);
   $.get( "../../booking/inc/hotel_category.php" , { hotel_id : hotel_id,quotation_id:quotation_id } , function ( data ) {
-        $ ("#txt_catagory"+count).html( data ) ;  
+        $ ("#txt_catagory"+count).html( data ) ;
+        if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+            refreshRoomCategorySelectAfterLoad("#txt_catagory" + count, { width: '140px' });
+        }
   } ) ;   
 }
 /////////////////////////////////////Package Tour hotel name list load end/////////////////////////////////////

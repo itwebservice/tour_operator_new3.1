@@ -5,6 +5,8 @@
 <div id="vi_confirm_box"></div>
 <div id="app_color_scheme_content"></div>
 <div id="div_customer_save_modal"></div>
+<div id="div_hotel_supplier_quick_modal"></div>
+<div id="div_airport_quick_modal"></div>
 <div id="div_itinerary_modal"></div>
 <div id="vehicle_add_modal"></div>
 

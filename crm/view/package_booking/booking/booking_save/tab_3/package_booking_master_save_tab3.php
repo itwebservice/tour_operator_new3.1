@@ -33,6 +33,7 @@
 </form>
 <script src="../js/tab_3.js"></script>
 <script type="text/javascript">
+    
 function disabled_transport_details(id) {
     var id = $('#transport_agency_id').val();
     if (id != 'N/A') {

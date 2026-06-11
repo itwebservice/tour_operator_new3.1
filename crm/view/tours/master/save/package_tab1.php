@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-md-3 col-sm-6 mg_bt_10 ">
                         <select id="dest_name_s" name="dest_name_s" title="Select Destination" class="form-control"
-                            style="width:100%" onchange="get_dest_image(this.id)" required>
+                            style="width:100%" onchange="get_dest_image(this.id)" required data-add-new-option="true">
                             <option value="">*Destination</option>
                             <?php
                             $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");
@@ -121,6 +121,9 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
 
 <script>
     $('#dest_name_s,#dest_image').select2();
+    if (typeof initAllDestinationSelectAddNew === 'function') {
+        initAllDestinationSelectAddNew('#frm_tour_master_save1');
+    }
     jQuery('#txt_from_date1, #txt_to_date1').datetimepicker({
         timepicker: false,
         minDate: new Date(),
@@ -228,6 +231,11 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                 $('#tab2_head').addClass('active');
                 $('.bk_tab').removeClass('active');
                 $('#tab2').addClass('active');
+                if (typeof refreshPlaneAirportSelect2In === 'function') {
+                    setTimeout(function () {
+                        refreshPlaneAirportSelect2In('#tab2');
+                    }, 300);
+                }
                 $('html, body').animate({
                     scrollTop: $('.bk_tab_head').offset().top
                 }, 200);

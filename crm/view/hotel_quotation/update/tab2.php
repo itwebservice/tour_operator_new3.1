@@ -57,13 +57,14 @@
                                                     </td>
                                                     <td><select id="city_name-u_<?= $count.$i ?>" name="city_name-u_<?= $count.$i ?>"
                                                             class="city_master_dropdown" style="width:160px"
-                                                            onchange="hotel_name_list_load(this.id);" title="Select City Name">
+                                                            onchange="hotel_name_list_load(this.id);" title="Select City Name" data-add-new-option="true">
                                                             <option value="<?= $data[$i]['city_id'] ?>" selected><?= $cityName['city_name'] ?>
                                                             </option>
                                                         </select>
                                                     </td>
                                                     <td><select id="hotel_name-u_<?= $count.$i ?>" name="hotel_name-u_<?= $count.$i ?>"
-                                                            onchange="hotel_type_load1(this.id);hotel_type_load_cate1(id)" style="width:160px" title="Select Hotel Name">
+                                                            onchange="hotel_type_load1(this.id);hotel_type_load_cate1(this.id)"
+                                                            class="form-control app_select2" style="width:160px" title="Select Hotel Name" data-add-new-option="true">
                                                             <option value="<?= $data[$i]['hotel_id'] ?>" selected><?= $hotelName['hotel_name'] ?>
                                                             </option>
                                                             <option value="">Hotel Name</option>
@@ -72,7 +73,7 @@
                                                     <?php if($room_category_switch == 'No' ){?>
                                                     <td><select name="room_cat-u_<?= $count.$i ?>" id="room_cat-u_<?= $count.$i ?>"
                                                             style="width:145px;" title="Room Category" class="form-control app_select2"
-                                                            onchange=""><?php get_room_category_dropdown(); ?>
+                                                            onchange="" data-add-new-option="true"><?php get_room_category_dropdown(); ?>
                                                             <option value="<?= $data[$i]['hotel_cat'] ?>" selected><?= $data[$i]['hotel_cat'] ?>
                                                             </option>
                                                         </select>
@@ -80,7 +81,7 @@
                                                     <?php } else{?>
                                                     <td><select name="room_cat-1" id="room_cat-u_<?= $count.$i ?>"
                                                             style="width:145px;" title="Room Category" class="form-control app_select2"
-                                                            onchange="">
+                                                            onchange="" data-add-new-option="true">
                                                             <option value="">Room Category</option>
                                                             <option value="<?= $data[$i]['hotel_cat'] ?>" selected><?= $data[$i]['hotel_cat'] ?>
                                                             </option>
@@ -159,6 +160,12 @@ $('.app_datepicker').datetimepicker({
 });
 city_lzloading('.city_master_dropdown');
 $('#dest_name').select2();
+
+$('#frm_tab2 select[id^="hotel_name-"]').each(function() {
+    if (!$(this).data('select2')) {
+        $(this).select2({ width: '160px', minimumResultsForSearch: 0 });
+    }
+});
 
 $('select[id^="room_cat-1"]').each(function() {
     $(this).select2();

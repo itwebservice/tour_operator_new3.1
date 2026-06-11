@@ -353,12 +353,63 @@ $.get('../booking/inc/get_currency_dropdown.php', {quotation_id:''}, function (d
     $('#currency_div').html(data);
 });
 city_lzloading('.city_id');
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+    hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/hotels/booking/booking/inc/hotel_name_load.php';
+}
+init_hotel_booking_row_select2();
+if (typeof initAllHotelSelectAddNew === 'function') {
+    initAllHotelSelectAddNew('#tbl_hotel_booking');
+}
 $('#payment_date,#due_date,#booking_date').datetimepicker({
     timepicker: false,
     format: 'd-m-Y'
 });
 $('#check_in1, #check_out1').datetimepicker({
     format: 'd-m-Y H:i'
+});
+
+function init_hotel_booking_row_select2() {
+    $('#tbl_hotel_booking .category_select2').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({
+                dropdownParent: $('#booking_save_modal'),
+                width: '140px',
+                minimumResultsForSearch: 0
+            });
+        }
+        if (typeof initRoomCategoryAddNewInline === 'function') {
+            initRoomCategoryAddNewInline(this);
+        }
+    });
+    $('#tbl_hotel_booking select[id^="hotel_id"][data-add-new-option="true"]').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({
+                dropdownParent: $('#booking_save_modal'),
+                width: '170px',
+                minimumResultsForSearch: 0
+            });
+        }
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config(this);
+        }
+        if (typeof initHotelSelectAddNew === 'function') {
+            initHotelSelectAddNew(this);
+        }
+    });
+}
+
+// Re-initialize when dynamic rows are appended.
+$(document).on('focus', '#tbl_hotel_booking .category_select2', function() {
+    if (!$(this).data('select2')) {
+        $(this).select2({
+            dropdownParent: $('#booking_save_modal'),
+            width: '140px',
+            minimumResultsForSearch: 0
+        });
+    }
+    if (typeof initRoomCategoryAddNewInline === 'function') {
+        initRoomCategoryAddNewInline(this);
+    }
 });
 
 //Get Hotel Cost

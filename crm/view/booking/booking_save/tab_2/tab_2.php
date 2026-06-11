@@ -139,6 +139,9 @@ function addTransportRowBooking(){
         destinationLoading('select[name^=transport_pickup_from]', 'Pickup Location');
         destinationLoading('select[name^=transport_drop_to]', 'Drop-off Location');
         $('#tbl_booking_transport').find('.app_select2').select2();
+        if (typeof initAllVehicleSelectAddNew === 'function') {
+            initAllVehicleSelectAddNew('#tbl_booking_transport');
+        }
         // Reinitialize datepicker for the new row
         $('#tbl_booking_transport').find('.app_datepicker').datetimepicker({ 
             timepicker: false, 

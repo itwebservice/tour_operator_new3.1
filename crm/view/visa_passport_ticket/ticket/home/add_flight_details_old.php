@@ -199,7 +199,7 @@ if ($pass_entry_id != '') {
 										<input type="text" id="aterm-<?= $sq_trip_entries_count ?>" name="aterm" onchange="validate_specialChar(this.id)" placeholder="Arrival Terminal" title="Arrival Terminal" data-dyn-valid="" value="<?= $arr_terminal ?>">
 									</div>
 									<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-										<select id="airlines_name-<?= $sq_trip_entries_count ?>" name="airlines_name" title="Airlines Name" style="width:100%" data-dyn-valid="required" class="airlines_names app_select">
+										<select id="airlines_name-<?= $sq_trip_entries_count ?>" name="airlines_name" title="Airlines Name" style="width:100%" data-dyn-valid="required" class="airlines_names app_select" data-add-new-option="true">
 											<?php if ($airline_name != '') { ?><option value="<?= $airline_name ?>"><?= $airline_name ?></option><?php } ?>
 											<option value="">*Airline Name</option>
 											<?php $sq_airline = mysqlQuery("SELECT airline_name,airline_code FROM airline_master WHERE active_flag!='Inactive' ORDER BY airline_name ASC");

@@ -1,7 +1,7 @@
 <?php
 class GeminiController
 {
-    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyC9diotLu1KA4NvNz5vzh6a1HD-nIppOFY';
+    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyCAC3eUrwFXdyhdXW8OKgOo-wIiQOOcpgs';
     
     private $promptTemplate = 
         'You are an AI that extracts structured travel itinerary data from raw, unstructured text.

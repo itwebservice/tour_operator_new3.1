@@ -3,8 +3,25 @@ function hotel_name_list_load(id) {
 
   var count = id.substring(7);
   var city_id = $("#" + id).val();
-  $.get("inc/hotel_name_load.php", { city_id: city_id }, function (data) {
-    $("#hotel_id" + count).html(data);
+  if (!city_id) {
+    return;
+  }
+  var $hotel = $("#hotel_id" + count);
+  if (typeof hotelDropdownLoadByCity === 'function') {
+    hotelDropdownLoadByCity(city_id, $hotel);
+    return;
+  }
+  var base_url = $('#base_url').val();
+  $.get(base_url + 'view/hotels/booking/booking/inc/hotel_name_load.php', { city_id: city_id }, function (data) {
+    if ($hotel.data('select2')) {
+      $hotel.select2('destroy');
+    }
+    $hotel.html(data);
+    $hotel.select2({ width: '170px', minimumResultsForSearch: 0 });
+    if (typeof captureHotelSelect2Config === 'function') {
+      captureHotelSelect2Config($hotel);
+    }
+    initHotelSelectAddNew($hotel);
   });
 }
 // room category
@@ -14,6 +31,12 @@ function hotel_type_load_cate(id)
   var hotel_id = $("#" + id).val();
   $.get("inc/hotel_category.php", { hotel_id: hotel_id }, function (data) {
     $("#category" + count).html(data);
+    if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+      refreshRoomCategorySelectAfterLoad("#category" + count, {
+        width: '140px',
+        dropdownParent: $('#booking_save_modal')
+      });
+    }
   });   
 }
 

@@ -120,7 +120,7 @@
 										<tr>
 												<td><input class="css-checkbox" id="chk_transport1" type="checkbox" checked><label class="css-label" for="chk_transport1"> </label></td>
 												<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
-												<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2">
+												<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
 														<option value="">Select Vehicle</option>
 														<?php
 														$sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -177,11 +177,32 @@
 											<tr>
 												<td><input class="css-checkbox" id="chk_plan1" checked type="checkbox"><label class="css-label" for="chk_plan1"> <label></td>
 												<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-												<td><input type="text" name="from_sector-1" id="from_sector-1" placeholder="From Sector" title="From Sector" style="width: 360px;">
+												
+												<!-- <td><input type="text" name="from_sector-1" id="from_sector-1" placeholder="From Sector" title="From Sector" style="width: 360px;">
 												</td>
 												<td><input type="text" name="to_sector-1" id="to_sector-1" placeholder="To Sector" title="To Sector" style="width: 360px;">
-												</td>
-												<td><select id="airline_name1" class="app_select2 form-control"  title="Airline Name" name="airline_name1" style="width: 300px;">
+												</td> -->
+
+												<td >
+													           <select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
+                                                </td>
+
+                                                <td>
+												      <select name="to_sector-1" id="to_sector-1"
+                                                          class="form-control app_select2 plane-airport-select"
+                                                          data-sector-type="to" title="To Sector"
+                                                           data-add-new-option="true">
+                                                          <option value="">*To Sector</option>
+                                                      </select>
+                                                </td>
+
+
+												<td><select id="airline_name1" class="app_select2 form-control"  title="Airline Name" name="airline_name1" style="width: 300px;" data-add-new-option="true">
 														<option value="">Airline Name</option>
 														<?php get_airline_name_dropdown(); ?>
 												</select></td>
@@ -264,9 +285,27 @@
 
 <script>
 
+	 $('#airline_name1').select2({
+ 
+        });
+        if (typeof initAllAirlineSelectAddNew === 'function') {
+            initAllAirlineSelectAddNew('#tbl_package_tour_quotation_dynamic_plane');
+        }
+        function initGroupQuotationPlaneAirports() {
+            if (typeof initPlaneAirportSelect2 === 'function') {
+                initPlaneAirportSelect2('#tbl_package_tour_quotation_dynamic_plane');
+                event_airport('tbl_package_tour_quotation_dynamic_plane');
+            } else {
+                setTimeout(initGroupQuotationPlaneAirports, 200);
+            }
+        }
+        initGroupQuotationPlaneAirports();
+$('#transport_vehicle_name1').select2({});
+if (typeof initAllVehicleSelectAddNew === 'function') {
+    initAllVehicleSelectAddNew('#tbl_group_tour_quotation_transport');
+}
 $('#plane_from_location1,#plane_to_location1,#train_from_location1,#train_to_location1').select2({
 	dropdownParent: $("#quotation_save_modal")});
-event_airport('tbl_package_tour_quotation_dynamic_plane');
 city_lzloading('.train_from', '*From', true);
 city_lzloading('.train_to', '*To', true);
 destinationLoading('select[name^="transport_pickup_from"]', 'Pickup Location');
@@ -281,6 +320,9 @@ function addTransportRowSave(){
 		destinationLoading('select[name^=transport_drop_to]', 'Drop-off Location');
 		$('.app_datepicker').datetimepicker({ timepicker:false, format:'d-m-Y' });
 		$('#tbl_group_tour_quotation_transport').find('.app_select2').select2();
+		if (typeof initAllVehicleSelectAddNew === 'function') {
+			initAllVehicleSelectAddNew('#tbl_group_tour_quotation_transport');
+		}
 	}, 100);
 }
 

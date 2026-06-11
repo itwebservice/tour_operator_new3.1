@@ -90,5 +90,71 @@ class airport_master{
 
 	}
 
+	public function airport_quick_save($city_id, $airport_name, $airport_code)
+	{
+		$city_id = mysqlREString($city_id);
+		$airport_name = addslashes(trim($airport_name));
+		$airport_code = strtoupper(addslashes(trim($airport_code)));
+
+		if($city_id == '' || !preg_match('/^[0-9]+$/', $city_id)){
+			echo json_encode(array('status' => 'error', 'message' => 'City is required.'));
+			exit;
+		}
+		if($airport_name == ''){
+			echo json_encode(array('status' => 'error', 'message' => 'Airport name is required.'));
+			exit;
+		}
+		if($airport_code == ''){
+			echo json_encode(array('status' => 'error', 'message' => 'Airport code is required.'));
+			exit;
+		}
+
+		$sq_count = mysqli_num_rows(mysqlQuery("select airport_id from airport_master where airport_code='$airport_code'"));
+		if($sq_count > 0){
+			echo json_encode(array('status' => 'error', 'message' => '('.$airport_code.') already exists!'));
+			exit;
+		}
+
+		$sq_count = mysqli_num_rows(mysqlQuery("select airport_id from airport_master where airport_name='$airport_name' and airport_code='$airport_code'"));
+		if($sq_count > 0){
+			echo json_encode(array('status' => 'error', 'message' => $airport_name.'('.$airport_code.') already exists!'));
+			exit;
+		}
+
+		$sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='$city_id'"));
+		$city_name = $sq_city ? $sq_city['city_name'] : '';
+
+		begin_t();
+
+		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(airport_id) as max from airport_master"));
+		$airport_id = $sq_max['max'] + 1;
+		$created_at = date('Y-m-d H:i');
+		$active_flag = 'Active';
+
+		$sq_airport = mysqlQuery("insert into airport_master (airport_id, city_id, airport_name, airport_code, flag, created_at) values ('$airport_id', '$city_id', '$airport_name', '$airport_code', '$active_flag', '$created_at')");
+
+		if(!$sq_airport){
+			rollback_t();
+			echo json_encode(array('status' => 'error', 'message' => 'Airport details not saved!'));
+			exit;
+		}
+
+		commit_t();
+
+		$label = $city_name . ' - ' . stripslashes($airport_name) . ' (' . $airport_code . ')';
+
+		echo json_encode(array(
+			'status' => 'success',
+			'airport_id' => $airport_id,
+			'airport_name' => stripslashes($airport_name),
+			'airport_code' => $airport_code,
+			'city_id' => $city_id,
+			'city_name' => $city_name,
+			'label' => $label,
+			'message' => 'Airport has been successfully saved.'
+		));
+		exit;
+	}
+
 }
 ?>

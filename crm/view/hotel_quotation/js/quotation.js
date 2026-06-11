@@ -104,10 +104,29 @@ function options_dynamic_reflect(id) {
 
 function hotel_name_list_load(id){
   var city_id = $("#"+id).val();
+  if (!city_id) {
+    return;
+  }
   var count = id.substring(9);
+  var $hotel = $("#hotel_name-" + count);
+  if (!$hotel.length) {
+    $hotel = $("#hotel_name" + count);
+  }
+  if (typeof hotelDropdownLoadByCity === 'function') {
+    hotelDropdownLoadByCity(city_id, $hotel);
+    return;
+  }
   var base_url = $('#base_url').val();
   $.get( base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php" , { city_id : city_id } , function ( data ) {
-        $ ("#hotel_name"+count).html( data );                     
+        if ($hotel.data('select2')) {
+            $hotel.select2('destroy');
+        }
+        $hotel.html( data );
+        $hotel.select2({ width: '160px', minimumResultsForSearch: 0 });
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($hotel);
+        }
+        initHotelSelectAddNew($hotel);
   }) ;   
 }
 
@@ -258,7 +277,10 @@ function hotel_type_load_cate(id)
 
 	var count = id.substring(11);
 	$.get( base_url + "view/package_booking/quotation/home/hotel/hotel_category.php" , { hotel_id : hotel_id } , function ( data ) {
-			$ ("#room_cat-"+count).html( data ) ;  
+			$ ("#room_cat-"+count).html( data ) ;
+			if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+				refreshRoomCategorySelectAfterLoad("#room_cat-" + count, { width: '162px' });
+			}
 	} ) ;
 }
 
@@ -282,7 +304,10 @@ function hotel_type_load_cate1(id)
 
   var count = id.substring(11);
   $.get( base_url + "view/package_booking/quotation/home/hotel/hotel_category.php" , { hotel_id : hotel_id } , function ( data ) {
-        $ ("#room_cat-"+count).html( data ) ;  
+        $ ("#room_cat-"+count).html( data ) ;
+        if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+            refreshRoomCategorySelectAfterLoad("#room_cat-" + count, { width: '162px' });
+        }
   } ) ;
 }
 function validate_validDates(to) {

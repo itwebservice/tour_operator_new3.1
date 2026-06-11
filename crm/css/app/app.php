@@ -2659,6 +2659,18 @@ textarea.ai-chat-textarea.form-control:focus,
 	justify-content: center;
 }
 
+#touraiToggleBtn{
+	width: 70px;
+	background: <?= $theme_color ?>
+}
+
+.touraiToggleBtn_div{
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	padding-right: 15px;
+}
+
 @media (max-width: 1100px) {
 	.ai-itinerary-row {
 		flex-wrap: wrap;
@@ -2710,12 +2722,21 @@ textarea.ai-chat-textarea.form-control:focus,
 	fill: #111827;
 }
 
-#aiApiInfo{
-    margin-left: 115px !important;
-    margin-bottom: 20px;
+.ai-chat-container #aiApiInfo {
+	display: block;
+	margin: 10px 0 20px;
+	padding: 0;
+	width: 100%;
+	background: transparent;
+	border: none;
+	font-size: 13px;
+	line-height: 1.5;
+	white-space: pre-wrap;
+	word-break: break-word;
+	color: #333;
 }
 
-#ai-inclusions-exclusions-info{
-	display: flex;
-    margin: 0px 80px;
+.ai-chat-container #aiApiInfo:empty {
+	display: none;
+	margin: 0;
 }

@@ -17,7 +17,7 @@ include "../../../model/model.php";
         <legend>Transporter Information</legend>
 			  <div class="row">
 			    <div class="col-md-3 col-sm-6 mg_bt_10">
-			      <select id="cmb_city_id" name="cmb_city_id" style="width:100%" class="form-control city_master_dropdown app_select2" title="Select City Name">
+			      <select id="cmb_city_id" name="cmb_city_id" style="width:100%" class="form-control city_master_dropdown app_select2" title="Select City Name" data-add-new-option="true">
 			      </select>
 			    </div>
 			    <div class="col-md-3 col-sm-6 mg_bt_10">
