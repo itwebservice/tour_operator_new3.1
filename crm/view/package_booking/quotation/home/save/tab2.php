@@ -117,7 +117,7 @@
                     <div class="col-md-6" id="ai-inclusions-info">
                         <h4>Inclusions</h4>
                         <hr />
-                        <textarea id="aiInclusionsInformation" name="exclusions" placeholder="Exclusions" title="Exclusions" rows="4"></textarea>
+                        <textarea id="aiInclusionsInformation" name="inclusions" placeholder="Inclusions" title="Inclusions" rows="4"></textarea>
                         <!-- <div id="aiInclusionsInformation"></div> -->
                     </div>
                     <div class="col-md-6" id="ai-exclusions-info">
@@ -322,16 +322,16 @@
                                     if (!parsed && response.raw)
                                         parsed = response.raw;
 
-                                    var hasInclusions = renderInfoList(
+                                    renderInfoList(
                                         '#aiInclusionsInformation',
                                         parsed && parsed.itinerary ? parsed.itinerary.inclusions : []
                                     );
-                                    var hasExclusions = renderInfoList(
+                                    renderInfoList(
                                         '#aiExclusionsInformation',
                                         parsed && parsed.itinerary ? parsed.itinerary.exclusions : []
                                     );
-                                    toggleInfoSection('#ai-inclusions-info', hasInclusions);
-                                    toggleInfoSection('#ai-exclusions-info', hasExclusions);
+                                    toggleInfoSection('#ai-inclusions-info', true);
+                                    toggleInfoSection('#ai-exclusions-info', true);
 
                                     if (!renderDetailedProgramRows(parsed)) {
                                         $('#aiApiInfo').text(response.reply || 'No detailed program found.');
