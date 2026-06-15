@@ -32,6 +32,10 @@ $sq_settings = mysqli_fetch_assoc(mysqlQuery("select * from app_settings"));
 	        <input type="radio" id="rd_credit" name="rd_app" onchange="content_reflect()">
 	        &nbsp;&nbsp;Credit Card
 	    </label>
+	    <label for="rd_quotation_builder" class="app_dual_button">
+	        <input type="radio" id="rd_quotation_builder" name="rd_app" onchange="content_reflect()">
+	        &nbsp;&nbsp;Quotation Builder
+	    </label>
 	</div>   
 </div>
 
@@ -71,6 +75,11 @@ function content_reflect()
 	}
 	if(id=="rd_credit"){
 		$.post('credit_card_charges/index.php', {}, function(data){
+			$('#div_app_setting_content').html(data);
+		});
+	}
+	if(id=="rd_quotation_builder"){
+		$.post('quotation_builder/index.php', {}, function(data){
 			$('#div_app_setting_content').html(data);
 		});
 	}
