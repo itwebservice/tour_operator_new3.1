@@ -3,19 +3,20 @@ include "../../../model/model.php";
 $sq_settings = mysqli_fetch_assoc(mysqlQuery("select * from app_settings"));
 $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_master"));
 
-if ($sq_settings['quot_format'] == 2) {
-	$quot_format = 'Landscape Standard';
-} else if ($sq_settings['quot_format'] == 3) {
-	$quot_format = 'Landscape Creative';
-} else if ($sq_settings['quot_format'] == 4) {
-	$quot_format = 'Portrait Creative';
-} else if ($sq_settings['quot_format'] == 5) {
-	$quot_format = 'Portrait Advanced';
-} else if ($sq_settings['quot_format'] == 6) {
-	$quot_format = 'Landscape Advanced';
-} else {
-	$quot_format = 'Portrait Standard';
-}
+$quot_format_labels = array(
+	1  => 'Option-1',
+	2  => 'Option-2',
+	3  => 'Option-3',
+	4  => 'Option-4',
+	5  => 'Option-5',
+	6  => 'Option-6',
+	7  => 'Option-7',
+	8  => 'Option-8',
+	9  => 'Portrait Standard',
+	10 => 'Portrait Advanced',
+);
+$qf_val = (int) $sq_settings['quot_format'];
+$quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val] : 'Option-1';
 ?>
 
 <form id="app_format_info" class="mg_tp_30">
@@ -59,17 +60,19 @@ if ($sq_settings['quot_format'] == 2) {
 				<legend>Quotation Format & Image Setting</legend>
 				<div class="col-sm-6 col-md-3 mg_bt_10">
 					<select name="format_list" id="format_list" title="Quotation Format List" onchange="display_images(this.id);">
-						<?php if ($sq_settings['quot_format'] != 0) { ?>
-							<option value="<?= $sq_settings['quot_format'] ?>"><?= $quot_format ?></option>
-						<?php } else { ?>
-							<option value="4">Portrait Creative</option>
+						<?php if ($qf_val != 0) { ?>
+							<option value="<?= $qf_val ?>"><?= $quot_format ?></option>
 						<?php } ?>
-						<option value="1">Portrait Standard</option>
-						<option value="4">Portrait Creative</option>
-						<option value="5">Portrait Advanced</option>
-						<option value="2">Landscape Standard</option>
-						<option value="3">Landscape Creative</option>
-						<option value="6">Landscape Advanced</option>
+						<option value="1">Option-1</option>
+						<option value="2">Option-2</option>
+						<option value="3">Option-3</option>
+						<option value="4">Option-4</option>
+						<option value="5">Option-5</option>
+						<option value="6">Option-6</option>
+						<option value="7">Option-7</option>
+						<option value="8">Option-8</option>
+						<option value="9">Portrait Standard</option>
+						<option value="10">Portrait Advanced</option>
 					</select>
 				</div>
 				<div class="col-sm-6 col-md-3 mg_bt_10">
