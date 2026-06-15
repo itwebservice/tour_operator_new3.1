@@ -1,7 +1,7 @@
 <?php
 class GeminiController
 {
-    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyCAC3eUrwFXdyhdXW8OKgOo-wIiQOOcpgs';
+    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
     
     private $promptTemplate = 
         'You are an AI that extracts structured travel itinerary data from raw, unstructured text.
@@ -742,7 +742,11 @@ class GeminiController
             )
         );
 
-        $ch = curl_init($this->url);
+        $apiKey = $this->getApiKey();
+        if ($apiKey === false)
+            return array('status' => false, 'error' => 'Failed to fetch valid API key from webhook.');
+
+        $ch = curl_init($this->url . '?key=' . $apiKey);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
@@ -778,6 +782,23 @@ class GeminiController
         }
 
         return array('status' => true, 'reply' => $reply, 'raw' => $decoded);
+    }
+
+    private function getApiKey()
+    {
+        $chKey = curl_init('https://itours.app.n8n.cloud/webhook/gemini-api-key');
+        curl_setopt($chKey, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($chKey, CURLOPT_TIMEOUT, 10);
+        $keyResponse = curl_exec($chKey);
+        $keyHttpCode = (int)curl_getinfo($chKey, CURLINFO_HTTP_CODE);
+        curl_close($chKey);
+        
+        $keyDecoded = json_decode($keyResponse, true);
+
+        if ($keyResponse === false || $keyHttpCode < 200 || $keyHttpCode >= 300 || !isset($keyDecoded['key']) || trim($keyDecoded['key']) === '')
+            return false;
+
+        return trim($keyDecoded['key']);
     }
 }
 
