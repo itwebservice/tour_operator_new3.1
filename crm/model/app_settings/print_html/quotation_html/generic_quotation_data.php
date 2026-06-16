@@ -274,6 +274,54 @@ if (!function_exists('get_generic_quotation_data')) {
             ? $branch_admin['company_name']
             : (isset($app['app_name']) ? $app['app_name'] : '');
 
+        //=============================== Dipti
+        // Gallery images for first page - destination wise last 4 images
+        $gallery_images = array();
+
+        $dest_id_for_gallery = 0;
+
+        // First try from package master
+        if (!empty($master['package_id'])) {
+          $pkg_id = gqd_esc($master['package_id']);
+          $pkg = gqd_row("SELECT dest_id FROM custom_package_master WHERE package_id='$pkg_id'");
+          if (!empty($pkg['dest_id'])) {
+            $dest_id_for_gallery = $pkg['dest_id'];
+          }
+        }
+
+        // Fallback: match destination name
+        if (empty($dest_id_for_gallery) && !empty($master['tour_name'])) {
+          $tour_name = gqd_esc($master['tour_name']);
+          $dest = gqd_row("SELECT dest_id FROM destination_master WHERE dest_name='$tour_name' LIMIT 1");
+          if (!empty($dest['dest_id'])) {
+            $dest_id_for_gallery = $dest['dest_id'];
+          }
+        }
+
+        if (!empty($dest_id_for_gallery)) {
+          $gallery_rows = gqd_rows("SELECT image_url FROM gallary_master WHERE dest_id='$dest_id_for_gallery' ORDER BY entry_id DESC LIMIT 4");
+
+          foreach ($gallery_rows as $gr) {
+            $img = isset($gr['image_url']) ? trim($gr['image_url']) : '';
+
+            if ($img != '') {
+              $img = str_replace('\\', '/', $img);
+
+              if (strpos($img, 'http://') !== 0 && strpos($img, 'https://') !== 0) {
+                $img = str_replace('../../../../', '', $img);
+                $img = str_replace('../../../', '', $img);
+                $img = str_replace('../../', '', $img);
+                $img = str_replace('../', '', $img);
+                $img = preg_replace('/\/+/', '/', $img);
+                $img = BASE_URL . $img;
+              }
+
+              $gallery_images[] = $img;
+            }
+          }
+        }
+            //=====================================
+
         $hero = array(
             'company_logo'   => function_exists('get_branch_logo_url') ? get_branch_logo_url($branch_admin_id) : '',
             'cover_image'    => function_exists('getFormatImg') ? getFormatImg($app_quot_format, $dest_id) : '',
@@ -333,6 +381,18 @@ if (!function_exists('get_generic_quotation_data')) {
             $img  = gqd_row("select hotel_pic_url from hotel_vendor_images_entries where hotel_id='$hid'");
             $photo = isset($img['hotel_pic_url']) ? preg_replace('/(\/+)/', '/', $img['hotel_pic_url']) : '';
 
+      //==============================Dipti
+      if (!empty($photo)) {
+        $photo = str_replace('\\', '/', $photo);
+
+        $photo = str_replace('../../../../', '', $photo);
+        $photo = str_replace('../../../', '', $photo);
+        $photo = str_replace('../../', '', $photo);
+        $photo = str_replace('../', '', $photo);
+
+        $photo = BASE_URL . $photo;
+      }
+            //-===================================
             $hotels[] = array(
                 'hotel_name'    => isset($hm['hotel_name']) ? $hm['hotel_name'] : '',
                 'hotel_city'    => isset($cm['city_name']) ? $cm['city_name'] : '',
@@ -698,9 +758,25 @@ if (!function_exists('get_generic_quotation_data')) {
             ),
         );
 
-        // =====================================================================
-        // 12. BANK DETAILS
-        // =====================================================================
+    // =====================================================================
+    // 12. BANK DETAILS
+    // =====================================================================
+    //========================== Dipti
+    $qr_code = isset($app['qr_url']) ? trim($app['qr_url']) : '';
+
+    if (!empty($qr_code)) {
+      $qr_code = str_replace('\\', '/', $qr_code);
+
+      $qr_code = str_replace('../../../../', '', $qr_code);
+      $qr_code = str_replace('../../../', '', $qr_code);
+      $qr_code = str_replace('../../', '', $qr_code);
+      $qr_code = str_replace('../', '', $qr_code);
+
+      $qr_code = preg_replace('/\/+/', '/', $qr_code);
+      $qr_code = BASE_URL . $qr_code;
+    }
+    
+        //=============================
         $bank_details = array(
             'bank_name'      => !empty($bank['bank_name']) ? $bank['bank_name'] : (isset($bank_name_setting) ? $bank_name_setting : ''),
             'account_name'   => !empty($bank['account_name']) ? $bank['account_name'] : (isset($bank_account_name) ? $bank_account_name : ''),
@@ -709,8 +785,10 @@ if (!function_exists('get_generic_quotation_data')) {
             'branch_name'    => !empty($bank['branch_name']) ? $bank['branch_name'] : (isset($bank_branch_name) ? $bank_branch_name : ''),
             'ifsc_code'      => !empty($bank['ifsc_code']) ? $bank['ifsc_code'] : (isset($bank_ifsc_code) ? $bank_ifsc_code : ''),
             'swift_code'     => !empty($bank['swift_code']) ? $bank['swift_code'] : (isset($bank_swift_code) ? $bank_swift_code : ''),
-            'upi_id'         => isset($bank['upi_id']) ? $bank['upi_id'] : '',
-            'qr_code'        => isset($app['qr_url']) ? $app['qr_url'] : '',
+            // 'upi_id'         => isset($bank['upi_id']) ? $bank['upi_id'] : '',
+            'upi_id' => isset($bank['upi_id']) ? $bank['upi_id'] : '', //======= Dipti
+            // 'qr_code'        => isset($app['qr_url']) ? $app['qr_url'] : '',
+            'qr_code' => $qr_code,
             'branch_qr_url'  => $branch_qr_url,
             'qr_available'   => (function_exists('check_qr') && check_qr($branch_admin_id) === true) || !empty($branch_qr_url) || !empty($app['qr_url']),
             'qr_html'        => function_exists('get_qr') ? get_qr('Protrait Standard', $branch_admin_id) : '',
@@ -770,6 +848,7 @@ if (!function_exists('get_generic_quotation_data')) {
         // ASSEMBLE
         // =====================================================================
         return array(
+      'gallery_images' => $gallery_images,
             'found'        => true,
             'quotation_id' => $master['quotation_id'],
             'quotation_code' => $display_id,

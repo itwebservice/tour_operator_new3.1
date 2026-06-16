@@ -87,6 +87,44 @@
   }
 }
 
+/* ====================================== Dipti*/
+@media print {
+  .page {
+    height: auto !important;
+    min-height: 297mm !important;
+    overflow: visible !important;
+    page-break-after: always;
+  }
+
+  .page .relative,
+  .page .px-10,
+  .page .py-7 {
+    overflow: visible !important;
+  }
+
+  .itinerary-card,
+  .day-card,
+  .rounded-xl {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+   .itinerary-card{
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 12px !important;
+    }
+
+    .itinerary-card img{
+        height: 140px !important;
+        object-fit: cover !important;
+    }
+
+  img {
+    loading: eager;
+  }
+}
+/* ========================================== */
+
 @layer theme {
   :root, :host {
     --font-sans: var(--font-sans);

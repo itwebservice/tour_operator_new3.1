@@ -200,17 +200,39 @@ function app_format_save(){
 
 		$sq_setting = mysqlQuery($query);
 	}
-	else{
-		if(empty($dest_id))
-		{
-			$sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
-		}
-		mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
-		mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
-	}
+
+    // =========================== Dipti
+    else {
+      if (empty($dest_id)) {
+        $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
+      } else {
+        $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='$dest_id' where setting_id='1'");
+        mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
+        mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
+      }
+    }
+  // ====================================
+
+	// else{
+	// 	if(empty($dest_id))
+	// 	{
+	// 		$sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
+	// 	}
+	// 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
+	// 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
+	// }
 
 
-	if($sq_invoice){
+    // ========================== Dipti
+    include_once(dirname(__FILE__) . '/print_html/quotation_html/generic_builder_config.php');
+    $testimonials = isset($_POST['testimonials']) ? json_decode($_POST['testimonials'], true) : array();
+
+    $config = gqb_get_config();
+    $config['testimonials'] = is_array($testimonials) ? $testimonials : array();
+    gqb_save_config($config);
+    // =============================
+
+    if($sq_invoice){
 		echo "Company profile details are saved successfully!! ";
 		exit;
 	}

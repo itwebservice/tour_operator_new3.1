@@ -13,7 +13,8 @@ public function bank_master_save()
 	$ifsc_code = $_POST['ifsc_code'];
 	$swift_code = $_POST['swift_code'];
 	$account_type = $_POST['account_type'];
-	$mobile_no = $_POST['mobile_no'];
+    // $mobile_no = $_POST['mobile_no'];
+    $upi_id = $_POST['upi_id']; //========== Dipti
 	// $opening_balance = $_POST['opening_balance'];
 	$active_flag = $_POST['active_flag'];
 	$as_of_date = $_POST['as_of_date'];
@@ -36,7 +37,10 @@ public function bank_master_save()
 	$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(bank_id) as max from bank_master"));
 	$bank_id = $sq_max['max'] + 1;
 
-	$sq_bank = mysqlQuery("insert into bank_master (bank_id,branch_id, bank_name,account_name, branch_name, address, account_no, ifsc_code, swift_code, account_type, mobile_no, op_balance,active_flag, created_at,balance_side) values ('$bank_id','$branch_id' ,'$bank_name', '$account_name','$branch_name', '$address', '$account_no', '$ifsc_code', '$swift_code', '$account_type', '$mobile_no', '$op_balance', '$active_flag', '$created_at','$balance_side')");
+    // $sq_bank = mysqlQuery("insert into bank_master (bank_id,branch_id, bank_name,account_name, branch_name, address, account_no, ifsc_code, swift_code, account_type, mobile_no, op_balance,active_flag, created_at,balance_side) values ('$bank_id','$branch_id' ,'$bank_name', '$account_name','$branch_name', '$address', '$account_no', '$ifsc_code', '$swift_code', '$account_type', '$mobile_no', '$op_balance', '$active_flag', '$created_at','$balance_side')");
+    //======== Dipti
+    $sq_bank = mysqlQuery("insert into bank_master (bank_id, branch_id, bank_name, account_name, branch_name, address, account_no, ifsc_code, swift_code, account_type, upi_id, op_balance, active_flag, created_at, balance_side) values ('$bank_id', '$branch_id', '$bank_name', '$account_name', '$branch_name', '$address', '$account_no', '$ifsc_code', '$swift_code', '$account_type', '$upi_id', '$op_balance', '$active_flag', '$created_at', '$balance_side')");
+    //=======================
 
 	if($bank_id == 1){
 		if($active_flag == 'Active'){
@@ -84,7 +88,8 @@ public function bank_master_update()
 	$ifsc_code = $_POST['ifsc_code'];
 	$swift_code = $_POST['swift_code'];
 	$account_type = $_POST['account_type'];
-	$mobile_no = $_POST['mobile_no'];
+	// $mobile_no = $_POST['mobile_no'];
+  $upi_id = $_POST['upi_id']; //=============== Dipti
 	$opening_balance = $_POST['opening_balance'];
 	$active_flag = $_POST['active_flag'];
 	$op_balance = $_POST['op_balance'];
@@ -98,7 +103,10 @@ public function bank_master_update()
 	}
 	//**Starting transaction
 	begin_t();
-	$sq_bank = mysqlQuery("update bank_master set branch_id='$branch_id',bank_name='$bank_name',account_name='$account_name', branch_name='$branch_name', address='$address', account_no='$account_no', ifsc_code='$ifsc_code', swift_code='$swift_code', account_type='$account_type', mobile_no='$mobile_no', op_balance='$op_balance',balance_side='$balance_side', active_flag='$active_flag' where bank_id='$bank_id'");
+    // $sq_bank = mysqlQuery("update bank_master set branch_id='$branch_id',bank_name='$bank_name',account_name='$account_name', branch_name='$branch_name', address='$address', account_no='$account_no', ifsc_code='$ifsc_code', swift_code='$swift_code', account_type='$account_type', mobile_no='$mobile_no', op_balance='$op_balance',balance_side='$balance_side', active_flag='$active_flag' where bank_id='$bank_id'");
+    //============ Dipti
+    $sq_bank = mysqlQuery("update bank_master set branch_id='$branch_id', bank_name='$bank_name', account_name='$account_name', branch_name='$branch_name', address='$address', account_no='$account_no', ifsc_code='$ifsc_code', swift_code='$swift_code', account_type='$account_type', upi_id='$upi_id', op_balance='$op_balance', balance_side='$balance_side', active_flag='$active_flag' where bank_id='$bank_id'");
+    //=====================
 
 	if($bank_id == 1){
 		if($active_flag == 'Active'){
