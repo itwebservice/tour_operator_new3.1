@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Singapore Tour Package – Voyage Lumière</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0f2044;
+  --navy-light:#1a3260;
+  --gold:#c9973a;
+  --gold-lt:#e0b96a;
+  --teal:#4a9fa8;
+  --teal-lt:#7bc4cb;
+  --white:#ffffff;
+  --bg:#f8f9fb;
+  --bg2:#f0f4f8;
+  --text:#0f2044;
+  --text-mid:#4a5568;
+  --text-muted:#8898aa;
+  --border:#e2e8f0;
+  --red:#e53e3e;
+  --green:#38a169;
+}
+body{font-family:'Inter',sans-serif;background:#dde2e8;color:var(--text);font-size:13px;line-height:1.6;}
+
+/* ── PAGE WRAPPER ── */
+.doc{width:700px;margin:30px auto;background:var(--white);box-shadow:0 4px 40px rgba(0,0,0,.18);}
+
+/* ═══════════════════════════════
+   COVER PAGE
+═══════════════════════════════ */
+.cover{
+  position:relative;
+  height:780px;
+  background:
+    linear-gradient(to bottom,rgba(10,22,50,.35) 0%,rgba(10,22,50,.55) 50%,rgba(10,22,50,.92) 100%),
+    url('https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=700&q=85') center/cover no-repeat;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.cover-top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 28px;
+}
+.vl-logo{display:flex;align-items:center;gap:10px;}
+.vl-logo-icon{
+  width:38px;height:38px;border-radius:50%;
+  border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:var(--gold);
+}
+.vl-logo-text .name{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--white);letter-spacing:.5px;}
+.vl-logo-text .tagline{font-size:8px;font-weight:600;letter-spacing:3px;color:rgba(255,255,255,.55);text-transform:uppercase;}
+.cover-badge{
+  border:1px solid rgba(255,255,255,.35);
+  color:rgba(255,255,255,.85);
+  font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  padding:6px 14px;border-radius:20px;
+}
+.cover-center{text-align:center;padding:0 40px;}
+.cover-presents{
+  font-size:10px;font-weight:600;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold-lt);margin-bottom:12px;
+}
+.cover-title{font-family:'Playfair Display',serif;font-size:58px;font-weight:700;color:var(--white);line-height:1;margin-bottom:4px;}
+.cover-subtitle{font-size:14px;font-weight:400;letter-spacing:8px;text-transform:uppercase;color:rgba(255,255,255,.8);margin-bottom:10px;}
+.cover-tagline{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(255,255,255,.65);}
+.cover-icons{
+  display:flex;justify-content:center;gap:8px;margin-top:22px;
+}
+.cover-icon-pill{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:10px;
+  padding:10px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  min-width:80px;
+}
+.cover-icon-pill .icon{font-size:18px;color:var(--gold-lt);}
+.cover-icon-pill .label{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.7);}
+.cover-bottom{padding:28px 28px 0;}
+.cover-bottom-bar{
+  border-top:1px solid rgba(255,255,255,.2);
+  padding-top:20px;padding-bottom:28px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+}
+.cover-client-label{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-lt);margin-bottom:5px;}
+.cover-client-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--white);}
+.cover-trip-info{text-align:right;}
+.cover-trip-nights{font-size:10px;font-weight:600;letter-spacing:1.5px;color:rgba(255,255,255,.55);text-transform:uppercase;margin-bottom:3px;}
+.cover-trip-dates{font-family:'Playfair Display',serif;font-size:15px;color:var(--white);}
+
+/* ═══════════════════════════════
+   PAGE HEADER
+═══════════════════════════════ */
+.page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;
+  background:linear-gradient(135deg, #0f2044 0%, #1a3a7a 50%, #2a52a0 100%);
+  border-bottom:none;
+  margin-top:0;
+}
+.page-header-right{
+  display:flex;align-items:center;gap:12px;
+}
+.page-header-label{
+  font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.7);
+}
+.page-num-badge{
+  background:rgba(15,32,68,.6);
+  border:1px solid rgba(255,255,255,.2);
+  color:var(--white);
+  font-size:9px;font-weight:700;letter-spacing:1.5px;
+  padding:5px 12px;border-radius:20px;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.page-header .pkg-pill{
+  background:var(--gold);color:var(--white);
+  font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 14px;border-radius:20px;
+}
+.page-num-old{display:none;}
+
+/* Section label+heading pattern */
+.sec-eyebrow{
+  display:flex;align-items:center;gap:10px;
+  font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);
+  margin-bottom:6px;
+}
+.sec-eyebrow::before{content:'';display:block;width:28px;height:2px;background:var(--gold);}
+.sec-heading{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text);margin-bottom:20px;}
+
+/* ═══════════════════════════════
+   PAGE 2 – OVERVIEW
+═══════════════════════════════ */
+.page-section{padding:32px 28px;background:var(--white);}
+.page-section+.page-section{border-top:1px solid var(--border);}
+
+/* Personalized banner */
+.personal-banner{
+  background:var(--navy);
+  border-radius:14px;
+  padding:20px 24px 22px;
+  position:relative;overflow:hidden;
+  margin-bottom:28px;
+}
+.personal-banner::after{
+  content:'✈';position:absolute;right:24px;bottom:-10px;
+  font-size:90px;color:rgba(255,255,255,.04);
+}
+.personal-banner .eyebrow{font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.personal-banner h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--white);line-height:1.35;}
+.personal-banner h2 span{color:var(--gold-lt);}
+
+/* Salutation card */
+.salutation-card{
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;margin-bottom:24px;
+}
+.salutation-card .dear{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.salutation-card p{font-size:12.5px;color:var(--text-mid);line-height:1.7;}
+
+/* Overview cards grid */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.ov-card{
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;
+}
+.ov-card .icon{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--bg2);display:flex;align-items:center;justify-content:center;
+  font-size:13px;margin-bottom:10px;color:var(--teal);
+}
+.ov-card .lbl{font-size:8.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px;}
+.ov-card .val{font-size:13px;font-weight:600;color:var(--text);}
+
+/* Prepared-for dark bar */
+.prep-bar{
+  background:var(--navy);border-radius:12px;padding:16px 20px;
+}
+.prep-bar .prep-lbl{font-size:8.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.prep-bar .prep-row{display:flex;align-items:center;gap:28px;}
+.prep-bar .prep-item{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--white);}
+.prep-bar .prep-item .pi{font-size:14px;color:var(--teal-lt);}
+
+/* ═══════════════════════════════
+   PAGE 3 – ACCOMMODATION
+═══════════════════════════════ */
+.pkg-pill{
+  background:var(--gold);color:var(--white);
+  font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 14px;border-radius:20px;
+}
+.hotel-card{
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  margin-bottom:14px;background:var(--white);
+}
+.hotel-card-inner{display:flex;gap:0;}
+.hotel-img{flex-shrink:0;width:195px;position:relative;}
+.hotel-img img{width:100%;height:100%;object-fit:cover;display:block;min-height:170px;}
+.hotel-img-badge{
+  position:absolute;top:10px;left:10px;
+  background:rgba(15,32,68,.75);backdrop-filter:blur(4px);
+  color:var(--white);font-size:9px;font-weight:600;
+  padding:3px 8px;border-radius:20px;letter-spacing:.5px;
+  display:flex;align-items:center;gap:4px;
+}
+.hotel-body{flex:1;padding:16px 18px;}
+.hotel-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;}
+.hotel-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--text);}
+.nights-badge{
+  background:var(--bg2);color:var(--teal);
+  font-size:9px;font-weight:600;letter-spacing:1px;
+  padding:3px 10px;border-radius:20px;white-space:nowrap;
+  display:flex;align-items:center;gap:4px;
+}
+.hotel-room{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-mid);margin-bottom:12px;}
+.hotel-dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.date-chip{background:var(--bg);border-radius:8px;padding:8px 10px;}
+.date-chip .dlbl{font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;}
+.date-chip .dval{font-size:12px;font-weight:600;color:var(--text);}
+.date-chip .dval .dc-icon{font-size:10px;color:var(--gold);margin-right:4px;}
+.amenities{display:flex;gap:12px;flex-wrap:wrap;}
+.amenity{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-mid);}
+.amenity .a-icon{font-size:12px;color:var(--teal);}
+.hotel-note{
+  background:var(--bg);border-radius:8px;padding:10px 14px;
+  font-size:10.5px;color:var(--text-muted);text-align:center;
+  margin-top:8px;
+}
+
+/* ═══════════════════════════════
+   PAGE 4 – FLIGHTS & TRANSFERS
+═══════════════════════════════ */
+.flight-card{
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  margin-bottom:14px;
+}
+.flight-card-inner{display:flex;}
+.flight-left{
+  background:var(--navy);width:110px;flex-shrink:0;
+  padding:16px 14px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.flight-boarding{font-size:7.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:4px;margin-bottom:auto;}
+.flight-num{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);margin-top:auto;margin-bottom:2px;}
+.flight-class{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--white);}
+.flight-right{flex:1;padding:14px 16px;}
+.flight-airline-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.flight-airline{font-size:12px;font-weight:600;color:var(--text);}
+.flight-num-badge{background:var(--bg);border:1px solid var(--border);font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;color:var(--text-mid);}
+.flight-route{display:flex;align-items:center;gap:0;margin-bottom:8px;}
+.flight-code{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+.flight-city{font-size:9px;color:var(--text-muted);}
+.flight-middle{flex:1;display:flex;flex-direction:column;align-items:center;padding:0 14px;padding-top:4px;}
+.flight-duration{font-size:9px;font-weight:600;color:var(--text-muted);margin-bottom:4px;}
+.flight-arrow-line{display:flex;align-items:center;gap:0;width:100%;}
+.fal{flex:1;height:1px;background:var(--border);}
+.fa-arrow{color:var(--gold);font-size:12px;}
+.flight-nonstop{font-size:8px;letter-spacing:1.5px;font-weight:600;text-transform:uppercase;color:var(--text-muted);margin-top:3px;}
+.flight-footer{display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;gap:0;border-top:1px dashed var(--border);margin-top:8px;padding-top:8px;}
+.ff-div{background:var(--border);}
+.ff-item{display:flex;align-items:center;gap:5px;padding:0 6px;}
+.ff-item:first-child{padding-left:0;}
+.ff-icon{font-size:11px;color:var(--gold);}
+.ff-lbl{font-size:8px;color:var(--text-muted);}
+.ff-val{font-size:10.5px;font-weight:600;color:var(--text);}
+
+/* Transfer card */
+.transfer-card{
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  background:var(--white);
+}
+.transfer-inner{display:flex;}
+.transfer-img{width:200px;flex-shrink:0;}
+.transfer-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.transfer-body{flex:1;background:var(--navy);padding:18px 20px;}
+.transfer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.transfer-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:8px;}
+.transfer-type-badge{background:var(--gold);color:var(--white);font-size:8.5px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.5px;}
+.transfer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.transfer-item .tlbl{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:2px;display:flex;align-items:center;gap:4px;}
+.transfer-item .tval{font-size:12.5px;font-weight:600;color:var(--white);}
+.transfer-duration{
+  background:rgba(255,255,255,.08);border-radius:8px;
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--white);
+}
+.transfer-duration .td-icon{color:var(--gold);}
+
+/* ═══════════════════════════════
+   PAGE 5 – ITINERARY
+═══════════════════════════════ */
+.itin-day{
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  margin-bottom:14px;background:var(--white);
+}
+.itin-day-header{
+  background:var(--navy);padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.itin-day-num{display:flex;align-items:baseline;gap:6px;}
+.itin-day-num .day-label{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.itin-day-num .day-n{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--white);line-height:1;}
+.itin-day-date{font-size:10px;color:rgba(255,255,255,.55);}
+.itin-day-img{width:100%;height:160px;object-fit:cover;display:block;}
+.itin-day-body{padding:16px 20px;}
+.itin-attraction{
+  display:flex;align-items:center;gap:7px;
+  font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;
+}
+.itin-prog-lbl{font-size:8.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.itin-prog{font-size:12px;color:var(--text-mid);line-height:1.65;margin-bottom:12px;}
+.itin-chips{display:flex;gap:8px;}
+.itin-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 14px;border-radius:9px;flex:1;
+}
+.itin-chip.meal{background:#fdf5e4;border:1px solid #e8d5a0;}
+.itin-chip.stay{background:var(--navy);}
+.itin-chip-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.itin-chip.meal .itin-chip-icon{background:#f0e0b0;}
+.itin-chip.stay .itin-chip-icon{background:rgba(255,255,255,.1);}
+.itin-chip-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;}
+.itin-chip.meal .itin-chip-lbl{color:var(--gold);}
+.itin-chip.stay .itin-chip-lbl{color:rgba(255,255,255,.55);}
+.itin-chip-val{font-size:13px;font-weight:700;}
+.itin-chip.meal .itin-chip-val{color:var(--text);}
+.itin-chip.stay .itin-chip-val{color:var(--white);}
+
+/* ═══════════════════════════════
+   PAGE 6 – PRICING
+═══════════════════════════════ */
+.inc-exc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;}
+.inc-card,.exc-card{border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.ie-eyebrow{font-size:8.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ie-eyebrow::before{content:'';display:block;width:20px;height:2px;background:var(--gold);}
+.ie-heading{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:14px;}
+.ie-list{list-style:none;}
+.ie-list li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-mid);padding:5px 0;border-bottom:1px solid var(--bg2);}
+.ie-list li:last-child{border-bottom:none;}
+.ie-icon-chk{color:var(--teal);font-size:13px;}
+.ie-icon-x{color:var(--red);font-size:13px;}
+
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.pricing-card{border:1px solid var(--border);border-radius:14px;padding:18px 16px;}
+.pricing-card.featured{background:var(--navy);border-color:var(--navy);position:relative;}
+.pricing-card.featured .rec-badge{
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  background:var(--gold);color:var(--white);font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 12px;border-radius:20px;white-space:nowrap;display:flex;align-items:center;gap:4px;
+}
+.pricing-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:14px;}
+.pricing-card:not(.featured) .pricing-name{color:var(--text);}
+.pricing-card.featured .pricing-name{color:var(--gold-lt);}
+.pricing-row{display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05);}
+.pricing-card.featured .pricing-row{border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.75);}
+.pricing-card:not(.featured) .pricing-row{color:var(--text-mid);}
+.pricing-total-lbl{font-size:8.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-top:12px;margin-bottom:4px;}
+.pricing-card:not(.featured) .pricing-total-lbl{color:var(--text-muted);}
+.pricing-card.featured .pricing-total-lbl{color:rgba(255,255,255,.5);}
+.pricing-total-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.pricing-card:not(.featured) .pricing-total-val{color:var(--text);}
+.pricing-card.featured .pricing-total-val{color:var(--white);}
+.pricing-note{font-size:10px;color:var(--text-muted);margin-top:10px;}
+
+/* ═══════════════════════════════
+   PAGE 7 – PAYMENT
+═══════════════════════════════ */
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.bank-card{border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.bank-header{background:var(--navy);padding:10px 16px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+.bank-body{display:grid;grid-template-columns:1fr 1fr;padding:14px 16px;gap:14px;}
+.bank-item .bi-lbl{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px;display:flex;align-items:center;gap:4px;}
+.bank-item .bi-val{font-size:12.5px;font-weight:600;color:var(--text);}
+.qr-card{border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.qr-title{font-size:8.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+.qr-box{width:110px;height:110px;background:#111;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.qr-upi{font-size:11px;font-weight:600;color:var(--text-mid);}
+.qr-accepts{font-size:9px;color:var(--text-muted);}
+.pay-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.pay-info-card{border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.pay-info-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;}
+.pay-info-icon{color:var(--gold);font-size:15px;}
+.pay-info-list{list-style:none;}
+.pay-info-list li{font-size:11.5px;color:var(--text-mid);padding:3px 0;display:flex;gap:6px;}
+.pay-info-list li::before{content:'•';color:var(--gold);}
+
+/* ═══════════════════════════════
+   PAGE 8 – REVIEWS
+═══════════════════════════════ */
+.review-card{border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:12px;position:relative;}
+.review-stars{color:var(--gold);font-size:14px;letter-spacing:1px;margin-bottom:8px;}
+.review-quote{font-size:9px;position:absolute;top:14px;right:18px;color:var(--bg2);font-family:'Playfair Display',serif;font-size:44px;line-height:1;color:var(--border);}
+.review-text{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:10px;}
+.review-footer{display:flex;align-items:center;gap:10px;}
+.review-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;}
+.review-name{font-size:12.5px;font-weight:700;color:var(--text);}
+.review-meta{font-size:10px;color:var(--text-muted);}
+.review-meta .dot{margin:0 4px;}
+.rating-bar{background:var(--navy);border-radius:10px;padding:14px 24px;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;}
+.rating-bar .star{color:var(--gold);font-size:16px;}
+.rating-bar .num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--white);}
+.rating-bar .txt{font-size:12px;color:rgba(255,255,255,.65);}
+
+/* ═══════════════════════════════
+   PAGE 9 – T&C
+═══════════════════════════════ */
+.tnc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.tnc-card{border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.tnc-num{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--teal);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.tnc-num::after{content:'';flex:1;height:1px;background:var(--border);}
+.tnc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.tnc-body{font-size:11px;color:var(--text-mid);line-height:1.65;}
+.tnc-footer{background:var(--bg);border-radius:10px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:10.5px;color:var(--text-mid);line-height:1.6;}
+.tnc-footer-icon{color:var(--text-muted);font-size:14px;flex-shrink:0;margin-top:1px;}
+
+/* ═══════════════════════════════
+   THANK YOU PAGE
+═══════════════════════════════ */
+.ty-page{
+  position:relative;min-height:680px;
+  background:
+    linear-gradient(to bottom,rgba(10,22,50,.7) 0%,rgba(10,22,50,.78) 60%,rgba(10,22,50,.95) 100%),
+    url('https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=700&q=80') center/cover no-repeat;
+  display:flex;flex-direction:column;
+}
+.ty-top{padding:22px 28px;display:flex;align-items:center;justify-content:space-between;}
+.ty-main{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:0 60px 30px;
+}
+.ty-until{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:14px;}
+.ty-line{width:50px;height:1.5px;background:var(--gold);}
+.ty-until-text{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+.ty-heading{font-family:'Playfair Display',serif;font-size:50px;font-weight:700;color:var(--white);margin-bottom:14px;line-height:1;}
+.ty-sub{font-size:13px;color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:36px;max-width:380px;}
+.ty-stats{display:flex;gap:40px;justify-content:center;margin-bottom:auto;}
+.ty-stat{text-align:center;}
+.ty-stat-icon{font-size:20px;color:var(--gold-lt);margin-bottom:8px;}
+.ty-stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--white);line-height:1;margin-bottom:4px;}
+.ty-stat-lbl{font-size:8.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);}
+.ty-bottom{margin:0 28px 0;padding-bottom:0;}
+.ty-contact-card{
+  background:rgba(15,32,68,.8);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.1);border-radius:14px;
+  padding:18px 22px;
+}
+.ty-contact-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px;}
+.ty-contact-item .tc-lbl{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.ty-contact-item .tc-val{font-size:11.5px;font-weight:600;color:var(--white);}
+.ty-contact-right{display:flex;flex-direction:column;gap:10px;}
+.ty-socials{display:flex;gap:8px;}
+.ty-social{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--white);}
+.ty-divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:14px 0;}
+.ty-footer-row{display:flex;align-items:center;justify-content:space-between;}
+.ty-prepared{color:rgba(255,255,255,.55);}
+.ty-prepared .lbl{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+.ty-prepared .name{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--gold-lt);}
+.ty-prepared .role{font-size:10px;color:rgba(255,255,255,.45);}
+.ty-brand-footer{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(255,255,255,.5);}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<!-- ═══════ COVER ═══════ -->
+<div class="cover">
+  <div class="cover-top-bar">
+    <div class="vl-logo">
+      <div class="vl-logo-icon">◎</div>
+      <div class="vl-logo-text">
+        <div class="name">Voyage Lumière</div>
+        <div class="tagline">Curated Luxury Journeys</div>
+      </div>
+    </div>
+    <div class="cover-badge">Travel Proposal</div>
+  </div>
+  <div class="cover-center">
+    <div class="cover-presents">Presents</div>
+    <div class="cover-title">Singapore</div>
+    <div class="cover-subtitle">Tour Package</div>
+    <div class="cover-tagline">Discover Extraordinary Experiences</div>
+    <div class="cover-icons">
+      <div class="cover-icon-pill"><div class="icon">🏨</div><div class="label">Hotels</div></div>
+      <div class="cover-icon-pill"><div class="icon">✈️</div><div class="label">Flights</div></div>
+      <div class="cover-icon-pill"><div class="icon">📸</div><div class="label">Activities</div></div>
+      <div class="cover-icon-pill"><div class="icon">🚐</div><div class="label">Transfers</div></div>
+      <div class="cover-icon-pill"><div class="icon">📍</div><div class="label">Sightseeing</div></div>
+      <div class="cover-icon-pill"><div class="icon">🍽️</div><div class="label">Meals</div></div>
+    </div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-bottom-bar">
+      <div>
+        <div class="cover-client-label">Prepared Exclusively For</div>
+        <div class="cover-client-name">Arpana Malhotra</div>
+      </div>
+      <div class="cover-trip-info">
+        <div class="cover-trip-nights">5 Nights / 6 Days</div>
+        <div class="cover-trip-dates">10 July 2026 — 15 July 2026</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 2 – OVERVIEW ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><span class="page-header-label">Economy Package</span><span class="page-num-badge">PAGE 02 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="personal-banner">
+    <div class="eyebrow">Personalized For You</div>
+    <h2>A Personalized Travel Experience<br/>Exclusively Designed for <span>Arpana Malhotra</span></h2>
+  </div>
+
+  <div class="salutation-card">
+    <div class="dear">Dear Sidharth Malhotra,</div>
+    <p>Thank you for choosing us for your upcoming journey. We are delighted to present this carefully crafted travel proposal designed to provide memorable experiences, seamless arrangements, and exceptional hospitality throughout your trip. Every detail has been thoughtfully curated to ensure your Singapore escape is nothing short of extraordinary.</p>
+  </div>
+
+  <div class="sec-eyebrow">Your Journey at a Glance</div>
+  <div class="sec-heading">Tour Overview</div>
+
+  <div class="ov-grid">
+    <div class="ov-card"><div class="icon">#</div><div class="lbl">Quotation ID</div><div class="val">QTN/2026/102</div></div>
+    <div class="ov-card"><div class="icon">🏷️</div><div class="lbl">Tour ID</div><div class="val">Singapore002</div></div>
+    <div class="ov-card"><div class="icon">📅</div><div class="lbl">Quotation Date</div><div class="val">05 June 2026</div></div>
+  </div>
+  <div class="ov-grid" style="margin-bottom:20px;">
+    <div class="ov-card"><div class="icon">✈️</div><div class="lbl">Travel Date</div><div class="val">10 July 2026 – 15 July 2026</div></div>
+    <div class="ov-card"><div class="icon">⏱️</div><div class="lbl">Duration</div><div class="val">5 Nights / 6 Days</div></div>
+    <div class="ov-card"><div class="icon">👥</div><div class="lbl">Guests</div><div class="val">4 Adults</div></div>
+  </div>
+
+  <div class="prep-bar">
+    <div class="prep-lbl">Prepared For</div>
+    <div class="prep-row">
+      <div class="prep-item"><span class="pi">👤</span> Sidharth Malhotra</div>
+      <div class="prep-item"><span class="pi">✉️</span> freezemytrip@gmail.com</div>
+      <div class="prep-item"><span class="pi">📞</span> +91 78387 79980</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 3 – ACCOMMODATION ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><div class="pkg-pill">Royal Package</div><span class="page-num-badge">PAGE 03 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="sec-eyebrow">Where You'll Stay</div>
+  <div class="sec-heading">Accommodation Details</div>
+
+  <!-- Hotel 1 -->
+  <div class="hotel-card">
+    <div class="hotel-card-inner">
+      <div class="hotel-img">
+        <img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=220&q=80" alt="Marina Bay"/>
+        <div class="hotel-img-badge">📍 Marina Bay</div>
+      </div>
+      <div class="hotel-body">
+        <div class="hotel-head">
+          <div class="hotel-name">Marina Bay Grand Hotel</div>
+          <div class="nights-badge">⏱ 2 Nights</div>
+        </div>
+        <div class="hotel-room">🛏️ Deluxe City View Room</div>
+        <div class="hotel-dates">
+          <div class="date-chip"><div class="dlbl">Check-In</div><div class="dval"><span class="dc-icon">→</span>10 Jul 2026</div></div>
+          <div class="date-chip"><div class="dlbl">Check-Out</div><div class="dval"><span class="dc-icon">↩</span>12 Jul 2026</div></div>
+        </div>
+        <div class="amenities">
+          <div class="amenity"><span class="a-icon">📶</span> Free Wi-Fi</div>
+          <div class="amenity"><span class="a-icon">🏊</span> Pool</div>
+          <div class="amenity"><span class="a-icon">🍳</span> Breakfast</div>
+          <div class="amenity"><span class="a-icon">💪</span> Fitness</div>
+          <div class="amenity"><span class="a-icon">🛎️</span> Concierge</div>
+          <div class="amenity"><span class="a-icon">❄️</span> AC</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hotel 2 -->
+  <div class="hotel-card">
+    <div class="hotel-card-inner">
+      <div class="hotel-img">
+        <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=220&q=80" alt="Orchard Road"/>
+        <div class="hotel-img-badge">📍 Orchard Road</div>
+      </div>
+      <div class="hotel-body">
+        <div class="hotel-head">
+          <div class="hotel-name">The Orchard Boutique Suites</div>
+          <div class="nights-badge">⏱ 2 Nights</div>
+        </div>
+        <div class="hotel-room">🛏️ Premier King Suite</div>
+        <div class="hotel-dates">
+          <div class="date-chip"><div class="dlbl">Check-In</div><div class="dval"><span class="dc-icon">→</span>12 Jul 2026</div></div>
+          <div class="date-chip"><div class="dlbl">Check-Out</div><div class="dval"><span class="dc-icon">↩</span>14 Jul 2026</div></div>
+        </div>
+        <div class="amenities">
+          <div class="amenity"><span class="a-icon">📶</span> Free Wi-Fi</div>
+          <div class="amenity"><span class="a-icon">🏊</span> Pool</div>
+          <div class="amenity"><span class="a-icon">🍳</span> Breakfast</div>
+          <div class="amenity"><span class="a-icon">💪</span> Fitness</div>
+          <div class="amenity"><span class="a-icon">🛎️</span> Concierge</div>
+          <div class="amenity"><span class="a-icon">❄️</span> AC</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hotel 3 -->
+  <div class="hotel-card">
+    <div class="hotel-card-inner">
+      <div class="hotel-img">
+        <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=220&q=80" alt="Sentosa Island"/>
+        <div class="hotel-img-badge">📍 Sentosa Island</div>
+      </div>
+      <div class="hotel-body">
+        <div class="hotel-head">
+          <div class="hotel-name">Sentosa Cove Resort &amp; Spa</div>
+          <div class="nights-badge">⏱ 1 Night</div>
+        </div>
+        <div class="hotel-room">🛏️ Resort Garden Pool View</div>
+        <div class="hotel-dates">
+          <div class="date-chip"><div class="dlbl">Check-In</div><div class="dval"><span class="dc-icon">→</span>14 Jul 2026</div></div>
+          <div class="date-chip"><div class="dlbl">Check-Out</div><div class="dval"><span class="dc-icon">↩</span>15 Jul 2026</div></div>
+        </div>
+        <div class="amenities">
+          <div class="amenity"><span class="a-icon">📶</span> Free Wi-Fi</div>
+          <div class="amenity"><span class="a-icon">🏊</span> Pool</div>
+          <div class="amenity"><span class="a-icon">🍳</span> Breakfast</div>
+          <div class="amenity"><span class="a-icon">💪</span> Fitness</div>
+          <div class="amenity"><span class="a-icon">🛎️</span> Concierge</div>
+          <div class="amenity"><span class="a-icon">❄️</span> AC</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hotel-note">All hotels are subject to availability at the time of confirmation. Similar category alternatives may be offered.</div>
+</div>
+
+<!-- ═══════ PAGE 4 – FLIGHTS & TRANSFERS ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><span class="page-header-label">Flights &amp; Transfers</span><span class="page-num-badge">PAGE 04 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="sec-eyebrow">Your Journey by Air</div>
+  <div class="sec-heading">Flight Details</div>
+
+  <!-- Flight 1 -->
+  <div class="flight-card">
+    <div class="flight-card-inner">
+      <div class="flight-left">
+        <div class="flight-boarding">✈ Boarding</div>
+        <div>
+          <div class="flight-num">SQ 421</div>
+          <div class="flight-class">Economy</div>
+        </div>
+      </div>
+      <div class="flight-right">
+        <div class="flight-airline-row">
+          <div class="flight-airline">Singapore Airlines</div>
+          <div class="flight-num-badge">SQ 421</div>
+        </div>
+        <div class="flight-route">
+          <div><div class="flight-code">DEL</div><div class="flight-city">New Delhi</div></div>
+          <div class="flight-middle">
+            <div class="flight-duration">5h 55m</div>
+            <div class="flight-arrow-line"><div class="fal"></div><div class="fa-arrow">→</div><div class="fal"></div></div>
+            <div class="flight-nonstop">Non-Stop</div>
+          </div>
+          <div style="text-align:right;"><div class="flight-code">SIN</div><div class="flight-city">Singapore</div></div>
+        </div>
+        <div class="flight-footer">
+          <div class="ff-item"><span class="ff-icon">⏰</span><div><div class="ff-lbl">Dep:</div><div class="ff-val">10 Jul 2026 · 22:45</div></div></div>
+          <div class="ff-div"></div>
+          <div class="ff-item"><span class="ff-icon">⏰</span><div><div class="ff-lbl">Arr:</div><div class="ff-val">11 Jul 2026 · 07:10</div></div></div>
+          <div class="ff-div"></div>
+          <div class="ff-item"><span class="ff-icon">🧳</span><div><div class="ff-lbl">Baggage</div><div class="ff-val">30kg Check-in · 7kg Cabin</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flight 2 -->
+  <div class="flight-card">
+    <div class="flight-card-inner">
+      <div class="flight-left">
+        <div class="flight-boarding">✈ Boarding</div>
+        <div>
+          <div class="flight-num">SQ 408</div>
+          <div class="flight-class">Economy</div>
+        </div>
+      </div>
+      <div class="flight-right">
+        <div class="flight-airline-row">
+          <div class="flight-airline">Singapore Airlines</div>
+          <div class="flight-num-badge">SQ 408</div>
+        </div>
+        <div class="flight-route">
+          <div><div class="flight-code">SIN</div><div class="flight-city">Singapore</div></div>
+          <div class="flight-middle">
+            <div class="flight-duration">5h 45m</div>
+            <div class="flight-arrow-line"><div class="fal"></div><div class="fa-arrow">→</div><div class="fal"></div></div>
+            <div class="flight-nonstop">Non-Stop</div>
+          </div>
+          <div style="text-align:right;"><div class="flight-code">DEL</div><div class="flight-city">New Delhi</div></div>
+        </div>
+        <div class="flight-footer">
+          <div class="ff-item"><span class="ff-icon">⏰</span><div><div class="ff-lbl">Dep:</div><div class="ff-val">15 Jul 2026 · 20:15</div></div></div>
+          <div class="ff-div"></div>
+          <div class="ff-item"><span class="ff-icon">⏰</span><div><div class="ff-lbl">Arr:</div><div class="ff-val">15 Jul 2026 · 23:30</div></div></div>
+          <div class="ff-div"></div>
+          <div class="ff-item"><span class="ff-icon">🧳</span><div><div class="ff-lbl">Baggage</div><div class="ff-val">30kg Check-in · 7kg Cabin</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-top:24px;">Ground Transportation</div>
+  <div class="sec-heading">Private Transfers</div>
+
+  <div class="transfer-card">
+    <div class="transfer-inner">
+      <div class="transfer-img">
+        <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=220&q=80" alt="Mercedes V-Class"/>
+      </div>
+      <div class="transfer-body">
+        <div class="transfer-head">
+          <div class="transfer-name">🚐 Mercedes-Benz V-Class</div>
+          <div class="transfer-type-badge">Private Luxury Van (6 Seater)</div>
+        </div>
+        <div class="transfer-grid">
+          <div class="transfer-item"><div class="tlbl">📍 Pickup</div><div class="tval">Changi International Airport</div></div>
+          <div class="transfer-item"><div class="tlbl">📍 Drop</div><div class="tval">Changi International Airport</div></div>
+          <div class="transfer-item"><div class="tlbl">📅 Start Date</div><div class="tval">11 Jul 2026</div></div>
+          <div class="transfer-item"><div class="tlbl">📅 End Date</div><div class="tval">15 Jul 2026</div></div>
+        </div>
+        <div class="transfer-duration"><span class="td-icon">⏱</span> Service Duration: <strong>5 Days · Full Day Disposal</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 5 – ITINERARY ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><span class="page-header-label">Day-Wise Itinerary</span><span class="page-num-badge">PAGE 05 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="sec-eyebrow">Your Day-by-Day Journey</div>
+  <div class="sec-heading">Itinerary</div>
+
+  <div class="itin-day">
+    <div class="itin-day-header">
+      <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n">01</span></div>
+      <div class="itin-day-date">10 July 2026</div>
+    </div>
+    <img class="itin-day-img" src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=700&q=80" alt="Marina Bay Sands"/>
+    <div class="itin-day-body">
+      <div class="itin-attraction">🌐 Special Attraction · Marina Bay Sands</div>
+      <div class="itin-prog-lbl">Detailed Programme</div>
+      <div class="itin-prog">Morning arrival and hotel transfer followed by city exploration. Evening visit to Marina Bay Sands observation deck for breathtaking city views.</div>
+      <div class="itin-chips">
+        <div class="itin-chip meal"><div class="itin-chip-icon">🍽️</div><div><div class="itin-chip-lbl">Meal Plan</div><div class="itin-chip-val">Breakfast</div></div></div>
+        <div class="itin-chip stay"><div class="itin-chip-icon">🌙</div><div><div class="itin-chip-lbl">Overnight Stay</div><div class="itin-chip-val">Singapore</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="itin-day">
+    <div class="itin-day-header">
+      <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n">02</span></div>
+      <div class="itin-day-date">11 July 2026</div>
+    </div>
+    <img class="itin-day-img" src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=700&q=80" alt="Gardens by the Bay"/>
+    <div class="itin-day-body">
+      <div class="itin-attraction">🌐 Special Attraction · Gardens by the Bay</div>
+      <div class="itin-prog-lbl">Detailed Programme</div>
+      <div class="itin-prog">Half day city tour and visit to Gardens by the Bay. Marvel at the Supertree Grove and Cloud Forest conservatory.</div>
+      <div class="itin-chips">
+        <div class="itin-chip meal"><div class="itin-chip-icon">🍽️</div><div><div class="itin-chip-lbl">Meal Plan</div><div class="itin-chip-val">Breakfast</div></div></div>
+        <div class="itin-chip stay"><div class="itin-chip-icon">🌙</div><div><div class="itin-chip-lbl">Overnight Stay</div><div class="itin-chip-val">Singapore</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="itin-day">
+    <div class="itin-day-header">
+      <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n">03</span></div>
+      <div class="itin-day-date">12 July 2026</div>
+    </div>
+    <img class="itin-day-img" src="https://images.unsplash.com/photo-1541336032412-2048a678540d?w=700&q=80" alt="Sentosa Island"/>
+    <div class="itin-day-body">
+      <div class="itin-attraction">🌐 Special Attraction · Sentosa Island</div>
+      <div class="itin-prog-lbl">Detailed Programme</div>
+      <div class="itin-prog">Sentosa Island tour with cable car, Wings of Time show and Universal Studios passes included for the full theme park experience.</div>
+      <div class="itin-chips">
+        <div class="itin-chip meal"><div class="itin-chip-icon">🍽️</div><div><div class="itin-chip-lbl">Meal Plan</div><div class="itin-chip-val">Breakfast</div></div></div>
+        <div class="itin-chip stay"><div class="itin-chip-icon">🌙</div><div><div class="itin-chip-lbl">Overnight Stay</div><div class="itin-chip-val">Singapore</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="itin-day">
+    <div class="itin-day-header">
+      <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n">04</span></div>
+      <div class="itin-day-date">13 July 2026</div>
+    </div>
+    <img class="itin-day-img" src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=700&q=80" alt="Universal Studios"/>
+    <div class="itin-day-body">
+      <div class="itin-attraction">🌐 Special Attraction · Universal Studios</div>
+      <div class="itin-prog-lbl">Detailed Programme</div>
+      <div class="itin-prog">Full day at Universal Studios Singapore. Enjoy world-class rides and attractions across themed zones from Hollywood to Far Far Away.</div>
+      <div class="itin-chips">
+        <div class="itin-chip meal"><div class="itin-chip-icon">🍽️</div><div><div class="itin-chip-lbl">Meal Plan</div><div class="itin-chip-val">Breakfast</div></div></div>
+        <div class="itin-chip stay"><div class="itin-chip-icon">🌙</div><div><div class="itin-chip-lbl">Overnight Stay</div><div class="itin-chip-val">Singapore</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="itin-day">
+    <div class="itin-day-header">
+      <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n">05</span></div>
+      <div class="itin-day-date">14 July 2026</div>
+    </div>
+    <img class="itin-day-img" src="https://images.unsplash.com/photo-1506291761-09d66cde8c1c?w=700&q=80" alt="Orchard Road"/>
+    <div class="itin-day-body">
+      <div class="itin-attraction">🌐 Special Attraction · Orchard Road Shopping</div>
+      <div class="itin-prog-lbl">Detailed Programme</div>
+      <div class="itin-prog">Shopping and leisure day on Singapore's premier shopping boulevard. Browse luxury boutiques, lifestyle stores, and local culinary gems.</div>
+      <div class="itin-chips">
+        <div class="itin-chip meal"><div class="itin-chip-icon">🍽️</div><div><div class="itin-chip-lbl">Meal Plan</div><div class="itin-chip-val">Breakfast</div></div></div>
+        <div class="itin-chip stay"><div class="itin-chip-icon">🌙</div><div><div class="itin-chip-lbl">Overnight Stay</div><div class="itin-chip-val">Singapore</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="itin-day">
+    <div class="itin-day-header">
+      <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n">06</span></div>
+      <div class="itin-day-date">15 July 2026</div>
+    </div>
+    <img class="itin-day-img" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=700&q=80" alt="Departure"/>
+    <div class="itin-day-body">
+      <div class="itin-attraction">🌐 Special Attraction · Departure</div>
+      <div class="itin-prog-lbl">Detailed Programme</div>
+      <div class="itin-prog">Hotel check-out and private transfer to Changi International Airport for your return flight. Farewell Singapore!</div>
+      <div class="itin-chips">
+        <div class="itin-chip meal"><div class="itin-chip-icon">🍽️</div><div><div class="itin-chip-lbl">Meal Plan</div><div class="itin-chip-val">Breakfast</div></div></div>
+        <div class="itin-chip stay"><div class="itin-chip-icon">✈️</div><div><div class="itin-chip-lbl">Transfer</div><div class="itin-chip-val">Return Flight</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 6 – PRICING ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><span class="page-header-label">Pricing &amp; Coverage</span><span class="page-num-badge">PAGE 06 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="inc-exc-grid">
+    <div class="inc-card">
+      <div class="ie-eyebrow">Included</div>
+      <div class="ie-heading">What's Included</div>
+      <ul class="ie-list">
+        <li><span class="ie-icon-chk">✓</span> Return Economy Flight Tickets</li>
+        <li><span class="ie-icon-chk">✓</span> 5 Nights Hotel Accommodation</li>
+        <li><span class="ie-icon-chk">✓</span> Daily Breakfast at Hotels</li>
+        <li><span class="ie-icon-chk">✓</span> Private Airport Transfers</li>
+        <li><span class="ie-icon-chk">✓</span> All Sightseeing as per Itinerary</li>
+        <li><span class="ie-icon-chk">✓</span> Universal Studios &amp; Sentosa Passes</li>
+        <li><span class="ie-icon-chk">✓</span> Singapore Visa Assistance</li>
+        <li><span class="ie-icon-chk">✓</span> Dedicated Tour Manager Support</li>
+      </ul>
+    </div>
+    <div class="exc-card">
+      <div class="ie-eyebrow" style="color:#e53e3e;">Excluded</div>
+      <div class="ie-heading">What's Excluded</div>
+      <ul class="ie-list">
+        <li><span class="ie-icon-x">✗</span> Personal Expenses &amp; Tips</li>
+        <li><span class="ie-icon-x">✗</span> Travel &amp; Medical Insurance</li>
+        <li><span class="ie-icon-x">✗</span> Optional / Additional Activities</li>
+        <li><span class="ie-icon-x">✗</span> Early Check-in &amp; Late Check-out</li>
+        <li><span class="ie-icon-x">✗</span> Meals Not Mentioned in Itinerary</li>
+        <li><span class="ie-icon-x">✗</span> Anything Not Listed in Inclusions</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec-eyebrow">Transparent Pricing</div>
+  <div class="sec-heading" style="margin-bottom:4px;">Costing Details</div>
+  <div class="pricing-note" style="margin-bottom:18px;">All figures are per package for 4 guests. Taxes &amp; TCS shown separately.</div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-name">Economy Package</div>
+      <div class="pricing-row"><span>Tour Cost</span><span>₹1,45,000</span></div>
+      <div class="pricing-row"><span>Tax</span><span>₹7,250</span></div>
+      <div class="pricing-row"><span>TCS</span><span>₹7,250</span></div>
+      <div class="pricing-row"><span>Travel Cost</span><span>₹62,000</span></div>
+      <div class="pricing-total-lbl">Grand Total</div>
+      <div class="pricing-total-val">₹ 2,21,500</div>
+    </div>
+    <div class="pricing-card featured">
+      <div class="rec-badge">⭐ Recommended</div>
+      <div class="pricing-name">Premium Package</div>
+      <div class="pricing-row"><span>Tour Cost</span><span>₹1,95,000</span></div>
+      <div class="pricing-row"><span>Tax</span><span>₹9,750</span></div>
+      <div class="pricing-row"><span>TCS</span><span>₹9,750</span></div>
+      <div class="pricing-row"><span>Travel Cost</span><span>₹78,000</span></div>
+      <div class="pricing-total-lbl">Grand Total</div>
+      <div class="pricing-total-val">₹ 2,92,500</div>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-name">Royal Package</div>
+      <div class="pricing-row"><span>Tour Cost</span><span>₹2,75,000</span></div>
+      <div class="pricing-row"><span>Tax</span><span>₹13,750</span></div>
+      <div class="pricing-row"><span>TCS</span><span>₹13,750</span></div>
+      <div class="pricing-row"><span>Travel Cost</span><span>₹96,000</span></div>
+      <div class="pricing-total-lbl">Grand Total</div>
+      <div class="pricing-total-val">₹ 3,98,500</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 7 – PAYMENT ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><span class="page-header-label">Secure Payments</span><span class="page-num-badge">PAGE 07 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="sec-eyebrow">How to Pay</div>
+  <div class="sec-heading">Payment Information</div>
+
+  <div class="pay-grid">
+    <div class="bank-card">
+      <div class="bank-header">Bank Transfer Details</div>
+      <div class="bank-body">
+        <div class="bank-item"><div class="bi-lbl">🏛️ Account Name</div><div class="bi-val">Voyage Lumière Travel Pvt. Ltd.</div></div>
+        <div class="bank-item"><div class="bi-lbl"># Account Number</div><div class="bi-val">5021 0034 7789 2210</div></div>
+        <div class="bank-item"><div class="bi-lbl">🏦 Bank Name</div><div class="bi-val">HDFC Bank</div></div>
+        <div class="bank-item"><div class="bi-lbl">📍 Branch</div><div class="bi-val">Bandra Kurla Complex, Mumbai</div></div>
+        <div class="bank-item"><div class="bi-lbl">🔑 IFSC Code</div><div class="bi-val">HDFC0001234</div></div>
+        <div class="bank-item"><div class="bi-lbl">📱 UPI ID</div><div class="bi-val">voyagelumiere@hdfcbank</div></div>
+      </div>
+    </div>
+    <div class="qr-card">
+      <div class="qr-title">Scan to Pay</div>
+      <div class="qr-box">
+        <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="24" height="24" fill="white" rx="2"/><rect x="7" y="7" width="18" height="18" fill="#111" rx="1"/><rect x="10" y="10" width="12" height="12" fill="white" rx="1"/>
+          <rect x="62" y="4" width="24" height="24" fill="white" rx="2"/><rect x="65" y="7" width="18" height="18" fill="#111" rx="1"/><rect x="68" y="10" width="12" height="12" fill="white" rx="1"/>
+          <rect x="4" y="62" width="24" height="24" fill="white" rx="2"/><rect x="7" y="65" width="18" height="18" fill="#111" rx="1"/><rect x="10" y="68" width="12" height="12" fill="white" rx="1"/>
+          <rect x="34" y="4" width="5" height="5" fill="white"/><rect x="41" y="4" width="5" height="5" fill="white"/><rect x="48" y="4" width="5" height="5" fill="white"/>
+          <rect x="34" y="11" width="5" height="5" fill="white"/><rect x="48" y="11" width="5" height="5" fill="white"/>
+          <rect x="34" y="18" width="5" height="5" fill="white"/><rect x="41" y="18" width="5" height="5" fill="white"/>
+          <rect x="34" y="34" width="5" height="5" fill="white"/><rect x="41" y="34" width="5" height="5" fill="white"/><rect x="48" y="34" width="5" height="5" fill="white"/>
+          <rect x="34" y="41" width="5" height="5" fill="white"/><rect x="48" y="41" width="5" height="5" fill="white"/>
+          <rect x="34" y="48" width="5" height="5" fill="white"/><rect x="41" y="48" width="5" height="5" fill="white"/>
+          <rect x="62" y="34" width="5" height="5" fill="white"/><rect x="69" y="34" width="5" height="5" fill="white"/><rect x="76" y="34" width="5" height="5" fill="white"/>
+          <rect x="62" y="41" width="5" height="5" fill="white"/><rect x="76" y="48" width="5" height="5" fill="white"/>
+          <rect x="62" y="55" width="5" height="5" fill="white"/><rect x="69" y="55" width="5" height="5" fill="white"/>
+          <rect x="4" y="34" width="5" height="5" fill="white"/><rect x="11" y="34" width="5" height="5" fill="white"/><rect x="18" y="34" width="5" height="5" fill="white"/><rect x="25" y="34" width="5" height="5" fill="white"/>
+          <rect x="4" y="41" width="5" height="5" fill="white"/><rect x="18" y="41" width="5" height="5" fill="white"/>
+          <rect x="4" y="48" width="5" height="5" fill="white"/><rect x="11" y="48" width="5" height="5" fill="white"/><rect x="25" y="48" width="5" height="5" fill="white"/>
+          <rect x="34" y="62" width="5" height="5" fill="white"/><rect x="41" y="62" width="5" height="5" fill="white"/><rect x="48" y="62" width="5" height="5" fill="white"/>
+          <rect x="34" y="69" width="5" height="5" fill="white"/><rect x="48" y="69" width="5" height="5" fill="white"/>
+          <rect x="41" y="76" width="5" height="5" fill="white"/><rect x="48" y="76" width="5" height="5" fill="white"/>
+        </svg>
+      </div>
+      <div class="qr-upi">voyagelumiere@hdfcbank</div>
+      <div class="qr-accepts">UPI · Google Pay · PhonePe · Paytm</div>
+    </div>
+  </div>
+
+  <div class="pay-cards-grid">
+    <div class="pay-info-card">
+      <div class="pay-info-title"><span class="pay-info-icon">💡</span> Payment Instructions</div>
+      <ul class="pay-info-list">
+        <li>Mention your Quotation ID in the payment reference.</li>
+        <li>Share the payment screenshot with your consultant.</li>
+        <li>An official receipt will be issued within 24 hours.</li>
+        <li>Cheque payments to be drawn in the company name.</li>
+      </ul>
+    </div>
+    <div class="pay-info-card">
+      <div class="pay-info-title"><span class="pay-info-icon">✅</span> Booking Policy</div>
+      <ul class="pay-info-list">
+        <li>50% advance required to confirm the booking.</li>
+        <li>Balance payment due 21 days before departure.</li>
+        <li>Rates are subject to availability and currency changes.</li>
+        <li>All payments are protected and securely processed.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 8 – REVIEWS ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><span class="page-header-label">Reviews</span><span class="page-num-badge">PAGE 08 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="sec-eyebrow">Loved by Travellers</div>
+  <div class="sec-heading">What Our Travellers Say</div>
+
+  <div class="review-card">
+    <div class="review-stars">★★★★★</div>
+    <div class="review-quote">"</div>
+    <div class="review-text">"Every detail was flawless — from the airport pickup to the Sentosa experiences. Voyage Lumière made our family trip absolutely unforgettable."</div>
+    <div class="review-footer">
+      <img class="review-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80" alt="Rohan Kapoor"/>
+      <div><div class="review-name">Rohan Kapoor</div><div class="review-meta">Singapore<span class="dot">·</span>2025</div></div>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-stars">★★★★★</div>
+    <div class="review-quote">"</div>
+    <div class="review-text">"The most seamless travel planning I've ever experienced. The hotels were stunning and the itinerary was perfectly paced. Highly recommend!"</div>
+    <div class="review-footer">
+      <img class="review-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=80" alt="Ananya Sharma"/>
+      <div><div class="review-name">Ananya Sharma</div><div class="review-meta">Bali &amp; Singapore<span class="dot">·</span>2025</div></div>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-stars">★★★★★</div>
+    <div class="review-quote">"</div>
+    <div class="review-text">"A truly premium experience. Our tour manager was attentive, and everything ran like clockwork. We've already booked our next trip with them."</div>
+    <div class="review-footer">
+      <img class="review-avatar" src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&q=80" alt="The Mehta Family"/>
+      <div><div class="review-name">The Mehta Family</div><div class="review-meta">Singapore<span class="dot">·</span>2024</div></div>
+    </div>
+  </div>
+
+  <div class="rating-bar">
+    <span class="star">★</span>
+    <span class="num">4.9</span>
+    <span class="txt">rated by 2,480+ happy travellers across the globe</span>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 9 – T&C ═══════ -->
+<div class="page-header">
+  <div class="vl-logo">
+    <div class="vl-logo-icon" style="border-color:var(--gold);color:var(--gold);">◎</div>
+    <div class="vl-logo-text"><div class="name" style="color:var(--white);">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+  </div>
+  <div class="page-header-right"><span class="page-header-label">Legal</span><span class="page-num-badge">PAGE 09 / 09</span></div>
+</div>
+
+<div class="page-section">
+  <div class="sec-eyebrow">Please Read Carefully</div>
+  <div class="sec-heading">Terms &amp; Conditions</div>
+
+  <div class="tnc-grid">
+    <div class="tnc-card"><div class="tnc-num">01</div><div class="tnc-title">Booking Policy</div><div class="tnc-body">A 50% advance payment is required to confirm the booking. The remaining balance must be cleared at least 21 days prior to the travel date. Bookings are subject to availability at the time of confirmation.</div></div>
+    <div class="tnc-card"><div class="tnc-num">02</div><div class="tnc-title">Cancellation Policy</div><div class="tnc-body">Cancellations made 30+ days before departure incur a 25% charge, 15–29 days incur 50%, and within 14 days are non-refundable. Cancellation requests must be submitted in writing.</div></div>
+    <div class="tnc-card"><div class="tnc-num">03</div><div class="tnc-title">Refund Policy</div><div class="tnc-body">Eligible refunds are processed within 15–20 working days to the original payment method. Government taxes and third-party non-refundable components are excluded from refunds.</div></div>
+    <div class="tnc-card"><div class="tnc-num">04</div><div class="tnc-title">Visa Disclaimer</div><div class="tnc-body">Visa assistance is provided as a facilitation service. The grant or rejection of a visa is at the sole discretion of the respective consulate. Visa fees are non-refundable.</div></div>
+    <div class="tnc-card"><div class="tnc-num">05</div><div class="tnc-title">Hotel Policies</div><div class="tnc-body">Standard check-in is 3:00 PM and check-out is 12:00 PM. Room categories are subject to availability. Any early check-in or late check-out is chargeable directly by the hotel.</div></div>
+    <div class="tnc-card"><div class="tnc-num">06</div><div class="tnc-title">Flight Policies</div><div class="tnc-body">Flight timings and fares are subject to airline confirmation and may change. Any fare difference due to delayed ticketing will be borne by the traveller.</div></div>
+    <div class="tnc-card"><div class="tnc-num">07</div><div class="tnc-title">Force Majeure</div><div class="tnc-body">The company is not liable for delays or cancellations due to natural calamities, political unrest, strikes, or any circumstances beyond reasonable control.</div></div>
+    <div class="tnc-card"><div class="tnc-num">08</div><div class="tnc-title">Travel Insurance</div><div class="tnc-body">Travel insurance is strongly recommended and is not included in the package cost unless specified. Travellers are responsible for their own medical and trip coverage.</div></div>
+  </div>
+
+  <div class="tnc-footer">
+    <span class="tnc-footer-icon">📄</span>
+    By confirming this booking, the traveller acknowledges and agrees to all terms and conditions stated above. These terms are governed by the laws of India and any disputes are subject to Mumbai jurisdiction.
+  </div>
+</div>
+
+<!-- ═══════ THANK YOU PAGE ═══════ -->
+<div class="ty-page">
+  <div class="ty-top">
+    <div class="vl-logo">
+      <div class="vl-logo-icon">◎</div>
+      <div class="vl-logo-text"><div class="name">Voyage Lumière</div><div class="tagline">Curated Luxury Journeys</div></div>
+    </div>
+  </div>
+
+  <div class="ty-main">
+    <div class="ty-until">
+      <div class="ty-line"></div>
+      <div class="ty-until-text">Until We Meet Again</div>
+      <div class="ty-line"></div>
+    </div>
+    <div class="ty-heading">Thank You</div>
+    <div class="ty-sub">We look forward to creating unforgettable travel memories for you. Your journey of a lifetime begins with us.</div>
+    <div class="ty-stats">
+      <div class="ty-stat">
+        <div class="ty-stat-icon">⭐</div>
+        <div class="ty-stat-num">4.9</div>
+        <div class="ty-stat-lbl">Google Rating</div>
+      </div>
+      <div class="ty-stat">
+        <div class="ty-stat-icon">👥</div>
+        <div class="ty-stat-num">2,480</div>
+        <div class="ty-stat-lbl">Total Reviews</div>
+      </div>
+      <div class="ty-stat">
+        <div class="ty-stat-icon">📍</div>
+        <div class="ty-stat-num">38,500+</div>
+        <div class="ty-stat-lbl">Happy Travellers</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ty-bottom">
+    <div class="ty-contact-card">
+      <div class="ty-contact-grid">
+        <div>
+          <div class="ty-contact-item" style="margin-bottom:10px;">
+            <div class="tc-lbl">📍 Office Address</div>
+            <div class="tc-val">402, Skyline Business Tower,<br/>Bandra Kurla Complex, Mumbai 400051, India</div>
+          </div>
+        </div>
+        <div class="ty-contact-right">
+          <div class="ty-contact-item">
+            <div class="tc-lbl">📞 Contact</div>
+            <div class="tc-val">+91 78387 79980</div>
+          </div>
+          <div class="ty-contact-item">
+            <div class="tc-lbl">🌐 Website</div>
+            <div class="tc-val">www.voyagelumiere.com</div>
+          </div>
+          <div class="ty-contact-item">
+            <div class="tc-lbl">✉️ Email</div>
+            <div class="tc-val">freezemytrip@gmail.com</div>
+          </div>
+          <div class="ty-socials">
+            <div class="ty-social">📸</div>
+            <div class="ty-social">👍</div>
+            <div class="ty-social">✖</div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-divider"></div>
+      <div class="ty-footer-row">
+        <div class="ty-prepared">
+          <div class="lbl">Prepared By</div>
+          <div class="name">Pramod Kotkar</div>
+          <div class="role">Senior Travel Consultant</div>
+        </div>
+        <div class="ty-brand-footer">Voyage Lumière — Curated Luxury Journeys</div>
+      </div>
+    </div>
+  </div>
+  <div style="height:28px;"></div>
+</div>
+
+</div>
+</body>
+</html>
