@@ -229,8 +229,13 @@ function app_format_save(){
 
     $config = gqb_get_config();
     $config['testimonials'] = is_array($testimonials) ? $testimonials : array();
-    gqb_save_config($config);
+    
+    //==============================
+    $social_links = isset($_POST['social_links']) ? json_decode($_POST['social_links'], true) : array();
+    $config['social_links'] = is_array($social_links) ? $social_links : array();
+    
     // =============================
+    gqb_save_config($config);
 
     if($sq_invoice){
 		echo "Company profile details are saved successfully!! ";

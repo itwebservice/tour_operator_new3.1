@@ -171,6 +171,40 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
                 <!-- =========================================== -->
               </div>
             </div>
+
+            <?php
+            $social_links = isset($gqb_config['social_links']) ? $gqb_config['social_links'] : array();
+            ?>
+
+            <div class="panel panel-default panel-body mg_tp_20">
+              <h4 class="text-left">Social Media Links</h4>
+
+              <div style="padding-top:15px;">
+                <div class="row mg_bt_10">
+                  <div class="col-md-4">
+                    <input type="text" class="form-control" id="facebook_link" placeholder="Facebook URL" value="<?= htmlspecialchars($social_links['facebook'] ?? '') ?>">
+                  </div>
+                  <div class="col-md-4">
+                    <input type="text" class="form-control" id="instagram_link" placeholder="Instagram URL" value="<?= htmlspecialchars($social_links['instagram'] ?? '') ?>">
+                  </div>
+                  <div class="col-md-4">
+                    <input type="text" class="form-control" id="linkedin_link" placeholder="LinkedIn URL" value="<?= htmlspecialchars($social_links['linkedin'] ?? '') ?>">
+                  </div>
+                </div>
+
+                <div class="row mg_bt_10">
+                  <div class="col-md-4">
+                    <input type="text" class="form-control" id="youtube_link" placeholder="YouTube URL" value="<?= htmlspecialchars($social_links['youtube'] ?? '') ?>">
+                  </div>
+                  <div class="col-md-4">
+                    <input type="text" class="form-control" id="twitter_link" placeholder="Twitter / X URL" value="<?= htmlspecialchars($social_links['twitter'] ?? '') ?>">
+                  </div>
+                  <div class="col-md-4">
+                    <input type="text" class="form-control" id="whatsapp_link" placeholder="WhatsApp URL" value="<?= htmlspecialchars($social_links['whatsapp'] ?? '') ?>">
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -358,6 +392,16 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
             photo: $(this).find('.testimonial_photo').val()
           });
         });
+
+        var social_links = {
+          facebook: $('#facebook_link').val(),
+          instagram: $('#instagram_link').val(),
+          linkedin: $('#linkedin_link').val(),
+          youtube: $('#youtube_link').val(),
+          twitter: $('#twitter_link').val(),
+          whatsapp: $('#whatsapp_link').val()
+        };
+        console.log(social_links);
         // =======================================
         var image = gallary_arr1[0];
         $('#format_save').button('loading');
@@ -372,7 +416,8 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
                   quot_format: quot_format,
                   image: image,
                   dest_id: dest_id,
-                  testimonials: JSON.stringify(testimonials)
+                  testimonials: JSON.stringify(testimonials), //============= Dipti
+                  social_links: JSON.stringify(social_links)
                 },
                 success: function(result) {
                   // msg_popup_reload(result);

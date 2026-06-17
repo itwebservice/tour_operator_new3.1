@@ -242,10 +242,26 @@ if (!function_exists('get_generic_quotation_data')) {
         $bank_branch_id = ($branch_admin_id != '0') ? $branch_admin_id : '1';
         $bank = gqd_row("select * from bank_master where branch_id='$bank_branch_id' and active_flag='Active'");
 
-        // Terms & conditions (Package Quotation, destination specific else global)
-        $tc_dest_count = gqd_count("select dest_id from terms_and_conditions where type='Package Quotation' and dest_id='$dest_id' and active_flag='Active'");
-        $tc_dest_id    = ($tc_dest_count != 0) ? $dest_id : '0';
-        $terms         = gqd_row("select * from terms_and_conditions where type='Package Quotation' and dest_id='$tc_dest_id' and active_flag='Active'");
+    // Terms & conditions (Package Quotation, destination specific else global)
+
+    // ================================== Dipti
+    $terms = gqd_row("select * from terms_and_conditions 
+where type='Package Quotation' 
+and dest_id='$dest_id' 
+and active_flag='Active' 
+order by terms_and_conditions_id desc limit 1");
+
+    if (empty($terms)) {
+      $terms = gqd_row("select * from terms_and_conditions 
+    where type='Package Quotation' 
+    and dest_id='0' 
+    and active_flag='Active' 
+    order by terms_and_conditions_id desc limit 1");
+    }
+    // =============================================================
+        // $tc_dest_count = gqd_count("select dest_id from terms_and_conditions where type='Package Quotation' and dest_id='$dest_id' and active_flag='Active'");
+        // $tc_dest_id    = ($tc_dest_count != 0) ? $dest_id : '0';
+        // $terms         = gqd_row("select * from terms_and_conditions where type='Package Quotation' and dest_id='$tc_dest_id' and active_flag='Active'");
 
         // Destination guide video
         $video = gqd_row("select link from video_itinerary_master where dest_id='$dest_id'");
@@ -411,30 +427,80 @@ if (!function_exists('get_generic_quotation_data')) {
             );
         }
 
-        // =====================================================================
-        // 4. FLIGHTS (loop)
-        // =====================================================================
-        $flights = array();
-        foreach (gqd_rows("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'") as $f) {
-            $aid     = gqd_esc($f['airline_name']);
-            $airline = gqd_row("select airline_name, airline_code, airline_logo from airline_master where airline_id='$aid'");
-            $airline_display = (!empty($f['airline_name']) && !empty($airline['airline_name']))
-                ? $airline['airline_name'] . ' (' . $airline['airline_code'] . ')'
-                : 'NA';
-            $flights[] = array(
-                'airline_name'   => isset($airline['airline_name']) ? $airline['airline_name'] : '',
-                'airline_display' => $airline_display,
-                'airline_code'   => isset($airline['airline_code']) ? $airline['airline_code'] : '',
-                'airline_logo'   => isset($airline['airline_logo']) ? $airline['airline_logo'] : '',
-                'class'          => isset($f['class']) ? $f['class'] : '',
-                'departure_datetime' => function_exists('get_datetime_user') ? get_datetime_user($f['dapart_time']) : $f['dapart_time'],
-                'arrival_datetime'   => function_exists('get_datetime_user') ? get_datetime_user($f['arraval_time']) : $f['arraval_time'],
-                'departure_raw'  => isset($f['dapart_time']) ? $f['dapart_time'] : '',
-                'arrival_raw'    => isset($f['arraval_time']) ? $f['arraval_time'] : '',
-                'from_city'      => isset($f['from_location']) ? $f['from_location'] : '',
-                'to_city'        => isset($f['to_location']) ? $f['to_location'] : '',
-            );
-        }
+    // =====================================================================
+    // 4. FLIGHTS (loop)
+    // =====================================================================
+    // =============================== Dipti 
+    $flights = array();
+
+    foreach (gqd_rows("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'") as $f) {
+
+      $aid = gqd_esc($f['airline_name']);
+
+      // $airline = gqd_row("select airline_name, airline_code, airline_logo from airline_master where airline_id='$aid'");
+      $airline = mysqli_fetch_assoc(
+        mysqlQuery("SELECT * FROM airline_master WHERE airline_id='$aid'")
+      );
+
+      $airline_name = !empty($airline['airline_name']) ? $airline['airline_name'] : 'NA';
+      $airline_code = !empty($airline['airline_code']) ? $airline['airline_code'] : 'FL';
+
+      $dep_time = !empty($f['dapart_time']) ? strtotime($f['dapart_time']) : false;
+      $arr_time = !empty($f['arraval_time']) ? strtotime($f['arraval_time']) : false;
+
+      $duration = 'Flight';
+      if ($dep_time && $arr_time) {
+        $diff = abs($arr_time - $dep_time);
+        $h = floor($diff / 3600);
+        $m = floor(($diff % 3600) / 60);
+        $duration = $h . 'H ' . $m . 'M';
+      }
+
+      $flights[] = array(
+        'airline_name'   => $airline_name,
+        'airline_display' => $airline_name,
+        'airline_code'   => $airline_code,
+        // 'airline_logo'   => !empty($airline['airline_logo']) ? $airline['airline_logo'] : '',
+        'airline_logo'   => !empty($airline['image']) ? $airline['image'] : '',
+        'class'          => !empty($f['class']) ? $f['class'] : 'Economy',
+
+        'departure_datetime' => function_exists('get_datetime_user') ? get_datetime_user($f['dapart_time']) : $f['dapart_time'],
+        'arrival_datetime'   => function_exists('get_datetime_user') ? get_datetime_user($f['arraval_time']) : $f['arraval_time'],
+        'departure_raw'      => !empty($f['dapart_time']) ? $f['dapart_time'] : '',
+        'arrival_raw'        => !empty($f['arraval_time']) ? $f['arraval_time'] : '',
+
+        'from_city'      => !empty($f['from_location']) ? $f['from_location'] : '',
+        'to_city'        => !empty($f['to_location']) ? $f['to_location'] : '',
+
+        // 'duration'       => $duration,
+        'duration' => ($duration == '0H 0M') ? 'As Per Itinerary' : $duration,
+        'stop_type'      => 'Non-stop',
+
+        'baggage'        => !empty($f['baggage']) ? $f['baggage'] : '30 KG',
+      );
+    }
+    // ============================
+        // $flights = array();
+        // foreach (gqd_rows("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'") as $f) {
+        //     $aid     = gqd_esc($f['airline_name']);
+        //     $airline = gqd_row("select airline_name, airline_code, airline_logo from airline_master where airline_id='$aid'");
+        //     $airline_display = (!empty($f['airline_name']) && !empty($airline['airline_name']))
+        //         ? $airline['airline_name'] . ' (' . $airline['airline_code'] . ')'
+        //         : 'NA';
+        //     $flights[] = array(
+        //         'airline_name'   => isset($airline['airline_name']) ? $airline['airline_name'] : '',
+        //         'airline_display' => $airline_display,
+        //         'airline_code'   => isset($airline['airline_code']) ? $airline['airline_code'] : '',
+        //         'airline_logo'   => isset($airline['airline_logo']) ? $airline['airline_logo'] : '',
+        //         'class'          => isset($f['class']) ? $f['class'] : '',
+        //         'departure_datetime' => function_exists('get_datetime_user') ? get_datetime_user($f['dapart_time']) : $f['dapart_time'],
+        //         'arrival_datetime'   => function_exists('get_datetime_user') ? get_datetime_user($f['arraval_time']) : $f['arraval_time'],
+        //         'departure_raw'  => isset($f['dapart_time']) ? $f['dapart_time'] : '',
+        //         'arrival_raw'    => isset($f['arraval_time']) ? $f['arraval_time'] : '',
+        //         'from_city'      => isset($f['from_location']) ? $f['from_location'] : '',
+        //         'to_city'        => isset($f['to_location']) ? $f['to_location'] : '',
+        //     );
+        // }
 
         // =====================================================================
         // 5. TRAINS (loop)
@@ -800,7 +866,7 @@ if (!function_exists('get_generic_quotation_data')) {
         $terms_conditions = array(
             'title'                => isset($terms['title']) ? $terms['title'] : '',
             'terms_and_conditions' => isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '',
-            'dest_id'              => $tc_dest_id,
+            'dest_id'              => $dest_id,
         );
 
         // =====================================================================

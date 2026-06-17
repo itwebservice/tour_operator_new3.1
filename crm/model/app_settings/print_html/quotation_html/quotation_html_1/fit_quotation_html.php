@@ -44,6 +44,10 @@ $testimonials = array();
 if (function_exists('gqb_get_config')) {
   $o1_cfg = gqb_get_config();
   $testimonials = isset($o1_cfg['testimonials']) && is_array($o1_cfg['testimonials']) ? $o1_cfg['testimonials'] : array();
+  // $social_links = isset($o1_cfg['social_links']) && is_array($o1_cfg['social_links']) ? $o1_cfg['social_links'] : array();
+  $social_links = isset($o1_cfg['social_links'])
+    ? $o1_cfg['social_links']
+    : array();
 }
 
 // ---- helpers ---------------------------------------------------------------
@@ -66,6 +70,74 @@ if (!function_exists('o1img')) {
     return (is_string($url) && trim($url) !== '' && stripos($url, 'dummy') === false) ? $url : $fallback;
   }
 }
+
+// =========================== Dipti 
+if (!function_exists('o1_terms_sections')) {
+  function o1_terms_sections($html)
+  {
+    $sections = array();
+
+    $html = str_replace(array("\r", "\n"), '', $html);
+    $html = preg_replace('/<br\s*\/?>/i', '', $html);
+
+    $parts = preg_split('/<b[^>]*>/i', $html);
+
+    foreach ($parts as $part) {
+      $part = trim($part);
+      if ($part == '') continue;
+
+      $bclose = stripos($part, '</b>');
+      if ($bclose === false) continue;
+
+      $title_html = substr($part, 0, $bclose);
+      $content_html = substr($part, $bclose + 4);
+
+      $title = trim(strip_tags($title_html));
+      $title = trim($title, " :\t\n\r\0\x0B");
+
+      // keep only bullet list content, avoid unclosed wrapper nesting
+      if (preg_match('/<ul[^>]*>(.*?)<\/ul>/is', $content_html, $ul_match)) {
+        $content_html = '<ul>' . $ul_match[1] . '</ul>';
+      } else {
+        $plain = trim(strip_tags($content_html));
+        $content_html = '<p>' . htmlspecialchars($plain) . '</p>';
+      }
+
+      if ($title != '' && $content_html != '') {
+        $sections[] = array(
+          'title' => $title,
+          'content' => $content_html
+        );
+      }
+    }
+
+    return $sections;
+  }
+}
+// ===========================================
+
+// ==================== Dipti
+function o1_airport_code($v)
+{
+  if (preg_match('/\((.*?)\)/', $v, $m)) {
+    return $m[1];
+  }
+  return strtoupper(substr(trim($v), 0, 3));
+}
+
+function o1_airport_name($v)
+{
+  return trim(preg_replace('/\s*\(.*?\)/', '', $v));
+}
+
+function o1_flight_date($v)
+{
+  if ($v == '' || strtotime($v) == false) {
+    return 'NA';
+  }
+  return date('d M · H:i', strtotime($v));
+}
+// ===================================
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -294,7 +366,7 @@ if (!function_exists('o1img')) {
           </div>
         </div>
       </div>
-      <div class="relative px-10 py-8">
+      <div class="relative px-10 py-6">
         <div class="rounded-xl px-6 py-4 flex items-center gap-4" style="background:var(--gradient-navy)">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-5 h-5 text-[color:var(--gold)]" aria-hidden="true">
             <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z">
@@ -467,19 +539,38 @@ if (!function_exists('o1img')) {
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Prepared For</div>
             <div class="font-display text-2xl text-[color:var(--navy)] mt-1"><?= o1e(o1nv($ov['client_name'], $hero['client_name'])) ?></div>
             <div class="mt-3 space-y-1.5 text-[13px] text-[color:var(--ink)]/85">
+              <!-- ================== Dipti -->
+              <?php
+              $customer_email = o1nv($ov['customer_email'], o1nv($hero['user_email_id'], ''));
+              ?>
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
                   <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7">
                   </path>
                   <rect x="2" y="4" width="20" height="16" rx="2">
                   </rect>
-                </svg> <?= o1e(o1nv($ov['customer_email'], o1nv($hero['user_email_id'], ''))) ?>
+                </svg> <?php if ($customer_email != '') { ?>
+                  <a href="mailto:<?= o1e($customer_email) ?>" style="color:inherit;text-decoration:none;position:relative;z-index:9999;pointer-events:auto;cursor:pointer;">
+                    <?= o1e($customer_email) ?>
+                  </a>
+                <?php } ?>
               </div>
+
+              <?php
+              $customer_mobile = o1nv($ov['customer_mobile'], o1nv($hero['user_contact'], ''));
+              $customer_mobile_href = preg_replace('/[^0-9+]/', '', $customer_mobile);
+              ?>
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
                   <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
                   </path>
-                </svg> <?= o1e(o1nv($ov['customer_mobile'], o1nv($hero['user_contact'], ''))) ?>
+                </svg> <? //= o1e(o1nv($ov['customer_mobile'], o1nv($hero['user_contact'], ''))) 
+                        ?>
+                <?php if ($customer_mobile != '') { ?>
+                  <a href="tel:<?= o1e($customer_mobile_href) ?>" style="color:inherit;text-decoration:none;position:relative;z-index:9999;pointer-events:auto;cursor:pointer;">
+                    <?= o1e($customer_mobile) ?>
+                  </a>
+                <?php } ?>
               </div>
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
@@ -514,7 +605,7 @@ if (!function_exists('o1img')) {
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>02<!-- --> / 09</span>
       </div>
     </section>
@@ -640,7 +731,7 @@ if (!function_exists('o1img')) {
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>03<!-- --> / 09</span>
       </div>
     </section>
@@ -685,13 +776,101 @@ if (!function_exists('o1img')) {
             <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Boarding Passes</span>
           </div>
           <hr class="gold-rule mt-2" />
+
+          <!-- ======================== Dipti -->
           <div class="grid grid-cols-2 gap-3 mt-4">
             <?php foreach ((array)$flights as $f): ?>
+
+              <?php
+              $from = isset($f['from_city']) ? $f['from_city'] : '';
+              $to   = isset($f['to_city']) ? $f['to_city'] : '';
+
+              $from_code = o1_airport_code($from);
+              $to_code   = o1_airport_code($to);
+
+              $from_name = o1_airport_name($from);
+              $to_name   = o1_airport_name($to);
+
+              $airline_name = o1nv(isset($f['airline_display']) ? $f['airline_display'] : '', o1nv(isset($f['airline_name']) ? $f['airline_name'] : '', 'Flight'));
+              $airline_code = o1nv(isset($f['airline_code']) ? $f['airline_code'] : '', 'FL');
+              ?>
+
+              <div class="rounded-xl bg-white overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+                <div class="px-4 py-2 flex items-center justify-between text-cream" style="background:var(--gradient-navy)">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full grid place-items-center font-display font-bold text-[color:var(--navy)]" style="background:var(--gradient-gold)">
+                      <?= o1e(substr($airline_code, 0, 2)) ?>
+                    </div>
+                    <div class="text-xs"><?= o1e($airline_name) ?></div>
+                  </div>
+                  <div class="text-[10px] uppercase tracking-[0.2em] text-[color:var(--gold)]">
+                    <?= o1e(o1nv(isset($f['class']) ? $f['class'] : '', 'Economy')) ?>
+                  </div>
+                </div>
+
+                <div class="p-4">
+                  <div class="flex items-center justify-between">
+                    <div style="max-width:110px;">
+                      <div class="font-display text-2xl text-[color:var(--navy)]"><?= o1e($from_code) ?></div>
+                      <div class="text-[10px] text-[color:var(--ink)]/60 uppercase tracking-wide"><?= o1e($from_name) ?></div>
+                    </div>
+
+                    <div class="flex-1 px-4 flex flex-col items-center">
+                      <div class="text-[10px] uppercase tracking-[0.25em] text-[color:var(--gold)]">Flight</div>
+                      <div class="relative w-full h-px bg-[color:var(--gold)]/40 my-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane w-3 h-3 text-[color:var(--gold)] absolute -top-1.5 left-1/2 -translate-x-1/2" aria-hidden="true">
+                          <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
+                        </svg>
+                      </div>
+                      <div class="text-[9px] text-[color:var(--ink)]/60">As per itinerary</div>
+                    </div>
+
+                    <div class="text-right" style="max-width:110px;">
+                      <div class="font-display text-2xl text-[color:var(--navy)]"><?= o1e($to_code) ?></div>
+                      <div class="text-[10px] text-[color:var(--ink)]/60 uppercase tracking-wide"><?= o1e($to_name) ?></div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-dashed border-[color:var(--gold)]/40 text-[10px]">
+                    <div>
+                      <div class="uppercase tracking-[0.2em] text-[color:var(--navy)]/60">Departure</div>
+                      <div class="font-display text-[13px] text-[color:var(--navy)]">
+                        <?= o1e(o1_flight_date(isset($f['departure_raw']) ? $f['departure_raw'] : '')) ?>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="uppercase tracking-[0.2em] text-[color:var(--navy)]/60">Arrival</div>
+                      <div class="font-display text-[13px] text-[color:var(--navy)]">
+                        <?= o1e(o1_flight_date(isset($f['arrival_raw']) ? $f['arrival_raw'] : '')) ?>
+                      </div>
+                    </div>
+                    <!-- <div>
+                      <div class="uppercase tracking-[0.2em] text-[color:var(--navy)]/60">Baggage</div>
+                      <div class="font-display text-[13px] text-[color:var(--navy)]">
+                        <? //= o1e(o1nv(isset($f['baggage']) ? $f['baggage'] : '', 'NA')) 
+                        ?>
+                      </div>
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+
+            <?php endforeach; ?>
+
+            <?php if (empty($flights)): ?>
+              <div class="col-span-2 rounded-xl bg-white border border-[color:var(--gold)]/25 p-5 text-center text-[color:var(--ink)]/60 text-sm">No flight details available.</div>
+            <?php endif; ?>
+          </div>
+          <!-- ================================================ -->
+          <!-- <div class="grid grid-cols-2 gap-3 mt-4">
+            <? //php foreach ((array)$flights as $f): 
+            ?>
               <div class="rounded-xl bg-white overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
                 <div class="px-4 py-2 flex items-center justify-between text-cream" style="background:var(--gradient-navy)">
                   <div class="flex items-center gap-2">
                     <div class="w-7 h-7 rounded-full grid place-items-center font-display font-bold text-[color:var(--navy)]" style="background:var(--gradient-gold)"><?= o1e(substr(o1nv(isset($f['airline_code']) ? $f['airline_code'] : '', 'FL'), 0, 2)) ?></div>
-                    <div class="text-xs"><?= o1e(o1nv(isset($f['airline_display']) ? $f['airline_display'] : '', o1nv(isset($f['airline_name']) ? $f['airline_name'] : '', 'Flight'))) ?></div>
+                    <div class="text-xs"><? //= o1e(o1nv(isset($f['airline_display']) ? $f['airline_display'] : '', o1nv(isset($f['airline_name']) ? $f['airline_name'] : '', 'Flight'))) 
+                                          ?></div>
                   </div>
                   <div class="text-[10px] uppercase tracking-[0.2em] text-[color:var(--gold)]"><?= o1e(o1nv(isset($f['class']) ? $f['class'] : '', '')) ?></div>
                 </div>
@@ -728,11 +907,14 @@ if (!function_exists('o1img')) {
                   </div>
                 </div>
               </div>
-            <?php endforeach; ?>
-            <?php if (empty($flights)): ?>
+            <? //php endforeach; 
+            ?>
+            <? //php if (empty($flights)): 
+            ?>
               <div class="col-span-2 rounded-xl bg-white border border-[color:var(--gold)]/25 p-5 text-center text-[color:var(--ink)]/60 text-sm">No flight details available.</div>
-            <?php endif; ?>
-          </div>
+            <? //php endif; 
+            ?>
+          </div> -->
         </div>
         <div>
           <h2 class="font-display text-2xl text-[color:var(--navy)] flex items-center gap-2">
@@ -751,12 +933,23 @@ if (!function_exists('o1img')) {
           <?php $o1_vehicle = !empty($vehs[0]) ? $vehs[0] : array(); ?>
           <div class="rounded-xl bg-white border border-[color:var(--gold)]/25 grid grid-cols-5 mt-3 overflow-hidden" style="box-shadow:var(--shadow-card)">
             <div class="col-span-2 bg-[color:var(--navy)] grid place-items-center p-4">
-              <img src="assets/vehicle.jpg" alt="Vehicle" class="w-full object-contain" loading="lazy" />
+              <!-- <img src="assets/vehicle.jpg" alt="Vehicle" class="w-full object-contain" loading="lazy" /> -->
+              <?php
+              $vehicle_img = BASE_URL . 'uploads/quotation_images/vehicle.jpg';
+              ?>
+
+              <img src="<?= o1e($vehicle_img) ?>"
+                alt="Vehicle"
+                style="width:100%;height:auto;object-fit:contain;" />
             </div>
             <div class="col-span-3 p-4">
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--teal)]"><?= o1e(o1nv(isset($o1_vehicle['vehicle_type']) ? $o1_vehicle['vehicle_type'] : '', 'Transport')) ?></div>
+                  <!-- <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--teal)]"><? //= o1e(o1nv(isset($o1_vehicle['vehicle_type']) ? $o1_vehicle['vehicle_type'] : '', 'Transport')) 
+                                                                                                      ?></div> -->
+                  <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--teal)]">
+                    Vehicle
+                  </div>
                   <h3 class="font-display text-xl text-[color:var(--navy)]"><?= o1e(o1nv(isset($o1_vehicle['vehicle_name']) ? $o1_vehicle['vehicle_name'] : '', 'Vehicle details')) ?></h3>
                 </div>
                 <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/40 text-[color:var(--navy)]"><?= o1e(o1nv(isset($o1_vehicle['vehicle_count']) ? $o1_vehicle['vehicle_count'] : '', '')) ?> Vehicle<?= (isset($o1_vehicle['vehicle_count']) && $o1_vehicle['vehicle_count'] == 1 ? '' : 's') ?></span>
@@ -1063,7 +1256,7 @@ if (!function_exists('o1img')) {
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>04<!-- --> / 09</span>
       </div>
     </section>
@@ -1165,7 +1358,7 @@ if (!function_exists('o1img')) {
             </ul>
           </div>
         </div>
-        <div class="mt-6">
+        <div class="mt-4">
           <div class="flex items-end justify-between">
             <h3 class="font-display text-2xl text-[color:var(--navy)]">Costing Details</h3>
             <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">All values in INR Â· per package</span>
@@ -1175,7 +1368,8 @@ if (!function_exists('o1img')) {
             <div class="grid grid-cols-6 text-[10px] uppercase tracking-[0.2em] text-cream px-4 py-3" style="background:var(--gradient-navy)">
               <div class="col-span-1">Package</div>
               <div class="text-right">Tour Cost</div>
-              <div class="text-right">Tax</div>
+              <!-- <div class="text-right">Tax</div> -->
+              <div class="text-right">Total Amount</div>
               <div class="text-right">TCS</div>
               <div class="text-right">Travel</div>
               <div class="text-right text-[color:var(--gold)]">Grand Total</div>
@@ -1194,7 +1388,10 @@ if (!function_exists('o1img')) {
                   <span class="font-display text-base text-[color:var(--navy)]"><?= o1e(o1nv($o1_row['package_type'], 'Package')) ?></span>
                 </div>
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tour_cost_display']) ?></div>
-                <div class="text-right text-[color:var(--ink)]/85"><?= o1e(o1nv($o1_row['tax_display'], '&#8377; 0')) ?></div>
+                <!-- <div class="text-right text-[color:var(--ink)]/85"><? //= o1e(o1nv($o1_row['tax_display'], '&#8377; 0')) 
+                                                                        ?></div> -->
+                <!-- ================== Dipti -->
+                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e(o1nv($o1_row['total_display'], '0')) ?></div>
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tcs_display']) ?></div>
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['travel_display']) ?></div>
                 <div class="text-right font-display text-lg text-[color:var(--navy)]">&#8377; <?= o1e($o1_row['total_display']) ?></div>
@@ -1207,7 +1404,7 @@ if (!function_exists('o1img')) {
       </div>
       <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>05<!-- --> / 09</span>
       </div>
     </section>
@@ -1633,7 +1830,7 @@ if (!function_exists('o1img')) {
                 <?php endif; ?>
               </div>
             </div>
-            <div class="font-display text-lg text-[color:var(--navy)] mt-3">UPI Â· GPay Â· PhonePe</div>
+            <div class="font-display text-lg text-[color:var(--navy)] mt-3">UPI · GPay · PhonePe</div>
             <div class="text-[11px] text-[color:var(--ink)]/60 font-serif-soft italic"><?= o1e(o1nv($bank['upi_id'], '')) ?></div>
           </div>
         </div>
@@ -1682,7 +1879,7 @@ if (!function_exists('o1img')) {
       </div>
       <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>06<!-- --> / 09</span>
       </div>
     </section>
@@ -1725,26 +1922,26 @@ if (!function_exists('o1img')) {
                 <!-- ========================== Dipti -->
                 <div class="col-span-1 flex flex-col items-center">
                   <?php
-$photo = isset($t['photo']) ? trim($t['photo']) : '';
+                  $photo = isset($t['photo']) ? trim($t['photo']) : '';
 
-if ($photo != '') {
-    $photo = str_replace('\\', '/', $photo);
+                  if ($photo != '') {
+                    $photo = str_replace('\\', '/', $photo);
 
-    if (strpos($photo, 'http://') !== 0 && strpos($photo, 'https://') !== 0) {
-        $photo = BASE_URL . ltrim($photo, '/');
-    }
-}
-?>
+                    if (strpos($photo, 'http://') !== 0 && strpos($photo, 'https://') !== 0) {
+                      $photo = BASE_URL . ltrim($photo, '/');
+                    }
+                  }
+                  ?>
 
-<?php if ($photo != '') { ?>
-    <img src="<?= o1e($photo) ?>"
-         alt="<?= o1e($t['name']) ?>"
-         class="w-20 h-20 rounded-full object-cover">
-<?php } else { ?>
-    <div class="w-20 h-20 rounded-full grid place-items-center text-cream font-display text-2xl" style="background:var(--gradient-navy)">
-        <?= o1e(strtoupper(substr(o1nv(isset($t['name']) ? $t['name'] : 'T', 'T'), 0, 1))) ?>
-    </div>
-<?php } ?>
+                  <?php if ($photo != '') { ?>
+                    <img src="<?= o1e($photo) ?>"
+                      alt="<?= o1e($t['name']) ?>"
+                      class="w-20 h-20 rounded-full object-cover">
+                  <?php } else { ?>
+                    <div class="w-20 h-20 rounded-full grid place-items-center text-cream font-display text-2xl" style="background:var(--gradient-navy)">
+                      <?= o1e(strtoupper(substr(o1nv(isset($t['name']) ? $t['name'] : 'T', 'T'), 0, 1))) ?>
+                    </div>
+                  <?php } ?>
 
                   <div class="font-display text-sm text-[color:var(--navy)] mt-2 text-center">
                     <?= o1e(o1nv($t['name'] ?? '', 'Traveller')) ?>
@@ -1916,7 +2113,7 @@ if ($photo != '') {
         </div>
         <div class="mt-8 grid grid-cols-3 gap-3 text-center">
           <div class="rounded-xl p-4 text-cream" style="background:var(--gradient-navy)">
-            <div class="font-display text-2xl gold-text">4.9 â˜…</div>
+            <div class="font-display text-2xl gold-text">4.9 ★</div>
             <div class="text-[10px] uppercase tracking-[0.25em] text-cream/70 mt-1">Google Rating</div>
           </div>
           <div class="rounded-xl p-4 text-cream" style="background:var(--gradient-navy)">
@@ -1931,7 +2128,7 @@ if ($photo != '') {
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>07<!-- --> / 09</span>
       </div>
     </section>
@@ -1968,167 +2165,264 @@ if ($photo != '') {
         <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">The Fine Print</div>
         <h2 class="font-display text-4xl text-[color:var(--navy)] mt-1"><?= o1e(o1nv(isset($terms['title']) ? $terms['title'] : '', 'Terms & Conditions')) ?></h2>
         <hr class="gold-rule mt-3" />
-        <div class="rounded-xl bg-white p-5 border border-[color:var(--gold)]/25 mt-6" style="box-shadow:var(--shadow-card)">
+
+        <!-- ==================================== Dipti -->
+        <?php
+        $o1_terms_html = trim(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '');
+        $o1_tc_sections = o1_terms_sections($o1_terms_html);
+        ?>
+
+        <?php if (!empty($o1_tc_sections)) { ?>
+          <!-- <div class="grid grid-cols-2 gap-3 mt-6"> -->
+          <div class="space-y-4 mt-6">
+            <?php foreach ($o1_tc_sections as $i => $tc) {
+
+              $svg_icons = array(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-4 h-4 text-[color:var(--navy)]"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>',
+
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-4 h-4 text-[color:var(--navy)]"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>',
+
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card w-4 h-4 text-[color:var(--navy)]"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>',
+
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe w-4 h-4 text-[color:var(--navy)]"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>'
+              );
+
+              $icon_svg = $svg_icons[$i % count($svg_icons)];
+            ?>
+              <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+                    <?= $icon_svg ?>
+                  </div>
+
+                  <h3 class="font-display text-base text-[color:var(--navy)]">
+                    <?= o1e($tc['title']) ?>
+                  </h3>
+                </div>
+
+                <div class="mt-3 text-[13px] text-[color:var(--ink)]/85 leading-relaxed tc-content">
+                  <?= $tc['content'] ?>
+                </div>
+              </div>
+            <?php } ?>
+          </div>
+        <?php } else { ?>
+          <div class="rounded-xl bg-white p-5 border border-[color:var(--gold)]/25 mt-6" style="box-shadow:var(--shadow-card)">
+            Terms and conditions will be shared as per company policy.
+          </div>
+        <?php } ?>
+
+      </div>
+      <!-- ======================================== -->
+      <!-- <div class="rounded-xl bg-white p-5 border border-[color:var(--gold)]/25 mt-6" style="box-shadow:var(--shadow-card)">
           <div class="font-serif-soft text-[12px] text-[color:var(--ink)]/85 leading-relaxed">
-            <?php
-            $o1_terms_html = trim(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '');
-            echo $o1_terms_html !== '' ? $o1_terms_html : 'Terms and conditions will be shared as per company policy.';
+            <? //php
+            //$o1_terms_html = trim(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '');
+            //echo $o1_terms_html !== '' ? $o1_terms_html : 'Terms and conditions will be shared as per company policy.';
             ?>
           </div>
+        </div> -->
+      <div class="grid grid-cols-2 gap-3 mt-6 hidden">
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z">
+                </path>
+                <path d="M14 2v5a1 1 0 0 0 1 1h5">
+                </path>
+                <path d="M10 9H8">
+                </path>
+                <path d="M16 13H8">
+                </path>
+                <path d="M16 17H8">
+                </path>
+              </svg>
+            </div>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Booking Policy</h3>
+          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">25% advance required to confirm the booking. The balance must be cleared 15 days prior to the travel date.</p> -->
         </div>
-        <div class="grid grid-cols-2 gap-3 mt-6 hidden">
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z">
-                  </path>
-                  <path d="M14 2v5a1 1 0 0 0 1 1h5">
-                  </path>
-                  <path d="M10 9H8">
-                  </path>
-                  <path d="M16 13H8">
-                  </path>
-                  <path d="M16 17H8">
-                  </path>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Booking Policy</h3>
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <path d="M18 6 6 18">
+                </path>
+                <path d="m6 6 12 12">
+                </path>
+              </svg>
             </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">25% advance required to confirm the booking. The balance must be cleared 15 days prior to the travel date.</p>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Cancellation Policy</h3>
           </div>
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <path d="M18 6 6 18">
-                  </path>
-                  <path d="m6 6 12 12">
-                  </path>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Cancellation Policy</h3>
-            </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">30+ days: 25% retention. 15â€“29 days: 50%. 7â€“14 days: 75%. Under 7 days: 100% retention.</p>
-          </div>
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <rect width="20" height="14" x="2" y="5" rx="2">
-                  </rect>
-                  <line x1="2" x2="22" y1="10" y2="10">
-                  </line>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Refund Policy</h3>
-            </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Refunds will be processed within 10â€“15 working days from the date of cancellation approval.</p>
-          </div>
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10">
-                  </circle>
-                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20">
-                  </path>
-                  <path d="M2 12h20">
-                  </path>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Visa Disclaimer</h3>
-            </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Visa approval is at the sole discretion of the embassy. Fees once paid are non-refundable in any case.</p>
-          </div>
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hotel w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <path d="M10 22v-6.57">
-                  </path>
-                  <path d="M12 11h.01">
-                  </path>
-                  <path d="M12 7h.01">
-                  </path>
-                  <path d="M14 15.43V22">
-                  </path>
-                  <path d="M15 16a5 5 0 0 0-6 0">
-                  </path>
-                  <path d="M16 11h.01">
-                  </path>
-                  <path d="M16 7h.01">
-                  </path>
-                  <path d="M8 11h.01">
-                  </path>
-                  <path d="M8 7h.01">
-                  </path>
-                  <rect x="4" y="2" width="16" height="20" rx="2">
-                  </rect>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Hotel Policies</h3>
-            </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Standard check-in 14:00, check-out 12:00. Early check-in or late check-out is subject to availability.</p>
-          </div>
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z">
-                  </path>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Flight Policies</h3>
-            </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Flight schedules and fares are subject to change by the airline. Re-booking charges are payable as applicable.</p>
-          </div>
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z">
-                  </path>
-                  <path d="m9 12 2 2 4-4">
-                  </path>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Force Majeure</h3>
-            </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">We shall not be liable for changes or cancellations due to natural calamities, political unrest, or pandemics.</p>
-          </div>
-          <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
-                  <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526">
-                  </path>
-                  <circle cx="12" cy="8" r="6">
-                  </circle>
-                </svg>
-              </div>
-              <h3 class="font-display text-base text-[color:var(--navy)]">Travel Insurance</h3>
-            </div>
-            <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Travel insurance is strongly recommended and not included in the package unless specified explicitly.</p>
-          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">30+ days: 25% retention. 15â€“29 days: 50%. 7â€“14 days: 75%. Under 7 days: 100% retention.</p> -->
         </div>
-        <div class="mt-6 rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy)">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-5 h-5 text-[color:var(--gold)]" aria-hidden="true">
-            <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z">
-            </path>
-            <path d="M20 2v4">
-            </path>
-            <path d="M22 4h-4">
-            </path>
-            <circle cx="4" cy="20" r="2">
-            </circle>
-          </svg>
-          <p class="mt-2 font-serif-soft italic text-[13px] text-cream/90 max-w-3xl">By confirming this booking, the guest acknowledges that they have read, understood and accepted the terms and conditions above. FreezeMyTrip reserves the right to amend these terms with prior notice.</p>
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <rect width="20" height="14" x="2" y="5" rx="2">
+                </rect>
+                <line x1="2" x2="22" y1="10" y2="10">
+                </line>
+              </svg>
+            </div>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Refund Policy</h3>
+          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Refunds will be processed within 10â€“15 working days from the date of cancellation approval.</p> -->
         </div>
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <circle cx="12" cy="12" r="10">
+                </circle>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20">
+                </path>
+                <path d="M2 12h20">
+                </path>
+              </svg>
+            </div>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Visa Disclaimer</h3>
+          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Visa approval is at the sole discretion of the embassy. Fees once paid are non-refundable in any case.</p> -->
+        </div>
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hotel w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <path d="M10 22v-6.57">
+                </path>
+                <path d="M12 11h.01">
+                </path>
+                <path d="M12 7h.01">
+                </path>
+                <path d="M14 15.43V22">
+                </path>
+                <path d="M15 16a5 5 0 0 0-6 0">
+                </path>
+                <path d="M16 11h.01">
+                </path>
+                <path d="M16 7h.01">
+                </path>
+                <path d="M8 11h.01">
+                </path>
+                <path d="M8 7h.01">
+                </path>
+                <rect x="4" y="2" width="16" height="20" rx="2">
+                </rect>
+              </svg>
+            </div>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Hotel Policies</h3>
+          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Standard check-in 14:00, check-out 12:00. Early check-in or late check-out is subject to availability.</p> -->
+        </div>
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z">
+                </path>
+              </svg>
+            </div>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Flight Policies</h3>
+          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Flight schedules and fares are subject to change by the airline. Re-booking charges are payable as applicable.</p> -->
+        </div>
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z">
+                </path>
+                <path d="m9 12 2 2 4-4">
+                </path>
+              </svg>
+            </div>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Force Majeure</h3>
+          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">We shall not be liable for changes or cancellations due to natural calamities, political unrest, or pandemics.</p> -->
+        </div>
+        <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526">
+                </path>
+                <circle cx="12" cy="8" r="6">
+                </circle>
+              </svg>
+            </div>
+            <h3 class="font-display text-base text-[color:var(--navy)]">Travel Insurance</h3>
+          </div>
+          <!-- ================= Dipti -->
+          <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">
+            <? //= o1e($tc['content']) 
+            ?>
+          </p>
+          <!-- ==================== -->
+          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Travel insurance is strongly recommended and not included in the package unless specified explicitly.</p> -->
+        </div>
+      </div>
+      <div class="mt-6 rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-5 h-5 text-[color:var(--gold)]" aria-hidden="true">
+          <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z">
+          </path>
+          <path d="M20 2v4">
+          </path>
+          <path d="M22 4h-4">
+          </path>
+          <circle cx="4" cy="20" r="2">
+          </circle>
+        </svg>
+        <p class="mt-2 font-serif-soft italic text-[13px] text-cream/90 max-w-3xl">By confirming this booking, the guest acknowledges that they have read, understood and accepted the terms and conditions above. FreezeMyTrip reserves the right to amend these terms with prior notice.</p>
+      </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>08<!-- --> / 09</span>
       </div>
     </section>
@@ -2181,12 +2475,12 @@ if ($photo != '') {
         <div class="text-center mt-10">
           <div class="text-[11px] uppercase tracking-[0.4em] text-[color:var(--gold)]">With Gratitude</div>
           <h1 class="font-display text-7xl text-[color:var(--navy)] mt-2 leading-none">Thank You</h1>
-          <div class="divider-fancy mt-4 max-w-xs mx-auto">âœ¦</div>
+          <div class="divider-fancy mt-4 max-w-xs mx-auto">✦</div>
           <p class="font-serif-soft italic text-xl text-[color:var(--ink)]/75 mt-4 max-w-lg mx-auto">We look forward to creating unforgettable travel memories for you and your family.</p>
         </div>
         <div class="grid grid-cols-3 gap-3 mt-10">
           <div class="rounded-xl p-4 text-cream" style="background:var(--gradient-navy)">
-            <div class="font-display text-2xl gold-text">4.9 â˜…</div>
+            <div class="font-display text-2xl gold-text">4.9 ★</div>
             <div class="text-[10px] uppercase tracking-[0.25em] text-cream/70 mt-1">Google Rating</div>
           </div>
           <div class="rounded-xl p-4 text-cream" style="background:var(--gradient-navy)">
@@ -2208,7 +2502,11 @@ if ($photo != '') {
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
                   <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
                   </path>
-                </svg> <?= o1e(o1nv($ty['company_contact'], '')) ?>
+                </svg> <? //= o1e(o1nv($ty['company_contact'], '')) 
+                        ?>
+                <a href="tel:<?= o1e(o1nv($ty['company_contact'], '')) ?>">
+                  <?= o1e(o1nv($ty['company_contact'], '')) ?>
+                </a>
               </div>
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
@@ -2216,7 +2514,9 @@ if ($photo != '') {
                   </path>
                   <rect x="2" y="4" width="20" height="16" rx="2">
                   </rect>
-                </svg> <?= o1e(o1nv($ty['company_email'], '')) ?>
+                </svg> <a href="mailto:<?= o1e(o1nv($ty['company_email'], '')) ?>">
+                  <?= o1e(o1nv($ty['company_email'], '')) ?>
+                </a>
               </div>
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
@@ -2229,7 +2529,68 @@ if ($photo != '') {
                 </svg> <?= o1e(o1nv($ty['website'], '')) ?>
               </div>
             </div>
+
+            <!-- =========================== Dipti -->
             <div class="flex gap-2 mt-4">
+
+              <?php if (!empty($social_links['instagram'])) { ?>
+                <a href="<?= o1e($social_links['instagram']) ?>" style="text-decoration:none; display:inline-block;">
+                  <span class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram w-3.5 h-3.5" aria-hidden="true">
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5">
+                      </rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z">
+                      </path>
+                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5">
+                      </line>
+                    </svg>
+                  </span>
+                </a>
+              <?php } ?>
+
+              <?php if (!empty($social_links['facebook'])) { ?>
+                <a href="<?= o1e($social_links['facebook']) ?>" style="text-decoration:none; display:inline-block;">
+                  <span class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook w-3.5 h-3.5" aria-hidden="true">
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z">
+                      </path>
+                    </svg>
+                  </span>
+                </a>
+              <?php } ?>
+
+              <?php if (!empty($social_links['linkedin'])) { ?>
+                <a href="<?= o1e($social_links['linkedin']) ?>" style="text-decoration:none; display:inline-block;">
+                  <span class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin w-3.5 h-3.5" aria-hidden="true">
+                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
+                      </path>
+                      <rect width="4" height="12" x="2" y="9">
+                      </rect>
+                      <circle cx="4" cy="4" r="2">
+                      </circle>
+                    </svg>
+                  </span>
+                </a>
+              <?php } ?>
+
+              <?php if (!empty($social_links['youtube'])) { ?>
+                <a href="<?= o1e($social_links['youtube']) ?>" style="text-decoration:none; display:inline-block;">
+                  <span class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube w-3.5 h-3.5" aria-hidden="true">
+                      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17">
+                      </path>
+                      <path d="m10 15 5-3-5-3z">
+                      </path>
+                    </svg>
+                  </span>
+                </a>
+              <?php } ?>
+
+            </div>
+            <!-- ============================= -->
+
+            <!-- <div class="flex gap-2 mt-4">
               <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram w-3.5 h-3.5" aria-hidden="true">
                   <rect width="20" height="20" x="2" y="2" rx="5" ry="5">
@@ -2264,7 +2625,7 @@ if ($photo != '') {
                   </path>
                 </svg>
               </div>
-            </div>
+            </div> -->
           </div>
           <div class="rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy);box-shadow:var(--shadow-card)">
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Prepared By</div>
@@ -2280,7 +2641,11 @@ if ($photo != '') {
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
                   <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
                   </path>
-                </svg> <?= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) ?>
+                </svg> <? //= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) 
+                        ?>
+                <a href="tel:<?= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) ?>">
+                  <?= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) ?>
+                </a>
               </div>
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
@@ -2288,7 +2653,9 @@ if ($photo != '') {
                   </path>
                   <rect x="2" y="4" width="20" height="16" rx="2">
                   </rect>
-                </svg> <?= o1e(o1nv($ty['company_email'], '')) ?>
+                </svg> <a href="mailto:<?= o1e(o1nv($ty['company_email'], '')) ?>">
+                  <?= o1e(o1nv($ty['company_email'], '')) ?>
+                </a>
               </div>
             </div>
             <p class="mt-5 font-serif-soft italic text-cream/80 text-[12px]">&quot;Travel is the only thing you buy that makes you richer. Let&#x27;s make yours unforgettable.&quot;</p>
@@ -2303,7 +2670,7 @@ if ($photo != '') {
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
         <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-        <span class="text-[color:var(--gold)]">âœ¦ âœ¦ âœ¦</span>
+        <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>09<!-- --> / 09</span>
       </div>
     </section>
