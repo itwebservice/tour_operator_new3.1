@@ -26,7 +26,8 @@ $quotation_id = $_GET['quotation_id'];
 
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
 $tcs_note_show = ($sq_quotation['booking_type'] != 'Domestic') ? $tcs_note : '';
-$sq_package_name = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$sq_quotation[package_id]'"));
+$package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
+$sq_package_name = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_lookup_id'"));
 
 $sq_terms_cond_count = mysqli_num_rows(mysqlQuery("select dest_id from terms_and_conditions where type='Package Quotation' and dest_id='$sq_package_name[dest_id]' and active_flag ='Active'"));
 $dest_id = ($sq_terms_cond_count != 0) ? $sq_package_name['dest_id'] : 0;

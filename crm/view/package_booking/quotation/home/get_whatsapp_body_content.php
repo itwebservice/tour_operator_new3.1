@@ -14,7 +14,7 @@ error_log("Selected Options: " . print_r($options, true));
 
 // Get quotation details
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id'"));
-$sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master WHERE package_id = '{$sq_quotation['package_id']}'"));
+$sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master WHERE package_id = '".get_quotation_package_lookup_id($sq_quotation)."'"));
 
 // Get costing details
 $sq_cost = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM package_tour_quotation_costing_entries WHERE quotation_id = '$quotation_id' ORDER BY sort_order LIMIT 1"));

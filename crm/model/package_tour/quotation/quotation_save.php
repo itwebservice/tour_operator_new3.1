@@ -3,6 +3,7 @@ class quotation_save{
 
 public function quotation_master_save()
 {
+	ensure_quotation_refer_id_column();
 	$login_id = $_POST['login_id'];
 	$emp_id = $_POST['emp_id'];
 	$enquiry_id = $_POST['enquiry_id'];
@@ -123,6 +124,14 @@ public function quotation_master_save()
 	$child_without_arr = isset($_POST['child_without_arr']) ? $_POST['child_without_arr'] : [];
 
 	$package_id_arr = $_POST['package_id_arr'] ?: [];
+	$is_ai_quotation = isset($_POST['is_ai_quotation']) ? $_POST['is_ai_quotation'] : '0';
+	$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
+	$quotation_refer_id = 0;
+
+	if ($is_ai_quotation == '1' && $dest_id > 0) {
+		$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
+		$package_id_arr = array('0');
+	}
 	$discount = $_POST['discount'];
 	$flight_acost = $_POST['flight_acost'];
 	$flight_ccost = $_POST['flight_ccost'];
@@ -161,7 +170,7 @@ public function quotation_master_save()
 		$quotation_id = $sq_max['max']+1;
 	    $quotation_id_arr[$i] = $quotation_id;
 		$whatsapp_no = $country_code.$mobile_no;
-		$sq_quotation = mysqlQuery("insert into package_tour_quotation_master ( quotation_id,enquiry_id, branch_admin_id,financial_year_id, tour_name, from_date, to_date, total_days, customer_name, email_id,mobile_no,country_code,whatsapp_no, total_adult, total_infant, total_passangers, children_without_bed, children_with_bed, quotation_date, booking_type, train_cost, flight_cost, cruise_cost, visa_cost, guide_cost,misc_cost, price_str_url, package_id, created_at, login_id,emp_id,inclusions,exclusions,costing_type,currency_code,discount,status, train_acost, flight_acost, cruise_acost, train_ccost, flight_ccost, cruise_ccost, train_icost, flight_icost, cruise_icost,other_desc,user_id) values ( '$quotation_id','$enquiry_id', '$branch_admin_id','$financial_year_id', '$tour_name', '$from_date', '$to_date', '$total_days', '$customer_name', '$email_id','$whatsapp_no','$country_code','$mobile_no', '$total_adult', '$total_infant', '$total_passangers', '$children_without_bed', '$children_with_bed', '$quotation_date', '$booking_type', '$train_cost','$flight_cost','$cruise_cost','$visa_cost','$guide_cost','$misc_cost','$price_str_url','$package_id_arr[$i]', '$created_at', '$login_id', '$emp_id','$incl','$excl','$costing_type','$currency_code','$discount','1','$train_acost','$flight_acost','$cruise_acost','$train_ccost','$flight_ccost','$cruise_ccost','$train_icost','$flight_icost','$cruise_icost','$other_desc','$user_id')");
+		$sq_quotation = mysqlQuery("insert into package_tour_quotation_master ( quotation_id,enquiry_id, branch_admin_id,financial_year_id, tour_name, from_date, to_date, total_days, customer_name, email_id,mobile_no,country_code,whatsapp_no, total_adult, total_infant, total_passangers, children_without_bed, children_with_bed, quotation_date, booking_type, train_cost, flight_cost, cruise_cost, visa_cost, guide_cost,misc_cost, price_str_url, package_id, quotation_refer_id, created_at, login_id,emp_id,inclusions,exclusions,costing_type,currency_code,discount,status, train_acost, flight_acost, cruise_acost, train_ccost, flight_ccost, cruise_ccost, train_icost, flight_icost, cruise_icost,other_desc,user_id) values ( '$quotation_id','$enquiry_id', '$branch_admin_id','$financial_year_id', '$tour_name', '$from_date', '$to_date', '$total_days', '$customer_name', '$email_id','$whatsapp_no','$country_code','$mobile_no', '$total_adult', '$total_infant', '$total_passangers', '$children_without_bed', '$children_with_bed', '$quotation_date', '$booking_type', '$train_cost','$flight_cost','$cruise_cost','$visa_cost','$guide_cost','$misc_cost','$price_str_url','$package_id_arr[$i]', '$quotation_refer_id', '$created_at', '$login_id', '$emp_id','$incl','$excl','$costing_type','$currency_code','$discount','1','$train_acost','$flight_acost','$cruise_acost','$train_ccost','$flight_ccost','$cruise_ccost','$train_icost','$flight_icost','$cruise_icost','$other_desc','$user_id')");
 
 		// Only create image entry if pckg_daywise_url is not empty (gallery images)
 		// Uploaded images are already handled by upload_itinerary_image.php
@@ -207,7 +216,7 @@ public function quotation_master_save()
 		// Update temporary quotation IDs in package_tour_quotation_images table
 		$this->update_temporary_quotation_ids_in_images($quotation_id_arr, $temp_quotation_id, $package_id_arr);
 		
-		$this->program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url);	
+		$this->program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url, $quotation_refer_id);	
 
 		echo "Quotation has been successfully saved. Quotation ID: " . $quotation_id_arr[0];
 		exit;
@@ -421,7 +430,7 @@ public function update_temporary_quotation_ids_in_images($quotation_id_arr, $tem
 	}
 }
 
-public function program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url)
+public function program_entries_save($quotation_id_arr,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$package_id_arr,$pckg_daywise_url, $quotation_refer_id = 0)
 {
 	error_log("DEBUG: program_entries_save called with:");
 	error_log("quotation_id_arr: " . print_r($quotation_id_arr, true));
@@ -468,8 +477,10 @@ public function program_entries_save($quotation_id_arr,$attraction_arr, $program
 			$meal_plan = addslashes($meal_plan_arr[$j]);
 			$day_image = isset($day_image_arr[$j]) ? addslashes($day_image_arr[$j]) : '';
 			
-			// Use the first package ID if available, otherwise use 1 as default
 			$package_id = !empty($package_id_arr) ? $package_id_arr[0] : 1;
+			if (intval($package_id) == 0 && intval($quotation_refer_id) > 0) {
+				$package_id = intval($quotation_refer_id);
+			}
 			
 			error_log("DEBUG: Inserting program data - ID: $id, Quotation ID: $quotation_id, Package ID: $package_id, Attraction: $attr, Day Image: $day_image");
 			$sq_plane = mysqlQuery("insert into package_quotation_program ( id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_image,day_count ) values ( '$id', '$quotation_id','$package_id', '$attr','$program', '$stay','$meal_plan','$day_image','$day_count')");

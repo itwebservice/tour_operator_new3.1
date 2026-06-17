@@ -1,6 +1,8 @@
 <?php
-$sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_id'"));
-$package_name = $sq_package['package_name'];
+$package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
+$is_ai_quotation = is_ai_package_quotation($sq_quotation) ? 1 : 0;
+$sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_lookup_id'"));
+$package_name = isset($sq_package['package_name']) ? $sq_package['package_name'] : '';
 ?>
 <form id="frm_tab3">
 

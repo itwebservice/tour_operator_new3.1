@@ -255,9 +255,10 @@
 $pp_costing = [];
 
 $sq_pp = mysqlQuery("SELECT * FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
-
-while($row = mysqli_fetch_assoc($sq_pp)) {
-    $pp_costing[$row['pax_type']] = $row;
+if ($sq_pp) {
+    while ($row = mysqli_fetch_assoc($sq_pp)) {
+        $pp_costing[$row['pax_type']] = $row;
+    }
 }
 
 // Safe getter function
@@ -1060,7 +1061,9 @@ $('#frm_tab4').validate({
 
         var enquiry_id = $('#enquiry_id12').val();
 
-        var package_id = $('#package_id1').val();
+        var package_id = $('#is_ai_quotation').val() === '1' ? '0' : $('#package_id1').val();
+        var is_ai_quotation = $('#is_ai_quotation').val() || '0';
+        var dest_id = $('#quotation_dest_id').val() || $('#dest_name').val() || $('#dest_name_hidden').val() || '';
         var tour_name = $('#tour_name12').val();
         var from_date = $('#from_date12').val();
 
@@ -1781,7 +1784,9 @@ $('#frm_tab4').validate({
                             chwob_arr: chwob_arr,
                             infant_arr: infant_arr,
                             discount: discount,
-                            flight_acost : flight_acost,flight_ccost:flight_ccost,flight_icost:flight_icost,train_acost:train_acost,train_ccost:train_ccost,train_icost:train_icost,cruise_acost:cruise_acost,cruise_ccost:cruise_ccost,cruise_icost:cruise_icost,other_desc:other_desc
+                            flight_acost : flight_acost,flight_ccost:flight_ccost,flight_icost:flight_icost,train_acost:train_acost,train_ccost:train_ccost,train_icost:train_icost,                            cruise_acost:cruise_acost,cruise_ccost:cruise_ccost,cruise_icost:cruise_icost,other_desc:other_desc,
+                            is_ai_quotation: is_ai_quotation,
+                            dest_id: dest_id
                         },
 
                         success: function(message) {

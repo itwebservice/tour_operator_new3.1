@@ -1,7 +1,7 @@
 <?php
 class GeminiController
 {
-    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyCAC3eUrwFXdyhdXW8OKgOo-wIiQOOcpgs';
+    private $url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=AIzaSyB-yDhmyvZa2YNt4zY_LN6yj9B4igDS0dQ';
     
     private $promptTemplate = 
         'You are an AI that extracts structured travel itinerary data from raw, unstructured text.
@@ -42,7 +42,7 @@ class GeminiController
         * EXCEPT vehicle object fields where empty string "" must be used
 
         OUTPUT FORMAT (STRICT JSON ONLY):
-        {"itinerary":{"destination":[],"total_days":0,"weekend_days":[],"special_attractions":[],"detailed_program":[{"day":0,"date":"YYYY-MM-DD","special_attraction":"","day_wise_program":"","overnight_stay":"","meal_plan":""}],"inclusions":[],"exclusions":[]},"day_wise_activity":[{"day":0,"date":"YYYY-MM-DD","activity_title":"","activity_type":"","activity_location":null,"start_time":null,"end_time":null,"duration":null,"is_optional":false,"activity_cost":0,"currency":null,"description":""}],"hotels":[{"city_name":"","hotel_name":"","category":"","check_in_date":"YYYY-MM-DD","check_out_date":"YYYY-MM-DD","total_rooms":0,"extra_bed":0}],"vehicle":[{"day":0,"date":"YYYY-MM-DD","vehicle_name":"","service_type":"","pickup_from":"","drop_to":"","total_vehicles":0}],"costings":[{"adult_cost_per_person":0,"adult_with_extra_bed_cost":0,"child_with_extra_bed_cost":0,"child_with_no_bed_cost":0,"total_cost":0,"currency":""}],"terms_and_conditions":{"general":[],"payment_policy":[],"cancellation_policy":[],"important_notes":[]}}
+        {"itinerary":{"destination":[],"total_days":0,"weekend_days":[],"special_attractions":[],"detailed_program":[{"day":0,"date":"YYYY-MM-DD","special_attraction":"","day_wise_program":"","overnight_stay":"","meal_plan":""}],"inclusions":[],"exclusions":[]},"hotels":[{"city_name":"","hotel_name":"","category":"","check_in_date":"YYYY-MM-DD","check_out_date":"YYYY-MM-DD","total_rooms":0,"extra_bed":0}],"vehicle":[{"day":0,"date":"YYYY-MM-DD","vehicle_name":"","service_type":"","pickup_from":"","drop_to":"","total_vehicles":0}],"costings":[{"adult_cost_per_person":0,"adult_with_extra_bed_cost":0,"child_with_extra_bed_cost":0,"child_with_no_bed_cost":0,"total_cost":0,"currency":""}],"terms_and_conditions":{"general":[],"payment_policy":[],"cancellation_policy":[],"important_notes":[]}}
 
         EXTRACTION RULES:
         * Do NOT hallucinate missing values → use null
@@ -61,61 +61,6 @@ class GeminiController
         SPECIAL ATTRACTIONS EXTRACTION (VERY IMPORTANT):
 
         PRIMARY RULE:
-
-        DAY TITLE PRIORITY RULE FOR detailed_program[].special_attraction
-
-        HIGHEST PRIORITY RULE:
-
-        Before applying any other special_attraction extraction logic, first extract the title text that appears immediately after the day label.
-
-        Examples:
-        Day 1: Hanoi Arrival - City Tour (-)
-        → day title = "Hanoi Arrival - City Tour"
-
-        Day 2: Hanoi – Halong Bay by Shuttle Bus – Overnight on Cruise (B, L, D)
-        → day title = "Hanoi – Halong Bay by Shuttle Bus – Overnight on Cruise"
-
-        Day 4: Danang – Bana Hill – Golden Bridge - Danang (B)
-        → day title = "Danang – Bana Hill – Golden Bridge - Danang"
-
-        EXTRACTION STEPS:
-
-        1. Detect the line beginning with:
-        Day X:
-
-        2. Extract all text after the colon ":" until the meal notation or end of line.
-
-        3. Remove meal indicators such as:
-        (-), (B), (L), (D), (B, L), (B, L, D), (Br)
-
-        4. Trim spaces and trailing punctuation.
-
-        PRIMARY ASSIGNMENT RULE:
-
-        If the extracted day title contains meaningful words, use it directly as:
-        detailed_program[].special_attraction
-
-        Do NOT replace it with individual attraction names.
-
-        GENERIC TITLES THAT SHOULD NOT BE USED DIRECTLY:
-
-        Arrival
-        Departure
-        Leisure
-        Free Day
-        Transfer
-        Check-in
-        Check-out
-
-        If the title contains only generic text, apply the normal attraction extraction rules.
-
-        FALLBACK RULE:
-
-        If no valid day title is found, then apply all existing special_attraction extraction rules.
-
-        MANDATORY RULE:
-
-        Whenever a meaningful day title exists, detailed_program[].special_attraction MUST be populated with that cleaned day title.
 
         Every detailed_program[].special_attraction MUST contain meaningful content whenever a day contains:
 
@@ -191,120 +136,6 @@ class GeminiController
         day_wise_program:
         "Leisure day at beach resort with evening free for shopping."
 
-        DAY-WISE ACTIVITY EXTRACTION (STRICT RULES – ONLY EXPLICIT ACTIVITY SECTIONS)
-
-        CRITICAL PURPOSE:
-        The day_wise_activity array is used ONLY to capture activities that are explicitly listed in dedicated activity sections such as:
-
-        * Optional Activities
-        * Activities
-        * Day-wise Activities
-        * Excursions
-        * Add-on Tours
-        * Supplement Activities
-        * Recommended Activities
-        * Sightseeing Activities
-        * Extra Activities
-
-        DO NOT populate day_wise_activity from detailed_program or itinerary day descriptions unless the activity is explicitly listed in one of the above activity sections.
-
-        SOURCE PRIORITY:
-        1. Optional Activities section
-        2. Activities section
-        3. Day-wise Activities section
-        4. Excursions section
-        5. Add-on Tours section
-        6. Supplement Activities section
-        7. Recommended Activities section
-
-        STRICT EXTRACTION RULES:
-        1. Create one day_wise_activity object ONLY for days that have explicitly listed activities in dedicated activity sections.
-        2. If only Day 2 and Day 5 have activities listed, then day_wise_activity must contain ONLY two objects.
-        3. Do NOT create day_wise_activity entries for all itinerary days.
-        4. Do NOT derive activities from detailed_program, special_attraction, or day_wise_program.
-        5. Do NOT create default arrival, departure, sightseeing, or transfer activities unless they appear inside a dedicated activity section.
-        6. If no dedicated activity section exists anywhere in the input, return:
-        "day_wise_activity":[]
-        7. Multiple activity types (optional, excursion, daily activity, etc.) should all be captured using the same structure.
-        8. Preserve the referenced itinerary day number and corresponding date from detailed_program if available.
-
-        FIELDS:
-        activity_title →
-        * Main title of the listed activity.
-        * Examples:
-        - "Albanian Night - Dinner with Folk Show"
-        - "Dinner with Sea Food Experience"
-        - "Sunset Cruise"
-        - "ATV Adventure"
-
-        activity_type →
-        Categorize into one of:
-        * "optional"
-        * "excursion"
-        * "activity"
-        * "meal"
-        * "city_tour"
-        * "sightseeing"
-        * "leisure"
-        * "other"
-
-        activity_location →
-        * Extract the city/location mentioned in the activity title or description.
-        * If not available → null.
-
-        start_time →
-        * Extract if explicitly mentioned; otherwise null.
-
-        end_time →
-        * Extract if explicitly mentioned; otherwise null.
-
-        duration →
-        * Extract if explicitly mentioned (e.g., "2 hours", "2 hrs"); otherwise null.
-
-        is_optional →
-        * true if activity comes from Optional Activities or similar add-on sections.
-        * false otherwise.
-
-        activity_cost →
-        * Extract numeric amount only.
-        * Examples:
-        - €68/p → 68
-        - USD 120 → 120
-        * If not available → 0.
-
-        currency →
-        * Extract currency code or symbol (EUR, USD, €, etc.).
-        * If not available → null.
-
-        description →
-        * Short cleaned summary of the listed activity.
-
-        SECTION DETECTION EXAMPLES:
-        The following headings should trigger extraction:
-        * OPTIONAL ACTIVITIES:
-        * ACTIVITIES:
-        * DAY WISE ACTIVITIES:
-        * EXCURSIONS:
-        * ADD-ON TOURS:
-        * RECOMMENDED ACTIVITIES:
-        * SUPPLEMENT ACTIVITIES:
-
-        EXAMPLE:
-        If input contains:
-        Day 2: Albanian Night - Dinner with Folk Show, 2 hours. €68/p
-        Day 5: Dinner with Sea Food Experience in Vlore, 2 hrs. €35/p
-
-        Then day_wise_activity must contain ONLY:
-        - One object for Day 2
-        - One object for Day 5
-
-        NOT eight objects for all itinerary days.
-
-        FINAL OUTPUT RULE:
-        day_wise_activity is an independent array containing ONLY explicitly listed activities from dedicated activity sections.
-
-        It must NOT be auto-generated from itinerary day descriptions.
-
         special_attraction:
         "Beach Leisure"
 
@@ -344,42 +175,8 @@ class GeminiController
         * NEVER keep null when meaningful itinerary content exists
 
         day_wise_program →
-        FULL CONTENT PRESERVATION RULE (HIGHEST PRIORITY):
-        The value of detailed_program[].day_wise_program MUST contain the COMPLETE cleaned narrative for that itinerary day.
-        MANDATORY RULES:
-        1. Preserve ALL paragraphs belonging to the day until the next "Day X:" heading or until a non-itinerary section begins (such as Hotels, Price, Inclusions, Exclusions, Notes, Terms and Conditions).
-        2. Do NOT stop extraction at periods (.), colons (:), semicolons (;), or ellipses (...).
-        3. Do NOT truncate after the first sentence.
-        4. Preserve all bracketed and parenthetical content exactly as written, including:
-        - (B)
-        - (B, L, D)
-        - (Note: Hotel’s check in is 14.00/15.00, Early check in is NOT included)
-        - (go to Halong Bay cruise by Shuttle Bus)
-        - (no guide)
-        - quoted text such as "Little Mekong Delta"
-        5. Preserve special punctuation and symbols such as:
-        - &
-        - /
-        - –
-        - -
-        - :
-        - ...
-        6. Merge broken lines and paragraphs into one continuous readable text.
-        7. Maintain the original sentence order.
-        8. Remove only excessive whitespace and duplicate blank lines.
-        9. Do NOT remove Note:, Important:, or similar informational sentences if they belong to the itinerary day.
+        * Full cleaned itinerary description of the day
 
-        OUTPUT FORMAT RULE:
-        Return day_wise_program as a single cleaned string containing the full day description.
-        EXAMPLE:
-        Input:
-        Day 1: Hanoi Arrival - City Tour (-)
-        Upon arrival at Noi Bai International Airport, our local guide and private driver will warmly welcome you and transfer you to the city center. Check-in at your hotel (Note: Hotels check in is 14.00/15.00, Early check in is NOT included)
-        Visit the Ho Chi Minh Complex, where Vietnams beloved leader rests peacefully.
-        Overnight in Hanoi.
-        Output day_wise_program:
-        "Upon arrival at Noi Bai International Airport, our local guide and private driver will warmly welcome you and transfer you to the city center. Check-in at your hotel (Note: Hotels check in is 14.00/15.00, Early check in is NOT included) Visit the Ho Chi Minh Complex, where Vietnam beloved leader rests peacefully."
-        
         overnight_stay →
         * Extract city/place where night stay is planned
 
@@ -508,113 +305,12 @@ class GeminiController
         * total_cost
         * currency
 
-        STANDARD FIELD MAPPING:
-        Adult Price / Per Person / Package Price / Cost Per Person
-        → adult_cost_per_person
-
-        Adult with EB / Extra Bed / Extra Bed Cost / Extra Person Cost
-        → adult_with_extra_bed_cost
-
-        Child with Bed / Child with Extra Bed / CWB
-        → child_with_extra_bed_cost
-
-        Child without Bed / Child No Bed / CNB
-        → child_with_no_bed_cost
-
-        Total / Package Cost / Grand Total
-        → total_cost
-
-        EXTRA BED DISAMBIGUATION RULE (VERY IMPORTANT):
-
-        If the pricing text contains phrases such as:
-        - Extra bed
-        - Extra Bed Cost
-        - Extra Person
-        - Additional Person
-        - Extra Mattress
-        - Additional Adult
-        - Extra Adult
-
-        AND the text does NOT explicitly mention any child-related keyword such as:
-        - Child
-        - Children
-        - Kid
-        - Infant
-        - CWB
-        - CNB
-
-        THEN map the amount to:
-        adult_with_extra_bed_cost
-
-        NOT to:
-        child_with_extra_bed_cost
-
-        CHILD-SPECIFIC RULE:
-
-        Only populate child_with_extra_bed_cost when the pricing text explicitly contains child-related wording such as:
-        - Child with Bed
-        - Child with Extra Bed
-        - Children with Bed
-        - CWB
-
-        Only populate child_with_no_bed_cost when the pricing text explicitly contains:
-        - Child without Bed
-        - Child No Bed
-        - CNB
-
-        EXAMPLE 1:
-
-        Input:
-        Extra bed 01. Rs.9500/-
-
-        Output:
-        adult_with_extra_bed_cost = 9500
-
-        EXAMPLE 2:
-
-        Input:
-        Child with Bed Rs.9500
-
-        Output:
-        child_with_extra_bed_cost = 9500
-
-        EXAMPLE 3:
-
-        Input:
-        Additional Adult Rs.9500
-
-        Output:
-        adult_with_extra_bed_cost = 9500
-
-        EXAMPLE 4:
-
-        Input:
-        CWB Rs.7500
-
-        Output:
-        child_with_extra_bed_cost = 7500
-
-        TOTAL COST EXTRACTION RULE:
-
-        If text contains:
-        - Total cost of package Rs.18700 per person
-        - Package Price Rs.18700 per person
-
-        Then:
-        adult_cost_per_person = 18700
-
-        Set total_cost only when an actual total package amount is explicitly stated for the whole booking rather than per person.
-
-        CURRENCY RULE:
-
-        Extract currency symbols and normalize:
-        - Rs., INR, ₹ → INR
-        - USD, $ → USD
-        - EUR, € → EUR
-
-        MISSING VALUES RULE:
-        If a pricing field is not present, return 0.
-        DO NOT GUESS child pricing from generic "Extra Bed" text.
+        Map variations like:
+        Adult Price / Per Person → adult_cost_per_person
+        Adult with EB / Extra Bed → adult_with_extra_bed_cost
+        Child with Bed / CWB → child_with_extra_bed_cost
+        Child without Bed / CNB → child_with_no_bed_cost
+        Total / Package Cost → total_cost
 
         TERMS AND CONDITIONS EXTRACTION:
         Extract all terms & conditions from INPUT_TEXT
@@ -637,37 +333,8 @@ class GeminiController
         STANDARD EXTRACTION
         If sections exist:
         Extract all bullet points or lines under each section
-        Extract each inclusion or exclusion as a complete logical item.
-        Treat each bullet point OR each non-empty line under the section as one item.
-        Preserve the FULL content of the line, including all sentences separated by periods (.).
-        Do NOT split an item at periods (.).
-        Do NOT split an item at commas (,), semicolons (;), or parentheses.
-        Continue capturing text until:
-        - the next bullet point
-        - the next non-empty line
-        - or a new unrelated section begins.
-        - If a line contains multiple sentences, keep them together as a single array item.
-        - Remove only the leading bullet markers such as: (•, -, *, !!)
-        - Trim extra spaces.
-        - Remove duplicate items.
-        - Preserve text exactly as written.
-
-        EXAMPLES:
-
-        Input:
-        All other transportation as per itinerary. Transfers as per the itinerary (Sprinter PVT)
-        Output:
-        "All other transportation as per itinerary. Transfers as per the itinerary (Sprinter PVT)"
-
-        Input:
-        International airfare and airport taxes. Airfares or VISA charges.
-        Output:
-        "International airfare and airport taxes. Airfares or VISA charges."
-
-        Input:
-        Local city/tourist tax (to be paid upon check in hotel)
-        Output:
-        "Local city/tourist tax (to be paid upon check in hotel)"
+        Stop when a new unrelated section begins
+        Clean symbols (•, -, *, !!), trim spaces, remove duplicates
 
         PARAGRAPH-BASED EXTRACTION
         If written in sentence form (e.g., “includes hotel, meals… not includes airfare…”):

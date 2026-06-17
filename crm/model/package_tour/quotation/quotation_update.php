@@ -3,6 +3,7 @@ class quotation_update{
 
 public function quotation_master_update()
 {
+	ensure_quotation_refer_id_column();
 	$quotation_id = $_POST['quotation_id'];
 	error_log("QUOTATION UPDATE: Starting update for quotation_id = " . $quotation_id);
 	
@@ -13,6 +14,14 @@ public function quotation_master_update()
 	}
 	$enquiry_id = $_POST['enquiry_id'];
 	$package_id = $_POST['package_id'];
+	$is_ai_quotation = isset($_POST['is_ai_quotation']) ? $_POST['is_ai_quotation'] : '0';
+	$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
+	$quotation_refer_id = 0;
+
+	if ($is_ai_quotation == '1' && $dest_id > 0) {
+		$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
+		$package_id = 0;
+	}
 	$tour_name = $_POST['tour_name'];
     $from_date = $_POST['from_date'];
     $to_date = $_POST['to_date'];
@@ -175,7 +184,7 @@ public function quotation_master_update()
 	$to_date = get_date_db($to_date);
 	$whatsapp_no = $country_code.$mobile_no;
 
-	$sq_quotation = mysqlQuery("update package_tour_quotation_master set tour_name = '$tour_name', from_date = '$from_date', to_date = '$to_date', total_days = '$total_days', customer_name = '$customer_name', email_id='$email_id',mobile_no='$whatsapp_no',whatsapp_no='$mobile_no',country_code='$country_code', total_adult = '$total_adult', total_infant = '$total_infant', total_passangers = '$total_passangers', children_without_bed = '$children_without_bed', children_with_bed = '$children_with_bed', quotation_date='$quotation_date', booking_type = '$booking_type', train_cost = '$train_cost', flight_cost = '$flight_cost',cruise_cost='$cruise_cost', visa_cost = '$visa_cost', guide_cost= '$guide_cost',misc_cost='$misc_cost', price_str_url= '$price_str_url', enquiry_id= '$enquiry_id',inclusions='$inclusions',exclusions='$exclusions',costing_type='$costing_type',currency_code='$currency_code',discount='$discount',status='$active_flag', train_acost='$train_acost',flight_acost='$flight_acost', cruise_acost='$cruise_acost', train_ccost='$train_ccost', flight_ccost='$flight_ccost', cruise_ccost='$cruise_ccost', train_icost='$train_icost', flight_icost='$flight_icost', cruise_icost='$cruise_icost',other_desc='$other_desc',user_id='$user_id',created_at=NOW() where quotation_id = '$quotation_id'");
+	$sq_quotation = mysqlQuery("update package_tour_quotation_master set tour_name = '$tour_name', from_date = '$from_date', to_date = '$to_date', total_days = '$total_days', customer_name = '$customer_name', email_id='$email_id',mobile_no='$whatsapp_no',whatsapp_no='$mobile_no',country_code='$country_code', total_adult = '$total_adult', total_infant = '$total_infant', total_passangers = '$total_passangers', children_without_bed = '$children_without_bed', children_with_bed = '$children_with_bed', quotation_date='$quotation_date', booking_type = '$booking_type', train_cost = '$train_cost', flight_cost = '$flight_cost',cruise_cost='$cruise_cost', visa_cost = '$visa_cost', guide_cost= '$guide_cost',misc_cost='$misc_cost', price_str_url= '$price_str_url', enquiry_id= '$enquiry_id', package_id='$package_id', quotation_refer_id='$quotation_refer_id', inclusions='$inclusions',exclusions='$exclusions',costing_type='$costing_type',currency_code='$currency_code',discount='$discount',status='$active_flag', train_acost='$train_acost',flight_acost='$flight_acost', cruise_acost='$cruise_acost', train_ccost='$train_ccost', flight_ccost='$flight_ccost', cruise_ccost='$cruise_ccost', train_icost='$train_icost', flight_icost='$flight_icost', cruise_icost='$cruise_icost',other_desc='$other_desc',user_id='$user_id',created_at=NOW() where quotation_id = '$quotation_id'");
 	
 	error_log("QUOTATION UPDATE: UPDATE query executed for quotation_id = " . $quotation_id . ", result = " . ($sq_quotation ? "success" : "failed"));
 	
@@ -206,7 +215,7 @@ public function quotation_master_update()
 		$this->tranport_entries_update($quotation_id,$vehicle_name_arr,$start_date_arr,$pickup_arr,$drop_arr,$vehicle_count_arr,$transport_cost_arr1,$package_name_arr1,$pickup_type_arr,$drop_type_arr, $package_id,$transport_status_arr,$transport_id_arr,$end_date_arr,$service_duration_arr);	
 		$this->excursion_entries_save($quotation_id,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$excursion_id_arr,$exc_status_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr,$vehicle_id_arr_e);
 		$this->costing_entries_update($tour_cost_arr,$transport_cost_arr, $basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr, $costing_id_arr,$excursion_cost_arr,$adult_cost,$infant_cost,$child_with,$child_without,$bsmValues,$quotation_id,$entry_id_arr,$discount_in_arr,$discount_arr);
-		$this->program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr);	
+		$this->program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr, $quotation_refer_id);	
 		
 		// Copy image entries from original quotation to new quotation
 		$this->copy_image_entries($quotation_id, $package_id);
@@ -267,11 +276,15 @@ public function quotation_master_update()
 }
 
 
-public function program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr)
+public function program_entries_save($quotation_id,$attraction_arr, $program_arr, $stay_arr,$meal_plan_arr,$day_image_arr,$package_p_id_arr,$checked_programe_arr1,$package_id,$day_count_arr, $quotation_refer_id = 0)
 {
 	// First, delete all existing entries for this quotation to prevent duplicates
 	$delete_query = "DELETE FROM package_quotation_program WHERE quotation_id = '$quotation_id'";
 	$delete_result = mysqlQuery($delete_query);
+
+	if (intval($package_id) == 0 && intval($quotation_refer_id) > 0) {
+		$package_id = intval($quotation_refer_id);
+	}
 	
 	for($i=0; $i<sizeof($program_arr); $i++)
 	{
@@ -699,6 +712,14 @@ function quotation_daywiseimages_update(){
 			$day_image_arr = isset($_POST['day_image_arr']) ? $_POST['day_image_arr'] : [];
 			$package_p_id_arr = $_POST['package_p_id_arr'];
 			$package_id = $_POST['package_id'];
+			$is_ai_quotation = isset($_POST['is_ai_quotation']) ? $_POST['is_ai_quotation'] : '0';
+			$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
+			$quotation_refer_id = 0;
+			if ($is_ai_quotation == '1' && $dest_id > 0) {
+				$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
+				$package_id = 0;
+				mysqlQuery("update package_tour_quotation_master set package_id='0', quotation_refer_id='$quotation_refer_id' where quotation_id='$quotation_id'");
+			}
 			
 			error_log("QUOTATION UPDATE: Itinerary data - checked_programe_arr1: " . print_r($checked_programe_arr1, true));
 			error_log("QUOTATION UPDATE: Itinerary data - attraction_arr: " . print_r($attraction_arr, true));
@@ -706,7 +727,7 @@ function quotation_daywiseimages_update(){
 			error_log("QUOTATION UPDATE: Itinerary data - day_image_arr: " . print_r($day_image_arr, true));
 			
 			// Save the itinerary data
-			$this->program_entries_save($quotation_id, $attraction_arr, $program_arr, $stay_arr, $meal_plan_arr, $day_image_arr, $package_p_id_arr, $checked_programe_arr1, $package_id, $day_count_arr);
+			$this->program_entries_save($quotation_id, $attraction_arr, $program_arr, $stay_arr, $meal_plan_arr, $day_image_arr, $package_p_id_arr, $checked_programe_arr1, $package_id, $day_count_arr, $quotation_refer_id);
 			
 			error_log("QUOTATION UPDATE: Itinerary data saved successfully");
 			

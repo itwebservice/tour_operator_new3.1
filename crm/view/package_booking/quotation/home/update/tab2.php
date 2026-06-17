@@ -185,11 +185,16 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
                 <!-- Hidden fields for package data -->
                 <?php
-                $sq_pacakge = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$sq_quotation[package_id]'"));
+                $is_ai_quotation = is_ai_package_quotation($sq_quotation) ? 1 : 0;
+                $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
+                $sq_pacakge = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$package_lookup_id'"));
                 $sq_destination = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id='{$sq_pacakge['dest_id']}'"));
                 ?>
-                <input type="hidden" value="<?= $sq_pacakge['dest_id'] ?>" id='dest_name_hidden'>
-                <input type="hidden" value="<?= $sq_quotation['package_id'] ?>" id='img_package_id'>
+                <input type="hidden" value="<?= isset($sq_pacakge['dest_id']) ? $sq_pacakge['dest_id'] : '' ?>" id='dest_name_hidden'>
+                <input type="hidden" value="<?= $is_ai_quotation ? 0 : $sq_quotation['package_id'] ?>" id='img_package_id'>
+                <input type="hidden" id="is_ai_quotation" value="<?= $is_ai_quotation ?>">
+                <input type="hidden" id="quotation_refer_id" value="<?= intval($sq_quotation['quotation_refer_id']) ?>">
+                <input type="hidden" id="quotation_dest_id" value="<?= isset($sq_pacakge['dest_id']) ? $sq_pacakge['dest_id'] : '' ?>">
                 <input type='hidden' id='pckg_daywise_url' name='pckg_daywise_url' />
                 <input type='hidden' id='quotation_id' name='quotation_id' value='<?= $quotation_id ?>' />
                 <input type='hidden' id='base_url' name='base_url' value='<?= BASE_URL ?>' />
@@ -952,8 +957,9 @@ function findImageUrl($image_path, $is_new_quotation = false)
         sessionStorage.setItem('tab2_form_data', JSON.stringify(formData));
         console.log("Form data stored in sessionStorage:", formData);
 
-        var dest_id = $('#dest_name').val();
-        var package_id = $('#img_package_id').val();
+        var dest_id = $('#dest_name').val() || $('#quotation_dest_id').val();
+        var is_ai_quotation = $('#is_ai_quotation').val() || '0';
+        var package_id = is_ai_quotation === '1' ? '0' : $('#img_package_id').val();
         var package_id_arr = [package_id];
 
         // Save the itinerary data to server first
@@ -985,7 +991,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
             },
             data: {
                 quotation_id: '<?php echo $quotation_id; ?>',
-                package_id: '<?php echo $package_id; ?>',
+                package_id: package_id,
                 checked_programe_arr: checked_programe_arr,
                 attraction_arr: attraction_arr,
                 program_arr: program_arr,
@@ -995,10 +1001,10 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 day_count_arr: day_count_arr,
                 day_image_arr: day_image_arr,
                 existing_image_path_arr: existing_image_path_arr,
-                dest_id: $('#dest_name').val(),
-                package_id: $('#img_package_id').val(),
+                dest_id: dest_id,
+                is_ai_quotation: is_ai_quotation,
                 nights_filter: $('#nights_filter').val(),
-                action: 'save_itinerary_only' // Flag to indicate this is just saving itinerary data
+                action: 'save_itinerary_only'
             },
             success: function(result) {
                 console.log('TAB2: AJAX success - Itinerary data saved successfully:', result);
@@ -1238,6 +1244,10 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
     // Function to pre-select the saved package (checkbox only)
     function preselectPackage() {
+        if ($('#is_ai_quotation').val() === '1') {
+            console.log('AI quotation - skipping package preselection');
+            return;
+        }
         var saved_package_id = $('#img_package_id').val();
         console.log('=== PRESELECT PACKAGE DEBUG ===');
         console.log('Saved package ID from img_package_id:', saved_package_id);

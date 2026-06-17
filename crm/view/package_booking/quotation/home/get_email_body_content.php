@@ -18,7 +18,7 @@ $sq_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT *,
 	COALESCE(parent_quotation_id, '0') as parent_quotation_id,
 	COALESCE(quotation_id_display, '') as quotation_display_id
 	FROM package_tour_quotation_master WHERE quotation_id = '$quotation_id'"));
-$sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master WHERE package_id = '{$sq_quotation['package_id']}'"));
+$sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master WHERE package_id = '".get_quotation_package_lookup_id($sq_quotation)."'"));
 
 // Get costing details
 $sq_cost = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM package_tour_quotation_costing_entries WHERE quotation_id = '$quotation_id' ORDER BY sort_order LIMIT 1"));
