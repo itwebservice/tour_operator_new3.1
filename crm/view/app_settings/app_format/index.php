@@ -214,6 +214,14 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
 <div id="invoice_format_image" class="main_block"></div>
 
 <script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
+
+<script>
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.qb_remove_testm')) {
+      e.target.closest('.testimonial_row').remove();
+    }
+  });
+</script>
 <script type="text/javascript">
   $('#destination_format_filter').select2();
 

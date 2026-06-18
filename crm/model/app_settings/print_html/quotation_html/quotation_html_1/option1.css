@@ -146,13 +146,15 @@
   display: none !important;
 }
 
-.watermark{
-  pointer-events:none !important;
-}
 
 a{
   pointer-events:auto !important;
   cursor:pointer !important;
+  position:relative;
+  z-index:9999;
+}
+.watermark{
+  pointer-events:none !important;
 }
 /* ========================================== */
 

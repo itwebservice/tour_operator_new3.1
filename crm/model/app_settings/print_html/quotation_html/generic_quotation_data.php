@@ -434,7 +434,11 @@ order by terms_and_conditions_id desc limit 1");
     $flights = array();
 
     foreach (gqd_rows("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'") as $f) {
-
+      // echo '<pre>';
+      // echo "FROM DB: " . $f['from_location'] . "\n";
+      // echo "TO DB: " . $f['to_location'] . "\n";
+      // print_r($f);
+      // echo '</pre>';
       $aid = gqd_esc($f['airline_name']);
 
       // $airline = gqd_row("select airline_name, airline_code, airline_logo from airline_master where airline_id='$aid'");
@@ -477,6 +481,7 @@ order by terms_and_conditions_id desc limit 1");
         'stop_type'      => 'Non-stop',
 
         'baggage'        => !empty($f['baggage']) ? $f['baggage'] : '30 KG',
+        
       );
     }
     // ============================
