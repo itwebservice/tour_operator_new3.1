@@ -2584,7 +2584,7 @@ textarea.ai-chat-textarea.form-control:focus,
 	background: #f9f9f9;
 	border: 1px solid #e1e3e8;
 	border-radius: 15px;
-	padding: 10px 12px;
+	padding: 20px 12px 10px 12px;
 	align-items: center;
 	gap: 25px;
 	opacity: 0;
@@ -2629,7 +2629,7 @@ textarea.ai-chat-textarea.form-control:focus,
 }
 
 .ai-day-program {
-	width: 50%;
+	width: 100%;
 	height: 80px !important;
 	resize: vertical;
 	line-height: 1.4;
@@ -2699,7 +2699,7 @@ textarea.ai-chat-textarea.form-control:focus,
 .send-btn {
 	position: absolute;
 	right: 20px;
-	bottom: 20px;
+	bottom: 10px;
 	width: 44px;
 	height: 44px;
 	border-radius: 50%;
