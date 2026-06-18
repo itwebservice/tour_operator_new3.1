@@ -7,7 +7,13 @@
 
                 <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_20" id="package_div">
                     <?php
-                    $sq_tours = mysqlQuery("select * from custom_package_master where status !='Inactive'"); ?>
+                    $sq_tours = mysqlQuery("select * from custom_package_master where status !='Inactive'");
+                    $quotation_refer_id_map = array();
+                    $sq_refer = mysqlQuery("SELECT dest_id, MIN(package_id) AS package_id FROM custom_package_master WHERE status != 'Inactive' GROUP BY dest_id");
+                    while ($row_refer = mysqli_fetch_assoc($sq_refer)) {
+                        $quotation_refer_id_map[$row_refer['dest_id']] = intval($row_refer['package_id']);
+                    }
+                    ?>
                     <select name="dest_name" id="dest_name" title="Select Destination"
                         onchange="load_packages_with_filter()" style="width:100%" data-add-new-option="true">
                         <option value="">*Select Destination</option>
@@ -58,6 +64,7 @@
 </i></span>
                     <span>AI</span>
                 </button>
+                        
                 <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
                     <textarea id="aiMessageInput" placeholder="Type your message..."></textarea>
 
@@ -73,15 +80,10 @@
                 <div id="aiItineraryContainer">
                 <div class="ai-itinerary-row" id="aiItineraryRow" aria-hidden="true">
                     <label class="ai-check-wrap" for="chk-program">
-                        <input id="chk-program" type="checkbox">
+                        <input id="chk-program" type="checkbox" checked>
                     </label>
                     <input type="text" class="ai-field ai-special" placeholder="*Special Attraction" value="">
-                    <div style="position: relative; display: flex; flex-direction: column; flex: 1;">
-                        <span class="style_text" style="position: absolute; right: 12px; top: -18px; display: flex; gap: 15px; z-index: 10; background: transparent; padding: 0;">
-                            <span class="style_text_b" data-wrapper="**" style="font-weight: 700; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span>
-                        </span>
-                        <textarea class="ai-field ai-day-program" placeholder="*Day-wise Program"></textarea>
-                    </div>
+                    <textarea class="ai-field ai-day-program" placeholder="*Day-wise Program"></textarea>
                     <input type="text" class="ai-field ai-stay" placeholder="*Overnight Stay" value="">
                     <select class="ai-field ai-meal">
                         <option selected>Meal Plan</option>
@@ -96,41 +98,14 @@
                         <option>No Meals</option>
                         <option>All Inclusive</option>
                     </select>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <button type="button" class="ai-plus-btn" aria-label="Add itinerary" style="padding: 10px;">+</button>
-                        <div style="position: relative; flex: 1;">
-                            <label class="btn btn-sm btn-success" for="ai-day-image" style="margin-bottom: 5px; font-size: 12px; border-radius: 4px; display: inline-block;">
-                                <i class="fa fa-image"></i> Upload Image
-                            </label>
-                            <input type="file" accept="image/*" id="ai-day-image" name="ai-day-image" onchange="handleAiImageUpload(event, 'ai-image-preview')" style="display:none;"/>
-                            <div id="ai-image-preview" style="margin-top: 5px; display: none;">
-                                <div class="image-zoom-container" style="height: 100px; width: 100px; overflow: hidden; border: 2px solid #ddd; border-radius: 8px; position: relative;">
-                                    <img id="ai-preview-img" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
-                                    <button type="button" onclick="removeAiImage('ai-day-image', 'ai-image-preview')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;" id="ai-remove-btn">×</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <button type="button" class="ai-plus-btn" id="aiPlusBtn" aria-label="Add itinerary">+</button>
                 </div>
-                <div class="row" style="margin: 20px 60px 0px 60px;">
-                    <div class="col-md-6" id="ai-inclusions-info">
-                        <h4>Inclusions</h4>
-                        <hr />
-                        <textarea id="aiInclusionsInformation" name="inclusions" placeholder="Inclusions" title="Inclusions" rows="4"></textarea>
-                        <!-- <div id="aiInclusionsInformation"></div> -->
-                    </div>
-                    <div class="col-md-6" id="ai-exclusions-info">
-                        <h4>Exclusions</h4>
-                        <hr />
-                        <textarea id="aiExclusionsInformation" name="exclusions" placeholder="Exclusions" title="Exclusions" rows="4"></textarea>
-                        <!-- <div id="aiExclusionsInformation"></div> -->
-                    </div>
                 </div>
+
                 <script>
                     const aiToggleBtn = document.getElementById("aiToggleBtn");
                     const aiChatBox = document.getElementById("aiChatBox");
                     const aiItineraryRow = document.getElementById("aiItineraryRow");
-                    const aiItineraryLegend = document.getElementById("aiItineraryLegend");
 
                     aiToggleBtn.addEventListener("click", function () {
                         aiChatBox.classList.toggle("show");
@@ -138,246 +113,9 @@
                         aiChatBox.setAttribute("aria-hidden", String(!isVisible));
                         aiItineraryRow.classList.toggle("show", isVisible);
                         aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
-                        aiItineraryLegend.style.display = isVisible ? "block" : "none";
-                    });
-
-                    function selectMealPlan($mealSelect, mealValue) {
-                        if (!mealValue) {
-                            $mealSelect.val('Meal Plan');
-                            return;
-                        }
-                        var target = String(mealValue).trim().toLowerCase();
-                        if (target === 'n/a' || target === 'na' || target === 'no meal' || target === 'no meals') {
-                            $mealSelect.val('No Meals');
-                            return;
-                        }
-                        var matchedValue = null;
-
-                        $mealSelect.find('option').each(function () {
-                            var optionText = String($(this).text() || '').trim().toLowerCase();
-                            if (optionText === target) {
-                                matchedValue = $(this).val();
-                                return false;
-                            }
-                        });
-
-                        if (matchedValue !== null) {
-                            $mealSelect.val(matchedValue);
-                        } else {
-                            $mealSelect.val('Meal Plan');
-                        }
-                    }
-
-                    function renderDetailedProgramRows(parsedData) {
-                        var programs = parsedData && parsedData.itinerary && parsedData.itinerary.detailed_program
-                            ? parsedData.itinerary.detailed_program
-                            : [];
-
-                        if (!Array.isArray(programs) || !programs.length) {
-                            return false;
-                        }
-
-                        $('.ai-itinerary-row-clone').remove();
-                        var $template = $('#aiItineraryRow');
-
-                        programs.forEach(function (item, index) {
-                            var $row = index === 0 ? $template : $template.clone(true, true);
-                            if (index > 0) {
-                                var uniqueSuffix = '_clone_' + index;
-                                $row.removeAttr('id');
-                                $row.addClass('ai-itinerary-row-clone');
-                                
-                                var $fileInput = $row.find('input[type="file"]');
-                                var oldFileId = $fileInput.attr('id');
-                                var newFileId = oldFileId ? oldFileId + uniqueSuffix : 'ai-day-image' + uniqueSuffix;
-                                $fileInput.attr('id', newFileId);
-
-                                var $label = $row.find('label[for="' + oldFileId + '"]');
-                                if ($label.length === 0 && oldFileId) {
-                                    $label = $row.find('label[for="ai-day-image"]');
-                                }
-                                $label.attr('for', newFileId);
-                                
-                                var $preview = $row.find('#ai-image-preview');
-                                if ($preview.length > 0) {
-                                    var newPreviewId = 'ai-image-preview' + uniqueSuffix;
-                                    $preview.attr('id', newPreviewId);
-                                    $preview.find('#ai-preview-img').attr('id', 'ai-preview-img' + uniqueSuffix);
-                                    $preview.find('#ai-remove-btn').attr('id', 'ai-remove-btn' + uniqueSuffix)
-                                        .attr('onclick', 'removeAiImage("' + newFileId + '", "' + newPreviewId + '")');
-                                }
-                                
-                                $fileInput.attr('onchange', 'handleAiImageUpload(event, "' + newPreviewId + '")');
-                                $row.insertAfter($('.ai-itinerary-row').last());
-                            }
-
-                            $row.attr('aria-hidden', 'false').addClass('show');
-                            $row.find('input[type="checkbox"]').prop('checked', true);
-                            $row.find('.ai-special').val(item && item.special_attraction ? item.special_attraction : '');
-                            $row.find('.ai-day-program').val(item && item.day_wise_program ? item.day_wise_program : '');
-                            $row.find('.ai-stay').val(item && item.overnight_stay ? item.overnight_stay : '');
-                            selectMealPlan($row.find('.ai-meal'), item ? item.meal_plan : null);
-                        });
-
-                        return true;
-                    }
-
-                    function renderInfoList(selector, items) {
-                        var $target = $(selector);
-                        var list = [];
-
-                        if (Array.isArray(items))
-                            list = items;
-                        else if (typeof items === 'string' && items.trim() !== '')
-                            list = [items.trim()];
-                        else if (items && typeof items === 'object') {
-                            list = Object.values(items).filter(function(v) {
-                                return v !== null && v !== undefined && String(v).trim() !== '';
-                            });
-                        }
-
-                        if (!list.length) {
-                            if ($target.is('textarea')) {
-                                $target.val('');
-
-                                if ($target.data('wysiwyg'))
-                                    $target.wysiwyg('setContent', '');
-                                
-                            } else
-                                $target.html('');
-                            
-                            return false;
-                        }
-
-                        var html = '<ul>';
-                        list.forEach(function (item) {
-                            html += '<li>' + $('<div/>').text(item || '').html() + '</li>';
-                        });
-                        html += '</ul>';
-
-                        if ($target.is('textarea')) {
-                            if ($target.data('wysiwyg'))
-                                $target.wysiwyg('setContent', html);
-                            else
-                                $target.val(list.join('\n'));
-                            
-                            $target.trigger('change');
-                        } else
-                            $target.html(html);
-                        
-                        return true;
-                    }
-
-                    function toggleInfoSection(sectionSelector, hasContent) {
-                        if (hasContent) {
-                            $(sectionSelector).show();
-                        } else {
-                            $(sectionSelector).hide();
-                        }
-                    }
-
-                    toggleInfoSection('#ai-inclusions-info', false);
-                    toggleInfoSection('#ai-exclusions-info', false);
-
-                    $('#btnAnalyseMessage').on('click', function () {
-                        var message = ($('#aiMessageInput').val() || '').trim();
-                        var base_url = $('#base_url').val();
-
-                        if (!message) {
-                            $('#aiApiInfo').text('Please enter a message.');
-                            return;
-                        }
-
-                        $('#aiApiInfo').text('');
-                        $('#aiApiInfo').text('Please Wait Analysing...');
-                        renderInfoList('#aiInclusionsInformation', []);
-                        renderInfoList('#aiExclusionsInformation', []);
-                        toggleInfoSection('#ai-inclusions-info', false);
-                        toggleInfoSection('#ai-exclusions-info', false);
-                        $('#btnAnalyseMessage').prop('disabled', true);
-
-                        $.ajax({
-                            type: 'post',
-                            url: base_url + 'controller/gemini/gemini.php',
-                            dataType: 'json',
-                            data: { text: message },
-                            success: function (response) {
-                                if (response && response.error) {
-                                    $('#aiApiInfo').text(response.error);
-                                    return;
-                                }
-
-                                if (response && response.status) {
-                                    //$('#aiApiInfo').text(response.reply || '');
-                                    $('#aiApiInfo').text('');
-
-                                    var parsed = null;
-                                    try {
-                                        parsed = JSON.parse(response.reply || '{}');
-                                    } catch (e) {
-                                        parsed = null;
-                                    }
-
-                                    if (!parsed && response.raw)
-                                        parsed = response.raw;
-
-                                    renderInfoList(
-                                        '#aiInclusionsInformation',
-                                        parsed && parsed.itinerary ? parsed.itinerary.inclusions : []
-                                    );
-                                    renderInfoList(
-                                        '#aiExclusionsInformation',
-                                        parsed && parsed.itinerary ? parsed.itinerary.exclusions : []
-                                    );
-                                    toggleInfoSection('#ai-inclusions-info', true);
-                                    toggleInfoSection('#ai-exclusions-info', true);
-
-                                    if (!renderDetailedProgramRows(parsed)) {
-                                        $('#aiApiInfo').text(response.reply || 'No detailed program found.');
-                                    }
-                                } else {
-                                    var errorMsg = (response && (response.error || response.Error))
-                                        ? (response.error || response.Error)
-                                        : 'Failed to analyse message.';
-                                    $('#aiApiInfo').text(errorMsg);
-                                }
-                            },
-                            error: function (xhr) {
-                                var errorMsg = 'Request failed.';
-                                
-                                if (xhr && xhr.responseJSON && xhr.responseJSON.error)
-                                    errorMsg = xhr.responseJSON.error;
-                                else if (xhr && xhr.responseText)
-                                    errorMsg = xhr.responseText;
-
-                                $('#aiApiInfo').text(errorMsg);
-                            },
-                            complete: function () {
-                                $('#btnAnalyseMessage').prop('disabled', false);
-                            }
-                        });
-                    });
-
-                    $('#aiMessageInput').on('input', function () {
-                        $('#aiApiInfo').text('');
-                    });
-
-                    $(document).ready(function () {
-                        var $featureEditors = $('#aiInclusionsInformation, #aiExclusionsInformation');
-                        $featureEditors.each(function () {
-                            var id = this.id;
-                            if (window.CKEDITOR && CKEDITOR.instances && CKEDITOR.instances[id])
-                                CKEDITOR.instances[id].destroy(true);
-                        });
-                        $featureEditors.each(function () {
-                            var $el = $(this);
-                            if ($el.data('wysiwyg'))
-                                $el.wysiwyg('destroy');
-                        });
-
-                        $featureEditors.wysiwyg({
-                            controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
-                            initialContent: ''
+                        document.querySelectorAll('#aiItineraryContainer .ai-itinerary-row').forEach(function(row) {
+                            row.classList.toggle("show", isVisible);
+                            row.setAttribute("aria-hidden", String(!isVisible));
                         });
                     });
                 </script>
@@ -398,6 +136,8 @@
             <input type="hidden" id="pckg_daywise_url" name="pckg_daywise_url" />
             <input type="hidden" id="is_ai_quotation" name="is_ai_quotation" value="0" />
             <input type="hidden" id="quotation_dest_id" name="quotation_dest_id" value="" />
+            <input type="hidden" id="quotation_refer_id" name="quotation_refer_id" value="0" />
+            <input type="hidden" id="quotation_refer_id_map" value='<?= htmlspecialchars(json_encode($quotation_refer_id_map), ENT_QUOTES, 'UTF-8') ?>' />
 
 </form>
 <?= end_panel() ?>
@@ -593,6 +333,7 @@ $(document).on('click', '#tab2_head', function() {
         }
 
         if (dest_id) {
+            syncQuotationReferId();
             // Debounce the loading to prevent excessive calls
             packageLoadingTimer = setTimeout(function() {
                 isLoadingPackages = true;
@@ -702,7 +443,7 @@ $(document).on('click', '#tab2_head', function() {
         var package_p_id_arr = [];
         var package_id_arr = [];
 
-        if (hasValidAiItinerary() && $('input[name="custom_package"]:checked').length === 0) {
+        if ((hasValidAiItinerary() || hasAiItineraryContent()) && $('input[name="custom_package"]:checked').length === 0) {
             var aiData = storeAiItinerarySession();
             console.log('Saving AI itinerary data:', aiData);
             return;
@@ -860,20 +601,34 @@ $(document).on('click', '#tab2_head', function() {
         var base_url = $('#base_url').val();
         window.href = base_url + 'view/custom_packages/master/package/index.php';
     }
+
+    function syncQuotationReferId() {
+        var dest_id = $('#dest_name').val() || sessionStorage.getItem('selected_destination_id') || '';
+        var referMap = {};
+        try {
+            referMap = JSON.parse($('#quotation_refer_id_map').val() || '{}');
+        } catch (e) {
+            referMap = {};
+        }
+        var refer_id = (dest_id && referMap[dest_id]) ? referMap[dest_id] : 0;
+        $('#quotation_refer_id').val(refer_id);
+        sessionStorage.setItem('quotation_refer_id', refer_id);
+        return refer_id;
+    }
+
     function collectAiItineraryArrays() {
         var attraction_arr = [], program_arr = [], stay_arr = [], meal_plan_arr = [];
         $('#aiItineraryContainer .ai-itinerary-row').each(function() {
             var $row = $(this);
-            var checked = $row.find('input[type="checkbox"]').is(':checked');
-            if (!checked) {
-                return;
-            }
             var attraction = ($row.find('.ai-special').val() || '').trim();
             var program = ($row.find('.ai-day-program').val() || '').trim();
             var stay = ($row.find('.ai-stay').val() || '').trim();
             var meal_plan = $row.find('.ai-meal').val() || '';
             if (meal_plan === 'Meal Plan') {
                 meal_plan = '';
+            }
+            if (!attraction && !program && !stay) {
+                return;
             }
             if (attraction && program && stay) {
                 attraction_arr.push(attraction);
@@ -890,6 +645,20 @@ $(document).on('click', '#tab2_head', function() {
         };
     }
 
+    function hasAiItineraryContent() {
+        var hasContent = false;
+        $('#aiItineraryContainer .ai-itinerary-row').each(function() {
+            var attraction = ($(this).find('.ai-special').val() || '').trim();
+            var program = ($(this).find('.ai-day-program').val() || '').trim();
+            var stay = ($(this).find('.ai-stay').val() || '').trim();
+            if (attraction || program || stay) {
+                hasContent = true;
+                return false;
+            }
+        });
+        return hasContent;
+    }
+
     function hasValidAiItinerary() {
         var data = collectAiItineraryArrays();
         return data.program_arr.length > 0;
@@ -898,6 +667,7 @@ $(document).on('click', '#tab2_head', function() {
     function storeAiItinerarySession() {
         var data = collectAiItineraryArrays();
         var dest_id = $('#dest_name').val() || sessionStorage.getItem('selected_destination_id') || '';
+        var refer_id = syncQuotationReferId();
         sessionStorage.setItem('is_ai_quotation', '1');
         sessionStorage.setItem('quotation_dest_id', dest_id);
         $('#is_ai_quotation').val('1');
@@ -1051,19 +821,30 @@ $(document).on('click', '#tab2_head', function() {
                 }
 
             });
-            var isAiFlow = hasValidAiItinerary();
-            if (package_id_arr.length == 0 && !isAiFlow) {
-                error_msg_alert('Please select at least one Package!');
-                return false;
-            }
+            var isAiFlow = hasValidAiItinerary() || hasAiItineraryContent();
 
             if (isAiFlow && package_id_arr.length == 0) {
-                var aiData = collectAiItineraryArrays();
-                for (var ai = 0; ai < aiData.program_arr.length; ai++) {
-                    if (!aiData.attraction_arr[ai] || !aiData.program_arr[ai] || !aiData.stay_arr[ai]) {
-                        error_msg_alert('Special Attraction, Daywise Program, and Overnight Stay are mandatory in AI row ' + (ai + 1));
+                var aiRowError = '';
+                $('#aiItineraryContainer .ai-itinerary-row').each(function(index) {
+                    var attraction = ($(this).find('.ai-special').val() || '').trim();
+                    var program = ($(this).find('.ai-day-program').val() || '').trim();
+                    var stay = ($(this).find('.ai-stay').val() || '').trim();
+                    if (!attraction && !program && !stay) {
+                        return;
+                    }
+                    if (!attraction || !program || !stay) {
+                        aiRowError = 'Special Attraction, Daywise Program, and Overnight Stay are mandatory in AI row ' + (index + 1);
                         return false;
                     }
+                });
+                if (aiRowError) {
+                    error_msg_alert(aiRowError);
+                    return false;
+                }
+                var aiData = collectAiItineraryArrays();
+                if (aiData.program_arr.length === 0) {
+                    error_msg_alert('Please enter at least one complete AI itinerary row.');
+                    return false;
                 }
                 var dest_id = $('#dest_name').val();
                 if (!dest_id) {
@@ -1077,8 +858,15 @@ $(document).on('click', '#tab2_head', function() {
             if (!isAiFlow) {
                 sessionStorage.removeItem('is_ai_quotation');
                 sessionStorage.removeItem('quotation_dest_id');
+                sessionStorage.removeItem('quotation_refer_id');
                 $('#is_ai_quotation').val('0');
                 $('#quotation_dest_id').val('');
+                $('#quotation_refer_id').val('0');
+            }
+
+            if (package_id_arr.length == 0 && !isAiFlow) {
+                error_msg_alert('Please select at least one Package!');
+                return false;
             }
 
             var attraction_arr = new Array();
@@ -1447,103 +1235,6 @@ $(document).on('click', '#tab2_head', function() {
             console.log("No stored destination found, not loading packages automatically");
         }
     });
-
-    // Event delegation for B and U text formatting buttons
-    $(document).on('click', '.style_text_b, .style_text_u', function() {
-        var wrapper = $(this).data('wrapper');
-
-        // Match existing get_packages.php behavior for selecting the target textarea.
-        var textarea = $(this).parents('.style_text').siblings('.day_program')[0];
-        if (!textarea) {
-            textarea = $(this).parents('.style_text').siblings('.ai-day-program')[0];
-        }
-        if (!textarea) {
-            console.error('Textarea not found for formatting');
-            return;
-        }
-
-        var start = textarea.selectionStart;
-        var end = textarea.selectionEnd;
-        var selectedText = textarea.value.substring(start, end);
-
-        // Wrap selected text with markdown wrappers (** / __)
-        var wrappedText = wrapper + selectedText + wrapper;
-        textarea.value = textarea.value.substring(0, start) + wrappedText + textarea.value.substring(end);
-
-        // Keep selection behavior aligned to existing implementation
-        textarea.selectionStart = start;
-        textarea.selectionEnd = end + wrapper.length * 2;
-
-        // Convert markdown wrappers to HTML tags (same as get_packages.php)
-        var text = textarea.value;
-        var content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-        content = content.replace(/__(.*?)__/g, '<u>$1</u>');
-        textarea.value = content;
-    });
-
-    // Handle AI day image upload with optional preview ID parameter
-    function handleAiImageUpload(event, previewId) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        // Use specific preview ID if provided, otherwise default to ai-image-preview
-        previewId = previewId || 'ai-image-preview';
-        const fileInputId = event.target.id;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imgSrc = e.target.result;
-            const $preview = $('#' + previewId);
-            const $img = $preview.find('img');
-            const $removeBtn = $preview.find('button');
-            const $fileInput = $('#' + fileInputId);
-            const $uploadLabel = $fileInput.parent().find('label');
-
-            // Hide the upload label and show preview
-            $uploadLabel.hide();
-            $preview.show();
-            $img.attr('src', imgSrc).show();
-            $removeBtn.show();
-
-            // Store image data for form submission
-            if (!window.aiImages) {
-                window.aiImages = {};
-            }
-            window.aiImages[fileInputId] = {
-                file: file,
-                data: imgSrc
-            };
-
-            console.log('AI image uploaded for input ID ' + fileInputId + ':', file.name);
-        };
-
-        reader.readAsDataURL(file);
-    }
-
-    // Remove AI day image with optional IDs
-    function removeAiImage(fileInputId, previewId) {
-        // Use provided IDs or defaults
-        fileInputId = fileInputId || 'ai-day-image';
-        previewId = previewId || 'ai-image-preview';
-
-        const $fileInput = $('#' + fileInputId);
-        const $preview = $('#' + previewId);
-        const $img = $preview.find('img');
-        const $removeBtn = $preview.find('button');
-        const $uploadLabel = $fileInput.parent().find('label');
-
-        $preview.hide();
-        $img.attr('src', '').hide();
-        $removeBtn.hide();
-        $fileInput.val('');
-        $uploadLabel.show();
-
-        if (window.aiImages) {
-            delete window.aiImages[fileInputId];
-        }
-
-        console.log('AI image removed for input ID: ' + fileInputId);
-    }
 </script>
 
 <!-- Image Zoom Functionality -->

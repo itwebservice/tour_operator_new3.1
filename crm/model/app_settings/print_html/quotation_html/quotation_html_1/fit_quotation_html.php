@@ -19,47 +19,6 @@ $quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id']
 $q = get_generic_quotation_data($quotation_id);
 if (empty($q['found'])) { echo "Quotation not found."; exit; }
 
-<<<<<<< HEAD
-if ($branch_admin_id != 0) {
-  $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
-  $sq_bank_count = mysqli_num_rows(mysqlQuery("select * from bank_master where branch_id='$branch_admin_id' and active_flag='Active'"));
-  $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='$branch_admin_id' and active_flag='Active'"));
-} else {
-  $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='1'"));
-  $sq_bank_count = mysqli_num_rows(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
-  $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
-}
-global $app_quot_img, $similar_text, $quot_note, $currency, $tcs_note, $app_quot_format;
-$quotation_id = $_GET['quotation_id'];
-
-$sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
-$tcs_note_show = ($sq_quotation['booking_type'] != 'Domestic') ? $tcs_note : '';
-$quotation_date = $sq_quotation['quotation_date'];
-$yr = explode("-", $quotation_date);
-$year = $yr[0];
-
-$package_lookup_id = get_quotation_package_lookup_id($sq_quotation);`r`n$sq_package_name = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_lookup_id'"));
-$sq_dest = mysqli_fetch_assoc(mysqlQuery("select link from video_itinerary_master where dest_id = '$sq_package_name[dest_id]'"));
-
-$sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order"));
-
-
-$sq_terms_cond_count = mysqli_num_rows(mysqlQuery("select dest_id from terms_and_conditions where type='Package Quotation' and dest_id='$sq_package_name[dest_id]' and active_flag ='Active'"));
-$dest_id = ($sq_terms_cond_count != 0) ? $sq_package_name['dest_id'] : 0;
-$sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Package Quotation' and dest_id='$dest_id' and active_flag ='Active'"));
-
-$sq_transport = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_transport_entries2 where quotation_id='$quotation_id'"));
-$sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id'"));
-$sq_package_program = mysqlQuery("select * from  package_quotation_program where quotation_id='$quotation_id'");
-
-$sq_login = mysqli_fetch_assoc(mysqlQuery("select * from roles where id='$sq_quotation[login_id]'"));
-$sq_emp_info = mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id='$sq_login[emp_id]'"));
-
-if ($sq_emp_info['first_name'] == '') {
-  $emp_name = 'Admin';
-} else {
-  $emp_name = $sq_emp_info['first_name'] . ' ' . $sq_emp_info['last_name'];
-=======
 // ---- section aliases -------------------------------------------------------
 $hero    = $q['hero'];
 $ov      = $q['tour_overview'];
@@ -81,7 +40,6 @@ $testimonials = array();
 if (function_exists('gqb_get_config')) {
 	$o1_cfg = gqb_get_config();
 	$testimonials = isset($o1_cfg['testimonials']) && is_array($o1_cfg['testimonials']) ? $o1_cfg['testimonials'] : array();
->>>>>>> 4c1208ef0615c99985520589385dd9c1c01b9707
 }
 
 // ---- helpers ---------------------------------------------------------------

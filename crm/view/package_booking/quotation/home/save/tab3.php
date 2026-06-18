@@ -2579,12 +2579,8 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
     });
 
     if (package_id_arr.length === 0) {
-        if (sessionStorage.getItem('is_ai_quotation') === '1') {
-            package_id_arr = ['0'];
-        } else {
-            error_msg_alert('Please select at least one Package!');
-            return false;
-        }
+        error_msg_alert('Please select at least one Package!');
+        return false;
     }
 
     // Save selected packages to sessionStorage

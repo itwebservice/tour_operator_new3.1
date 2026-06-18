@@ -9,12 +9,6 @@ $hide_train = ($package_train_switch == 'Yes') ? 'hidden' : '';
 
 $quotation_id = $_POST['quotation_id'];
 $package_id = $_POST['package_id'];
-$sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
-if (is_ai_package_quotation($sq_quotation)) {
-    $package_id = 0;
-} elseif (empty($package_id) && !empty($sq_quotation['package_id'])) {
-    $package_id = $sq_quotation['package_id'];
-}
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
@@ -23,6 +17,8 @@ $q = "select * from branch_assign where link='package_booking/quotation/home/ind
 $sq_count = mysqli_num_rows(mysqlQuery($q));
 $sq = mysqli_fetch_assoc(mysqlQuery($q));
 $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['branch_status'])) ? $sq['branch_status'] : 'no';
+
+$sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
 ?>
 <!-- Tab panes -->
 <div class="bk_tab_head bg_light">
