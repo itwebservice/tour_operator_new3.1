@@ -336,9 +336,37 @@ order by terms_and_conditions_id desc limit 1");
             }
           }
         }
-            //=====================================
 
-        $hero = array(
+    // ======================= Dipti: Destination 5th Gallery Image
+    $destination_5th_gallery_image = '';
+
+    if (!empty($dest_id_for_gallery)) {
+      $gallery_img = gqd_row("SELECT image_url 
+  FROM gallary_master 
+  WHERE dest_id='$dest_id_for_gallery' 
+  ORDER BY entry_id ASC 
+  LIMIT 4,1");
+
+      if (!empty($gallery_img['image_url'])) {
+        $img = trim($gallery_img['image_url']);
+        $img = str_replace('\\', '/', $img);
+
+        if (strpos($img, 'http://') !== 0 && strpos($img, 'https://') !== 0) {
+          $img = str_replace('../../../../', '', $img);
+          $img = str_replace('../../../', '', $img);
+          $img = str_replace('../../', '', $img);
+          $img = str_replace('../', '', $img);
+          $img = preg_replace('/\/+/', '/', $img);
+          $img = BASE_URL . $img;
+        }
+
+        $destination_5th_gallery_image = $img;
+      }
+    }
+    // ==========================================================
+    //=====================================
+
+    $hero = array(
             'company_logo'   => function_exists('get_branch_logo_url') ? get_branch_logo_url($branch_admin_id) : '',
             'cover_image'    => function_exists('getFormatImg') ? getFormatImg($app_quot_format, $dest_id) : '',
             'tour_name'      => isset($master['tour_name']) ? $master['tour_name'] : (isset($package['package_name']) ? $package['package_name'] : ''),
@@ -354,6 +382,7 @@ order by terms_and_conditions_id desc limit 1");
             'login_user'     => $emp_name,
             'user_email_id'  => isset($master['email_id']) ? $master['email_id'] : '',
             'user_contact'   => isset($master['mobile_no']) ? $master['mobile_no'] : '',
+      'destination_5th_gallery_image' => $destination_5th_gallery_image,
         );
 
         // =====================================================================
