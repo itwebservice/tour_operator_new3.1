@@ -15,8 +15,9 @@
                 $package_type_options .= "<option value=".$row_hotel1['package_type'].">".$row_hotel1['package_type']."</option>";
             }
             if($sq_hotel_count==0){
-                $sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_id'"));
-                $package_name = $sq_package['package_name'];
+                $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
+                $sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_lookup_id'"));
+                $package_name = isset($sq_package['package_name']) ? $sq_package['package_name'] : '';
                 ?>
                 <tr>
                     <td><input class="css-checkbox" id="chk_hotel1" type="checkbox" checked readonly><label class="css-label" for="chk_hotel1" > <label></td>

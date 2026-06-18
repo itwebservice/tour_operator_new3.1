@@ -1676,6 +1676,12 @@ if (input) {
                 }
             });
 
+            var is_ai_quotation = sessionStorage.getItem('is_ai_quotation') === '1' ? '1' : ($('#is_ai_quotation').val() || '0');
+            var dest_id = sessionStorage.getItem('quotation_dest_id') || $('#quotation_dest_id').val() || $('#dest_name').val() || '';
+            if (is_ai_quotation === '1' && package_id_arr1.length === 0) {
+                package_id_arr1 = ['0'];
+            }
+
             // Get itinerary data from sessionStorage (saved in tab2)
             var itineraryData = sessionStorage.getItem('itinerary_data');
             var attraction_arr = [];
@@ -1952,7 +1958,9 @@ if (input) {
                                 cruise_icost: cruise_icost,
                                 other_desc: other_desc,
                                 pp_costing_arr: JSON.stringify(pp_costing_arr),
-                                temp_quotation_id: temp_quotation_id
+                                temp_quotation_id: temp_quotation_id,
+                                is_ai_quotation: is_ai_quotation,
+                                dest_id: dest_id
                             },
                             success: function(message) {
                                 console.log("QUOTATION SAVE: Response received");

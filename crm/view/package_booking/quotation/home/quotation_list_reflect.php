@@ -65,7 +65,7 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	$quotation_date = $row_quotation['quotation_date'];
 	$yr = explode("-", $quotation_date);
 	$year = $yr[0];
-	$sq_package_program = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id ='$row_quotation[package_id]'"));
+	$sq_package_program = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id ='".get_quotation_package_lookup_id($row_quotation)."'"));
 	
 	// Only show parent quotations on the list page
 	$is_sub_quotation = false;

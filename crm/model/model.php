@@ -37,7 +37,7 @@ $password = "";
 
 // $db_name = "tour_operator_theme";
 
-$db_name = "tour_operator_new_3_1";
+$db_name = "itours_latest";
 
 global $conn;
 $conn = new mysqli($servername, $username, $password, $db_name);
@@ -64,9 +64,12 @@ $terms_conditions_url = BASE_URL . 'images/terms-condition.jpg';
 function get_branch_logo_url($branch_admin_id = 0) {
 	global $admin_logo_url;
 	if($branch_admin_id != 0) {
-		$branch_details = mysqli_fetch_assoc(mysqlQuery("select logo_url from branches where branch_id='$branch_admin_id'"));
-		if($branch_details && !empty($branch_details['logo_url'])) {
-			return BASE_URL . substr($branch_details['logo_url'], 9);
+		$branch_result = mysqlQuery("select logo_url from branches where branch_id='$branch_admin_id'");
+		if ($branch_result) {
+			$branch_details = mysqli_fetch_assoc($branch_result);
+			if($branch_details && !empty($branch_details['logo_url'])) {
+				return BASE_URL . substr($branch_details['logo_url'], 9);
+			}
 		}
 	}
 	return $admin_logo_url; // Fallback to admin logo
@@ -75,19 +78,18 @@ function get_branch_logo_url($branch_admin_id = 0) {
 // Function to get branch-wise logo file path (for FPDF)
 function get_branch_logo_path($branch_admin_id = 0) {
 	if($branch_admin_id != 0) {
-		$branch_details = mysqli_fetch_assoc(mysqlQuery("select logo_url from branches where branch_id='$branch_admin_id'"));
-		if($branch_details && !empty($branch_details['logo_url'])) {
-			// Convert relative path to absolute file path
-			// logo_url is stored as '../../../uploads/...' (9 chars to remove)
-			$relative_path = substr($branch_details['logo_url'], 9);
-			$file_path = __DIR__ . '/../../' . $relative_path;
-			
-			// Check if file exists and is a valid image type for FPDF
-			if(file_exists($file_path)) {
-				$ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
-				// FPDF supports jpg, jpeg, png (without alpha), gif
-				if(in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-					return $file_path;
+		$branch_result = mysqlQuery("select logo_url from branches where branch_id='$branch_admin_id'");
+		if ($branch_result) {
+			$branch_details = mysqli_fetch_assoc($branch_result);
+			if($branch_details && !empty($branch_details['logo_url'])) {
+				$relative_path = substr($branch_details['logo_url'], 9);
+				$file_path = __DIR__ . '/../../' . $relative_path;
+
+				if(file_exists($file_path)) {
+					$ext = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+					if(in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+						return $file_path;
+					}
 				}
 			}
 		}
@@ -104,9 +106,12 @@ function get_branch_logo_path($branch_admin_id = 0) {
 // Function to get branch-wise QR URL
 function get_branch_qr_url($branch_admin_id = 0) {
 	if($branch_admin_id != 0) {
-		$branch_details = mysqli_fetch_assoc(mysqlQuery("select qr_url from branches where branch_id='$branch_admin_id'"));
-		if($branch_details && !empty($branch_details['qr_url'])) {
-			return BASE_URL . substr($branch_details['qr_url'], 9);
+		$branch_result = mysqlQuery("select qr_url from branches where branch_id='$branch_admin_id'");
+		if ($branch_result) {
+			$branch_details = mysqli_fetch_assoc($branch_result);
+			if($branch_details && !empty($branch_details['qr_url'])) {
+				return BASE_URL . substr($branch_details['qr_url'], 9);
+			}
 		}
 	}
 	// Fallback to app_settings QR
@@ -732,6 +737,50 @@ function get_signature($url = false)
   return $htmlSign;
 }
 
+
+function ensure_quotation_refer_id_column()
+{
+  static $checked = false;
+  if ($checked) {
+    return true;
+  }
+  $checked = true;
+  $result = mysqlQuery("SHOW COLUMNS FROM package_tour_quotation_master LIKE 'quotation_refer_id'");
+  if (mysqli_num_rows($result) == 0) {
+    mysqlQuery("ALTER TABLE package_tour_quotation_master ADD COLUMN quotation_refer_id INT(11) NOT NULL DEFAULT 0 AFTER package_id");
+  }
+  return true;
+}
+
+function get_quotation_refer_id_by_dest($dest_id)
+{
+  $dest_id = intval($dest_id);
+  if ($dest_id <= 0) {
+    return 0;
+  }
+  $sq = mysqli_fetch_assoc(mysqlQuery(
+    "SELECT MIN(package_id) AS package_id FROM custom_package_master WHERE dest_id='$dest_id' AND status != 'Inactive'"
+  ));
+  return isset($sq['package_id']) ? intval($sq['package_id']) : 0;
+}
+
+function is_ai_package_quotation($quotation_row)
+{
+  if (!is_array($quotation_row)) {
+    return false;
+  }
+  $refer_id = isset($quotation_row['quotation_refer_id']) ? intval($quotation_row['quotation_refer_id']) : 0;
+  $package_id = isset($quotation_row['package_id']) ? intval($quotation_row['package_id']) : 0;
+  return $refer_id > 0 && $package_id == 0;
+}
+
+function get_quotation_package_lookup_id($quotation_row)
+{
+  if (is_ai_package_quotation($quotation_row)) {
+    return intval($quotation_row['quotation_refer_id']);
+  }
+  return isset($quotation_row['package_id']) ? intval($quotation_row['package_id']) : 0;
+}
 
 function get_dates_for_package_itineary($quotation_id)
 {

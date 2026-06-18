@@ -96,7 +96,8 @@ function findImageUrl($image_path, $is_new_quotation = false) {
 $quotation_id = $_GET['quotation_id'];
 $role = $_SESSION['role'];
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
-$sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id ='$sq_quotation[package_id]'"));
+$package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
+$sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id ='$package_lookup_id'"));
 $quotation_date = $sq_quotation['quotation_date'];
 $yr = explode("-", $quotation_date);
 $year = $yr[0];
