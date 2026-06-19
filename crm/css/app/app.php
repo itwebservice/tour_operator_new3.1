@@ -2553,18 +2553,9 @@ border: 1px solid #d8d6de;
 	border-radius: 22px;
 	padding: 20px 20px 56px;
 	box-shadow: 0 0.5px 30px rgba(0, 0, 0, 0.1);
-	opacity: 0;
-	visibility: hidden;
-	display: none;
-	transition: opacity 0.2s ease, transform 0.2s ease;
-	margin: 50px auto 30px !important;
+	margin: 0 auto 30px !important;
 }
 
-.ai-chat-box.show {
-	display: block;
-	opacity: 1;
-	visibility: visible;
-}
 
 textarea.ai-chat-textarea.form-control:focus,
 .ai-chat-box textarea:focus,
@@ -2587,18 +2578,15 @@ textarea.ai-chat-textarea.form-control:focus,
 	padding: 20px 12px 10px 12px;
 	align-items: center;
 	gap: 25px;
-	opacity: 0;
-	visibility: hidden;
-	display: none !important;
-	transition: opacity 0.2s ease;
+	margin: 10px auto 10px;
+	display: flex;
+}
+
+.ai-inclusions-exclusions-row{
+	width: 90%;
 	margin: 10px auto 10px;
 }
 
-.ai-itinerary-row.show {
-	display: flex !important;
-	opacity: 1;
-	visibility: visible;
-}
 
 .ai-check-wrap {
 	width: 24px;
@@ -2644,7 +2632,7 @@ textarea.ai-chat-textarea.form-control:focus,
 }
 
 .ai-plus-btn {
-	width: 36px;
+	min-width: 36px;
 	height: 36px;
 	border: 1px solid <?= $theme_color ?>;
 	cursor: pointer;
@@ -2734,9 +2722,4 @@ textarea.ai-chat-textarea.form-control:focus,
 	white-space: pre-wrap;
 	word-break: break-word;
 	color: #333;
-}
-
-.ai-chat-container #aiApiInfo:empty {
-	display: none;
-	margin: 0;
 }

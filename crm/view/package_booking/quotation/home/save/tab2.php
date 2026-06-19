@@ -1,9 +1,60 @@
+
+<style>
+  .app_dual_button input[type="radio"]{
+display: none;
+}
+.app_dual_button{
+padding: 6px 6px;
+border: 1px solid <?= $theme_color ?>;
+margin-right: -5px;
+background: #fff;
+margin-bottom: 0;
+cursor: pointer;
+font-weight: 300;
+font-size: 14px;
+}
+.app_dual_button label{
+margin:0;
+}
+.app_dual_button.active{
+background: <?= $theme_color ?>;
+color: #fff;
+}
+.app_dual_button:first-child{
+border-top-left-radius:20px;
+border-bottom-left-radius:20px;
+}
+.app_dual_button:last-child{
+border-top-right-radius:20px;
+border-bottom-right-radius:20px;
+}
+label input.labelauty:checked + label{
+<!-- background-color: rgba(0, 0, 0, 0.42); -->
+color: #ffffff;
+}
+input.labelauty + label, input.labelauty:checked + label, input.labelauty:checked:not([disabled]) + label:hover{
+background-color:<?= $theme_color ?>;
+}
+</style>
+
 <form id="frm_tab2">
 
     <div class="app_panel" style="padding-top: 30px;">
 
         <div class="container" style="width:100% !important;">
-            <div class="row">
+
+        <div class="row text-center text_left_sm_xs mg_bt_10">	
+            <label for="standardPackage" class="app_dual_button mg_bt_10 active">
+                <input type="radio" id="standardPackage" name="quotation_package" checked onchange="package_booking_reflect()">
+                &nbsp;&nbsp;Standard Package
+            </label>    
+            <label for="aiBuilder" class="app_dual_button mg_bt_10">
+                <input type="radio" id="aiBuilder" name="quotation_package" onchange="package_booking_reflect()">
+                &nbsp;&nbsp;AI Builder
+            </label>
+        </div> 
+
+            <div class="row" id="package_div_content">
 
                 <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_20" id="package_div">
                     <?php
@@ -42,28 +93,28 @@
                     <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : The Package is not available for this Destination.Please create here."><i class="fa fa-question-circle"></i></button>
 
                     <a href="../../../../custom_packages/master/index.php" target='_blank' class="btn btn-sm" style="
-    background: none;
-    background: none;
-    color: #fff;
-    padding: 6px 14px;
-    font-size: 16px;
-    color: #007bff;text-decoration:none; display:inline-block;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Package Tour</a>
+                      background: none;
+                      background: none;
+                      color: #fff;
+                      padding: 6px 14px;
+                      font-size: 16px;
+                      color: #007bff;text-decoration:none; display:inline-block;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Package Tour</a>
                 </div>
                 <div class="col-md-12 col-sm-8 col-xs-12 no-pad" id="package_name_div">
                 </div>
             </div>
 
             <!-- ai chat container start -->
-            <div class="ai-chat-container">
-                <button class="btn btn-info btn-sm ico_left" id="aiToggleBtn" type="button" aria-label="Toggle AI assistant">
+            <div class="ai-chat-container" id="ai_chat_container" style="display: none;">
+                <!-- <button class="btn btn-info btn-sm ico_left" id="aiToggleBtn" type="button" aria-label="Toggle AI assistant">
                     <span class="ai-toggle-icon"><i class=""><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.6838 0L10.8879 2.38783L8.50006 3.18377V4.13245L10.8879 4.9284L11.6838 7.31623H12.6325L13.4285 4.9284L15.8163 4.13245V3.18377L13.4285 2.38783L12.6325 0H11.6838Z" fill="white"/>
-<path d="M5.01289 8.51283L6.18383 5H7.13251L8.30346 8.51283L11.8163 9.68377V10.6325L8.30346 11.8034L7.13251 15.3162H6.18383L5.01289 11.8034L1.50006 10.6325V9.68377L5.01289 8.51283Z" fill="white"/>
-<path d="M2.17582 1L1.63186 2.63186L0 3.17582V3.82416L1.63186 4.36811L2.17582 5.99997H2.82416L3.36811 4.36811L4.99997 3.82416V3.17582L3.36811 2.63186L2.82416 1H2.17582Z" fill="white"/>
-</svg>
-</i></span>
+                       <path d="M11.6838 0L10.8879 2.38783L8.50006 3.18377V4.13245L10.8879 4.9284L11.6838 7.31623H12.6325L13.4285 4.9284L15.8163 4.13245V3.18377L13.4285 2.38783L12.6325 0H11.6838Z" fill="white"/>
+                       <path d="M5.01289 8.51283L6.18383 5H7.13251L8.30346 8.51283L11.8163 9.68377V10.6325L8.30346 11.8034L7.13251 15.3162H6.18383L5.01289 11.8034L1.50006 10.6325V9.68377L5.01289 8.51283Z" fill="white"/>
+                       <path d="M2.17582 1L1.63186 2.63186L0 3.17582V3.82416L1.63186 4.36811L2.17582 5.99997H2.82416L3.36811 4.36811L4.99997 3.82416V3.17582L3.36811 2.63186L2.82416 1H2.17582Z" fill="white"/>
+                       </svg>
+                       </i></span>
                     <span>AI</span>
-                </button>
+                </button> -->
                         
                 <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
                     <textarea id="aiMessageInput" placeholder="Type your message..."></textarea>
@@ -100,6 +151,41 @@
                     </select>
                     <button type="button" class="ai-plus-btn" id="aiPlusBtn" aria-label="Add itinerary">+</button>
                 </div>
+
+
+
+                </div>
+
+                <div class="ai-inclusions-exclusions-row">
+                <div class="row mg_tp_20 ">
+                                    <div class="col-md-6">
+                                        <legend>Inclusions</legend>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <legend>Exclusions</legend>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table style="width:100%" class="no-marg"
+                                            id=""
+                                            name="">
+                                            <tr>
+                                        
+                                                <td class="col-md-6"><textarea class="feature_editor"
+                                                        id="inclusions_ai" name="inclusions"
+                                                        placeholder="Inclusions" title="Inclusions"
+                                                        rows="4"></textarea></td>
+                                                <td class="col-md-6"><textarea class="feature_editor"
+                                                        id="exclusions_ai" name="exclusions"
+                                                        placeholder="Exclusions" title="Exclusions"
+                                                        rows="4"></textarea></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+            </div>
                 </div>
 
                 <script>
@@ -119,7 +205,11 @@
                         });
                     });
                 </script>
-            </div>
+
+
+
+
+
             <!-- ai chat container end -->
 
             <div class="row text-center mg_tp_20">
@@ -616,6 +706,77 @@ $(document).on('click', '#tab2_head', function() {
         return refer_id;
     }
 
+    function getQuotationEditorContent(textareaId) {
+        var $target = $('#' + textareaId);
+        if (!$target.length) {
+            return '';
+        }
+        if ($target.data('wysiwyg')) {
+            return $target.wysiwyg('getContent') || '';
+        }
+        var iframe = document.getElementById(textareaId + '-wysiwyg-iframe');
+        if (iframe && iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.body) {
+            return iframe.contentWindow.document.body.innerHTML || '';
+        }
+        return $target.val() || '';
+    }
+
+    function normalizeAiList(items) {
+        if (Array.isArray(items)) {
+            return items.filter(function(item) {
+                return item !== null && item !== undefined && String(item).trim() !== '';
+            });
+        }
+        if (typeof items === 'string' && items.trim() !== '') {
+            return [items.trim()];
+        }
+        if (items && typeof items === 'object') {
+            return Object.values(items).filter(function(item) {
+                return item !== null && item !== undefined && String(item).trim() !== '';
+            });
+        }
+        return [];
+    }
+
+    function buildAiListHtml(items) {
+        var list = normalizeAiList(items);
+        if (!list.length) {
+            return '';
+        }
+        return '<ul>' + list.map(function(item) {
+            return '<li>' + $('<div/>').text(item).html() + '</li>';
+        }).join('') + '</ul>';
+    }
+
+    function setWysiwygContent(textareaId, items) {
+        var html = buildAiListHtml(items);
+        var list = normalizeAiList(items);
+        var $target = $('#' + textareaId);
+        if (!$target.length) {
+            return false;
+        }
+        if ($target.data('wysiwyg')) {
+            $target.wysiwyg('setContent', html);
+        } else {
+            var iframe = document.getElementById(textareaId + '-wysiwyg-iframe');
+            if (iframe && iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.body) {
+                iframe.contentWindow.document.body.innerHTML = html;
+            } else {
+                $target.val(list.join('\n'));
+            }
+        }
+        $target.trigger('change');
+        return list.length > 0;
+    }
+
+    function fillAiInclusionsExclusions(itinerary) {
+        if (!itinerary) {
+            return;
+        }
+        setWysiwygContent('inclusions_ai', itinerary.inclusions);
+        setWysiwygContent('exclusions_ai', itinerary.exclusions);
+    }
+
     function collectAiItineraryArrays() {
         var attraction_arr = [], program_arr = [], stay_arr = [], meal_plan_arr = [];
         $('#aiItineraryContainer .ai-itinerary-row').each(function() {
@@ -668,6 +829,8 @@ $(document).on('click', '#tab2_head', function() {
         var data = collectAiItineraryArrays();
         var dest_id = $('#dest_name').val() || sessionStorage.getItem('selected_destination_id') || '';
         var refer_id = syncQuotationReferId();
+        var inclusions = getQuotationEditorContent('inclusions_ai');
+        var exclusions = getQuotationEditorContent('exclusions_ai');
         sessionStorage.setItem('is_ai_quotation', '1');
         sessionStorage.setItem('quotation_dest_id', dest_id);
         $('#is_ai_quotation').val('1');
@@ -679,7 +842,9 @@ $(document).on('click', '#tab2_head', function() {
             meal_plan_arr: data.meal_plan_arr,
             day_image_arr: [],
             package_p_id_arr: [],
-            package_id_arr: ['0']
+            package_id_arr: ['0'],
+            inclusions: inclusions,
+            exclusions: exclusions
         }));
         return data;
     }
@@ -779,7 +944,14 @@ $(document).on('click', '#tab2_head', function() {
                 }
                 var programs = parsed.itinerary && parsed.itinerary.detailed_program ? parsed.itinerary.detailed_program : [];
                 fillAiItineraryRows(programs);
-                $('#aiApiInfo').text(programs.length ? 'Itinerary generated successfully.' : 'No itinerary rows found in AI response.');
+                fillAiInclusionsExclusions(parsed.itinerary);
+                var hasInclExcl = normalizeAiList(parsed.itinerary && parsed.itinerary.inclusions).length ||
+                    normalizeAiList(parsed.itinerary && parsed.itinerary.exclusions).length;
+                var statusMsg = programs.length ? 'Itinerary generated successfully.' : 'No itinerary rows found in AI response.';
+                if (hasInclExcl) {
+                    statusMsg += ' Inclusions and exclusions populated.';
+                }
+                $('#aiApiInfo').text(statusMsg);
             },
             error: function(xhr) {
                 $('#aiApiInfo').text((xhr && xhr.responseText) ? xhr.responseText : 'Request failed.');
@@ -1363,4 +1535,23 @@ $(document).on('click', '#tab2_head', function() {
             initImageZoom();
         }, 500);
     });
+    function package_booking_reflect() {
+        $('.app_dual_button').removeClass('active');
+        $('input[name="quotation_package"]:checked').closest('label').addClass('active');
+
+        var id = $('input[name="quotation_package"]:checked').attr('id');
+        if (id == "standardPackage") {
+            $('#package_div_content').show();
+            $('#ai_chat_container').hide();
+            $('#is_ai_quotation').val('0');
+        }
+        if (id == "aiBuilder") {
+            $('#package_div_content').hide();
+            $('#ai_chat_container').show();
+            $('#is_ai_quotation').val('1');
+        }
+    }
+    package_booking_reflect();
+
+
 </script>

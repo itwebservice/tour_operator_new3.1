@@ -13,6 +13,7 @@ $branch_status = isset($_POST['branch_status']) ? $_POST['branch_status'] : '';
 $financial_year_id = isset($_POST['financial_year_id']) ? $_POST['financial_year_id'] : '';
 $branch_id = isset($_POST['branch_id']) ? $_POST['branch_id'] : '';
 $status = isset($_POST['status']) ? $_POST['status'] : '';
+$quotation_source_type = isset($_POST['quotation_source_type']) ? $_POST['quotation_source_type'] : 'standard';
 
 global $app_quot_format, $currency, $modify_entries_switch;
 if ($status != '') {
@@ -41,6 +42,11 @@ if ($package_id != '') {
 }
 if ($quotation_id != '') {
 	$query .= " and quotation_id='$quotation_id'";
+}
+if ($quotation_source_type === 'ai') {
+	$query .= " and quotation_refer_id > 0";
+} else {
+	$query .= " and package_id > 0";
 }
 if ($branch_id != "") {
 	$query .= " and branch_admin_id = '$branch_id'";

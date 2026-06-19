@@ -242,10 +242,26 @@ if (!function_exists('get_generic_quotation_data')) {
         $bank_branch_id = ($branch_admin_id != '0') ? $branch_admin_id : '1';
         $bank = gqd_row("select * from bank_master where branch_id='$bank_branch_id' and active_flag='Active'");
 
-        // Terms & conditions (Package Quotation, destination specific else global)
-        $tc_dest_count = gqd_count("select dest_id from terms_and_conditions where type='Package Quotation' and dest_id='$dest_id' and active_flag='Active'");
-        $tc_dest_id    = ($tc_dest_count != 0) ? $dest_id : '0';
-        $terms         = gqd_row("select * from terms_and_conditions where type='Package Quotation' and dest_id='$tc_dest_id' and active_flag='Active'");
+    // Terms & conditions (Package Quotation, destination specific else global)
+
+    // ================================== Dipti
+    $terms = gqd_row("select * from terms_and_conditions 
+where type='Package Quotation' 
+and dest_id='$dest_id' 
+and active_flag='Active' 
+order by terms_and_conditions_id desc limit 1");
+
+    if (empty($terms)) {
+      $terms = gqd_row("select * from terms_and_conditions 
+    where type='Package Quotation' 
+    and dest_id='0' 
+    and active_flag='Active' 
+    order by terms_and_conditions_id desc limit 1");
+    }
+    // =============================================================
+        // $tc_dest_count = gqd_count("select dest_id from terms_and_conditions where type='Package Quotation' and dest_id='$dest_id' and active_flag='Active'");
+        // $tc_dest_id    = ($tc_dest_count != 0) ? $dest_id : '0';
+        // $terms         = gqd_row("select * from terms_and_conditions where type='Package Quotation' and dest_id='$tc_dest_id' and active_flag='Active'");
 
         // Destination guide video
         $video = gqd_row("select link from video_itinerary_master where dest_id='$dest_id'");
@@ -274,7 +290,83 @@ if (!function_exists('get_generic_quotation_data')) {
             ? $branch_admin['company_name']
             : (isset($app['app_name']) ? $app['app_name'] : '');
 
-        $hero = array(
+        //=============================== Dipti
+        // Gallery images for first page - destination wise last 4 images
+        $gallery_images = array();
+
+        $dest_id_for_gallery = 0;
+
+        // First try from package master
+        if (!empty($master['package_id'])) {
+          $pkg_id = gqd_esc($master['package_id']);
+          $pkg = gqd_row("SELECT dest_id FROM custom_package_master WHERE package_id='$pkg_id'");
+          if (!empty($pkg['dest_id'])) {
+            $dest_id_for_gallery = $pkg['dest_id'];
+          }
+        }
+
+        // Fallback: match destination name
+        if (empty($dest_id_for_gallery) && !empty($master['tour_name'])) {
+          $tour_name = gqd_esc($master['tour_name']);
+          $dest = gqd_row("SELECT dest_id FROM destination_master WHERE dest_name='$tour_name' LIMIT 1");
+          if (!empty($dest['dest_id'])) {
+            $dest_id_for_gallery = $dest['dest_id'];
+          }
+        }
+
+        if (!empty($dest_id_for_gallery)) {
+          $gallery_rows = gqd_rows("SELECT image_url FROM gallary_master WHERE dest_id='$dest_id_for_gallery' ORDER BY entry_id DESC LIMIT 4");
+
+          foreach ($gallery_rows as $gr) {
+            $img = isset($gr['image_url']) ? trim($gr['image_url']) : '';
+
+            if ($img != '') {
+              $img = str_replace('\\', '/', $img);
+
+              if (strpos($img, 'http://') !== 0 && strpos($img, 'https://') !== 0) {
+                $img = str_replace('../../../../', '', $img);
+                $img = str_replace('../../../', '', $img);
+                $img = str_replace('../../', '', $img);
+                $img = str_replace('../', '', $img);
+                $img = preg_replace('/\/+/', '/', $img);
+                $img = BASE_URL . $img;
+              }
+
+              $gallery_images[] = $img;
+            }
+          }
+        }
+
+    // ======================= Dipti: Destination 5th Gallery Image
+    $destination_5th_gallery_image = '';
+
+    if (!empty($dest_id_for_gallery)) {
+      $gallery_img = gqd_row("SELECT image_url 
+  FROM gallary_master 
+  WHERE dest_id='$dest_id_for_gallery' 
+  ORDER BY entry_id ASC 
+  LIMIT 4,1");
+
+      if (!empty($gallery_img['image_url'])) {
+        $img = trim($gallery_img['image_url']);
+        $img = str_replace('\\', '/', $img);
+
+        if (strpos($img, 'http://') !== 0 && strpos($img, 'https://') !== 0) {
+          $img = str_replace('../../../../', '', $img);
+          $img = str_replace('../../../', '', $img);
+          $img = str_replace('../../', '', $img);
+          $img = str_replace('../', '', $img);
+          $img = preg_replace('/\/+/', '/', $img);
+          $img = BASE_URL . $img;
+        }
+
+        $destination_5th_gallery_image = $img;
+      }
+    }
+    // ==========================================================
+    //=====================================
+
+    $hero = array(
             'company_logo'   => function_exists('get_branch_logo_url') ? get_branch_logo_url($branch_admin_id) : '',
             'cover_image'    => function_exists('getFormatImg') ? getFormatImg($app_quot_format, $dest_id) : '',
             'tour_name'      => isset($master['tour_name']) ? $master['tour_name'] : (isset($package['package_name']) ? $package['package_name'] : ''),
@@ -290,6 +382,7 @@ if (!function_exists('get_generic_quotation_data')) {
             'login_user'     => $emp_name,
             'user_email_id'  => isset($master['email_id']) ? $master['email_id'] : '',
             'user_contact'   => isset($master['mobile_no']) ? $master['mobile_no'] : '',
+      'destination_5th_gallery_image' => $destination_5th_gallery_image,
         );
 
         // =====================================================================
@@ -333,6 +426,18 @@ if (!function_exists('get_generic_quotation_data')) {
             $img  = gqd_row("select hotel_pic_url from hotel_vendor_images_entries where hotel_id='$hid'");
             $photo = isset($img['hotel_pic_url']) ? preg_replace('/(\/+)/', '/', $img['hotel_pic_url']) : '';
 
+      //==============================Dipti
+      if (!empty($photo)) {
+        $photo = str_replace('\\', '/', $photo);
+
+        $photo = str_replace('../../../../', '', $photo);
+        $photo = str_replace('../../../', '', $photo);
+        $photo = str_replace('../../', '', $photo);
+        $photo = str_replace('../', '', $photo);
+
+        $photo = BASE_URL . $photo;
+      }
+            //-===================================
             $hotels[] = array(
                 'hotel_name'    => isset($hm['hotel_name']) ? $hm['hotel_name'] : '',
                 'hotel_city'    => isset($cm['city_name']) ? $cm['city_name'] : '',
@@ -351,30 +456,85 @@ if (!function_exists('get_generic_quotation_data')) {
             );
         }
 
-        // =====================================================================
-        // 4. FLIGHTS (loop)
-        // =====================================================================
-        $flights = array();
-        foreach (gqd_rows("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'") as $f) {
-            $aid     = gqd_esc($f['airline_name']);
-            $airline = gqd_row("select airline_name, airline_code, airline_logo from airline_master where airline_id='$aid'");
-            $airline_display = (!empty($f['airline_name']) && !empty($airline['airline_name']))
-                ? $airline['airline_name'] . ' (' . $airline['airline_code'] . ')'
-                : 'NA';
-            $flights[] = array(
-                'airline_name'   => isset($airline['airline_name']) ? $airline['airline_name'] : '',
-                'airline_display' => $airline_display,
-                'airline_code'   => isset($airline['airline_code']) ? $airline['airline_code'] : '',
-                'airline_logo'   => isset($airline['airline_logo']) ? $airline['airline_logo'] : '',
-                'class'          => isset($f['class']) ? $f['class'] : '',
-                'departure_datetime' => function_exists('get_datetime_user') ? get_datetime_user($f['dapart_time']) : $f['dapart_time'],
-                'arrival_datetime'   => function_exists('get_datetime_user') ? get_datetime_user($f['arraval_time']) : $f['arraval_time'],
-                'departure_raw'  => isset($f['dapart_time']) ? $f['dapart_time'] : '',
-                'arrival_raw'    => isset($f['arraval_time']) ? $f['arraval_time'] : '',
-                'from_city'      => isset($f['from_location']) ? $f['from_location'] : '',
-                'to_city'        => isset($f['to_location']) ? $f['to_location'] : '',
-            );
-        }
+    // =====================================================================
+    // 4. FLIGHTS (loop)
+    // =====================================================================
+    // =============================== Dipti 
+    $flights = array();
+
+    foreach (gqd_rows("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'") as $f) {
+      // echo '<pre>';
+      // echo "FROM DB: " . $f['from_location'] . "\n";
+      // echo "TO DB: " . $f['to_location'] . "\n";
+      // print_r($f);
+      // echo '</pre>';
+      $aid = gqd_esc($f['airline_name']);
+
+      // $airline = gqd_row("select airline_name, airline_code, airline_logo from airline_master where airline_id='$aid'");
+      $airline = mysqli_fetch_assoc(
+        mysqlQuery("SELECT * FROM airline_master WHERE airline_id='$aid'")
+      );
+
+      $airline_name = !empty($airline['airline_name']) ? $airline['airline_name'] : 'NA';
+      $airline_code = !empty($airline['airline_code']) ? $airline['airline_code'] : 'FL';
+
+      $dep_time = !empty($f['dapart_time']) ? strtotime($f['dapart_time']) : false;
+      $arr_time = !empty($f['arraval_time']) ? strtotime($f['arraval_time']) : false;
+
+      $duration = 'Flight';
+      if ($dep_time && $arr_time) {
+        $diff = abs($arr_time - $dep_time);
+        $h = floor($diff / 3600);
+        $m = floor(($diff % 3600) / 60);
+        $duration = $h . 'H ' . $m . 'M';
+      }
+
+      $flights[] = array(
+        'airline_name'   => $airline_name,
+        'airline_display' => $airline_name,
+        'airline_code'   => $airline_code,
+        // 'airline_logo'   => !empty($airline['airline_logo']) ? $airline['airline_logo'] : '',
+        'airline_logo'   => !empty($airline['image']) ? $airline['image'] : '',
+        'class'          => !empty($f['class']) ? $f['class'] : 'Economy',
+
+        'departure_datetime' => function_exists('get_datetime_user') ? get_datetime_user($f['dapart_time']) : $f['dapart_time'],
+        'arrival_datetime'   => function_exists('get_datetime_user') ? get_datetime_user($f['arraval_time']) : $f['arraval_time'],
+        'departure_raw'      => !empty($f['dapart_time']) ? $f['dapart_time'] : '',
+        'arrival_raw'        => !empty($f['arraval_time']) ? $f['arraval_time'] : '',
+
+        'from_city'      => !empty($f['from_location']) ? $f['from_location'] : '',
+        'to_city'        => !empty($f['to_location']) ? $f['to_location'] : '',
+
+        // 'duration'       => $duration,
+        'duration' => ($duration == '0H 0M') ? 'As Per Itinerary' : $duration,
+        'stop_type'      => 'Non-stop',
+
+        'baggage'        => !empty($f['baggage']) ? $f['baggage'] : '30 KG',
+        
+      );
+    }
+    // ============================
+        // $flights = array();
+        // foreach (gqd_rows("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'") as $f) {
+        //     $aid     = gqd_esc($f['airline_name']);
+        //     $airline = gqd_row("select airline_name, airline_code, airline_logo from airline_master where airline_id='$aid'");
+        //     $airline_display = (!empty($f['airline_name']) && !empty($airline['airline_name']))
+        //         ? $airline['airline_name'] . ' (' . $airline['airline_code'] . ')'
+        //         : 'NA';
+        //     $flights[] = array(
+        //         'airline_name'   => isset($airline['airline_name']) ? $airline['airline_name'] : '',
+        //         'airline_display' => $airline_display,
+        //         'airline_code'   => isset($airline['airline_code']) ? $airline['airline_code'] : '',
+        //         'airline_logo'   => isset($airline['airline_logo']) ? $airline['airline_logo'] : '',
+        //         'class'          => isset($f['class']) ? $f['class'] : '',
+        //         'departure_datetime' => function_exists('get_datetime_user') ? get_datetime_user($f['dapart_time']) : $f['dapart_time'],
+        //         'arrival_datetime'   => function_exists('get_datetime_user') ? get_datetime_user($f['arraval_time']) : $f['arraval_time'],
+        //         'departure_raw'  => isset($f['dapart_time']) ? $f['dapart_time'] : '',
+        //         'arrival_raw'    => isset($f['arraval_time']) ? $f['arraval_time'] : '',
+        //         'from_city'      => isset($f['from_location']) ? $f['from_location'] : '',
+        //         'to_city'        => isset($f['to_location']) ? $f['to_location'] : '',
+        //     );
+        // }
 
         // =====================================================================
         // 5. TRAINS (loop)
@@ -698,9 +858,25 @@ if (!function_exists('get_generic_quotation_data')) {
             ),
         );
 
-        // =====================================================================
-        // 12. BANK DETAILS
-        // =====================================================================
+    // =====================================================================
+    // 12. BANK DETAILS
+    // =====================================================================
+    //========================== Dipti
+    $qr_code = isset($app['qr_url']) ? trim($app['qr_url']) : '';
+
+    if (!empty($qr_code)) {
+      $qr_code = str_replace('\\', '/', $qr_code);
+
+      $qr_code = str_replace('../../../../', '', $qr_code);
+      $qr_code = str_replace('../../../', '', $qr_code);
+      $qr_code = str_replace('../../', '', $qr_code);
+      $qr_code = str_replace('../', '', $qr_code);
+
+      $qr_code = preg_replace('/\/+/', '/', $qr_code);
+      $qr_code = BASE_URL . $qr_code;
+    }
+    
+        //=============================
         $bank_details = array(
             'bank_name'      => !empty($bank['bank_name']) ? $bank['bank_name'] : (isset($bank_name_setting) ? $bank_name_setting : ''),
             'account_name'   => !empty($bank['account_name']) ? $bank['account_name'] : (isset($bank_account_name) ? $bank_account_name : ''),
@@ -709,8 +885,10 @@ if (!function_exists('get_generic_quotation_data')) {
             'branch_name'    => !empty($bank['branch_name']) ? $bank['branch_name'] : (isset($bank_branch_name) ? $bank_branch_name : ''),
             'ifsc_code'      => !empty($bank['ifsc_code']) ? $bank['ifsc_code'] : (isset($bank_ifsc_code) ? $bank_ifsc_code : ''),
             'swift_code'     => !empty($bank['swift_code']) ? $bank['swift_code'] : (isset($bank_swift_code) ? $bank_swift_code : ''),
-            'upi_id'         => isset($bank['upi_id']) ? $bank['upi_id'] : '',
-            'qr_code'        => isset($app['qr_url']) ? $app['qr_url'] : '',
+            // 'upi_id'         => isset($bank['upi_id']) ? $bank['upi_id'] : '',
+            'upi_id' => isset($bank['upi_id']) ? $bank['upi_id'] : '', //======= Dipti
+            // 'qr_code'        => isset($app['qr_url']) ? $app['qr_url'] : '',
+            'qr_code' => $qr_code,
             'branch_qr_url'  => $branch_qr_url,
             'qr_available'   => (function_exists('check_qr') && check_qr($branch_admin_id) === true) || !empty($branch_qr_url) || !empty($app['qr_url']),
             'qr_html'        => function_exists('get_qr') ? get_qr('Protrait Standard', $branch_admin_id) : '',
@@ -722,7 +900,7 @@ if (!function_exists('get_generic_quotation_data')) {
         $terms_conditions = array(
             'title'                => isset($terms['title']) ? $terms['title'] : '',
             'terms_and_conditions' => isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '',
-            'dest_id'              => $tc_dest_id,
+            'dest_id'              => $dest_id,
         );
 
         // =====================================================================
@@ -770,6 +948,7 @@ if (!function_exists('get_generic_quotation_data')) {
         // ASSEMBLE
         // =====================================================================
         return array(
+      'gallery_images' => $gallery_images,
             'found'        => true,
             'quotation_id' => $master['quotation_id'],
             'quotation_code' => $display_id,

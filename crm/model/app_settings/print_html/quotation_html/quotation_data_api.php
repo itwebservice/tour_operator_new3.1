@@ -38,6 +38,10 @@ if ($quotation_id === '') {
 
 $config = gqb_get_config();
 
+// echo '<pre>';
+// print_r($config['social_links']);
+// exit;
+
 // Respect the activate/deactivate toggle unless explicitly forced.
 if (empty($config['active']) && !$force) {
     echo json_encode(array(

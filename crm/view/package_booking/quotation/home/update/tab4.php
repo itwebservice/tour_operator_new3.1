@@ -913,6 +913,33 @@ function get_pp_val($pp_costing, $type, $field){
 </form>
 <?= end_panel(); ?>
 <script>
+function getQuotationEditorContent(textareaId) {
+    var $target = $('#' + textareaId);
+    if (!$target.length) {
+        return '';
+    }
+    if ($target.data('wysiwyg')) {
+        return $target.wysiwyg('getContent') || '';
+    }
+    var iframe = document.getElementById(textareaId + '-wysiwyg-iframe');
+    if (iframe && iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.body) {
+        return iframe.contentWindow.document.body.innerHTML || '';
+    }
+    return $target.val() || '';
+}
+
+function getInclusionsExclusionsForQuotation() {
+    if ($('#inclusions_ai').length) {
+        return {
+            inclusions: getQuotationEditorContent('inclusions_ai'),
+            exclusions: getQuotationEditorContent('exclusions_ai')
+        };
+    }
+    return {
+        inclusions: getQuotationEditorContent('inclusions1'),
+        exclusions: getQuotationEditorContent('exclusions1')
+    };
+}
 $('#currency_code1').select2();
 function get_business(id, flag, change = false) {
     var offset = id.split('-');
@@ -1048,6 +1075,34 @@ $('#frm_tab4').validate({
     submitHandler: function(form, e) {
 
         e.preventDefault();
+
+        function getRowInputValue(row, cellIndex) {
+            if (!row || !row.cells || !row.cells[cellIndex]) {
+                return '';
+            }
+            var input = row.cells[cellIndex].querySelector('input, select, textarea');
+            if (!input) {
+                return '';
+            }
+            var $input = $(input);
+            if ($input.data('select2')) {
+                return $input.val() || '';
+            }
+            return input.value || '';
+        }
+
+        function getRowCheckboxChecked(row, cellIndex) {
+            if (!row || !row.cells || !row.cells[cellIndex]) {
+                return 'false';
+            }
+            var checkbox = row.cells[cellIndex].querySelector('input[type="checkbox"]');
+            return (checkbox && checkbox.checked) ? 'true' : 'false';
+        }
+
+        function getTableRows(tableId) {
+            var table = document.getElementById(tableId);
+            return (table && table.rows) ? table.rows : [];
+        }
         
         // Prevent double submission
         if (window.quotationUpdateInProgress) {
@@ -1126,21 +1181,65 @@ $('#frm_tab4').validate({
             day_image_arr = window.tab2FormData.day_image_arr || [];
             package_p_id_arr = window.tab2FormData.package_p_id_arr || [];
         } else {
-            console.log("UPDATE TAB4: No stored tab2 data, reading from table");
-            // Fallback to reading from table if no stored data
-            var table = document.getElementById("dynamic_table_list_update");
+            var storedTab2Data = sessionStorage.getItem('tab2_form_data');
+            if (storedTab2Data) {
+                try {
+                    window.tab2FormData = JSON.parse(storedTab2Data);
+                    checked_programe_arr = window.tab2FormData.checked_programe_arr || [];
+                    day_count_arr = window.tab2FormData.day_count_arr || [];
+                    attraction_arr = window.tab2FormData.attraction_arr || [];
+                    program_arr = window.tab2FormData.program_arr || [];
+                    stay_arr = window.tab2FormData.stay_arr || [];
+                    meal_plan_arr = window.tab2FormData.meal_plan_arr || [];
+                    day_image_arr = window.tab2FormData.day_image_arr || [];
+                    package_p_id_arr = window.tab2FormData.package_p_id_arr || [];
+                } catch (parseError) {
+                    console.error("UPDATE TAB4: Error parsing stored tab2 data:", parseError);
+                }
+            }
+        }
+
+        if (!program_arr.length) {
+            console.log("UPDATE TAB4: No stored tab2 data, reading from visible itinerary table");
+            var table = null;
+            if ($('#is_ai_quotation').val() === '1') {
+                table = document.getElementById("dynamic_table_list_update");
+            } else {
+                var packageTableId = $('input[name="custom_package"]:checked').val() || $('#img_package_id').val() || $('#package_id1').val();
+                if (packageTableId) {
+                    table = document.getElementById("dynamic_table_list_p_" + packageTableId);
+                }
+                if (!table) {
+                    table = document.getElementById("dynamic_table_list_update");
+                }
+            }
+
+            if (!table) {
+                error_msg_alert('Itinerary data not found. Please open the Package tab and click Next before updating.');
+                window.quotationUpdateInProgress = false;
+                $('#btn_quotation_update').prop('disabled', false);
+                return false;
+            }
+
             var rowCount = table.rows.length;
             for (var i = 0; i < rowCount; i++) {
                 var row = table.rows[i];
-                var checked_programe = row.cells[0].childNodes[0].checked;
-                var day_count = row.cells[1].childNodes[0].value;
-                var attraction = row.cells[2].childNodes[0].value;
-                var program = row.cells[3].childNodes[0].value;
-                var stay = row.cells[4].childNodes[0].value;
-                var meal_plan = row.cells[5].childNodes[0].value;
-                var package_id1 = row.cells[7].childNodes[0].value;
+                var checkbox = row.querySelector('input[type="checkbox"]');
+                var checked_programe = checkbox ? checkbox.checked : false;
+                var attractionInput = row.querySelector('input[id*="special_attaraction"]');
+                var programTextarea = row.querySelector('textarea[id*="day_program"]');
+                var stayInput = row.querySelector('input[id*="overnight_stay"]');
+                var mealPlanSelect = row.querySelector('select[id*="meal_plan"]');
+                var packageIdInput = row.querySelector('input[name="package_id_n"]');
+
+                var attraction = attractionInput ? attractionInput.value : '';
+                var program = programTextarea ? programTextarea.value : '';
+                var stay = stayInput ? stayInput.value : '';
+                var meal_plan = mealPlanSelect ? mealPlanSelect.value : '';
+                var package_id1 = packageIdInput ? packageIdInput.value : ($('#is_ai_quotation').val() === '1' ? $('#quotation_refer_id').val() : $('#package_id1').val());
+
                 checked_programe_arr.push(checked_programe);
-                day_count_arr.push(day_count);
+                day_count_arr.push(i + 1);
                 attraction_arr.push(attraction);
                 program_arr.push(program);
                 stay_arr.push(stay);
@@ -1216,23 +1315,16 @@ $('#frm_tab4').validate({
         var train_departure_date_arr = [];
         var train_id_arr = [];
 
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_train");
-        var rowCount = table.rows.length;
-
-        for (var i = 0; i < rowCount; i++) {
-            var row = table.rows[i];
-            var status = row.cells[0].childNodes[0].checked;
-            var train_from_location1 = row.cells[2].childNodes[0].value;
-            var train_to_location1 = row.cells[3].childNodes[0].value;
-            var train_class = row.cells[4].childNodes[0].value;
-            var train_departure_date = row.cells[5].childNodes[0].value;
-            var train_arrival_date = row.cells[6].childNodes[0].value;
-
-            if (row.cells[7] && row.cells[7].childNodes[0]) {
-                var train_id = row.cells[7].childNodes[0].value;
-            } else {
-                var train_id = "";
-            }
+        var trainRows = getTableRows("tbl_package_tour_quotation_dynamic_train");
+        for (var i = 0; i < trainRows.length; i++) {
+            var row = trainRows[i];
+            var status = getRowCheckboxChecked(row, 0);
+            var train_from_location1 = getRowInputValue(row, 2);
+            var train_to_location1 = getRowInputValue(row, 3);
+            var train_class = getRowInputValue(row, 4);
+            var train_departure_date = getRowInputValue(row, 5);
+            var train_arrival_date = getRowInputValue(row, 6);
+            var train_id = getRowInputValue(row, 7);
 
             train_status_arr.push(status);
             train_from_location_arr.push(train_from_location1);
@@ -1255,28 +1347,20 @@ $('#frm_tab4').validate({
         var dapart_arr = [];
         var plane_id_arr = [];
 
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_plane");
-        var rowCount = table.rows.length;
+        var planeRows = getTableRows("tbl_package_tour_quotation_dynamic_plane");
+        for (var i = 0; i < planeRows.length; i++) {
+            var row = planeRows[i];
 
-        for (var i = 0; i < rowCount; i++) {
-            var row = table.rows[i];
-
-            var status = row.cells[0].childNodes[0].checked;
-            var plane_from_location1 = row.cells[2].childNodes[0].value;
-            var plane_to_location1 = row.cells[3].childNodes[0].value;
-            var airline_name = row.cells[4].childNodes[0].value;
-            var plane_class = row.cells[5].childNodes[0].value;
-            var dapart1 = row.cells[6].childNodes[0].value;
-            var arraval1 = row.cells[7].childNodes[0].value;
-            var plane_from_city = row.cells[8].childNodes[0].value;
-            var plane_to_city = row.cells[9].childNodes[0].value;
-
-
-            if (row.cells[10] && row.cells[10].childNodes[0]) {
-                var plane_id = row.cells[10].childNodes[0].value;
-            } else {
-                var plane_id = "";
-            }
+            var status = getRowCheckboxChecked(row, 0);
+            var plane_from_location1 = getRowInputValue(row, 2);
+            var plane_to_location1 = getRowInputValue(row, 3);
+            var airline_name = getRowInputValue(row, 4);
+            var plane_class = getRowInputValue(row, 5);
+            var dapart1 = getRowInputValue(row, 6);
+            var arraval1 = getRowInputValue(row, 7);
+            var plane_from_city = getRowInputValue(row, 8);
+            var plane_to_city = getRowInputValue(row, 9);
+            var plane_id = getRowInputValue(row, 10);
 
             plane_status_arr.push(status);
             plane_from_city_arr.push(plane_from_city);
@@ -1298,24 +1382,20 @@ $('#frm_tab4').validate({
         var sharing_arr = [];
         var c_entry_id_arr = [];
 
-        var table = document.getElementById("tbl_dynamic_cruise_quotation");
-        var rowCount = table.rows.length;
+        var cruiseRows = getTableRows("tbl_dynamic_cruise_quotation");
+        for (var i = 0; i < cruiseRows.length; i++) {
+            var row = cruiseRows[i];
 
-        for (var i = 0; i < rowCount; i++) {
-            var row = table.rows[i];
-
-            var status = row.cells[0].childNodes[0].checked;
-            var cruise_from_date = row.cells[2].childNodes[0].value;
-            var cruise_to_date = row.cells[3].childNodes[0].value;
-            var route = row.cells[4].childNodes[0].value;
-            var cabin = row.cells[5].childNodes[0].value;
-            var sharing = row.cells[6].childNodes[0].value;
-            var c_entry_id = row.cells[7].childNodes[0].value;
+            var status = getRowCheckboxChecked(row, 0);
+            var cruise_from_date = getRowInputValue(row, 2);
+            var cruise_to_date = getRowInputValue(row, 3);
+            var route = getRowInputValue(row, 4);
+            var cabin = getRowInputValue(row, 5);
+            var sharing = getRowInputValue(row, 6);
+            var c_entry_id = getRowInputValue(row, 7);
 
             if (c_entry_id == '') {
                 c_entry_id = 0;
-            } else {
-                c_entry_id = row.cells[7].childNodes[0].value;
             }
             cruise_status_arr.push(status);
             cruise_departure_date_arr.push(cruise_from_date);
@@ -1344,34 +1424,27 @@ $('#frm_tab4').validate({
         var hotel_id_arr = [];
         var hotel_meal_plan_arr = [];
 
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel_update");
-        var rowCount = table.rows.length;
+        var hotelRows = getTableRows("tbl_package_tour_quotation_dynamic_hotel_update");
+        for (var i = 0; i < hotelRows.length; i++) {
 
-        for (var i = 0; i < rowCount; i++) {
-
-            var row = table.rows[i];
-            var status = row.cells[0].childNodes[0].checked;
-            var package_type = row.cells[2].childNodes[0].value;
-            var city_name = row.cells[3].childNodes[0].value;
-            var hotel_id = row.cells[4].childNodes[0].value;
-            var hotel_cat = row.cells[5].childNodes[0].value;
-            var check_in = row.cells[6].childNodes[0].value;
-            var checkout = row.cells[7].childNodes[0].value;
-            var hotel_type = row.cells[8].childNodes[0].value;
-            var hotel_stay_days1 = row.cells[9].childNodes[0].value;
-            var total_rooms = row.cells[10].childNodes[0].value;
-            var extra_bed = row.cells[11].childNodes[0].value;
-            var package_name1 = row.cells[12].childNodes[0].value;
-            var hotel_cost = row.cells[13].childNodes[0].value;
-            var package_id1 = row.cells[14].childNodes[0].value;
-            var extra_bed_cost = row.cells[15].childNodes[0].value;
-            var meal_plan = row.cells[16].childNodes[0].value;
-
-            if (row.cells[17] && row.cells[17].childNodes[0]) {
-                var hotel_id1 = row.cells[17].childNodes[0].value;
-            } else {
-                var hotel_id1 = '';
-            }
+            var row = hotelRows[i];
+            var status = getRowCheckboxChecked(row, 0);
+            var package_type = getRowInputValue(row, 2);
+            var city_name = getRowInputValue(row, 3);
+            var hotel_id = getRowInputValue(row, 4);
+            var hotel_cat = getRowInputValue(row, 5);
+            var check_in = getRowInputValue(row, 6);
+            var checkout = getRowInputValue(row, 7);
+            var hotel_type = getRowInputValue(row, 8);
+            var hotel_stay_days1 = getRowInputValue(row, 9);
+            var total_rooms = getRowInputValue(row, 10);
+            var extra_bed = getRowInputValue(row, 11);
+            var package_name1 = getRowInputValue(row, 12);
+            var hotel_cost = getRowInputValue(row, 13);
+            var package_id1 = getRowInputValue(row, 14);
+            var extra_bed_cost = getRowInputValue(row, 15);
+            var meal_plan = getRowInputValue(row, 16);
+            var hotel_id1 = getRowInputValue(row, 17);
 
             hotel_status_arr.push(status);
             package_type_arr.push(package_type);
@@ -1406,33 +1479,30 @@ $('#frm_tab4').validate({
         var transport_id_arr = [];
         var service_duration_arr = [];
 
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_transport_u");
-        var rowCount = table.rows.length;
+        var transportRows = getTableRows("tbl_package_tour_quotation_dynamic_transport_u");
+        for (var i = 0; i < transportRows.length; i++) {
 
-        for (var i = 0; i < rowCount; i++) {
-
-            var row = table.rows[i];
-            var status = row.cells[0].childNodes[0].checked;
-            var transport_id1 = row.cells[2].childNodes[0].value;
-            var travel_date = row.cells[3].childNodes[0].value;
-            var end_date = row.cells[4].childNodes[0].value;
-            var pickup = row.cells[5].childNodes[0].value;
-            var drop = row.cells[6].childNodes[0].value;
-            var pickup_type = $("option:selected", $("#" + row.cells[5].childNodes[0].id)).parent().attr(
-                'value');
-            var drop_type = $("option:selected", $("#" + row.cells[6].childNodes[0].id)).parent().attr(
-                'value');
-            var service_duration = row.cells[7].childNodes[0].value;
-            var vehicle_count = row.cells[8].childNodes[0].value;
-            var transport_cost = row.cells[9].childNodes[0].value;
-            var pname = row.cells[10].childNodes[0].value;
-            var package_id1 = row.cells[11].childNodes[0].value;
-
-            if (row.cells[14] && row.cells[14].childNodes[0]) {
-                var transport_id = row.cells[14].childNodes[0].value;
-            } else {
-                var transport_id = '';
+            var row = transportRows[i];
+            var status = getRowCheckboxChecked(row, 0);
+            var transport_id1 = getRowInputValue(row, 2);
+            var travel_date = getRowInputValue(row, 3);
+            var end_date = getRowInputValue(row, 4);
+            var pickup = getRowInputValue(row, 5);
+            var drop = getRowInputValue(row, 6);
+            var pickup_type = getRowInputValue(row, 12);
+            var drop_type = getRowInputValue(row, 13);
+            if (!pickup_type && pickup && pickup.indexOf('-') !== -1) {
+                pickup_type = pickup.split('-')[0];
             }
+            if (!drop_type && drop && drop.indexOf('-') !== -1) {
+                drop_type = drop.split('-')[0];
+            }
+            var service_duration = getRowInputValue(row, 7);
+            var vehicle_count = getRowInputValue(row, 8);
+            var transport_cost = getRowInputValue(row, 9);
+            var pname = getRowInputValue(row, 10);
+            var package_id1 = getRowInputValue(row, 11);
+            var transport_id = getRowInputValue(row, 14);
 
             transport_status_arr.push(status);
             vehicle_name_arr.push(transport_id1);
@@ -1447,10 +1517,22 @@ $('#frm_tab4').validate({
             drop_type_arr.push(drop_type);
             transport_id_arr.push(transport_id);
             service_duration_arr.push(service_duration);
+
+            if (status === 'true' && transport_id1 && !pickup) {
+                error_msg_alert('Select pickup location in transport row ' + (i + 1));
+                window.quotationUpdateInProgress = false;
+                $('#btn_quotation_update').prop('disabled', false);
+                return false;
+            }
+            if (status === 'true' && transport_id1 && !drop) {
+                error_msg_alert('Select drop-off location in transport row ' + (i + 1));
+                window.quotationUpdateInProgress = false;
+                $('#btn_quotation_update').prop('disabled', false);
+                return false;
+            }
         }
         //Activity Info
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
-        var rowCount = table.rows.length;
+        var excRows = getTableRows("tbl_package_tour_quotation_dynamic_excursion");
 
         var exc_status_arr = [];
         var exc_date_arr_e = [];
@@ -1466,27 +1548,22 @@ $('#frm_tab4').validate({
         var vehicle_id_arr_e = [];
         var vehicles_arr = [];
 
-        for (var e = 0; e < rowCount; e++) {
-            var row = table.rows[e];
+        for (var e = 0; e < excRows.length; e++) {
+            var row = excRows[e];
 
-            var status = row.cells[0].childNodes[0].checked;
-            var exc_date = row.cells[2].childNodes[0].value;
-            var city_name = row.cells[3].childNodes[0].value;
-            var excursion_name = row.cells[4].childNodes[0].value;
-            var transfer_option = row.cells[5].childNodes[0].value;
-            var adults = row.cells[6].childNodes[0].value;
-            var chwb = row.cells[7].childNodes[0].value;
-            var chwob = row.cells[8].childNodes[0].value;
-            var infant = row.cells[9].childNodes[0].value;
-            var excursion_amount = row.cells[10].childNodes[0].value;
-            var vehicle_id = row.cells[15].childNodes[0].value;
-            var vehicles = row.cells[16].childNodes[0].value;
-
-            if (row.cells[17] && row.cells[17].childNodes[0]) {
-                var excursion_id = row.cells[17].childNodes[0].value;
-            } else {
-                var excursion_id = "";
-            }
+            var status = getRowCheckboxChecked(row, 0);
+            var exc_date = getRowInputValue(row, 2);
+            var city_name = getRowInputValue(row, 3);
+            var excursion_name = getRowInputValue(row, 4);
+            var transfer_option = getRowInputValue(row, 5);
+            var adults = getRowInputValue(row, 6);
+            var chwb = getRowInputValue(row, 7);
+            var chwob = getRowInputValue(row, 8);
+            var infant = getRowInputValue(row, 9);
+            var excursion_amount = getRowInputValue(row, 10);
+            var vehicle_id = '';
+            var vehicles = getRowInputValue(row, 15);
+            var excursion_id = getRowInputValue(row, 16);
             exc_status_arr.push(status);
             exc_date_arr_e.push(exc_date);
             city_name_arr_e.push(city_name);
@@ -1500,6 +1577,19 @@ $('#frm_tab4').validate({
             vehicle_id_arr_e.push(vehicle_id);
             vehicles_arr.push(vehicles);
             excursion_id_arr.push(excursion_id);
+
+            if (status === 'true' && city_name && !excursion_name) {
+                error_msg_alert('Select activity name in row ' + (e + 1));
+                window.quotationUpdateInProgress = false;
+                $('#btn_quotation_update').prop('disabled', false);
+                return false;
+            }
+            if (status === 'true' && excursion_name && !city_name) {
+                error_msg_alert('Select activity city in row ' + (e + 1));
+                window.quotationUpdateInProgress = false;
+                $('#btn_quotation_update').prop('disabled', false);
+                return false;
+            }
         }
 
         //Costing Information
@@ -1516,26 +1606,24 @@ $('#frm_tab4').validate({
         var discount_in_arr = [];
         var discount_arr = [];
 
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-        var rowCount = table.rows.length;
-        for (var i = 0; i < rowCount; i++) {
+        var costingRows = getTableRows("tbl_package_tour_quotation_dynamic_costing");
+        for (var i = 0; i < costingRows.length; i++) {
 
-
-            var row = table.rows[i];
-            var package_type_c = row.cells[2].childNodes[1].value;
-            var tour_cost = row.cells[3].childNodes[1].value;
-            var transport_cost = row.cells[4].childNodes[1].value;
-            var excursion_cost = row.cells[5].childNodes[1].value;
-            var basic_amount = row.cells[6].childNodes[1].value;
-            var service_charge = row.cells[7].childNodes[1].value;
-            var discount_in = row.cells[8].childNodes[1].value;
-            var discount = row.cells[9].childNodes[1].value;
-            var tax_apply_on = row.cells[10].childNodes[1].value;
-            var tax_value = row.cells[11].childNodes[1].value;
-            var service_tax_subtotal = row.cells[12].childNodes[1].value;
-            var total_tour_cost = row.cells[16].childNodes[1].value;
-            var package_name3 = row.cells[17].childNodes[1].value;
-            var costing_id = row.cells[19].childNodes[0].value;
+            var row = costingRows[i];
+            var package_type_c = getRowInputValue(row, 2);
+            var tour_cost = getRowInputValue(row, 3);
+            var transport_cost = getRowInputValue(row, 4);
+            var excursion_cost = getRowInputValue(row, 5);
+            var basic_amount = getRowInputValue(row, 6);
+            var service_charge = getRowInputValue(row, 7);
+            var discount_in = getRowInputValue(row, 8);
+            var discount = getRowInputValue(row, 9);
+            var tax_apply_on = getRowInputValue(row, 10);
+            var tax_value = getRowInputValue(row, 11);
+            var service_tax_subtotal = getRowInputValue(row, 12);
+            var total_tour_cost = getRowInputValue(row, 16);
+            var package_name3 = getRowInputValue(row, 17);
+            var costing_id = getRowInputValue(row, 19);
 
             if (tour_cost == "") {
                 error_msg_alert('Select Tour cost in row' + (i + 1));
@@ -1568,18 +1656,16 @@ $('#frm_tab4').validate({
         }
         var bsmValues = [];
 
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-        var rowCount = table.rows.length;
-        for (var i = 0; i < rowCount; i++) {
-            var row = table.rows[i];
+        for (var i = 0; i < costingRows.length; i++) {
+            var row = costingRows[i];
             var bsmvaluesEach = [];
-            if (row.cells[0].childNodes[1].checked) {
-                    var basic_show = $(row.cells[6].childNodes[1]).find('span').text();
-                    var service_show = $(row.cells[7].childNodes[1]).find('span').text();
-                    var tax_apply_on = row.cells[10].childNodes[1].value;
-                    var tax_value = row.cells[11].childNodes[1].value;
-                    var tcs = row.cells[13].childNodes[3].value;
-                    var tcsvalue = row.cells[14].childNodes[3].value;
+            if (getRowCheckboxChecked(row, 0)) {
+                    var basic_show = $(row.cells[6]).find('span').last().text();
+                    var service_show = $(row.cells[7]).find('span').last().text();
+                    var tax_apply_on = getRowInputValue(row, 10);
+                    var tax_value = getRowInputValue(row, 11);
+                    var tcs = getRowInputValue(row, 13);
+                    var tcsvalue = getRowInputValue(row, 14);
                 
                     bsmvaluesEach.push({
                         "basic": 'basic',
@@ -1626,8 +1712,9 @@ $('#frm_tab4').validate({
         var other_desc = $('#other_desc1').val();
 
         var costing_type = $('#costing_type1').val();
-        var inclusions = $('#inclusions1').val();
-        var exclusions = $('#exclusions1').val();
+        var inclExclData = getInclusionsExclusionsForQuotation();
+        var inclusions = inclExclData.inclusions;
+        var exclusions = inclExclData.exclusions;
         var image_url_id = $('#image_url_id').val();
         var pckg_daywise_url = $('#pckg_daywise_url').val();
         var image_url = $('#delete_image_url').val();
@@ -2190,24 +2277,19 @@ function uploadSingleImage(imageData, quotationId, base_url) {
     });
 }
 
-// Load form data from sessionStorage when tab4 loads
-$(document).ready(function() {
-    var storedData = sessionStorage.getItem('tab2_form_data');
-    if (storedData) {
-        try {
-            var formData = JSON.parse(storedData);
-            console.log("TAB4: Loading stored form data:", formData);
-            
-            // Store the data in global variables for use in form submission
-            window.tab2FormData = formData;
-            
-            // Clear the stored data after loading
-            sessionStorage.removeItem('tab2_form_data');
-        } catch (e) {
-            console.error("TAB4: Error parsing stored form data:", e);
+    // Load form data from sessionStorage when tab4 loads
+    $(document).ready(function() {
+        var storedData = sessionStorage.getItem('tab2_form_data');
+        if (storedData && !window.tab2FormData) {
+            try {
+                var formData = JSON.parse(storedData);
+                console.log("TAB4: Loading stored form data:", formData);
+                window.tab2FormData = formData;
+            } catch (e) {
+                console.error("TAB4: Error parsing stored form data:", e);
+            }
         }
-    }
-});
+    });
 
 function calculateCostingCardsUpdate() {
 

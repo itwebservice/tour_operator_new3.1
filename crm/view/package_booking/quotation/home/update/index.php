@@ -7,8 +7,8 @@ $hide_flight = ($package_flight_switch == 'Yes') ? 'hidden' : '';
 $hide_cruise = ($package_cruise_switch == 'Yes') ? 'hidden' : '';
 $hide_train = ($package_train_switch == 'Yes') ? 'hidden' : '';
 
-$quotation_id = $_POST['quotation_id'];
-$package_id = $_POST['package_id'];
+$quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] : '';
+$package_id = isset($_POST['package_id']) ? $_POST['package_id'] : '';
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
@@ -156,8 +156,7 @@ function hotel_type_load_cate(id)
 function get_excursion_list(id) {
     var city_id = $("#" + id).val();
     var base_url = $('#base_url').val();
-
-    var count = id.substring(10);
+    var count = id.replace(/^city_name-/, '');
     $.post(base_url + "view/package_booking/quotation/home/excursion_name_load.php", {
         city_id: city_id
     }, function(data) {
@@ -182,16 +181,16 @@ function get_excursion_amount_update(eleid) {
     var exc_arr = new Array();
     var transfer_arr = new Array();
 
-    var id = eleid.split('-');
+    var rowSuffix = eleid.replace(/^[^-]+-/, '');
 
     total_adult = (total_adult == '') ? 0 : total_adult;
     children_without_bed = (children_without_bed == '') ? 0 : children_without_bed;
     children_with_bed = (children_with_bed == '') ? 0 : children_with_bed;
     total_infant = (total_infant == '') ? 0 : total_infant;
 
-    exc_date_arr.push($('#exc_date-' + id[1]).val());
-    exc_arr.push($('#excursion-' + id[1]).val());
-    transfer_arr.push($('#transfer_option-' + id[1]).val());
+    exc_date_arr.push($('#exc_date-' + rowSuffix).val());
+    exc_arr.push($('#excursion-' + rowSuffix).val());
+    transfer_arr.push($('#transfer_option-' + rowSuffix).val());
 
     $.post(base_url + "view/package_booking/quotation/home/excursion_amount_load.php", {
         exc_date_arr: exc_date_arr,
@@ -203,7 +202,7 @@ function get_excursion_amount_update(eleid) {
         total_infant: total_infant
     }, function(data) {
         var amount_arr = JSON.parse(data);
-        $('#excursion_amount-' + id[1]).val(amount_arr[0]['total_cost']);
+        $('#excursion_amount-' + rowSuffix).val(amount_arr[0]['total_cost']);
     });
 }
 

@@ -1,3 +1,41 @@
+<style>
+  .app_dual_button input[type="radio"]{
+display: none;
+}
+.app_dual_button{
+padding: 6px 6px;
+border: 1px solid <?= $theme_color ?>;
+margin-right: -5px;
+background: #fff;
+margin-bottom: 0;
+cursor: pointer;
+font-weight: 300;
+font-size: 14px;
+}
+.app_dual_button label{
+margin:0;
+}
+.app_dual_button.active{
+background: <?= $theme_color ?>;
+color: #fff;
+}
+.app_dual_button:first-child{
+border-top-left-radius:20px;
+border-bottom-left-radius:20px;
+}
+.app_dual_button:last-child{
+border-top-right-radius:20px;
+border-bottom-right-radius:20px;
+}
+label input.labelauty:checked + label{
+<!-- background-color: rgba(0, 0, 0, 0.42); -->
+color: #ffffff;
+}
+input.labelauty + label, input.labelauty:checked + label, input.labelauty:checked:not([disabled]) + label:hover{
+background-color:<?= $theme_color ?>;
+}
+</style>
+
 <?php
 include "../../../../model/model.php";
 /*======******Header******=======*/
@@ -16,6 +54,20 @@ $financial_year_id = $_SESSION['financial_year_id'];
 <input type="hidden" id="branch_status" name="branch_status" value="<?= $branch_status ?>">
 <?= begin_panel('Package Tour Quotation', 40) ?>
 <div class="app_panel_content">
+
+
+     <div class="row text-center text_left_sm_xs mg_bt_10">	
+    <label for="standardPackage" class="app_dual_button mg_bt_10 active">
+        <input type="radio" id="standardPackage" name="quotation_package" checked onchange="package_booking_reflect()">
+        &nbsp;&nbsp;Standard Package
+    </label>    
+    <label for="aiBuilder" class="app_dual_button mg_bt_10">
+        <input type="radio" id="aiBuilder" name="quotation_package" onchange="package_booking_reflect()">
+        &nbsp;&nbsp;AI Builder
+    </label>
+    </div> 
+
+
     <div class="row">
         <div class="col-md-12">
             <div id="div_id_proof_content"> </div>
@@ -311,6 +363,7 @@ function quotation_list_reflect() {
     var branch_id = $('#branch_id_filter1').val();
     var status = $('#status').val();
     var financial_year_id_filter = $('#financial_year_id_filter').val();
+    var quotation_source_type = $('input[name="quotation_package"]:checked').attr('id') === 'aiBuilder' ? 'ai' : 'standard';
 
     $.post('quotation_list_reflect.php', {
         from_date: from_date,
@@ -321,13 +374,13 @@ function quotation_list_reflect() {
         branch_status: branch_status,
         branch_id: branch_id,
         status: status,
-        financial_year_id:financial_year_id_filter
+        financial_year_id: financial_year_id_filter,
+        quotation_source_type: quotation_source_type
     }, function(data) {
         pagination_load(data, column, true, false, 20, 'package_table');
         $('.loader').remove();
     })
 }
-quotation_list_reflect();
 
     function quotation_clone(quotation_id) {
         var base_url = $('#base_url').val();
@@ -667,6 +720,13 @@ $(document).ready(function() {
         }
     });
 });
+
+    function package_booking_reflect() {
+        $('.app_dual_button').removeClass('active');
+        $('input[name="quotation_package"]:checked').closest('label').addClass('active');
+        quotation_list_reflect();
+    }
+    package_booking_reflect();
 </script>
 <style>
     .action_width {

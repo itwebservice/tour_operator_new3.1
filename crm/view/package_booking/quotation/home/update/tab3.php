@@ -140,6 +140,7 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                         name="pickup_type-" style="display:none;"></td>
                                                                 <td><input type="hidden" id="drop_type" name="drop_type"
                                                                         style="display:none;"></td>
+                                                                <td class="hidden"><input type="hidden" id="transport_id-" value=""></td>
                                                             </tr>
                                                             <script type="text/javascript">
                                                                 $('#transport_vehicle1-,#pickup_from1-,#drop_to1-').select2();
@@ -297,9 +298,7 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                             name="drop_type-<?= $count ?>_u"
                                                                             style="display:none;"
                                                                             value="<?= $row_q_tr['drop_type'] ?>"></td>
-                                                                    <td class="hidden"><input type="hidden"
-                                                                            value="<?= $row_q_tr['id'] ?>"
-                                                                            style="display:none;"></td>
+                                                                    <td class="hidden"><input type="hidden" id="transport_id-<?= $count ?>_u" value="<?= $row_q_tr['id'] ?>"></td>
                                                                 </tr>
                                                                 <script type="text/javascript">
                                                                     $('#transport_vehicle-<?= $count ?>_u,#pickup_from-<?= $count ?>_u,#drop_to-<?= $count ?>_u').select2();
@@ -372,37 +371,37 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                         if ($sq_ex_count == 0) {
                                                         ?>
                                                             <tr>
-                                                                <td><input class="css-checkbox" id="chk_tour_group-1"
-                                                                        type="checkbox"
+                                                                <td><input class="css-checkbox" id="chk_tour_group-1_u"
+                                                                        type="checkbox" checked
                                                                         onchange="get_excursion_amount_update(this.id);"><label
-                                                                        class="css-label" for="chk_tour_group-1"> <label>
+                                                                        class="css-label" for="chk_tour_group-1_u"> <label>
                                                                 </td>
                                                                 <td style="width:10%"><input maxlength="15" value="1"
                                                                         type="text" name="username1" placeholder="Sr. No."
                                                                         class="form-control" disabled /></td>
                                                                 <td><input type="text"
                                                                         class="form-control app_datetimepicker"
-                                                                        id="exc_date-1" name="exc_date-1"
+                                                                        id="exc_date-1_u" name="exc_date-1_u"
                                                                         placeholder="Activity Date/Time"
                                                                         title="Activity Date/Time"
                                                                         value="<?= date('d-m-Y H:i') ?>" style="width:130px"
                                                                         onchange="get_excursion_amount_update(this.id);">
                                                                 </td>
-                                                                <td><select id="city_name-1"
+                                                                <td><select id="city_name-1_u"
                                                                         class="form-control app_select2 act_city"
-                                                                        name="city_name-1" title="City Name"
+                                                                        name="city_name-1_u" title="City Name"
                                                                         style="width:150px"
                                                                         onchange="get_excursion_list(this.id);" data-add-new-option="true">
                                                                         <option value="">*City</option>
                                                                     </select></td>
-                                                                <td><select id="excursion-1"
+                                                                <td><select id="excursion-1_u"
                                                                         class="form-control app_select2"
-                                                                        title="Activity Name" name="excursion-1"
+                                                                        title="Activity Name" name="excursion-1_u"
                                                                         style="width:150px"
                                                                         onchange="get_excursion_amount_update(this.id);">
                                                                         <option value="">*Activity Name</option>
                                                                     </select></td>
-                                                                <td><select name="transfer_option-1" id="transfer_option-1"
+                                                                <td><select name="transfer_option-1_u" id="transfer_option-1_u"
                                                                         data-toggle="tooltip"
                                                                         class="form-contrl app_select2"
                                                                         title="Transfer Option" style="width:150px"
@@ -415,28 +414,28 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                         </option>
                                                                         <option value="SIC">SIC</option>
                                                                     </select></td>
-                                                                <td><input type="number" id="adult-1" name="adult-1"
+                                                                <td><input type="number" id="adult-1_u" name="adult-1_u"
                                                                         placeholder="Adult(s)" title="Adult(s)"
                                                                         style="width:150px"
-                                                                        onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'Adult');">
+                                                                        onchange="get_excursion_amount_update(this.id);validate_balance(this.id);validate_pax_count(this.id,'Adult');">
                                                                 </td>
-                                                                <td><input type="number" id="child-1" name="child-1"
+                                                                <td><input type="number" id="child-1_u" name="child-1_u"
                                                                         placeholder="Child With-Bed" title="Child With-Bed"
                                                                         style="width:150px"
-                                                                        onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'ChildWithBed');">
+                                                                        onchange="get_excursion_amount_update(this.id);validate_balance(this.id);validate_pax_count(this.id,'ChildWithBed');">
                                                                 </td>
-                                                                <td><input type="number" id="childwo-1" name="childwo-1"
+                                                                <td><input type="number" id="childwo-1_u" name="childwo-1_u"
                                                                         placeholder="Child Without-Bed"
                                                                         title="Child Without-Bed" style="width:150px"
-                                                                        onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'ChildWithoutBed');">
+                                                                        onchange="get_excursion_amount_update(this.id);validate_balance(this.id);validate_pax_count(this.id,'ChildWithoutBed');">
                                                                 </td>
-                                                                <td><input type="number" id="infant-1" name="infant-1"
+                                                                <td><input type="number" id="infant-1_u" name="infant-1_u"
                                                                         placeholder="Infant(s)" title="Infant(s)"
                                                                         style="width:150px"
-                                                                        onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'Infant');">
+                                                                        onchange="get_excursion_amount_update(this.id);validate_balance(this.id);validate_pax_count(this.id,'Infant');">
                                                                 </td>
                                                                 <td style="display:none"><input type="text"
-                                                                        id="excursion_amount-1" name="excursion_amount-1"
+                                                                        id="excursion_amount-1_u" name="excursion_amount-1_u"
                                                                         placeholder="Activity Amount"
                                                                         title="Activity Amount"
                                                                         style="width:150px;display:none;"
@@ -453,14 +452,15 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                 <td style="display:none"><input type="number"
                                                                         id="infant_total-1" name="infant_total-1"
                                                                         style="width:100px;display:none;"></td>
-                                                                <td><input type="number" id="no_vehicles-1" name="no_vehicles-1"
+                                                                <td><input type="number" id="no_vehicles-1_u" name="no_vehicles-1_u"
                                                                         placeholder="No.Of Vehicles" title="No.Of Vehicles"
-                                                                        style="width:150px" onchange="get_excursion_amount();">
+                                                                        style="width:150px" onchange="get_excursion_amount_update(this.id);">
                                                                 </td>
+                                                                <td class="hidden"><input type="hidden" id="excursion_id-1_u" value=""></td>
                                                             </tr>
                                                             <script>
-                                                                $('#city_name-1').select2();
-                                                                $("#exc_date-1").datetimepicker({
+                                                                $('#city_name-1_u').select2();
+                                                                $("#exc_date-1_u").datetimepicker({
                                                                     format: 'd-m-Y H:i'
                                                                 });
                                                                 city_lzloading('.act_city', '*City');
@@ -477,9 +477,9 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                             ?>
                                                                 <tr>
                                                                     <td><input class="css-checkbox"
-                                                                            id="chk_tour_group-<?= $count ?>" type="checkbox"
+                                                                            id="chk_tour_group-<?= $count ?>_u" type="checkbox"
                                                                             checked><label class="css-label"
-                                                                            for="chk_tour_group-<?= $count ?>"
+                                                                            for="chk_tour_group-<?= $count ?>_u"
                                                                             onchange="get_excursion_amount_update(this.id);">
                                                                             <label></td>
                                                                     <td><input maxlength="15" value="<?= $count ?>" type="text"
@@ -571,8 +571,8 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                     <td style="display:none"><input type="number"
                                                                             id="infant_total-1" name="infant_total-1"
                                                                             style="width:100px;display:none;"></td>
-                                                                    <td><input type="number" id="no_vehicles-<?= $count ?>_u" name="no_vehicles-<?= $count ?>_u" placeholder="No.Of Vehicles" title="No.Of Vehicles" style="width:150px" onchange="get_excursion_amount();" value="<?php echo $row_q_ex['vehicles'] ?>">
-                                                                    <td class="hidden"><input type="hidden" value="<?= $row_q_ex['id'] ?>"></td>
+                                                                    <td><input type="number" id="no_vehicles-<?= $count ?>_u" name="no_vehicles-<?= $count ?>_u" placeholder="No.Of Vehicles" title="No.Of Vehicles" style="width:150px" onchange="get_excursion_amount_update(this.id);" value="<?php echo $row_q_ex['vehicles'] ?>"></td>
+                                                                    <td class="hidden"><input type="hidden" id="excursion_id-<?= $count ?>_u" value="<?= $row_q_ex['id'] ?>"></td>
                                                                 </tr>
                                                                 <script>
                                                                     $('#city_name-<?= $count ?>_u').select2();
@@ -667,19 +667,14 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
     destinationLoading(".drop_to", 'Drop-off Location');
     city_lzloading('.city_name');
     
-    // Load form data from sessionStorage when tab3 loads
+    // Preserve tab2 itinerary data for the final update step
     $(document).ready(function() {
         var storedData = sessionStorage.getItem('tab2_form_data');
-        if (storedData) {
+        if (storedData && !window.tab2FormData) {
             try {
                 var formData = JSON.parse(storedData);
                 console.log("Loading stored form data:", formData);
-                
-                // Store the data in global variables for use in tab4
                 window.tab2FormData = formData;
-                
-                // Clear the stored data after loading
-                sessionStorage.removeItem('tab2_form_data');
             } catch (e) {
                 console.error("Error parsing stored form data:", e);
             }

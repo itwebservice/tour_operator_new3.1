@@ -133,11 +133,33 @@ function findImageUrl($image_path, $is_new_quotation = false)
 <form id="frm_tab2_u">
     <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
     <input type="hidden" id="quotation_id" value="<?= $quotation_id ?>" />
+    <?php
+    $is_ai_quotation = (intval($sq_quotation['quotation_refer_id']) > 0) ? 1 : 0;
+    $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
+    $sq_pacakge = array('dest_id' => '', 'package_name' => '');
+    if ($package_lookup_id > 0) {
+        $row_pkg = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$package_lookup_id'"));
+        if ($row_pkg) {
+            $sq_pacakge = $row_pkg;
+        }
+    }
+    $sq_destination = array('dest_name' => '');
+    if (!empty($sq_pacakge['dest_id'])) {
+        $row_dest_pkg = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id='{$sq_pacakge['dest_id']}'"));
+        if ($row_dest_pkg) {
+            $sq_destination = $row_dest_pkg;
+        }
+    }
+    ?>
     <div class="app_panel">
 
         <div class="container" style="width:100% !important;">
 
-            <div class="row">
+            <?php if ($is_ai_quotation) { ?>
+                <input type="hidden" name="dest_name" id="dest_name" value="<?= isset($sq_pacakge['dest_id']) ? $sq_pacakge['dest_id'] : '' ?>">
+                <input type="hidden" id="nights_filter" value="<?= intval($sq_quotation['total_days']) ?>">
+            <?php } else { ?>
+            <div class="row" id="package_tour_filters_row">
                 <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_20" id="package_div">
                     <select name="dest_name" id="dest_name" title="Select Destination"
                         onchange="load_packages_with_filter()" style="width:100%">
@@ -145,7 +167,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                         <?php
                         $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");
                         while ($row_dest = mysqli_fetch_assoc($sq_query)) {
-                            $selected = ($sq_pacakge['dest_id'] == $row_dest['dest_id']) ? 'selected' : '';
+                            $selected = (!empty($sq_pacakge['dest_id']) && $sq_pacakge['dest_id'] == $row_dest['dest_id']) ? 'selected' : '';
                         ?>
                             <option value="<?php echo $row_dest['dest_id']; ?>" <?= $selected ?>><?php echo $row_dest['dest_name']; ?>
                             </option>
@@ -157,7 +179,6 @@ function findImageUrl($image_path, $is_new_quotation = false)
                         onchange="filter_packages_by_nights()" style="width:100%">
                         <option value="">All Nights</option>
                         <?php
-                        // Generate options for 1 to 30 nights
                         for ($i = 1; $i <= 30; $i++) {
                             $selected = ($sq_quotation['total_days'] == $i) ? 'selected' : '';
                             echo "<option value='$i' $selected>$i Night" . ($i > 1 ? 's' : '') . "</option>";
@@ -176,6 +197,9 @@ function findImageUrl($image_path, $is_new_quotation = false)
     font-size: 16px;
     color: #007bff;text-decoration:none; display:inline-block;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Package Tour</a>
                 </div>
+            </div>
+            <?php } ?>
+            <div class="row">
                 <div class="col-md-12 col-sm-8 col-xs-12 no-pad" id="package_name_div">
                     <!-- Packages will be loaded here via AJAX -->
                     <div class="text-center" style="padding: 20px;">
@@ -184,12 +208,6 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 </div>
 
                 <!-- Hidden fields for package data -->
-                <?php
-                $is_ai_quotation = is_ai_package_quotation($sq_quotation) ? 1 : 0;
-                $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
-                $sq_pacakge = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$package_lookup_id'"));
-                $sq_destination = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id='{$sq_pacakge['dest_id']}'"));
-                ?>
                 <input type="hidden" value="<?= isset($sq_pacakge['dest_id']) ? $sq_pacakge['dest_id'] : '' ?>" id='dest_name_hidden'>
                 <input type="hidden" value="<?= $is_ai_quotation ? 0 : $sq_quotation['package_id'] ?>" id='img_package_id'>
                 <input type="hidden" id="is_ai_quotation" value="<?= $is_ai_quotation ?>">
@@ -198,11 +216,6 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 <input type='hidden' id='pckg_daywise_url' name='pckg_daywise_url' />
                 <input type='hidden' id='quotation_id' name='quotation_id' value='<?= $quotation_id ?>' />
                 <input type='hidden' id='base_url' name='base_url' value='<?= BASE_URL ?>' />
-            </div>
-            <div class="row">
-                <div class="col-md-12 col-sm-8 col-xs-12 no-pad" id="package_name_div">
-                    <!-- Packages will be loaded here via AJAX -->
-                </div>
             </div>
             <div class="row" style="display: none;">
                 <div class="col-md-12 col-sm-8 col-xs-12 no-pad">
@@ -472,6 +485,14 @@ function findImageUrl($image_path, $is_new_quotation = false)
     `;
 
         console.log("DEBUG: New itinerary row added with offset:", offset, "package_id:", package_id);
+        setTimeout(function() {
+            if (typeof wrapImagesWithZoomUpdate === 'function') {
+                wrapImagesWithZoomUpdate();
+            }
+            if (typeof initImageZoomUpdate === 'function') {
+                initImageZoomUpdate();
+            }
+        }, 100);
     }
 
     // Function to delete itinerary row
@@ -748,6 +769,28 @@ function findImageUrl($image_path, $is_new_quotation = false)
     }
 
 
+    // Resolve the visible itinerary table for the selected package (AJAX-loaded content)
+    function getUpdateItineraryTable() {
+        if ($('#is_ai_quotation').val() === '1') {
+            var aiTable = document.getElementById('dynamic_table_list_update');
+            if (aiTable) {
+                return { table: aiTable, package_id: '0' };
+            }
+        }
+
+        var package_id = $('input[name="custom_package"]:checked').val() || $('#img_package_id').val();
+        if (package_id) {
+            var packageTable = document.getElementById('dynamic_table_list_p_' + package_id);
+            if (packageTable) {
+                return { table: packageTable, package_id: package_id };
+            }
+        }
+        return {
+            table: document.getElementById('dynamic_table_list_update'),
+            package_id: package_id || $('#img_package_id').val()
+        };
+    }
+
     // Function to submit tab2 form
     function submitTab2Form() {
         console.log("TAB2: submitTab2Form called");
@@ -770,7 +813,15 @@ function findImageUrl($image_path, $is_new_quotation = false)
         var existing_image_path_arr = new Array();
         var count = 0;
 
-        var table = document.getElementById("dynamic_table_list_update");
+        var itineraryContext = getUpdateItineraryTable();
+        var table = itineraryContext.table;
+        var selected_package_id = itineraryContext.package_id;
+
+        if (!table) {
+            error_msg_alert('Package itinerary not found. Please reload the page and try again.');
+            return false;
+        }
+
         var rowCount = table.rows.length;
         for (var i = 0; i < rowCount; i++) {
             var row = table.rows[i];
@@ -848,9 +899,8 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 package_id1 = packageIdInput.value;
                 console.log("TAB2: Found package_id_n with value:", package_id1);
             } else {
-                // Fallback to the global package_id
-                package_id1 = '<?php echo $package_id; ?>';
-                console.log("TAB2: Using global package_id:", package_id1);
+                package_id1 = selected_package_id || '<?php echo $package_id; ?>';
+                console.log("TAB2: Using selected package_id:", package_id1);
             }
             if (checked_programe) {
                 count++;
@@ -950,16 +1000,17 @@ function findImageUrl($image_path, $is_new_quotation = false)
             day_image_arr: day_image_arr,
             existing_image_path_arr: existing_image_path_arr,
             dest_id: $('#dest_name').val(),
-            package_id: $('#img_package_id').val(),
+            package_id: selected_package_id || $('#img_package_id').val(),
             nights_filter: $('#nights_filter').val()
         };
 
         sessionStorage.setItem('tab2_form_data', JSON.stringify(formData));
+        window.tab2FormData = formData;
         console.log("Form data stored in sessionStorage:", formData);
 
         var dest_id = $('#dest_name').val() || $('#quotation_dest_id').val();
         var is_ai_quotation = $('#is_ai_quotation').val() || '0';
-        var package_id = is_ai_quotation === '1' ? '0' : $('#img_package_id').val();
+        var package_id = is_ai_quotation === '1' ? '0' : (selected_package_id || $('#img_package_id').val());
         var package_id_arr = [package_id];
 
         // Save the itinerary data to server first
@@ -1227,6 +1278,11 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
         console.log('TAB2: load_packages_with_filter called - dest_id:', dest_id, 'total_nights:', total_nights);
 
+        if ($('#is_ai_quotation').val() === '1') {
+            package_dynamic_reflect_with_nights('dest_name', total_nights);
+            return;
+        }
+
         if (dest_id) {
             // Update sessionStorage with current nights selection
             if (total_nights) {
@@ -1340,8 +1396,10 @@ function findImageUrl($image_path, $is_new_quotation = false)
         var ajax_data = {
             dest_id: dest_id,
             total_nights: total_nights,
-            current_package_id: $('#img_package_id').val(), // Pass current package ID for pre-selection
-            quotation_id: $('#quotation_id').val() // Pass quotation ID for loading quotation-specific data
+            current_package_id: $('#img_package_id').val(),
+            quotation_id: $('#quotation_id').val(),
+            is_ai_quotation: $('#is_ai_quotation').val() || '0',
+            quotation_refer_id: $('#quotation_refer_id').val() || '0'
         };
 
         // Debug: Log the data being sent
@@ -1362,11 +1420,16 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 console.log('Result preview:', result.substring(0, 200));
                 $('#package_name_div').html(result);
 
+                if ($('#is_ai_quotation').val() === '1') {
+                    console.log('AI quotation loaded - skipping package preselection');
+                    return;
+                }
+
                 // Pre-select the saved package after loading
                 console.log('Calling preselectPackage...');
                 setTimeout(function() {
                     preselectPackage();
-                }, 500); // Small delay to ensure DOM is ready
+                }, 500);
             },
             error: function(xhr, status, error) {
                 console.log('Package loading error:', status, error);
@@ -1599,15 +1662,5 @@ function findImageUrl($image_path, $is_new_quotation = false)
             initImageZoomUpdate();
         }, 500);
     });
-    
-    // Also wrap images when new rows are added dynamically
-    function addItineraryRow(package_id) {
-        // Original addItineraryRow function code would go here
-        // For now, just call the wrap function after adding
-        setTimeout(function() {
-            wrapImagesWithZoomUpdate();
-            initImageZoomUpdate();
-        }, 100);
-    }
 </script>
 <?= end_panel(); ?>

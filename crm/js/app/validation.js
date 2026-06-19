@@ -1874,45 +1874,48 @@ function foo(tableID, quot_table_id, rowCounts) {
     tableID == "tbl_package_tour_quotation_dynamic_transport_u"
   ) {
     let fun_name = "";
+    var transportIdSuffix = "";
     if (tableID == "tbl_package_tour_quotation_dynamic_transport_u") {
       fun_name = "get_transport_cost_update(id);";
+      transportIdSuffix = "_u";
     } else {
       fun_name = "get_transport_cost();";
     }
     row.cells[0].childNodes[0].setAttribute(
       "id",
-      "chk_transport-" + foo.counter
+      "chk_transport-" + foo.counter + transportIdSuffix
     );
+    row.cells[0].childNodes[0].checked = true;
     row.cells[2].childNodes[0].setAttribute(
       "id",
-      "transport_vehicle-" + foo.counter
+      "transport_vehicle-" + foo.counter + transportIdSuffix
     );
     row.cells[3].childNodes[0].setAttribute(
       "id",
-      "transport_start_date-" + foo.counter
+      "transport_start_date-" + foo.counter + transportIdSuffix
     );
     row.cells[4].childNodes[0].setAttribute(
       "id",
-      "transport_end_date-" + foo.counter
+      "transport_end_date-" + foo.counter + transportIdSuffix
     );
-    row.cells[5].childNodes[0].setAttribute("id", "pickup_from-" + foo.counter);
-    row.cells[6].childNodes[0].setAttribute("id", "drop_to-" + foo.counter);
-    row.cells[7].childNodes[0].setAttribute("id", "duration-" + foo.counter);
-    row.cells[8].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter);
+    row.cells[5].childNodes[0].setAttribute("id", "pickup_from-" + foo.counter + transportIdSuffix);
+    row.cells[6].childNodes[0].setAttribute("id", "drop_to-" + foo.counter + transportIdSuffix);
+    row.cells[7].childNodes[0].setAttribute("id", "duration-" + foo.counter + transportIdSuffix);
+    row.cells[8].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter + transportIdSuffix);
     row.cells[9].childNodes[0].setAttribute(
       "id",
-      "transport_cost-" + foo.counter
+      "transport_cost-" + foo.counter + transportIdSuffix
     );
     row.cells[10].childNodes[0].setAttribute(
       "id",
-      "package_name-" + foo.counter
+      "package_name-" + foo.counter + transportIdSuffix
     );
-    row.cells[11].childNodes[0].setAttribute("id", "package_id-" + foo.counter);
+    row.cells[11].childNodes[0].setAttribute("id", "package_id-" + foo.counter + transportIdSuffix);
     row.cells[12].childNodes[0].setAttribute(
       "id",
-      "pickup_type-" + foo.counter
+      "pickup_type-" + foo.counter + transportIdSuffix
     );
-    row.cells[13].childNodes[0].setAttribute("id", "drop_type" + foo.counter);
+    row.cells[13].childNodes[0].setAttribute("id", "drop_type-" + foo.counter + transportIdSuffix);
 
     row.cells[5].childNodes[0].setAttribute("title", "Pickup Location");
     row.cells[6].childNodes[0].setAttribute("title", "Drop-off Location");
@@ -1969,42 +1972,50 @@ function foo(tableID, quot_table_id, rowCounts) {
         .trigger("change");
 
     if (row.cells[14]) {
-      row.cells[14].innerHTML = "";
+      row.cells[14].innerHTML =
+        '<input type="hidden" id="transport_id-' + foo.counter + transportIdSuffix + '" value="">';
       row.cells[14].style.display = "none";
     }
     row.cells[9].style.display = "none";
     row.cells[10].style.display = "none";
     row.cells[11].style.display = "none";
+
+    if (tableID == "tbl_package_tour_quotation_dynamic_transport_u" && typeof destinationLoading === "function") {
+      destinationLoading($(row.cells[5].childNodes[0]), "Pickup Location");
+      destinationLoading($(row.cells[6].childNodes[0]), "Drop-off Location");
+    }
   }
 
   if (tableID == "tbl_package_tour_quotation_dynamic_excursion") {
     foo.counter=rowCount;
+    var excursionIdSuffix = "";
+    if (window.location.href.indexOf("/quotation/home/update/") !== -1) {
+      excursionIdSuffix = "_u";
+    }
    
     // foo.counter += 3; // Increase counter by 3 each time a new row is added
 
     row.cells[0].childNodes[0].setAttribute(
       "id",
-      "chk_tour_group-" + foo.counter
+      "chk_tour_group-" + foo.counter + excursionIdSuffix
     );
-    // alert(foo.counter);
-    row.cells[2].childNodes[0].setAttribute("id", "exc_date-" + foo.counter);
-    row.cells[3].childNodes[0].setAttribute("id", "city_name-" + foo.counter);
+    row.cells[0].childNodes[0].checked = true;
+    row.cells[2].childNodes[0].setAttribute("id", "exc_date-" + foo.counter + excursionIdSuffix);
+    row.cells[3].childNodes[0].setAttribute("id", "city_name-" + foo.counter + excursionIdSuffix);
     $(row.cells[3].childNodes[0]).next("span").remove();
-    row.cells[4].childNodes[0].setAttribute("id", "excursion-" + foo.counter);
+    row.cells[4].childNodes[0].setAttribute("id", "excursion-" + foo.counter + excursionIdSuffix);
     row.cells[5].childNodes[0].setAttribute(
       "id",
-      "transfer_option-" + foo.counter
+      "transfer_option-" + foo.counter + excursionIdSuffix
     );
-    row.cells[6].childNodes[0].setAttribute("id", "adult-" + foo.counter);
-    row.cells[7].childNodes[0].setAttribute("id", "child-" + foo.counter);
-    row.cells[8].childNodes[0].setAttribute("id", "childwo-" + foo.counter);
-    row.cells[9].childNodes[0].setAttribute("id", "infant-" + foo.counter);
+    row.cells[6].childNodes[0].setAttribute("id", "adult-" + foo.counter + excursionIdSuffix);
+    row.cells[7].childNodes[0].setAttribute("id", "child-" + foo.counter + excursionIdSuffix);
+    row.cells[8].childNodes[0].setAttribute("id", "childwo-" + foo.counter + excursionIdSuffix);
+    row.cells[9].childNodes[0].setAttribute("id", "infant-" + foo.counter + excursionIdSuffix);
     row.cells[10].childNodes[0].setAttribute(
       "id",
-      "excursion_amount-" + foo.counter
+      "excursion_amount-" + foo.counter + excursionIdSuffix
     );
-    row.cells[15].childNodes[0].setAttribute("id", "vehicle_id-" + foo.counter);
-    row.cells[16].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter);
 
     for (var i = row.cells[2].childNodes[0].attributes.length; i-- > 0; )
       row.cells[2].childNodes[0].removeAttributeNode(
@@ -2031,8 +2042,13 @@ function foo(tableID, quot_table_id, rowCounts) {
       .addClass("form-control")
       .datetimepicker({ format: "d-m-Y H:i" });
 
-    if (quot_table_id == "") var function_name = "get_excursion_amount()";
-    else var function_name = "get_excursion_amount_update(id)";
+    if (excursionIdSuffix === "_u") {
+      var function_name = "get_excursion_amount_update(id);";
+    } else if (quot_table_id == "") {
+      var function_name = "get_excursion_amount();";
+    } else {
+      var function_name = "get_excursion_amount_update(id);";
+    }
     row.cells[0].childNodes[0].setAttribute("onchange", function_name);
     row.cells[2].childNodes[0].setAttribute("onchange", function_name);
     row.cells[4].childNodes[0].setAttribute("onchange", function_name);
@@ -2080,9 +2096,20 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[12].style.display = "none";
     row.cells[13].style.display = "none";
     row.cells[14].style.display = "none";
-    row.cells[15].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter);
+    row.cells[15].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter + excursionIdSuffix);
 
-    // row.cells[16].childNodes[0].setAttribute("id","transfer_total-" + foo.counter);
+    if (!row.cells[16]) {
+      var excursionIdCell = row.insertCell(-1);
+      excursionIdCell.className = "hidden";
+      excursionIdCell.style.display = "none";
+    }
+    row.cells[16].innerHTML =
+      '<input type="hidden" id="excursion_id-' + foo.counter + excursionIdSuffix + '" value="">';
+    row.cells[16].style.display = "none";
+
+    if (excursionIdSuffix === "_u" && typeof city_lzloading === "function") {
+      city_lzloading($(row.cells[3].childNodes[0]), '*City');
+    }
 
     if (row.cells[17]) {
       row.cells[17].innerHTML = "";
@@ -4830,7 +4857,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         } else if (["text","number","hidden","textarea"].includes(cloned.type)) {
             cloned.value = "";
         } else if (cloned.type === "checkbox") {
-            cloned.checked = false;
+            cloned.checked = (tableID === "tbl_package_tour_quotation_dynamic_transport_u" || tableID === "tbl_package_tour_quotation_dynamic_excursion");
             cloned.disabled = false;
         }
 

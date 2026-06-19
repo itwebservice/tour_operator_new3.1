@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Package Quotation</title>
+
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="cover-a">
+<div class="doc">
+
+  <!-- ==================================================== -->
+  <!-- PAGE 1 · COVER                                        -->
+  <!-- ==================================================== -->
+  <section class="page cover">
+    <div class="cv cv-a">
+      <img class="cv-a__photo" src="images/hero.jpg" alt="Destination hero">
+      <div class="cv-a__veil"></div>
+
+      <div class="cv-a__inner">
+        <div class="logo">
+          <img class="logo__slot" src="images/logo.png" alt="Company logo">
+          <div>
+            <div class="logo__name">{{COMPANY_NAME}}</div>
+            <div class="logo__tag">{{COMPANY_TAGLINE}}</div>
+          </div>
+        </div>
+
+        <div class="cv-a__eyebrow">{{TOUR_SUBTITLE}}</div>
+        <h1 class="cv-a__dest">{{DESTINATION}}</h1>
+        <div class="cv-a__badge">{{DURATION_SHORT}}</div>
+
+        <img class="cv-a__round" src="images/day.jpg" alt="Highlight">
+      </div>
+
+      <div class="cv-a__for">
+        <div class="l">Prepared Exclusively For</div>
+        <div class="n">{{CLIENT_NAME}}</div>
+      </div>
+
+      <!-- Inclusion icon strip -->
+      <div class="incstrip">
+        <div class="incstrip__row">
+          <div class="incitem"><span class="ico"><i class="fa-solid fa-plane"></i></span><span>International &amp;<br>Internal Flights</span></div>
+          <div class="incitem"><span class="ico"><i class="fa-solid fa-hotel"></i></span><span>4-Star Premium<br>Hotels</span></div>
+          <div class="incitem"><span class="ico"><i class="fa-solid fa-utensils"></i></span><span>Daily<br>Breakfast</span></div>
+          <div class="incitem"><span class="ico"><i class="fa-solid fa-compass"></i></span><span>Sightseeing With<br>Tour Guide</span></div>
+          <div class="incitem"><span class="ico"><i class="fa-solid fa-car"></i></span><span>Private<br>Transfers</span></div>
+          <div class="incitem"><span class="ico"><i class="fa-solid fa-passport"></i></span><span>Free Visa<br>&amp; SIM</span></div>
+        </div>
+        <div class="incstrip__foot"><b>INCLUSION:</b>&nbsp; Flights &amp; Free Visa, SIM, Travel Insurance</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 2 · OVERVIEW                                     -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">{{COMPANY_NAME}} · Travel Proposal</div>
+          <h2 class="strip__title">Your Journey</h2>
+        </div>
+        <div class="strip__no">Quotation&nbsp; <b>{{QUOTATION_ID}}</b></div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+
+      <div class="banner">
+        <div class="k">A Personalized Travel Experience</div>
+        <h2>Exclusively designed for <em>{{CLIENT_NAME}}</em> — an unforgettable journey through {{DESTINATION}}.</h2>
+      </div>
+
+      <p class="greet" style="margin:7mm 0 0">
+        Dear <b>{{CLIENT_FIRST_NAME}}</b>,<br>
+        Thank you for choosing {{COMPANY_NAME}} for your upcoming journey. We are delighted to present this carefully
+        crafted travel proposal, designed to deliver memorable experiences, seamless arrangements and exceptional
+        hospitality at every step of your trip.
+      </p>
+
+      <!-- Tour overview cards -->
+      <div style="margin-top:7mm">
+        <p class="kicker">Tour Overview</p>
+        <div class="ov-grid" style="margin-top:11px">
+          <div class="card ov"><span class="ic"><i class="fa-solid fa-file-lines"></i></span><div><div class="t">Quotation ID</div><div class="v sm">{{QUOTATION_ID}}</div></div></div>
+          <div class="card ov"><span class="ic"><i class="fa-solid fa-earth-asia"></i></span><div><div class="t">Tour ID</div><div class="v sm">{{TOUR_ID}}</div></div></div>
+          <div class="card ov"><span class="ic"><i class="fa-solid fa-calendar-day"></i></span><div><div class="t">Quotation Date</div><div class="v sm">{{QUOTATION_DATE}}</div></div></div>
+          <div class="card ov"><span class="ic"><i class="fa-solid fa-plane"></i></span><div><div class="t">Travel Dates</div><div class="v sm">{{TRAVEL_DATES}}</div></div></div>
+          <div class="card ov"><span class="ic"><i class="fa-solid fa-moon"></i></span><div><div class="t">Duration</div><div class="v sm">{{DURATION}}</div></div></div>
+          <div class="card ov"><span class="ic"><i class="fa-solid fa-users"></i></span><div><div class="t">Guests</div><div class="v sm">{{GUESTS}}</div></div></div>
+        </div>
+      </div>
+
+      <!-- Prepared for -->
+      <div style="margin-top:7mm">
+        <p class="kicker">Prepared For</p>
+        <div class="prep" style="margin-top:11px">
+          <div class="card prep__card">
+            <img class="prep__photo" src="images/person.jpg" alt="Client">
+            <div>
+              <div class="nm">{{CLIENT_NAME}}</div>
+              <div class="meta">
+                <span><i class="fa-solid fa-envelope"></i> {{CLIENT_EMAIL}}</span>
+                <span><i class="fa-solid fa-phone"></i> {{CLIENT_PHONE}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="card prep__card" style="flex:.85">
+            <span class="ic ic--navy" style="width:46px;height:46px"><i class="fa-solid fa-star" style="font-size:20px"></i></span>
+            <div>
+              <div class="t" style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Package Type</div>
+              <div class="nm" style="font-size:16px;margin-top:2px">{{PACKAGE_TYPE}}</div>
+              <div class="meta" style="margin-top:3px"><span style="color:var(--gold-deep);font-weight:500">Recommended for your group</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>02</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 3 · HOTELS                                       -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">Where You'll Stay</div>
+          <h2 class="strip__title">Accommodation</h2>
+        </div>
+        <div class="strip__no">{{PACKAGE_TYPE}}&nbsp; <b>Package</b></div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+
+      <div class="sec-h">
+        <div>
+          <span class="gold-rule" style="display:block;margin-bottom:7px"></span>
+          <span class="t">Handpicked Stays Across {{DESTINATION}}</span>
+        </div>
+        <span class="sec-tag">{{PACKAGE_TYPE}} Package</span>
+      </div>
+
+      <div class="hotel-grid">
+        <!-- Hotel 1 -->
+        <div class="card hotel">
+          <img class="hotel__img" src="images/hotel-1.jpg" alt="Hotel">
+          <div class="hotel__b">
+            <div class="hotel__city"><i class="fa-solid fa-location-dot"></i> {{HOTEL_1_CITY}}</div>
+            <div class="hotel__name">{{HOTEL_1_NAME}}</div>
+            <div class="hotel__cat">{{HOTEL_1_ROOM}}</div>
+            <div class="hotel__stars">★★★★★</div>
+            <div class="hotel__dates">
+              <div class="hotel__dt"><div class="l">Check-In</div><div class="d">{{HOTEL_1_CHECKIN}}</div></div>
+              <div class="hotel__dt"><div class="l">Check-Out</div><div class="d">{{HOTEL_1_CHECKOUT}}</div></div>
+            </div>
+            <div class="amen">
+              <span><i class="fa-solid fa-wifi"></i> Wi-Fi</span>
+              <span><i class="fa-solid fa-mug-saucer"></i> Breakfast</span>
+              <span><i class="fa-solid fa-person-swimming"></i> Pool</span>
+              <span><i class="fa-solid fa-snowflake"></i> AC</span>
+            </div>
+          </div>
+        </div>
+        <!-- Hotel 2 -->
+        <div class="card hotel">
+          <img class="hotel__img" src="images/hotel-2.jpg" alt="Hotel">
+          <div class="hotel__b">
+            <div class="hotel__city"><i class="fa-solid fa-location-dot"></i> {{HOTEL_2_CITY}}</div>
+            <div class="hotel__name">{{HOTEL_2_NAME}}</div>
+            <div class="hotel__cat">{{HOTEL_2_ROOM}}</div>
+            <div class="hotel__stars">★★★★★</div>
+            <div class="hotel__dates">
+              <div class="hotel__dt"><div class="l">Check-In</div><div class="d">{{HOTEL_2_CHECKIN}}</div></div>
+              <div class="hotel__dt"><div class="l">Check-Out</div><div class="d">{{HOTEL_2_CHECKOUT}}</div></div>
+            </div>
+            <div class="amen">
+              <span><i class="fa-solid fa-wifi"></i> Wi-Fi</span>
+              <span><i class="fa-solid fa-mug-saucer"></i> Breakfast</span>
+              <span><i class="fa-solid fa-person-swimming"></i> Pool</span>
+              <span><i class="fa-solid fa-dumbbell"></i> Gym</span>
+            </div>
+          </div>
+        </div>
+        <!-- Hotel 3 -->
+        <div class="card hotel">
+          <img class="hotel__img" src="images/hotel-3.jpg" alt="Hotel">
+          <div class="hotel__b">
+            <div class="hotel__city"><i class="fa-solid fa-location-dot"></i> {{HOTEL_3_CITY}}</div>
+            <div class="hotel__name">{{HOTEL_3_NAME}}</div>
+            <div class="hotel__cat">{{HOTEL_3_ROOM}}</div>
+            <div class="hotel__stars">★★★★★</div>
+            <div class="hotel__dates">
+              <div class="hotel__dt"><div class="l">Check-In</div><div class="d">{{HOTEL_3_CHECKIN}}</div></div>
+              <div class="hotel__dt"><div class="l">Check-Out</div><div class="d">{{HOTEL_3_CHECKOUT}}</div></div>
+            </div>
+            <div class="amen">
+              <span><i class="fa-solid fa-wifi"></i> Wi-Fi</span>
+              <span><i class="fa-solid fa-mug-saucer"></i> Breakfast</span>
+              <span><i class="fa-solid fa-person-swimming"></i> Rooftop Pool</span>
+              <span><i class="fa-solid fa-snowflake"></i> AC</span>
+            </div>
+          </div>
+        </div>
+        <!-- Common amenities -->
+        <div class="card" style="padding:14px 15px;display:flex;flex-direction:column;justify-content:center">
+          <div class="hotel__city" style="color:var(--gold-deep)"><i class="fa-solid fa-circle-info"></i> Common Amenities</div>
+          <div class="hotel__name" style="font-size:15px;margin-bottom:8px">Standard in Every Hotel</div>
+          <div class="amen" style="border:0;padding:0;gap:9px 12px">
+            <span><i class="fa-solid fa-wifi"></i> Free Wi-Fi</span>
+            <span><i class="fa-solid fa-mug-saucer"></i> Daily Breakfast</span>
+            <span><i class="fa-solid fa-person-swimming"></i> Swimming Pool</span>
+            <span><i class="fa-solid fa-snowflake"></i> Air Conditioning</span>
+            <span><i class="fa-solid fa-dumbbell"></i> Fitness Centre</span>
+            <span><i class="fa-solid fa-car"></i> Valet Parking</span>
+          </div>
+          <p class="muted" style="font-size:9px;margin:10px 0 0;line-height:1.5">All stays are on twin-sharing basis with daily breakfast. Room categories may be upgraded subject to availability at the time of booking.</p>
+        </div>
+      </div>
+
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>03</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 4 · FLIGHTS & TRANSPORT                          -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">Getting There &amp; Around</div>
+          <h2 class="strip__title">Journey Plan</h2>
+        </div>
+        <div class="strip__no">Flights · <b>Transfers</b></div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+
+      <p class="kicker">A · Flight Details</p>
+      <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
+        <!-- Outbound flight (full width) -->
+        <div class="boarding">
+          <div class="boarding__main">
+            <div class="boarding__top">
+              <div class="airline">
+                <img class="airline__logo" src="images/airline.png" alt="Airline">
+                <div><div class="airline__name">{{FLIGHT_OUT_AIRLINE}}</div><div class="airline__cls">{{FLIGHT_OUT_CLASS}}</div></div>
+              </div>
+              <div class="boarding__pnr">Outbound</div>
+            </div>
+            <div class="sector">
+              <div class="pt"><div class="code">{{FLIGHT_OUT_FROM_CODE}}</div><div class="city">{{FLIGHT_OUT_FROM_CITY}}</div></div>
+              <div class="mid"><i class="fa-solid fa-plane"></i><div class="line"></div><div class="dur">{{FLIGHT_OUT_DURATION}}</div></div>
+              <div class="pt"><div class="code">{{FLIGHT_OUT_TO_CODE}}</div><div class="city">{{FLIGHT_OUT_TO_CITY}}</div></div>
+            </div>
+            <div class="boarding__times">
+              <div class="x"><div class="l">Departure</div><div class="v">{{FLIGHT_OUT_DEP}}</div></div>
+              <div class="x"><div class="l">Arrival</div><div class="v">{{FLIGHT_OUT_ARR}}</div></div>
+              <div class="x"><div class="l">Flight No.</div><div class="v">{{FLIGHT_OUT_NO}}</div></div>
+            </div>
+          </div>
+          <div class="boarding__stub">
+            <div class="bl">Baggage</div><div class="bv">{{FLIGHT_OUT_BAGGAGE}}</div>
+            <div class="bl" style="margin-top:5px">Cabin</div><div class="bv">{{FLIGHT_OUT_CABIN}}</div>
+          </div>
+        </div>
+        <!-- Return flight (full width, next row) -->
+        <div class="boarding">
+          <div class="boarding__main">
+            <div class="boarding__top">
+              <div class="airline">
+                <img class="airline__logo" src="images/airline.png" alt="Airline">
+                <div><div class="airline__name">{{FLIGHT_RET_AIRLINE}}</div><div class="airline__cls">{{FLIGHT_RET_CLASS}}</div></div>
+              </div>
+              <div class="boarding__pnr">Return</div>
+            </div>
+            <div class="sector">
+              <div class="pt"><div class="code">{{FLIGHT_RET_FROM_CODE}}</div><div class="city">{{FLIGHT_RET_FROM_CITY}}</div></div>
+              <div class="mid"><i class="fa-solid fa-plane"></i><div class="line"></div><div class="dur">{{FLIGHT_RET_DURATION}}</div></div>
+              <div class="pt"><div class="code">{{FLIGHT_RET_TO_CODE}}</div><div class="city">{{FLIGHT_RET_TO_CITY}}</div></div>
+            </div>
+            <div class="boarding__times">
+              <div class="x"><div class="l">Departure</div><div class="v">{{FLIGHT_RET_DEP}}</div></div>
+              <div class="x"><div class="l">Arrival</div><div class="v">{{FLIGHT_RET_ARR}}</div></div>
+              <div class="x"><div class="l">Flight No.</div><div class="v">{{FLIGHT_RET_NO}}</div></div>
+            </div>
+          </div>
+          <div class="boarding__stub">
+            <div class="bl">Baggage</div><div class="bv">{{FLIGHT_RET_BAGGAGE}}</div>
+            <div class="bl" style="margin-top:5px">Cabin</div><div class="bv">{{FLIGHT_RET_CABIN}}</div>
+          </div>
+        </div>
+      </div>
+      <p class="muted" style="font-size:9px;margin:7px 0 0">{{FLIGHT_INTERNAL_NOTE}}</p>
+
+      <p class="kicker" style="margin-top:6mm">B · Transportation</p>
+      <div class="tline" style="margin-top:11px">
+        <div class="tnode">
+          <div class="card">
+            <img class="tveh" src="images/vehicle.jpg" alt="Vehicle">
+            <div>
+              <div class="nm">{{VEHICLE_1_NAME}}</div>
+              <div class="rt"><i class="fa-solid fa-location-dot"></i> {{VEHICLE_1_ROUTE}}</div>
+            </div>
+            <div class="meta">{{VEHICLE_1_DATES}}<br><span class="cat">{{VEHICLE_1_TYPE}}</span></div>
+          </div>
+        </div>
+        <div class="tnode">
+          <div class="card">
+            <img class="tveh" src="images/vehicle.jpg" alt="Vehicle">
+            <div>
+              <div class="nm">{{VEHICLE_2_NAME}}</div>
+              <div class="rt"><i class="fa-solid fa-location-dot"></i> {{VEHICLE_2_ROUTE}}</div>
+            </div>
+            <div class="meta">{{VEHICLE_2_DATES}}<br><span class="cat">{{VEHICLE_2_TYPE}}</span></div>
+          </div>
+        </div>
+        <div class="tnode">
+          <div class="card">
+            <img class="tveh" src="images/vehicle.jpg" alt="Vehicle">
+            <div>
+              <div class="nm">{{VEHICLE_3_NAME}}</div>
+              <div class="rt"><i class="fa-solid fa-location-dot"></i> {{VEHICLE_3_ROUTE}}</div>
+            </div>
+            <div class="meta">{{VEHICLE_3_DATES}}<br><span class="cat">{{VEHICLE_3_TYPE}}</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>04</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 5 · ITINERARY (Days 1–3)                         -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">Day by Day</div>
+          <h2 class="strip__title">Itinerary</h2>
+        </div>
+        <div class="strip__no">Days 1 – 3</div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+      <div class="itin">
+
+        <!-- Day 1 -->
+        <div class="card iday">
+          <div class="iday__media">
+            <img src="images/day.jpg" alt="Day 1">
+            <div class="iday__tag"><span class="iday__no">DAY 1</span><span class="iday__date">{{DAY1_DATE}}</span></div>
+          </div>
+          <div class="iday__b">
+            <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · {{DAY1_ATTRACTION}}</div>
+            <div class="iday__field">
+              <div class="iday__lbl">Detailed Programme</div>
+              <div class="iday__val">{{DAY1_DESC}}</div>
+            </div>
+            <div class="iday__chips">
+              <div class="ichip ichip--meal"><span class="b"><i class="fa-solid fa-utensils"></i></span><div><div class="l">Meal Plan</div><div class="v">{{DAY1_MEALS}}</div></div></div>
+              <div class="ichip ichip--stay"><span class="b"><i class="fa-solid fa-moon"></i></span><div><div class="l">Overnight Stay</div><div class="v">{{DAY1_STAY}}</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 2 -->
+        <div class="card iday">
+          <div class="iday__media">
+            <img src="images/day.jpg" alt="Day 2">
+            <div class="iday__tag"><span class="iday__no">DAY 2</span><span class="iday__date">{{DAY2_DATE}}</span></div>
+          </div>
+          <div class="iday__b">
+            <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · {{DAY2_ATTRACTION}}</div>
+            <div class="iday__field">
+              <div class="iday__lbl">Detailed Programme</div>
+              <div class="iday__val">{{DAY2_DESC}}</div>
+            </div>
+            <div class="iday__chips">
+              <div class="ichip ichip--meal"><span class="b"><i class="fa-solid fa-utensils"></i></span><div><div class="l">Meal Plan</div><div class="v">{{DAY2_MEALS}}</div></div></div>
+              <div class="ichip ichip--stay"><span class="b"><i class="fa-solid fa-moon"></i></span><div><div class="l">Overnight Stay</div><div class="v">{{DAY2_STAY}}</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 3 -->
+        <div class="card iday">
+          <div class="iday__media">
+            <img src="images/day.jpg" alt="Day 3">
+            <div class="iday__tag"><span class="iday__no">DAY 3</span><span class="iday__date">{{DAY3_DATE}}</span></div>
+          </div>
+          <div class="iday__b">
+            <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · {{DAY3_ATTRACTION}}</div>
+            <div class="iday__field">
+              <div class="iday__lbl">Detailed Programme</div>
+              <div class="iday__val">{{DAY3_DESC}}</div>
+            </div>
+            <div class="iday__chips">
+              <div class="ichip ichip--meal"><span class="b"><i class="fa-solid fa-utensils"></i></span><div><div class="l">Meal Plan</div><div class="v">{{DAY3_MEALS}}</div></div></div>
+              <div class="ichip ichip--stay"><span class="b"><i class="fa-solid fa-moon"></i></span><div><div class="l">Overnight Stay</div><div class="v">{{DAY3_STAY}}</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>04</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 6 · ITINERARY (Days 4–8)                         -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">Day by Day</div>
+          <h2 class="strip__title">Itinerary</h2>
+        </div>
+        <div class="strip__no">Days 4 – 8</div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+      <div class="itin">
+
+        <!-- Day 4 -->
+        <div class="card iday">
+          <div class="iday__media">
+            <img src="images/day.jpg" alt="Day 4">
+            <div class="iday__tag"><span class="iday__no">DAY 4</span><span class="iday__date">{{DAY4_DATE}}</span></div>
+          </div>
+          <div class="iday__b">
+            <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · {{DAY4_ATTRACTION}}</div>
+            <div class="iday__field">
+              <div class="iday__lbl">Detailed Programme</div>
+              <div class="iday__val">{{DAY4_DESC}}</div>
+            </div>
+            <div class="iday__chips">
+              <div class="ichip ichip--meal"><span class="b"><i class="fa-solid fa-utensils"></i></span><div><div class="l">Meal Plan</div><div class="v">{{DAY4_MEALS}}</div></div></div>
+              <div class="ichip ichip--stay"><span class="b"><i class="fa-solid fa-moon"></i></span><div><div class="l">Overnight Stay</div><div class="v">{{DAY4_STAY}}</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 5 -->
+        <div class="card iday">
+          <div class="iday__media">
+            <img src="images/day.jpg" alt="Day 5">
+            <div class="iday__tag"><span class="iday__no">DAY 5</span><span class="iday__date">{{DAY5_DATE}}</span></div>
+          </div>
+          <div class="iday__b">
+            <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · {{DAY5_ATTRACTION}}</div>
+            <div class="iday__field">
+              <div class="iday__lbl">Detailed Programme</div>
+              <div class="iday__val">{{DAY5_DESC}}</div>
+            </div>
+            <div class="iday__chips">
+              <div class="ichip ichip--meal"><span class="b"><i class="fa-solid fa-utensils"></i></span><div><div class="l">Meal Plan</div><div class="v">{{DAY5_MEALS}}</div></div></div>
+              <div class="ichip ichip--stay"><span class="b"><i class="fa-solid fa-moon"></i></span><div><div class="l">Overnight Stay</div><div class="v">{{DAY5_STAY}}</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day 6–8 -->
+        <div class="card iday">
+          <div class="iday__media">
+            <img src="images/day.jpg" alt="Day 6 to 8">
+            <div class="iday__tag"><span class="iday__no">DAY 6 – 8</span><span class="iday__date">{{DAY6_DATE}}</span></div>
+          </div>
+          <div class="iday__b">
+            <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · {{DAY6_ATTRACTION}}</div>
+            <div class="iday__field">
+              <div class="iday__lbl">Detailed Programme</div>
+              <div class="iday__val">{{DAY6_DESC}}</div>
+            </div>
+            <div class="iday__chips">
+              <div class="ichip ichip--meal"><span class="b"><i class="fa-solid fa-utensils"></i></span><div><div class="l">Meal Plan</div><div class="v">{{DAY6_MEALS}}</div></div></div>
+              <div class="ichip ichip--stay"><span class="b"><i class="fa-solid fa-moon"></i></span><div><div class="l">Overnight Stay</div><div class="v">{{DAY6_STAY}}</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>04</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 7 · INCLUSIONS / EXCLUSIONS / COSTING            -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">The Fine Detail</div>
+          <h2 class="strip__title">Inclusions</h2>
+        </div>
+        <div class="strip__no">&amp; <b>Investment</b></div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+
+      <div class="ie-grid">
+        <div class="card ie ie--in">
+          <h3><span class="b"><i class="fa-solid fa-check"></i></span> What's Included</h3>
+          <ul>
+            <li><i class="fa-solid fa-check"></i> Hotel accommodation (7 nights, twin-sharing)</li>
+            <li><i class="fa-solid fa-check"></i> Return &amp; internal flight tickets</li>
+            <li><i class="fa-solid fa-check"></i> All airport &amp; sightseeing transfers</li>
+            <li><i class="fa-solid fa-check"></i> Daily breakfast &amp; select meals</li>
+            <li><i class="fa-solid fa-check"></i> Sightseeing with English-speaking guide</li>
+            <li><i class="fa-solid fa-check"></i> {{DESTINATION}} visa assistance</li>
+            <li><i class="fa-solid fa-check"></i> Complimentary travel SIM &amp; insurance</li>
+          </ul>
+        </div>
+        <div class="card ie ie--ex">
+          <h3><span class="b"><i class="fa-solid fa-xmark"></i></span> What's Excluded</h3>
+          <ul>
+            <li><i class="fa-solid fa-xmark"></i> Personal expenses &amp; shopping</li>
+            <li><i class="fa-solid fa-xmark"></i> Optional / additional activities</li>
+            <li><i class="fa-solid fa-xmark"></i> Early check-in &amp; late check-out</li>
+            <li><i class="fa-solid fa-xmark"></i> Meals not mentioned in the itinerary</li>
+            <li><i class="fa-solid fa-xmark"></i> Tips, gratuities &amp; porterage</li>
+            <li><i class="fa-solid fa-xmark"></i> Anything not listed under inclusions</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top:6mm">
+        <div class="sec-h">
+          <div><span class="gold-rule" style="display:block;margin-bottom:7px"></span><span class="t">Costing Details</span></div>
+          <span class="s">All amounts in ₹ · for {{GUESTS}}</span>
+        </div>
+        <!-- Pricing table -->
+        <table class="cost">
+          <thead>
+            <tr><th>Package</th><th>Tour Cost</th><th>Tax (GST)</th><th>TCS</th><th>Travel Cost</th><th>Grand Total</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="pk">{{PKG1_NAME}}</td><td>{{PKG1_TOUR}}</td><td>{{PKG1_GST}}</td><td>{{PKG1_TCS}}</td><td>{{PKG1_TRAVEL}}</td><td class="gt">{{PKG1_TOTAL}}</td>
+            </tr>
+            <tr class="rec">
+              <td class="pk"><span class="recbar">{{PKG2_NAME}} <span class="tag">Recommended</span></span></td><td>{{PKG2_TOUR}}</td><td>{{PKG2_GST}}</td><td>{{PKG2_TCS}}</td><td>{{PKG2_TRAVEL}}</td><td class="gt">{{PKG2_TOTAL}}</td>
+            </tr>
+            <tr>
+              <td class="pk">{{PKG3_NAME}}</td><td>{{PKG3_TOUR}}</td><td>{{PKG3_GST}}</td><td>{{PKG3_TCS}}</td><td>{{PKG3_TRAVEL}}</td><td class="gt">{{PKG3_TOTAL}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="cost-note"><i class="fa-solid fa-circle-info"></i> Prices are indicative and subject to availability and currency fluctuation at the time of confirmation.</p>
+      </div>
+
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>05</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 8 · PAYMENT                                      -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">Securing Your Booking</div>
+          <h2 class="strip__title">Payment</h2>
+        </div>
+        <div class="strip__no">Bank &amp; <b>UPI</b></div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+
+      <div class="pay-grid">
+        <div class="bankcard">
+          <div class="bankcard__top">
+            <div class="l">Bank Transfer Details</div>
+            <div class="bankcard__chip"></div>
+          </div>
+          <div class="bankrow solo">
+            <div class="f"><div class="l">Account Name</div><div class="v">{{BANK_ACCOUNT_NAME}}</div></div>
+          </div>
+          <div class="bankcard__div"></div>
+          <div class="bankrow">
+            <div class="f"><div class="l">Account Number</div><div class="v mono">{{BANK_ACCOUNT_NUMBER}}</div></div>
+            <div class="f"><div class="l">IFSC Code</div><div class="v mono">{{BANK_IFSC}}</div></div>
+            <div class="f"><div class="l">Bank Name</div><div class="v">{{BANK_NAME}}</div></div>
+            <div class="f"><div class="l">Branch</div><div class="v">{{BANK_BRANCH}}</div></div>
+          </div>
+          <div class="bankcard__div"></div>
+          <div class="bankrow solo">
+            <div class="f"><div class="l">UPI ID</div><div class="v mono">{{UPI_ID}}</div></div>
+          </div>
+        </div>
+
+        <div class="card qrcard">
+          <div class="scan">Scan &amp; Pay</div>
+          <img class="qr" src="images/qr.png" alt="UPI QR code">
+          <div class="upi">{{UPI_ID}}</div>
+          <p class="muted" style="font-size:9px;margin:0;line-height:1.5">Pay instantly via any UPI app — Google Pay, PhonePe, Paytm or BHIM.</p>
+        </div>
+      </div>
+
+      <div class="pay-panels" style="margin-top:6mm">
+        <div class="card panel">
+          <h4><i class="fa-solid fa-circle-info"></i> Payment Instructions</h4>
+          <ul>
+            <li>A 30% advance confirms your booking; the balance is due 21 days before travel.</li>
+            <li>Share the payment screenshot or UTR with your travel consultant.</li>
+            <li>All payments are accepted in Indian Rupees (₹) only.</li>
+            <li>A GST invoice is issued against every confirmed payment.</li>
+          </ul>
+        </div>
+        <div class="card panel">
+          <h4><i class="fa-solid fa-shield-halved"></i> Booking Policy</h4>
+          <ul>
+            <li>Booking is confirmed only on receipt of the advance amount.</li>
+            <li>Rates are held for 7 days from the quotation date.</li>
+            <li>Visa, flights &amp; hotels are confirmed after full payment.</li>
+            <li>Names must match passports exactly to avoid charges.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>06</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 9 · TESTIMONIALS                                 -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">Loved by Travellers</div>
+          <h2 class="strip__title">Their Words</h2>
+        </div>
+        <div class="strip__no">{{GOOGLE_RATING}} ★ <b>Rated</b></div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+
+      <div class="sec-h">
+        <div><span class="gold-rule" style="display:block;margin-bottom:7px"></span><span class="t">What Our Travellers Say</span></div>
+        <span class="s">Verified Google reviews</span>
+      </div>
+
+      <div class="testi-grid">
+        <div class="card testi">
+          <img class="testi__ph" src="images/person.jpg" alt="Reviewer">
+          <div>
+            <div class="testi__stars">★★★★★</div>
+            <div class="testi__quote"><span class="testi__mark">“</span> {{TESTI_1_QUOTE}}</div>
+            <div class="testi__by"><span class="n">{{TESTI_1_NAME}}</span><span class="sep"></span><span class="d">{{TESTI_1_TRIP}}</span></div>
+          </div>
+        </div>
+        <div class="card testi">
+          <img class="testi__ph" src="images/person.jpg" alt="Reviewer">
+          <div>
+            <div class="testi__stars">★★★★★</div>
+            <div class="testi__quote"><span class="testi__mark">“</span> {{TESTI_2_QUOTE}}</div>
+            <div class="testi__by"><span class="n">{{TESTI_2_NAME}}</span><span class="sep"></span><span class="d">{{TESTI_2_TRIP}}</span></div>
+          </div>
+        </div>
+        <div class="card testi">
+          <img class="testi__ph" src="images/person.jpg" alt="Reviewer">
+          <div>
+            <div class="testi__stars">★★★★★</div>
+            <div class="testi__quote"><span class="testi__mark">“</span> {{TESTI_3_QUOTE}}</div>
+            <div class="testi__by"><span class="n">{{TESTI_3_NAME}}</span><span class="sep"></span><span class="d">{{TESTI_3_TRIP}}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="statbar">
+        <div class="st"><div class="n">{{GOOGLE_RATING}}★</div><div class="l">Google Rating</div></div>
+        <div class="st"><div class="n">{{REVIEW_COUNT}}</div><div class="l">Verified Reviews</div></div>
+        <div class="st"><div class="n">{{TRAVELLER_COUNT}}</div><div class="l">Happy Travellers</div></div>
+      </div>
+
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>07</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 10 · TERMS & CONDITIONS                          -->
+  <!-- ==================================================== -->
+  <section class="page">
+    <header class="strip">
+      <img class="strip__img" src="images/banner.jpg" alt="Banner">
+      <div class="strip__shade"></div>
+      <div class="strip__content">
+        <div>
+          <div class="strip__eyebrow">Please Read Carefully</div>
+          <h2 class="strip__title">Terms</h2>
+        </div>
+        <div class="strip__no">&amp; <b>Conditions</b></div>
+      </div>
+      <div class="strip__torn"></div>
+    </header>
+
+    <div class="page__wm"></div>
+    <div class="page__body">
+
+      <div class="terms-grid" style="margin-top:2mm">
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-file-lines"></i></span><div><h4>Booking Policy</h4><p>A 30% advance confirms the booking; the balance is payable 21 days prior to departure. Confirmation is subject to availability at the time of payment.</p></div></div>
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-ban"></i></span><div><h4>Cancellation Policy</h4><p>Cancellations 30+ days before travel: 25% charge. 15–29 days: 50%. Within 14 days: 100%. Charges apply on the total tour value.</p></div></div>
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-rotate-left"></i></span><div><h4>Refund Policy</h4><p>Eligible refunds are processed within 15–21 working days to the original payment method, after deduction of applicable supplier charges.</p></div></div>
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-passport"></i></span><div><h4>Visa Disclaimer</h4><p>Visa approval is at the sole discretion of the issuing authority. Rejections are not the company's liability; fees are non-refundable.</p></div></div>
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-hotel"></i></span><div><h4>Hotel Policies</h4><p>Standard check-in is 14:00 and check-out 12:00. Room categories are confirmed on availability; early check-in is chargeable.</p></div></div>
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-plane"></i></span><div><h4>Flight Policies</h4><p>Flight timings and fares are subject to airline confirmation. Schedule changes and baggage rules are governed by airline terms.</p></div></div>
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-earth-americas"></i></span><div><h4>Force Majeure</h4><p>The company is not liable for disruptions caused by weather, natural events, political unrest or any circumstances beyond reasonable control.</p></div></div>
+        <div class="term"><span class="ic term__b"><i class="fa-solid fa-shield-halved"></i></span><div><h4>Travel Insurance</h4><p>Complimentary basic insurance is included. Travellers are advised to review coverage and opt for enhanced protection if required.</p></div></div>
+      </div>
+
+      <div class="card" style="margin-top:6mm;padding:12px 15px;display:flex;gap:11px;align-items:center;background:var(--cream)">
+        <span class="ic ic--navy"><i class="fa-solid fa-circle-info"></i></span>
+        <p class="muted" style="font-size:10px;margin:0;line-height:1.5">By proceeding with payment, the traveller acknowledges and accepts all terms and conditions outlined above. This quotation is valid for 7 days from the date of issue.</p>
+      </div>
+
+    </div>
+    <footer class="foot">
+      <span class="foot__mark"><span class="dot"></span> {{COMPANY_NAME}} · {{DESTINATION}} Package</span>
+      <span><b>08</b> &nbsp;/&nbsp; 09</span>
+    </footer>
+  </section>
+
+  <!-- ==================================================== -->
+  <!-- PAGE 11 · THANK YOU                                   -->
+  <!-- ==================================================== -->
+  <section class="page thanks">
+    <div class="page__wm thanks__wm"></div>
+    <div class="thanks__wrap">
+      <div class="logo">
+        <img class="logo__slot" src="images/logo.png" alt="Company logo">
+        <div>
+          <div class="logo__name">{{COMPANY_NAME}}</div>
+          <div class="logo__tag">{{COMPANY_TAGLINE}}</div>
+        </div>
+      </div>
+      <div class="thanks__k">With Heartfelt Gratitude</div>
+      <h2 class="thanks__big">Thank You</h2>
+      <p class="thanks__msg">We look forward to creating unforgettable travel memories for you. Your journey through {{DESTINATION}} is just the beginning of many more to come.</p>
+
+      <div class="thanks__stats">
+        <div class="s"><div class="n">{{GOOGLE_RATING}}★</div><div class="l">Google Rating</div></div>
+        <div class="s"><div class="n">{{REVIEW_COUNT}}</div><div class="l">Reviews</div></div>
+        <div class="s"><div class="n">{{TRAVELLER_COUNT}}</div><div class="l">Happy Travellers</div></div>
+      </div>
+
+      <div class="thanks__social">
+        <a href="{{SOCIAL_INSTAGRAM}}" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="{{SOCIAL_FACEBOOK}}" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="{{SOCIAL_WHATSAPP}}" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="{{SOCIAL_YOUTUBE}}" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+
+      <div class="thanks__contact">
+        <span class="c"><i class="fa-solid fa-location-dot"></i> {{COMPANY_ADDRESS}}</span>
+        <span class="c"><i class="fa-solid fa-phone"></i> {{COMPANY_PHONE}}</span>
+        <span class="c"><i class="fa-solid fa-envelope"></i> {{COMPANY_EMAIL}}</span>
+        <span class="c"><i class="fa-solid fa-earth-asia"></i> {{COMPANY_WEBSITE}}</span>
+      </div>
+    </div>
+    <div class="thanks__bar">
+      <div>
+        <div class="l">Prepared By</div>
+        <div class="n">{{CONSULTANT_NAME}}</div>
+        <div class="sub">Travel Consultant · {{COMPANY_NAME}}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="l">Quotation</div>
+        <div class="n">{{QUOTATION_ID}}</div>
+        <div class="sub">Issued {{QUOTATION_DATE}}</div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /doc -->
+</body>
+</html>

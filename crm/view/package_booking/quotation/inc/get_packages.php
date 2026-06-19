@@ -175,25 +175,66 @@ function findImageUrl($image_path, $is_new_quotation = false)
     return '';
 }
 
-// Always load all available packages for the destination and nights (both new and edit mode)
-$query = "select * from custom_package_master where dest_id = '$dest_id' and status!='Inactive'";
-if (!empty($total_nights) && $total_nights != '') {
-    // Ensure we're comparing the same data type
-    $query .= " and total_nights = " . intval($total_nights);
+// Load quotation details when editing and detect AI vs package-tour quotation
+$quotation_inclusions = '';
+$quotation_exclusions = '';
+$quotation_tour_name = '';
+$quotation_refer_id_val = 0;
+$quotation_package_id = 0;
+$is_ai_edit = false;
+
+if (!empty($quotation_id)) {
+    $sq_quotation_row = mysqli_fetch_assoc(mysqlQuery("select package_id, quotation_refer_id, tour_name, inclusions, exclusions from package_tour_quotation_master where quotation_id='$quotation_id'"));
+    if ($sq_quotation_row) {
+        $quotation_inclusions = $sq_quotation_row['inclusions'];
+        $quotation_exclusions = $sq_quotation_row['exclusions'];
+        $quotation_tour_name = $sq_quotation_row['tour_name'];
+        $quotation_refer_id_val = intval($sq_quotation_row['quotation_refer_id']);
+        $quotation_package_id = intval($sq_quotation_row['package_id']);
+        // quotation_refer_id > 0 = AI quotation, quotation_refer_id = 0 = package tour quotation
+        $is_ai_edit = ($quotation_refer_id_val > 0);
+
+        // Package-tour edit: use saved package_id from quotation master
+        if (!$is_ai_edit && empty($current_package_id) && $quotation_package_id > 0) {
+            $current_package_id = $quotation_package_id;
+        }
+    }
 }
 
-error_log("Loading package data for dest_id: " . $dest_id . ", total_nights: " . $total_nights . ", quotation_id: " . $quotation_id);
+// Build package query based on quotation type
+if (!empty($quotation_id) && $is_ai_edit) {
+    // AI quotation: itinerary is loaded directly from package_quotation_program (no package list)
+    $query = '';
+} elseif (!empty($quotation_id) && !empty($current_package_id)) {
+    // Package-tour edit: show only the selected package tour
+    $query = "select * from custom_package_master where package_id = '" . intval($current_package_id) . "' and status!='Inactive'";
+} else {
+    // New quotation: show all packages for destination and nights filter
+    $query = "select * from custom_package_master where dest_id = '$dest_id' and status!='Inactive'";
+    if (!empty($total_nights) && $total_nights != '') {
+        $query .= " and total_nights = " . intval($total_nights);
+    }
+}
+
+error_log("Loading package data for dest_id: " . $dest_id . ", total_nights: " . $total_nights . ", quotation_id: " . $quotation_id . ", is_ai_edit: " . ($is_ai_edit ? 'YES' : 'NO'));
 
 // Debug information
 echo "<!-- Debug: dest_id = " . $dest_id . " -->";
 echo "<!-- Debug: total_nights = " . $total_nights . " -->";
 echo "<!-- Debug: quotation_id = " . $quotation_id . " -->";
 echo "<!-- Debug: current_package_id = " . $current_package_id . " -->";
+echo "<!-- Debug: is_ai_edit = " . ($is_ai_edit ? 'YES' : 'NO') . " -->";
+echo "<!-- Debug: quotation_refer_id = " . $quotation_refer_id_val . " -->";
 echo "<!-- Debug: Query = " . $query . " -->";
 echo "<!-- Debug: Is update operation = " . (!empty($quotation_id) ? 'YES' : 'NO') . " -->";
 
-$sq_tours = mysqlQuery($query);
-$result_count = mysqli_num_rows($sq_tours);
+if (!empty($quotation_id) && $is_ai_edit) {
+    $sq_tours = null;
+    $result_count = 0;
+} else {
+    $sq_tours = mysqlQuery($query);
+    $result_count = mysqli_num_rows($sq_tours);
+}
 echo "<!-- Debug: Result count = " . $result_count . " -->";
 ?>
 
@@ -504,11 +545,11 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 </style>
 
 <div class="col-md-12 app_accordion">
-    <?php if (!empty($total_nights)) { ?>
+    <!-- <?php if (!empty($total_nights)) { ?>
         <div class="alert alert-info">
             <strong>Showing packages for <?= $total_nights ?> night<?= $total_nights > 1 ? 's' : '' ?></strong>
         </div>
-    <?php } ?>
+    <?php } ?> -->
 
     <!-- Loading indicator -->
     <div id="package_loading_indicator" style="display: none; text-align: center; padding: 20px;">
@@ -519,6 +560,86 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         <?php
         $table_count = 0;
         $package_found = false;
+
+        if (!empty($quotation_id) && $is_ai_edit) {
+            $package_found = true;
+            $sq_program = mysqlQuery("select * from package_quotation_program where quotation_id='$quotation_id' order by day_count, id");
+            $program_count = mysqli_num_rows($sq_program);
+            $display_inclusions = htmlspecialchars_decode($quotation_inclusions);
+            $display_exclusions = htmlspecialchars_decode($quotation_exclusions);
+        ?>
+            <!-- <div class="alert alert-info">
+                <strong>AI Generated Quotation</strong> — Edit the saved itinerary below.
+            </div> -->
+            <div class="accordion_content package_content mg_bt_10">
+                <div class="panel panel-default main_block">
+                    <div class="panel-body">
+                        <div class="col-md-12 no-pad">
+                            <div class="row mg_bt_10">
+                                <div class="col-xs-12 text-right text_center_xs">
+                                    <!-- <button type="button" class="btn btn-excel btn-sm" onClick="addItineraryRow('<?= $quotation_refer_id_val ?>')"><i class="fa fa-plus"></i></button> -->
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table style="width:100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
+                                    <legend>Tour Itinerary</legend>
+                                    <?php
+                                    $offset1 = 0;
+                                    if ($program_count == 0) {
+                                        $offset1 = 1;
+                                    ?>
+                                        <tr>
+                                            <td style="width: 50px;"><input class="css-checkbox mg_bt_10" id="chk_program1" type="checkbox" checked><label class="css-label" style="margin-top: 55px;" for="chk_program1"></label></td>
+                                            <td style="width: 50px;" class="hidden"><input maxlength="15" value="1" type="text" name="username" class="form-control mg_bt_10" disabled /></td>
+                                            <td style="width: 100px;"><input type="text" id="special_attaraction1-u" name="special_attaraction" class="form-control mg_bt_10" placeholder="*Special Attraction" title="Special Attraction" style="width:220px;margin-top: 35px;"></td>
+                                            <td class="col-md-6 pad_8" style="max-width:594px;overflow:hidden;position:relative;"><textarea id="day_program1-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day-wise Program" title="Day-wise Program" style="height:80px;" rows="3"></textarea></td>
+                                            <td style="width: 100px;"><input type="text" id="overnight_stay1-u" name="overnight_stay" class="form-control mg_bt_10" placeholder="*Overnight Stay" title="Overnight Stay" style="width:170px;margin-top: 35px;"></td>
+                                            <td><select id="meal_plan1-u" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style="width:140px;margin-top: 35px;"><option value="">Select Meal Plan</option><?php get_mealplan_dropdown(); ?></select></td>
+                                            <td class="hidden"><input type="hidden" name="package_id_n" value="<?= $quotation_refer_id_val ?>"></td>
+                                        </tr>
+                                    <?php
+                                    } else {
+                                        while ($row_program = mysqli_fetch_assoc($sq_program)) {
+                                            $offset1++;
+                                    ?>
+                                        <tr>
+                                            <td style="width: 50px;"><input class="css-checkbox mg_bt_10" id="chk_program<?= $offset1 ?>" type="checkbox" checked><label class="css-label" style="margin-top: 55px;" for="chk_program<?= $offset1 ?>"></label></td>
+                                            <td style="width: 50px;" class="hidden"><input maxlength="15" value="<?= $offset1 ?>" type="text" name="username" class="form-control mg_bt_10" disabled /></td>
+                                            <td style="width: 100px;"><input type="text" id="special_attaraction<?= $offset1 ?>-u" name="special_attaraction" class="form-control mg_bt_10" placeholder="*Special Attraction" title="Special Attraction" value="<?= htmlspecialchars($row_program['attraction']) ?>" style="width:220px;margin-top: 35px;"></td>
+                                            <td class="col-md-6 pad_8" style="max-width:594px;overflow:hidden;position:relative;"><textarea id="day_program<?= $offset1 ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day-wise Program" title="Day-wise Program" style="height:80px;" rows="3"><?= htmlspecialchars($row_program['day_wise_program']) ?></textarea></td>
+                                            <td style="width: 100px;"><input type="text" id="overnight_stay<?= $offset1 ?>-u" name="overnight_stay" class="form-control mg_bt_10" placeholder="*Overnight Stay" title="Overnight Stay" value="<?= htmlspecialchars($row_program['stay']) ?>" style="width:170px;margin-top: 35px;"></td>
+                                            <td><select id="meal_plan<?= $offset1 ?>-u" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style="width:140px;margin-top: 35px;">
+                                                <?php if ($row_program['meal_plan'] != '') { ?><option value="<?= htmlspecialchars($row_program['meal_plan']) ?>"><?= htmlspecialchars($row_program['meal_plan']) ?></option><?php } ?>
+                                                <?php get_mealplan_dropdown(); ?>
+                                            </select></td>
+                                            <td class="hidden"><input type="hidden" name="package_id_n" value="<?= $quotation_refer_id_val ?>"></td>
+                                        </tr>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </table>
+                            </div>
+                            <div class="row mg_tp_20">
+                                <div class="col-md-6"><legend>Inclusions</legend></div>
+                                <div class="col-md-6"><legend>Exclusions</legend></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table style="width:100%" class="no-marg" id="dynamic_table_incl_ai" name="dynamic_table_incl_ai">
+                                        <tr>
+                                            <td class="col-md-6"><textarea class="feature_editor" id="inclusions_ai" name="inclusions" placeholder="Inclusions" title="Inclusions" rows="4"><?= $display_inclusions ?></textarea></td>
+                                            <td class="col-md-6"><textarea class="feature_editor" id="exclusions_ai" name="exclusions" placeholder="Exclusions" title="Exclusions" rows="4"><?= $display_exclusions ?></textarea></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php
+        } else if ($sq_tours) {
         while ($row_tours = mysqli_fetch_assoc($sq_tours)) {
             $package_found = true;
         ?>
@@ -562,9 +683,9 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
                                         // Load itinerary data from the correct table based on operation type
                                         if (!empty($quotation_id)) {
-                                            // For update operations, load from package_quotation_program
-                                            $sq_program = mysqlQuery("select * from package_quotation_program where package_id='$row_tours[package_id]' and quotation_id='$quotation_id' order by day_count");
-                                            error_log("Loading itinerary from package_quotation_program for package_id: " . $row_tours['package_id'] . ", quotation_id: " . $quotation_id);
+                                            // For update operations, load saved quotation itinerary
+                                            $sq_program = mysqlQuery("select * from package_quotation_program where quotation_id='$quotation_id' order by day_count, id");
+                                            error_log("Loading itinerary from package_quotation_program for quotation_id: " . $quotation_id);
                                             echo "<!-- Debug: Loading from package_quotation_program for quotation_id: " . $quotation_id . " -->";
                                         } else {
                                             // For new quotations, load from custom_package_program
@@ -869,14 +990,18 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                             id="dynamic_table_incl<?= $row_tours['package_id'] ?>"
                                             name="dynamic_table_incl<?= $row_tours['package_id'] ?>">
                                             <tr>
+                                                <?php
+                                                $display_inclusions = !empty($quotation_id) ? htmlspecialchars_decode($quotation_inclusions) : $row_tours['inclusions'];
+                                                $display_exclusions = !empty($quotation_id) ? htmlspecialchars_decode($quotation_exclusions) : $row_tours['exclusions'];
+                                                ?>
                                                 <td class="col-md-6"><textarea class="feature_editor"
                                                         id="inclusions<?= $row_tours['package_id'] ?>" name="inclusions"
                                                         placeholder="Inclusions" title="Inclusions"
-                                                        rows="4"><?php echo $row_tours['inclusions']; ?></textarea></td>
+                                                        rows="4"><?php echo $display_inclusions; ?></textarea></td>
                                                 <td class="col-md-6"><textarea class="feature_editor"
                                                         id="exclusions<?= $row_tours['package_id'] ?>" name="exclusions"
                                                         placeholder="Exclusions" title="Exclusions"
-                                                        rows="4"><?php echo $row_tours['exclusions']; ?></textarea></td>
+                                                        rows="4"><?php echo $display_exclusions; ?></textarea></td>
                                             </tr>
                                         </table>
                                     </div>
@@ -891,15 +1016,16 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             $table_count++;
             $_SESSION['id'] = $row_tours['package_id'];
         }
+        }
 
 
         // Show message if no packages found for selected nights
-        if (!$package_found && !empty($total_nights)) {
+        if (!$package_found && empty($is_ai_edit) && !empty($total_nights)) {
             echo '<div class="alert alert-info text-center">';
             echo '<h4>No packages found for ' . $total_nights . ' night' . ($total_nights > 1 ? 's' : '') . '</h4>';
             echo '<p>Please try selecting a different number of nights or create a new package for this duration.</p>';
             echo '</div>';
-        } elseif (!$package_found) {
+        } elseif (!$package_found && empty($is_ai_edit)) {
             echo '<div class="alert alert-warning text-center">';
             echo '<h4>No packages available</h4>';
             echo '<p>Please select a destination and number of nights to see available packages.</p>';

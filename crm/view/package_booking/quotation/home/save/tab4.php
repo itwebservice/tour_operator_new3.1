@@ -785,6 +785,21 @@
 
 <script>
 
+function getQuotationEditorContent(textareaId) {
+    var $target = $('#' + textareaId);
+    if (!$target.length) {
+        return '';
+    }
+    if ($target.data('wysiwyg')) {
+        return $target.wysiwyg('getContent') || '';
+    }
+    var iframe = document.getElementById(textareaId + '-wysiwyg-iframe');
+    if (iframe && iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.body) {
+        return iframe.contentWindow.document.body.innerHTML || '';
+    }
+    return $target.val() || '';
+}
+
 
 function get_hotel_cost() {
 
@@ -1469,7 +1484,7 @@ if (input) {
             }
 
             var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
-            var rowCount = table.rows.length;
+            var rowCount = table ? table.rows.length : 0;
             var exc_date_arr_e = [];
             var city_name_arr_e = [];
             var excursion_name_arr = [];
@@ -1484,51 +1499,53 @@ if (input) {
 
             for (var e = 0; e < rowCount; e++) {
                 var row = table.rows[e];
-                if (row.cells[0].childNodes[0].checked) {
-                    var exc_date = row.cells[2].childNodes[0].value;
-                    var city_name = row.cells[3].childNodes[0].value;
-                    var excursion_name = row.cells[4].childNodes[0].value;
-                    var transfer_option = row.cells[5].childNodes[0].value;
-                    var adults = row.cells[6].childNodes[0].value;
-                    var chwb = row.cells[7].childNodes[0].value;
-                    var chwob = row.cells[8].childNodes[0].value;
-                    var infant = row.cells[9].childNodes[0].value;
-                    var excursion_amount = row.cells[10].childNodes[0].value;
-                    var vehicle_id = row.cells[15].childNodes[0].value;
-                    var vehicles = row.cells[16].childNodes[0].value;
-
-                    if (exc_date == "") {
-                        error_msg_alert('Select Activity date in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
-                        return false;
-                    }
-                    if (city_name == "") {
-                        error_msg_alert('Select Activity city in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
-                        return false;
-                    }
-                    if (excursion_name == "") {
-                        error_msg_alert('Select Activity name in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
-                        return false;
-                    }
-                    if (transfer_option == "") {
-                        error_msg_alert('Select Transfer option in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
-                        return false;
-                    }
-                    exc_date_arr_e.push(exc_date);
-                    city_name_arr_e.push(city_name);
-                    excursion_name_arr.push(excursion_name);
-                    transfer_option_arr.push(transfer_option);
-                    excursion_amt_arr.push(excursion_amount);
-                    adult_arr.push(adults);
-                    chwb_arr.push(chwb);
-                    chwob_arr.push(chwob);
-                    infant_arr.push(infant);
-                    vehicle_id_arr_e.push(vehicle_id);
-                    vehicles_arr.push(vehicles);
+                var $checkbox = $(row.cells[0]).find('input[type="checkbox"]');
+                if (!$checkbox.prop('checked')) {
+                    continue;
                 }
+                var exc_date = row.cells[2].childNodes[0].value;
+                var city_name = $(row.cells[3].childNodes[0]).val() || '';
+                var excursion_name = $(row.cells[4].childNodes[0]).val() || '';
+                var transfer_option = $(row.cells[5].childNodes[0]).val() || '';
+                var adults = row.cells[6].childNodes[0].value || 0;
+                var chwb = row.cells[7].childNodes[0].value || 0;
+                var chwob = row.cells[8].childNodes[0].value || 0;
+                var infant = row.cells[9].childNodes[0].value || 0;
+                var excursion_amount = (row.cells[10] && row.cells[10].childNodes[0]) ? (row.cells[10].childNodes[0].value || 0) : 0;
+                var vehicle_id = '';
+                var vehicles = (row.cells[15] && row.cells[15].childNodes[0]) ? (row.cells[15].childNodes[0].value || 0) : 0;
+
+                if (exc_date == "") {
+                    error_msg_alert('Select Activity date in row' + (e + 1));
+                    $('#btn_quotation_save').prop('disabled', false);
+                    return false;
+                }
+                if (city_name == "") {
+                    error_msg_alert('Select Activity city in row' + (e + 1));
+                    $('#btn_quotation_save').prop('disabled', false);
+                    return false;
+                }
+                if (excursion_name == "") {
+                    error_msg_alert('Select Activity name in row' + (e + 1));
+                    $('#btn_quotation_save').prop('disabled', false);
+                    return false;
+                }
+                if (transfer_option == "") {
+                    error_msg_alert('Select Transfer option in row' + (e + 1));
+                    $('#btn_quotation_save').prop('disabled', false);
+                    return false;
+                }
+                exc_date_arr_e.push(exc_date);
+                city_name_arr_e.push(city_name);
+                excursion_name_arr.push(excursion_name);
+                transfer_option_arr.push(transfer_option);
+                excursion_amt_arr.push(excursion_amount);
+                adult_arr.push(adults);
+                chwb_arr.push(chwb);
+                chwob_arr.push(chwob);
+                infant_arr.push(infant);
+                vehicle_id_arr_e.push(vehicle_id);
+                vehicles_arr.push(vehicles);
             }
 
             //Costing Information  
@@ -1753,6 +1770,20 @@ if (input) {
                         }
                     }
                 }
+            }
+
+            if (is_ai_quotation === '1' && incl_arr.length === 0) {
+                var inclContent = getQuotationEditorContent('inclusions_ai');
+                var exclContent = getQuotationEditorContent('exclusions_ai');
+                if (!inclContent && !exclContent && itineraryData) {
+                    try {
+                        var storedInclExcl = JSON.parse(itineraryData);
+                        inclContent = storedInclExcl.inclusions || '';
+                        exclContent = storedInclExcl.exclusions || '';
+                    } catch (e) {}
+                }
+                incl_arr = [inclContent];
+                excl_arr = [exclContent];
             }
 
             console.log("Final itinerary arrays:", {

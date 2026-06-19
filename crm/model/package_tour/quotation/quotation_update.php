@@ -477,40 +477,48 @@ public function tranport_entries_update($quotation_id,$vehicle_name_arr,$start_d
 {
 	for($i=0; $i<sizeof($vehicle_name_arr); $i++)
 	{
+		$is_active = ($transport_status_arr[$i] === true || $transport_status_arr[$i] === 1 || $transport_status_arr[$i] === '1' || $transport_status_arr[$i] === 'true');
 
-
-		if($transport_status_arr[$i] == 'true'){
-			
-			$pickup_type = explode("-",$pickup_arr[$i])[0];
-			$drop_type = explode("-",$drop_arr[$i])[0];
-			$pickup = isset($pickup_arr[$i]) ? explode("-",$pickup_arr[$i])[1] : '';
-			$drop = isset($drop_arr[$i]) ? explode("-",$drop_arr[$i])[1] : '';
+		if($is_active){
+			$pickup_raw = isset($pickup_arr[$i]) ? $pickup_arr[$i] : '';
+			$drop_raw = isset($drop_arr[$i]) ? $drop_arr[$i] : '';
+			$pickup_parts = explode("-", $pickup_raw, 2);
+			$drop_parts = explode("-", $drop_raw, 2);
+			$pickup_type = !empty($pickup_type_arr[$i]) ? $pickup_type_arr[$i] : (isset($pickup_parts[0]) ? $pickup_parts[0] : '');
+			$drop_type = !empty($drop_type_arr[$i]) ? $drop_type_arr[$i] : (isset($drop_parts[0]) ? $drop_parts[0] : '');
+			$pickup = isset($pickup_parts[1]) ? $pickup_parts[1] : '';
+			$drop = isset($drop_parts[1]) ? $drop_parts[1] : '';
 			$start_date_arr[$i] = date('Y-m-d H:i', strtotime($start_date_arr[$i]));
 			$end_date_arr[$i] = date('Y-m-d H:i', strtotime($end_date_arr[$i]));
 			$row1 = mysqli_fetch_assoc(mysqlQuery("select duration from service_duration_master where entry_id='$service_duration_arr[$i]'"));
 			$duration = isset($row1['duration']) ? $row1['duration'] : '';
+			$vehicle_name = intval($vehicle_name_arr[$i]);
+			$vehicle_count = intval($vehicle_count_arr[$i]);
+			$transport_cost = floatval($transport_cost_arr1[$i]);
 			
 			if($transport_id_arr[$i]==""){
 					$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_tour_quotation_transport_entries2"));
-					$id = $sq_max['max']+1;
+					$id = intval($sq_max['max'] ?? 0) + 1;
 
-					$sq_trans = mysqlQuery("insert into package_tour_quotation_transport_entries2 ( `id`, `quotation_id`, `vehicle_name`, `start_date`, `pickup`, `drop`, `pickup_type`, `drop_type`, `package_id`, `transport_cost`,`vehicle_count`,`end_date`,`service_duration`) values ( '$id', '$quotation_id', '$vehicle_name_arr[$i]', '$start_date_arr[$i]','$pickup','$drop','$pickup_type','$drop_type', '$package_id','$transport_cost_arr1[$i]','$vehicle_count_arr[$i]','$end_date_arr[$i]','$duration')");
+					$sq_trans = mysqlQuery("insert into package_tour_quotation_transport_entries2 ( `id`, `quotation_id`, `vehicle_name`, `start_date`, `pickup`, `drop`, `pickup_type`, `drop_type`, `package_id`, `transport_cost`,`vehicle_count`,`end_date`,`service_duration`) values ( '$id', '$quotation_id', '$vehicle_name', '$start_date_arr[$i]','$pickup','$drop','$pickup_type','$drop_type', '$package_id','$transport_cost','$vehicle_count','$end_date_arr[$i]','$duration')");
 					if(!$sq_trans)
 					{
-						echo "Transport information not inserted.";
+						echo "error--Transport information not inserted.";
 						exit;
 					}
 			}
 			else{
-				$sq_trans = mysqlQuery("update package_tour_quotation_transport_entries2 set vehicle_name='$vehicle_name_arr[$i]', start_date='$start_date_arr[$i]', `pickup`='$pickup', `drop`='$drop', `pickup_type`='$pickup_type', `drop_type`='$drop_type', `transport_cost`='$transport_cost_arr1[$i]',`vehicle_count`='$vehicle_count_arr[$i]',end_date='$end_date_arr[$i]',`service_duration`='$duration' where id='$transport_id_arr[$i]'");
+				$transport_id = intval($transport_id_arr[$i]);
+				$sq_trans = mysqlQuery("update package_tour_quotation_transport_entries2 set vehicle_name='$vehicle_name', start_date='$start_date_arr[$i]', `pickup`='$pickup', `drop`='$drop', `pickup_type`='$pickup_type', `drop_type`='$drop_type', `transport_cost`='$transport_cost',`vehicle_count`='$vehicle_count',end_date='$end_date_arr[$i]',`service_duration`='$duration' where id='$transport_id'");
 				if(!$sq_trans){
 					echo "error--Transport information not updated!";
 					exit;
 				}
 			}
 		}
-		else{
-			$sq_trans = mysqlQuery("delete from package_tour_quotation_transport_entries2 where id='$transport_id_arr[$i]'");
+		else if(!empty($transport_id_arr[$i])){
+			$transport_id = intval($transport_id_arr[$i]);
+			$sq_trans = mysqlQuery("delete from package_tour_quotation_transport_entries2 where id='$transport_id'");
 			if(!$sq_trans){
 				echo "error--Transport information not deleted!";
 				exit;
@@ -521,14 +529,31 @@ public function tranport_entries_update($quotation_id,$vehicle_name_arr,$start_d
 }
 
 public function excursion_entries_save($quotation_id,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$excursion_id_arr,$exc_status_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr,$vehicle_id_arr_e=[]){
+	if (empty($city_name_arr_e) || !is_array($city_name_arr_e)) {
+		return;
+	}
 	for($i=0; $i<sizeof($city_name_arr_e); $i++){
+		$is_active = ($exc_status_arr[$i] === true || $exc_status_arr[$i] === 1 || $exc_status_arr[$i] === '1' || $exc_status_arr[$i] === 'true');
 
-		if($exc_status_arr[$i] == 'true'){
-			
-			$exc_date_arr_e[$i] = get_datetime_db($exc_date_arr_e[$i]);
-			$vehicle_id = isset($vehicle_id_arr_e[$i]) ? $vehicle_id_arr_e[$i] : '';
-			if($excursion_id_arr[$i] != ""){
-				$sq_exc = mysqlQuery("update package_tour_quotation_excursion_entries set city_name='$city_name_arr_e[$i]', excursion_name='$excursion_name_arr[$i]', excursion_amount='$excursion_amt_arr[$i]',exc_date='$exc_date_arr_e[$i]',transfer_option='$transfer_option_arr[$i]',adult='$adult_arr[$i]',chwb='$chwb_arr[$i]',chwob='$chwob_arr[$i]',infant='$infant_arr[$i]',vehicles='$vehicles_arr[$i]',vehicle_id='$vehicle_id' where id='$excursion_id_arr[$i]' ");
+		if($is_active){
+			$city_name = intval($city_name_arr_e[$i]);
+			$excursion_name = addslashes(trim((string)($excursion_name_arr[$i] ?? '')));
+			if ($city_name <= 0 || $excursion_name === '') {
+				continue;
+			}
+			$exc_date = get_datetime_db($exc_date_arr_e[$i] ?? '');
+			$excursion_amt = floatval($excursion_amt_arr[$i] ?? 0);
+			$transfer_option = addslashes((string)($transfer_option_arr[$i] ?? ''));
+			$adult = intval($adult_arr[$i] ?? 0);
+			$chwb = intval($chwb_arr[$i] ?? 0);
+			$chwob = intval($chwob_arr[$i] ?? 0);
+			$infant = intval($infant_arr[$i] ?? 0);
+			$vehicles = intval($vehicles_arr[$i] ?? 0);
+			$vehicle_id = addslashes((string)($vehicle_id_arr_e[$i] ?? ''));
+
+			if($excursion_id_arr[$i] != "" && $excursion_id_arr[$i] != "undefined"){
+				$excursion_id = intval($excursion_id_arr[$i]);
+				$sq_exc = mysqlQuery("update package_tour_quotation_excursion_entries set city_name='$city_name', excursion_name='$excursion_name', excursion_amount='$excursion_amt',exc_date='$exc_date',transfer_option='$transfer_option',adult='$adult',chwb='$chwb',chwob='$chwob',infant='$infant',vehicles='$vehicles',vehicle_id='$vehicle_id' where id='$excursion_id' ");
 				if(!$sq_exc){
 					echo "error--Activity information not updated!";
 					exit;
@@ -536,16 +561,17 @@ public function excursion_entries_save($quotation_id,$city_name_arr_e, $excursio
 			}
 			else{
 				$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_tour_quotation_excursion_entries"));
-				$id = $sq_max['max']+1;
+				$id = intval($sq_max['max'] ?? 0) + 1;
 
-				$sq_exc = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles,vehicle_id ) values ( '$id', '$quotation_id', '$city_name_arr_e[$i]','$excursion_name_arr[$i]', '$excursion_amt_arr[$i]','$exc_date_arr_e[$i]','$transfer_option_arr[$i]','$adult_arr[$i]','$chwb_arr[$i]','$chwob_arr[$i]','$infant_arr[$i]','$vehicles_arr[$i]','$vehicle_id')");
+				$sq_exc = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles,vehicle_id ) values ( '$id', '$quotation_id', '$city_name', '$excursion_name', '$excursion_amt', '$exc_date', '$transfer_option', '$adult', '$chwb', '$chwob', '$infant', '$vehicles', '$vehicle_id')");
 				if(!$sq_exc){
 					echo "error--Activity information not saved!";
 					exit;
 				}
 			}
-		}else{
-			$sq_exc = mysqlQuery("delete from package_tour_quotation_excursion_entries where id='$excursion_id_arr[$i]'");
+		}else if(!empty($excursion_id_arr[$i])){
+			$excursion_id = intval($excursion_id_arr[$i]);
+			$sq_exc = mysqlQuery("delete from package_tour_quotation_excursion_entries where id='$excursion_id'");
 			if(!$sq_exc){
 				echo "error--Activity information not deleted!";
 				exit;
