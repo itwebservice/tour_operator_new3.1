@@ -2579,7 +2579,7 @@ textarea.ai-chat-textarea.form-control:focus,
 	align-items: center;
 	gap: 25px;
 	margin: 10px auto 10px;
-	display: flex;
+	display: flex !important;
 }
 
 .ai-inclusions-exclusions-row{

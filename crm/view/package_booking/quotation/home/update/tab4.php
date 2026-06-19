@@ -153,7 +153,7 @@
                                                                             <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small>
                                                                             <select title="TCS" id="tcs_tax-<?= $count ?>" name="tcs_tax-<?= $count ?>" class="form-control" style="width: 150px!important;">
                                                                                 <option value="">*TCS Tax</option>
-                                            									<option value="5" <?php if($bsmValues[0]->tcsper==5) { echo "selected"; } ?> >5% TCS</option>
+                                            									<option value="2" <?php if($bsmValues[0]->tcsper==2) { echo "selected"; } ?> >2% TCS</option>
                                             									<option value="20" <?php if($bsmValues[0]->tcsper==20) { echo "selected"; } ?>>20% TCS</option>
                                                                             </select><span>TCS</span>
                                                                         </td>

@@ -1,3 +1,146 @@
+<style>
+    
+     
+    .action-icon-btn {
+        padding: 4px 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background: #fff;
+        color: #495057;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        min-width: auto;
+        white-space: nowrap;
+    }
+    
+    .action-icon-btn:hover {
+        border-color: #adb5bd;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-icon-btn:hover i {
+        transform: scale(1.15);
+        transition: all 0.2s ease;
+        color: #ffffff !important;
+    }
+    
+    /* Background becomes icon color, icon becomes white on hover */
+    /* Background becomes icon color, icon becomes white on hover */
+    .action-icon-btn:hover i {
+        color: #ffffff !important;
+    }
+    
+    .action-icon-btn[data-icon-type="copy"]:hover {
+        background: #ffc107 !important;
+    }
+    
+    .action-icon-btn[data-icon-type="edit"]:hover {
+        background: #007bff !important;
+    }
+    
+    .action-icon-btn[data-icon-type="view"]:hover {
+        background: #17a2b8 !important;
+    }
+    
+    .action-icon-btn[data-icon-type="hotel"]:hover {
+        background: #fd7e14 !important;
+    }
+    
+    .action-icon-btn[data-icon-type="backoffice"]:hover {
+        background: #6c757d !important;
+    }
+    
+    .action-icon-btn[data-icon-type="convert"]:hover {
+        background: #6f42c1 !important;
+    }
+    
+    .action-icon-btn[data-icon-type="pdf"]:hover {
+        background: #dc3545 !important;
+    }
+    
+    .action-icon-btn[data-icon-type="word"]:hover {
+        background: #2b579a !important;
+    }
+    
+    .action-icon-btn[data-icon-type="email"]:hover {
+        background: #007bff !important;
+    }
+    
+    .action-icon-btn[data-icon-type]:hover .action-label {
+        color: #ffffff !important;
+    }
+    
+    .action-icon-btn i {
+        font-size: 14px;
+    }
+    
+    .action-icon-btn .action-label {
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    /* Icon Colors */
+    .action-icon-btn .copy-icon {
+        color: #ffc107;
+    }
+    
+    .action-icon-btn .edit-icon {
+        color: #007bff;
+    }
+    
+    .action-icon-btn .view-icon {
+        color: #17a2b8;
+    }
+    
+    .action-icon-btn .hotel-icon {
+        color: #fd7e14;
+    }
+    
+    .action-icon-btn .backoffice-icon {
+        color: #6c757d;
+    }
+    
+    .action-icon-btn .convert-icon {
+        color: #6f42c1;
+    }
+    
+    .action-icon-btn .pdf-icon {
+        color: #dc3545;
+    }
+    
+    .action-icon-btn .word-icon {
+        color: #2b579a;
+    }
+    
+    .action-icon-btn .email-icon {
+        color: #007bff;
+    }
+    @media (max-width: 1600px) {
+        .action-icon-btn .action-label {
+            display: none;
+        }
+        .action-icon-btn {
+            padding: 4px 6px;
+            min-width: 28px;
+        }
+    }
+    
+    /* On very small screens, allow wrapping if needed */
+    @media (max-width: 1200px) {
+        .actions-buttons-container {
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        .action-icon-btn {
+            padding: 3px 5px;
+            min-width: 26px;
+        }
+    }
+</style>
 <?php
 include "../../../../model/model.php";
 
@@ -215,6 +358,8 @@ $quotation_count = mysqli_num_rows($sq_query);
 									<th>Quotation ID</th>
 									<th>Quotation Cost</th>
 									<th>Updated Date</th>
+									<!-- <th>Actions</th> -->
+                                    <th>Generate Quotation</th>
 									<th>Actions</th>
 								</tr>
 								<?php
@@ -343,7 +488,7 @@ $quotation_count = mysqli_num_rows($sq_query);
 											}
 											echo $display_date;
 										?></td>
-										<td>
+										<!-- <td> -->
     <?php
     // Get URLs for this specific quotation
     $urls = getQuotationUrls($row_tours['quotation_id']);
@@ -357,7 +502,7 @@ $quotation_count = mysqli_num_rows($sq_query);
     ?>
     
     <!-- Combined Download Button with Email2 -->
-    <div class="btn-group download-btn-group">
+    <!-- <div class="btn-group download-btn-group">
         <button type="button" class="btn btn-info btn-sm dropdown-toggle download-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Download & Email Quotation">
             <i class="fa fa-download"></i>
         </button>
@@ -393,10 +538,10 @@ $quotation_count = mysqli_num_rows($sq_query);
                 </span>
             </a>
         </div>
-    </div>
+    </div> -->
 
     <!-- Actions Button -->
-    <div class="btn-group actions-btn-group">
+    <!-- <div class="btn-group actions-btn-group">
         <button type="button" class="btn btn-success btn-sm dropdown-toggle actions-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Actions">
             <span class="btn-text">Actions</span>
         </button>
@@ -455,8 +600,77 @@ $quotation_count = mysqli_num_rows($sq_query);
                 </span>
             </a>
         </div>
-    </div>
+    </div> -->
 
+<!-- </td> -->
+ <td>
+    <div class="download-actions-container" style="display: inline-flex; gap: 6px; align-items: center;">
+        <!-- PDF Button -->
+        <button type="button" class="btn btn-sm action-icon-btn"  onclick="loadOtherPage('<?php echo $url1; ?>')"
+                data-icon-type="pdf" 
+                data-toggle="tooltip" data-placement="top" title="Download as PDF">
+            <i class="fa fa-file-pdf-o pdf-icon"></i>
+            <span class="action-label">PDF</span>
+        </button>
+        
+        <!-- Word Button -->
+        <button type="button" class="btn btn-sm action-icon-btn" onclick="exportHTML('<?php echo $urldoc; ?>')"
+                data-icon-type="word"
+                data-toggle="tooltip" data-placement="top" title="Download as Word">
+            <i class="fa fa-file-word-o word-icon"></i>
+            <span class="action-label">Word</span>
+        </button>
+        
+        <!-- Email Button -->
+        <button type="button" class="btn btn-sm action-icon-btn"  onclick="openEmailWhatsappModal({
+                    quotation_id: <?php echo $row_tours['quotation_id']; ?>,
+                    email_id: '<?php echo $row_tours['email_id']; ?>',
+                    mobile_no: '<?php echo $row_tours['mobile_no']; ?>',
+                    package_name: '<?php echo addslashes($sq_tours_package['package_name']); ?>',
+                    customer_name: '<?php echo addslashes($row_tours['customer_name']); ?>',
+                    clone_qtn_id: '<?php echo addslashes($quotation_id_display); ?>'
+                })" 
+                data-icon-type="email"
+                data-toggle="tooltip" data-placement="top" title="Email to Customer">
+            <i class="fa fa-envelope-o email-icon"></i>
+            <span class="action-label">Email</span>
+        </button>
+    </div>
+</td>
+
+<td>
+    <div class="actions-buttons-container">
+        <button type="button" class="btn btn-sm action-icon-btn" 
+                data-icon-type="copy"
+                onclick="quotation_sub_copy(<?php echo $row_tours['quotation_id']; ?>)"
+                data-toggle="tooltip" data-placement="top" title="Create Sub-Quotation Copy">
+            <i class="fa fa-files-o copy-icon"></i>
+            <span class="action-label">Copy</span>
+        </button>
+        <button type="button" class="btn btn-sm action-icon-btn" 
+                data-icon-type="edit"
+                onclick="editQuotationDirect(<?php echo $row_tours['quotation_id']; ?>, <?php echo $row_tours['package_id']; ?>)"
+                data-toggle="tooltip" data-placement="top" title="Edit Quotation">
+            <i class="fa fa-pencil-square-o edit-icon"></i>
+            <span class="action-label">Edit</span>
+        </button>
+        <a href="quotation_view.php?quotation_id=<?php echo $row_tours['quotation_id']; ?>" 
+           target="_BLANK" 
+           class="btn btn-sm action-icon-btn" 
+           data-icon-type="view"
+           data-toggle="tooltip" data-placement="top" title="View Details" style="padding-top: 12px; padding-bottom: 12px;padding-left: 15px; padding-right: 15px;">
+            <i class="fa fa-eye view-icon"></i>
+            <span class="action-label">View</span>
+        </a>  
+        <button type="button" class="btn btn-sm action-icon-btn" 
+                data-icon-type="backoffice"
+                onclick="quotation_email_send_backoffice_modal(<?php echo $row_tours['quotation_id']; ?>);btnDisableEnable('email_backoffice_btn-<?php echo $row_tours['quotation_id']; ?>')"
+                data-toggle="tooltip" data-placement="top" title="Email Quotation to Backoffice">
+                <i class="fa fa-paper-plane-o backoffice-icon"></i>
+            <span class="action-label">Email</span>
+        </button>
+      
+    </div>
 </td>
 
 									</tr>
