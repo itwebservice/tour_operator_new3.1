@@ -274,7 +274,7 @@ function o1_flight_date($v)
 
       <!-- ====================================  Dipti -->
       <div class="relative z-10 mt-7 px-12">
-        <div class="grid grid-cols-4 gap-2 h-32" style="margin-top:50px;">
+        <div class="grid grid-cols-4 gap-2 h-32" style="margin-top:155px;">
           <?php
           $first_page_images = array();
 
@@ -471,7 +471,10 @@ function o1_flight_date($v)
                 </div>
                 <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--navy)]/60">Travel Dates</div>
               </div>
-              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]"><?= o1e($ov['travel_from']) ?> &ndash; <?= o1e($ov['travel_to']) ?></div>
+              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]">
+                <?= o1e($ov['travel_from']) ?><br>
+                <?= o1e($ov['travel_to']) ?>
+              </div>
             </div>
             <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
               <div class="flex items-center gap-2.5">
@@ -3004,12 +3007,12 @@ function o1_flight_date($v)
           </div>
         </div>
         <div class="mt-10 text-center">
-          <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div>
-          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1">FreezeMyTrip Â· Luxury Voyages Â· Est. 2014</div>
+          <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></span>
+          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1">FreezeMyTrip · Luxury Voyages · Est. 2014</div>
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>09<!-- --> / 09</span>
       </div>
