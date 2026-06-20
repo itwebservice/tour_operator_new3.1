@@ -1157,7 +1157,7 @@ function o1_flight_date($v)
               style="box-shadow:var(--shadow-card)">
 
               <div class="col-span-2 bg-[color:var(--navy)] grid place-items-center p-4">
-                <?php $vehicle_img = BASE_URL . 'uploads/quotation_images/vehicle.jpg'; ?>
+                <?php $vehicle_img = BASE_URL . 'uploads/quotation_images/vehicle.png'; ?>
                 <img src="<?= o1e($vehicle_img) ?>"
                   alt="Vehicle"
                   style="width:100%;height:auto;object-fit:contain;" />
@@ -1739,11 +1739,12 @@ function o1_flight_date($v)
                 </tbody>
               </table>
             <?php } ?>
-            </div>
+            
           </div>
-          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
+        </div>
+        <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
           <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
             <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
             <span>05<!-- --> / 09</span>
           </div>

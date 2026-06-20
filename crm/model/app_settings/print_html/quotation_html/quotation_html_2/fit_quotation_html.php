@@ -433,12 +433,26 @@ $o2_round = o2img(
           <div class="prep" style="margin-top:11px">
             <div class="card prep__card">
               <img class="prep__photo" src="<?= o2e($assets . 'person.jpg') ?>" alt="Client">
-              <div>
-                <div class="nm"><?= o2e($o2_client) ?></div>
-                <div class="meta">
-                  <?php if (o2nv($ov['customer_email'], '') !== ''): ?><span><i class="fa-solid fa-envelope"></i> <?= o2e($ov['customer_email']) ?></span><?php endif; ?>
-                  <?php if (o2nv($ov['customer_mobile'], '') !== ''): ?><span><i class="fa-solid fa-phone"></i> <?= o2e($ov['customer_mobile']) ?></span><?php endif; ?>
-                </div>
+              <div class="meta">
+
+                <?php if (o2nv($ov['customer_email'], '') !== ''): ?>
+                  <span>
+                    <i class="fa-solid fa-envelope"></i>
+                    <a href="mailto:<?= o2e($ov['customer_email']) ?>">
+                      <?= o2e($ov['customer_email']) ?>
+                    </a>
+                  </span>
+                <?php endif; ?>
+
+                <?php if (o2nv($ov['customer_mobile'], '') !== ''): ?>
+                  <span>
+                    <i class="fa-solid fa-phone"></i>
+                    <a href="tel:<?= o2e(preg_replace('/\D+/', '', $ov['customer_mobile'])) ?>">
+                      <?= o2e($ov['customer_mobile']) ?>
+                    </a>
+                  </span>
+                <?php endif; ?>
+
               </div>
             </div>
             <div class="card prep__card" style="flex:.85">
@@ -749,7 +763,7 @@ $o2_round = o2img(
           <?php if (!empty($vehs)): foreach ((array) $vehs as $v): ?>
               <div class="tnode">
                 <div class="card">
-                  <img class="tveh" src="<?= o2e($assets . 'vehicle.jpg') ?>" alt="Vehicle">
+                  <img class="tveh" src="<?= o2e($assets . 'vehicle.png') ?>" alt="Vehicle">
                   <div>
                     <div class="nm"><?= o2e(o2nv($v['vehicle_name'], 'Transfer')) ?></div>
                     <div class="rt"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($v['pickup'], '')) ?><?php if (o2nv($v['drop'], '') !== ''): ?> → <?= o2e($v['drop']) ?><?php endif; ?></div>
@@ -1310,10 +1324,33 @@ $o2_round = o2img(
           </a>
         </div>
         <div class="thanks__contact">
-          <span class="c"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($ty['company_address'], '')) ?></span>
-          <span class="c"><i class="fa-solid fa-phone"></i> <?= o2e(o2nv($ty['company_contact'], o2nv($ty['user_mobile'], ''))) ?></span>
-          <span class="c"><i class="fa-solid fa-envelope"></i> <?= o2e(o2nv($ty['company_email'], '')) ?></span>
-          <span class="c"><i class="fa-solid fa-earth-asia"></i> <?= o2e($o2_web) ?></span>
+
+          <span class="c">
+            <i class="fa-solid fa-location-dot"></i>
+            <?= o2e(o2nv($ty['company_address'], '')) ?>
+          </span>
+
+          <span class="c">
+            <i class="fa-solid fa-phone"></i>
+            <a href="tel:<?= o2e(preg_replace('/\D+/', '', o2nv($ty['company_contact'], o2nv($ty['user_mobile'], '')))) ?>">
+              <?= o2e(o2nv($ty['company_contact'], o2nv($ty['user_mobile'], ''))) ?>
+            </a>
+          </span>
+
+          <span class="c">
+            <i class="fa-solid fa-envelope"></i>
+            <a href="mailto:<?= o2e(o2nv($ty['company_email'], '')) ?>">
+              <?= o2e(o2nv($ty['company_email'], '')) ?>
+            </a>
+          </span>
+
+          <span class="c">
+            <i class="fa-solid fa-earth-asia"></i>
+            <a href="<?= o2e($o2_web) ?>" target="_blank">
+              <?= o2e($o2_web) ?>
+            </a>
+          </span>
+
         </div>
       </div>
       <div class="thanks__bar">

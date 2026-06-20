@@ -384,6 +384,14 @@ body.cover-b .cv-b{ display:flex; }
   margin-top:0 !important;
   margin-bottom:8px !important;
 }
+.meta a{
+    color: inherit;
+    text-decoration: none;
+}
+.thanks__contact a{
+    color: inherit;
+    text-decoration: none;
+}
 /* ================ */
 .sec-h .t{ font-family:var(--serif); font-weight:700; font-size:18px; color:var(--navy); }
 .sec-h .s{ font-size:10px; color:var(--muted); }
