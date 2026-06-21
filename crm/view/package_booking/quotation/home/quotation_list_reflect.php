@@ -423,6 +423,10 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 		$url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_6/fit_quotation_html.php?quotation_id=$quotation_id";
 
 		$urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_6/fit_quotation_html_doc.php?quotation_id=$quotation_id";
+	} else if ($app_quot_format == 7) {
+		$url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_7/fit_quotation_html.php?quotation_id=$quotation_id";
+
+		$urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_7/fit_quotation_html.php?quotation_id=$quotation_id";
 	} else {
 		$url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_1/fit_quotation_html.php?quotation_id=$quotation_id";
 

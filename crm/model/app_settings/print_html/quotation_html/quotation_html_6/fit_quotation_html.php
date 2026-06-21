@@ -1,1103 +1,1124 @@
 <?php
-//Generic Files
+
+/**
+ * OPTION-6 (quotation_html_6) — Package Tour Quotation
+ * Layout/CSS from Final-Designs/Option-6-Done/index.html
+ * Data from generic quotation engine (no inline DB queries).
+ */
 include "../../../../model.php";
-include "printFunction.php";
-global $app_quot_img, $similar_text, $quot_note, $currency, $tcs_note, $app_quot_format;
+include_once "../generic_quotation_data.php";
+include_once "../generic_builder_config.php";
 
-$role = $_SESSION['role'];
-$branch_admin_id = $_SESSION['branch_admin_id'];
-$sq = mysqli_fetch_assoc(mysqlQuery("select * from branch_assign where link='package_booking/quotation/home/index.php'"));
-$branch_status = $sq['branch_status'];
-if ($branch_admin_id != 0) {
-  $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
-  $sq_bank_count = mysqli_num_rows(mysqlQuery("select * from bank_master where branch_id='$branch_admin_id' and active_flag='Active'"));
-  $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='$branch_admin_id' and active_flag='Active'"));
-} else {
-  $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='1'"));
-  $sq_bank_count = mysqli_num_rows(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
-  $sq_bank_branch = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where branch_id='1' and active_flag='Active'"));
+$quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id']
+  : (isset($_REQUEST['quotation_id']) ? $_REQUEST['quotation_id'] : 0);
+
+$q = get_generic_quotation_data($quotation_id);
+if (empty($q['found'])) {
+  echo "Quotation not found.";
+  exit;
 }
 
-// Get branch-wise logo and QR code
-$admin_logo_url = get_branch_logo_url($branch_admin_id);
-
-$quotation_id = $_GET['quotation_id'];
-
-$sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
-$tcs_note_show = ($sq_quotation['booking_type'] != 'Domestic') ? $tcs_note : '';
-$sq_package_name = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$sq_quotation[package_id]'"));
-
-$sq_terms_cond_count = mysqli_num_rows(mysqlQuery("select dest_id from terms_and_conditions where type='Package Quotation' and dest_id='$sq_package_name[dest_id]' and active_flag ='Active'"));
-$dest_id = ($sq_terms_cond_count != 0) ? $sq_package_name['dest_id'] : 0;
-$sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditions where type='Package Quotation' and dest_id='$dest_id' and active_flag ='Active'"));
-
-$sq_dest = mysqli_fetch_assoc(mysqlQuery("select link from video_itinerary_master where dest_id = '$sq_package_name[dest_id]'"));
-$sq_transport = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_transport_entries2 where quotation_id='$quotation_id'"));
-$sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order"));
-$sq_package_program = mysqlQuery("select * from  package_quotation_program where quotation_id='$quotation_id'");
-
-$sq_login = mysqli_fetch_assoc(mysqlQuery("select * from roles where id='$sq_quotation[login_id]'"));
-$sq_emp_info = mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id='$sq_login[emp_id]'"));
-
-$quotation_date = $sq_quotation['quotation_date'];
-$yr = explode("-", $quotation_date);
-$year = $yr[0];
-
-if ($sq_emp_info['first_name'] == '') {
-  $emp_name = 'Admin';
-} else {
-  $emp_name = $sq_emp_info['first_name'] . ' ' . $sq_emp_info['last_name'];
+$hero         = $q['hero'];
+$ov           = $q['tour_overview'];
+$hotels       = $q['hotels'];
+$flights      = $q['flights'];
+$vehs         = $q['vehicles'];
+$itin         = $q['itinerary'];
+$incx         = $q['inclusion_exclusion'];
+$cost         = $q['costing'];
+$bank         = $q['bank_details'];
+$terms        = $q['terms_conditions'];
+$ty           = $q['thank_you'];
+$present      = $q['sections_present'];
+$gallery      = isset($q['gallery_images']) && is_array($q['gallery_images']) ? $q['gallery_images'] : array();
+$assets       = "assets/";
+$testimonials = array();
+$o6_cfg       = array();
+if (function_exists('gqb_get_config')) {
+  $o6_cfg = gqb_get_config();
+  $testimonials = isset($o6_cfg['testimonials']) && is_array($o6_cfg['testimonials'])
+    ? $o6_cfg['testimonials'] : array();
 }
 
-$basic_cost = $sq_costing['basic_amount'];
-$service_charge = $sq_costing['service_charge'];
-$tour_cost = $basic_cost + $service_charge;
-$service_tax_amount = 0;
-$tax_show = '';
-$bsmValues = json_decode($sq_costing['bsmValues']);
-?>
-<style>
-  .package_costing table tr:nth-child(even) {
-    background-color: #51514f !important;
+if (!function_exists('o6e')) {
+  function o6e($v)
+  {
+    return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
   }
-</style>
+}
+if (!function_exists('o6nv')) {
+  function o6nv($v, $f = '')
+  {
+    return ($v !== null && $v !== '') ? $v : $f;
+  }
+}
+if (!function_exists('o6_media_url')) {
+  function o6_media_url($url)
+  {
+    $url = trim((string) $url);
+    if ($url === '' || stripos($url, 'dummy') !== false) {
+      return '';
+    }
+    $url = str_replace('\\', '/', $url);
+    if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
+      return $url;
+    }
+    $url = preg_replace('#^(\.\./)+#', '', $url);
+    return BASE_URL . ltrim($url, '/');
+  }
+}
+if (!function_exists('o6img')) {
+  function o6img($url, $fallback)
+  {
+    $resolved = o6_media_url($url);
+    return $resolved !== '' ? $resolved : $fallback;
+  }
+}
+if (!function_exists('o6_guest_label')) {
+  function o6_guest_label($ov)
+  {
+    $p = isset($ov['pax']) ? $ov['pax'] : array();
+    $parts = array();
+    $ad = (int) o6nv(isset($p['adult']) ? $p['adult'] : 0, 0);
+    $ch = (int) o6nv(isset($p['children_with_bed']) ? $p['children_with_bed'] : 0, 0)
+      + (int) o6nv(isset($p['children_without_bed']) ? $p['children_without_bed'] : 0, 0);
+    $inf = (int) o6nv(isset($p['infant']) ? $p['infant'] : 0, 0);
+    if ($ad) {
+      $parts[] = $ad . ' Adult' . ($ad > 1 ? 's' : '');
+    }
+    if ($ch) {
+      $parts[] = $ch . ' Child' . ($ch > 1 ? 'ren' : '');
+    }
+    if ($inf) {
+      $parts[] = $inf . ' Infant' . ($inf > 1 ? 's' : '');
+    }
+    return $parts ? implode(', ', $parts) : o6nv($ov['guest_count'], '-');
+  }
+}
+if (!function_exists('o6_split_lines')) {
+  function o6_split_lines($html, $fallback = array())
+  {
+    $text = trim(strip_tags(str_replace(array('<br>', '<br/>', '<br />', '</p>', '</li>'), "\n", (string) $html)));
+    $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
+    $items = array_values(array_filter(array_map('trim', (array) $items)));
+    return $items ? $items : $fallback;
+  }
+}
+if (!function_exists('o6_air_code')) {
+  function o6_air_code($loc)
+  {
+    $loc = trim((string) $loc);
+    if ($loc === '') {
+      return '—';
+    }
+    if (preg_match('/\(([A-Z]{3})\)/', strtoupper($loc), $m)) {
+      return $m[1];
+    }
+    $words = preg_split('/[\s,]+/', $loc);
+    if (count($words) >= 2) {
+      return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 2));
+    }
+    return strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $loc), 0, 3));
+  }
+}
+if (!function_exists('o6_flight_parts')) {
+  function o6_flight_parts($dt)
+  {
+    $dt = trim((string) $dt);
+    $time = '—';
+    $date = '—';
+    if (preg_match('/(\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM|am|pm)?)/', $dt, $m)) {
+      $time = trim($m[1]);
+    }
+    if (preg_match('/(\d{2}[-\/]\d{2}[-\/]\d{4})/', $dt, $m)) {
+      $date = $m[1];
+    } elseif (preg_match('/(\d{4}[-\/]\d{2}[-\/]\d{2})/', $dt, $m)) {
+      $date = $m[1];
+    }
+    return array($time, $date);
+  }
+}
+if (!function_exists('o6_vehicle_end_date')) {
+  function o6_vehicle_end_date($v)
+  {
+    if (!empty($v['end_date_raw']) && function_exists('get_date_user')) {
+      return get_date_user($v['end_date_raw']);
+    }
+    return o6nv(isset($v['end_date_raw']) ? $v['end_date_raw'] : '', '');
+  }
+}
+if (!function_exists('o6_initials')) {
+  function o6_initials($name)
+  {
+    $name = trim((string) $name);
+    if ($name === '') {
+      return 'G';
+    }
+    $parts = preg_split('/\s+/', $name);
+    $out = '';
+    foreach ($parts as $p) {
+      if ($p !== '') {
+        $out .= strtoupper(substr($p, 0, 1));
+      }
+      if (strlen($out) >= 2) {
+        break;
+      }
+    }
+    return $out !== '' ? $out : 'G';
+  }
+}
+if (!function_exists('o6_first_name')) {
+  function o6_first_name($name)
+  {
+    $name = trim((string) $name);
+    if ($name === '') {
+      return 'Guest';
+    }
+    $parts = preg_split('/\s+/', $name);
+    return o6nv($parts[0], 'Guest');
+  }
+}
+if (!function_exists('o6_stars')) {
+  function o6_stars($rating)
+  {
+    $n = (int) preg_replace('/\D/', '', (string) $rating);
+    if ($n < 1) {
+      return '';
+    }
+    $n = min($n, 5);
+    $html = '';
+    for ($i = 0; $i < $n; $i++) {
+      $html .= '<i class="fa-solid fa-star"></i>';
+    }
+    return $html;
+  }
+}
+if (!function_exists('o6_render_page_header')) {
+  function o6_render_page_header($hero, $topic)
+  {
+    $name = o6nv($hero['company_name'], 'Travel Partner');
+    $logo = o6nv($hero['company_logo'], '');
+    ?>
+    <div class="page-header">
+      <?php if ($logo !== '') : ?>
+        <span class="header-brand"><img src="<?= o6e($logo) ?>" alt="<?= o6e($name) ?>" class="company-logo-img" /></span>
+      <?php else : ?>
+        <span class="header-brand"><?= o6e(strtoupper($name)) ?></span>
+      <?php endif; ?>
+      <span class="header-topic"><?= o6e(strtoupper($topic)) ?></span>
+    </div>
+    <?php
+  }
+}
+if (!function_exists('o6_render_footer')) {
+  function o6_render_footer($ty, $hero, $pg, $total, $meta_override = '')
+  {
+    if ($meta_override !== '') {
+      $meta = $meta_override;
+    } else {
+      $contact = o6nv($ty['company_contact'], o6nv($hero['user_contact'], ''));
+      $website = o6nv($ty['website'], '');
+      $meta = trim($contact . ($website !== '' ? ' • ' . strtoupper($website) : ''));
+    }
+    ?>
+    <div class="page-footer">
+      <span class="footer-meta-text"><?= o6e($meta) ?></span>
+      <span class="page-number"><?= o6e(str_pad((string) $pg, 2, '0', STR_PAD_LEFT) . '/' . str_pad((string) $total, 2, '0', STR_PAD_LEFT)) ?></span>
+    </div>
+    <?php
+  }
+}
 
-<!-- landingPage -->
-<section class="landingSec main_block">
+$o6_dest        = o6nv($ov['destination'], o6nv($hero['tour_name'], 'Tour'));
+$o6_dest_up     = strtoupper($o6_dest);
+$o6_client      = o6nv($ov['client_name'], o6nv($hero['client_name'], 'Guest'));
+$o6_first       = o6_first_name($o6_client);
+$o6_company     = o6nv($hero['company_name'], 'Travel Partner');
+$o6_logo        = o6nv($hero['company_logo'], '');
+$o6_tour_id     = o6nv($hero['package_code'], o6nv($ov['tour_id'], ''));
+$o6_quot_code   = o6nv($hero['quotation_code'], '');
+$o6_duration    = o6nv($ov['duration_label'], o6nv($hero['duration_label'], ''));
+$o6_travel_from = o6nv($ov['travel_from'], '');
+$o6_travel_to   = o6nv($ov['travel_to'], '');
+$o6_travel_range = trim($o6_travel_from . ($o6_travel_to !== '' ? ' to ' . $o6_travel_to : ''));
+$o6_pkg_badge   = '';
+if (!empty($cost['computed']['group'][0]['package_type'])) {
+  $o6_pkg_badge = $cost['computed']['group'][0]['package_type'];
+} elseif (!empty($hotels[0]['package_type'])) {
+  $o6_pkg_badge = $hotels[0]['package_type'];
+}
+$o6_pkg_ov = o6nv($o6_pkg_badge, o6nv($ov['package_type_label'], 'Package'));
+$o6_included = o6_split_lines(isset($incx['included']) ? $incx['included'] : '', array('Inclusions as per itinerary.'));
+$o6_excluded = o6_split_lines(isset($incx['excluded']) ? $incx['excluded'] : '', array('Exclusions as per company policy.'));
+$o6_cost_grp = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
+if (empty($o6_cost_grp)) {
+  $o6_cost_grp = array(array(
+    'package_type'      => 'Package',
+    'tour_cost_display' => '0',
+    'tax_display'       => '0',
+    'tcs_display'       => '0',
+    'travel_display'    => '0',
+    'total_display'     => '0',
+  ));
+}
+$o6_pay_notes = o6_split_lines(
+  o6nv(isset($incx['quot_note']) ? $incx['quot_note'] : '', ''),
+  array(
+    '50% advance payment required to confirm booking.',
+    'Remaining balance before departure as per company policy.',
+    'Payment can be made via NEFT/RTGS/IMPS/UPI.',
+  )
+);
+$o6_book_policy = o6_split_lines(
+  o6nv(isset($incx['note']) ? $incx['note'] : '', ''),
+  array(
+    'All bookings are subject to availability.',
+    'Package rates are as quoted in this proposal.',
+    'Rates may vary during peak or festive seasons.',
+  )
+);
+$o6_term_lines = o6_split_lines(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '', array());
+$o6_show_flights = !empty($present['flights']) && !empty($flights);
+$o6_show_vehs = !empty($present['vehicles']) && !empty($vehs);
 
-  <div class="landingPageTop main_block">
+$o6_itin_p5 = array();
+$o6_itin_p6 = array();
+if (!empty($itin)) {
+  foreach ($itin as $idx => $day) {
+    if ($idx < 2) {
+      $o6_itin_p5[] = $day;
+    } else {
+      $o6_itin_p6[] = $day;
+    }
+  }
+}
 
-    <img src="<?= getFormatImg($app_quot_format, $sq_package_name['dest_id']) ?>" class="img-responsive">
-    <span class="landingPageId"><?= get_quotation_id($quotation_id, $year) ?></span>
-    <h1 class="landingpageTitle"><?= $sq_package_name['package_name'] ?><?= ' (' . $sq_package_name['package_code'] . ')' ?></h1>
+$o6_total_pages = 11;
+if (!$o6_show_flights) {
+  $o6_total_pages--;
+}
+if (empty($o6_itin_p6)) {
+  $o6_total_pages--;
+}
+$o6_pg = 2;
 
+$o6_consult_email = o6nv($ty['company_email'], o6nv($hero['user_email_id'], ''));
+$o6_consult_phone = o6nv($ty['company_contact'], o6nv($hero['user_contact'], ''));
+$o6_google_rating = o6nv(isset($o6_cfg['google_rating']) ? $o6_cfg['google_rating'] : '', '4.9');
+$o6_review_count  = o6nv(isset($o6_cfg['review_count']) ? $o6_cfg['review_count'] : '', '245');
+$o6_traveller_cnt = o6nv(isset($o6_cfg['traveller_count']) ? $o6_cfg['traveller_count'] : '', '5,000+');
+$o6_years_exp     = o6nv(isset($o6_cfg['years_experience']) ? $o6_cfg['years_experience'] : '', '10+');
 
-    <div class="packageDeatailPanel">
-      <div class="landigPageCustomer">
-        <h3 class="customerFrom">PREPARED FOR :</h3>
-        <span class="customerName"><em><i class="fa fa-user"></i></em> : <?= $sq_quotation['customer_name'] ?></span><br>
-        <span class="customerMail"><em><i class="fa fa-envelope"></i></em> : <?= $sq_quotation['email_id'] ?></span><br>
-        <span class="customerMobile"><em><i class="fa fa-phone"></i></em> : <?= $sq_quotation['mobile_no'] ?></span>
+$o6_qr_url = '';
+if (!empty($bank['qr_code_url'])) {
+  $o6_qr_url = o6_media_url($bank['qr_code_url']);
+} elseif (!empty($bank['qr_code'])) {
+  $o6_qr_url = o6_media_url($bank['qr_code']);
+} elseif (!empty($bank['branch_qr_url'])) {
+  $o6_qr_url = o6_media_url($bank['branch_qr_url']);
+}
+
+$o6_term_clauses = array();
+if (!empty($o6_book_policy)) {
+  $o6_term_clauses[] = array('title' => 'Booking Policy', 'body' => implode(' ', array_slice($o6_book_policy, 0, 4)));
+}
+if (!empty($o6_pay_notes)) {
+  $o6_term_clauses[] = array('title' => 'Payment Instructions', 'body' => implode(' ', array_slice($o6_pay_notes, 0, 4)));
+}
+foreach ($o6_term_lines as $ti => $line) {
+  $title = 'Terms & Conditions';
+  $body = $line;
+  if (strpos($line, ':') !== false) {
+    list($title, $body) = array_map('trim', explode(':', $line, 2));
+  } elseif ($ti === 0) {
+    $title = o6nv($terms['title'], 'Terms & Conditions');
+  }
+  $o6_term_clauses[] = array('title' => $title, 'body' => $body);
+}
+if (empty($o6_term_clauses)) {
+  $o6_term_clauses[] = array(
+    'title' => 'Terms & Conditions',
+    'body'  => 'Terms and conditions will be shared as per company policy.',
+  );
+}
+
+list($o6_logo_main, $o6_logo_sub) = array(strtoupper($o6_company), 'Journey &amp; Dream');
+$brand_parts = preg_split('/\s+/', trim($o6_company), 2);
+if (is_array($brand_parts) && count($brand_parts) >= 2) {
+  $o6_logo_main = strtoupper($brand_parts[0]);
+  $o6_logo_sub = strtoupper($brand_parts[1]);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><?= o6e($o6_dest) ?> Tour Package – <?= o6e($o6_company) ?></title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="option6.css" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- PAGE 1 — COVER -->
+  <div class="page cover-page">
+    <div class="jp-pattern-overlay"></div>
+    <div class="cover-header">
+      <div class="logo-block">
+        <?php if ($o6_logo !== '') : ?>
+          <img src="<?= o6e($o6_logo) ?>" alt="<?= o6e($o6_company) ?>" class="company-logo-img" style="max-height:48px;margin-bottom:6px;" />
+        <?php else : ?>
+          <span class="logo-main"><?= o6e($o6_logo_main) ?></span>
+          <span class="logo-sub"><?= o6e(html_entity_decode(strip_tags($o6_logo_sub), ENT_QUOTES, 'UTF-8')) ?></span>
+        <?php endif; ?>
       </div>
-
-      <div class="landingPageBlocks">
-
-        <div class="detailBlock">
-          <div class="detailBlockIcon">
-            <i class="fa fa-calendar"></i>
-          </div>
-          <div class="detailBlockContent">
-            <p>QUOTATION DATE : <?= get_date_user($sq_quotation['quotation_date']) ?></p>
-          </div>
-        </div>
-        <div class="detailBlock">
-          <div class="detailBlockIcon">
-            <i class="fa fa-calendar"></i>
-          </div>
-          <div class="detailBlockContent">
-            <p>TRAVEL DATE : <?= get_date_user($sq_quotation['from_date']) . ' To ' . get_date_user($sq_quotation['to_date']) ?></p>
-          </div>
-        </div>
-
-        <div class="detailBlock">
-          <div class="detailBlockIcon">
-            <i class="fa fa-hourglass-half"></i>
-          </div>
-          <div class="detailBlockContent">
-            <p>DURATION : <?php echo $sq_quotation['total_days'] . 'N/' . ($sq_quotation['total_days'] + 1) . 'D' ?></p>
-          </div>
-        </div>
-
-        <div class="detailBlock">
-          <div class="detailBlockIcon">
-            <i class="fa fa-users"></i>
-          </div>
-          <div class="detailBlockContent">
-            <p>TOTAL GUEST : <?= $sq_quotation['total_passangers'] ?></p>
-          </div>
-        </div>
+      <div class="proposal-badge">
+        <span class="badge-code">TOUR PACKAGE</span>
+        <span class="badge-id">#<?= o6e($o6_quot_code) ?></span>
       </div>
     </div>
 
+    <div class="cover-hero">
+      <div class="jp-accent-line"></div>
+      <span class="proposal-title-tag"><?= o6e($o6_dest_up) ?></span>
+      <h1 class="main-destination"><?= o6e($o6_dest_up) ?></h1>
+      <h2 class="sub-destination">TOUR PACKAGE</h2>
+      <p class="hero-description">Discover Extraordinary Experiences</p>
+    </div>
+
+    <div class="quick-glance-grid">
+      <div class="glance-card">
+        <i class="fa-solid fa-hotel"></i>
+        <h4>HOTELS</h4>
+        <p>PREMIUM STAYS</p>
+      </div>
+      <div class="glance-card">
+        <i class="fa-solid fa-plane-departure"></i>
+        <h4>FLIGHTS</h4>
+        <p><?= o6e($o6_show_flights ? 'RETURN TRANSIT' : 'AS QUOTED') ?></p>
+      </div>
+      <div class="glance-card">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <h4>ACTIVITIES</h4>
+        <p>SIGHTSEEING</p>
+      </div>
+      <div class="glance-card">
+        <i class="fa-solid fa-car-side"></i>
+        <h4>TRANSFERS</h4>
+        <p><?= o6e($o6_show_vehs ? 'PRIVATE TRANSFER' : 'AS PER ITINERARY') ?></p>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div class="footer-meta">
+        <h5>PREPARED EXCLUSIVELY FOR</h5>
+        <p class="client-name"><?= o6e($o6_client) ?></p>
+      </div>
+      <div class="consultant-meta">
+        <h5>YOUR TRAVEL CONSULTANT</h5>
+        <p class="consultant-name"><?= o6e($o6_company) ?></p>
+        <?php if ($o6_consult_email !== '') : ?>
+        <p class="consultant-contact"><i class="fa-solid fa-envelope"></i> <?= o6e($o6_consult_email) ?></p>
+        <?php endif; ?>
+        <?php if ($o6_consult_phone !== '') : ?>
+        <p class="consultant-contact"><i class="fa-solid fa-phone"></i> <?= o6e($o6_consult_phone) ?></p>
+        <?php endif; ?>
+      </div>
+    </div>
   </div>
-</section>
 
-<!-- Count queries -->
-<?php
-$sq_package_count = mysqli_num_rows(mysqlQuery("select * from  package_quotation_program where quotation_id='$quotation_id'"));
-$sq_hotel_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id'"));
-$sq_transport_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_transport_entries2 where quotation_id='$quotation_id'"));
-$sq_train_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'"));
-$sq_plane_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'"));
-$sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_cruise_entries where quotation_id='$quotation_id'"));
-$sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_excursion_entries where quotation_id='$quotation_id'"));
+  <!-- PAGE 2 — WELCOME & OVERVIEW -->
+  <div class="page">
+    <?php o6_render_page_header($hero, $o6_dest_up . ' TOUR PACKAGE'); ?>
 
-$overall_count = 0;
-if ($sq_train_count > 0) $overall_count++;
-if ($sq_plane_count > 0) $overall_count++;
-if ($sq_cruise_count > 0) $overall_count++;
-if ($sq_hotel_count > 0) $overall_count++;
-if ($sq_transport_count > 0) $overall_count++;
-if ($sq_exc_count > 0) $overall_count++;
-?>
-
-<!-- traveling Information -->
-<?php if ($sq_hotel_count != 0 || $sq_plane_count != 0 || $sq_transport_count != 0) {
-?>
-  <!-- traveling Information -->
-  <section class="pageSection main_block">
-    <!-- background Image -->
-    <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-    <section class="travelingDetails main_block mg_tp_30 pageSectionInner">
-      <!-- hotel -->
-      <?php
-      $package_type_count = 1;
-      if ($sq_hotel_count != 0) {
-        $sq_package_type = mysqlQuery("select DISTINCT(package_type) from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' order by '$sq_costing[sort_order]'");
-        while ($row_hotel1 = mysqli_fetch_assoc($sq_package_type)) {
-
-          $sq_package_type1 = mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' and package_type='$row_hotel1[package_type]' order by package_type");
-          if ($package_type_count == '4' || $package_type_count == '7' || $package_type_count == '10') {
-
-      ?>
-            <section class="pageSection main_block">
-              <!-- background Image -->
-              <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-              <section class="travelingDetails main_block mg_tp_30 pageSectionInner">
-              <?php } ?>
-              <section class="transportDetailsPanel transportDetailsLeftPanel main_block side_pad">
-                <h6 class="text-center">PACKAGE TYPE - <?= $row_hotel1['package_type'] ?></h6>
-                <div class="travsportInfoBlock">
-                  <div class="transportIcon">
-                    <img src="<?= BASE_URL ?>images/quotation/p4/TI_hotel.png" class="img-responsive">
-                  </div>
-                  <div class="transportDetails">
-                    <div class="col-md-12 no-pad">
-                      <div class="table-responsive" style="margin-top:1px;margin-right: 1px;">
-                        <table class="table tableTrnasp no-marg" id="tbl_emp_list">
-                          <thead>
-                            <tr class="table-heading-row">
-                              <th>City</th>
-                              <th>Hotel Name</th>
-                              <th>Check_IN</th>
-                              <th>Check_OUT</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <?php
-                            while ($row_hotel = mysqli_fetch_assoc($sq_package_type1)) {
-
-                              $hotel_name = mysqli_fetch_assoc(mysqlQuery("select * from hotel_master where hotel_id='$row_hotel[hotel_name]'"));
-                              $city_name = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_hotel[city_name]'"));
-                            ?>
-                              <tr>
-                                <td><?php echo $city_name['city_name']; ?></td>
-                                <td><?php echo $hotel_name['hotel_name'] . $similar_text; ?></td>
-                                <td><?= get_date_user($row_hotel['check_in']) ?></td>
-                                <td><?= get_date_user($row_hotel['check_out']) ?></td>
-                              </tr>
-                            <?php } ?>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-              <?php
-              if ($package_type_count == '3' || $package_type_count == '6' || $package_type_count == '9') { ?>
-              </section>
-            </section>
-      <?php  }
-              $package_type_count++;
-            }
-          }
-      ?>
-      <!-- Flight -->
-      <?php
-      if ($sq_plane_count > 0) { ?>
-        <section class="transportDetailsPanel transportDetailsLeftPanel main_block side_pad">
-          <div class="travsportInfoBlock">
-            <div class="transportIcon">
-              <img src="<?= BASE_URL ?>images/quotation/p4/TI_flight.png" class="img-responsive">
-            </div>
-            <div class="transportDetails">
-              <div class="table-responsive" style="margin-top:1px;margin-right: 1px;">
-                <table class="table tableTrnasp no-marg" id="tbl_emp_list">
-                  <thead>
-                    <tr class="table-heading-row">
-                      <th>From_Sector</th>
-                      <th>To_Sector</th>
-                      <th>Airline</th>
-                      <th>Class</th>
-                      <th>Departure_D/T</th>
-                      <th>Arrival_D/T</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    $sq_plane = mysqlQuery("select * from package_tour_quotation_plane_entries where quotation_id='$quotation_id'");
-                    while ($row_plane = mysqli_fetch_assoc($sq_plane)) {
-                      $sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_plane[airline_name]'"));
-                      $airline = ($row_plane['airline_name'] != '') ? $sq_airline['airline_name'] . ' (' . $sq_airline['airline_code'] . ')' : 'NA';
-                    ?>
-                      <tr>
-                        <td><?= $row_plane['from_location'] ?></td>
-                        <td><?= $row_plane['to_location'] ?></td>
-                        <td><?= $airline ?></td>
-                        <td><?= $row_plane['class'] ?></td>
-                        <td><?= get_datetime_user($row_plane['dapart_time']) ?></td>
-                        <td><?= get_datetime_user($row_plane['arraval_time']) ?></td>
-                      </tr>
-                    <?php } ?>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-      <?php } ?>
-      <?php
-      if ($sq_transport_count > 0) { ?>
-        <!-- transport -->
-        <section class="transportDetailsPanel transportDetailsLeftPanel main_block side_pad">
-          <div class="travsportInfoBlock">
-            <div class="transportIcon">
-              <img src="<?= BASE_URL ?>images/quotation/p4/TI_car.png" class="img-responsive">
-            </div>
-            <div class="transportDetails">
-              <div class="table-responsive" style="margin-top:1px;margin-right: 1px;">
-                <table class="table no-marg tableTrnasp">
-                  <thead>
-                    <tr class="table-heading-row">
-                      <th>VEHICLE</th>
-                      <th>START_DATE</th>
-                      <th>END_DATE</th>
-                      <th>PICKUP</th>
-                      <th>DROP</th>
-                      <th>S_duration</th>
-                      <th>VEHICLES</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    $count = 0;
-                    $sq_hotel = mysqlQuery("select * from package_tour_quotation_transport_entries2 where quotation_id='$quotation_id'");
-                    while ($row_hotel = mysqli_fetch_assoc($sq_hotel)) {
-                      $transport_name = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_hotel[vehicle_name]'"));
-                      // Pickup
-                      if ($row_hotel['pickup_type'] == 'city') {
-                        $row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_hotel[pickup]'"));
-                        $pickup = $row['city_name'];
-                      } else if ($row_hotel['pickup_type'] == 'hotel') {
-                        $row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_hotel[pickup]'"));
-                        $pickup = $row['hotel_name'];
-                      } else {
-                        $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_hotel[pickup]'"));
-                        $airport_nam = clean($row['airport_name']);
-                        $airport_code = clean($row['airport_code']);
-                        $pickup = $airport_nam . " (" . $airport_code . ")";
-                      }
-                      //Drop-off
-                      if ($row_hotel['drop_type'] == 'city') {
-                        $row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_hotel[drop]'"));
-                        $drop = $row['city_name'];
-                      } else if ($row_hotel['drop_type'] == 'hotel') {
-                        $row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_hotel[drop]'"));
-                        $drop = $row['hotel_name'];
-                      } else {
-                        $row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_hotel[drop]'"));
-                        $airport_nam = clean($row['airport_name']);
-                        $airport_code = clean($row['airport_code']);
-                        $drop = $airport_nam . " (" . $airport_code . ")";
-                      }
-                    ?>
-                      <tr>
-                        <td><?= $transport_name['vehicle_name'] . $similar_text ?></td>
-                        <td><?= date('d-m-Y', strtotime($row_hotel['start_date'])) ?></td>
-                        <td><?= date('d-m-Y', strtotime($row_hotel['end_date'])) ?></td>
-                        <td><?= $pickup ?></td>
-                        <td><?= $drop ?></td>
-                        <td><?= $row_hotel['service_duration'] ?></td>
-                        <td><?= $row_hotel['vehicle_count'] ?></td>
-                      </tr>
-                    <?php } ?>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-      <?php } ?>
-    </section>
-  </section>
-<?php } ?>
-<!-- traveling Information -->
-<?php if ($sq_train_count != 0 || $sq_cruise_count != 0 || $sq_exc_count != 0) { ?>
-  <!-- traveling Information -->
-  <section class="pageSection main_block">
-    <!-- background Image -->
-    <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-    <section class="travelingDetails main_block mg_tp_30 pageSectionInner">
-      <!-- Train -->
-      <?php if ($sq_train_count > 0) { ?>
-        <section class="transportDetailsPanel transportDetailsLeftPanel main_block side_pad">
-          <div class="travsportInfoBlock">
-            <div class="transportIcon">
-              <img src="<?= BASE_URL ?>images/quotation/p4/TI_train.png" class="img-responsive">
-            </div>
-            <div class="transportDetails">
-              <div class="table-responsive" style="margin-top:1px;margin-right: 1px;">
-                <table class="table tableTrnasp no-marg" id="tbl_emp_list">
-                  <thead>
-                    <tr class="table-heading-row">
-                      <th>From_Location</th>
-                      <th>To_Location</th>
-                      <th>Class</th>
-                      <th>Departure_D/T</th>
-                      <th>Arrival_D/T</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    $sq_train = mysqlQuery("select * from package_tour_quotation_train_entries where quotation_id='$quotation_id'");
-                    while ($row_train = mysqli_fetch_assoc($sq_train)) {
-                    ?>
-                      <tr>
-                        <td><?= $row_train['from_location'] ?></td>
-                        <td><?= $row_train['to_location'] ?></td>
-                        <td><?php echo ($row_train['class'] != '') ? $row_train['class'] : 'NA'; ?></td>
-                        <td><?= date('d-m-Y H:i', strtotime($row_train['departure_date'])) ?></td>
-                        <td><?= date('d-m-Y H:i', strtotime($row_train['arrival_date'])) ?></td>
-                      </tr>
-                    <?php } ?>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-      <?php } ?>
-      <!-- Cruise -->
-      <?php
-      if ($sq_cruise_count > 0) { ?>
-        <section class="transportDetailsPanel transportDetailsLeftPanel transportDetailsLastPanel main_block side_pad">
-          <div class="travsportInfoBlock">
-            <div class="transportIcon">
-              <img src="<?= BASE_URL ?>images/quotation/p4/TI_cruise.png" class="img-responsive">
-            </div>
-
-            <div class="transportDetails">
-              <div class="table-responsive" style="margin-top:1px;margin-right: 1px;">
-                <table class="table tableTrnasp no-marg" id="tbl_emp_list">
-                  <thead>
-                    <tr class="table-heading-row">
-                      <th>Departure_D/T</th>
-                      <th>Arrival_D/T</th>
-                      <th>Route</th>
-                      <th>Cabin</th>
-                      <th>Sharing</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    $sq_cruise = mysqlQuery("select * from package_tour_quotation_cruise_entries where quotation_id='$quotation_id'");
-                    while ($row_cruise = mysqli_fetch_assoc($sq_cruise)) {
-                    ?>
-                      <tr>
-                        <td><?= date('d-m-Y H:i', strtotime($row_cruise['dept_datetime'])) ?></td>
-                        <td><?= date('d-m-Y H:i', strtotime($row_cruise['arrival_datetime'])) ?></td>
-                        <td><?= $row_cruise['route'] ?></td>
-                        <td><?= $row_cruise['cabin'] ?></td>
-                        <td><?= $row_cruise['sharing'] ?></td>
-                      </tr>
-                    <?php } ?>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-      <?php } ?>
-      <!-- excursion -->
-      <?php
-      if ($sq_exc_count > 0) { ?>
-        <section class="transportDetailsPanel transportDetailsLeftPanel main_block side_pad">
-          <div class="travsportInfoBlock">
-            <div class="transportIcon">
-              <img src="<?= BASE_URL ?>images/quotation/p4/TI_excursion.png" class="img-responsive">
-            </div>
-
-            <div class="transportDetails">
-              <div class="table-responsive" style="margin-top:1px;margin-right: 1px;">
-                <table class="table no-marg tableTrnasp">
-                  <thead>
-                    <tr class="table-heading-row">
-                      <th>City </th>
-                      <th>Activity_D/T</th>
-                      <th>Activity Name</th>
-                      <th>Transfer Option</th>
-                      <th>Vehicle Name</th>
-                      <th>Adult</th>
-                      <th>CWB</th>
-                      <th>CWOB</th>
-                      <th>Infant</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    $count = 0;
-                    $sq_ex = mysqlQuery("select * from package_tour_quotation_excursion_entries where quotation_id='$quotation_id'");
-                    while ($row_ex = mysqli_fetch_assoc($sq_ex)) {
-                      $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_ex[city_name]'"));
-                      $sq_ex_name = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_ex[excursion_name]'"));
-                      // Get vehicle name
-                      $vehicle_display = '';
-                      if(isset($row_ex['vehicle_id']) && $row_ex['vehicle_id'] != '' && $row_ex['vehicle_id'] != '0' && $row_ex['vehicle_id'] != null){
-                          $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_ex['vehicle_id']."'"));
-                          if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
-                              $vehicle_display = $sq_vehicle['vehicle_name'];
-                          }
-                      }
-                    ?>
-                      <tr>
-                        <td><?= $sq_city['city_name'] ?></td>
-                        <td><?= get_datetime_user($row_ex['exc_date']) ?></td>
-                        <td><?= $sq_ex_name['excursion_name'] ?></td>
-                        <td><?= $row_ex['transfer_option'] ?></td>
-                        <td><?= $vehicle_display ?></td>
-                        <td><?= $row_ex['adult'] ?></td>
-                        <td><?= $row_ex['chwb'] ?></td>
-                        <td><?= $row_ex['chwob'] ?></td>
-                        <td><?= $row_ex['infant'] ?></td>
-                      </tr>
-                    <?php }  ?>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-      <?php } ?>
-
-    </section>
-  </section>
-<?php } ?>
-<!-- Itinerary -->
-<?php
-$count = 1;
-$i = 0;
-$dates = (array) get_dates_for_package_itineary($quotation_id);
-$checkPageEnd = 0;
-while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
-
-  $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
-  
-  // Use day_image from package_quotation_program table
-  $daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
-  if (!empty($row_itinarary['day_image'])) {
-    // Construct full URL for the image (remove /crm from BASE_URL for images)
-    $base_url_for_images = str_replace('/crm', '', BASE_URL);
-    $daywise_image = $base_url_for_images . $row_itinarary['day_image'];
-  } else {
-    // Fallback to old system if day_image is empty
-    $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]'"));
-    if ($sq_day_image && !empty($sq_day_image['image_url'])) {
-      $day_url1 = explode(',', $sq_day_image['image_url']);
-      for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
-        $day_url2 = explode('=', $day_url1[$count1]);
-        if (isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count'] && isset($day_url2[0]) && $day_url2[0] == $row_itinarary['package_id']) {
-          $daywise_image = $day_url2[2];
-        }
-      }
-    }
-  }
-  if ($checkPageEnd % 1 == 0 || $checkPageEnd == 0) {
-    $go = $checkPageEnd + 0;
-    $flag = 0;
-?>
-    <section class="pageSection main_block">
-      <!-- background Image -->
-      <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-
-      <section class="itinerarySec main_block side_pad mg_tp_30 pageSectionInner">
-        <?php if ($count == 1) { ?>
-          <div class="mg-bt-30">
-            <div class="vitinerary_div">
-              <h6>Destination Guide Video</h6>
-              <img src="<?php echo BASE_URL . 'images/quotation/youtube-icon.png'; ?>" class="itinerary-img img-responsive"><br />
-              <a href="<?= $sq_dest['link'] ?>" class="no-marg" target="_blank"></a>
-            </div>
-          </div>
-        <?php } ?>
-      <?php
-    }
-    // if($count%2!=0){
-      ?>
-      <ul class="print_itinenary no-pad no-marg">
-        <li class="print_single_itinenary topItinerary">
-          <div class="itineraryContent">
-            <div class="itneraryImg" style="background: none !important;">
-              <img src="<?= $daywise_image ?>" class="img-responsive" style="background: none !important;">
-            </div>
-            <div class="itneraryText">
-              <div class="itneraryDayInfo">
-                <i class="fa fa-map-marker" aria-hidden="true"></i><span> Day <?= $count ?> <small> (<?= $date_format ?>) </small> : <?= $row_itinarary['attraction'] ?> </span>
-              </div>
-              <div class="itneraryDayPlan">
-                <p><?= $row_itinarary['day_wise_program'] ?></p>
-              </div>
-              <div class="itneraryDayAccomodation">
-                <span><i class="fa fa-bed"></i> : <?= $row_itinarary['stay'] ?></span>
-                <span><i class="fa fa-cutlery"></i> : <?= $row_itinarary['meal_plan'] ?></span>
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <?php
-        // }
-        if ($go == $checkPageEnd) {
-          $flag = 1;
-        ?>
-      </ul>
-      </section>
-    </section>
-  <?php
-        }
-        $count++;
-        $i++;
-        $checkPageEnd++;
-      }
-      if ($flag == 0) {
-  ?>
-  </ul>
-  </section>
-  </section>
-<?php } ?>
-
-<?php if ($sq_quotation['inclusions'] != '' && $sq_quotation['inclusions'] != ' ' && $sq_quotation['inclusions'] != '<div><br></div>') { ?>
-  <!-- Inclusion -->
-  <section class="pageSection main_block">
-    <!-- background Image -->
-    <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-    <section class="incluExcluTerms main_block side_pad mg_tp_30 pageSectionInner">
-
-      <?php if ($sq_quotation['inclusions'] != '' && $sq_quotation['inclusions'] != ' ' && $sq_quotation['inclusions'] != '<div><br></div>') { ?>
-        <!-- Inclusion -->
-        <div class="row side_pad">
-          <div class="col-md-12 mg_tp_30">
-            <div class="incluExcluTermsTabPanel inclusions main_block">
-              <h3 class="incexTitle">INCLUSIONS</h3>
-              <div class="tabContent">
-                <div class="real_text"><?= $sq_quotation['inclusions'] ?></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php } ?>
-    </section>
-  </section>
-<?php } ?>
-
-<?php if ($sq_quotation['exclusions'] != '' && $sq_quotation['exclusions'] != ' ' && $sq_quotation['exclusions'] != '<div><br></div>') { ?>
-  <!-- Inclusion -->
-  <section class="pageSection main_block">
-    <!-- background Image -->
-    <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-    <section class="incluExcluTerms main_block side_pad mg_tp_30 pageSectionInner">
-
-      <?php if ($sq_quotation['exclusions'] != '' && $sq_quotation['exclusions'] != ' ' && $sq_quotation['exclusions'] != '<div><br></div>') { ?>
-        <!-- Exclusion -->
-        <div class="row side_pad">
-          <div class="col-md-12 mg_tp_30">
-            <div class="incluExcluTermsTabPanel exclusions main_block">
-              <h3 class="incexTitle">EXCLUSIONS</h3>
-              <div class="tabContent">
-                <div class="real_text"><?= $sq_quotation['exclusions'] ?></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php } ?>
-    </section>
-  </section>
-<?php } ?>
-<!-- Terms and Conditions -->
-<?php if (isset($sq_terms_cond['terms_and_conditions'])) { ?>
-  <section class="pageSection main_block">
-    <!-- background Image -->
-    <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-    <section class="incluExcluTerms main_block side_pad mg_tp_30 pageSectionInner">
-
-      <!-- Terms and Conditions -->
-      <?php
-      if (isset($sq_terms_cond['terms_and_conditions'])) { ?>
-        <div class="row side_pad mg_tp_10">
-          <div class="col-md-12">
-            <div class="incluExcluTermsTabPanel inclusions main_block">
-              <h3 class="incexTitle">TERMS AND CONDITIONS</h3>
-              <div class="tabContent">
-                <pre class="real_text"><?php echo $sq_terms_cond['terms_and_conditions']; ?></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php } ?>
-    </section>
-  </section>
-<?php } ?>
-<?php if ($sq_package_name['note'] != '' || $quot_note != '') { ?>
-  <section class="pageSection main_block">
-    <!-- background Image -->
-    <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-    <section class="incluExcluTerms main_block side_pad mg_tp_30 pageSectionInner">
-
-      <?php
-      if ($sq_package_name['note'] != '') { ?>
-        <!-- Note -->
-        <div class="row side_pad">
-          <div class="col-md-12 mg_tp_30">
-            <div class="incluExcluTermsTabPanel inclusions main_block">
-              <h3 class="incexTitle">NOTE</h3>
-              <div class="tabContent">
-                <pre class="real_text"><?php echo $sq_package_name['note']; ?></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php }
-      if ($quot_note != '') { ?>
-        <pre class="real_text"><?php echo $quot_note; ?></pre>
-      <?php } ?>
-    </section>
-  </section>
-<?php } ?>
-
-<!-- Costing & Banking Page -->
-<section class="pageSection main_block">
-  <!-- background Image -->
-  <img src="<?= BASE_URL ?>images/quotation/p6/pageBGF.jpg" class="img-responsive pageBGImg">
-  <section class="endPageSection main_block mg_tp_30 pageSectionInner">
-
-    <div class="row">
-
-      <!-- Guest Detail -->
-      <div class="col-md-3 passengerPanel endPagecenter mg_bt_30">
-        <h3 class="endingPageTitle text-center">TOTAL GUEST</h3>
-        <div class="icon">
-          <img src="<?= BASE_URL ?>images/quotation/p4/adult.png" class="img-responsive">
-          <h4 class="no-marg">Adult : <?= $sq_quotation['total_adult'] ?></h4>
-          <i class="fa fa-plus"></i>
-        </div>
-        <div class="icon">
-          <img src="<?= BASE_URL ?>images/quotation/p4/child.png" class="img-responsive">
-          <h4 class="no-marg">CWB/CWOB/Infant : <?= $sq_quotation['children_with_bed'] + $sq_quotation['children_without_bed'] + $sq_quotation['total_infant'] ?></h4>
-          <i class="fa fa-plus"></i>
-        </div>
-        <?php
-        if (check_qr($branch_admin_id)) { ?>
-          <div class="icon">
-            <!-- <img src="<?= get_qr('Landscape Advanced', $branch_admin_id) ?>images/quotation/p4/infant.png" class="img-responsive"> -->
-            <?= get_qr('Landscape Advanced', $branch_admin_id) ?>
-            <h4 class="no-marg">Scan And Pay </h4>
-          </div>
-        <?php } ?>
+    <div class="content-container">
+      <div class="welcome-section card-container">
+        <span class="section-context">A Personalized Travel Experience</span>
+        <h3 class="welcome-sub">Exclusively Designed for <?= o6e($o6_client) ?></h3>
+        <p class="letter-para">Dear <?= o6e($o6_first) ?>, Thank you for choosing <strong><?= o6e($o6_company) ?></strong> for your upcoming journey to <?= o6e($o6_dest) ?>. We are delighted to present this carefully crafted travel proposal designed to provide memorable experiences, seamless arrangements, and exceptional hospitality throughout your trip.</p>
       </div>
-      <div class="col-md-9">
-        <!-- Costing -->
-        <div class="col-md-12 constingPanel constingBankingPanel mg_bt_30">
-          <h3 class="costBankTitle text-center">COSTING DETAILS</h3>
-          <?php
-          $discount1 = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['discount']);
-          if ($sq_quotation['discount'] != 0) {
-            $discount = ' (Applied Discount : ' . $discount1 . ')';
-          } else {
-            $discount = '';
-          }
-          ?><p class="text-center costBankTitle"><?= $discount ?></p>
-          <!-- Group costing -->
-          <?php
-          if ($sq_quotation['costing_type'] == 1) { ?>
 
-            <div class="travsportInfoBlock1">
-              <div class="transportDetails_costing">
-                <div class="table-responsive">
-                  <table class="table table-bordered tableTrnasp no-marg" style="width:100% !important;" id="tbl_emp_list">
-                    <thead>
-                      <tr class="table-heading-row">
-                        <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Package Type</th>
-                        <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Tour Cost</th>
-                        <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Tax</th>
-                        <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Tcs</th>
-                        <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">TRAVEL/OTHER</th>
-                        <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Total Cost</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <?php
-                      $sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order");
-                      while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
-                        $basic_cost = $sq_costing['basic_amount'];
-                        $service_charge = $sq_costing['service_charge'];
-                        $service_tax_amount = 0;
-                        $tax_show = '';
-                        $bsmValues = json_decode($sq_costing['bsmValues'], true);
-                        $discount_in = $sq_costing['discount_in'];
-                        $discount = $sq_costing['discount'];
-                        if ($discount_in == 'Percentage') {
-                          $act_discount = (float)($service_charge) * (float)($discount) / 100;
-                        } else {
-                          $act_discount = ($service_charge != 0) ? $discount : 0;
-                        }
-                        $service_charge = $service_charge - (float)($act_discount);
-                        $tour_cost = $basic_cost + $service_charge;
-                        $name = '';
-                        if ($sq_costing['service_tax_subtotal'] !== 0.00 && ($sq_costing['service_tax_subtotal']) !== '') {
-                          $service_tax_subtotal1 = explode(',', $sq_costing['service_tax_subtotal']);
-                          for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
-                            $service_tax = explode(':', $service_tax_subtotal1[$i]);
-                            $service_tax_amount = (float)($service_tax_amount) + (float)($service_tax[2]);
-                            $name .= $service_tax[0] . $service_tax[1] . ', ';
-                          }
-                        }
+      <div class="overview-section card-container">
+        <div class="block-header-strip">
+          <h4 class="block-title"><i class="fa-solid fa-compass"></i> TOUR OVERVIEW</h4>
+        </div>
+        <div class="overview-details-grid">
+          <div class="overview-item">
+            <span class="label">QUOTATION ID</span>
+            <span class="val font-highlight"><?= o6e($o6_quot_code) ?></span>
+          </div>
+          <div class="overview-item">
+            <span class="label">TOUR ID</span>
+            <span class="val"><?= o6e($o6_tour_id) ?></span>
+          </div>
+          <div class="overview-item">
+            <span class="label">QUOTATION DATE</span>
+            <span class="val"><?= o6e(o6nv($ov['quotation_date'], '')) ?></span>
+          </div>
+          <div class="overview-item">
+            <span class="label">TRAVEL DATE</span>
+            <span class="val"><?= o6e($o6_travel_range !== '' ? $o6_travel_range : ($o6_travel_from . ($o6_travel_to !== '' ? ' to ' . $o6_travel_to : ''))) ?></span>
+          </div>
+          <div class="overview-item">
+            <span class="label">DURATION</span>
+            <span class="val"><?= o6e($o6_duration) ?></span>
+          </div>
+          <div class="overview-item">
+            <span class="label">PACKAGE TYPE</span>
+            <span class="val"><?= o6e($o6_pkg_ov) ?></span>
+          </div>
+        </div>
+      </div>
 
-                        if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-                          $tcsper = $bsmValues[0]['tcsper'];
-                          $tcsvalue = $bsmValues[0]['tcsvalue'];
-                        } else {
-                          $tcsper = 0;
-                          $tcsvalue = 0;
-                        }
-                        $tcs_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $tcsvalue);
+      <div class="split-profile-investment-grid">
+        <div class="profile-card card-container">
+          <h5 class="card-mini-title"><i class="fa-solid fa-circle-user"></i> PREPARED FOR</h5>
+          <div class="profile-identity-lock">
+            <div class="avatar-badge"><?= o6e(o6_initials($o6_client)) ?></div>
+            <div class="identity-text">
+              <h4><?= o6e($o6_client) ?></h4>
+              <p><i class="fa-solid fa-envelope"></i> <?= o6e(o6nv($ov['customer_email'], o6nv($hero['user_email_id'], ''))) ?></p>
+              <p><i class="fa-solid fa-phone"></i> <?= o6e(o6nv($ov['customer_mobile'], o6nv($hero['user_contact'], ''))) ?></p>
+            </div>
+          </div>
+        </div>
 
-                        $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
-                        $quotation_cost = (float)($basic_cost) + (float)($service_charge) + (float)($service_tax_amount) + (float)($sq_quotation['train_cost']) + (float)($sq_quotation['cruise_cost']) + (float)($sq_quotation['flight_cost']) + (float)($sq_quotation['visa_cost']) + (float)($sq_quotation['guide_cost']) + (float)($sq_quotation['misc_cost']) + (float)($tcsvalue);
-                        // $quotation_cost = ceil($quotation_cost);
-
-                        // $quotation_cost = floor($quotation_cost);
-                        ////////////////Currency conversion ////////////
-                        $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'], $quotation_cost);
-                        $act_tour_cost = (float)($quotation_cost) - (float)($service_charge) + (float)($sq_costing['service_charge']);
-                        // $act_tour_cost = ceil($act_tour_cost);
-                        $act_tour_cost_camount = ($discount != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], $act_tour_cost) : '';
-
-                        $newBasic = currency_conversion($currency, $sq_quotation['currency_code'], $tour_cost);
-                        $travel_cost = (float)($sq_quotation['train_cost']) + (float)($sq_quotation['flight_cost']) + (float)($sq_quotation['cruise_cost']) + (float)($sq_quotation['visa_cost']) + (float)($sq_quotation['guide_cost']) + (float)($sq_quotation['misc_cost']);
-                        $travel_cost = currency_conversion($currency, $sq_quotation['currency_code'], $travel_cost);
-                      ?>
-                        <tr>
-                          <td style="font-size: 14px !important; padding: 5px 18px !important;"><?php echo $sq_costing['package_type'] ?></td>
-                          <td style="font-size: 14px !important; padding: 5px 18px !important;"><?= $newBasic ?></td>
-                          <td style="font-size: 14px !important; padding: 5px 18px !important;"><?= str_replace(',', '', $name) . $service_tax_amount_show ?></td>
-                          <td style="font-size: 14px !important; padding: 8px  20px !important;">Tcs:(<?= $tcsper ?>%)<br><?= $tcs_amount_show ?></td>
-                          <td style="font-size: 14px !important; padding: 5px 18px !important;"><?= $travel_cost ?></td>
-                          <td style="font-size: 14px !important; padding: 5px 18px !important;"><?= $currency_amount1 . ' <s style="white-space:nowrap !important;color: white !important;">' . $act_tour_cost_camount . '</s>' ?></td>
-                        </tr>
-                      <?php
-                      }
-                      ?>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div><!-- group Costing End -->
-            <?php
-          } else {
-            $sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id'  order by sort_order");
-            while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
-
-              $service_charge = $sq_costing['service_charge'];
-              $discount_in = $sq_costing['discount_in'];
-              $discount = $sq_costing['discount'];
-              if ($discount_in == 'Percentage') {
-                $act_discount = (float)($service_charge) * (float)($discount) / 100;
-              } else {
-                $act_discount = ($service_charge != 0) ? $discount : 0;
-              }
-              $service_charge = $service_charge - (float)($act_discount);
-              $total_pax = (float)($sq_quotation['total_adult']) + (float)($sq_quotation['children_with_bed']) + (float)($sq_quotation['children_without_bed']) + (float)($sq_quotation['total_infant']);
-              $per_service_charge = (float)($service_charge) / (float)($total_pax);
-              $o_per_service_charge = (float)($sq_costing['service_charge']) / (float)($total_pax);
-
-              $adult_cost = ($sq_quotation['total_adult'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['adult_cost'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-              $child_with = ($sq_quotation['children_with_bed'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['child_with'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-              $child_without = ($sq_quotation['children_without_bed'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['child_without'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-              $infant_cost = ($sq_quotation['total_infant'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['infant_cost'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-
-              // Without currency
-              $adult_costw = ($sq_quotation['total_adult'] != '0') ? ((float)($sq_costing['adult_cost'] + (float)($per_service_charge)) * intval($sq_quotation['total_adult'])) : 0;
-              $child_withw = ($sq_quotation['children_with_bed'] != '0') ? ((float)($sq_costing['child_with'] + (float)($per_service_charge)) * intval($sq_quotation['children_with_bed'])) : 0;
-              $child_withoutw = ($sq_quotation['children_without_bed'] != '0') ? ((float)($sq_costing['child_without'] + (float)($per_service_charge)) * intval($sq_quotation['children_without_bed'])) : 0;
-              $infant_costw = ($sq_quotation['total_infant'] != '0') ? ((float)($sq_costing['infant_cost'] + (float)($per_service_charge)) * intval($sq_quotation['total_infant'])) : 0;
-              $o_adult_costw = ($sq_quotation['total_adult'] != '0') ? ((float)($sq_costing['adult_cost'] + (float)($o_per_service_charge)) * intval($sq_quotation['total_adult'])) : 0;
-              $o_child_withw = ($sq_quotation['children_with_bed'] != '0') ? ((float)($sq_costing['child_with'] + (float)($o_per_service_charge)) * intval($sq_quotation['children_with_bed'])) : 0;
-              $o_child_withoutw = ($sq_quotation['children_without_bed'] != '0') ? ((float)($sq_costing['child_without'] + (float)($o_per_service_charge)) * intval($sq_quotation['children_without_bed'])) : 0;
-              $o_infant_costw = ($sq_quotation['total_infant'] != '0') ? ((float)($sq_costing['infant_cost'] + (float)($o_per_service_charge)) * intval($sq_quotation['total_infant'])) : 0;
-
-              $service_tax_amount = 0;
-              $tax_show = '';
-              $bsmValues = json_decode($sq_costing['bsmValues'], true);
-              $name = '';
-              if ($sq_costing['service_tax_subtotal'] !== 0.00 && ($sq_costing['service_tax_subtotal']) !== '') {
-                $service_tax_subtotal1 = explode(',', $sq_costing['service_tax_subtotal']);
-                for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
-                  $service_tax = explode(':', $service_tax_subtotal1[$i]);
-                  $service_tax_amount = (float)($service_tax_amount) + (float)($service_tax[2]);
-                  $name .= $service_tax[0] . $service_tax[1] . ', ';
-                }
-              }
-              if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-                $tcsper = $bsmValues[0]['tcsper'];
-                $tcsvalue = $bsmValues[0]['tcsvalue'];
-              } else {
-                $tcsper = 0;
-                $tcsvalue = 0;
-              }
-              $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
-
-              $total_child = (float)($sq_quotation['children_with_bed']) + (float)($sq_quotation['children_without_bed']);
-
-              $quotation_cost = (float)($adult_costw) + (float)($child_withw) + (float)($child_withoutw) + (float)($infant_costw);
-              $o_quotation_cost = (float)($o_adult_costw) + (float)($o_child_withw) + (float)($o_child_withoutw) + (float)($o_infant_costw);
-
-              $other_cost = $service_tax_amount + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'];
-              $travel_cost = ($sq_plane_count > 0) ? $sq_quotation['flight_ccost'] + $sq_quotation['flight_icost'] + $sq_quotation['flight_acost'] : 0;
-              $travel_cost += ($sq_train_count > 0) ? $sq_quotation['train_ccost'] + $sq_quotation['train_icost'] + $sq_quotation['train_acost'] : 0;
-              $travel_cost += ($sq_cruise_count > 0) ?  $sq_quotation['cruise_acost'] + $sq_quotation['cruise_icost'] + $sq_quotation['cruise_ccost'] : 0;
-
-
-              $train_cost_a = $sq_quotation['train_acost'] * intval($sq_quotation['total_adult']);
-              $train_cost_cw = $sq_quotation['train_ccost'] * intval($sq_quotation['children_with_bed']);
-              $train_cost_cwo =  $sq_quotation['train_ccost'] * intval($sq_quotation['children_without_bed']);
-              $train_cost_i = $sq_quotation['train_icost'] * intval($sq_quotation['total_infant']);
-
-              $train_total_cost = ($sq_train_count > 0) ? $train_cost_a + $train_cost_cw + $train_cost_cwo + $train_cost_i : 0;
-              // flight cost
-              $flight_cost_a = $sq_quotation['flight_acost'] * intval($sq_quotation['total_adult']);
-              $flight_cost_cw = $sq_quotation['flight_ccost'] * intval($sq_quotation['children_with_bed']);
-              $flight_cost_cwo =  $sq_quotation['flight_ccost'] * intval($sq_quotation['children_without_bed']);
-              $flight_cost_i = $sq_quotation['flight_icost'] * intval($sq_quotation['total_infant']);
-
-              $flight_total_cost = ($sq_plane_count > 0) ? $flight_cost_a + $flight_cost_cw + $flight_cost_cwo + $flight_cost_i : 0;
-              // Cruise cost
-
-
-              $cruise_cost_a = $sq_quotation['cruise_acost'] * intval($sq_quotation['total_adult']);
-              $cruise_cost_cw = $sq_quotation['cruise_ccost'] * intval($sq_quotation['children_with_bed']);
-              $cruise_cost_cwo =  $sq_quotation['cruise_ccost'] * intval($sq_quotation['children_without_bed']);
-              $cruise_cost_i = $sq_quotation['cruise_icost'] * intval($sq_quotation['total_infant']);
-
-              $cruise_total_cost = ($sq_cruise_count > 0) ? $cruise_cost_a + $cruise_cost_cw + $cruise_cost_cwo + $cruise_cost_i : 0;
-
-
-
-              $quotation_cost = (float)($quotation_cost) + (float)($train_total_cost) + (float)($flight_total_cost) + (float)($cruise_total_cost) + (float)($other_cost) + (float)($tcsvalue);
-              // $quotation_cost = ceil($quotation_cost);
-              $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'], $quotation_cost);
-
-              $tcs_show1 = currency_conversion($currency, $sq_quotation['currency_code'], $tcsvalue);
-              // $o_quotation_cost = (float)($o_quotation_cost) + (float)($travel_cost) + (float)($other_cost);
-              $o_quotation_cost = (float)($o_quotation_cost) +  (float)($train_total_cost) + (float)($flight_total_cost) + (float)($cruise_total_cost) + (float)($other_cost) + (float)($tcsvalue);
-
-
-              // $o_quotation_cost = ceil($o_quotation_cost);
-              $act_tour_cost_camount = ($discount != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], $o_quotation_cost) : '';
+        <div class="investment-card card-container">
+          <h5 class="card-mini-title"><i class="fa-solid fa-receipt"></i> PACKAGE CONFIGURATION</h5>
+          <?php foreach ($o6_cost_grp as $ci => $row) :
+            $tier_cls = ($ci === 1 && count($o6_cost_grp) > 1) ? ' recommended-tier' : '';
+            $tier_lbl = ($ci === 0) ? 'Selected Base Tier' : 'Package Tier ' . ($ci + 1);
+            if ($ci === 1 && count($o6_cost_grp) > 1) {
+              $tier_lbl = 'Premium Upgrade Tier';
+            }
             ?>
-              <div class="travsportInfoBlock1 mg_bt_30">
-                <div class="transportDetails_costing package_costing">
-                  <h5 style="margin:0px 2px 10px 10px!important;" class="endingPageTitle"><?= $sq_costing['package_type'] . ' (' . $currency_amount1 . ' <s style="color: white !important;">' . $act_tour_cost_camount . '</s>)' ?></h5>
-                  <div class="table-responsive">
-                    <table class="table no-marg table-bordered tableTrnasp" id="tbl_emp_list">
-                      <thead>
-                        <tr class="table-heading-row">
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">ADULT</th>
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">CWB</th>
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">CWOB</th>
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">INFANT</th>
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">TAX</th>
-                          <th style="font-size: 16px !important; font-weight: 500 !important; padding: 8px  20px !important;">TCS</th>
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Visa</th>
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Guide</th>
-                          <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Misc</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><?= $adult_cost ?></td>
-                          <td><?= $child_with ?></td>
-                          <td><?= $child_without  ?></td>
-                          <td><?= $infant_cost ?></td>
-                          <td style="color: #fff !important;"><?= str_replace(',', '', $name) .  $service_tax_amount_show ?></td>
-                          <td>Tcs:(<?= $tcsper ?>%)<br><?= $tcs_show1 ?></td>
-                          <td><?= currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['visa_cost']) ?></td>
-                          <td><?= currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['guide_cost'])  ?></td>
-                          <td><?= currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['misc_cost'])  ?></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <?php
-              if ($sq_plane_count > 0 || $sq_train_count > 0 || $sq_cruise_count > 0) { ?>
-                <div class="travsportInfoBlock1 mg_bt_30">
-                  <div class="transportDetails_costing package_costing">
-                    <div class="table-responsive">
-                      <table class="table table-bordered no-marg tableTrnasp" id="tbl_emp_list">
-                        <thead>
-                          <tr class="table-heading-row">
-                            <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Travel_Type</th>
-                            <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Adult(PP)</th>
-                            <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Child(PP)</th>
-                            <th style="font-size: 16px !important; font-weight: 600 !important; padding: 8px  20px !important;">Infant(PP)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <?php
-                          if ($sq_plane_count > 0) { ?>
-                            <tr>
-                              <td><?= 'Flight' ?></td>
-                              <td><?= $sq_quotation['total_adult'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['flight_acost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0)) ?></td>
-                              <td><?= ($sq_quotation['children_with_bed'] != 0 || $sq_quotation['children_without_bed'] != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['flight_ccost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0))  ?></td>
-                              <td><?= $sq_quotation['total_infant'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['flight_icost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0))  ?></td>
-                            </tr>
-                          <?php }
-                          if ($sq_train_count > 0) { ?>
-                            <tr>
-                              <td><?= 'Train' ?></td>
-                              <td><?= $sq_quotation['total_adult'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['train_acost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0)) ?></td>
-                              <td><?= ($sq_quotation['children_with_bed'] != 0 || $sq_quotation['children_without_bed'] != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['train_ccost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0)) ?></td>
-                              <td><?= $sq_quotation['total_infant'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['train_icost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0)) ?></td>
-                            </tr>
-                          <?php }
-                          if ($sq_cruise_count > 0) { ?>
-                            <tr>
-                              <td><?= 'Cruise' ?></td>
-                              <td><?= $sq_quotation['total_adult'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['cruise_acost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0)) ?></td>
-                              <td><?= ($sq_quotation['children_with_bed'] != 0 || $sq_quotation['children_without_bed'] != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['cruise_ccost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0)) ?></td>
-                              <td><?= $sq_quotation['total_infant'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['cruise_icost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0)) ?></td>
-                            </tr>
-                          <?php } ?>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-          <?php }
-            }
-          } ?>
-          <?php
-          // if ($tcs_note_show != '') { 
-          ?>
-          <!-- <p style="margin-left:10px!important;" class="costBankTitle"> -->
-          <?php // $tcs_note_show 
-          ?></p>
-          <?php //} 
-          ?>
-          <?php
-          if ($sq_quotation['other_desc'] != '') { ?>
-            <p style="margin-left:10px!important;" class="costBankTitle">MISCELLANEOUS DESCRIPTION: <?= $sq_quotation['other_desc'] ?></p>
-          <?php } ?>
-          <!-- Per person costing End -->
-        </div>
-
-
-      </div>
-    </div>
-
-  </section>
-</section>
-
-<section class="pageSection main_block">
-  <!-- background Image -->
-  <img src="<?= BASE_URL ?>images/quotation/p6/pageBG.jpg" class="img-responsive pageBGImg">
-  <section class="contactSection main_block mg_tp_30 pageSectionInner">
-    <!-- Bank Detail -->
-    <div class="col-md-12 constingBankingPanel BankingPanel">
-      <h3 class="costBankTitle text-center">BANK DETAILS</h3>
-      <div class="col-md-4 text-center mg_bt_30">
-        <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/bankName.png" class="img-responsive"></div>
-        <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['bank_name'] != '') ? $sq_bank_branch['bank_name'] : $bank_name_setting  ?></h4>
-        <p>BANK NAME</p>
-      </div>
-      <div class="col-md-4 text-center mg_bt_30">
-        <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/branchName.png" class="img-responsive"> </div>
-        <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['branch_name'] != '') ? $sq_bank_branch['branch_name'] : $bank_branch_name ?></h4>
-        <p>BRANCH</p>
-      </div>
-      <div class="col-md-4 text-center mg_bt_30">
-        <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/accName.png" class="img-responsive"></div>
-        <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_type'] != '') ? $sq_bank_branch['account_type'] : $acc_name  ?></h4>
-        <p>A/C TYPE</p>
-      </div>
-      <div class="col-md-4 text-center mg_bt_30">
-        <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/accNumber.png" class="img-responsive"></div>
-        <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_no'] != '') ? $sq_bank_branch['account_no'] : $bank_acc_no  ?></h4>
-        <p>A/C NO</p>
-      </div>
-      <div class="col-md-4 text-center mg_bt_30">
-        <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/code.png" class="img-responsive"></div>
-        <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_name'] != '') ? $sq_bank_branch['account_name'] : $bank_account_name ?></h4>
-        <p>BANK ACCOUNT NAME</p>
-      </div>
-      <div class="col-md-4 text-center mg_bt_30">
-        <div class="icon"><img src="<?= BASE_URL ?>images/quotation/p4/code.png" class="img-responsive"></div>
-        <h4 class="no-marg"><?= ($sq_bank_count > 0 || $sq_bank_branch['swift_code'] != '') ? strtoupper($sq_bank_branch['swift_code']) :  strtoupper($bank_swift_code) ?></h4>
-        <p>SWIFT CODE</p>
-      </div>
-    </div>
-  </section>
-</section>
-<!-- Costing & Banking Page -->
-<section class="pageSection main_block">
-  <!-- background Image -->
-  <img src="<?= BASE_URL ?>images/quotation/p6/pageBG.jpg" class="img-responsive pageBGImg">
-  <section class="contactSection main_block mg_tp_30 pageSectionInner">
-    <div class="contactPanel">
-      <div class="companyLogo">
-        <img src="<?= $admin_logo_url ?>">
-      </div>
-      <div class="companyContactDetail">
-        <?php //if($app_address != ''){
-        ?>
-        <div class="contactBlock">
-          <i class="fa fa-map-marker"></i>
-          <p><?php echo ($branch_status == 'yes' && $role != 'Admin') ? $branch_details['address1'] . ',' . $branch_details['address2'] . ',' . $branch_details['city'] : $app_address; ?></p>
-        </div>
-        <?php //}
-        ?>
-        <?php //if($app_contact_no != ''){
-        ?>
-        <div class="contactBlock">
-          <i class="fa fa-phone"></i>
-          <p><?php echo ($branch_status == 'yes' && $role != 'Admin') ? $branch_details['contact_no']  : $app_contact_no; ?></p>
-        </div>
-        <?php //}
-        ?>
-        <?php //if($app_email_id != ''){
-        ?>
-        <div class="contactBlock">
-          <i class="fa fa-envelope"></i>
-          <p><?php echo ($branch_status == 'yes' && $role != 'Admin' && $branch_details['email_id'] != '') ? $branch_details['email_id'] : $app_email_id; ?></p>
-        </div>
-        <?php //}
-        ?>
-        <?php if ($app_website != '') { ?>
-          <div class="contactBlock">
-            <i class="fa fa-globe"></i>
-            <p><?php echo $app_website; ?></p>
+          <div class="pricing-tier-row<?= $tier_cls ?>">
+            <span class="tier-name"><?= o6e($tier_lbl) ?></span>
+            <span class="tier-cost"><?= o6e(o6nv($row['package_type'], 'Package')) ?></span>
           </div>
-        <?php } ?>
-        <div class="contactBlock">
-          <i class="fa fa-pencil-square-o"></i>
-          <p>PREPARED BY : <?= $emp_name ?></p>
+          <?php endforeach; ?>
+          <div class="tax-disclaimer-strip">VALIDATED PROPOSAL FRAMEWORK</div>
         </div>
       </div>
     </div>
-  </section>
-</section>
 
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+
+  <!-- PAGE 3 — HOTELS -->
+  <div class="page">
+    <?php o6_render_page_header($hero, 'Accommodation Details'); ?>
+
+    <div class="content-container">
+      <div class="section-intro">
+        <h2 class="main-section-title">Hotel Options &amp; Stay Parameters</h2>
+        <p class="section-desc">Package Type: <?= o6e($o6_pkg_ov) ?> — Handpicked accommodation options for your <?= o6e($o6_dest) ?> journey.</p>
+      </div>
+
+      <?php if (!empty($hotels)) :
+        foreach ($hotels as $h) :
+          $room_label = o6nv($h['room_category'], o6nv($h['room_type'], 'Standard Room'));
+          $stars_html = o6_stars(o6nv($h['rating'], ''));
+          ?>
+      <div class="hotel-striped-card layout-split-card">
+        <div class="card-left-stripbg"></div>
+        <div class="card-right-datacore">
+          <div class="property-top-meta-row">
+            <div class="title-stars-block">
+              <span class="micro-location-tag"><?= o6e(strtoupper(o6nv($h['hotel_city'], $o6_dest_up))) ?></span>
+              <h3><?= o6e(o6nv($h['hotel_name'], 'Hotel')) ?></h3>
+              <?php if ($stars_html !== '') : ?>
+              <div class="star-rating-row"><?= $stars_html ?></div>
+              <?php endif; ?>
+            </div>
+            <div class="property-badges-block">
+              <?php if (!empty($h['rating'])) : ?>
+              <div class="score-pill-badge"><i class="fa-solid fa-star"></i> <?= o6e($h['rating']) ?></div>
+              <?php endif; ?>
+              <?php if (!empty($h['meal_plan'])) : ?>
+              <div class="score-pill-badge" style="background:#f1f5f9;color:#1e293b;"><?= o6e($h['meal_plan']) ?></div>
+              <?php endif; ?>
+            </div>
+          </div>
+          <table class="property-metrics-table">
+            <thead>
+              <tr>
+                <th>CHECK-IN</th>
+                <th>CHECK-OUT</th>
+                <th>ROOM CATEGORY</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><?= o6e(o6nv($h['check_in'], '')) ?></strong></td>
+                <td><strong><?= o6e(o6nv($h['check_out'], '')) ?></strong></td>
+                <td><strong><?= o6e($room_label) ?></strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+        <?php
+        endforeach;
+      else :
+        ?>
+      <div class="hotel-striped-card layout-split-card">
+        <div class="card-left-stripbg"></div>
+        <div class="card-right-datacore">
+          <div class="property-top-meta-row">
+            <div class="title-stars-block">
+              <h3>Hotel details will be confirmed with your booking.</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+
+  <?php if ($o6_show_flights) : ?>
+  <!-- PAGE 4 — FLIGHTS -->
+  <div class="page">
+    <?php o6_render_page_header($hero, $o6_dest_up . ' TOUR PACKAGE'); ?>
+
+    <div class="content-container">
+      <div class="section-intro">
+        <h2 class="main-section-title"><i class="fa-solid fa-plane"></i> Flight Details</h2>
+        <p class="section-desc">Confirmed flight configurations for your outbound and return sectors.</p>
+      </div>
+
+      <div class="flight-itinerary-stack">
+        <?php
+        $o6_fi = 0;
+        $o6_fcnt = count($flights);
+        foreach ($flights as $f) :
+          $o6_fi++;
+          $air_name = o6nv($f['airline_name'], o6nv($f['airline_display'], 'Flight'));
+          $flight_lbl = o6nv($f['airline_code'], o6nv($f['airline_display'], ''));
+          $from_code = o6_air_code(o6nv($f['from_city'], ''));
+          $to_code = o6_air_code(o6nv($f['to_city'], ''));
+          list($dep_time, $dep_date) = o6_flight_parts(o6nv($f['departure_datetime'], ''));
+          list($arr_time, $arr_date) = o6_flight_parts(o6nv($f['arrival_datetime'], ''));
+          $sector = ($o6_fi === 1) ? 'OUTBOUND' : (($o6_fi === $o6_fcnt && $o6_fcnt > 1) ? 'RETURN' : 'SECTOR ' . $o6_fi);
+          $baggage = o6nv($f['baggage'], 'As per airline policy');
+          ?>
+        <div class="boarding-pass-container">
+          <div class="pass-left-main">
+            <div class="pass-header-row">
+              <span class="pass-sector-route"><?= o6e($sector) ?> · <?= o6e(strtoupper(o6nv($f['from_city'], ''))) ?> <i class="fa-solid fa-arrow-right-long"></i> <?= o6e(strtoupper(o6nv($f['to_city'], ''))) ?></span>
+              <span class="pass-cabin-badge"><?= o6e(strtoupper(o6nv($f['class'], 'Economy'))) ?></span>
+            </div>
+            <div class="pass-carrier-row">
+              <div class="carrier-icon-square"><i class="fa-solid fa-plane"></i></div>
+              <div class="carrier-text-stack">
+                <h3><?= o6e($air_name) ?></h3>
+                <p>FLIGHT <?= o6e($flight_lbl) ?></p>
+              </div>
+            </div>
+            <div class="pass-transit-core">
+              <div class="transit-node alignment-left">
+                <h2><?= o6e($from_code) ?></h2>
+                <p class="airport-sub"><?= o6e(o6nv($f['from_city'], '')) ?></p>
+              </div>
+              <div class="transit-vector-track">
+                <span class="duration-lbl">Depart: <?= o6e($dep_date) ?></span>
+                <div class="track-vector-line"><i class="fa-solid fa-plane track-plane-icon"></i></div>
+                <span class="stops-lbl">Duration: <?= o6e(o6nv($f['duration'], 'Direct')) ?></span>
+              </div>
+              <div class="transit-node alignment-right">
+                <h2><?= o6e($to_code) ?></h2>
+                <p class="airport-sub"><?= o6e(o6nv($f['to_city'], '')) ?></p>
+              </div>
+            </div>
+            <div class="pass-footer-metrics">
+              <div class="metric-column">
+                <span class="lbl">DEPARTS TIME</span>
+                <span class="val"><strong><?= o6e($dep_time) ?></strong></span>
+              </div>
+              <div class="metric-column">
+                <span class="lbl">ARRIVES TIME</span>
+                <span class="val"><strong><?= o6e($arr_time) ?></strong></span>
+              </div>
+              <div class="metric-column static-allowance">
+                <span><i class="fa-solid fa-briefcase"></i> ALLOWANCE: <?= o6e(strtoupper($baggage)) ?></span>
+              </div>
+            </div>
+          </div>
+          <div class="pass-right-stub">
+            <div class="stub-notch-top"></div>
+            <div class="stub-notch-bottom"></div>
+            <div class="stub-content-wrapper">
+              <div class="stub-data-node"><span class="stub-lbl">FLIGHT</span><span class="stub-val"><?= o6e($flight_lbl) ?></span></div>
+              <div class="stub-data-node"><span class="stub-lbl">CLASS</span><span class="stub-val"><?= o6e(o6nv($f['class'], 'Economy')) ?></span></div>
+              <div class="stub-data-node"><span class="stub-lbl">SEAT</span><span class="stub-val">As Assumed</span></div>
+            </div>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+  <?php endif; ?>
+
+  <!-- PAGE 5 — VEHICLES + ITINERARY (DAYS 1–2) -->
+  <div class="page">
+    <?php o6_render_page_header($hero, 'Transportation Details'); ?>
+
+    <div class="content-container">
+      <?php if ($o6_show_vehs) : ?>
+      <div class="section-intro">
+        <h2 class="main-section-title"><i class="fa-solid fa-van-shuttle"></i> Ground Transportation</h2>
+        <p class="section-desc">Private logistics allocations designated for the program duration.</p>
+      </div>
+
+      <?php foreach ($vehs as $v) :
+        $v_start = o6nv($v['date'], '');
+        $v_end = o6_vehicle_end_date($v);
+        $svc = o6nv($v['service_duration'], o6nv($v['description'], 'As per itinerary'));
+        ?>
+      <div class="hotel-striped-card layout-split-card" style="height: 140px;">
+        <div class="card-left-stripbg"></div>
+        <div class="card-right-datacore" style="padding: 12px 18px;">
+          <div class="property-top-meta-row">
+            <div class="title-stars-block">
+              <span class="micro-location-tag">VEHICLE CATEGORY: <?= o6e(strtoupper(o6nv($v['vehicle_type'], 'PRIVATE TRANSFER'))) ?></span>
+              <h3><?= o6e(o6nv($v['vehicle_name'], 'Vehicle')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o6e($v['vehicle_count']) ?>)<?php endif; ?></h3>
+            </div>
+            <div class="score-pill-badge" style="background:#f1f5f9;color:#1e293b;"><?= o6e($svc) ?></div>
+          </div>
+          <table class="property-metrics-table" style="margin: 4px 0;">
+            <thead>
+              <tr>
+                <th>PICKUP LOCATION</th>
+                <th>DROP-OFF ROUTING</th>
+                <th>START DATE</th>
+                <th>RETURN DATE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><?= o6e(o6nv($v['pickup'], 'NA')) ?></td>
+                <td><?= o6e(o6nv($v['drop'], 'NA')) ?></td>
+                <td><?= o6e($v_start) ?></td>
+                <td><?= o6e($v_end) ?></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <?php endforeach; ?>
+      <?php endif; ?>
+
+      <h4 class="block-title" style="margin-top: 10px;"><i class="fa-solid fa-calendar-days"></i> DAY WISE ITINERARY</h4>
+
+      <div class="itinerary-timeline-vertical">
+        <?php if (!empty($o6_itin_p5)) :
+          foreach ($o6_itin_p5 as $day) :
+            $day_title = o6nv($day['special_attraction'], o6nv($day['city'], 'Sightseeing'));
+            ?>
+        <div class="timeline-day-block">
+          <div class="day-spine-node-badge">
+            <span class="word">DAY</span>
+            <span class="num"><?= o6e(o6nv($day['day_number'], '')) ?></span>
+          </div>
+          <div class="itinerary-split-card layout-split-card">
+            <div class="card-left-stripbg"></div>
+            <div class="card-right-datacore">
+              <div class="day-header-meta">
+                <span class="date-string"><?= o6e(o6nv($day['date'], '')) ?></span>
+                <h4><?= o6e($day_title) ?></h4>
+              </div>
+              <p class="day-narrative-text"><?= o6e(o6nv($day['detailed_programme'], '')) ?></p>
+              <?php if (!empty($day['meal_plan']) || !empty($day['overnight_stay'])) : ?>
+              <p class="day-narrative-text" style="margin-top:6px;font-size:0.62rem;">
+                <?php if (!empty($day['meal_plan'])) : ?>Meals: <?= o6e($day['meal_plan']) ?><?php endif; ?>
+                <?php if (!empty($day['overnight_stay'])) : ?><?= !empty($day['meal_plan']) ? ' · ' : '' ?>Stay: <?= o6e($day['overnight_stay']) ?><?php endif; ?>
+              </p>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+          <?php
+          endforeach;
+        else :
+          ?>
+        <div class="timeline-day-block">
+          <div class="itinerary-split-card layout-split-card">
+            <div class="card-left-stripbg"></div>
+            <div class="card-right-datacore">
+              <p class="day-narrative-text">Itinerary details will be shared upon confirmation.</p>
+            </div>
+          </div>
+        </div>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+
+  <!-- PAGE 6 — ITINERARY CONTINUED (DAY 3+) -->
+  <?php if (!empty($o6_itin_p6)) : ?>
+  <div class="page">
+    <?php o6_render_page_header($hero, 'Day Wise Itinerary Continued'); ?>
+
+    <div class="content-container">
+      <div class="itinerary-timeline-vertical">
+        <?php foreach ($o6_itin_p6 as $day) :
+          $day_title = o6nv($day['special_attraction'], o6nv($day['city'], 'Sightseeing'));
+          ?>
+        <div class="timeline-day-block">
+          <div class="day-spine-node-badge">
+            <span class="word">DAY</span>
+            <span class="num"><?= o6e(o6nv($day['day_number'], '')) ?></span>
+          </div>
+          <div class="itinerary-split-card layout-split-card">
+            <div class="card-left-stripbg"></div>
+            <div class="card-right-datacore">
+              <div class="day-header-meta">
+                <span class="date-string"><?= o6e(o6nv($day['date'], '')) ?></span>
+                <h4><?= o6e($day_title) ?></h4>
+              </div>
+              <p class="day-narrative-text"><?= o6e(o6nv($day['detailed_programme'], '')) ?></p>
+              <?php if (!empty($day['meal_plan']) || !empty($day['overnight_stay'])) : ?>
+              <p class="day-narrative-text" style="margin-top:6px;font-size:0.62rem;">
+                <?php if (!empty($day['meal_plan'])) : ?>Meals: <?= o6e($day['meal_plan']) ?><?php endif; ?>
+                <?php if (!empty($day['overnight_stay'])) : ?><?= !empty($day['meal_plan']) ? ' · ' : '' ?>Stay: <?= o6e($day['overnight_stay']) ?><?php endif; ?>
+              </p>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+  <?php endif; ?>
+
+  <!-- PAGE 7 — INCLUSIONS / EXCLUSIONS -->
+  <div class="page">
+    <?php o6_render_page_header($hero, "What's Included / What's Excluded"); ?>
+
+    <div class="content-container">
+      <div class="scope-matrix-grid">
+        <div class="matrix-column-wrapper">
+          <div class="matrix-header inclusions-bg">
+            <div class="header-badge-circle"><i class="fa-solid fa-check"></i></div>
+            <h3>What's Included</h3>
+          </div>
+          <div class="matrix-list-body">
+            <span class="matrix-scope-tag">PACKAGE SCOPE</span>
+            <ul>
+              <?php foreach ($o6_included as $item) : ?>
+              <li><i class="fa-regular fa-circle-check item-inc-icon"></i> <?= o6e($item) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        </div>
+
+        <div class="matrix-column-wrapper">
+          <div class="matrix-header exclusions-bg">
+            <div class="header-badge-circle"><i class="fa-solid fa-xmark"></i></div>
+            <h3>What's Excluded</h3>
+          </div>
+          <div class="matrix-list-body">
+            <span class="matrix-scope-tag text-red">OUT OF SCOPE</span>
+            <ul>
+              <?php foreach ($o6_excluded as $item) : ?>
+              <li><i class="fa-regular fa-circle-xmark item-exc-icon"></i> <?= o6e($item) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+
+  <!-- PAGE 8 — COSTING & PAYMENT -->
+  <div class="page">
+    <?php o6_render_page_header($hero, 'Costing Details'); ?>
+
+    <div class="content-container">
+      <div class="section-intro">
+        <h2 class="main-section-title">Your Investment Matrix</h2>
+        <p class="section-desc">Consolidated cost structure breakdown per package tier definitions.</p>
+      </div>
+
+      <table class="financial-breakdown-table card-container">
+        <thead>
+          <tr>
+            <th>PACKAGE TYPE</th>
+            <th>TOUR COST</th>
+            <th>TAX</th>
+            <th>TCS</th>
+            <th>TRAVEL COST</th>
+            <th>GRAND TOTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($o6_cost_grp as $ci => $row) :
+            $is_rec = (stripos(o6nv($row['package_type'], ''), 'premium') !== false)
+              || (stripos(o6nv($row['package_type'], ''), 'recommended') !== false)
+              || (stripos(o6nv($row['package_type'], ''), 'royal') !== false)
+              || ($ci === 1 && count($o6_cost_grp) > 1);
+            ?>
+          <tr<?= $is_rec ? ' class="highlighted-row"' : '' ?>>
+            <td>
+              <strong><?= o6e(o6nv($row['package_type'], 'Package')) ?></strong>
+              <?php if ($is_rec) : ?> <span class="table-rec-badge">RECOMMENDED</span><?php endif; ?>
+            </td>
+            <td><?= o6e(o6nv($row['tour_cost_display'], '0')) ?></td>
+            <td><?= o6e(o6nv($row['tax_display'], '0')) ?></td>
+            <td><?= o6e(o6nv($row['tcs_display'], '0')) ?></td>
+            <td><?= o6e(o6nv($row['travel_display'], '0')) ?></td>
+            <td class="final-total-field<?= $is_rec ? ' focus-color' : '' ?>"><?= o6e(o6nv($row['total_display'], '0')) ?></td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <p class="table-disclaimer-text"><i class="fa-solid fa-circle-info"></i> Notes: <?= o6e(o6nv(isset($incx['note']) ? $incx['note'] : '', 'Rates are subject to availability at the time of final confirmation.')) ?></p>
+
+      <h4 class="block-title" style="margin-top: 15px;">PAYMENT INFORMATION <span class="sub-label-term">— How to pay</span></h4>
+
+      <div class="payment-infrastructure-grid">
+        <div class="payment-solid-dark-box">
+          <span class="top-micro-caption">BANK TRANSFER SETUP</span>
+          <h2><?= o6e(o6nv($bank['account_name'], o6nv($ty['company_name'], $o6_company))) ?></h2>
+          <div class="solid-grid-meta">
+            <div class="meta-cell">
+              <span class="label">ACCOUNT NUMBER</span>
+              <span class="val font-mono"><?= o6e(o6nv($bank['account_no'], 'NA')) ?></span>
+            </div>
+            <div class="meta-cell">
+              <span class="label">BANK ENTITY</span>
+              <span class="val"><?= o6e(o6nv($bank['bank_name'], 'NA')) ?></span>
+            </div>
+            <div class="meta-cell">
+              <span class="label">LOCATION BRANCH</span>
+              <span class="val"><?= o6e(o6nv($bank['branch_name'], 'NA')) ?></span>
+            </div>
+            <div class="meta-cell">
+              <span class="label">IFSC CODE</span>
+              <span class="val font-mono"><?= o6e(o6nv($bank['ifsc_code'], o6nv($bank['swift_code'], 'NA'))) ?></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-right-stack-layout">
+          <div class="qr-code-white-card card-container">
+            <?php if (!empty($bank['qr_html'])) : ?>
+              <?= $bank['qr_html'] ?>
+            <?php elseif ($o6_qr_url !== '') : ?>
+              <img src="<?= o6e($o6_qr_url) ?>" alt="Payment QR" style="width:90px;height:90px;object-fit:contain;" />
+            <?php else : ?>
+              <div class="simulated-qr-pattern"></div>
+            <?php endif; ?>
+            <span class="qr-caption">SCAN &amp; PAY VIA UPI</span>
+            <?php if (!empty($bank['upi_id'])) : ?>
+            <p class="qr-upi-text"><?= o6e($bank['upi_id']) ?></p>
+            <?php endif; ?>
+          </div>
+
+          <div class="payment-notice-tint-box">
+            <h5>PAYMENT INSTRUCTIONS</h5>
+            <p style="font-size: 0.65rem; line-height: 1.3;"><?= o6e(implode(' ', array_slice($o6_pay_notes, 0, 4))) ?></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+
+  <!-- PAGE 9 — TESTIMONIALS -->
+  <div class="page">
+    <?php o6_render_page_header($hero, 'What Our Travellers Say'); ?>
+
+    <div class="content-container">
+      <div class="section-intro">
+        <h2 class="main-section-title">Client Feedback Profiles</h2>
+        <p class="section-desc">A consistent record of exceptional holiday delivery across global sectors.</p>
+      </div>
+
+      <div class="reviews-masonry-grid">
+        <?php if (!empty($testimonials)) :
+          $o6_ti = 0;
+          foreach ($testimonials as $t) :
+            if ($o6_ti >= 3) {
+              break;
+            }
+            $o6_ti++;
+            $photo = o6_media_url(isset($t['photo']) ? $t['photo'] : '');
+            ?>
+        <div class="testimonial-card-v2 card-container">
+          <div class="quote-signature-mark">&ldquo;</div>
+          <div class="star-row-layout">
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+          </div>
+          <p class="review-body-text"><?= o6e(o6nv($t['review'], '')) ?></p>
+          <div class="reviewer-footer-row">
+            <?php if ($photo !== '') : ?>
+              <img class="circle-avatar-initials" src="<?= o6e($photo) ?>" alt="<?= o6e(o6nv($t['name'], '')) ?>" style="object-fit:cover;padding:0;" />
+            <?php else : ?>
+              <div class="circle-avatar-initials"><?= o6e(o6_initials(o6nv($t['name'], 'T'))) ?></div>
+            <?php endif; ?>
+            <div class="reviewer-identity">
+              <h4><?= o6e(o6nv($t['name'], 'Traveller')) ?></h4>
+              <span class="destination-tag"><?= o6e(strtoupper(o6nv($t['designation'], ''))) ?></span>
+            </div>
+          </div>
+        </div>
+            <?php
+          endforeach;
+        else :
+          ?>
+        <div class="testimonial-card-v2 card-container">
+          <p class="review-body-text">Customer testimonials can be managed from Quotation Builder settings.</p>
+        </div>
+        <?php endif; ?>
+      </div>
+
+      <div class="reputation-tracker-bar">
+        <i class="fa-brands fa-google"></i>
+        <span><strong><?= o6e($o6_review_count) ?> GOOGLE REVIEWS</strong> — <?= o6e(strtoupper($o6_google_rating)) ?> AVERAGE RATING</span>
+      </div>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+
+  <!-- PAGE 10 — TERMS -->
+  <div class="page">
+    <?php o6_render_page_header($hero, 'Terms & Conditions'); ?>
+
+    <div class="content-container fine-print-body">
+      <div class="section-intro">
+        <h2 class="main-section-title">THE FINE PRINT</h2>
+        <p class="section-desc"><?= o6e(o6nv($terms['title'], 'Standard terms governing travel packaging arrangements.')) ?></p>
+      </div>
+
+      <div class="legal-clauses-two-column">
+        <?php foreach ($o6_term_clauses as $clause) : ?>
+        <div class="clause-node">
+          <h5><?= o6e($clause['title']) ?></h5>
+          <p><?= o6e($clause['body']) ?></p>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages, o6nv($ty['company_address'], '')); ?>
+  </div>
+  <?php $o6_pg++; ?>
+
+  <!-- PAGE 11 — THANK YOU -->
+  <div class="page thank-you-page">
+    <div class="thank-you-main-core">
+      <span class="jp-closing-text">ありがとうございます</span>
+      <h1 class="thank-you-headline">Thank You</h1>
+      <p class="thank-you-subtext">for choosing us as your premium travel partner</p>
+      <div class="closing-divider-diamond"></div>
+      <p class="closing-personal-note">Dear <?= o6e($o6_first) ?>, we truly appreciate your trust in <?= o6e(o6nv($ty['company_name'], $o6_company)) ?>. Our team is committed to crafting an unforgettable journey for you. Should you have any questions, please reach out anytime.</p>
+    </div>
+
+    <div class="corporate-metrics-strip card-container">
+      <div class="metric-node">
+        <h3><?= o6e($o6_review_count) ?></h3>
+        <p>GOOGLE REVIEWS</p>
+      </div>
+      <div class="metric-node">
+        <h3><?= o6e($o6_google_rating) ?></h3>
+        <p>AVERAGE RATING</p>
+      </div>
+      <div class="metric-node">
+        <h3><?= o6e($o6_years_exp) ?></h3>
+        <p>YEARS EXPERIENCE</p>
+      </div>
+      <div class="metric-node">
+        <h3><?= o6e($o6_traveller_cnt) ?></h3>
+        <p>HAPPY TRAVELLERS</p>
+      </div>
+    </div>
+
+    <div class="closing-contact-card">
+      <?php if ($o6_consult_phone !== '') : ?>
+      <div class="contact-channel-row">
+        <span><i class="fa-solid fa-phone"></i> <?= o6e($o6_consult_phone) ?></span>
+        <span><i class="fa-brands fa-whatsapp"></i> WhatsApp <?= o6e($o6_consult_phone) ?></span>
+      </div>
+      <?php endif; ?>
+      <div class="contact-channel-row">
+        <?php if ($o6_consult_email !== '') : ?>
+        <span><i class="fa-solid fa-envelope"></i> <?= o6e($o6_consult_email) ?></span>
+        <?php endif; ?>
+        <?php if (o6nv($ty['website'], '') !== '') : ?>
+        <span><i class="fa-solid fa-globe"></i> <?= o6e($ty['website']) ?></span>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <div class="page-footer closing-version">
+      <span class="footer-meta-text">PREPARED BY <?= o6e(strtoupper(o6nv($ty['prepared_by'], o6nv($hero['login_user'], 'TEAM')))) ?> TRAVEL CONSULTANT</span>
+      <span class="page-number"><?= o6e(str_pad((string) $o6_pg, 2, '0', STR_PAD_LEFT) . '/' . str_pad((string) $o6_total_pages, 2, '0', STR_PAD_LEFT)) ?></span>
+    </div>
+  </div>
+
+<script type="text/javascript">
+(function() {
+  var printed = false;
+  function doPrint() {
+    if (printed) return;
+    printed = true;
+    try { window.focus(); } catch (e) {}
+    window.print();
+  }
+  function waitForImages() {
+    var imgs = Array.prototype.slice.call(document.images || []);
+    var pending = imgs.filter(function(img) { return !img.complete; });
+    if (pending.length === 0) return Promise.resolve();
+    return Promise.all(pending.map(function(img) {
+      return new Promise(function(resolve) {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      });
+    }));
+  }
+  function waitForFonts() {
+    if (document.fonts && document.fonts.ready) {
+      return document.fonts.ready.catch(function() {});
+    }
+    return Promise.resolve();
+  }
+  function ready() {
+    var safety = new Promise(function(resolve) { setTimeout(resolve, 4000); });
+    Promise.race([
+      Promise.all([waitForImages(), waitForFonts()]),
+      safety
+    ]).then(function() { setTimeout(doPrint, 150); });
+  }
+  if (document.readyState === 'complete') {
+    ready();
+  } else {
+    window.addEventListener('load', ready);
+  }
+})();
+</script>
 </body>
-
 </html>
