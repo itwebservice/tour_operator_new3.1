@@ -224,6 +224,7 @@ $o2_round = o2img(
           <div class="cv-a__eyebrow"><?= o2e(o2nv($hero['package_name'], o2nv($hero['tour_name'], 'Exclusive Tour'))) ?></div>
           <h1 class="cv-a__dest"><?= o2e($o2_dest) ?></h1>
           <div class="cv-a__badge"><?= o2e(o2nv($hero['duration_label'], o2nv($ov['duration_label'], ''))) ?></div>
+
           <img class="cv-a__round" src="<?= o2e($o2_round) ?>" alt="Highlight">
         </div>
         <div class="cv-a__for">
@@ -713,7 +714,7 @@ $o2_round = o2img(
 
         <!-- =============== Activity Details -->
         <?php if (!empty($acts)): ?>
-          <p class="kicker" style="margin-top:6mm">B · Activity Details</p>
+          <p class="kicker" style="margin-top:6mm">C · Activity Details</p>
 
           <div class="tline" style="margin-top:11px">
             <?php foreach ((array)$acts as $a): ?>
@@ -758,12 +759,14 @@ $o2_round = o2img(
           </div>
         <?php endif; ?>
         <!-- ====================== -->
-        <p class="kicker" style="margin-top:6mm">C · Transportation</p>
+        <p class="kicker" style="margin-top:6mm">D · Transportation</p>
         <div class="tline" style="margin-top:11px">
           <?php if (!empty($vehs)): foreach ((array) $vehs as $v): ?>
               <div class="tnode">
                 <div class="card">
-                  <img class="tveh" src="<?= o2e($assets . 'vehicle.png') ?>" alt="Vehicle">
+                  <!-- <img class="tveh" src="<? //= o2e($assets . 'vehicle.png') 
+                                              ?>" alt="Vehicle"> -->
+                  <img class="tveh" src="<?= o2e(BASE_URL . 'uploads/quotation_images/vehicle.png') ?>" alt="Vehicle">
                   <div>
                     <div class="nm"><?= o2e(o2nv($v['vehicle_name'], 'Transfer')) ?></div>
                     <div class="rt"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($v['pickup'], '')) ?><?php if (o2nv($v['drop'], '') !== ''): ?> → <?= o2e($v['drop']) ?><?php endif; ?></div>
@@ -795,7 +798,16 @@ $o2_round = o2img(
             <div class="itin">
               <?php foreach ($o2_chunk as $d):
                 $o2_dno   = (int) o2nv(isset($d['day_number']) ? $d['day_number'] : '', 0);
-                $o2_dimg  = o2img(isset($d['image']) ? $d['image'] : '', $assets . 'day.jpg');
+                // $o2_dimg  = o2img(isset($d['image']) ? $d['image'] : '', $assets . 'day.jpg');
+                $dummy_day_img = BASE_URL . 'uploads/quotation_images/itinerary.png';
+
+                $o2_day_photo = isset($d['image']) ? trim($d['image']) : '';
+
+                if ($o2_day_photo == '' || stripos($o2_day_photo, 'dummy') !== false) {
+                  $o2_dimg = $dummy_day_img;
+                } else {
+                  $o2_dimg = o2img($o2_day_photo, $dummy_day_img);
+                }
                 $o2_attr  = o2nv($d['special_attraction'], o2nv($d['city'], 'Day ' . $o2_dno));
                 $o2_prog  = trim(isset($d['detailed_programme']) ? $d['detailed_programme'] : '');
               ?>

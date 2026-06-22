@@ -57,6 +57,20 @@ body {
     gap: 12px; /* Reduced layout spacing by 25% for tighter compact flow */
 }
 
+/* ============ Dipti */
+.consultant-contact a{
+  color: inherit;
+  text-decoration: none;
+}
+p a{
+  color: inherit;
+  text-decoration: none;
+}
+.closing-contact-card a{
+  color: inherit;
+  text-decoration: none;
+}
+/* ================= */
 /* Uniform White Component Blocks Framework */
 .card-container {
     background-color: #ffffff;

@@ -22,6 +22,8 @@ $hero         = $q['hero'];
 $ov           = $q['tour_overview'];
 $hotels       = $q['hotels'];
 $flights      = $q['flights'];
+$trains = isset($q['trains']) ? $q['trains'] : array();
+$acts   = isset($q['activities']) ? $q['activities'] : array();
 $vehs         = $q['vehicles'];
 $itin         = $q['itinerary'];
 $incx         = $q['inclusion_exclusion'];
@@ -198,7 +200,7 @@ if (!function_exists('o6_render_page_header')) {
   {
     $name = o6nv($hero['company_name'], 'Travel Partner');
     $logo = o6nv($hero['company_logo'], '');
-    ?>
+?>
     <div class="page-header">
       <?php if ($logo !== '') : ?>
         <span class="header-brand"><img src="<?= o6e($logo) ?>" alt="<?= o6e($name) ?>" class="company-logo-img" /></span>
@@ -207,7 +209,7 @@ if (!function_exists('o6_render_page_header')) {
       <?php endif; ?>
       <span class="header-topic"><?= o6e(strtoupper($topic)) ?></span>
     </div>
-    <?php
+  <?php
   }
 }
 if (!function_exists('o6_render_footer')) {
@@ -220,12 +222,12 @@ if (!function_exists('o6_render_footer')) {
       $website = o6nv($ty['website'], '');
       $meta = trim($contact . ($website !== '' ? ' • ' . strtoupper($website) : ''));
     }
-    ?>
+  ?>
     <div class="page-footer">
       <span class="footer-meta-text"><?= o6e($meta) ?></span>
       <span class="page-number"><?= o6e(str_pad((string) $pg, 2, '0', STR_PAD_LEFT) . '/' . str_pad((string) $total, 2, '0', STR_PAD_LEFT)) ?></span>
     </div>
-    <?php
+<?php
   }
 }
 
@@ -351,6 +353,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -359,6 +362,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link href="option6.css" rel="stylesheet" />
 </head>
+
 <body>
 
   <!-- PAGE 1 — COVER -->
@@ -419,10 +423,21 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
         <h5>YOUR TRAVEL CONSULTANT</h5>
         <p class="consultant-name"><?= o6e($o6_company) ?></p>
         <?php if ($o6_consult_email !== '') : ?>
-        <p class="consultant-contact"><i class="fa-solid fa-envelope"></i> <?= o6e($o6_consult_email) ?></p>
+          <p class="consultant-contact">
+            <i class="fa-solid fa-envelope"></i>
+            <a href="mailto:<?= o6e($o6_consult_email) ?>">
+              <?= o6e($o6_consult_email) ?>
+            </a>
+          </p>
         <?php endif; ?>
+
         <?php if ($o6_consult_phone !== '') : ?>
-        <p class="consultant-contact"><i class="fa-solid fa-phone"></i> <?= o6e($o6_consult_phone) ?></p>
+          <p class="consultant-contact">
+            <i class="fa-solid fa-phone"></i>
+            <a href="tel:<?= preg_replace('/\s+/', '', $o6_consult_phone) ?>">
+              <?= o6e($o6_consult_phone) ?>
+            </a>
+          </p>
         <?php endif; ?>
       </div>
     </div>
@@ -478,8 +493,21 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             <div class="avatar-badge"><?= o6e(o6_initials($o6_client)) ?></div>
             <div class="identity-text">
               <h4><?= o6e($o6_client) ?></h4>
-              <p><i class="fa-solid fa-envelope"></i> <?= o6e(o6nv($ov['customer_email'], o6nv($hero['user_email_id'], ''))) ?></p>
-              <p><i class="fa-solid fa-phone"></i> <?= o6e(o6nv($ov['customer_mobile'], o6nv($hero['user_contact'], ''))) ?></p>
+              <!-- <p><i class="fa-solid fa-envelope"></i> <?= o6e(o6nv($ov['customer_email'], o6nv($hero['user_email_id'], ''))) ?></p>
+              <p><i class="fa-solid fa-phone"></i> <?= o6e(o6nv($ov['customer_mobile'], o6nv($hero['user_contact'], ''))) ?></p> -->
+              <p>
+                <i class="fa-solid fa-envelope"></i>
+                <a href="mailto:<?= o6e(o6nv($ov['customer_email'], o6nv($hero['user_email_id'], ''))) ?>">
+                  <?= o6e(o6nv($ov['customer_email'], o6nv($hero['user_email_id'], ''))) ?>
+                </a>
+              </p>
+
+              <p>
+                <i class="fa-solid fa-phone"></i>
+                <a href="tel:<?= preg_replace('/\s+/', '', o6nv($ov['customer_mobile'], o6nv($hero['user_contact'], ''))) ?>">
+                  <?= o6e(o6nv($ov['customer_mobile'], o6nv($hero['user_contact'], ''))) ?>
+                </a>
+              </p>
             </div>
           </div>
         </div>
@@ -492,11 +520,11 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             if ($ci === 1 && count($o6_cost_grp) > 1) {
               $tier_lbl = 'Premium Upgrade Tier';
             }
-            ?>
-          <div class="pricing-tier-row<?= $tier_cls ?>">
-            <span class="tier-name"><?= o6e($tier_lbl) ?></span>
-            <span class="tier-cost"><?= o6e(o6nv($row['package_type'], 'Package')) ?></span>
-          </div>
+          ?>
+            <div class="pricing-tier-row<?= $tier_cls ?>">
+              <span class="tier-name"><?= o6e($tier_lbl) ?></span>
+              <span class="tier-cost"><?= o6e(o6nv($row['package_type'], 'Package')) ?></span>
+            </div>
           <?php endforeach; ?>
           <div class="tax-disclaimer-strip">VALIDATED PROPOSAL FRAMEWORK</div>
         </div>
@@ -512,7 +540,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
     <?php o6_render_page_header($hero, 'Accommodation Details'); ?>
 
     <div class="content-container">
-      <div class="section-intro">
+      <div class="section-intro"></br>
         <h2 class="main-section-title">Hotel Options &amp; Stay Parameters</h2>
         <p class="section-desc">Package Type: <?= o6e($o6_pkg_ov) ?> — Handpicked accommodation options for your <?= o6e($o6_dest) ?> journey.</p>
       </div>
@@ -521,59 +549,59 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
         foreach ($hotels as $h) :
           $room_label = o6nv($h['room_category'], o6nv($h['room_type'], 'Standard Room'));
           $stars_html = o6_stars(o6nv($h['rating'], ''));
-          ?>
-      <div class="hotel-striped-card layout-split-card">
-        <div class="card-left-stripbg"></div>
-        <div class="card-right-datacore">
-          <div class="property-top-meta-row">
-            <div class="title-stars-block">
-              <span class="micro-location-tag"><?= o6e(strtoupper(o6nv($h['hotel_city'], $o6_dest_up))) ?></span>
-              <h3><?= o6e(o6nv($h['hotel_name'], 'Hotel')) ?></h3>
-              <?php if ($stars_html !== '') : ?>
-              <div class="star-rating-row"><?= $stars_html ?></div>
-              <?php endif; ?>
-            </div>
-            <div class="property-badges-block">
-              <?php if (!empty($h['rating'])) : ?>
-              <div class="score-pill-badge"><i class="fa-solid fa-star"></i> <?= o6e($h['rating']) ?></div>
-              <?php endif; ?>
-              <?php if (!empty($h['meal_plan'])) : ?>
-              <div class="score-pill-badge" style="background:#f1f5f9;color:#1e293b;"><?= o6e($h['meal_plan']) ?></div>
-              <?php endif; ?>
+      ?>
+          <div class="hotel-striped-card layout-split-card">
+            <div class="card-left-stripbg"></div>
+            <div class="card-right-datacore">
+              <div class="property-top-meta-row">
+                <div class="title-stars-block">
+                  <span class="micro-location-tag"><?= o6e(strtoupper(o6nv($h['hotel_city'], $o6_dest_up))) ?></span>
+                  <h3><?= o6e(o6nv($h['hotel_name'], 'Hotel')) ?></h3>
+                  <?php if ($stars_html !== '') : ?>
+                    <div class="star-rating-row"><?= $stars_html ?></div>
+                  <?php endif; ?>
+                </div>
+                <div class="property-badges-block">
+                  <?php if (!empty($h['rating'])) : ?>
+                    <div class="score-pill-badge"><i class="fa-solid fa-star"></i> <?= o6e($h['rating']) ?></div>
+                  <?php endif; ?>
+                  <?php if (!empty($h['meal_plan'])) : ?>
+                    <div class="score-pill-badge" style="background:#f1f5f9;color:#1e293b;"><?= o6e($h['meal_plan']) ?></div>
+                  <?php endif; ?>
+                </div>
+              </div>
+              <table class="property-metrics-table">
+                <thead>
+                  <tr>
+                    <th>CHECK-IN</th>
+                    <th>CHECK-OUT</th>
+                    <th>ROOM CATEGORY</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong><?= o6e(o6nv($h['check_in'], '')) ?></strong></td>
+                    <td><strong><?= o6e(o6nv($h['check_out'], '')) ?></strong></td>
+                    <td><strong><?= o6e($room_label) ?></strong></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          <table class="property-metrics-table">
-            <thead>
-              <tr>
-                <th>CHECK-IN</th>
-                <th>CHECK-OUT</th>
-                <th>ROOM CATEGORY</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong><?= o6e(o6nv($h['check_in'], '')) ?></strong></td>
-                <td><strong><?= o6e(o6nv($h['check_out'], '')) ?></strong></td>
-                <td><strong><?= o6e($room_label) ?></strong></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
         <?php
         endforeach;
       else :
         ?>
-      <div class="hotel-striped-card layout-split-card">
-        <div class="card-left-stripbg"></div>
-        <div class="card-right-datacore">
-          <div class="property-top-meta-row">
-            <div class="title-stars-block">
-              <h3>Hotel details will be confirmed with your booking.</h3>
+        <div class="hotel-striped-card layout-split-card">
+          <div class="card-left-stripbg"></div>
+          <div class="card-right-datacore">
+            <div class="property-top-meta-row">
+              <div class="title-stars-block">
+                <h3>Hotel details will be confirmed with your booking.</h3>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       <?php endif; ?>
     </div>
 
@@ -582,91 +610,262 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
   <?php $o6_pg++; ?>
 
   <?php if ($o6_show_flights) : ?>
-  <!-- PAGE 4 — FLIGHTS -->
+    <!-- PAGE 4 — FLIGHTS -->
+    <div class="page">
+      <?php o6_render_page_header($hero, $o6_dest_up . ' TOUR PACKAGE'); ?>
+
+      <div class="content-container">
+        <div class="section-intro"></br>
+          <h2 class="main-section-title"><i class="fa-solid fa-plane"></i> Flight Details</h2>
+          <p class="section-desc">Confirmed flight configurations for your outbound and return sectors.</p>
+        </div>
+
+        <div class="flight-itinerary-stack">
+          <?php
+          $o6_fi = 0;
+          $o6_fcnt = count($flights);
+          foreach ($flights as $f) :
+            $o6_fi++;
+            $air_name = o6nv($f['airline_name'], o6nv($f['airline_display'], 'Flight'));
+            $flight_lbl = o6nv($f['airline_code'], o6nv($f['airline_display'], ''));
+            $from_code = o6_air_code(o6nv($f['from_city'], ''));
+            $to_code = o6_air_code(o6nv($f['to_city'], ''));
+            list($dep_time, $dep_date) = o6_flight_parts(o6nv($f['departure_datetime'], ''));
+            list($arr_time, $arr_date) = o6_flight_parts(o6nv($f['arrival_datetime'], ''));
+            $sector = ($o6_fi === 1) ? 'OUTBOUND' : (($o6_fi === $o6_fcnt && $o6_fcnt > 1) ? 'RETURN' : 'SECTOR ' . $o6_fi);
+            $baggage = o6nv($f['baggage'], 'As per airline policy');
+          ?>
+            <div class="boarding-pass-container">
+              <div class="pass-left-main">
+                <div class="pass-header-row">
+                  <span class="pass-sector-route"><?= o6e($sector) ?> · <?= o6e(strtoupper(o6nv($f['from_city'], ''))) ?> <i class="fa-solid fa-arrow-right-long"></i> <?= o6e(strtoupper(o6nv($f['to_city'], ''))) ?></span>
+                  <span class="pass-cabin-badge"><?= o6e(strtoupper(o6nv($f['class'], 'Economy'))) ?></span>
+                </div>
+                <div class="pass-carrier-row">
+                  <div class="carrier-icon-square"><i class="fa-solid fa-plane"></i></div>
+                  <div class="carrier-text-stack">
+                    <h3><?= o6e($air_name) ?></h3>
+                    <p>FLIGHT <?= o6e($flight_lbl) ?></p>
+                  </div>
+                </div>
+                <div class="pass-transit-core">
+                  <div class="transit-node alignment-left">
+                    <h2><?= o6e($from_code) ?></h2>
+                    <p class="airport-sub"><?= o6e(o6nv($f['from_city'], '')) ?></p>
+                  </div>
+                  <div class="transit-vector-track">
+                    <span class="duration-lbl">Depart: <?= o6e($dep_date) ?></span>
+                    <div class="track-vector-line"><i class="fa-solid fa-plane track-plane-icon"></i></div>
+                    <span class="stops-lbl">Duration: <?= o6e(o6nv($f['duration'], 'Direct')) ?></span>
+                  </div>
+                  <div class="transit-node alignment-right">
+                    <h2><?= o6e($to_code) ?></h2>
+                    <p class="airport-sub"><?= o6e(o6nv($f['to_city'], '')) ?></p>
+                  </div>
+                </div>
+                <div class="pass-footer-metrics">
+                  <div class="metric-column">
+                    <span class="lbl">DEPARTS TIME</span>
+                    <span class="val"><strong><?= o6e($dep_time) ?></strong></span>
+                  </div>
+                  <div class="metric-column">
+                    <span class="lbl">ARRIVES TIME</span>
+                    <span class="val"><strong><?= o6e($arr_time) ?></strong></span>
+                  </div>
+                  <div class="metric-column static-allowance">
+                    <span><i class="fa-solid fa-briefcase"></i> ALLOWANCE: <?= o6e(strtoupper($baggage)) ?></span>
+                  </div>
+                </div>
+              </div>
+              <div class="pass-right-stub">
+                <div class="stub-notch-top"></div>
+                <div class="stub-notch-bottom"></div>
+                <div class="stub-content-wrapper">
+                  <div class="stub-data-node"><span class="stub-lbl">FLIGHT</span><span class="stub-val"><?= o6e($flight_lbl) ?></span></div>
+                  <div class="stub-data-node"><span class="stub-lbl">CLASS</span><span class="stub-val"><?= o6e(o6nv($f['class'], 'Economy')) ?></span></div>
+                  <div class="stub-data-node"><span class="stub-lbl">SEAT</span><span class="stub-val">As Assumed</span></div>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
+      <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+    </div>
+    <?php $o6_pg++; ?>
+  <?php endif; ?>
+
+  <!-- Train Details -->
   <div class="page">
     <?php o6_render_page_header($hero, $o6_dest_up . ' TOUR PACKAGE'); ?>
 
-    <div class="content-container">
-      <div class="section-intro">
-        <h2 class="main-section-title"><i class="fa-solid fa-plane"></i> Flight Details</h2>
-        <p class="section-desc">Confirmed flight configurations for your outbound and return sectors.</p>
+    <?php if (!empty($trains)) : ?>
+      <div class="section-intro" style="margin-top:28px;">
+        <h2 class="main-section-title"><i class="fa-solid fa-train"></i> Train Details</h2>
+        <p class="section-desc">Confirmed train journey details for your tour.</p>
       </div>
 
       <div class="flight-itinerary-stack">
-        <?php
-        $o6_fi = 0;
-        $o6_fcnt = count($flights);
-        foreach ($flights as $f) :
-          $o6_fi++;
-          $air_name = o6nv($f['airline_name'], o6nv($f['airline_display'], 'Flight'));
-          $flight_lbl = o6nv($f['airline_code'], o6nv($f['airline_display'], ''));
-          $from_code = o6_air_code(o6nv($f['from_city'], ''));
-          $to_code = o6_air_code(o6nv($f['to_city'], ''));
-          list($dep_time, $dep_date) = o6_flight_parts(o6nv($f['departure_datetime'], ''));
-          list($arr_time, $arr_date) = o6_flight_parts(o6nv($f['arrival_datetime'], ''));
-          $sector = ($o6_fi === 1) ? 'OUTBOUND' : (($o6_fi === $o6_fcnt && $o6_fcnt > 1) ? 'RETURN' : 'SECTOR ' . $o6_fi);
-          $baggage = o6nv($f['baggage'], 'As per airline policy');
-          ?>
-        <div class="boarding-pass-container">
-          <div class="pass-left-main">
-            <div class="pass-header-row">
-              <span class="pass-sector-route"><?= o6e($sector) ?> · <?= o6e(strtoupper(o6nv($f['from_city'], ''))) ?> <i class="fa-solid fa-arrow-right-long"></i> <?= o6e(strtoupper(o6nv($f['to_city'], ''))) ?></span>
-              <span class="pass-cabin-badge"><?= o6e(strtoupper(o6nv($f['class'], 'Economy'))) ?></span>
-            </div>
-            <div class="pass-carrier-row">
-              <div class="carrier-icon-square"><i class="fa-solid fa-plane"></i></div>
-              <div class="carrier-text-stack">
-                <h3><?= o6e($air_name) ?></h3>
-                <p>FLIGHT <?= o6e($flight_lbl) ?></p>
+        <?php foreach ($trains as $tr) :
+          $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
+          $to_loc = isset($tr['to_location']) ? $tr['to_location'] : '';
+          $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
+          $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
+
+          $total_pax = 0;
+          if (isset($ov['pax']) && is_array($ov['pax'])) {
+            $total_pax =
+              (int)o6nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
+              (int)o6nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
+              (int)o6nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
+              (int)o6nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
+          }
+        ?>
+          <div class="boarding-pass-container">
+            <div class="pass-left-main">
+              <div class="pass-header-row">
+                <span class="pass-sector-route">
+                  TRAIN · <?= o6e(strtoupper($from_loc)) ?>
+                  <i class="fa-solid fa-arrow-right-long"></i>
+                  <?= o6e(strtoupper($to_loc)) ?>
+                </span>
+                <span class="pass-cabin-badge"><?= o6e($train_class) ?></span>
+              </div>
+
+              <div class="pass-carrier-row">
+                <div class="carrier-icon-square"><i class="fa-solid fa-train"></i></div>
+                <div class="carrier-text-stack">
+                  <h3>Train Journey</h3>
+                  <p>CLASS <?= o6e($train_class) ?></p>
+                </div>
+              </div>
+
+              <div class="pass-transit-core">
+                <div class="transit-node alignment-left">
+                  <h2><?= o6e(o6_air_code($from_loc)) ?></h2>
+                  <p class="airport-sub"><?= o6e(o6nv($from_loc, 'NA')) ?></p>
+                </div>
+
+                <div class="transit-vector-track">
+                  <span class="duration-lbl">Date: <?= o6e(o6nv($from_date, 'NA')) ?></span>
+                  <div class="track-vector-line"><i class="fa-solid fa-train track-plane-icon"></i></div>
+                  <span class="stops-lbl">Rail Journey</span>
+                </div>
+
+                <div class="transit-node alignment-right">
+                  <h2><?= o6e(o6_air_code($to_loc)) ?></h2>
+                  <p class="airport-sub"><?= o6e(o6nv($to_loc, 'NA')) ?></p>
+                </div>
+              </div>
+
+              <div class="pass-footer-metrics">
+                <div class="metric-column">
+                  <span class="lbl">DATE & TIME</span>
+                  <span class="val"><strong><?= o6e(o6nv($from_date, 'NA')) ?></strong></span>
+                </div>
+                <div class="metric-column">
+                  <span class="lbl">TOTAL PAX</span>
+                  <span class="val"><strong><?= o6e($total_pax) ?></strong></span>
+                </div>
+                <div class="metric-column static-allowance">
+                  <span><i class="fa-solid fa-ticket"></i> CLASS: <?= o6e(strtoupper($train_class)) ?></span>
+                </div>
               </div>
             </div>
-            <div class="pass-transit-core">
-              <div class="transit-node alignment-left">
-                <h2><?= o6e($from_code) ?></h2>
-                <p class="airport-sub"><?= o6e(o6nv($f['from_city'], '')) ?></p>
-              </div>
-              <div class="transit-vector-track">
-                <span class="duration-lbl">Depart: <?= o6e($dep_date) ?></span>
-                <div class="track-vector-line"><i class="fa-solid fa-plane track-plane-icon"></i></div>
-                <span class="stops-lbl">Duration: <?= o6e(o6nv($f['duration'], 'Direct')) ?></span>
-              </div>
-              <div class="transit-node alignment-right">
-                <h2><?= o6e($to_code) ?></h2>
-                <p class="airport-sub"><?= o6e(o6nv($f['to_city'], '')) ?></p>
-              </div>
-            </div>
-            <div class="pass-footer-metrics">
-              <div class="metric-column">
-                <span class="lbl">DEPARTS TIME</span>
-                <span class="val"><strong><?= o6e($dep_time) ?></strong></span>
-              </div>
-              <div class="metric-column">
-                <span class="lbl">ARRIVES TIME</span>
-                <span class="val"><strong><?= o6e($arr_time) ?></strong></span>
-              </div>
-              <div class="metric-column static-allowance">
-                <span><i class="fa-solid fa-briefcase"></i> ALLOWANCE: <?= o6e(strtoupper($baggage)) ?></span>
+
+            <div class="pass-right-stub">
+              <div class="stub-notch-top"></div>
+              <div class="stub-notch-bottom"></div>
+              <div class="stub-content-wrapper">
+                <div class="stub-data-node"><span class="stub-lbl">TYPE</span><span class="stub-val">TRAIN</span></div>
+                <div class="stub-data-node"><span class="stub-lbl">CLASS</span><span class="stub-val"><?= o6e($train_class) ?></span></div>
+                <div class="stub-data-node"><span class="stub-lbl">PAX</span><span class="stub-val"><?= o6e($total_pax) ?></span></div>
               </div>
             </div>
           </div>
-          <div class="pass-right-stub">
-            <div class="stub-notch-top"></div>
-            <div class="stub-notch-bottom"></div>
-            <div class="stub-content-wrapper">
-              <div class="stub-data-node"><span class="stub-lbl">FLIGHT</span><span class="stub-val"><?= o6e($flight_lbl) ?></span></div>
-              <div class="stub-data-node"><span class="stub-lbl">CLASS</span><span class="stub-val"><?= o6e(o6nv($f['class'], 'Economy')) ?></span></div>
-              <div class="stub-data-node"><span class="stub-lbl">SEAT</span><span class="stub-val">As Assumed</span></div>
-            </div>
-          </div>
-        </div>
         <?php endforeach; ?>
       </div>
-    </div>
+    <?php endif; ?>
 
     <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
   </div>
   <?php $o6_pg++; ?>
-  <?php endif; ?>
+  <!-- ============== -->
+
+  <!-- Activity Details -->
+  <div class="page">
+    <?php o6_render_page_header($hero, $o6_dest_up . ' TOUR PACKAGE'); ?>
+    <?php if (!empty($acts)) : ?>
+      <div class="section-intro" style="margin-top:28px;">
+        <h2 class="main-section-title"><i class="fa-solid fa-camera"></i> Activity Details</h2>
+        <p class="section-desc">Experiences and activities included in this quotation.</p>
+      </div>
+
+      <?php foreach ($acts as $a) :
+        $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+
+        $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
+        $city_name = isset($a['city_name']) ? $a['city_name'] : '';
+        $activity_date = isset($a['date']) ? $a['date'] : '';
+        $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
+
+        $total_pax = 0;
+        if (isset($a['pax']) && is_array($a['pax'])) {
+          $total_pax =
+            (int)o6nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
+            (int)o6nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
+            (int)o6nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
+            (int)o6nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
+        }
+      ?>
+        <div class="boarding-pass-container">
+          <div class="pass-left-main">
+            <div class="pass-header-row">
+              <span class="pass-sector-route">ACTIVITY · <?= o6e(strtoupper(o6nv($city_name, 'CITY'))) ?></span>
+              <span class="pass-cabin-badge"><?= o6e(o6nv($transfer_type, 'ACTIVITY')) ?></span>
+            </div>
+
+            <div class="pass-carrier-row">
+              <div class="carrier-icon-square"><i class="fa-solid fa-camera"></i></div>
+              <div class="carrier-text-stack">
+                <h3><?= o6e(o6nv($activity_name, 'Activity')) ?></h3>
+                <p><?= o6e(o6nv($city_name, 'NA')) ?></p>
+              </div>
+            </div>
+
+            <div class="pass-footer-metrics">
+              <div class="metric-column">
+                <span class="lbl">DATE</span>
+                <span class="val"><strong><?= o6e(o6nv($activity_date, 'NA')) ?></strong></span>
+              </div>
+              <div class="metric-column">
+                <span class="lbl">TOTAL PAX</span>
+                <span class="val"><strong><?= o6e($total_pax) ?> Pax</strong></span>
+              </div>
+              <div class="metric-column static-allowance">
+                <span><i class="fa-solid fa-car"></i> TRANSFER: <?= o6e(strtoupper(o6nv($transfer_type, 'NA'))) ?></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pass-right-stub">
+            <div class="stub-notch-top"></div>
+            <div class="stub-notch-bottom"></div>
+            <div class="stub-content-wrapper">
+              <div class="stub-data-node"><span class="stub-lbl">TYPE</span><span class="stub-val">ACTIVITY</span></div>
+              <div class="stub-data-node"><span class="stub-lbl">CITY</span><span class="stub-val"><?= o6e(o6nv($city_name, 'NA')) ?></span></div>
+              <div class="stub-data-node"><span class="stub-lbl">PAX</span><span class="stub-val"><?= o6e($total_pax) ?></span></div>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+
+    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+  </div>
+  <?php $o6_pg++; ?>
+  <!-- =============== -->
 
   <!-- PAGE 5 — VEHICLES + ITINERARY (DAYS 1–2) -->
   <div class="page">
@@ -674,47 +873,47 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
 
     <div class="content-container">
       <?php if ($o6_show_vehs) : ?>
-      <div class="section-intro">
-        <h2 class="main-section-title"><i class="fa-solid fa-van-shuttle"></i> Ground Transportation</h2>
-        <p class="section-desc">Private logistics allocations designated for the program duration.</p>
-      </div>
-
-      <?php foreach ($vehs as $v) :
-        $v_start = o6nv($v['date'], '');
-        $v_end = o6_vehicle_end_date($v);
-        $svc = o6nv($v['service_duration'], o6nv($v['description'], 'As per itinerary'));
-        ?>
-      <div class="hotel-striped-card layout-split-card" style="height: 140px;">
-        <div class="card-left-stripbg"></div>
-        <div class="card-right-datacore" style="padding: 12px 18px;">
-          <div class="property-top-meta-row">
-            <div class="title-stars-block">
-              <span class="micro-location-tag">VEHICLE CATEGORY: <?= o6e(strtoupper(o6nv($v['vehicle_type'], 'PRIVATE TRANSFER'))) ?></span>
-              <h3><?= o6e(o6nv($v['vehicle_name'], 'Vehicle')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o6e($v['vehicle_count']) ?>)<?php endif; ?></h3>
-            </div>
-            <div class="score-pill-badge" style="background:#f1f5f9;color:#1e293b;"><?= o6e($svc) ?></div>
-          </div>
-          <table class="property-metrics-table" style="margin: 4px 0;">
-            <thead>
-              <tr>
-                <th>PICKUP LOCATION</th>
-                <th>DROP-OFF ROUTING</th>
-                <th>START DATE</th>
-                <th>RETURN DATE</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><?= o6e(o6nv($v['pickup'], 'NA')) ?></td>
-                <td><?= o6e(o6nv($v['drop'], 'NA')) ?></td>
-                <td><?= o6e($v_start) ?></td>
-                <td><?= o6e($v_end) ?></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="section-intro"></br>
+          <h2 class="main-section-title"><i class="fa-solid fa-van-shuttle"></i> Ground Transportation</h2>
+          <p class="section-desc">Private logistics allocations designated for the program duration.</p>
         </div>
-      </div>
-      <?php endforeach; ?>
+
+        <?php foreach ($vehs as $v) :
+          $v_start = o6nv($v['date'], '');
+          $v_end = o6_vehicle_end_date($v);
+          $svc = o6nv($v['service_duration'], o6nv($v['description'], 'As per itinerary'));
+        ?>
+          <div class="hotel-striped-card layout-split-card" style="height: 140px;">
+            <div class="card-left-stripbg"></div>
+            <div class="card-right-datacore" style="padding: 12px 18px;">
+              <div class="property-top-meta-row">
+                <div class="title-stars-block">
+                  <span class="micro-location-tag">VEHICLE CATEGORY: <?= o6e(strtoupper(o6nv($v['vehicle_type'], 'PRIVATE TRANSFER'))) ?></span>
+                  <h3><?= o6e(o6nv($v['vehicle_name'], 'Vehicle')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o6e($v['vehicle_count']) ?>)<?php endif; ?></h3>
+                </div>
+                <div class="score-pill-badge" style="background:#f1f5f9;color:#1e293b;"><?= o6e($svc) ?></div>
+              </div>
+              <table class="property-metrics-table" style="margin: 4px 0;">
+                <thead>
+                  <tr>
+                    <th>PICKUP LOCATION</th>
+                    <th>DROP-OFF ROUTING</th>
+                    <th>START DATE</th>
+                    <th>RETURN DATE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><?= o6e(o6nv($v['pickup'], 'NA')) ?></td>
+                    <td><?= o6e(o6nv($v['drop'], 'NA')) ?></td>
+                    <td><?= o6e($v_start) ?></td>
+                    <td><?= o6e($v_end) ?></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <?php endforeach; ?>
       <?php endif; ?>
 
       <h4 class="block-title" style="margin-top: 10px;"><i class="fa-solid fa-calendar-days"></i> DAY WISE ITINERARY</h4>
@@ -723,41 +922,41 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
         <?php if (!empty($o6_itin_p5)) :
           foreach ($o6_itin_p5 as $day) :
             $day_title = o6nv($day['special_attraction'], o6nv($day['city'], 'Sightseeing'));
-            ?>
-        <div class="timeline-day-block">
-          <div class="day-spine-node-badge">
-            <span class="word">DAY</span>
-            <span class="num"><?= o6e(o6nv($day['day_number'], '')) ?></span>
-          </div>
-          <div class="itinerary-split-card layout-split-card">
-            <div class="card-left-stripbg"></div>
-            <div class="card-right-datacore">
-              <div class="day-header-meta">
-                <span class="date-string"><?= o6e(o6nv($day['date'], '')) ?></span>
-                <h4><?= o6e($day_title) ?></h4>
+        ?>
+            <div class="timeline-day-block">
+              <div class="day-spine-node-badge">
+                <span class="word">DAY</span>
+                <span class="num"><?= o6e(o6nv($day['day_number'], '')) ?></span>
               </div>
-              <p class="day-narrative-text"><?= o6e(o6nv($day['detailed_programme'], '')) ?></p>
-              <?php if (!empty($day['meal_plan']) || !empty($day['overnight_stay'])) : ?>
-              <p class="day-narrative-text" style="margin-top:6px;font-size:0.62rem;">
-                <?php if (!empty($day['meal_plan'])) : ?>Meals: <?= o6e($day['meal_plan']) ?><?php endif; ?>
-                <?php if (!empty($day['overnight_stay'])) : ?><?= !empty($day['meal_plan']) ? ' · ' : '' ?>Stay: <?= o6e($day['overnight_stay']) ?><?php endif; ?>
-              </p>
-              <?php endif; ?>
+              <div class="itinerary-split-card layout-split-card">
+                <div class="card-left-stripbg"></div>
+                <div class="card-right-datacore">
+                  <div class="day-header-meta">
+                    <span class="date-string"><?= o6e(o6nv($day['date'], '')) ?></span>
+                    <h4><?= o6e($day_title) ?></h4>
+                  </div>
+                  <p class="day-narrative-text"><?= o6e(o6nv($day['detailed_programme'], '')) ?></p>
+                  <?php if (!empty($day['meal_plan']) || !empty($day['overnight_stay'])) : ?>
+                    <p class="day-narrative-text" style="margin-top:6px;font-size:0.62rem;">
+                      <?php if (!empty($day['meal_plan'])) : ?>Meals: <?= o6e($day['meal_plan']) ?><?php endif; ?>
+                      <?php if (!empty($day['overnight_stay'])) : ?><?= !empty($day['meal_plan']) ? ' · ' : '' ?>Stay: <?= o6e($day['overnight_stay']) ?><?php endif; ?>
+                    </p>
+                  <?php endif; ?>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
           <?php
           endforeach;
         else :
           ?>
-        <div class="timeline-day-block">
-          <div class="itinerary-split-card layout-split-card">
-            <div class="card-left-stripbg"></div>
-            <div class="card-right-datacore">
-              <p class="day-narrative-text">Itinerary details will be shared upon confirmation.</p>
+          <div class="timeline-day-block">
+            <div class="itinerary-split-card layout-split-card">
+              <div class="card-left-stripbg"></div>
+              <div class="card-right-datacore">
+                <p class="day-narrative-text">Itinerary details will be shared upon confirmation.</p>
+              </div>
             </div>
           </div>
-        </div>
         <?php endif; ?>
       </div>
     </div>
@@ -768,43 +967,43 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
 
   <!-- PAGE 6 — ITINERARY CONTINUED (DAY 3+) -->
   <?php if (!empty($o6_itin_p6)) : ?>
-  <div class="page">
-    <?php o6_render_page_header($hero, 'Day Wise Itinerary Continued'); ?>
+    <div class="page">
+      <?php o6_render_page_header($hero, 'Day Wise Itinerary Continued'); ?>
 
-    <div class="content-container">
-      <div class="itinerary-timeline-vertical">
-        <?php foreach ($o6_itin_p6 as $day) :
-          $day_title = o6nv($day['special_attraction'], o6nv($day['city'], 'Sightseeing'));
+      <div class="content-container">
+        <div class="itinerary-timeline-vertical">
+          <?php foreach ($o6_itin_p6 as $day) :
+            $day_title = o6nv($day['special_attraction'], o6nv($day['city'], 'Sightseeing'));
           ?>
-        <div class="timeline-day-block">
-          <div class="day-spine-node-badge">
-            <span class="word">DAY</span>
-            <span class="num"><?= o6e(o6nv($day['day_number'], '')) ?></span>
-          </div>
-          <div class="itinerary-split-card layout-split-card">
-            <div class="card-left-stripbg"></div>
-            <div class="card-right-datacore">
-              <div class="day-header-meta">
-                <span class="date-string"><?= o6e(o6nv($day['date'], '')) ?></span>
-                <h4><?= o6e($day_title) ?></h4>
+            <div class="timeline-day-block">
+              <div class="day-spine-node-badge">
+                <span class="word">DAY</span>
+                <span class="num"><?= o6e(o6nv($day['day_number'], '')) ?></span>
               </div>
-              <p class="day-narrative-text"><?= o6e(o6nv($day['detailed_programme'], '')) ?></p>
-              <?php if (!empty($day['meal_plan']) || !empty($day['overnight_stay'])) : ?>
-              <p class="day-narrative-text" style="margin-top:6px;font-size:0.62rem;">
-                <?php if (!empty($day['meal_plan'])) : ?>Meals: <?= o6e($day['meal_plan']) ?><?php endif; ?>
-                <?php if (!empty($day['overnight_stay'])) : ?><?= !empty($day['meal_plan']) ? ' · ' : '' ?>Stay: <?= o6e($day['overnight_stay']) ?><?php endif; ?>
-              </p>
-              <?php endif; ?>
+              <div class="itinerary-split-card layout-split-card">
+                <div class="card-left-stripbg"></div>
+                <div class="card-right-datacore">
+                  <div class="day-header-meta">
+                    <span class="date-string"><?= o6e(o6nv($day['date'], '')) ?></span>
+                    <h4><?= o6e($day_title) ?></h4>
+                  </div>
+                  <p class="day-narrative-text"><?= o6e(o6nv($day['detailed_programme'], '')) ?></p>
+                  <?php if (!empty($day['meal_plan']) || !empty($day['overnight_stay'])) : ?>
+                    <p class="day-narrative-text" style="margin-top:6px;font-size:0.62rem;">
+                      <?php if (!empty($day['meal_plan'])) : ?>Meals: <?= o6e($day['meal_plan']) ?><?php endif; ?>
+                      <?php if (!empty($day['overnight_stay'])) : ?><?= !empty($day['meal_plan']) ? ' · ' : '' ?>Stay: <?= o6e($day['overnight_stay']) ?><?php endif; ?>
+                    </p>
+                  <?php endif; ?>
+                </div>
+              </div>
             </div>
-          </div>
+          <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
       </div>
-    </div>
 
-    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
-  </div>
-  <?php $o6_pg++; ?>
+      <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+    </div>
+    <?php $o6_pg++; ?>
   <?php endif; ?>
 
   <!-- PAGE 7 — INCLUSIONS / EXCLUSIONS -->
@@ -822,7 +1021,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             <span class="matrix-scope-tag">PACKAGE SCOPE</span>
             <ul>
               <?php foreach ($o6_included as $item) : ?>
-              <li><i class="fa-regular fa-circle-check item-inc-icon"></i> <?= o6e($item) ?></li>
+                <li><i class="fa-regular fa-circle-check item-inc-icon"></i> <?= o6e($item) ?></li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -837,7 +1036,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             <span class="matrix-scope-tag text-red">OUT OF SCOPE</span>
             <ul>
               <?php foreach ($o6_excluded as $item) : ?>
-              <li><i class="fa-regular fa-circle-xmark item-exc-icon"></i> <?= o6e($item) ?></li>
+                <li><i class="fa-regular fa-circle-xmark item-exc-icon"></i> <?= o6e($item) ?></li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -851,46 +1050,107 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
 
   <!-- PAGE 8 — COSTING & PAYMENT -->
   <div class="page">
+    <?php
+    $o6_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
+    $o6_is_per_person = ($o6_costing_type == 'per person');
+    $o6_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+    ?>
     <?php o6_render_page_header($hero, 'Costing Details'); ?>
 
     <div class="content-container">
-      <div class="section-intro">
+      <div class="section-intro"></br>
         <h2 class="main-section-title">Your Investment Matrix</h2>
         <p class="section-desc">Consolidated cost structure breakdown per package tier definitions.</p>
       </div>
+      <?php if (!$o6_is_per_person) { ?>
+        <table class="financial-breakdown-table card-container">
+          <thead>
+            <tr>
+              <th>PACKAGE TYPE</th>
+              <th>TOUR COST</th>
+              <th>TAX</th>
+              <th>TCS</th>
+              <th>TRAVEL COST</th>
+              <th>GRAND TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($o6_cost_grp as $ci => $row) :
+              $tax_amount = '0.00';
 
-      <table class="financial-breakdown-table card-container">
-        <thead>
-          <tr>
-            <th>PACKAGE TYPE</th>
-            <th>TOUR COST</th>
-            <th>TAX</th>
-            <th>TCS</th>
-            <th>TRAVEL COST</th>
-            <th>GRAND TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($o6_cost_grp as $ci => $row) :
-            $is_rec = (stripos(o6nv($row['package_type'], ''), 'premium') !== false)
-              || (stripos(o6nv($row['package_type'], ''), 'recommended') !== false)
-              || (stripos(o6nv($row['package_type'], ''), 'royal') !== false)
-              || ($ci === 1 && count($o6_cost_grp) > 1);
+              if (!empty($row['tax_display'])) {
+                preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
+                if (!empty($m[1])) {
+                  $tax_amount = $m[1];
+                }
+              }
+              $is_rec = (stripos(o6nv($row['package_type'], ''), 'premium') !== false)
+                || (stripos(o6nv($row['package_type'], ''), 'recommended') !== false)
+                || (stripos(o6nv($row['package_type'], ''), 'royal') !== false)
+                || ($ci === 1 && count($o6_cost_grp) > 1);
             ?>
-          <tr<?= $is_rec ? ' class="highlighted-row"' : '' ?>>
-            <td>
-              <strong><?= o6e(o6nv($row['package_type'], 'Package')) ?></strong>
-              <?php if ($is_rec) : ?> <span class="table-rec-badge">RECOMMENDED</span><?php endif; ?>
-            </td>
-            <td><?= o6e(o6nv($row['tour_cost_display'], '0')) ?></td>
-            <td><?= o6e(o6nv($row['tax_display'], '0')) ?></td>
-            <td><?= o6e(o6nv($row['tcs_display'], '0')) ?></td>
-            <td><?= o6e(o6nv($row['travel_display'], '0')) ?></td>
-            <td class="final-total-field<?= $is_rec ? ' focus-color' : '' ?>"><?= o6e(o6nv($row['total_display'], '0')) ?></td>
-          </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+              <tr<?= $is_rec ? ' class="highlighted-row"' : '' ?>>
+                <td>
+                  <strong><?= o6e(o6nv($row['package_type'], 'Package')) ?></strong>
+                  <?php if ($is_rec) : ?> <span class="table-rec-badge">RECOMMENDED</span><?php endif; ?>
+                </td>
+                <td><?= o6e(o6nv($row['tour_cost_display'], '0')) ?></td>
+                <td>INR <?= o6e($tax_amount) ?></td>
+                <td><?= o6e(o6nv($row['tcs_display'], '0')) ?></td>
+                <td><?= o6e(o6nv($row['travel_display'], '0')) ?></td>
+                <td class="final-total-field<?= $is_rec ? ' focus-color' : '' ?>"><?= o6e(o6nv($row['total_display'], '0')) ?></td>
+                </tr>
+              <?php endforeach; ?>
+          </tbody>
+        </table>
+      <?php } else { ?>
+        <table class="financial-breakdown-table card-container">
+          <thead>
+            <tr>
+              <th>PACKAGE</th>
+              <th>ADULT</th>
+              <th>CWB</th>
+              <th>CWOB</th>
+              <th>INFANT</th>
+              <th>TAX</th>
+              <th>TCS</th>
+              <th>VISA</th>
+              <th>GUIDE</th>
+              <th>MISC</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <?php foreach ($o6_pp as $pp) :
+
+              $tax_amount = '0.00';
+
+              if (!empty($pp['tax_display'])) {
+                preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
+                if (!empty($m[1])) {
+                  $tax_amount = $m[1];
+                }
+              }
+            ?>
+              <tr>
+                <td><?= o6e(o6nv($pp['package_type'], 'Package')) ?></td>
+                <td><?= o6e(o6nv($pp['pp_adult_display'], '0')) ?></td>
+                <td><?= o6e(o6nv($pp['pp_cwb_display'], '0')) ?></td>
+                <td><?= o6e(o6nv($pp['pp_cwnb_display'], '0')) ?></td>
+                <td><?= o6e(o6nv($pp['pp_infant_display'], '0')) ?></td>
+
+                <td>INR <?= o6e($tax_amount) ?></td>
+
+                <td><?= o6e(o6nv($pp['tcs_display'], '0')) ?></td>
+                <td><?= o6e(o6nv($pp['visa_display'], '0')) ?></td>
+                <td><?= o6e(o6nv($pp['guide_display'], '0')) ?></td>
+                <td><?= o6e(o6nv($pp['misc_display'], '0')) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      <?php } ?>
+
       <p class="table-disclaimer-text"><i class="fa-solid fa-circle-info"></i> Notes: <?= o6e(o6nv(isset($incx['note']) ? $incx['note'] : '', 'Rates are subject to availability at the time of final confirmation.')) ?></p>
 
       <h4 class="block-title" style="margin-top: 15px;">PAYMENT INFORMATION <span class="sub-label-term">— How to pay</span></h4>
@@ -930,7 +1190,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             <?php endif; ?>
             <span class="qr-caption">SCAN &amp; PAY VIA UPI</span>
             <?php if (!empty($bank['upi_id'])) : ?>
-            <p class="qr-upi-text"><?= o6e($bank['upi_id']) ?></p>
+              <p class="qr-upi-text"><?= o6e($bank['upi_id']) ?></p>
             <?php endif; ?>
           </div>
 
@@ -951,7 +1211,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
     <?php o6_render_page_header($hero, 'What Our Travellers Say'); ?>
 
     <div class="content-container">
-      <div class="section-intro">
+      <div class="section-intro"></br>
         <h2 class="main-section-title">Client Feedback Profiles</h2>
         <p class="section-desc">A consistent record of exceptional holiday delivery across global sectors.</p>
       </div>
@@ -965,32 +1225,32 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             }
             $o6_ti++;
             $photo = o6_media_url(isset($t['photo']) ? $t['photo'] : '');
-            ?>
-        <div class="testimonial-card-v2 card-container">
-          <div class="quote-signature-mark">&ldquo;</div>
-          <div class="star-row-layout">
-            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-          </div>
-          <p class="review-body-text"><?= o6e(o6nv($t['review'], '')) ?></p>
-          <div class="reviewer-footer-row">
-            <?php if ($photo !== '') : ?>
-              <img class="circle-avatar-initials" src="<?= o6e($photo) ?>" alt="<?= o6e(o6nv($t['name'], '')) ?>" style="object-fit:cover;padding:0;" />
-            <?php else : ?>
-              <div class="circle-avatar-initials"><?= o6e(o6_initials(o6nv($t['name'], 'T'))) ?></div>
-            <?php endif; ?>
-            <div class="reviewer-identity">
-              <h4><?= o6e(o6nv($t['name'], 'Traveller')) ?></h4>
-              <span class="destination-tag"><?= o6e(strtoupper(o6nv($t['designation'], ''))) ?></span>
+        ?>
+            <div class="testimonial-card-v2 card-container">
+              <div class="quote-signature-mark">&ldquo;</div>
+              <div class="star-row-layout">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </div>
+              <p class="review-body-text"><?= o6e(o6nv($t['review'], '')) ?></p>
+              <div class="reviewer-footer-row">
+                <?php if ($photo !== '') : ?>
+                  <img class="circle-avatar-initials" src="<?= o6e($photo) ?>" alt="<?= o6e(o6nv($t['name'], '')) ?>" style="object-fit:cover;padding:0;" />
+                <?php else : ?>
+                  <div class="circle-avatar-initials"><?= o6e(o6_initials(o6nv($t['name'], 'T'))) ?></div>
+                <?php endif; ?>
+                <div class="reviewer-identity">
+                  <h4><?= o6e(o6nv($t['name'], 'Traveller')) ?></h4>
+                  <span class="destination-tag"><?= o6e(strtoupper(o6nv($t['designation'], ''))) ?></span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-            <?php
+          <?php
           endforeach;
         else :
           ?>
-        <div class="testimonial-card-v2 card-container">
-          <p class="review-body-text">Customer testimonials can be managed from Quotation Builder settings.</p>
-        </div>
+          <div class="testimonial-card-v2 card-container">
+            <p class="review-body-text">Customer testimonials can be managed from Quotation Builder settings.</p>
+          </div>
         <?php endif; ?>
       </div>
 
@@ -1009,17 +1269,17 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
     <?php o6_render_page_header($hero, 'Terms & Conditions'); ?>
 
     <div class="content-container fine-print-body">
-      <div class="section-intro">
+      <div class="section-intro"></br>
         <h2 class="main-section-title">THE FINE PRINT</h2>
         <p class="section-desc"><?= o6e(o6nv($terms['title'], 'Standard terms governing travel packaging arrangements.')) ?></p>
       </div>
 
       <div class="legal-clauses-two-column">
         <?php foreach ($o6_term_clauses as $clause) : ?>
-        <div class="clause-node">
-          <h5><?= o6e($clause['title']) ?></h5>
-          <p><?= o6e($clause['body']) ?></p>
-        </div>
+          <div class="clause-node">
+            <h5><?= o6e($clause['title']) ?></h5>
+            <p><?= o6e($clause['body']) ?></p>
+          </div>
         <?php endforeach; ?>
       </div>
     </div>
@@ -1058,20 +1318,49 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
     </div>
 
     <div class="closing-contact-card">
+
       <?php if ($o6_consult_phone !== '') : ?>
-      <div class="contact-channel-row">
-        <span><i class="fa-solid fa-phone"></i> <?= o6e($o6_consult_phone) ?></span>
-        <span><i class="fa-brands fa-whatsapp"></i> WhatsApp <?= o6e($o6_consult_phone) ?></span>
-      </div>
+        <div class="contact-channel-row">
+
+          <span>
+            <i class="fa-solid fa-phone"></i>
+            <a href="tel:<?= preg_replace('/\s+/', '', $o6_consult_phone) ?>">
+              <?= o6e($o6_consult_phone) ?>
+            </a>
+          </span>
+
+          <span>
+            <i class="fa-brands fa-whatsapp"></i>
+            <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $o6_consult_phone) ?>">
+              WhatsApp <?= o6e($o6_consult_phone) ?>
+            </a>
+          </span>
+
+        </div>
       <?php endif; ?>
+
       <div class="contact-channel-row">
+
         <?php if ($o6_consult_email !== '') : ?>
-        <span><i class="fa-solid fa-envelope"></i> <?= o6e($o6_consult_email) ?></span>
+          <span>
+            <i class="fa-solid fa-envelope"></i>
+            <a href="mailto:<?= o6e($o6_consult_email) ?>">
+              <?= o6e($o6_consult_email) ?>
+            </a>
+          </span>
         <?php endif; ?>
+
         <?php if (o6nv($ty['website'], '') !== '') : ?>
-        <span><i class="fa-solid fa-globe"></i> <?= o6e($ty['website']) ?></span>
+          <span>
+            <i class="fa-solid fa-globe"></i>
+            <a href="<?= o6e($ty['website']) ?>">
+              <?= o6e($ty['website']) ?>
+            </a>
+          </span>
         <?php endif; ?>
+
       </div>
+
     </div>
 
     <div class="page-footer closing-version">
@@ -1080,45 +1369,62 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
     </div>
   </div>
 
-<script type="text/javascript">
-(function() {
-  var printed = false;
-  function doPrint() {
-    if (printed) return;
-    printed = true;
-    try { window.focus(); } catch (e) {}
-    window.print();
-  }
-  function waitForImages() {
-    var imgs = Array.prototype.slice.call(document.images || []);
-    var pending = imgs.filter(function(img) { return !img.complete; });
-    if (pending.length === 0) return Promise.resolve();
-    return Promise.all(pending.map(function(img) {
-      return new Promise(function(resolve) {
-        img.addEventListener('load', resolve, { once: true });
-        img.addEventListener('error', resolve, { once: true });
-      });
-    }));
-  }
-  function waitForFonts() {
-    if (document.fonts && document.fonts.ready) {
-      return document.fonts.ready.catch(function() {});
-    }
-    return Promise.resolve();
-  }
-  function ready() {
-    var safety = new Promise(function(resolve) { setTimeout(resolve, 4000); });
-    Promise.race([
-      Promise.all([waitForImages(), waitForFonts()]),
-      safety
-    ]).then(function() { setTimeout(doPrint, 150); });
-  }
-  if (document.readyState === 'complete') {
-    ready();
-  } else {
-    window.addEventListener('load', ready);
-  }
-})();
-</script>
+  <script type="text/javascript">
+    (function() {
+      var printed = false;
+
+      function doPrint() {
+        if (printed) return;
+        printed = true;
+        try {
+          window.focus();
+        } catch (e) {}
+        window.print();
+      }
+
+      function waitForImages() {
+        var imgs = Array.prototype.slice.call(document.images || []);
+        var pending = imgs.filter(function(img) {
+          return !img.complete;
+        });
+        if (pending.length === 0) return Promise.resolve();
+        return Promise.all(pending.map(function(img) {
+          return new Promise(function(resolve) {
+            img.addEventListener('load', resolve, {
+              once: true
+            });
+            img.addEventListener('error', resolve, {
+              once: true
+            });
+          });
+        }));
+      }
+
+      function waitForFonts() {
+        if (document.fonts && document.fonts.ready) {
+          return document.fonts.ready.catch(function() {});
+        }
+        return Promise.resolve();
+      }
+
+      function ready() {
+        var safety = new Promise(function(resolve) {
+          setTimeout(resolve, 4000);
+        });
+        Promise.race([
+          Promise.all([waitForImages(), waitForFonts()]),
+          safety
+        ]).then(function() {
+          setTimeout(doPrint, 150);
+        });
+      }
+      if (document.readyState === 'complete') {
+        ready();
+      } else {
+        window.addEventListener('load', ready);
+      }
+    })();
+  </script>
 </body>
+
 </html>

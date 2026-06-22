@@ -803,7 +803,16 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
 
       <?php if (!empty($itin)) :
         foreach ($itin as $day) :
-          $day_img = o3img(isset($day['image']) ? $day['image'] : '', $assets . 'day-' . ((($day['day_number'] - 1) % 6) + 1) . '.jpg');
+          // $day_img = o3img(isset($day['image']) ? $day['image'] : '', $assets . 'day-' . ((($day['day_number'] - 1) % 6) + 1) . '.jpg');
+          $dummy_day_img = BASE_URL . 'uploads/quotation_images/itinerary.png';
+
+          $o3_day_photo = isset($day['image']) ? trim($day['image']) : '';
+
+          if ($o3_day_photo == '' || stripos($o3_day_photo, 'dummy') !== false) {
+            $day_img = $dummy_day_img;
+          } else {
+            $day_img = o3img($o3_day_photo, $dummy_day_img);
+          }
           $day_date = o3nv($day['date'], '');
           $day_date_html = str_replace(' ', '<br/>', o3e($day_date));
       ?>

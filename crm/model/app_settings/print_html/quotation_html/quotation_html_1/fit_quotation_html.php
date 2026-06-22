@@ -789,7 +789,7 @@ function o1_flight_date($v)
             </div>
           </div>
           <div class="text-cream text-right">
-            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Flights Â· Transfers Â· Itinerary</div>
+            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Flights · Transfers · Itinerary</div>
             <div class="font-display text-sm"><?= o1e($hero['quotation_code']) ?> &middot; <?= o1e(o1nv($ov['destination'], $hero['tour_name'])) ?></div>
           </div>
           <div class="flex items-center gap-2">
@@ -1231,7 +1231,16 @@ function o1_flight_date($v)
             $o1_itin = is_array($itin) ? $itin : array();
             foreach ($o1_itin as $d):
               $o1_dno    = str_pad((string) (int) o1nv(isset($d['day_number']) ? $d['day_number'] : '', 0), 2, '0', STR_PAD_LEFT);
-              $o1_dimg   = o1img(isset($d['image']) ? $d['image'] : '', $assets . 'day-1.jpg');
+              // $o1_dimg   = o1img(isset($d['image']) ? $d['image'] : '', $assets . 'day-1.jpg');
+              $dummy_day_img = BASE_URL . 'uploads/quotation_images/itinerary.png';
+
+              $o1_day_photo = isset($d['image']) ? trim($d['image']) : '';
+
+              if ($o1_day_photo == '' || stripos($o1_day_photo, 'dummy') !== false) {
+                $o1_dimg = $dummy_day_img;
+              } else {
+                $o1_dimg = o1img($o1_day_photo, $dummy_day_img);
+              }
               $o1_dtitle = o1nv(isset($d['special_attraction']) ? $d['special_attraction'] : '', o1nv(isset($d['city']) ? $d['city'] : '', 'Day ' . $o1_dno));
               $o1_dprog  = isset($d['detailed_programme']) ? trim($d['detailed_programme']) : '';
             ?>
@@ -1252,13 +1261,8 @@ function o1_flight_date($v)
                   </div>
                 </div>
                 <div class="col-span-8 p-4 relative">
-                  <!-- <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">&#10022; Day <?= o1e((int) o1nv(isset($d['day_number']) ? $d['day_number'] : '', 0)) ?></div> -->
 
                   <!-- ============== Dipti -->
-                  <!-- <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">
-                    <? //= o1e(o1nv($d['date'] ?? '', '')) 
-                    ?>
-                  </div> -->
                   <?php $o1_day_date = isset($d['date']) ? trim($d['date']) : ''; ?>
 
                   <?php if ($o1_day_date != '') { ?>
@@ -1278,8 +1282,6 @@ function o1_flight_date($v)
                         <circle cx="12" cy="10" r="3">
                         </circle>
                       </svg> <!-- --><?= o1e(o1nv($d['special_attraction'] ?? '', $o1_dtitle)) ?>
-                      <!-- <? //= o1e(o1nv(isset($d['overnight_stay']) ? $d['overnight_stay'] : '', $o1_dtitle)) 
-                            ?> -->
                     </div>
                   <?php endif; ?>
                   <p class="text-[12px] text-[color:var(--ink)]/85 mt-2 leading-relaxed font-serif-soft" style="font-size:13px"><?= ($o1_dprog !== '' ? $o1_dprog : 'Detailed programme will be shared.') ?></p>
@@ -1456,7 +1458,7 @@ function o1_flight_date($v)
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>04<!-- --> / 09</span>
       </div>
@@ -1481,7 +1483,7 @@ function o1_flight_date($v)
             </div>
           </div>
           <div class="text-cream text-right">
-            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Inclusions Â· Exclusions Â· Pricing</div>
+            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Inclusions · Exclusions · Pricing</div>
             <div class="font-display text-sm"><?= o1e($hero['quotation_code']) ?> &middot; <?= o1e(o1nv($ov['destination'], $hero['tour_name'])) ?></div>
           </div>
           <div class="flex items-center gap-2">
@@ -1622,7 +1624,7 @@ function o1_flight_date($v)
               endforeach; ?>
             <?php } ?>
           </div>
-          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
+          <!-- <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div> -->
         </div>
 
         <?php

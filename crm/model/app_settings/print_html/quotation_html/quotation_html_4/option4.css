@@ -27,14 +27,59 @@ body{font-family:'Inter',sans-serif;background:#dde2e8;color:var(--text);font-si
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    COVER PAGE
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.cover{
+/* .cover{
   position:relative;
   height:780px;
   background:
     linear-gradient(to bottom,rgba(10,22,50,.35) 0%,rgba(10,22,50,.55) 50%,rgba(10,22,50,.92) 100%),
     url('https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=700&q=85') center/cover no-repeat;
   display:flex;flex-direction:column;justify-content:space-between;
+} */
+
+
+  /* ========== Dipti */
+  .cover{
+  position:relative;
+  height:780px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
+
+.cover-bg-img{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+}
+
+.cover-overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:linear-gradient(
+    to bottom,rgba(10,22,50,.35) 0%,rgba(10,22,50,.55) 50%,rgba(10,22,50,.92) 100%
+  );
+  z-index:1;
+}
+
+.cover > *:not(.cover-bg-img):not(.cover-overlay){
+  position:relative;
+  z-index:2;
+}
+
+.tc-val a{
+  color: inherit;
+  text-decoration: none;
+}
+  /* ============= */
+
 .cover-top-bar{
   display:flex;align-items:center;justify-content:space-between;
   padding:22px 28px;
@@ -120,6 +165,12 @@ body{font-family:'Inter',sans-serif;background:#dde2e8;color:var(--text);font-si
 .page-section{padding:32px 28px;background:var(--white);}
 .page-section+.page-section{border-top:1px solid var(--border);}
 
+/* ==================== Dipti */
+.prep-item a{
+  color: inherit;
+  text-decoration: none;
+}
+/* ====================== */
 /* Personalized banner */
 .personal-banner{
   background:var(--navy);
