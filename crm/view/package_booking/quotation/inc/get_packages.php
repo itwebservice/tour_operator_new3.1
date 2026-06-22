@@ -41,6 +41,11 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
     $image_path_clean = ltrim($image_path, '/');
 
+    // Paths saved after itinerary image upload (relative to project root)
+    if (strpos($image_path_clean, 'crm/uploads/quotation_images/') === 0) {
+        return $project_base_url . '/' . $image_path_clean;
+    }
+
     // For both new and existing quotations, check multiple locations for package images
     if ($is_new_quotation) {
         error_log("QUOTATION: Checking multiple locations for quotation - image: " . $image_path_clean);
@@ -739,8 +744,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                 <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" style="border:none;margin-top: 35px;" title="Add Itinerary" id="itinerary<?php echo $offset1; ?>" onclick="add_itinerary('dest_name','special_attaraction<?php echo $offset1; ?>-u','day_program<?php echo $offset1; ?>-u','overnight_stay<?php echo $offset1; ?>-u','Day-<?= $offset1 ?>')"><i class="fa fa-plus"></i></button>
                                                 </td>
                                               <?php
-    $package_id = $row_program['package_id'] ?? 'pkg0'; // or however you have it stored
-    $offset_id = $package_id . '_' . $current_offset;
+    $package_id = $row_tours['package_id'];
+    $offset_id = $package_id . '_' . $offset1;
     $image_path = trim($row_program['day_image'] ?? '');
     $has_image = ($image_path !== '' && strtolower($image_path) !== 'null');
 
@@ -767,29 +772,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                id="day_image_<?php echo $offset_id; ?>"
                name="day_image_<?php echo $offset_id; ?>"
                accept="image/*"
-               onchange="
-               console.log('File selected for <?php echo $offset_id; ?>');
-               var uniqueId = '<?php echo $offset_id; ?>';
-               var file = this.files[0];
-               if (file) {
-                   var reader = new FileReader();
-                   reader.onload = function(e) {
-                       // Show preview
-                       $('#preview_img_' + uniqueId).attr('src', e.target.result).show();
-                       $('#day_image_preview_' + uniqueId).show().css('display', 'block !important');
-                       
-                       // Hide upload button - SIMPLE DIRECT APPROACH
-                       var element = document.getElementById('upload_btn_container_' + uniqueId);
-                       if (element) {
-                           element.style.display = 'none';
-                           element.style.visibility = 'hidden';
-                           element.style.opacity = '0';
-                           console.log('Upload button hidden for ' + uniqueId);
-                       }
-                   };
-                   reader.readAsDataURL(file);
-               }
-               "
+               onchange="if(typeof window.previewDayImage==='function'){window.previewDayImage(this,'<?php echo $offset_id; ?>');}"
                style="display:none;">
     </div>
 
@@ -811,7 +794,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                     if (uploadContainer) uploadContainer.style.display='flex';
                  ">
             <button type="button"
-                    onclick="removeDayImage('<?php echo $package_id; ?>', '<?php echo $current_offset; ?>')"
+                    onclick="removeDayImage('<?php echo $package_id; ?>', '<?php echo $offset1; ?>')"
                     title="Remove Image"
                     style="position:absolute; top:5px; right:5px; background-color:#dc3545; color:#fff; border:none; border-radius:50%; width:20px; height:20px; display:<?php echo $has_image ? 'flex' : 'none'; ?>; align-items:center; justify-content:center;">
                 ×
@@ -825,7 +808,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
            value="<?php echo htmlspecialchars($image_path); ?>">
 </td>
 
-                                                <td class="hidden"><input type="hidden" name="package_id_n" value=""></td>
+                                                <td class="hidden"><input type="hidden" name="package_id_n" value="<?php echo $row_tours['package_id']; ?>"></td>
                                             </tr>
                                             <?php
                                         } else {
@@ -910,29 +893,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                                                                    id="day_image_<?php echo $offset_id; ?>"
                                                                    name="day_image_<?php echo $offset_id; ?>"
                                                                    accept="image/*"
-                                                                   onchange="
-                                                                   console.log('File selected for <?php echo $offset_id; ?>');
-                                                                   var uniqueId = '<?php echo $offset_id; ?>';
-                                                                   var file = this.files[0];
-                                                                   if (file) {
-                                                                       var reader = new FileReader();
-                                                                       reader.onload = function(e) {
-                                                                           // Show preview
-                                                                           $('#preview_img_' + uniqueId).attr('src', e.target.result).show();
-                                                                           $('#day_image_preview_' + uniqueId).show().css('display', 'block !important');
-                                                                           
-                                                                           // Hide upload button - SIMPLE DIRECT APPROACH
-                                                                           var element = document.getElementById('upload_btn_container_' + uniqueId);
-                                                                           if (element) {
-                                                                               element.style.display = 'none';
-                                                                               element.style.visibility = 'hidden';
-                                                                               element.style.opacity = '0';
-                                                                               console.log('Upload button hidden for ' + uniqueId);
-                                                                           }
-                                                                       };
-                                                                       reader.readAsDataURL(file);
-                                                                   }
-                                                                   "
+                                                                   onchange="if(typeof window.previewDayImage==='function'){window.previewDayImage(this,'<?php echo $offset_id; ?>');}"
                                                                    style="display: none;">
                                                         </div>
                                                         <!-- Image preview container -->
@@ -1180,9 +1141,28 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
     // Function to get package ID for a specific offset
     function getPackageIdForOffset(offset) {
-        // Try to find package ID from the current row
-        var packageIdInput = $('input[name="package_id_n"]').first();
-        var packageId = packageIdInput.val() || '1'; // Default to 1 if not found
+        var packageId = '';
+        if (typeof offset === 'string' && offset.indexOf('_') !== -1) {
+            packageId = offset.split('_')[0];
+        }
+        if (!packageId) {
+            var fileInput = $('#day_image_' + offset);
+            if (fileInput.length) {
+                var rowPackageInput = fileInput.closest('tr').find('input[name="package_id_n"]');
+                if (rowPackageInput.length && rowPackageInput.val()) {
+                    packageId = rowPackageInput.val();
+                }
+            }
+        }
+        if (!packageId) {
+            var checkedPackage = $('input[name="custom_package"]:checked').val();
+            if (checkedPackage) {
+                packageId = checkedPackage;
+            }
+        }
+        if (!packageId) {
+            packageId = $('input[name="package_id_n"]').first().val() || '1';
+        }
 
         console.log("DEBUG: Getting package ID for offset", offset, ":", packageId);
         return packageId;
@@ -1954,10 +1934,9 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         console.log("QUOTATION: File size:", file.size);
 
         // Validate file type
-        var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            error_msg_alert('Only JPG, JPEG, PNG, WEBP files are allowed');
-            input.value = ''; // Clear the input
+        if (typeof quotationIsValidImageFile === 'function' ? !quotationIsValidImageFile(file) : false) {
+            error_msg_alert('Please select a valid image file');
+            input.value = '';
             return;
         }
 
@@ -2129,13 +2108,17 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         // Check if there's an existing image for this offset (replacement)
         var existingImage = $('#existing_image_path_' + offset).val();
         var isReplacement = existingImage && existingImage.trim() !== '';
+        var dayNumber = offset;
+        if (typeof offset === 'string' && offset.indexOf('_') !== -1) {
+            dayNumber = offset.split('_').pop();
+        }
 
         window.quotationImages[offset] = {
             file: file,
             uploaded: false,
             offset: offset,
             package_id: getPackageIdForOffset(offset),
-            day_number: offset,
+            day_number: dayNumber,
             is_replacement: isReplacement,
             existing_image_url: existingImage
         };
@@ -2451,9 +2434,28 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
     // Function to get package ID for a specific offset
     function getPackageIdForOffset(offset) {
-        // Try to find package ID from the current row
-        var packageIdInput = $('input[name="package_id_n"]').first();
-        var packageId = packageIdInput.val() || '1'; // Default to 1 if not found
+        var packageId = '';
+        if (typeof offset === 'string' && offset.indexOf('_') !== -1) {
+            packageId = offset.split('_')[0];
+        }
+        if (!packageId) {
+            var fileInput = $('#day_image_' + offset);
+            if (fileInput.length) {
+                var rowPackageInput = fileInput.closest('tr').find('input[name="package_id_n"]');
+                if (rowPackageInput.length && rowPackageInput.val()) {
+                    packageId = rowPackageInput.val();
+                }
+            }
+        }
+        if (!packageId) {
+            var checkedPackage = $('input[name="custom_package"]:checked').val();
+            if (checkedPackage) {
+                packageId = checkedPackage;
+            }
+        }
+        if (!packageId) {
+            packageId = $('input[name="package_id_n"]').first().val() || '1';
+        }
 
         console.log("DEBUG: Getting package ID for offset", offset, ":", packageId);
         return packageId;
@@ -2555,112 +2557,11 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
     $(document).ready(function() {
         console.log("QUOTATION: Setting up modal event listeners");
 
-        // Multiple event listeners to ensure we catch the modal close
         $(document).on('hidden.bs.modal', '#itinerary_detail_modal', function() {
-            console.log("QUOTATION: Modal closed (hidden.bs.modal), processing selected image");
-            console.log("QUOTATION: window.selectedItineraryImage =", window.selectedItineraryImage);
             setTimeout(function() {
                 processSelectedItineraryImageQuotation();
             }, 100);
         });
-
-        $(document).on('hide.bs.modal', '#itinerary_detail_modal', function() {
-            console.log("QUOTATION: Modal closing (hide.bs.modal), processing selected image");
-            console.log("QUOTATION: window.selectedItineraryImage =", window.selectedItineraryImage);
-            setTimeout(function() {
-                processSelectedItineraryImageQuotation();
-            }, 200);
-        });
-
-        // Also check periodically if image data is available
-        setInterval(function() {
-            if (window.selectedItineraryImage) {
-                console.log("QUOTATION: Periodic check found selectedItineraryImage, processing...");
-                processSelectedItineraryImageQuotation();
-            }
-        }, 1000);
-
-        // Add click event listener for image upload buttons (copied from update_modal.php)
-        $(document).on('click', 'label[class*="upload-btn-"]', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var forAttr = $(this).attr('for');
-            var offset = forAttr.replace('day_image_', '');
-            console.log('QUOTATION: Upload button clicked for offset:', offset);
-            console.log('QUOTATION: Upload button for attribute:', forAttr);
-
-            // Check if file input exists
-            var fileInput = $('#day_image_' + offset);
-            console.log('QUOTATION: File input exists:', fileInput.length > 0);
-            console.log('QUOTATION: File input element:', fileInput[0]);
-
-            // Clear the file input first to ensure change event fires
-            fileInput.val('');
-
-            // Use a more robust method to trigger file input click
-            console.log('QUOTATION: About to click file input');
-
-            // Method 4: Test if label is properly connected
-            console.log('QUOTATION: Testing label connection - file input ID:', fileInput.attr('id'));
-            console.log('QUOTATION: Testing label connection - label for attribute:', forAttr);
-            console.log('QUOTATION: Testing label connection - match:', fileInput.attr('id') === forAttr);
-
-            // Keep the upload button visible and make it automatically trigger the file input
-            console.log('QUOTATION: Making upload button automatically trigger file input');
-
-            // Keep the upload button visible but make it trigger the file input
-            var uploadButton = $('label[for="day_image_' + offset + '"]');
-
-            // Make sure the file input is hidden initially
-            fileInput.css('display', 'none');
-
-            // When upload button is clicked, automatically trigger the file input
-            uploadButton.off('click.auto').on('click.auto', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                console.log('QUOTATION: Upload button clicked, automatically triggering file input');
-
-                // Try multiple methods to trigger the file input
-                try {
-                    fileInput[0].click();
-                    console.log('QUOTATION: File input click triggered');
-                } catch (e) {
-                    console.log('QUOTATION: File input click failed:', e);
-                }
-
-                // Also try jQuery trigger
-                try {
-                    fileInput.trigger('click');
-                    console.log('QUOTATION: File input jQuery trigger attempted');
-                } catch (e) {
-                    console.log('QUOTATION: File input jQuery trigger failed:', e);
-                }
-
-                // Also try mouse event
-                try {
-                    var clickEvent = new MouseEvent('click', {
-                        view: window,
-                        bubbles: true,
-                        cancelable: true
-                    });
-                    fileInput[0].dispatchEvent(clickEvent);
-                    console.log('QUOTATION: File input mouse event triggered');
-                } catch (e) {
-                    console.log('QUOTATION: File input mouse event failed:', e);
-                }
-            });
-
-            console.log('QUOTATION: Upload button configured to auto-trigger file input');
-
-            // Check if click was successful
-            setTimeout(function() {
-                console.log('QUOTATION: File input after click - files:', fileInput[0].files);
-                console.log('QUOTATION: File input after click - length:', fileInput[0].files.length);
-            }, 200);
-        });
-
-        // Add change event listener for file inputs (copied from update_modal.php)
         $(document).on('change', 'input[id^="day_image_"]', function() {
             var offset = $(this).attr('id').replace('day_image_', '');
 

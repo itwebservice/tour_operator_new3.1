@@ -2,16 +2,11 @@
 <?php 
 
 $hotel_id = $_GET['hotel_id'];
-$quotation_id=$_GET['quotation_id'];
+$quotation_id = isset($_GET['quotation_id']) ? $_GET['quotation_id'] : 0;
 
 ?>
 <option value="">Room Category</option>
 <?php
-if($quotation_id==0)
-{
-    
-
-
 $room_category_arr = [];
 $sq_hotel = mysqlQuery("select * from hotel_vendor_price_master where hotel_id='$hotel_id'");
 while($row_hotel = mysqli_fetch_assoc($sq_hotel))
@@ -47,6 +42,5 @@ array_push($room_category_arr,$sq_cat['room_category']);
 }
 }
 
-}
 }
 ?>

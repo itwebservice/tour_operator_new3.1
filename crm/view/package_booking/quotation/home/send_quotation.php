@@ -141,6 +141,8 @@
         }
     }
 </style>
+
+
 <?php
 include "../../../../model/model.php";
 
@@ -603,7 +605,7 @@ $quotation_count = mysqli_num_rows($sq_query);
     </div> -->
 
 <!-- </td> -->
- <td>
+<td>
     <div class="download-actions-container" style="display: inline-flex; gap: 6px; align-items: center;">
         <!-- PDF Button -->
         <button type="button" class="btn btn-sm action-icon-btn"  onclick="loadOtherPage('<?php echo $url1; ?>')"
@@ -718,86 +720,57 @@ $quotation_count = mysqli_num_rows($sq_query);
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Hidden fields to store modal parameters for refresh -->
                 <input type="hidden" id="modal_email_id" value="<?= $email_id ?>">
                 <input type="hidden" id="modal_mobile_no" value="<?= $mobile_no ?>">
                 <input type="hidden" id="modal_quotation_id" value="<?= $specific_quotation_id ?>">
-                <!-- Tab Navigation -->
-                <ul class="nav nav-tabs" id="communicationTabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="email-tab" data-toggle="tab" href="#email-content" role="tab" aria-controls="email-content" aria-selected="true">Email</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="whatsapp-tab" data-toggle="tab" href="#whatsapp-content" role="tab" aria-controls="whatsapp-content" aria-selected="false">WhatsApp</a>
-                    </li>
-                </ul>
 
-                <!-- Tab Content -->
+                <div class="communication-toolbar d-flex align-items-center mb-3">
+                    <ul class="nav nav-tabs customMailTabs" id="communicationTabs" role="tablist">
+                        <li class="nav-item">
+                            <div class="split-tab-group">
+                                <a class="nav-link split-tab-label active" id="email-tab" data-toggle="tab" href="#email-content" role="tab" aria-controls="email-content" aria-selected="true">Email</a>
+                                <button type="button" class="split-tab-arrow custom-dropdown-link" aria-label="Email options">
+                                    <i class="fa fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="dropdown-list">
+                                <div class="mail-tab-option"><label><input type="checkbox" class="email-option" name="emailOptions[]" value="price_structure" checked><span>Price Structure</span></label></div>
+                                <div class="mail-tab-option"><label><input type="checkbox" class="email-option" name="emailOptions[]" value="inclusion_exclusion" checked><span>Inclusion/Exclusion</span></label></div>
+                                <div class="mail-tab-option"><label><input type="checkbox" class="email-option" name="emailOptions[]" value="terms_conditions" checked><span>Terms & Conditions</span></label></div>
+                                <div class="mail-tab-option"><label><input type="checkbox" class="email-option" name="emailOptions[]" value="itinerary" checked><span>Itinerary</span></label></div>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <div class="split-tab-group">
+                                <a class="nav-link split-tab-label" id="whatsapp-tab" data-toggle="tab" href="#whatsapp-content" role="tab" aria-controls="whatsapp-content" aria-selected="false">WhatsApp</a>
+                                <button type="button" class="split-tab-arrow custom-dropdown-link" aria-label="WhatsApp options">
+                                    <i class="fa fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="dropdown-list">
+                                <div class="mail-tab-option"><label><input type="checkbox" class="whatsapp-option" name="whatsappOptions[]" value="price_structure" checked><span>Price Structure</span></label></div>
+                                <div class="mail-tab-option"><label><input type="checkbox" class="whatsapp-option" name="whatsappOptions[]" value="inclusion_exclusion" checked><span>Inclusion/Exclusion</span></label></div>
+                                <div class="mail-tab-option"><label><input type="checkbox" class="whatsapp-option" name="whatsappOptions[]" value="terms_conditions" checked><span>Terms & Conditions</span></label></div>
+                                <div class="mail-tab-option"><label><input type="checkbox" class="whatsapp-option" name="whatsappOptions[]" value="itinerary" checked><span>Itinerary</span></label></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
                 <div class="tab-content" id="communicationTabContent">
                     <!-- Email Tab -->
-                    <div class="tab-pane fade show active" id="email-content" role="tabpanel" aria-labelledby="email-tab">
+                    <div class="tab-pane  show active" id="email-content" role="tabpanel" aria-labelledby="email-tab">
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <!-- Content Options Card -->
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card mb-4">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">Select Content Options</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row email-options-row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-check email-option-check">
-                                                            <input class="form-check-input email-option" type="checkbox" id="emailPriceStructure" name="emailOptions[]" value="price_structure" checked>
-                                                            <label class="form-check-label" for="emailPriceStructure">Price Structure</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check email-option-check">
-                                                            <input class="form-check-input email-option" type="checkbox" id="emailInclusionExclusion" name="emailOptions[]" value="inclusion_exclusion" checked>
-                                                            <label class="form-check-label" for="emailInclusionExclusion">Inclusion/Exclusion</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check email-option-check">
-                                                            <input class="form-check-input email-option" type="checkbox" id="emailTermsConditions" name="emailOptions[]" value="terms_conditions" checked>
-                                                            <label class="form-check-label" for="emailTermsConditions">Terms & Conditions</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check email-option-check">
-                                                            <input class="form-check-input email-option" type="checkbox" id="emailItinerary" name="emailOptions[]" value="itinerary" checked>
-                                                            <label class="form-check-label" for="emailItinerary">Itinerary</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                               
 
-                                <!-- Action Buttons -->
-                                <div class="form-group">
-                                    <div class="row align-items-end">
-                                        <div class="col-md-12">
-                                            <div class="email-action-buttons">
-                                                <button type="button" class="btn" style="background-color: #009898;" id="sendEmailBtn">
-                                                    <i class="fa fa-paper-plane"></i> Send Email
-                                                </button>
-                                                <button type="button" class="btn"  style="background-color: #009898;"  id="copyEmailBtn">
-                                                    <i class="fa fa-copy"></i> Copy Email
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Email Preview -->
-                                <div class="form-group">
-                                    <label class="font-weight-bold" style="color: #009898;">Email Preview:</label>
-                                    <div id="emailPreviewArea">
-                                        <!-- Email preview will be loaded here -->
+                                <label class="font-weight-bold preview-label">Email Preview :</label>
+                                <div class="form-group email-preview-wrapper">
+                                    <button type="button" class="copyBtn" id="copyEmailBtn" title="Copy email">
+                                        <i class="fa fa-clone"></i>
+                                    </button>
+                                    <div id="emailPreviewArea" >
                                         <div class="p-3 text-center text-muted">
                                             <i class="fa fa-envelope fa-2x mb-2"></i>
                                             <p>Email preview will appear here...</p>
@@ -805,16 +778,14 @@ $quotation_count = mysqli_num_rows($sq_query);
                                     </div>
                                 </div>
 
-                                <!-- Email Draft - Hidden -->
+                                <div class="email-send-row">
+                                    <button type="button" class="btn" style="background-color: #009898; color: #fff;" id="sendEmailBtn">
+                                        <i class="fa fa-paper-plane"></i> Send Email
+                                    </button>
+                                </div>
+
                                 <div class="form-group" style="display: none;">
-                                    <label class="font-weight-bold" style="color: #009898;">Email Draft (Email Body Format):</label>
-                                    <div id="emailDraftArea">
-                                        <!-- Email draft will be loaded here -->
-                                        <div class="p-3 text-center text-muted">
-                                            <i class="fa fa-file-text fa-2x mb-2"></i>
-                                            <p>Email draft will appear here...</p>
-                                        </div>
-                                    </div>
+                                    <div id="emailDraftArea"></div>
                                 </div>
                             </div>
                         </div>
@@ -824,88 +795,38 @@ $quotation_count = mysqli_num_rows($sq_query);
                     <div class="tab-pane fade" id="whatsapp-content" role="tabpanel" aria-labelledby="whatsapp-tab">
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <!-- Content Options Card for WhatsApp -->
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card mb-4">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">Select Content Options</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappPriceStructure" name="whatsappOptions[]" value="price_structure" checked>
-                                                            <label class="form-check-label" for="whatsappPriceStructure">Price Structure</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappInclusionExclusion" name="whatsappOptions[]" value="inclusion_exclusion" checked>
-                                                            <label class="form-check-label" for="whatsappInclusionExclusion">Inclusion/Exclusion</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappTermsConditions" name="whatsappOptions[]" value="terms_conditions" checked>
-                                                            <label class="form-check-label" for="whatsappTermsConditions">Terms & Conditions</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input whatsapp-option" type="checkbox" id="whatsappItinerary" name="whatsappOptions[]" value="itinerary" checked>
-                                                            <label class="form-check-label" for="whatsappItinerary">Itinerary</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                <div class="form-group">
+                                    <label class="font-weight-bold preview-label">WhatsApp Preview:</label>
+                                    <div class="whatsapp-preview-wrapper">
+                                        <button type="button" class="copyBtn" id="copyWhatsappBtn" title="Copy WhatsApp">
+                                            <i class="fa fa-clone"></i>
+                                        </button>
+                                        <div id="whatsappPreviewArea">
+                                            <div class="p-3 text-center text-muted">
+                                                <i class="fa fa-whatsapp fa-2x mb-2 text-success"></i>
+                                                <p>WhatsApp preview will appear here...</p>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- Action Buttons for WhatsApp -->
-                                <div class="form-group">
-                                    <button type="button" class="btn" style="background-color: #009898;" id="sendWhatsappBtn">Send WhatsApp</button>
-                                    <button type="button" class="btn" style="background-color: #009898;" id="copyWhatsappBtn">Copy WhatsApp</button>
-                                </div>
-
-                                <!-- WhatsApp Preview -->
-                                <div class="form-group">
-                                    <label class="font-weight-bold" style="color: #009898;">WhatsApp Preview:</label>
-                                    <div id="whatsappPreviewArea">
-                                        <!-- WhatsApp preview will be loaded here -->
-                                        <div class="p-3 text-center text-muted">
-                                            <i class="fa fa-whatsapp fa-2x mb-2 text-success"></i>
-                                            <p>WhatsApp preview will appear here...</p>
-                                        </div>
+                                    <div class="whatsapp-send-row">
+                                        <button type="button" class="btn btn-teal" id="sendWhatsappBtn">
+                                            <i class="fa fa-paper-plane-o"></i> Send WhatsApp
+                                        </button>
                                     </div>
                                 </div>
-
-                                <!-- WhatsApp Draft - Hidden -->
                                 <div class="form-group" style="display: none;">
-                                    <label class="font-weight-bold" style="color: #009898;">WhatsApp Draft:</label>
-                                    <div id="whatsappDraftArea">
-                                        <!-- WhatsApp draft will be loaded here -->
-                                        <div class="p-3 text-center text-muted">
-                                            <i class="fa fa-file-text fa-2x mb-2 text-success"></i>
-                                            <p>WhatsApp draft will appear here...</p>
-                                        </div>
-                                    </div>
+                                    <div id="whatsappDraftArea"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn" style="background-color: #009898;" data-dismiss="modal">Close</button>
-            </div>
         </div>
     </div>
-</div>
+</div> 
 
 <script>
-
 $(document).off('click', '.actions-btn-group .dropdown-toggle'); // prevent duplicate binding
 $(document).on('click', '.actions-btn-group .dropdown-toggle', function (e) {
     e.preventDefault();
@@ -1039,44 +960,15 @@ $(document).on('click', function () {
 		
 		// Show modal
 		$('#emailWhatsappModal').modal('show');
-		
-		// Debug: Check if checkboxes are available after modal is shown
-		setTimeout(function() {
-		}, 500);
-		
-		// Ensure proper tab state - Email tab active by default
-        $('#email-tab').trigger('click').addClass('active').attr('aria-selected', 'true');
 
+		$('#email-tab').addClass('active').attr('aria-selected', 'true');
 		$('#whatsapp-tab').removeClass('active').attr('aria-selected', 'false');
-		
-		// Debug: Check checkboxes when modal is fully shown
-		$('#emailWhatsappModal').on('shown.bs.modal', function() {
-		});
 		$('#email-content').addClass('show active');
 		$('#whatsapp-content').removeClass('show active');
-		
-		// Load email content after modal is shown
+
 		setTimeout(function() {
 			loadEmailContent(quotationData.quotation_id);
 		}, 300);
-		
-		// Set default email format to Email Body (no HTML support)
-		// $('#emailFormatSelect').val('body'); // Removed - only Email Body format supported
-		
-		// Add modal refresh on show event
-		$('#quotation_send_modal').on('shown.bs.modal', function() {
-			// Force reload the modal content
-			if (window.currentQuotationData) {
-				loadEmailContent(window.currentQuotationData.quotation_id);
-			}
-		});
-		
-		// Add event listeners for email option checkboxes
-		$('.email-option').on('change', function() {
-			updateContentPreview('email');
-		});
-		
-		// Email format dropdown removed - only Email Body format supported
 	}
 
 	// Function to load email content
@@ -1085,32 +977,20 @@ $(document).on('click', function () {
 		$('#emailPreviewArea').html('<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Loading email content...</div>');
 		$('#emailDraftArea').html('<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Loading email draft...</div>');
 
-		// Always use Email Body format (HTML format removed)
 		var format = 'body';
 		var emailOption = 'Email Body';
+		var allOptions = ['price_structure', 'inclusion_exclusion', 'terms_conditions', 'itinerary'];
 
-		// Gather currently selected email options
-		var selectedOptions = [];
-		$('.email-option:checked').each(function() {
-			selectedOptions.push($(this).val());
-		});
-
-		// Load email content (Email Body format only)
 		$.post('get_email_body_content.php', {
 			quotation_id: quotation_id,
 			email_option: emailOption,
-			options: selectedOptions,
-			format: format
+			options: allOptions,
+			format: format,
+			sectioned: '1'
 		}, function(data) {
 			if (data && data.trim() !== '') {
-					// For Email Body format, show text content
-					var formattedContent = data.replace(/\n/g, '<br>');
-					$('#emailPreviewArea').html(formattedContent);
-					
-					var textDraft = '<div style="font-family: monospace; font-size: 12px; line-height: 1.4; background: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; white-space: pre-wrap;">';
-					textDraft += data;
-					textDraft += '</div>';
-					$('#emailDraftArea').html(textDraft);
+				$('#emailPreviewArea').html(data);
+				togglePreviewSections('email');
 			} else {
 				$('#emailPreviewArea').html('<div class="p-3"><h5>Email Content Preview</h5><p class="text-muted">Email content will be displayed here based on your selections.</p></div>');
 				$('#emailDraftArea').html('<div class="p-3"><h5>Email Draft</h5><p class="text-muted">Email draft content will be displayed here.</p></div>');
@@ -1127,28 +1007,17 @@ $(document).on('click', function () {
 		$('#whatsappPreviewArea').html('<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Loading WhatsApp content...</div>');
 		$('#whatsappDraftArea').html('<div class="text-center p-3"><i class="fa fa-spinner fa-spin"></i> Loading WhatsApp draft...</div>');
 
-		// Gather currently selected WhatsApp options
-		var selectedOptions = [];
-		$('.whatsapp-option:checked').each(function() {
-			selectedOptions.push($(this).val());
-		});
+		var allOptions = ['price_structure', 'inclusion_exclusion', 'terms_conditions', 'itinerary'];
 
-		// Load WhatsApp content (similar to email but formatted for WhatsApp)
 		$.post('get_email_body_content.php', {
 			quotation_id: quotation_id,
 			email_option: 'WhatsApp',
-			options: selectedOptions
+			options: allOptions,
+			sectioned: '1'
 		}, function(data) {
 			if (data && data.trim() !== '') {
-				// Format the content for WhatsApp preview (with proper line breaks)
-				var formattedContent = data.replace(/\n/g, '<br>');
-				$('#whatsappPreviewArea').html(formattedContent);
-				
-				// Format the WhatsApp draft with proper line breaks and styling
-				var draftContent = '<div style="font-family: monospace; font-size: 12px; line-height: 1.6; background: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; white-space: pre-wrap;">';
-				draftContent += data;
-				draftContent += '</div>';
-				$('#whatsappDraftArea').html(draftContent);
+				$('#whatsappPreviewArea').html(data);
+				togglePreviewSections('whatsapp');
 			} else {
 				$('#whatsappPreviewArea').html('<div class="p-3"><h5>WhatsApp Content Preview</h5><p class="text-muted">WhatsApp content will be displayed here based on your selections.</p></div>');
 				$('#whatsappDraftArea').html('<div class="p-3"><h5>WhatsApp Draft</h5><p class="text-muted">WhatsApp draft content will be displayed here.</p></div>');
@@ -1159,20 +1028,68 @@ $(document).on('click', function () {
 		});
 	}
 
-	// Function to update content based on checkbox selections
-	function updateContentPreview(type) {
-		var selectedOptions = [];
+	// Toggle preview sections based on checkbox selections
+	function togglePreviewSections(type) {
 		var optionClass = type === 'email' ? '.email-option' : '.whatsapp-option';
 		var previewArea = type === 'email' ? '#emailPreviewArea' : '#whatsappPreviewArea';
+		var draftArea = type === 'email' ? '#emailDraftArea' : '#whatsappDraftArea';
+		var selectedOptions = [];
+
+		$(optionClass + ':checked').each(function() {
+			selectedOptions.push($(this).val());
+		});
+
+		$(previewArea + ' .preview-section-block').each(function() {
+			var sectionKey = $(this).data('section');
+			if (sectionKey === 'header' || sectionKey === 'footer') {
+				$(this).show();
+				return;
+			}
+			if (selectedOptions.indexOf(sectionKey) !== -1) {
+				$(this).show();
+			} else {
+				$(this).hide();
+			}
+		});
+
+		updateDraftFromPreview(previewArea, draftArea);
+	}
+
+	// Build draft text from visible preview sections
+	function updateDraftFromPreview(previewArea, draftArea) {
+		var draftText = '';
+		$(previewArea + ' .preview-section-block:visible').each(function() {
+			var sectionText = $(this).text();
+			if (sectionText && sectionText.trim() !== '') {
+				draftText += sectionText.trim() + '\n\n';
+			}
+		});
+
+		if (draftText.trim() !== '') {
+			var textDraft = '<div style="font-family: monospace; font-size: 12px; line-height: 1.6; background: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; white-space: pre-wrap;">';
+			textDraft += draftText.trim();
+			textDraft += '</div>';
+			$(draftArea).html(textDraft);
+		}
+	}
+
+	// Function to update content based on checkbox selections (fallback for non-sectioned content)
+	function updateContentPreview(type) {
+		var previewArea = type === 'email' ? '#emailPreviewArea' : '#whatsappPreviewArea';
+		if ($(previewArea + ' .preview-section-block').length) {
+			togglePreviewSections(type);
+			return;
+		}
+
+		var selectedOptions = [];
+		var optionClass = type === 'email' ? '.email-option' : '.whatsapp-option';
 		var draftArea = type === 'email' ? '#emailDraftArea' : '#whatsappDraftArea';
 		
 		$(optionClass + ':checked').each(function() {
 			selectedOptions.push($(this).val());
 		});
 		
-		// Load content based on selected options
 		if (window.currentQuotationData) {
-			// Always use Email Body format (HTML format removed)
 			var emailOption = 'Email Body';
 			var format = 'body';
 			
@@ -1183,15 +1100,13 @@ $(document).on('click', function () {
 				format: type === 'email' ? format : 'text'
 			}, function(data) {
 				if (data && data.trim() !== '') {
-						// For Email Body format or WhatsApp, show text content
-						var formattedContent = data.replace(/\n/g, '<br>');
-						$(previewArea).html(formattedContent);
-						
-					// Format draft with proper line breaks and styling
+					var formattedContent = data.replace(/\n/g, '<br>');
+					$(previewArea).html(formattedContent);
+					
 					var textDraft = '<div style="font-family: monospace; font-size: 12px; line-height: 1.6; background: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 4px; white-space: pre-wrap;">';
-						textDraft += data;
-						textDraft += '</div>';
-						$(draftArea).html(textDraft);
+					textDraft += data;
+					textDraft += '</div>';
+					$(draftArea).html(textDraft);
 				} else {
 					$(previewArea).html('<div class="p-3"><h5>Content Preview</h5><p class="text-muted">Content will be displayed here based on your selections.</p></div>');
 					$(draftArea).html('<div class="p-3"><h5>Draft</h5><p class="text-muted">Draft content will be displayed here.</p></div>');
@@ -1250,16 +1165,14 @@ $(document).on('click', function () {
 		});
 
 	// Send WhatsApp button
-	$('#sendWhatsappBtn').click(function() {
+	$(document).on('click', '#sendWhatsappBtn', function() {
 		var selectedOptions = [];
 		$('input[name="whatsappOptions[]"]:checked').each(function() {
 			selectedOptions.push($(this).val());
 		});
-		
 
-        return false;
 		if (window.currentQuotationData) {
-			sendIndividualQuotationWhatsApp(window.currentQuotationData.quotation_id, 
+			sendIndividualQuotationWhatsApp(window.currentQuotationData.quotation_id,
 				window.currentQuotationData.mobile_no, selectedOptions);
 		}
 	});
@@ -1285,43 +1198,96 @@ $(document).on('click', function () {
 			}
 		});
 
-		// Checkbox change events for Email
-		$('.email-option').change(function() {
-			updateContentPreview('email');
-		});
+		function closeMailTabDropdowns() {
+			$('#emailWhatsappModal .dropdown-list').removeClass('show');
+			$('#emailWhatsappModal .customMailTabs .nav-item').removeClass('is-open');
+		}
 
-		// Checkbox change events for WhatsApp
-		$('.whatsapp-option').change(function() {
-			updateContentPreview('whatsapp');
-		});
-
-		// Tab change events
-		$('#email-tab').on('click', function() {
-			// Remove active class from WhatsApp tab
+		function activateEmailTab() {
 			$('#whatsapp-tab').removeClass('active').attr('aria-selected', 'false');
 			$('#whatsapp-content').removeClass('show active');
-			
-			// Add active class to Email tab
-			$(this).addClass('active').attr('aria-selected', 'true');
+			$('#email-tab').addClass('active').attr('aria-selected', 'true');
 			$('#email-content').addClass('show active');
-			
 			if (window.currentQuotationData) {
 				loadEmailContent(window.currentQuotationData.quotation_id);
 			}
-		});
-		
-		$('#whatsapp-tab').on('click', function() {
-			// Remove active class from Email tab
+		}
+
+		function activateWhatsappTab() {
 			$('#email-tab').removeClass('active').attr('aria-selected', 'false');
 			$('#email-content').removeClass('show active');
-			
-			// Add active class to WhatsApp tab
-			$(this).addClass('active').attr('aria-selected', 'true');
+			$('#whatsapp-tab').addClass('active').attr('aria-selected', 'true');
 			$('#whatsapp-content').addClass('show active');
-			
 			if (window.currentQuotationData) {
 				loadWhatsappContent(window.currentQuotationData.quotation_id);
 			}
+		}
+
+		$('#emailWhatsappModal').on('hidden.bs.modal', function() {
+			closeMailTabDropdowns();
+		});
+
+		// Arrow click - switch tab and toggle dropdown
+		$(document).off('click', '#emailWhatsappModal .custom-dropdown-link');
+		$(document).on('click', '#emailWhatsappModal .custom-dropdown-link', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			var $navItem = $(this).closest('.nav-item');
+			var $dropdown = $navItem.find('.dropdown-list');
+			var isOpen = $dropdown.hasClass('show');
+			var isEmailTab = $navItem.find('#email-tab').length > 0;
+
+			if (isEmailTab) {
+				activateEmailTab();
+			} else {
+				activateWhatsappTab();
+			}
+
+			$('#emailWhatsappModal .dropdown-list').not($dropdown).removeClass('show');
+			$('#emailWhatsappModal .customMailTabs .nav-item').not($navItem).removeClass('is-open');
+
+			if (isOpen) {
+				$dropdown.removeClass('show');
+				$navItem.removeClass('is-open');
+			} else {
+				$dropdown.addClass('show');
+				$navItem.addClass('is-open');
+			}
+		});
+
+		$(document).off('click', '#emailWhatsappModal .dropdown-list');
+		$(document).on('click', '#emailWhatsappModal .dropdown-list', function(e) {
+			e.stopPropagation();
+		});
+
+		$(document).off('click.mailTabDropdown');
+		$(document).on('click.mailTabDropdown', function(e) {
+			if (!$(e.target).closest('#emailWhatsappModal .nav-item').length) {
+				closeMailTabDropdowns();
+			}
+		});
+
+		$(document).on('change', '.email-option', function(e) {
+			e.stopPropagation();
+			updateContentPreview('email');
+		});
+
+		$(document).on('change', '.whatsapp-option', function(e) {
+			e.stopPropagation();
+			updateContentPreview('whatsapp');
+		});
+
+		$('#email-tab').off('click').on('click', function(e) {
+			e.preventDefault();
+			closeMailTabDropdowns();
+			activateEmailTab();
+		});
+
+		$('#whatsapp-tab').off('click').on('click', function(e) {
+			e.preventDefault();
+			closeMailTabDropdowns();
+			activateWhatsappTab();
 		});
 	});
 
@@ -1913,41 +1879,419 @@ $(document).on('click', function () {
     }
     
     /* Email/WhatsApp Modal Styling */
-    #emailWhatsappModal .nav-tabs .nav-link {
-        border: 1px solid #dee2e6;
-        border-bottom: none;
-        border-radius: 0.25rem 0.25rem 0 0;
-        margin-right: 2px;
+    #emailWhatsappModal .modal-dialog {
+        max-width: 1400px;
+        width: 95%;
+        margin: 20px auto;
+        overflow: visible;
     }
-    
-    #emailWhatsappModal .nav-tabs .nav-link.active {
-        background-color: #009898;
-        color: white;
-        border-color: #009898;
+
+    #emailWhatsappModal .modal-xl {
+        max-width: 1400px;
+        width: 95%;
     }
-    
-    #emailWhatsappModal .nav-tabs .nav-link:hover {
-        border-color: #009898;
-    }
-    
-    #emailWhatsappModal .form-check {
-        margin-bottom: 0.5rem;
-    }
-    
-    #emailWhatsappModal .btn {
-        margin-right: 10px;
-        margin-bottom: 5px;
-    }
-    
-    #emailPreviewArea, #whatsappPreviewArea, #emailDraftArea, #whatsappDraftArea {
-        border: 1px solid #e9ecef;
+
+    #emailWhatsappModal .modal-content {
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        border: none;
         border-radius: 8px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: visible;
+    }
+
+    #emailWhatsappModal .modal-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: visible;
+        padding: 20px;
+        background: #fff;
+    }
+
+    #emailWhatsappModal .modal-body ul.nav.customMailTabs {
+        display: flex !important;
+        border-bottom: 0 !important;
+        border-radius: 0 !important;
+        justify-content: center;
+    }
+
+    #emailWhatsappModal .modal-body ul.nav.customMailTabs li a.split-tab-label {
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        transition: none !important;
+    }
+
+    #emailWhatsappModal .communication-toolbar {
+        padding-bottom: 0;
+        overflow: visible;
+        position: relative;
+        z-index: 50;
+    }
+
+    #emailWhatsappModal .customMailTabs {
+        border-bottom: 1px solid #eaeaea;
+        margin-bottom: 0;
+        position: relative;
+        z-index: 50;
+        overflow: visible;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        padding-bottom: 12px;
+    }
+
+    #emailWhatsappModal .customMailTabs .nav-item {
+        position: relative;
+        margin-right: 0;
+        overflow: visible;
+        list-style: none;
+    }
+
+    #emailWhatsappModal .customMailTabs .nav-item.is-open {
+        z-index: 60;
+    }
+
+    #emailWhatsappModal .split-tab-group {
+        display: inline-flex;
+        align-items: stretch;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #d8d8d8;
+        height: 40px;
+        background: #fff;
+    }
+
+    #emailWhatsappModal .split-tab-label {
+        padding: 0 22px;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff !important;
+        color: #444 !important;
+        font-weight: 500;
+        font-size: 15px;
+        text-decoration: none !important;
+        min-width: 90px;
+        box-shadow: none !important;
+    }
+
+    #emailWhatsappModal .split-tab-label:before {
+        display: none !important;
+    }
+
+    #emailWhatsappModal .split-tab-label.active {
+        background: #e8f7f7 !important;
+        color: #009898 !important;
+    }
+
+    #emailWhatsappModal .split-tab-label:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    #emailWhatsappModal .split-tab-label.active + .split-tab-arrow,
+    #emailWhatsappModal .nav-item.is-open .split-tab-label.active + .split-tab-arrow {
+        background: #009898;
+        color: #fff;
+        border-left-color: #009898;
+    }
+
+    #emailWhatsappModal .split-tab-group:has(.split-tab-label.active) {
+        border-color: #009898;
+    }
+
+    #emailWhatsappModal .split-tab-arrow {
+        width: 38px;
+        min-width: 38px;
+        border: none;
+        border-left: 1px solid #d8d8d8;
+        background: #f3f3f3;
+        color: #444;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        font-size: 12px;
+        outline: none;
+        transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    #emailWhatsappModal .split-tab-arrow:hover {
+        background: #e9ecef;
+    }
+
+    #emailWhatsappModal .split-tab-label.active + .split-tab-arrow:hover {
+        background: #008080;
+    }
+
+    #emailWhatsappModal .split-tab-arrow i {
+        pointer-events: none;
+    }
+
+    #emailWhatsappModal .customMailTabs .dropdown-list {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        min-width: 100%;
+        width: max-content;
+        min-width: 220px;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        padding: 8px 0;
+        z-index: 2000;
+    }
+
+    #emailWhatsappModal .customMailTabs .dropdown-list.show {
+        display: block !important;
+    }
+
+    #emailWhatsappModal .customMailTabs .mail-tab-option {
+        padding: 10px 16px;
+        background: transparent;
+    }
+
+    #emailWhatsappModal .customMailTabs .mail-tab-option:hover {
+        background: #f8f9fa;
+    }
+
+    #emailWhatsappModal .customMailTabs .dropdown-list label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        color: #333;
+        font-size: 14px;
+    }
+
+    #emailWhatsappModal .customMailTabs .dropdown-list input[type="checkbox"] {
+        accent-color: #009898;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    #emailWhatsappModal .modal-header {
+        background: #009898;
+        color: white;
+        border-bottom: none;
+        padding: 15px 20px;
+    }
+
+    #emailWhatsappModal .modal-header .close {
+        color: white;
+        opacity: 0.9;
+        text-shadow: none;
+    }
+
+    #emailWhatsappModal .modal-header .close:hover {
+        opacity: 1;
+    }
+
+    #emailWhatsappModal .modal-title {
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    #emailWhatsappModal .email-format-toolbar {
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: center;
+        margin: 30px 0 20px;
+    }
+
+    #emailWhatsappModal .Format-dropdown-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    #emailWhatsappModal .Format-items {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    #emailWhatsappModal .Format-items .format-item {
+        padding: 0;
+    }
+
+    #emailWhatsappModal .Format-items label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        color: #333;
+    }
+
+    #emailWhatsappModal .Format-items input[type="radio"] {
+        accent-color: #009898;
+        width: 16px;
+        height: 16px;
+    }
+
+    #emailWhatsappModal .email-subject-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        min-width: 320px;
+    }
+
+    #emailWhatsappModal .email-subject-input {
+        flex: 1;
+        min-width: 280px;
+    }
+
+    #emailWhatsappModal .email-subject-input .form-control {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        height: 42px;
+    }
+
+    #emailWhatsappModal .format-label,
+    #emailWhatsappModal .subject-label,
+    #emailWhatsappModal .preview-label {
+        color: #000;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+    #emailWhatsappModal .preview-label {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    #emailWhatsappModal .copyBtn {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        color: #009898;
+        padding: 11px 15px;
+        cursor: pointer;
+        z-index: 5;
+        color:#737373;
+    }
+
+    #emailWhatsappModal .email-preview-wrapper:focus-visible,
+    #emailWhatsappModal #emailPreviewArea:focus-visible{
+        outline:none;
+    }
+
+
+    #emailWhatsappModal .email-preview-wrapper,
+    #emailWhatsappModal .whatsapp-preview-wrapper {
+        position: relative;
+    }
+
+    #emailWhatsappModal .email-preview-wrapper .copyBtn,
+    #emailWhatsappModal .whatsapp-preview-wrapper .copyBtn {
+        position: absolute;
+        right: 30px;
+        top: 15px;
+    }
+
+    #emailWhatsappModal .copy-subject-btn {
+        margin-bottom: 0;
+    }
+
+    #emailWhatsappModal #emailPreviewArea {
+        border: 1px solid #D5D5D5;
+        border-radius: 8px;
         min-height: 250px;
-        max-height: 400px;
+        max-height: 600px;
         overflow-y: auto;
         padding: 15px;
+        box-shadow: 0 4px 12px rgba(0, 152, 152, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    #emailWhatsappModal #whatsappPreviewArea {
+        border: 1px solid #D5D5D5;
+        border-radius: 8px;
+        background-color: #fff;
+        min-height: 250px;
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 15px;
+        box-shadow: 0 4px 12px rgba(0, 152, 152, 0.15);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    #emailWhatsappModal #email-content,
+    #emailWhatsappModal #whatsapp-content
+     {
+        padding-top: 20px;
+    }
+
+    #emailWhatsappModal .email-send-row,
+    #emailWhatsappModal .whatsapp-send-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+    }
+
+    #emailWhatsappModal .email-send-row .btn {
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        font-weight: 500;
+    }
+
+    #emailWhatsappModal .email-send-row .btn:hover {
+        background-color: #007777 !important;
+        color: #fff;
+    }
+
+    #emailWhatsappModal .btn-teal {
+        background-color: #009898;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        font-weight: 500;
+    }
+
+    #emailWhatsappModal .btn-teal:hover {
+        background-color: #007777;
+        color: #fff;
+    }
+
+    #emailWhatsappModal .form-group {
+        margin-bottom: 0;
+    }
+
+    #emailWhatsappModal #emailPreviewArea::-webkit-scrollbar,
+    #emailWhatsappModal #whatsappPreviewArea::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #emailWhatsappModal #emailPreviewArea::-webkit-scrollbar-thumb,
+    #emailWhatsappModal #whatsappPreviewArea::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    #emailWhatsappModal .fa-spinner {
+        color: #009898;
     }
     
     /* Card border to match email preview */
@@ -1964,96 +2308,12 @@ $(document).on('click', function () {
         padding: 12px 16px;
     }
     
-    #emailPreviewArea, #whatsappPreviewArea {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #333;
-    }
-    
     #emailDraftArea, #whatsappDraftArea {
         font-family: 'Courier New', monospace;
         font-size: 12px;
         line-height: 1.4;
         background-color: #f8f9fa;
         color: #495057;
-    }
-    
-    /* Remove excessive white space */
-    #emailPreviewArea *, #whatsappPreviewArea *, #emailDraftArea *, #whatsappDraftArea * {
-        margin: 0;
-        padding: 0;
-    }
-    
-    #emailPreviewArea p, #whatsappPreviewArea p, #emailDraftArea p, #whatsappDraftArea p {
-        margin-bottom: 10px;
-    }
-    
-    #emailPreviewArea h1, #whatsappPreviewArea h1, #emailDraftArea h1, #whatsappDraftArea h1,
-    #emailPreviewArea h2, #whatsappPreviewArea h2, #emailDraftArea h2, #whatsappDraftArea h2,
-    #emailPreviewArea h3, #whatsappPreviewArea h3, #emailDraftArea h3, #whatsappDraftArea h3 {
-        margin-bottom: 15px;
-        margin-top: 20px;
-    }
-    
-    #emailPreviewArea h1:first-child, #whatsappPreviewArea h1:first-child, 
-    #emailDraftArea h1:first-child, #whatsappDraftArea h1:first-child {
-        margin-top: 0;
-    }
-    
-    #emailWhatsappModal .modal-dialog {
-        max-width: 1400px;
-        width: 95%;
-        margin: 20px auto;
-    }
-    
-    #emailWhatsappModal .modal-xl {
-        max-width: 1400px;
-        width: 95%;
-    }
-    
-    #emailWhatsappModal .modal-content {
-        height: 90vh;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    #emailWhatsappModal .modal-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 20px;
-    }
-    
-    #emailWhatsappModal .modal-header {
-        background: linear-gradient(135deg, #009898 0%, #009898 100%);
-        color: white;
-        border-bottom: none;
-        padding: 15px 20px;
-    }
-    
-    #emailWhatsappModal .modal-header .close {
-        color: white;
-        opacity: 0.8;
-        text-shadow: none;
-    }
-    
-    #emailWhatsappModal .modal-header .close:hover {
-        opacity: 1;
-    }
-    
-    #emailWhatsappModal .modal-title {
-        font-weight: 600;
-        font-size: 18px;
-    }
-    
-    #emailWhatsappModal .form-check-input:checked {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-    
-    #emailWhatsappModal .form-check-input:focus {
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
     
     /* Download dropdown styling */
@@ -2293,181 +2553,6 @@ $(document).on('click', function () {
         font-size: 18px;
         width: 20px;
         text-align: center;
-    }
-    
-    /* Enhanced tab styling */
-    #emailWhatsappModal .nav-tabs {
-        border-bottom: 2px solid #e9ecef;
-        margin-bottom: 20px;
-    }
-    
-    #emailWhatsappModal .nav-tabs .nav-link {
-        border: none;
-        border-radius: 8px 8px 0 0;
-        margin-right: 5px;
-        padding: 12px 20px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    #emailWhatsappModal .nav-tabs .nav-link:hover {
-        border: none;
-        background-color: #f8f9fa;
-        color: #495057;
-    }
-    
-    #emailWhatsappModal .nav-tabs .nav-link.active {
-        background: linear-gradient(135deg, #009898 0%, #009898 100%);
-        color: white;
-        border: none;
-        box-shadow: 0 2px 4px rgba(0,123,255,0.3);
-    }
-    
-    /* Button styling */
-    #emailWhatsappModal .btn {
-        border-radius: 6px;
-        font-weight: 500;
-        padding: 8px 16px;
-        transition: all 0.3s ease;
-    }
-    
-    #emailWhatsappModal .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    
-    /* Form group spacing */
-    #emailWhatsappModal .form-group {
-        margin-bottom: 25px;
-    }
-    
-    /* Loading spinner styling */
-    .fa-spinner {
-        color: #009898;
-    }
-    
-    /* Email Format Dropdown removed - only Email Body format supported */
-
-    /* Email Action Buttons Styling */
-    .email-action-buttons {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .email-action-buttons .btn {
-        border-radius: 6px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        padding: 8px 16px;
-    }
-
-    .email-action-buttons .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-
-    /* Card Styling for Content Options */
-    .card-title {
-        color: #009898;
-        font-weight: 600;
-        font-size: 14px;
-    }
-    
-    .card-body {
-        padding: 16px;
-    }
-    
-    /* Card width and spacing */
-    .col-md-6 .card {
-        margin-bottom: 20px;
-    }
-
-    /* Email Options Checkbox Styling */
-    .email-options-row {
-        margin-bottom: 0;
-    }
-
-    .email-option-check {
-        margin-bottom: 4px;
-        padding: 2px 0;
-    }
-
-    .email-option-check .form-check-input {
-        margin-right: 6px;
-    }
-
-    .email-option-check .form-check-label {
-        font-size: 13px;
-        margin-bottom: 0;
-        font-weight: 500;
-    }
-    
-    /* WhatsApp Options Styling */
-    .whatsapp-option {
-        margin-bottom: 4px;
-        padding: 2px 0;
-    }
-    
-    .whatsapp-option .form-check-input {
-        margin-right: 6px;
-    }
-    
-    .whatsapp-option .form-check-label {
-        font-size: 13px;
-        margin-bottom: 0;
-        font-weight: 500;
-    }
-    
-    /* Reduce spacing between form groups */
-    .form-group {
-        margin-bottom: 15px;
-    }
-    
-    /* Compact row spacing */
-    .row {
-        margin-bottom: 0;
-    }
-    
-    .col-md-3 {
-        padding: 0 8px;
-    }
-    
-    /* Card internal column spacing */
-    .card-body .col-md-6 {
-        padding: 0 8px;
-        margin-bottom: 8px;
-    }
-
-    /* Content area scrollbar styling */
-    #emailPreviewArea::-webkit-scrollbar,
-    #whatsappPreviewArea::-webkit-scrollbar,
-    #emailDraftArea::-webkit-scrollbar,
-    #whatsappDraftArea::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    #emailPreviewArea::-webkit-scrollbar-track,
-    #whatsappPreviewArea::-webkit-scrollbar-track,
-    #emailDraftArea::-webkit-scrollbar-track,
-    #whatsappDraftArea::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-    
-    #emailPreviewArea::-webkit-scrollbar-thumb,
-    #whatsappPreviewArea::-webkit-scrollbar-thumb,
-    #emailDraftArea::-webkit-scrollbar-thumb,
-    #whatsappDraftArea::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 4px;
-    }
-    
-    #emailPreviewArea::-webkit-scrollbar-thumb:hover,
-    #whatsappPreviewArea::-webkit-scrollbar-thumb:hover,
-    #emailDraftArea::-webkit-scrollbar-thumb:hover,
-    #whatsappDraftArea::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
     }
     
     /* Simple Sub-quotation ID Display Styling */

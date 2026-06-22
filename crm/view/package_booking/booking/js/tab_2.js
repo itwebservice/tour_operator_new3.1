@@ -59,23 +59,31 @@ function package_tour_booking_tab2_validate() {
   for (var i = 0; i < rowCount; i++) {
     var row = table.rows[i];
     var current_row = parseInt(i) + 1;
+    var planeChk = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[0]) : row.cells[0].childNodes[0];
+    var planeDep = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[2]) : row.cells[2].childNodes[0];
+    var planeArr = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[3]) : row.cells[3].childNodes[0];
+    var planeFrom = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[4]) : row.cells[4].childNodes[0];
+    var planeTo = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[5]) : row.cells[5].childNodes[0];
+    var planeAirline = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[6]) : row.cells[6].childNodes[0];
+    var planeClass = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[7]) : row.cells[7].childNodes[0];
+    var planeAmount = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[9]) : row.cells[9].childNodes[0];
 
-    if (row.cells[0].childNodes[0].checked) {
-      validate_dynamic_empty_date(row.cells[2].childNodes[0]);
-      validate_dynamic_empty_select(row.cells[3].childNodes[0]);
-      validate_dynamic_empty_select(row.cells[4].childNodes[0]);
-      validate_dynamic_empty_select(row.cells[5].childNodes[0]);
-      validate_dynamic_empty_fields(row.cells[6].childNodes[0]); //airline
-      validate_dynamic_empty_fields(row.cells[7].childNodes[0]); //class
-      validate_dynamic_empty_fields(row.cells[9].childNodes[0]);//amount
+    if (planeChk && planeChk.checked) {
+      validate_dynamic_empty_date(planeDep);
+      validate_dynamic_empty_date(planeArr);
+      validate_dynamic_empty_select(planeFrom);
+      validate_dynamic_empty_select(planeTo);
+      validate_dynamic_empty_select(planeAirline);
+      validate_dynamic_empty_fields(planeClass);
+      validate_dynamic_empty_fields(planeAmount);
 
-      if (row.cells[2].childNodes[0].value == "") { validate_message += "Departure Date in row-" + (i + 1) + " is required<br>"; }
-      if (row.cells[3].childNodes[0].value == "") { validate_message += "Arrival Date and time in row-" + (i + 1) + " is required<br>"; }
-      if (row.cells[4].childNodes[0].value == "") { validate_message += "From Sector in row-" + (i + 1) + " is required<br>"; }
-      if (row.cells[5].childNodes[0].value == "") { validate_message += "To Sector in row-" + (i + 1) + " is required<br>"; }
-      if (row.cells[6].childNodes[0].value == "") { validate_message += "Airline Name in row-" + (i + 1) + " is required<br>"; }
-      if (row.cells[7].childNodes[0].value == "") { validate_message += "Class in row-" + (i + 1) + " is required<br>"; }
-      if (row.cells[9].childNodes[0].value == "") { validate_message += "Amount in row-" + (i + 1) + " is required<br>"; }
+      if (!planeDep || planeDep.value == "") { validate_message += "Departure Date in row-" + (i + 1) + " is required<br>"; }
+      if (!planeArr || planeArr.value == "") { validate_message += "Arrival Date and time in row-" + (i + 1) + " is required<br>"; }
+      if (!planeFrom || planeFrom.value == "") { validate_message += "From Sector in row-" + (i + 1) + " is required<br>"; }
+      if (!planeTo || planeTo.value == "") { validate_message += "To Sector in row-" + (i + 1) + " is required<br>"; }
+      if (!planeAirline || planeAirline.value == "") { validate_message += "Airline Name in row-" + (i + 1) + " is required<br>"; }
+      if (!planeClass || planeClass.value == "") { validate_message += "Class in row-" + (i + 1) + " is required<br>"; }
+      if (!planeAmount || planeAmount.value == "") { validate_message += "Amount in row-" + (i + 1) + " is required<br>"; }
 
       count++;
     }
@@ -112,6 +120,7 @@ function package_tour_booking_tab2_validate() {
     return false;
   }
   if (g_validate_status == false) { return false; }
+  return true;
 }
 /////////////////////////////////////Package Tour Master Tab2 validate end/////////////////////////////////////
 

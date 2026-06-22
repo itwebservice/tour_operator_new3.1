@@ -2552,8 +2552,9 @@ border: 1px solid #d8d6de;
 	border: 1px solid #e2e4ea;
 	border-radius: 22px;
 	padding: 20px 20px 56px;
-	box-shadow: 0 0.5px 30px rgba(0, 0, 0, 0.1);
-	margin: 0 auto 30px !important;
+	box-shadow: 0 0.5px 10px rgba(0, 0, 0, 0.1);
+	margin: 10 auto 30px !important;
+	
 }
 
 
@@ -2722,4 +2723,7 @@ textarea.ai-chat-textarea.form-control:focus,
 	white-space: pre-wrap;
 	word-break: break-word;
 	color: #333;
+}
+#tbl_package_tour_member .select2-container .select2-selection--single{
+    width:70px !important;
 }

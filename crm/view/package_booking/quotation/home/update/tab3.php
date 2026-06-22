@@ -143,7 +143,7 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                 <td class="hidden"><input type="hidden" id="transport_id-" value=""></td>
                                                             </tr>
                                                             <script type="text/javascript">
-                                                                $('#transport_vehicle1-,#pickup_from1-,#drop_to1-').select2();
+                                                                $('#transport_vehicle-,#duration-').select2();
                                                                 $('#transport_start_date-,#transport_end_date-')
                                                                     .datetimepicker({
                                                                         format: 'd-m-Y',
@@ -301,8 +301,7 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                     <td class="hidden"><input type="hidden" id="transport_id-<?= $count ?>_u" value="<?= $row_q_tr['id'] ?>"></td>
                                                                 </tr>
                                                                 <script type="text/javascript">
-                                                                    $('#transport_vehicle-<?= $count ?>_u,#pickup_from-<?= $count ?>_u,#drop_to-<?= $count ?>_u').select2();
-                                                                    $('#duration-<?= $count ?>_u').select2();
+                                                                    $('#transport_vehicle-<?= $count ?>_u,#duration-<?= $count ?>_u').select2();
                                                                     $('#transport_start_date-<?= $count ?>_u,#transport_end_date-<?= $count ?>_u')
                                                                         .datetimepicker({
                                                                             format: 'd-m-Y',
@@ -372,7 +371,7 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                         ?>
                                                             <tr>
                                                                 <td><input class="css-checkbox" id="chk_tour_group-1_u"
-                                                                        type="checkbox" checked
+                                                                        type="checkbox"
                                                                         onchange="get_excursion_amount_update(this.id);"><label
                                                                         class="css-label" for="chk_tour_group-1_u"> <label>
                                                                 </td>
@@ -531,25 +530,25 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                             </option>
                                                                             <option value="SIC">SIC</option>
                                                                         </select></td>
-                                                                    <td><input type="number" id="adult-1" name="adult-1"
+                                                                    <td><input type="number" id="adult-<?= $count ?>_u" name="adult-<?= $count ?>_u"
                                                                             placeholder="Adult(s)" title="Adult(s)"
                                                                             style="width:150px"
-                                                                            onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'Adult');"
+                                                                            onchange="get_excursion_amount_update('chk_tour_group-<?= $count ?>_u');validate_balance(this.id);validate_pax_count(this.id,'Adult');"
                                                                             value="<?= $row_q_ex['adult'] ?>"></td>
-                                                                    <td><input type="number" id="child-1" name="child-1"
+                                                                    <td><input type="number" id="child-<?= $count ?>_u" name="child-<?= $count ?>_u"
                                                                             placeholder="Child With-Bed" title="Child With-Bed"
                                                                             style="width:150px"
-                                                                            onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'ChildWithBed');"
+                                                                            onchange="get_excursion_amount_update('chk_tour_group-<?= $count ?>_u');validate_balance(this.id);validate_pax_count(this.id,'ChildWithBed');"
                                                                             value="<?= $row_q_ex['chwb'] ?>"></td>
-                                                                    <td><input type="number" id="childwo-1" name="childwo-1"
+                                                                    <td><input type="number" id="childwo-<?= $count ?>_u" name="childwo-<?= $count ?>_u"
                                                                             placeholder="Child Without-Bed"
                                                                             title="Child Without-Bed" style="width:150px"
-                                                                            onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'ChildWithoutBed');"
+                                                                            onchange="get_excursion_amount_update('chk_tour_group-<?= $count ?>_u');validate_balance(this.id);validate_pax_count(this.id,'ChildWithoutBed');"
                                                                             value="<?= $row_q_ex['chwob'] ?>"></td>
-                                                                    <td><input type="number" id="infant-1" name="infant-1"
+                                                                    <td><input type="number" id="infant-<?= $count ?>_u" name="infant-<?= $count ?>_u"
                                                                             placeholder="Infant(s)" title="Infant(s)"
                                                                             style="width:150px"
-                                                                            onchange="get_excursion_amount();validate_balance(this.id);validate_pax_count(this.id,'Infant');"
+                                                                            onchange="get_excursion_amount_update('chk_tour_group-<?= $count ?>_u');validate_balance(this.id);validate_pax_count(this.id,'Infant');"
                                                                             value="<?= $row_q_ex['infant'] ?>"></td>
                                                                     <td style="display:none"><input type="text"
                                                                             id="excursion_amount-<?= $count ?>_u"
@@ -663,9 +662,17 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
 
 
 <script>
-    destinationLoading(".pickup_from", 'Pickup Location');
-    destinationLoading(".drop_to", 'Drop-off Location');
+    $(document).ready(function () {
+        destinationLoading(".pickup_from", 'Pickup Location');
+        destinationLoading(".drop_to", 'Drop-off Location');
+    });
     city_lzloading('.city_name');
+
+    $('#tbl_package_tour_quotation_dynamic_hotel_update').on('change select2:select', 'select[id^="city_name"], select[name^="city_name"]', function() {
+        if (typeof hotel_name_list_load === 'function') {
+            hotel_name_list_load(this.id);
+        }
+    });
     
     // Preserve tab2 itinerary data for the final update step
     $(document).ready(function() {
@@ -1284,6 +1291,9 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
     // Initialize when tab3 becomes active
     $('#tab3_head').on('click', function() {
         setTimeout(function() {
+            if (typeof syncQuotationTravelStayDates === 'function') {
+                syncQuotationTravelStayDates();
+            }
             get_hotel_cost();
             get_excursion_amount();
             get_transport_cost();

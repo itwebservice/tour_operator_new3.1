@@ -1038,19 +1038,15 @@ function quotation_cost_calculate1(id) {
 		var discount = (service_charge != 0) ? parseFloat(discount_amt) : 0;
 	}
 	var after_discount_amt = parseFloat(discountable_amt) - parseFloat(discount);
-	// customTcsTax(rowId);
-    
-        var tcs_amt = $('#tcs1-').val();
-        if(tcs_amt=='')
-        {
-            tcs_amt=0;
-        }
-        
-        
-    var total_amt = parseFloat(sub_total) + parseFloat(service_tax_amount) + parseFloat(after_discount_amt)+parseFloat(tcs_amt);
-    $('#total_tour_cost-' + offset[1]).val(total_amt.toFixed(2));
-    customTcsTax( offset[1]);
+    customTcsTax(offset[1]);
 
+    var tcs_amt = $('#tcs1-' + offset[1]).val();
+    if (tcs_amt == '') {
+        tcs_amt = 0;
+    }
+
+    var total_amt = parseFloat(sub_total) + parseFloat(service_tax_amount) + parseFloat(after_discount_amt) + parseFloat(tcs_amt);
+    $('#total_tour_cost-' + offset[1]).val(total_amt.toFixed(2));
 }
 
 $('#frm_tab4').validate({
@@ -1247,56 +1243,30 @@ $('#frm_tab4').validate({
             
             // Get image data for this row - check both new uploads and existing images
             var img = '';
-            var rowIndex = i + 1; // Convert to 1-based index
+            var imageInput = row.querySelector('input[id^="day_image_"]');
+            var imageKey = imageInput && imageInput.id ? imageInput.id.replace('day_image_', '') : String(i + 1);
             
-            console.log("UPDATE TAB4: Processing image for row", i, "with rowIndex", rowIndex);
+            console.log("UPDATE TAB4: Processing image for row", i, "with imageKey", imageKey);
             
             // First check if we have a new image uploaded via previewDayImage
-            if (window.quotationImages && window.quotationImages[rowIndex]) {
-                var imageData = window.quotationImages[rowIndex];
-                console.log("UPDATE TAB4: Found new image data for rowIndex", rowIndex, imageData);
+            if (window.quotationImages && window.quotationImages[imageKey]) {
+                var imageData = window.quotationImages[imageKey];
+                console.log("UPDATE TAB4: Found new image data for imageKey", imageKey, imageData);
                 
-                if (imageData.file && !imageData.uploaded) {
-                    console.log("UPDATE TAB4: Uploading new image for rowIndex", rowIndex);
-                    // Upload the image immediately
-                    var formData = new FormData();
-                    formData.append('uploadfile', imageData.file);
-                    
-                    $.ajax({
-                        url: $('#base_url').val() + 'view/other_masters/itinerary/upload_itinerary_image.php',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        async: false, // Make it synchronous for data collection
-                        success: function(response) {
-                            try {
-                                var msg = response.split('--');
-                                if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
-                                    img = response;
-                                    window.quotationImages[rowIndex].uploaded = true;
-                                    window.quotationImages[rowIndex].image_url = response;
-                                    console.log("UPDATE TAB4: Image uploaded successfully for rowIndex", rowIndex, ":", img);
-                                } else {
-                                    console.log("UPDATE TAB4: Upload failed for rowIndex", rowIndex, ":", response);
-                                }
-                            } catch(e) {
-                                console.log('UPDATE TAB4: Upload parse error for rowIndex', rowIndex, ':', e);
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.log("UPDATE TAB4: Upload error for rowIndex", rowIndex, ":", error);
-                        }
-                    });
-                } else if (imageData.image_url) {
+                if (imageData.image_url) {
                     img = imageData.image_url;
-                    console.log("UPDATE TAB4: Using existing uploaded image URL for rowIndex", rowIndex, ":", img);
+                    console.log("UPDATE TAB4: Using existing uploaded image URL for imageKey", imageKey, ":", img);
+                }
+            } else if (window.quotationImages && window.quotationImages[i + 1]) {
+                var imageDataLegacy = window.quotationImages[i + 1];
+                if (imageDataLegacy.image_url) {
+                    img = imageDataLegacy.image_url;
                 }
             } else {
                 // Fallback to existing image from hidden input
                 var existingImgInput = row.querySelector('input[id^="existing_image_path_"]');
                 img = existingImgInput ? existingImgInput.value : '';
-                console.log("UPDATE TAB4: Using existing image for rowIndex", rowIndex, ":", img);
+                console.log("UPDATE TAB4: Using existing image for imageKey", imageKey, ":", img);
             }
             
             console.log("UPDATE TAB4: Final image for row", i, ":", img);

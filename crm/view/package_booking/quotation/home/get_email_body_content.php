@@ -5,7 +5,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 $quotation_id = $_POST['quotation_id'];
 $email_option = $_POST['email_option'];
-$options = isset($_POST['options']) && !empty($_POST['options']) ? $_POST['options'] : array();
+$options = isset($_POST['options']) ? (array)$_POST['options'] : array('price_structure', 'inclusion_exclusion', 'terms_conditions', 'itinerary');
+$sectioned = isset($_POST['sectioned']) && $_POST['sectioned'] == '1';
 
 // Debug information
 error_log("Quotation ID: " . $quotation_id);
@@ -233,189 +234,169 @@ if ($sq_terms_and_conditions && mysqli_num_rows($sq_terms_and_conditions) > 0) {
     $terms_and_conditions_details = $row_terms['terms_and_conditions'] ?? '';
 }
 
-// Generate email body content
-$email_content = "Hi Guest,\n\n";
-$email_content .= "Greetings from ITOURS LLP PVT LTDS\n\n";
-$email_content .= "Thank you for your query with us. As per your requirements, following are the package details.\n";
-$email_content .= "*Quotation ID :* {$quotation_id_display} \n\n";
-$email_content .= "*{$sq_package['package_name']}*\n";
-$email_content .= "* {$from_date} for {$duration} Nights, " . ($duration + 1) . " Days\n";
-$email_content .= "* {$sq_quotation['total_adult']} Adults\n";
-$email_content .= "* " . ($sq_quotation['children_with_bed'] + $sq_quotation['children_without_bed']) . " Child\n";
-$email_content .= "* {$sq_quotation['total_infant']} Infant\n";
-$email_content .= "               \n";
+// Generate email body content - header (always included)
+$header_content = "Hi Guest,\n\n";
+$header_content .= "Greetings from ITOURS LLP PVT LTDS\n\n";
+$header_content .= "Thank you for your query with us. As per your requirements, following are the package details.\n";
+$header_content .= "*Quotation ID :* {$quotation_id_display} \n\n";
+$header_content .= "*{$sq_package['package_name']}*\n";
+$header_content .= "* {$from_date} for {$duration} Nights, " . ($duration + 1) . " Days\n";
+$header_content .= "* {$sq_quotation['total_adult']} Adults\n";
+$header_content .= "* " . ($sq_quotation['children_with_bed'] + $sq_quotation['children_without_bed']) . " Child\n";
+$header_content .= "* {$sq_quotation['total_infant']} Infant\n";
+$header_content .= "               \n";
 
-// Price Structure - show if selected OR no specific options are selected (show all sections)
-$show_price = in_array('price_structure', $options) || $show_all_sections;
+// Price Structure section
+$price_section = "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
+$price_section .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
+$price_section .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
+$price_section .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
+$price_section .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
 
-if ($show_price) {
-    $email_content .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-    $email_content .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-    $email_content .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-    $email_content .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-    $email_content .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+// Hotels + Itinerary + Transportation section
+$itinerary_section = '';
+if ($hotel_count > 0) {
+    $itinerary_section .= "🏨  *Hotels*\n";
+    $itinerary_section .= "-----------\n";
+    $itinerary_section .= $hotel_details . "\n";
+} elseif (!empty($hotel_details)) {
+    $itinerary_section .= "🏨  *Hotels*\n";
+    $itinerary_section .= "-----------\n";
+    $itinerary_section .= "Hotel details will be provided upon confirmation.\n\n";
 }
 
-
-
-
-// Hotels - show if we have hotel data AND no specific options are selected (show all sections)
-$show_all_sections = empty($options);
-$show_hotels = !empty($hotel_details) && $show_all_sections;
-
-if ($show_hotels && $hotel_count > 0) {
-    $email_content .= "🏨  *Hotels*\n";
-    $email_content .= "-----------\n";
-    $email_content .= $hotel_details . "\n";
-} elseif ($show_hotels) {
-    $email_content .= "🏨  *Hotels*\n";
-    $email_content .= "-----------\n";
-    $email_content .= "Hotel details will be provided upon confirmation.\n\n";
-}
-
-
-// Itinerary - show if selected OR no specific options are selected (show all sections)
-$show_itinerary = in_array('itinerary', $options) || $show_all_sections;
-
-if ($show_itinerary) {
-    if ($itinerary_count > 0) {
-        $email_content .= "-----------\n";
-        $email_content .= $itinerary_details . "\n";
-    } else {
-        $email_content .= "-----------\n";
-        $email_content .= "📅 *Itinerary*\n";
-        $email_content .= "-----------\n";
-        $email_content .= "Detailed itinerary will be provided upon confirmation.\n\n";
-    }
-}
-
-// Transportation - show if we have transport data AND no specific options are selected (show all sections)
-$show_transport = $transport_count > 0 && $show_all_sections;
-
-if ($show_transport) {
-    $email_content .= "🚖  *Transportation*\n";
-    $email_content .= "-----------\n";
-    $email_content .= $transport_details . "\n";
-}
-
-// Inclusion/Exclusion - show if selected OR no specific options are selected (show all sections)
-$show_inclusions = in_array('inclusion_exclusion', $options) || $show_all_sections;
-
-if ($show_inclusions) {
-    error_log("Processing inclusions/exclusions...");
-    error_log("Inclusions data: " . (isset($sq_quotation['inclusions']) ? $sq_quotation['inclusions'] : 'NOT SET'));
-    error_log("Exclusions data: " . (isset($sq_quotation['exclusions']) ? $sq_quotation['exclusions'] : 'NOT SET'));
-    
-    // Inclusions
-    $email_content .= "✅  *Inclusions*\n";
-    $email_content .= "-----------\n";
-    if (!empty($sq_quotation['inclusions'])) {
-        // Remove HTML tags and clean up the text
-        $inclusions = $sq_quotation['inclusions'];
-        $inclusions = strip_tags($inclusions);
-        $inclusions = html_entity_decode($inclusions, ENT_QUOTES, 'UTF-8');
-        $inclusions = preg_replace('/\s+/', ' ', $inclusions); // Replace multiple spaces with single space
-        $inclusions = trim($inclusions);
-        
-        // Split by common separators and format as bullet points
-        $inclusions_list = preg_split('/(\.|;|,)/', $inclusions);
-        foreach ($inclusions_list as $inclusion) {
-            $inclusion = trim($inclusion);
-            // Only include meaningful items (at least 10 characters)
-            if (!empty($inclusion) && strlen($inclusion) > 10) {
-                $email_content .= "• " . $inclusion . "\n";
-            }
-        }
-        $email_content .= "\n";
-    } else {
-        $email_content .= "Inclusions will be provided upon confirmation.\n\n";
-    }
-
-    // Exclusions
-    $email_content .= "❌  *Exclusions*\n";
-    $email_content .= "-----------\n";
-    if (!empty($sq_quotation['exclusions'])) {
-        // Remove HTML tags and clean up the text
-        $exclusions = $sq_quotation['exclusions'];
-        $exclusions = strip_tags($exclusions);
-        $exclusions = html_entity_decode($exclusions, ENT_QUOTES, 'UTF-8');
-        $exclusions = preg_replace('/\s+/', ' ', $exclusions); // Replace multiple spaces with single space
-        $exclusions = trim($exclusions);
-        
-        // Split by common separators and format as bullet points
-        $exclusions_list = preg_split('/(\.|;|,)/', $exclusions);
-        foreach ($exclusions_list as $exclusion) {
-            $exclusion = trim($exclusion);
-            // Only include meaningful items (at least 10 characters)
-            if (!empty($exclusion) && strlen($exclusion) > 10) {
-                $email_content .= "• " . $exclusion . "\n";
-            }
-        }
-        $email_content .= "\n";
-    } else {
-        $email_content .= "Exclusions will be provided upon confirmation.\n\n";
-    }
+if ($itinerary_count > 0) {
+    $itinerary_section .= "-----------\n";
+    $itinerary_section .= $itinerary_details . "\n";
 } else {
-    error_log("Inclusions/Exclusions NOT selected in options");
+    $itinerary_section .= "-----------\n";
+    $itinerary_section .= "📅 *Itinerary*\n";
+    $itinerary_section .= "-----------\n";
+    $itinerary_section .= "Detailed itinerary will be provided upon confirmation.\n\n";
 }
 
+if ($transport_count > 0) {
+    $itinerary_section .= "🚖  *Transportation*\n";
+    $itinerary_section .= "-----------\n";
+    $itinerary_section .= $transport_details . "\n";
+}
 
+// Inclusion/Exclusion section
+$inclusion_section = "✅  *Inclusions*\n";
+$inclusion_section .= "-----------\n";
+if (!empty($sq_quotation['inclusions'])) {
+    $inclusions = $sq_quotation['inclusions'];
+    $inclusions = strip_tags($inclusions);
+    $inclusions = html_entity_decode($inclusions, ENT_QUOTES, 'UTF-8');
+    $inclusions = preg_replace('/\s+/', ' ', $inclusions);
+    $inclusions = trim($inclusions);
 
-// Terms & Conditions - show if selected OR no specific options are selected (show all sections)
-$show_terms = in_array('terms_conditions', $options) || $show_all_sections;
-
-if ($show_terms) {
-    error_log("Processing terms and conditions...");
-    error_log("Terms data: " . (isset($terms_and_conditions_details) ? substr($terms_and_conditions_details, 0, 200) . '...' : 'NOT SET'));
-    
-    $email_content .= "📌 *TERMS AND CONDITIONS*\n";
-    $email_content .= "-----------\n";
-    if (!empty($terms_and_conditions_details)) {
-        // Format terms and conditions as a proper list
-        $terms = $terms_and_conditions_details;
-        
-        // Remove all HTML tags and clean up the text
-        $terms = strip_tags($terms);
-        $terms = html_entity_decode($terms, ENT_QUOTES, 'UTF-8');
-        $terms = preg_replace('/\s+/', ' ', $terms); // Replace multiple spaces with single space
-        $terms = trim($terms);
-        
-        // Split by common separators and format as bullet points
-        $terms_list = preg_split('/(\.|;|,)/', $terms);
-        foreach ($terms_list as $term) {
-            $term = trim($term);
-            if (!empty($term) && strlen($term) > 10) { // Only include meaningful terms
-                $email_content .= "• " . $term . "\n";
-            }
+    $inclusions_list = preg_split('/(\.|;|,)/', $inclusions);
+    foreach ($inclusions_list as $inclusion) {
+        $inclusion = trim($inclusion);
+        if (!empty($inclusion) && strlen($inclusion) > 10) {
+            $inclusion_section .= "• " . $inclusion . "\n";
         }
-        $email_content .= "\n";
-    } else {
-        $email_content .= "Standard terms and conditions apply. Details will be provided upon confirmation.\n";
     }
+    $inclusion_section .= "\n";
 } else {
-    error_log("Terms and conditions NOT selected in options");
+    $inclusion_section .= "Inclusions will be provided upon confirmation.\n\n";
 }
 
+$inclusion_section .= "❌  *Exclusions*\n";
+$inclusion_section .= "-----------\n";
+if (!empty($sq_quotation['exclusions'])) {
+    $exclusions = $sq_quotation['exclusions'];
+    $exclusions = strip_tags($exclusions);
+    $exclusions = html_entity_decode($exclusions, ENT_QUOTES, 'UTF-8');
+    $exclusions = preg_replace('/\s+/', ' ', $exclusions);
+    $exclusions = trim($exclusions);
 
+    $exclusions_list = preg_split('/(\.|;|,)/', $exclusions);
+    foreach ($exclusions_list as $exclusion) {
+        $exclusion = trim($exclusion);
+        if (!empty($exclusion) && strlen($exclusion) > 10) {
+            $inclusion_section .= "• " . $exclusion . "\n";
+        }
+    }
+    $inclusion_section .= "\n";
+} else {
+    $inclusion_section .= "Exclusions will be provided upon confirmation.\n\n";
+}
 
-// Generate quotation link
+// Terms & Conditions section
+$terms_section = "📌 *TERMS AND CONDITIONS*\n";
+$terms_section .= "-----------\n";
+if (!empty($terms_and_conditions_details)) {
+    $terms = $terms_and_conditions_details;
+    $terms = strip_tags($terms);
+    $terms = html_entity_decode($terms, ENT_QUOTES, 'UTF-8');
+    $terms = preg_replace('/\s+/', ' ', $terms);
+    $terms = trim($terms);
+
+    $terms_list = preg_split('/(\.|;|,)/', $terms);
+    foreach ($terms_list as $term) {
+        $term = trim($term);
+        if (!empty($term) && strlen($term) > 10) {
+            $terms_section .= "• " . $term . "\n";
+        }
+    }
+    $terms_section .= "\n";
+} else {
+    $terms_section .= "Standard terms and conditions apply. Details will be provided upon confirmation.\n";
+}
+
+// Footer (always included)
 $quotation_encoded = base64_encode($quotation_id);
 $quotation_link = BASE_URL . "model/package_tour/quotation/single_quotation.php?quotation={$quotation_encoded}";
 
-$email_content .= "\n*Link* : {$quotation_link}\n\n";
-$email_content .= "Please contact for more details : ITOURS LLP PVT LTDS +919168425999\n";
-$email_content .= "Thank you.";
+$footer_content = "\n*Link* : {$quotation_link}\n\n";
+$footer_content .= "Please contact for more details : ITOURS LLP PVT LTDS +919168425999\n";
+$footer_content .= "Thank you.";
 
-// If WhatsApp is requested, format content for WhatsApp
-if ($email_option == 'WhatsApp') {
+function format_preview_section_html($section_key, $content) {
+    if (trim($content) === '') {
+        return '';
+    }
+    $formatted = str_replace("\n", '<br>', $content);
+    return '<div class="preview-section-block" data-section="' . $section_key . '">' . $formatted . '</div>';
+}
+
+if ($sectioned) {
+    $email_content = '<div class="preview-section-block preview-section-header" data-section="header">' . str_replace("\n", '<br>', $header_content) . '</div>';
+    $email_content .= format_preview_section_html('price_structure', $price_section);
+    $email_content .= format_preview_section_html('itinerary', $itinerary_section);
+    $email_content .= format_preview_section_html('inclusion_exclusion', $inclusion_section);
+    $email_content .= format_preview_section_html('terms_conditions', $terms_section);
+    $email_content .= '<div class="preview-section-block preview-section-footer" data-section="footer">' . str_replace("\n", '<br>', $footer_content) . '</div>';
+} else {
+    $email_content = $header_content;
+
+    if (in_array('price_structure', $options)) {
+        $email_content .= $price_section;
+    }
+    if (in_array('itinerary', $options)) {
+        $email_content .= $itinerary_section;
+    }
+    if (in_array('inclusion_exclusion', $options)) {
+        $email_content .= $inclusion_section;
+    }
+    if (in_array('terms_conditions', $options)) {
+        $email_content .= $terms_section;
+    }
+
+    $email_content .= $footer_content;
+}
+
+// If WhatsApp is requested, format content for WhatsApp (skip when sectioned preview HTML is used)
+if ($email_option == 'WhatsApp' && !$sectioned) {
     error_log("Formatting for WhatsApp");
-    // Format content for WhatsApp (remove HTML tags, use * for bold)
     $email_content = str_replace(['<br>', '<br/>', '<br />'], "\n", $email_content);
     $email_content = strip_tags($email_content);
     $email_content = str_replace(['<b>', '</b>', '<strong>', '</strong>'], '*', $email_content);
     $email_content = str_replace(['<i>', '</i>', '<em>', '</em>'], '_', $email_content);
-    $email_content = preg_replace('/\*+/', '*', $email_content); // Remove multiple asterisks
-    $email_content = preg_replace('/\n\s*\n/', "\n\n", $email_content); // Clean up multiple newlines
+    $email_content = preg_replace('/\*+/', '*', $email_content);
+    $email_content = preg_replace('/\n\s*\n/', "\n\n", $email_content);
 } else {
     error_log("Formatting for Email");
 }

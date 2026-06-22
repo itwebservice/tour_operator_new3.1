@@ -2,8 +2,19 @@ $('#train_arrival_date1, #train_departure_date1').datetimepicker({ format: 'd-m-
 $('#transport_start_date1, #transport_end_date1').datetimepicker({ timepicker: false, format: 'd-m-Y' });
 
 function total_days_reflect(offset = '') {
-	var from_date = $('#from_date' + offset).val();
-	var to_date = $('#to_date' + offset).val();
+	var from_date = $('#from_date' + offset).val() || '';
+	var to_date = $('#to_date' + offset).val() || '';
+
+	if (from_date && typeof syncQuotationTravelStayDates === 'function') {
+		syncQuotationTravelStayDates();
+	}
+
+	if (!from_date || !to_date) {
+		if (!from_date && !to_date) {
+			$('#total_days' + offset).val(0);
+		}
+		return;
+	}
 
 	var edate = from_date.split('-');
 	e_date = new Date(edate[2], edate[1] - 1, edate[0]).getTime();
@@ -19,13 +30,7 @@ function total_days_reflect(offset = '') {
 	var total_days = Math.round(Math.abs(difference_ms) / one_day);
 
 	total_days = parseFloat(total_days);
-
-	if(from_date == "" && to_date == ""){
-		$('#total_days' + offset).val(0);
-	}
-	else{
-		$('#total_days' + offset).val(total_days);
-		
+	$('#total_days' + offset).val(total_days);
 		// Store nights for package filtering (only for main form, not other offsets)
 		if (offset === '') {
 			sessionStorage.setItem('selected_nights', total_days);
@@ -62,7 +67,6 @@ function total_days_reflect(offset = '') {
 				});
 			}
 		}
-	}
 }
 
 function package_dynamic_reflect(dest_name) {
@@ -231,7 +235,7 @@ function quotation_cost_calculate(id) {
 	sub_total = ($('#basic_show-' + offset[1]).html() == '&nbsp;') ? sub_total : parseFloat($('#basic_show-' + offset[1]).text().split(' : ')[1]);
 	service_charge = ($('#service_show-' + offset[1]).html() == '&nbsp;') ? service_charge : parseFloat($('#service_show-' + offset[1]).text().split(' : ')[1]);
     customTcsTax(id);
-    
+
     var tcs_amt = $('#tcs1-' + offset[1]).val();
     if(tcs_amt=='')
     {
@@ -490,5 +494,357 @@ function validate_pax_count(id,type){
 		$('#'+id).val(0);
 		return false;
 	}
+}
+
+function quotationParseDMY(dateStr) {
+	if (!dateStr) return null;
+	var value = String(dateStr).trim();
+	var timeIdx = value.indexOf(' ');
+	if (timeIdx > -1) {
+		value = value.substring(0, timeIdx);
+	}
+	var parts = value.split('-');
+	if (parts.length !== 3) return null;
+	return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+}
+
+function quotationFormatDMY(dateObj) {
+	var day = dateObj.getDate();
+	var month = dateObj.getMonth() + 1;
+	var year = dateObj.getFullYear();
+	return (day < 10 ? '0' : '') + day + '-' + (month < 10 ? '0' : '') + month + '-' + year;
+}
+
+function quotationDaysBetween(fromStr, toStr) {
+	var from = quotationParseDMY(fromStr);
+	var to = quotationParseDMY(toStr);
+	if (!from || !to) return 0;
+	return Math.round(Math.abs(to - from) / (1000 * 60 * 60 * 24));
+}
+
+function quotationDateDelta(oldFrom, newFrom) {
+	var oldD = quotationParseDMY(oldFrom);
+	var newD = quotationParseDMY(newFrom);
+	if (!oldD || !newD) return 0;
+	return Math.round((newD - oldD) / (1000 * 60 * 60 * 24));
+}
+
+function quotationShiftDMY(dateStr, deltaDays) {
+	if (!dateStr || deltaDays === 0) return dateStr;
+	var value = String(dateStr).trim();
+	var timePart = '';
+	if (value.indexOf(' ') > -1) {
+		timePart = value.substring(value.indexOf(' '));
+		value = value.substring(0, value.indexOf(' '));
+	}
+	var shifted = quotationAddDays(value, deltaDays);
+	return shifted + timePart;
+}
+
+function quotationAddDays(dateStr, days) {
+	var d = quotationParseDMY(dateStr);
+	if (!d) return '';
+	d.setDate(d.getDate() + days);
+	return quotationFormatDMY(d);
+}
+
+function quotationGetTravelDates() {
+	var isUpdate = $('#from_date12').length > 0;
+	return {
+		isUpdate: isUpdate,
+		from_date: isUpdate ? $('#from_date12').val() : $('#from_date').val(),
+		to_date: isUpdate ? $('#to_date12').val() : $('#to_date').val()
+	};
+}
+
+function quotationIsRowActive(row) {
+	if (!row || !row.cells || !row.cells[0] || !row.cells[0].childNodes[0]) return true;
+	var input = row.cells[0].childNodes[0];
+	return input.type !== 'checkbox' || input.checked;
+}
+
+function quotationShiftTableDateCells(tableId, cellIndexes, delta) {
+	var table = document.getElementById(tableId);
+	if (!table || !delta) return;
+	for (var i = 0; i < table.rows.length; i++) {
+		var row = table.rows[i];
+		if (!quotationIsRowActive(row)) continue;
+		for (var j = 0; j < cellIndexes.length; j++) {
+			var input = quotationGetTableDateInput(row, cellIndexes[j]);
+			if (input && input.value) {
+				input.value = quotationShiftDMY(input.value, delta);
+				if (window.jQuery) {
+					jQuery(input).trigger('change');
+				}
+			}
+		}
+	}
+}
+
+function quotationSetTableDateCells(tableId, cellIndexes, dateValue) {
+	var table = document.getElementById(tableId);
+	if (!table || !dateValue) return;
+	for (var i = 0; i < table.rows.length; i++) {
+		var row = table.rows[i];
+		if (!quotationIsRowActive(row)) continue;
+		for (var j = 0; j < cellIndexes.length; j++) {
+			var input = quotationGetTableDateInput(row, cellIndexes[j]);
+			if (input) {
+				quotationSetInputDateValue(input, dateValue);
+			}
+		}
+	}
+}
+
+function quotationGetTableDateInput(row, cellIndex) {
+	if (!row || !row.cells || !row.cells[cellIndex]) return null;
+	var cell = row.cells[cellIndex];
+	for (var i = 0; i < cell.childNodes.length; i++) {
+		var node = cell.childNodes[i];
+		if (node.tagName === 'INPUT' || node.tagName === 'SELECT' || node.tagName === 'TEXTAREA') {
+			return node;
+		}
+	}
+	return null;
+}
+
+function quotationGetRowNights(row) {
+	var stayDaysInput = quotationGetTableDateInput(row, 9);
+	if (stayDaysInput && stayDaysInput.value) {
+		var nightsFromField = parseInt(stayDaysInput.value, 10);
+		if (!isNaN(nightsFromField) && nightsFromField > 0) {
+			return nightsFromField;
+		}
+	}
+
+	var checkInInput = quotationGetTableDateInput(row, 6);
+	var checkOutInput = quotationGetTableDateInput(row, 7);
+	if (checkInInput && checkOutInput && checkInInput.value && checkOutInput.value) {
+		var nightsFromDates = quotationDaysBetween(checkInInput.value, checkOutInput.value);
+		if (nightsFromDates > 0) {
+			return nightsFromDates;
+		}
+	}
+
+	return 1;
+}
+
+function quotationSetInputDateValue(input, dateValue) {
+	if (!input || !dateValue) return;
+	input.value = dateValue;
+	if (window.jQuery) {
+		jQuery(input).trigger('change');
+	}
+}
+
+function quotationSyncHotelDatesFromTravelStart(from_date) {
+	var tableIds = ['tbl_package_tour_quotation_dynamic_hotel', 'tbl_package_tour_quotation_dynamic_hotel_update'];
+	var travelStart = from_date.split(' ')[0];
+
+	tableIds.forEach(function (tableId) {
+		var table = document.getElementById(tableId);
+		if (!table || !table.rows.length) return;
+
+		var chainDate = travelStart;
+		for (var i = 0; i < table.rows.length; i++) {
+			var row = table.rows[i];
+			if (!quotationIsRowActive(row)) continue;
+
+			var checkInInput = quotationGetTableDateInput(row, 6);
+			var checkOutInput = quotationGetTableDateInput(row, 7);
+			if (!checkInInput || !checkOutInput) continue;
+
+			var nights = quotationGetRowNights(row);
+			var checkOutDate = quotationAddDays(chainDate, nights);
+
+			quotationSetInputDateValue(checkInInput, chainDate);
+			quotationSetInputDateValue(checkOutInput, checkOutDate);
+
+			var stayDaysInput = quotationGetTableDateInput(row, 9);
+			if (stayDaysInput) {
+				stayDaysInput.value = nights;
+			}
+
+			chainDate = checkOutDate;
+		}
+	});
+}
+
+function quotationSyncTransportDates(from_date, to_date) {
+	var travelStart = from_date.split(' ')[0];
+	var travelEnd = to_date ? to_date.split(' ')[0] : '';
+
+	['tbl_package_tour_quotation_dynamic_transport', 'tbl_package_tour_quotation_dynamic_transport_u'].forEach(function (tableId) {
+		var table = document.getElementById(tableId);
+		if (!table) return;
+		for (var i = 0; i < table.rows.length; i++) {
+			var row = table.rows[i];
+			if (!quotationIsRowActive(row)) continue;
+			var startInput = quotationGetTableDateInput(row, 3);
+			var endInput = quotationGetTableDateInput(row, 4);
+			if (startInput && !startInput.value) {
+				quotationSetInputDateValue(startInput, travelStart);
+			}
+			if (endInput && !endInput.value && travelEnd) {
+				quotationSetInputDateValue(endInput, travelEnd);
+			}
+		}
+	});
+}
+
+function quotationShiftDatetimeFieldsByDelta(delta) {
+	if (!delta) return;
+
+	quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_plane', [6, 7], delta);
+	quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_train', [5, 6], delta);
+	quotationShiftTableDateCells('tbl_dynamic_cruise_quotation', [2, 3], delta);
+	quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_excursion', [2], delta);
+
+	[
+		'input[id^="txt_dapart"]',
+		'input[id^="txt_arrval"]',
+		'input[id^="train_departure_date"]',
+		'input[id^="train_arrival_date"]',
+		'input[id^="cruise_departure_date"]',
+		'input[id^="cruise_arrival_date"]',
+		'input[id^="exc_date-"]'
+	].forEach(function (selector) {
+		jQuery(selector).each(function () {
+			if (this.value) {
+				this.value = quotationShiftDMY(this.value, delta);
+				jQuery(this).trigger('change');
+			}
+		});
+	});
+}
+
+function quotationSetDefaultSectionDates(from_date) {
+	jQuery('#txt_dapart1, #txt_arrval1, #train_departure_date, #train_arrival_date, #cruise_departure_date, #cruise_arrival_date, #exc_date-1').each(function () {
+		var current = jQuery(this).val();
+		var timePart = ' 00:00';
+		if (current && current.indexOf(' ') > -1) {
+			timePart = current.substring(current.indexOf(' '));
+		}
+		jQuery(this).val(from_date.split(' ')[0] + timePart).trigger('change');
+	});
+}
+function quotationGetTravelStayBaselineDate() {
+	var hotelTableIds = ['tbl_package_tour_quotation_dynamic_hotel', 'tbl_package_tour_quotation_dynamic_hotel_update'];
+	for (var h = 0; h < hotelTableIds.length; h++) {
+		var hotelTable = document.getElementById(hotelTableIds[h]);
+		if (!hotelTable) continue;
+		for (var i = 0; i < hotelTable.rows.length; i++) {
+			var row = hotelTable.rows[i];
+			if (!quotationIsRowActive(row)) continue;
+			var checkInInput = quotationGetTableDateInput(row, 6);
+			if (checkInInput && checkInInput.value) {
+				return checkInInput.value.split(' ')[0];
+			}
+		}
+	}
+
+	var transportTableIds = ['tbl_package_tour_quotation_dynamic_transport', 'tbl_package_tour_quotation_dynamic_transport_u'];
+	for (var t = 0; t < transportTableIds.length; t++) {
+		var transportTable = document.getElementById(transportTableIds[t]);
+		if (!transportTable) continue;
+		for (var k = 0; k < transportTable.rows.length; k++) {
+			var tRow = transportTable.rows[k];
+			if (!quotationIsRowActive(tRow)) continue;
+			var startInput = quotationGetTableDateInput(tRow, 3);
+			if (startInput && startInput.value) {
+				return startInput.value.split(' ')[0];
+			}
+		}
+	}
+
+	return '';
+}
+
+function quotationRecalculateTravelStayCosts(isUpdate) {
+	if (typeof get_hotel_cost === 'function') {
+		get_hotel_cost();
+	}
+	if (!isUpdate && typeof get_transport_cost === 'function') {
+		get_transport_cost();
+	}
+	if (isUpdate && typeof get_transport_cost_update === 'function') {
+		var transportTable = document.getElementById('tbl_package_tour_quotation_dynamic_transport_u');
+		if (transportTable && transportTable.rows.length) {
+			var firstRow = transportTable.rows[0];
+			var startInput = firstRow.cells[3] && firstRow.cells[3].childNodes[0];
+			if (startInput && startInput.id) {
+				get_transport_cost_update(startInput.id);
+			}
+		}
+	}
+	if (typeof get_excursion_amount === 'function') {
+		get_excursion_amount();
+	}
+}
+
+function syncQuotationTravelStayDates() {
+	var dates = quotationGetTravelDates();
+	var from_date = dates.from_date;
+	var to_date = dates.to_date;
+	if (!from_date) return;
+
+	var travelStart = from_date.split(' ')[0];
+	var baselineDate = quotationGetTravelStayBaselineDate();
+	var delta = baselineDate ? quotationDateDelta(baselineDate, travelStart) : 0;
+	var hasHotelRows = !!document.getElementById('tbl_package_tour_quotation_dynamic_hotel') ||
+		!!document.getElementById('tbl_package_tour_quotation_dynamic_hotel_update');
+
+	if (hasHotelRows) {
+		quotationSyncHotelDatesFromTravelStart(from_date);
+	}
+
+	quotationSyncTransportDates(from_date, to_date);
+
+	if (delta !== 0) {
+		quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_transport', [3, 4], delta);
+		quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_transport_u', [3, 4], delta);
+		quotationShiftDatetimeFieldsByDelta(delta);
+	} else if (!baselineDate) {
+		quotationSetDefaultSectionDates(from_date);
+	}
+
+	quotationRecalculateTravelStayCosts(dates.isUpdate);
+}
+
+function quotationWatchTab3Activation() {
+	var tab3 = document.getElementById('tab3');
+	if (!tab3 || !window.MutationObserver) return;
+
+	var observer = new MutationObserver(function () {
+		if (jQuery('#tab3').hasClass('active')) {
+			setTimeout(function () {
+				if (typeof syncQuotationTravelStayDates === 'function') {
+					syncQuotationTravelStayDates();
+				}
+			}, 150);
+		}
+	});
+
+	observer.observe(tab3, { attributes: true, attributeFilter: ['class'] });
+}
+
+jQuery(document).ready(function () {
+	quotationWatchTab3Activation();
+});
+
+jQuery(document).on('click', '#tab3_head', function () {
+	setTimeout(function () {
+		if (typeof syncQuotationTravelStayDates === 'function') {
+			syncQuotationTravelStayDates();
+		}
+	}, 200);
+});
+
+function quotationIsValidImageFile(file) {
+	if (!file || !file.name) return false;
+	if (file.type && file.type.indexOf('image/') === 0) return true;
+	var ext = file.name.split('.').pop().toLowerCase();
+	var imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'tif', 'ico', 'heic', 'heif', 'avif'];
+	return imageExts.indexOf(ext) !== -1;
 }
 

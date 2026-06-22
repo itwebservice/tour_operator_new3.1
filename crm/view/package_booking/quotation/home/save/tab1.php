@@ -321,6 +321,10 @@ $('#frm_tab1').validate({
         $('.bk_tab').removeClass('active');
         $('#tab2').addClass('active');
         
+        if (typeof syncQuotationTravelStayDates === 'function') {
+            syncQuotationTravelStayDates();
+        }
+        
         // Reset user modification flag when submitting Tab1 (going to Tab2)
         // This ensures fresh sync from Tab1 values
         sessionStorage.removeItem('user_modified_nights');

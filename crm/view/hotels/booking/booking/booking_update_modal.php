@@ -393,7 +393,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                         <label for="tcs_tax">Select TCS Tax</label>
                                         <select title="Select Tax" id="tcs_tax" name="tcs_tax" class="form-control">
                                             <option value="">Select Tax</option>
-											<option value="5" <?php if($sq_booking['tcs_per']==5){ echo "selected"; } ?>>5% TCS</option>
+											<option value="2" <?php if($sq_booking['tcs_per']==2){ echo "selected"; } ?>>2% TCS</option>
 											<option value="20" <?php if($sq_booking['tcs_per']==20){ echo "selected"; } ?>>20% TCS</option>
                                         </select>
                                     </div>

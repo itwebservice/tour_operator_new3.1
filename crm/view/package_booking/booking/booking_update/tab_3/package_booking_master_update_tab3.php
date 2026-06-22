@@ -207,7 +207,7 @@
                                                     value="<?= $count_tt ?>" placeholder="Sr. No." disabled /></td>
                                             <td><select name="vehicle_name1<?= $count_tt ?>-u"
                                                     id="vehicle_name1<?= $count_tt ?>-u" title="Vehicle Name"
-                                                    style="width:200px" data-add-new-option="true">
+                                                    style="width:200px" class="app_select2" data-add-new-option="true">
                                                     <?php
                                                             $sq_transport = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_trans_acc[transport_bus_id]'"));
                                                             ?>
@@ -408,10 +408,11 @@
                                                     value="<?php echo $row_exc_acc['entry_id'] ?>"></td>
                                         </tr>
                                         <script>
-                                        $('#city_name-1<?= $count_et ?>').select2();
                                         $('#exc_date-1<?= $count_et ?>').datetimepicker({
                                             format: 'd-m-Y H:i'
                                         });
+                                        $('#transfer_option-1<?= $count_et ?>').select2({ width: '200px' });
+                                        $('#vehicle_name-1<?= $count_et ?>').select2({ width: '200px' });
                                         </script>
                                         <?php } ?>
                                     </table>
@@ -441,41 +442,84 @@
 
 <?= end_panel() ?>
 <script>
-    $('select[id^="vehicle_name1"]').select2({
-    width: '300px'
-});
-$('#transport_bus_id').select2();
-$(document).ready(function() {
-    city_lzloading('.city_name');
-    destinationLoading(".pickup_from", 'Pickup Location');
-    destinationLoading(".drop_to", 'Drop-off Location');
-    $('#tbl_package_hotel_infomration select[id^="hotel_name1"]').each(function() {
-        if (!$(this).data('select2')) {
-            $(this).select2({
-                width: '170px',
-                minimumResultsForSearch: 0
-            });
+function init_booking_update_city_selects() {
+    $('.city_name').each(function () {
+        var $city = $(this);
+        var selectedVal = $city.val();
+        var selectedText = $city.find('option:selected').text();
+        if ($city.data('select2')) {
+            $city.select2('destroy');
+        }
+        city_lzloading(this);
+        if (selectedVal && selectedText && selectedText.trim() !== '') {
+            if (!$city.find('option[value="' + selectedVal + '"]').length) {
+                $city.append(new Option(selectedText, selectedVal, true, true));
+            }
+            this.value = selectedVal;
+            $city.trigger('change.select2');
         }
     });
-})
+}
+
+function init_booking_update_destination_selects() {
+    $('.pickup_from, .drop_to, select[id^="pickup_from"], select[id^="drop_to"]').each(function () {
+        var $el = $(this);
+        var selectedVal = $el.val();
+        var selectedText = $el.find('option:selected').text();
+        if (typeof destinationLoading === 'function') {
+            destinationLoading($el, $el.hasClass('pickup_from') || ($el.attr('id') || '').indexOf('pickup') === 0 ? 'Pickup Location' : 'Drop-off Location');
+        } else if (!$el.data('select2')) {
+            $el.select2({ width: '250px' });
+        }
+        if (selectedVal) {
+            $el.val(selectedVal).trigger('change.select2');
+        }
+    });
+}
+
+$('select[id^="vehicle_name1"]').select2({ width: '300px' });
+if (typeof initAllVehicleSelectAddNew === 'function') {
+    initAllVehicleSelectAddNew('#tbl_package_transport_infomration');
+    initAllVehicleSelectAddNew('#tbl_package_exc_infomration');
+}
+$(document).ready(function () {
+    init_booking_update_city_selects();
+    init_booking_update_destination_selects();
+    if (typeof initAllHotelSelectAddNew === 'function') {
+        initAllHotelSelectAddNew('#tbl_package_hotel_infomration');
+    }
+    if (typeof initAllRoomCategorySelectAddNew === 'function') {
+        initAllRoomCategorySelectAddNew('#tbl_package_hotel_infomration');
+    }
+    $('#tbl_package_exc_infomration select[id^="transfer_option-"]').each(function () {
+        if (!$(this).data('select2')) {
+            $(this).select2({ width: '200px' });
+        }
+    });
+});
 
 function generating_hotel_acc_date() {
-    var count = $("#txt_generate_hotel_acc_date").val();
-    for (var i = 0; i <= count; i++) {
-        $("#txt_hotel_from_date" + i + "_h").datetimepicker({
-            format: "d-m-Y H:i"
+    var count = parseInt($("#txt_generate_hotel_acc_date").val(), 10) || 0;
+    for (var i = 1; i <= count; i++) {
+        $("#txt_hotel_from_date" + i + "_h, #txt_hotel_to_date" + i + "_h").each(function () {
+            if (!$(this).data('xdsoft_datetimepicker')) {
+                $(this).datetimepicker({ format: "d-m-Y H:i" });
+            }
         });
-        $("#txt_hotel_to_date" + i + "_h").datetimepicker({
-            format: "d-m-Y H:i"
-        });
-
-        $("#city_name1" + i + "_h").select2();
+        var $city = $("#city_name1" + i + "_h");
+        if ($city.length && !$city.data('select2')) {
+            $city.select2({ width: '150px' });
+        }
         var $hotelRow = $("#hotel_name1" + i + "_h");
-        if ($hotelRow.length && !$hotelRow.data("select2")) {
-            $hotelRow.select2({
-                width: "170px",
-                minimumResultsForSearch: 0
-            });
+        if ($hotelRow.length && !$hotelRow.data('select2')) {
+            $hotelRow.select2({ width: "170px", minimumResultsForSearch: 0 });
+            if (typeof initHotelSelectAddNew === 'function') {
+                initHotelSelectAddNew($hotelRow);
+            }
+        }
+        var $cat = $("#txt_catagory" + i + "_h, #txt_catagory1");
+        if ($cat.length && !$cat.data('select2')) {
+            $cat.select2({ width: "180px", minimumResultsForSearch: 0 });
         }
     }
 }
@@ -529,8 +573,14 @@ function hotel_name_list_load1(id) {
     if (!city_id) {
         return;
     }
-    var count = id.substring(10);
-    var $hotel = $("#hotel_name1" + count);
+    var count = '1';
+    if (id.indexOf('city_name') === 0) {
+        count = id.substring(9).replace('_h', '') || '1';
+    }
+    var $hotel = $("#hotel_name1" + count + "_h");
+    if (!$hotel.length) {
+        $hotel = $("#hotel_name1" + count);
+    }
     if (typeof hotelDropdownLoadByCity === 'function') {
         hotelDropdownLoadByCity(city_id, $hotel);
         return;
@@ -560,9 +610,18 @@ function hotel_name_list_load1(id) {
 function hotel_type_load_cate2(id)
 {
   var hotel_id = $("#"+id).val();
-  var count = id.substring(11);
-  var $cat = $("#txt_catagory" + count);
-  $.get( "../../booking/inc/hotel_category.php" , { hotel_id : hotel_id } , function ( data ) {
+  var count = '1';
+  if (id.indexOf('hotel_name') === 0) {
+    count = id.substring(11).replace('_h', '') || '1';
+  }
+  var $cat = $("#txt_catagory" + count + "_h");
+  if (!$cat.length) {
+    $cat = $("#txt_catagory" + count);
+  }
+  if (!$cat.length) {
+    $cat = $("#txt_catagory1");
+  }
+  $.get("../inc/hotel_category.php", { hotel_id: hotel_id, quotation_id: $('#quotation_id1').val() || 0 }, function (data) {
         var hadSelect2 = $cat.length && !!$cat.data("select2");
         if (hadSelect2) {
           $cat.select2("destroy");

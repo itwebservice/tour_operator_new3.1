@@ -139,13 +139,13 @@ function get_auto_values(
 	var new_service_charge1 = parseFloat(discountable_amt) - parseFloat(discount);
 
 	if(tax_apply_on == 1){
-		tax_on_amount = (basic_amount=='') ? 0 : basic_amount;
+		tax_on_amount = (basic_amount=='') ? 0 : parseFloat(basic_amount) || 0;
 	}
 	else if(tax_apply_on == 2){
-		tax_on_amount = (new_service_charge1=='') ? 0 : new_service_charge1;
+		tax_on_amount = (new_service_charge1=='') ? 0 : parseFloat(new_service_charge1) || 0;
 	}
 	else if(tax_apply_on == 3){
-		tax_on_amount = parseFloat(basic_amount) || 0; + parseFloat(new_service_charge1);
+		tax_on_amount = (parseFloat(basic_amount) || 0) + (parseFloat(new_service_charge1) || 0);
 	}
 	if(tax_apply_on!="" && tax_value!=""){
 		var service_tax_subtotal1 = tax_value.split("+");

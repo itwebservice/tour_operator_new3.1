@@ -316,6 +316,10 @@ $('#frm_tab_u_1').validate({
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');
         $('#tab2').addClass('active');
+
+        if (typeof syncQuotationTravelStayDates === 'function') {
+            syncQuotationTravelStayDates();
+        }
         
         // Sync nights filter and destination when switching to tab2
         setTimeout(function() {

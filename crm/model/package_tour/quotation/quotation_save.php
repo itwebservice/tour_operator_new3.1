@@ -39,6 +39,9 @@ public function quotation_master_save()
 	$currency_code = $_POST['currency_code'];
 
 	$pp_costing_arr = isset($_POST['pp_costing_arr']) ? json_decode($_POST['pp_costing_arr'], true) : [];
+	if (!is_array($pp_costing_arr)) {
+		$pp_costing_arr = [];
+	}
 	//Train
 	$train_from_location_arr = isset($_POST['train_from_location_arr']) ? $_POST['train_from_location_arr'] : [];
 	$train_to_location_arr = isset($_POST['train_to_location_arr']) ? $_POST['train_to_location_arr'] : [];
@@ -91,17 +94,16 @@ public function quotation_master_save()
 	$service_duration_arr = isset($_POST['service_duration_arr']) ? $_POST['service_duration_arr'] : [];
 	
 	//Excursion
-	$city_name_arr_e = isset($_POST['city_name_arr_e']) ?$_POST['city_name_arr_e']: [];
-	$excursion_name_arr = isset($_POST['excursion_name_arr']) ? $_POST['excursion_name_arr'] : [];
-	$excursion_amt_arr = isset($_POST['excursion_amt_arr']) ? $_POST['excursion_amt_arr'] : [];
-	$exc_date_arr_e = isset($_POST['exc_date_arr_e']) ? $_POST['exc_date_arr_e'] : [];
-	$transfer_option_arr = isset($_POST['transfer_option_arr']) ? $_POST['transfer_option_arr'] : [];
-	$vehicle_id_arr_e = isset($_POST['vehicle_id_arr_e']) ? $_POST['vehicle_id_arr_e'] : [];
-	$adult_arr = isset($_POST['adult_arr']) ? $_POST['adult_arr'] : [];
-	$chwb_arr = isset($_POST['chwb_arr']) ? $_POST['chwb_arr'] : [];
-	$chwob_arr = isset($_POST['chwob_arr']) ? $_POST['chwob_arr'] : [];
-	$infant_arr = isset($_POST['infant_arr']) ? $_POST['infant_arr'] : [];
-	$vehicles_arr = isset($_POST['vehicles_arr']) ? $_POST['vehicles_arr'] : [];
+	$city_name_arr_e = isset($_POST['city_name_arr_e']) ? (array)$_POST['city_name_arr_e'] : [];
+	$excursion_name_arr = isset($_POST['excursion_name_arr']) ? (array)$_POST['excursion_name_arr'] : [];
+	$excursion_amt_arr = isset($_POST['excursion_amt_arr']) ? (array)$_POST['excursion_amt_arr'] : [];
+	$exc_date_arr_e = isset($_POST['exc_date_arr_e']) ? (array)$_POST['exc_date_arr_e'] : [];
+	$transfer_option_arr = isset($_POST['transfer_option_arr']) ? (array)$_POST['transfer_option_arr'] : [];
+	$adult_arr = isset($_POST['adult_arr']) ? (array)$_POST['adult_arr'] : [];
+	$chwb_arr = isset($_POST['chwb_arr']) ? (array)$_POST['chwb_arr'] : [];
+	$chwob_arr = isset($_POST['chwob_arr']) ? (array)$_POST['chwob_arr'] : [];
+	$infant_arr = isset($_POST['infant_arr']) ? (array)$_POST['infant_arr'] : [];
+	$vehicles_arr = isset($_POST['vehicles_arr']) ? (array)$_POST['vehicles_arr'] : [];
 	
 	//Costing
 	$tour_cost_arr = isset($_POST['tour_cost_arr']) ? $_POST['tour_cost_arr']: [];
@@ -345,7 +347,7 @@ public function tranport_entries_save($quotation_id_arr,$vehicle_name_arr,$start
 	}
 }
 
-public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr,$vehicle_id_arr_e=[])
+public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr)
 {
 	if (empty($city_name_arr_e) || !is_array($city_name_arr_e)) {
 		return;
@@ -369,9 +371,8 @@ public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excu
 			$chwob = intval($chwob_arr[$j] ?? 0);
 			$infant = intval($infant_arr[$j] ?? 0);
 			$vehicles = intval($vehicles_arr[$j] ?? 0);
-			$vehicle_id = addslashes((string)($vehicle_id_arr_e[$j] ?? ''));
 
-			$sq_plane = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles,vehicle_id ) values ( '$id', '$quotation_id_arr[$i]', '$city_name', '$excursion_name', '$excursion_amt', '$exc_date', '$transfer_option', '$adult', '$chwb', '$chwob', '$infant', '$vehicles', '$vehicle_id')");
+			$sq_plane = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles ) values ( '$id', '$quotation_id_arr[$i]', '$city_name', '$excursion_name', '$excursion_amt', '$exc_date', '$transfer_option', '$adult', '$chwb', '$chwob', '$infant', '$vehicles')");
 			if (!$sq_plane) {
 				echo "error--Activity information not saved!";
 				exit;

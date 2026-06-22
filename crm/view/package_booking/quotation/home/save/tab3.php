@@ -67,7 +67,8 @@
                                                                 </select></td>
                                                             <td><select id="city_name1" name="city_name1"
                                                                     class="city_master_dropdown city_name1 form-control app_select2"
-                                                                    style="width:160px" title="Select City Name" data-add-new-option="true">
+                                                                    style="width:160px" title="Select City Name" data-add-new-option="true"
+                                                                    onchange="hotel_name_list_load(this.id);">
                                                                 </select></td>
                                                             <td><select id="hotel_name-1" name="hotel_name-1"
                                                                     onchange="hotel_type_load(this.id);get_hotel_cost();"
@@ -465,7 +466,7 @@
                                                                             <?= $row_vehicle['vehicle_name'] ?></option>
                                                                     <?php } ?>
                                                                 </select></td> -->
-                                                            <td><input type="number" id="no_vehicles-1" name="no_vehicles-1" placeholder="No.Of Vehicles" title="No.Of Vehicles" style="width:150px" onchange="get_excursion_amount();">
+                                                            <td><input type="number" id="no_vehicles-1" name="no_vehicles-1" placeholder="No.Of Vehicles" title="No.Of Vehicles" style="width:150px" onchange="get_excursion_amount();"></td>
                                                             <td style="display:none"><input type="number" id="transfer_total-1" name="transfer_total-1" style="width:100px;display:none;"></td>
                                                         </tr>
                                                     </table>
@@ -859,57 +860,27 @@
             }
         });
     }
-    // Hotel name list load function
-    function hotel_name_list_load(id) {
-        var city_id = $("#" + id).val();
-        if (!city_id) {
-            return;
-        }
-        var count = id.substring(9);
-        var $hotel = $("#hotel_name-" + count);
-        if (!$hotel.length) {
-            $hotel = $("#hotel_name" + count);
-        }
-        if (typeof hotelDropdownLoadByCity === 'function') {
-            hotelDropdownLoadByCity(city_id, $hotel);
-            return;
-        }
-        var base_url = $("#base_url").val();
-        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", {
-                city_id: city_id
-            })
-            .done(function(data) {
-                if ($hotel.data('select2')) {
-                    $hotel.select2('destroy');
-                }
-                $hotel.html(data);
-                $hotel.select2({
-                    placeholder: "Select Hotel",
-                    allowClear: true,
-                    width: '160px',
-                    minimumResultsForSearch: 0
-                });
-                if (typeof captureHotelSelect2Config === 'function') {
-                    captureHotelSelect2Config($hotel);
-                }
-                initHotelSelectAddNew($hotel);
-            });
-    }
+    // hotel_name_list_load is provided by footer_scripts.js
 
     // Hotel type load function
     function hotel_type_load(id) {
         var base_url = $("#base_url").val();
         var hotel_id = $("#" + id).val();
-        var count = id.substring(10); // Extract number from hotel_name-1, hotel_name-2, etc.
+        var count = typeof parseQuotationHotelRowSuffix === 'function'
+            ? parseQuotationHotelRowSuffix(id)
+            : id.substring(10);
         $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_type_load.php", {
             hotel_id: hotel_id
         }, function(data) {
             $("#hotel_type-" + count).val(data);
         });
+        if (typeof hotel_type_load_cate === 'function') {
+            hotel_type_load_cate(id);
+        }
     }
 
     // Event handlers for city and hotel dropdowns
-    $('#tbl_package_tour_quotation_dynamic_hotel').on('change', 'select[name^="city_name"]', function() {
+    $('#tbl_package_tour_quotation_dynamic_hotel').on('change select2:select', 'select[id^="city_name"], select[name^="city_name"]', function() {
         console.log("City dropdown changed:", this.id, "Value:", $(this).val());
         hotel_name_list_load(this.id);
     });
@@ -2646,9 +2617,7 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
         success: function(result) {
             const hotel_arr = JSON.parse(result);
             const table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-
-            // Find current max row number
-            let lastIndex = Math.max(...Array.from(table.rows).slice(1).map(row => parseInt(row.cells[1].childNodes[0].value) || 0));
+            const startRowIndex = table.rows.length;
 
             // Append new rows from hotel data
             hotel_arr.forEach((hotel, i) => {
@@ -2659,14 +2628,14 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
                 if (!row || !row.cells || row.cells.length < 17) return;
 
                 // Continuous numbering for new row
-                row.cells[1].childNodes[0].value = ++lastIndex;
+                row.cells[1].childNodes[0].value = startRowIndex + i;
 
                 // Populate dropdowns and fields with hotel data
                 populateHotelRow(row, hotel, i, hotel_arr);
             });
 
             // Initialize city dropdowns ONLY for newly added rows
-            initializeCityDropdowns(table, hotel_arr);
+            initializeCityDropdowns(table, hotel_arr, startRowIndex);
 
             // Hide hotel package if needed
             const selectedPackagevalue = table.rows[1]?.cells[2]?.childNodes[0]?.value || '';
@@ -2680,64 +2649,78 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
 function populateHotelRow(row, hotel, i, hotel_arr) {
     const hotelSelect = $(row.cells[4].childNodes[0]);
     const roomCatSelect = $(row.cells[5].childNodes[0]);
+    const citySelect = $(row.cells[3].childNodes[0]);
 
-    // Set hotel dropdown options
-    hotelSelect.html('<option value="">*Hotel Name</option>' + hotel_arr.map(h => `<option value="${h.hotel_id1}">${h.hotel_name}</option>`).join(''));
-
-    // Set hotel selection based on previous row's selection
-    const prevHotelId = hotel_arr[i]?.hotel_id1 || null;
-    if (prevHotelId) {
-        hotelSelect.val(prevHotelId).trigger('change');
+    city_lzloading(citySelect);
+    if (hotel.city_id && hotel.city_name) {
+        const cityOption = new Option(hotel.city_name, hotel.city_id, true, true);
+        citySelect.append(cityOption).trigger('change.select2');
     }
 
-    // Set room category if available
-    const prevRoomCatValue = roomCatSelect.val();
-    if (prevRoomCatValue) {
-        roomCatSelect.val(prevRoomCatValue);
-    }
-
-    // Set other fields (dates, package details, etc.)
-    row.cells[6].childNodes[0].value = hotel.check_in_date;
-    row.cells[7].childNodes[0].value = hotel.check_out_date;
-    row.cells[8].childNodes[0].value = hotel.hotel_type;
-    row.cells[9].childNodes[0].value = hotel.package_name;
-    row.cells[14].childNodes[0].value = hotel.package_id;
-
-    // Set the package type (make sure this is properly set for new rows)
-    const packageTypeSelect = $(row.cells[2].childNodes[0]);
-    if ($('#package_type').val()) {
-        packageTypeSelect.val($('#package_type').val()).trigger('change');
+    if (hotel.city_id && typeof hotelDropdownLoadByCity === 'function') {
+        hotelDropdownLoadByCity(hotel.city_id, hotelSelect, function(success) {
+            if (success && hotel.hotel_id1) {
+                if (typeof selectHotelInDropdown === 'function') {
+                    selectHotelInDropdown(hotelSelect, hotel.hotel_id1, hotel.hotel_name);
+                } else {
+                    hotelSelect.val(hotel.hotel_id1).trigger('change');
+                }
+            }
+        });
     } else {
-        packageTypeSelect.selectedIndex = 0; // Default to the first option
+        hotelSelect.html('<option value="">*Hotel Name</option>' +
+            (hotel.hotel_id1 ? '<option value="' + hotel.hotel_id1 + '" selected>' + (hotel.hotel_name || '') + '</option>' : ''));
+        hotelSelect.select2({ width: '160px', minimumResultsForSearch: 0 });
     }
 
-    // Initialize select2 for dropdowns
-    $('#'+row.cells[2].childNodes[0].id).select2().trigger("change");
-    hotelSelect.select2({ width: '160px', minimumResultsForSearch: 0 }).trigger("change");
-    roomCatSelect.select2().trigger("change");
     hotelSelect.attr('data-add-new-option', 'true');
     if (typeof initHotelSelectAddNew === 'function') {
         initHotelSelectAddNew(hotelSelect);
     }
+
+    // Set other fields (dates, package details, etc.)
+    row.cells[6].childNodes[0].value = hotel.check_in_date || '';
+    row.cells[7].childNodes[0].value = hotel.check_out_date || '';
+    row.cells[8].childNodes[0].value = hotel.hotel_type || '';
+    if (row.cells[9] && row.cells[9].childNodes[0]) {
+        row.cells[9].childNodes[0].value = hotel.total_days || hotel.package_name || '';
+    }
+    if (row.cells[14] && row.cells[14].childNodes[0]) {
+        row.cells[14].childNodes[0].value = hotel.package_id || '';
+    }
+
+    const packageTypeSelect = $(row.cells[2].childNodes[0]);
+    if ($('#package_type').val()) {
+        packageTypeSelect.val($('#package_type').val()).trigger('change');
+    }
+
+    $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
+    roomCatSelect.select2().trigger("change");
 }
 
-
 // Helper function to initialize city dropdowns
-function initializeCityDropdowns(table, hotel_arr) {
-    const startingRowIndex = table.rows.length;
-    for (let i = startingRowIndex; i < table.rows.length; i++) {
-        const row = table.rows[i];
+function initializeCityDropdowns(table, hotel_arr, startRowIndex) {
+    if (!hotel_arr || !hotel_arr.length) {
+        return;
+    }
+    const firstRow = typeof startRowIndex === 'number'
+        ? startRowIndex
+        : Math.max(1, table.rows.length - hotel_arr.length);
+
+    for (let i = 0; i < hotel_arr.length; i++) {
+        const rowIndex = firstRow + i;
+        if (rowIndex >= table.rows.length) {
+            break;
+        }
+        const row = table.rows[rowIndex];
         const citySelect = $(row.cells[3].childNodes[0]);
+        const hotel = hotel_arr[i] || {};
 
         city_lzloading(citySelect);
 
-        const cityId = hotel_arr[i - startingRowIndex]?.city_id || null;
-        const cityName = hotel_arr[i - startingRowIndex]?.city_name || null;
-
-        if (cityId && cityName) {
-            const newOption = new Option(cityName, cityId, true, true);
-            citySelect.append(newOption);
-            citySelect.val(cityId).trigger('change');
+        if (hotel.city_id && hotel.city_name) {
+            const newOption = new Option(hotel.city_name, hotel.city_id, true, true);
+            citySelect.append(newOption).trigger('change');
         }
     }
 }

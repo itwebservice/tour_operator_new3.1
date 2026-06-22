@@ -1,16 +1,17 @@
 <?php 
 include "../../../../../model/model.php"; 
-$city_id = $_GET['city_id'];
+$city_id = isset($_GET['city_id']) ? trim($_GET['city_id']) : '';
 
 // Debug logging
 error_log("Hotel Name Load - City ID: " . $city_id);
 
 // Check if city_id is valid
-if(empty($city_id) || !is_numeric($city_id)) {
+if ($city_id === '' || !ctype_digit((string) $city_id)) {
     error_log("Hotel Name Load - Invalid city_id: " . $city_id);
-    echo '<option value="">Invalid City</option>';
+    echo '<option value="">Select Hotel</option>';
     exit;
 }
+$city_id = intval($city_id);
 ?>
 <option value="">Select Hotel</option>
 <?php

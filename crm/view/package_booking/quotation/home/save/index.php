@@ -92,40 +92,18 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
     if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
         hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/package_booking/quotation/home/hotel/hotel_name_load.php';
     }
-    function hotel_name_list_load(id) {
-        var city_id = $("#" + id).val();
-        if (!city_id) {
-            return;
-        }
-        var count = id.substring(9);
-        var $hotel = $("#hotel_name-" + count);
-        if (typeof hotelDropdownLoadByCity === 'function') {
-            hotelDropdownLoadByCity(city_id, $hotel);
-            return;
-        }
-        var base_url = $("#base_url").val();
-        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", {
-            city_id: city_id
-        }, function(data) {
-            if ($hotel.data('select2')) {
-                $hotel.select2('destroy');
-            }
-            $hotel.html(data);
-            $hotel.select2({ width: '160px', minimumResultsForSearch: 0 });
-            if (typeof captureHotelSelect2Config === 'function') {
-                captureHotelSelect2Config($hotel);
-            }
-            initHotelSelectAddNew($hotel);
-        });
-    }
+    // Hotel name list load is defined in footer_scripts.js (resolveHotelSelectFromCity).
 
     function hotel_type_load(id) {
         var hotel_id = $("#" + id).val();
-        var count = id.substring(10);
-        $.get("../hotel/hotel_type_load.php", {
+        var count = typeof parseQuotationHotelRowSuffix === 'function'
+            ? parseQuotationHotelRowSuffix(id)
+            : id.substring(10);
+        var base_url = $('#base_url').val();
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_type_load.php", {
             hotel_id: hotel_id
         }, function(data) {
-            $("#hotel_type" + count).val(data);
+            $("#hotel_type-" + count).val(data);
         });
         hotel_type_load_cate(id);
     }
@@ -143,9 +121,12 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
     //roomcategory load
     function hotel_type_load_cate(id) {
         var hotel_id = $("#" + id).val();
-        var count = id.substring(11);
+        var count = typeof parseQuotationHotelRowSuffix === 'function'
+            ? parseQuotationHotelRowSuffix(id)
+            : id.substring(11);
+        var base_url = $('#base_url').val();
         console.log("DEBUG: Loading room categories for hotel_id:", hotel_id, "count:", count);
-        $.get("../hotel/hotel_category.php", {
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_category.php", {
             hotel_id: hotel_id
         }, function(data) {
             console.log("DEBUG: Room category data received:", data);

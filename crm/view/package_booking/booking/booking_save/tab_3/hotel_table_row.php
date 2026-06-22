@@ -34,7 +34,7 @@
                     <?php get_room_category_dropdown(); ?>
                     </select></td>
                     <?php } else{?>
-                    <td><select name="txt_catagory1" id="txt_catagory" title="Category" style="width: 140px;" class="app_select2" data-add-new-option="true">
+                    <td><select name="txt_catagory1" id="txt_catagory1" title="Category" style="width: 140px;" class="app_select2" data-add-new-option="true">
                             <option value="">*Room Category</option>
                         </select></td>
                     <?php }?>

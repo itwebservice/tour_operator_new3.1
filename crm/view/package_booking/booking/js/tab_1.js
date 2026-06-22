@@ -448,6 +448,632 @@ function taxes_reflect(tax_id, tax) {
 	});
 }
 
+function format_booking_datetime(value) {
+	if (!value) {
+		return '';
+	}
+	value = String(value).trim();
+	if (/^\d{2}-\d{2}-\d{4}$/.test(value)) {
+		return value + ' 00:00';
+	}
+	if (/^\d{2}-\d{2}-\d{4}\s+\d{1,2}:\d{2}$/.test(value)) {
+		var parts = value.split(/\s+/);
+		var timeParts = parts[1].split(':');
+		return parts[0] + ' ' + (timeParts[0].length === 1 ? '0' + timeParts[0] : timeParts[0]) + ':' + timeParts[1];
+	}
+	return value;
+}
+
+function set_booking_field_value(el, value) {
+	if (!el) {
+		return;
+	}
+	var savedOnchange = el.getAttribute('onchange');
+	if (savedOnchange) {
+		el.removeAttribute('onchange');
+	}
+	el.value = value;
+	if (savedOnchange) {
+		el.setAttribute('onchange', savedOnchange);
+	}
+}
+
+function set_booking_city_select(cityEl, cityId, cityName) {
+	if (!cityEl || !cityId) {
+		return;
+	}
+	var $city = $(cityEl);
+	if ($city.data('select2')) {
+		$city.select2('destroy');
+	}
+	city_lzloading(cityEl);
+	var savedOnchange = cityEl.getAttribute('onchange');
+	if (savedOnchange) {
+		cityEl.removeAttribute('onchange');
+	}
+	if (typeof selectCityInLazyDropdown === 'function') {
+		selectCityInLazyDropdown($city, cityId, cityName, { triggerChange: false });
+	} else {
+		$city.append(new Option(cityName, cityId, true, true));
+		$city.val(String(cityId)).trigger('change.select2');
+	}
+	if (savedOnchange) {
+		cityEl.setAttribute('onchange', savedOnchange);
+	}
+}
+
+function apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, roomCategory) {
+	if (!hotelEl || !hotelId) {
+		return;
+	}
+	var $hotel = $(hotelEl);
+	var hid = String(hotelId);
+	var savedOnchange = hotelEl.getAttribute('onchange');
+	if (savedOnchange) {
+		hotelEl.removeAttribute('onchange');
+	}
+	if (!$hotel.find('option[value="' + hid.replace(/"/g, '\\"') + '"]').length) {
+		$hotel.append(new Option(hotelName || ('Hotel ' + hid), hid, true, true));
+	}
+	$hotel.val(hid);
+	if ($hotel.data('select2')) {
+		$hotel.trigger('change.select2');
+	} else {
+		$hotel.select2({ width: '170px', minimumResultsForSearch: 0 });
+	}
+	if (typeof initHotelSelectAddNew === 'function') {
+		initHotelSelectAddNew($hotel);
+	}
+	if (savedOnchange) {
+		hotelEl.setAttribute('onchange', savedOnchange);
+	}
+	set_booking_hotel_room_category(roomCatEl, hotelId, roomCategory || '');
+}
+
+function refresh_booking_hotel_select2_display() {
+	var $table = $('#tbl_package_hotel_infomration');
+	if (!$table.length) {
+		return;
+	}
+	$table.find('select[id^="hotel_name"], select[id^="txt_catagory"]').each(function () {
+		var $sel = $(this);
+		var val = $sel.val();
+		if (!val) {
+			return;
+		}
+		if ($sel.data('select2')) {
+			$sel.val(val).trigger('change.select2');
+		}
+	});
+}
+
+function booking_table_cell_control(cell) {
+	if (!cell) {
+		return null;
+	}
+	if (typeof getCellFormControl === 'function') {
+		return getCellFormControl(cell);
+	}
+	var $el = $(cell).find('select, input, textarea').first();
+	return $el.length ? $el[0] : cell.childNodes[0];
+}
+
+function populate_booking_flight_sector($select, sectorLabel, cityId) {
+	if (!$select || !$select.length || !sectorLabel) {
+		return;
+	}
+	if ($select.data('select2')) {
+		$select.select2('destroy');
+	}
+	$select.empty().append(new Option(sectorLabel, sectorLabel, true, true));
+	if (!$select.data('select2')) {
+		$select.select2({ width: '100%' });
+	} else {
+		$select.trigger('change.select2');
+	}
+	if (cityId && typeof syncSectorCityHidden === 'function') {
+		syncSectorCityHidden($select.attr('id') || '', cityId);
+	} else if (cityId) {
+		var sectorId = $select.attr('id') || '';
+		var suffix = sectorId.replace(/^from_sector-/, '').replace(/^to_sector-/, '');
+		if (sectorId.indexOf('from_sector') === 0) {
+			$('#from_city-' + suffix).val(cityId);
+		} else {
+			$('#to_city-' + suffix).val(cityId);
+		}
+	}
+}
+
+function set_booking_hotel_room_category(roomCatEl, hotelId, roomCategory) {
+	if (!roomCatEl || !hotelId) {
+		return;
+	}
+	var $roomCat = $(roomCatEl);
+	var quotationId = $('#quotation_id').val() || 0;
+	$.get('../inc/hotel_category.php', { hotel_id: hotelId, quotation_id: quotationId }, function (data) {
+		$roomCat.html(data);
+		if (roomCategory) {
+			if (!$roomCat.find('option[value="' + roomCategory + '"]').length) {
+				$roomCat.prepend(
+					$('<option></option>').attr('value', roomCategory).text(roomCategory)
+				);
+			}
+		}
+		if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+			refreshRoomCategorySelectAfterLoad(roomCatEl, { width: '140px' });
+		} else if (!$roomCat.data('select2')) {
+			$roomCat.select2({ width: '140px' });
+		}
+		if (roomCategory) {
+			$roomCat.val(roomCategory).trigger('change.select2');
+		}
+	});
+}
+
+function load_booking_hotel_table(hotel_info_arr) {
+	var table = document.getElementById('tbl_package_hotel_infomration');
+	if (!table) {
+		return;
+	}
+
+	while (table.rows.length > 1) {
+		table.deleteRow(1);
+	}
+	while (table.rows.length < (hotel_info_arr || []).length) {
+		addRow('tbl_package_hotel_infomration');
+	}
+
+	if (!hotel_info_arr || !hotel_info_arr.length) {
+		if (table.rows.length > 0) {
+			var emptyChk = booking_table_cell_control(table.rows[0].cells[0]);
+			if (emptyChk) {
+				emptyChk.checked = false;
+			}
+		}
+		return;
+	}
+
+	var pendingHotelLoads = 0;
+
+	function hotelRowLoadDone() {
+		pendingHotelLoads--;
+		if (pendingHotelLoads <= 0) {
+			setTimeout(refresh_booking_hotel_select2_display, 100);
+		}
+	}
+
+	for (var i = 0; i < hotel_info_arr.length; i++) {
+		var row = table.rows[i];
+		var data = hotel_info_arr[i] || {};
+		var chkEl = booking_table_cell_control(row.cells[0]);
+		var cityEl = booking_table_cell_control(row.cells[2]);
+		var hotelEl = booking_table_cell_control(row.cells[3]);
+		var checkInEl = booking_table_cell_control(row.cells[4]);
+		var checkOutEl = booking_table_cell_control(row.cells[5]);
+		var roomsEl = booking_table_cell_control(row.cells[6]);
+		var roomCatEl = booking_table_cell_control(row.cells[7]);
+		var mealPlanEl = booking_table_cell_control(row.cells[8]);
+		var extraBedEl = booking_table_cell_control(row.cells[9]);
+		var hotelId = data.hotel_id1 || data.hotel_id || '';
+		var hotelName = data.hotel_name1 || data.hotel_name || '';
+
+		if (chkEl) {
+			chkEl.checked = true;
+		}
+
+		set_booking_field_value(checkInEl, format_booking_datetime(data.check_in || data.check_in_date || ''));
+		set_booking_field_value(checkOutEl, format_booking_datetime(data.check_out || data.check_out_date || ''));
+		if (roomsEl) {
+			roomsEl.value = data.total_rooms || '';
+		}
+		if (mealPlanEl && data.meal_plan) {
+			mealPlanEl.value = data.meal_plan;
+		}
+		if (extraBedEl) {
+			extraBedEl.value = data.extra_bed || '0';
+		}
+
+		if (cityEl && data.city_id && data.city_name) {
+			set_booking_city_select(cityEl, data.city_id, data.city_name);
+		}
+
+		if (hotelEl && hotelId) {
+			pendingHotelLoads++;
+			var $hotel = $(hotelEl);
+			if (data.city_id && typeof hotelDropdownLoadByCity === 'function') {
+				hotelDropdownLoadByCity(data.city_id, $hotel, function (success) {
+					if (success) {
+						apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, data.room_category || '');
+					} else {
+						if ($hotel.data('select2')) {
+							$hotel.select2('destroy');
+						}
+						$hotel.html('<option value="' + hotelId + '" selected="selected">' + hotelName + '</option>');
+						apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, data.room_category || '');
+					}
+					hotelRowLoadDone();
+				});
+			} else {
+				if ($hotel.data('select2')) {
+					$hotel.select2('destroy');
+				}
+				$hotel.html('<option value="' + hotelId + '" selected="selected">' + hotelName + '</option>');
+				apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, data.room_category || '');
+				hotelRowLoadDone();
+			}
+		} else if (roomCatEl && data.room_category) {
+			var $roomCat = $(roomCatEl);
+			if (!$roomCat.find('option[value="' + data.room_category + '"]').length) {
+				$roomCat.prepend($('<option></option>').attr('value', data.room_category).text(data.room_category));
+			}
+			if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+				refreshRoomCategorySelectAfterLoad(roomCatEl, { width: '140px' });
+			}
+			$roomCat.val(data.room_category).trigger('change.select2');
+		}
+	}
+
+	if (pendingHotelLoads === 0) {
+		setTimeout(refresh_booking_hotel_select2_display, 100);
+	}
+}
+
+function load_booking_excursion_table(exc_info_arr) {
+	var table = document.getElementById('tbl_package_exc_infomration');
+	if (!table) {
+		return;
+	}
+
+	while (table.rows.length > 1) {
+		table.deleteRow(1);
+	}
+	while (table.rows.length < (exc_info_arr || []).length) {
+		addRow('tbl_package_exc_infomration');
+		var newRow = table.rows[table.rows.length - 1];
+		var newCityEl = booking_table_cell_control(newRow.cells[3]);
+		if (newCityEl) {
+			city_lzloading(newCityEl);
+		}
+	}
+
+	if (!exc_info_arr || !exc_info_arr.length) {
+		if (table.rows.length > 0) {
+			var emptyChk = booking_table_cell_control(table.rows[0].cells[0]);
+			if (emptyChk) {
+				emptyChk.checked = false;
+			}
+		}
+		return;
+	}
+
+	for (var i = 0; i < exc_info_arr.length; i++) {
+		var row = table.rows[i];
+		var data = exc_info_arr[i] || {};
+		var chkEl = booking_table_cell_control(row.cells[0]);
+		var dateEl = booking_table_cell_control(row.cells[2]);
+		var cityEl = booking_table_cell_control(row.cells[3]);
+		var excEl = booking_table_cell_control(row.cells[4]);
+		var transferEl = booking_table_cell_control(row.cells[5]);
+		var vehicleEl = booking_table_cell_control(row.cells[6]);
+		var adultEl = booking_table_cell_control(row.cells[7]);
+		var chwbEl = booking_table_cell_control(row.cells[8]);
+		var chwobEl = booking_table_cell_control(row.cells[9]);
+		var infantEl = booking_table_cell_control(row.cells[10]);
+
+		if (chkEl) {
+			chkEl.checked = true;
+		}
+		if (dateEl) {
+			set_booking_field_value(dateEl, format_booking_datetime(data.exc_date || ''));
+		}
+
+		if (cityEl && data.city_id && data.city_name) {
+			set_booking_city_select(cityEl, data.city_id, data.city_name);
+		}
+
+		if (excEl && data.exc_id) {
+			$(excEl).html(
+				'<option value="' + data.exc_id + '" selected="selected">' + (data.exc_name || '') + '</option>'
+			);
+			excEl.value = data.exc_id;
+		}
+
+		if (transferEl && data.transfer_option) {
+			var $transfer = $(transferEl);
+			if (!$transfer.find('option[value="' + data.transfer_option + '"]').length) {
+				$transfer.prepend(
+					$('<option></option>').attr('value', data.transfer_option).text(data.transfer_option)
+				);
+			}
+			transferEl.value = data.transfer_option;
+			if (!$transfer.data('select2')) {
+				$transfer.select2({ width: '200px' });
+			}
+			$transfer.trigger('change');
+		}
+
+		if (vehicleEl && data.vehicle_id) {
+			var $vehicle = $(vehicleEl);
+			if (typeof selectVehicleInDropdown === 'function') {
+				selectVehicleInDropdown($vehicle, data.vehicle_id, data.vehicle_name || '');
+			} else {
+				if (!$vehicle.find('option[value="' + data.vehicle_id + '"]').length) {
+					$vehicle.prepend(
+						$('<option></option>').attr('value', data.vehicle_id).text(data.vehicle_name || '').prop('selected', true)
+					);
+				}
+				vehicleEl.value = data.vehicle_id;
+				$vehicle.trigger('change');
+			}
+		}
+
+		if (adultEl) {
+			adultEl.value = data.adult || '';
+		}
+		if (chwbEl) {
+			chwbEl.value = data.chwb || '';
+		}
+		if (chwobEl) {
+			chwobEl.value = data.chwob || '';
+		}
+		if (infantEl) {
+			infantEl.value = data.infant || '';
+		}
+	}
+
+	if (typeof initAllVehicleSelectAddNew === 'function') {
+		initAllVehicleSelectAddNew('#tbl_package_exc_infomration');
+	}
+}
+
+function populate_booking_transport_pickup_drop($select, type, locId, label, placeholder) {
+	if (!$select || !$select.length || !type || !locId) {
+		return;
+	}
+	var val = type + '-' + locId;
+	var groupLabel = type.charAt(0).toUpperCase() + type.slice(1) + ' Name';
+	if ($select.data('select2')) {
+		$select.select2('destroy');
+	}
+	$select.empty().append(
+		$('<optgroup></optgroup>').attr('value', type).attr('label', groupLabel).append(
+			$('<option></option>').attr('value', val).text(label || val).prop('selected', true)
+		)
+	);
+	$select.val(val);
+	if (!$select.data('select2')) {
+		$select.select2({ width: '250px' });
+	} else {
+		$select.trigger('change.select2');
+	}
+}
+
+function load_booking_flight_table(flight_info_arr, flightCost) {
+	var table = document.getElementById('tbl_plane_travel_details_dynamic_row');
+	if (!table) {
+		return;
+	}
+
+	while (table.rows.length > 1) {
+		table.deleteRow(1);
+	}
+	while (table.rows.length < (flight_info_arr || []).length) {
+		addRow('tbl_plane_travel_details_dynamic_row');
+		if (typeof event_airport === 'function') {
+			event_airport('tbl_plane_travel_details_dynamic_row', 4, 5);
+		}
+	}
+
+	if (!flight_info_arr || !flight_info_arr.length) {
+		if (table.rows.length > 0) {
+			var emptyChk = booking_table_cell_control(table.rows[0].cells[0]);
+			if (emptyChk) {
+				emptyChk.checked = false;
+			}
+		}
+		return;
+	}
+
+	for (var i = 0; i < flight_info_arr.length; i++) {
+		var row = table.rows[i];
+		var data = flight_info_arr[i] || {};
+		var chkEl = booking_table_cell_control(row.cells[0]);
+		var depEl = booking_table_cell_control(row.cells[2]);
+		var arrEl = booking_table_cell_control(row.cells[3]);
+		var fromEl = booking_table_cell_control(row.cells[4]);
+		var toEl = booking_table_cell_control(row.cells[5]);
+		var airlineEl = booking_table_cell_control(row.cells[6]);
+		var classEl = booking_table_cell_control(row.cells[7]);
+		var amountEl = booking_table_cell_control(row.cells[9]);
+		var fromCityEl = booking_table_cell_control(row.cells[10]);
+		var toCityEl = booking_table_cell_control(row.cells[11]);
+
+		if (chkEl) {
+			chkEl.checked = true;
+		}
+
+		set_booking_field_value(depEl, format_booking_datetime(data.departure_date || ''));
+		set_booking_field_value(arrEl, format_booking_datetime(data.arrival_date || ''));
+
+		var from_sector = '';
+		if (data.from_location) {
+			from_sector = data.from_city ? data.from_city + ' - ' + data.from_location : data.from_location;
+		}
+		var to_sector = '';
+		if (data.to_location) {
+			to_sector = data.to_city ? data.to_city + ' - ' + data.to_location : data.to_location;
+		}
+
+		populate_booking_flight_sector($(fromEl), from_sector, data.from_city_id);
+		populate_booking_flight_sector($(toEl), to_sector, data.to_city_id);
+
+		if (fromCityEl) {
+			fromCityEl.value = data.from_city_id || '';
+		}
+		if (toCityEl) {
+			toCityEl.value = data.to_city_id || '';
+		}
+
+		if (airlineEl && data.airline_id) {
+			var $airline = $(airlineEl);
+			if ($airline.data('select2')) {
+				$airline.select2('destroy');
+			}
+			if (!$airline.find('option[value="' + data.airline_id + '"]').length) {
+				$airline.prepend(
+					$('<option></option>').attr('value', data.airline_id).text(data.airline_name || '').prop('selected', true)
+				);
+			}
+			airlineEl.value = data.airline_id;
+			$airline.select2({ width: '150px' });
+		}
+
+		if (classEl && data.class) {
+			var $class = $(classEl);
+			if (!$class.find('option[value="' + data.class + '"]').length) {
+				$class.prepend($('<option></option>').attr('value', data.class).text(data.class).prop('selected', true));
+			}
+			classEl.value = data.class;
+		}
+
+		if (amountEl && flightCost && parseFloat(flightCost) > 0) {
+			amountEl.value = (parseFloat(flightCost) / flight_info_arr.length).toFixed(2);
+		}
+
+		if (depEl && depEl.id && typeof dynamic_datetime === 'function') {
+			dynamic_datetime(depEl.id);
+		}
+		if (arrEl && arrEl.id && typeof dynamic_datetime === 'function') {
+			dynamic_datetime(arrEl.id);
+		}
+	}
+
+	if (typeof initAllAirlineSelectAddNew === 'function') {
+		initAllAirlineSelectAddNew('#tbl_plane_travel_details_dynamic_row');
+	}
+	if (typeof calculate_plane_expense === 'function') {
+		calculate_plane_expense('tbl_plane_travel_details_dynamic_row', true);
+	}
+}
+
+function load_booking_transport_table(transport_info_arr) {
+	var table = document.getElementById('tbl_package_transport_infomration');
+	if (!table) {
+		return;
+	}
+
+	while (table.rows.length > 1) {
+		table.deleteRow(1);
+	}
+	while (table.rows.length < transport_info_arr.length) {
+		addRow('tbl_package_transport_infomration');
+	}
+
+	if (!transport_info_arr.length) {
+		if (table.rows.length > 0) {
+			var emptyChk = booking_table_cell_control(table.rows[0].cells[0]);
+			if (emptyChk) {
+				emptyChk.checked = false;
+			}
+		}
+		return;
+	}
+
+	for (var i = 0; i < transport_info_arr.length; i++) {
+		var row = table.rows[i];
+		var data = transport_info_arr[i];
+		var chkEl = booking_table_cell_control(row.cells[0]);
+		var vehicleEl = booking_table_cell_control(row.cells[2]);
+		var fromDateEl = booking_table_cell_control(row.cells[3]);
+		var toDateEl = booking_table_cell_control(row.cells[4]);
+		var pickupEl = booking_table_cell_control(row.cells[5]);
+		var dropEl = booking_table_cell_control(row.cells[6]);
+		var durationEl = booking_table_cell_control(row.cells[7]);
+		var countEl = booking_table_cell_control(row.cells[8]);
+
+		if (chkEl) {
+			chkEl.checked = true;
+		}
+		if (fromDateEl) {
+			set_booking_field_value(fromDateEl, format_booking_datetime(data['start_date'] || ''));
+		}
+		if (toDateEl) {
+			set_booking_field_value(toDateEl, format_booking_datetime(data['end_date'] || ''));
+		}
+
+		if (vehicleEl && data['vehicle_id']) {
+			var $vehicle = $(vehicleEl);
+			var vehicleLabel = data['vehicle_name'] || data['bus_name'] || '';
+			if (typeof selectVehicleInDropdown === 'function') {
+				selectVehicleInDropdown($vehicle, data['vehicle_id'], vehicleLabel);
+			} else {
+				if (!$vehicle.find('option[value="' + data['vehicle_id'] + '"]').length) {
+					$vehicle.prepend(
+						'<option value="' + data['vehicle_id'] + '" selected="selected">' + vehicleLabel + '</option>'
+					);
+				}
+				vehicleEl.value = data['vehicle_id'];
+				$vehicle.trigger('change');
+			}
+			if (!$vehicle.data('select2')) {
+				$vehicle.select2({ width: '250px' });
+			}
+		}
+
+		if (pickupEl) {
+			populate_booking_transport_pickup_drop(
+				$(pickupEl),
+				data['pickup_type'],
+				data['pickup_id'],
+				data['pickup'],
+				'Pickup Location'
+			);
+		}
+		if (dropEl) {
+			populate_booking_transport_pickup_drop(
+				$(dropEl),
+				data['drop_type'],
+				data['drop_id'],
+				data['drop'],
+				'Drop-off Location'
+			);
+		}
+
+		if (durationEl) {
+			var $duration = $(durationEl);
+			if (data['s_duration_id'] && !$duration.find('option[value="' + data['s_duration_id'] + '"]').length) {
+				$duration.prepend(
+					'<option value="' + data['s_duration_id'] + '">' + data['service_duration'] + '</option>'
+				);
+			}
+			if (data['s_duration_id']) {
+				durationEl.value = data['s_duration_id'];
+			} else if (data['service_duration']) {
+				durationEl.value = data['service_duration'];
+			}
+			if (!$duration.data('select2')) {
+				$duration.select2({ width: '170px' });
+			}
+			$duration.trigger('change');
+		}
+
+		if (countEl) {
+			countEl.value = data['vehicle_count'] || '';
+		}
+
+		if (fromDateEl && fromDateEl.id && typeof dynamic_datetime === 'function') {
+			dynamic_datetime(fromDateEl.id);
+		}
+		if (toDateEl && toDateEl.id && typeof dynamic_datetime === 'function') {
+			dynamic_datetime(toDateEl.id);
+		}
+	}
+
+	if (typeof initAllVehicleSelectAddNew === 'function') {
+		initAllVehicleSelectAddNew('#tbl_package_transport_infomration');
+	}
+}
+
 /////////////////////////////////////Quotation information load start/////////////////////////////////////
 function quotation_info_load() {
 
@@ -494,81 +1120,9 @@ function quotation_info_load() {
 					}
 				}
 				//Transport Info
-				var transport_info_arr = response.transport_info_arr;
-				var table = document.getElementById('tbl_package_transport_infomration');
-				for (var i = 1; i < table.rows.length; i++) {
-					document.getElementById('tbl_package_transport_infomration').deleteRow(i);
-				}
-				if (table.rows.length != transport_info_arr.length) {
-					for (var i = 1; i < transport_info_arr.length; i++) {
-						addRow('tbl_package_transport_infomration');
-					}
-				}
-				for (var i = 0; i < transport_info_arr.length; i++) {
-					var row = table.rows[i];
-					row.cells[0].childNodes[0].setAttribute('checked', 'true');
-					row.cells[2].childNodes[0].value = transport_info_arr[i]['vehicle_id'];
-					row.cells[3].childNodes[0].value = transport_info_arr[i]['start_date'];
-					row.cells[4].childNodes[0].value = transport_info_arr[i]['end_date'];
-
-					$(row.cells[5].childNodes[0]).prepend('<optgroup value=' + transport_info_arr[i]['pickup_type'] + ' label="' + (transport_info_arr[i]['pickup_type']).charAt(0).toUpperCase() + (transport_info_arr[i]['pickup_type']).slice(1) + ' Name"><option value="' + transport_info_arr[i]['pickup_type'] + '-' + transport_info_arr[i]['pickup_id'] + '">' + transport_info_arr[i]['pickup'] + '</option></optgroup>');
-					document.getElementById(row.cells[5].childNodes[0].id).value = transport_info_arr[i]['pickup_type'] + '-' + transport_info_arr[i]['pickup_id'];
-
-					$(row.cells[6].childNodes[0]).prepend('<optgroup value=' + transport_info_arr[i]['drop_type'] + ' label="' + (transport_info_arr[i]['drop_type']).charAt(0).toUpperCase() + (transport_info_arr[i]['drop_type']).slice(1) + ' Name"><option value="' + transport_info_arr[i]['drop_type'] + '-' + transport_info_arr[i]['drop_id'] + '">' + transport_info_arr[i]['drop'] + '</option></optgroup>');
-					document.getElementById(row.cells[6].childNodes[0].id).value = transport_info_arr[i]['drop_type'] + '-' + transport_info_arr[i]['drop_id'];
-
-					row.cells[7].childNodes[0].value = transport_info_arr[i]['service_duration'];
-					$(row.cells[7].childNodes[0]).prepend(
-						'<option value="' + transport_info_arr[i]['s_duration_id'] + '">' + transport_info_arr[i]['service_duration'] + '</option>'
-					);
-					row.cells[8].childNodes[0].value = transport_info_arr[i]['vehicle_count'];
-
-					$(row.cells[5].childNodes[0]).select2().trigger('change');
-					$(row.cells[6].childNodes[0]).select2().trigger('change');
-					$(row.cells[7].childNodes[0]).select2().trigger('change');
-				}
-				destinationLoading("select[name^=pickup_from]", "Pickup Location");
-				destinationLoading("select[name^=drop_to]", "Drop-off Location");
+				load_booking_transport_table(response.transport_info_arr || []);
 				//Excursion Info
-				var exc_info_arr = response.exc_info_arr;
-				var table = document.getElementById('tbl_package_exc_infomration');
-				for (var i = 1; i < table.rows.length; i++) {
-					document.getElementById('tbl_package_exc_infomration').deleteRow(i);
-				}
-				if (table.rows.length != exc_info_arr.length) {
-					for (var i = 1; i < exc_info_arr.length; i++) {
-						addRow('tbl_package_exc_infomration');
-					}
-				}
-				for (var i = 0; i < exc_info_arr.length; i++) {
-
-					var row = table.rows[i];
-					row.cells[0].childNodes[0].setAttribute('checked', 'true');
-					row.cells[3].childNodes[0].value = exc_info_arr[i]['city_id'];
-					$(row.cells[3].childNodes[0]).html(
-						'<option value="' +
-						exc_info_arr[i]['city_id'] +
-						'" selected="selected">' +
-						exc_info_arr[i]['city_name'] +
-						'</option>'
-					);
-					city_lzloading(row.cells[3].childNodes[0]);
-
-					$(row.cells[4].childNodes[0]).html(
-						'<option value="' + exc_info_arr[i]['exc_id'] + '">' + exc_info_arr[i]['exc_name'] + '</option>'
-					);
-					row.cells[2].childNodes[0].value = exc_info_arr[i]['exc_date'];
-					$(row.cells[5].childNodes[0]).prepend(
-						'<option value="' + exc_info_arr[i]['transfer_option'] + '">' + exc_info_arr[i]['transfer_option'] + '</option>'
-					);
-					row.cells[5].childNodes[0].value = exc_info_arr[i]['transfer_option'];
-					row.cells[6].childNodes[0].value = exc_info_arr[i]['adult'];
-					row.cells[7].childNodes[0].value = exc_info_arr[i]['chwb'];
-					row.cells[8].childNodes[0].value = exc_info_arr[i]['chwob'];
-					row.cells[9].childNodes[0].value = exc_info_arr[i]['infant'];
-
-					$(row.cells[5].childNodes[0]).select2().trigger('change');
-				}
+				load_booking_excursion_table(response.exc_info_arr || []);
 
 				//Train Info
 				var train_info_arr = response.train_info_arr;
@@ -585,7 +1139,7 @@ function quotation_info_load() {
 					var row = table.rows[i];
 					row.cells[0].childNodes[0].setAttribute('checked', 'true');
 
-					row.cells[2].childNodes[0].value = train_info_arr[i]['departure_date'];
+					set_booking_field_value(row.cells[2].childNodes[0], format_booking_datetime(train_info_arr[i]['departure_date']));
 					$(row.cells[3].childNodes[0]).html(
 						'<option value="' +
 						train_info_arr[i]['from_location'] +
@@ -593,7 +1147,6 @@ function quotation_info_load() {
 						train_info_arr[i]['from_location'] +
 						'</option>'
 					);
-					city_lzloading(row.cells[3].childNodes[0]);
 					$(row.cells[4].childNodes[0]).html(
 						'<option value="' +
 						train_info_arr[i]['to_location'] +
@@ -601,41 +1154,10 @@ function quotation_info_load() {
 						train_info_arr[i]['to_location'] +
 						'</option>'
 					);
-					city_lzloading(row.cells[4].childNodes[0]);
 					row.cells[8].childNodes[0].value = train_info_arr[i]['class'];
-					$(row.cells[2].childNodes[0]).trigger('change');
-					$(row.cells[3].childNodes[0]).trigger('change');
-					$(row.cells[4].childNodes[0]).trigger('change');
 				}
 
-
-				//Flight info
-				var flight_info_arr = response.flight_info_arr;
-				var table = document.getElementById('tbl_plane_travel_details_dynamic_row');
-				for (var i = 1; i < table.rows.length; i++) {
-					document.getElementById('tbl_plane_travel_details_dynamic_row').deleteRow(i);
-				}
-				if (table.rows.length != flight_info_arr.length) {
-					for (var i = 1; i < flight_info_arr.length; i++) {
-						addRow('tbl_plane_travel_details_dynamic_row');
-					}
-				}
-				for (var i = 0; i < flight_info_arr.length; i++) {
-
-					var row = table.rows[i];
-					row.cells[0].childNodes[0].setAttribute('checked', 'true');
-					row.cells[2].childNodes[0].value = flight_info_arr[i]['departure_date'];
-					row.cells[3].childNodes[0].value = flight_info_arr[i]['arrival_date'];
-					row.cells[4].childNodes[0].value = flight_info_arr[i]['from_city'] + ' - ' + flight_info_arr[i]['from_location'];
-					row.cells[5].childNodes[0].value = flight_info_arr[i]['to_city'] + ' - ' + flight_info_arr[i]['to_location'];
-					row.cells[6].childNodes[0].value = flight_info_arr[i]['airline_name'];
-					row.cells[7].childNodes[0].value = flight_info_arr[i]['class'];
-					row.cells[10].childNodes[0].value = flight_info_arr[i]['from_city_id'];
-					row.cells[11].childNodes[0].value = flight_info_arr[i]['to_city_id'];
-
-					$(row.cells[6].childNodes[0]).trigger('change');
-					$(row.cells[7].childNodes[0]).trigger('change');
-				}
+				load_booking_flight_table(response.flight_info_arr || [], response.flight_cost);
 				//Cruise Info
 				var cruise_info_arr = response.cruise_info_arr;
 				var table = document.getElementById('tbl_dynamic_cruise_package_booking');
@@ -653,17 +1175,11 @@ function quotation_info_load() {
 					var row = table.rows[i];
 					row.cells[0].childNodes[0].setAttribute('checked', 'true');
 
-					row.cells[2].childNodes[0].value = cruise_info_arr[i]['departure_date'];
-					row.cells[3].childNodes[0].value = cruise_info_arr[i]['arrival_date'];
+					set_booking_field_value(row.cells[2].childNodes[0], format_booking_datetime(cruise_info_arr[i]['departure_date']));
+					set_booking_field_value(row.cells[3].childNodes[0], format_booking_datetime(cruise_info_arr[i]['arrival_date']));
 					row.cells[4].childNodes[0].value = cruise_info_arr[i]['route'];
 					row.cells[5].childNodes[0].value = cruise_info_arr[i]['cabin'];
 					row.cells[6].childNodes[0].value = cruise_info_arr[i]['sharing'];
-
-					$(row.cells[2].childNodes[0]).trigger('change');
-					$(row.cells[3].childNodes[0]).trigger('change');
-					$(row.cells[4].childNodes[0]).trigger('change');
-					$(row.cells[5].childNodes[0]).trigger('change');
-					$(row.cells[6].childNodes[0]).trigger('change');
 				}
 
 				var tour_type = $('#tour_type').val();
@@ -681,7 +1197,12 @@ function quotation_info_load() {
 				}
 				package_html += '</select>';
 				$('#package_types_html').html(package_html);
-				get_package_type_costing();
+				if (hotel_package_type_arr.length > 0) {
+					get_package_type_costing();
+				} else {
+					load_booking_hotel_table(response.hotel_info_arr || []);
+					get_package_type_costing();
+				}
 			}
 		});
 	}
@@ -875,61 +1396,17 @@ function get_package_type_costing() {
 		data: { quotation_id: quotation_id,package_type:package_type },
 		success: function (result) {
 			var response = JSON.parse(result);
-			//Hotel info
-			var hotel_info_arr = response.hotel_info_arr;
-			var table = document.getElementById('tbl_package_hotel_infomration');
-
-			for (var i = 1; i < table.rows.length; i++) {
-				document.getElementById('tbl_package_hotel_infomration').deleteRow(i);
-			}
-			if (table.rows.length != hotel_info_arr.length) {
-				for (var i = 1; i < hotel_info_arr.length; i++) {
-					addRow('tbl_package_hotel_infomration');
-				}
-			}
-			for (var i = 0; i < hotel_info_arr.length; i++) {
-				var row = table.rows[i];
-				row.cells[0].childNodes[0].setAttribute('checked', 'true');
-
-				$(row.cells[2].childNodes[0]).html(
-					'<option value="' +
-					hotel_info_arr[i]['city_id'] +
-					'" selected="selected">' +
-					hotel_info_arr[i]['city_name'] +
-					'</option>'
-				);
-				city_lzloading(row.cells[2].childNodes[0]);
-				$(row.cells[3].childNodes[0]).html('<option value="' + hotel_info_arr[i]['hotel_id1'] + '">' + hotel_info_arr[i]['hotel_name1'] + '</option>');
-				document.getElementById(row.cells[3].childNodes[0].id).value = hotel_info_arr[i]['hotel_id1'];
-
-
-				row.cells[4].childNodes[0].value = hotel_info_arr[i]['check_in'];
-				row.cells[5].childNodes[0].value = hotel_info_arr[i]['check_out'];
-				row.cells[6].childNodes[0].value = hotel_info_arr[i]['total_rooms'];
-				$(row.cells[7].childNodes[0]).prepend(
-					'<option value="' +
-					hotel_info_arr[i]['room_category'] +
-					'">' +
-					hotel_info_arr[i]['room_category'] +
-					'</option>'
-				);
-				row.cells[8].childNodes[0].value= hotel_info_arr[i]['meal_plan'];
-				document.getElementById(row.cells[7].childNodes[0].id).value = hotel_info_arr[i]['room_category'];
-				document.getElementById(row.cells[9].childNodes[0].id).value = hotel_info_arr[i]['extra_bed'];
-
-				$('#' + row.cells[7].childNodes[0].id).select2().trigger("change");
-				
-
-			}
-			// var subtotal = parseFloat(response.tour_cost) + parseFloat(response.markup_cost);
-			$('#txt_hotel_expenses').val(response.tour_cost);
+			load_booking_hotel_table(response.hotel_info_arr || []);
+			$('#txt_hotel_expenses').val(response.tour_cost || 0);
 			$('#service_charge').val(response.service_charge);
 			$('#total_basic_amt').val(response.tour_cost);
 			$('#discount_in').val(response.discount_in);
 			$('#discount_amt').val(response.discount);
 			$('#tax_apply_on').val(response.tax_apply_on);
 			$('#tax_value').val(response.tax_value);
-			response.tour_cost = response.tour_cost.toFixed(2);
+			if (response.tour_cost !== undefined && response.tour_cost !== null) {
+				response.tour_cost = parseFloat(response.tour_cost).toFixed(2);
+			}
 			get_auto_values('txt_booking_date','total_basic_amt','payment_mode','service_charge','markup','save','true','service_charge','discount');
 		}
 });
@@ -945,87 +1422,10 @@ function get_package_program(package) {
 
 			success: function (result) {
 				var result1 = JSON.parse(result);
-				var hotel_info_arr = result1.hotel_info_arr;
-				var table = document.getElementById('tbl_package_hotel_infomration');
-
-				if (table.rows.length == 1) {
-					for (var i = 1; i < table.rows.length; i++) {
-						document.getElementById('tbl_package_hotel_infomration').deleteRow(i);
-					}
-				}
-				else {
-					for (var i = 0; i < table.rows.length; i++) {
-						document.getElementById('tbl_package_hotel_infomration').deleteRow(i);
-					}
-				}
-				if (table.rows.length != hotel_info_arr.length) {
-					for (var i = 1; i < hotel_info_arr.length; i++) {
-						addRow('tbl_package_hotel_infomration');
-					}
-				}
-				for (var i = 0; i < hotel_info_arr.length; i++) {
-
-					var row = table.rows[i];
-					row.cells[0].childNodes[0].setAttribute('checked', 'true');
-					$(row.cells[2].childNodes[0]).html(
-						'<option value="' +
-						hotel_info_arr[i]['city_id'] +
-						'" selected="selected">' +
-						hotel_info_arr[i]['city_name'] +
-						'</option>'
-					);
-					city_lzloading(row.cells[2].childNodes[0]);
-
-					$(row.cells[3].childNodes[0]).html(
-						'<option value="' +
-						hotel_info_arr[i]['hotel_id1'] +
-						'">' +
-						hotel_info_arr[i]['hotel_name'] +
-						'</option>'
-					);
-					hotel_type_load_cate(row.cells[7].childNodes[0].id);
-				}
+				load_booking_hotel_table(result1.hotel_info_arr || []);
 
 				//Transport Info
-				var transport_info_arr = result1.transport_info_arr;
-				var table = document.getElementById('tbl_package_transport_infomration');
-
-				if (table.rows.length == 1) {
-					for (var i = 1; i < table.rows.length; i++) {
-						document.getElementById('tbl_package_transport_infomration').deleteRow(i);
-					}
-				}
-				else {
-					for (var i = 0; i < table.rows.length; i++) {
-						document.getElementById('tbl_package_transport_infomration').deleteRow(i);
-					}
-				}
-				if (table.rows.length != transport_info_arr.length) {
-					for (var i = 1; i < transport_info_arr.length; i++) {
-						addRow('tbl_package_transport_infomration');
-					}
-				}
-				for (var i = 0; i < transport_info_arr.length; i++) {
-
-					var row = table.rows[i];
-					row.cells[0].childNodes[0].setAttribute('checked', 'true');
-					row.cells[2].childNodes[0].value = transport_info_arr[i]['vehicle_id'];
-					$(row.cells[5].childNodes[0]).prepend('<optgroup value=' + transport_info_arr[i]['pickup_type'] + ' label="' + (transport_info_arr[i]['pickup_type']).charAt(0).toUpperCase() + (transport_info_arr[i]['pickup_type']).slice(1) + ' Name"><option value="' + transport_info_arr[i]['pickup_type'] + '-' + transport_info_arr[i]['pickup_id'] + '">' + transport_info_arr[i]['pickup'] + '</option></optgroup>');
-					document.getElementById(row.cells[5].childNodes[0].id).value = transport_info_arr[i]['pickup_type'] + '-' + transport_info_arr[i]['pickup_id'];
-
-					$(row.cells[6].childNodes[0]).prepend('<optgroup value=' + transport_info_arr[i]['drop_type'] + ' label="' + (transport_info_arr[i]['drop_type']).charAt(0).toUpperCase() + (transport_info_arr[i]['drop_type']).slice(1) + ' Name"><option value="' + transport_info_arr[i]['drop_type'] + '-' + transport_info_arr[i]['drop_id'] + '">' + transport_info_arr[i]['drop'] + '</option></optgroup>');
-					document.getElementById(row.cells[6].childNodes[0].id).value = transport_info_arr[i]['drop_type'] + '-' + transport_info_arr[i]['drop_id'];
-
-					row.cells[8].childNodes[0].value = '';
-					row.cells[7].childNodes[0].value = '';
-
-					$(row.cells[5].childNodes[0]).select2().trigger('change');
-					$(row.cells[6].childNodes[0]).select2().trigger('change');
-					$(row.cells[7].childNodes[0]).select2().trigger('change');
-
-				}
-				destinationLoading("select[name^=pickup_from]", "Pickup Location");
-				destinationLoading("select[name^=drop_to]", "Drop-off Location");
+				load_booking_transport_table(result1.transport_info_arr || []);
 
 				$('#txt_package_tour_name').val(result1.package_name);
 				$('#tour_type').val(result1.tour_type);

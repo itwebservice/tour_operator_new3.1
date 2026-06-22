@@ -67,6 +67,14 @@
     {                            
         $sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id=".$row_plane_details['from_city']));
         $sq_city2 = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id=".$row_plane_details['to_city']));
+        $from_sector = '';
+        if ($row_plane_details['from_location']) {
+            $from_sector = ($sq_city['city_name']) ? $sq_city['city_name'] . ' - ' . $row_plane_details['from_location'] : $row_plane_details['from_location'];
+        }
+        $to_sector = '';
+        if ($row_plane_details['to_location']) {
+            $to_sector = ($sq_city2['city_name']) ? $sq_city2['city_name'] . ' - ' . $row_plane_details['to_location'] : $row_plane_details['to_location'];
+        }
         $count++;
     ?>
 
@@ -78,24 +86,27 @@
 
             <td><input type="text" id="txt_plane_date-<?= $offset.$count ?>_d" name="txt_plane_date-<?= $offset.$count ?>_d ?>" placeholder="Departure Date" title="Departure Date & Time" onchange="get_to_datetime(this.id,'txt_arravl-<?= $offset.$count ?>_d')" value="<?php echo date("d-m-Y H:i", strtotime($row_plane_details['date'])) ?>" style="width: 152px;/"></td>
             <td><input type="text" id="txt_arravl-<?= $offset.$count ?>_d" name="txt_arravl-<?= $offset.$count ?>_d" placeholder="Arrival date & time" style="width:200px" title="Arrival date & time" onchange="validate_validDatetime('txt_plane_date-<?= $offset.$count ?>_d' , this.id)" class="app_datetimepicker" value="<?php echo date("d-m-Y H:i", strtotime($row_plane_details['arraval_time'])) ?>"/></td>
-            <!-- <td><input type="text" name="from_sector-1" id="from_sector-<?= $offset.$count ?>_d" placeholder="*From Sector" title="From Sector" style="width: 250px;" value="<?php echo ($sq_city['city_name']) ? $sq_city['city_name']." - ".$row_plane_details['from_location'] : ''; ?>">
-	        </td>
-	        <td><input type="text" name="to_sector-1" id="to_sector-<?= $offset.$count ?>_d" placeholder="*To Sector" title="To Sector" style="width: 250px;" value="<?php echo ($sq_city2['city_name']) ? $sq_city2['city_name']." - ".$row_plane_details['to_location'] : ''; ?>">
-	        </td> -->
+
             <td style="min-width:360px;"><select name="from_sector-<?= $offset.$count ?>_d"
 id="from_sector-<?= $offset.$count ?>_d"
-                                                                    class="form-control app_select2 "
+                                                                    class="form-control app_select2 plane-airport-select"
                                                                     data-sector-type="from" title="From Sector"
                                                                      data-add-new-option="true" style="width:100%">
                                                                     <option value="">*From Sector</option>
+                                                                    <?php if ($from_sector != '') { ?>
+                                                                    <option value="<?= htmlspecialchars($from_sector, ENT_QUOTES) ?>" selected><?= htmlspecialchars($from_sector, ENT_QUOTES) ?></option>
+                                                                    <?php } ?>
                                                                 </select>
                                                             </td>
                                                             <td style="min-width:360px;"><select name="to_sector-<?= $offset.$count ?>_d"
 id="to_sector-<?= $offset.$count ?>_d"
-                                                                    class="form-control app_select2 "
+                                                                    class="form-control app_select2 plane-airport-select"
                                                                     data-sector-type="to" title="To Sector"
                                                                      data-add-new-option="true" style="width:100%">
                                                                     <option value="">*To Sector</option>
+                                                                    <?php if ($to_sector != '') { ?>
+                                                                    <option value="<?= htmlspecialchars($to_sector, ENT_QUOTES) ?>" selected><?= htmlspecialchars($to_sector, ENT_QUOTES) ?></option>
+                                                                    <?php } ?>
                                                                 </select>
                                                             </td>
 
@@ -105,7 +116,7 @@ id="to_sector-<?= $offset.$count ?>_d"
                 <option value="<?php echo $sq_airline['airline_id'] ?>"><?php echo $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' ?></option>
                 <?php get_airline_name_dropdown(); ?>
             </select></td>
-            <td><select name="plane_class-1" id="plane_class-1" title="Class" style="width: 200px;">
+            <td><select name="plane_class-<?= $offset.$count ?>_d" id="plane_class-<?= $offset.$count ?>_d" title="Class" style="width: 200px;">
                 <option value="<?php echo $row_plane_details['class'] ?>"><?php echo $row_plane_details['class'] ?></option>
                 <?php get_flight_class_dropdown(); ?>
             </select></td>
@@ -116,7 +127,6 @@ id="to_sector-<?= $offset.$count ?>_d"
             <td><input type="hidden" value="<?php echo $row_plane_details['plane_id'] ?>"></td>
         </tr>
         <script>
-            $('#plane_from_location-<?= $offset.$count ?>_d,#plane_to_location-<?= $offset.$count ?>_d, #txt_plane_company-<?= $offset.$count ?>_d').select2();
             $('#txt_arravl-<?= $offset.$count ?>_d, #txt_plane_date-<?= $offset.$count ?>_d').datetimepicker({ format:'d-m-Y H:i' });
         </script>
     <?php }
@@ -150,26 +160,46 @@ id="to_sector-<?= $offset.$count ?>_d"
     </div>    
 
 <script>
-event_airport('tbl_plane_travel_details_dynamic_row',4,5);
-function generating_plane_date()
-{
-    var count = $("#txt_plane_date_generate").val();
-    for(var i=0; i<=count; i++)
-    {
-        $( "#txt_plane_date-"+i).datetimepicker({ format: "d-m-Y H:i"  });
-    }             
+function init_package_booking_update_plane_rows() {
+    if (typeof initPlaneAirportSelect2 === 'function') {
+        initPlaneAirportSelect2('#tbl_plane_travel_details_dynamic_row');
+    }
+    $('#tbl_plane_travel_details_dynamic_row select[id^="from_sector-"], #tbl_plane_travel_details_dynamic_row select[id^="to_sector-"]').each(function () {
+        var $sel = $(this);
+        var sectorId = $sel.attr('id') || '';
+        var selectedVal = $sel.find('option:selected').val() || $sel.val();
+        var selectedText = $sel.find('option:selected').text() || selectedVal;
+        if (selectedVal && selectedText) {
+            if (!$sel.find('option[value="' + selectedVal.replace(/"/g, '\\"') + '"]').length) {
+                $sel.append(new Option(selectedText, selectedVal, true, true));
+            }
+            $sel.val(selectedVal);
+        }
+        var suffix = sectorId.replace(/^from_sector-/, '').replace(/^to_sector-/, '');
+        var cityId = '';
+        if (sectorId.indexOf('from_sector') === 0) {
+            cityId = $('#from_city-' + suffix).val();
+        } else if (sectorId.indexOf('to_sector') === 0) {
+            cityId = $('#to_city-' + suffix).val();
+        }
+        if (cityId && typeof syncSectorCityHidden === 'function') {
+            syncSectorCityHidden(sectorId, cityId);
+        }
+    });
+    if (typeof initAllAirlineSelectAddNew === 'function') {
+        initAllAirlineSelectAddNew('#tbl_plane_travel_details_dynamic_row');
+    }
+    $('[id^="txt_plane_date-"], [id^="txt_arravl-"]').each(function () {
+        if (!$(this).data('xdsoft_datetimepicker')) {
+            $(this).datetimepicker({ format: 'd-m-Y H:i' });
+        }
+    });
+    if (typeof calculate_plane_expense === 'function') {
+        calculate_plane_expense('tbl_plane_travel_details_dynamic_row', true);
+    }
 }
-generating_plane_date();
-
+event_airport('tbl_plane_travel_details_dynamic_row', 4, 5);
 $(document).ready(function () {
-
-    $('select[id^="from_sector-"]').select2({
-        width: '100%'
-    });
-
-    $('select[id^="to_sector-"]').select2({
-        width: '100%'
-    });
-
+    init_package_booking_update_plane_rows();
 });
 </script>

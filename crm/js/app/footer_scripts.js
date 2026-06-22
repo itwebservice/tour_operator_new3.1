@@ -2129,6 +2129,77 @@ function resolveHotelCitySelect($hotelSelect) {
 	return $('#city_name').length ? $('#city_name') : $();
 }
 
+function parseQuotationHotelRowSuffix(fieldId) {
+	if (!fieldId) {
+		return '';
+	}
+	var match = String(fieldId).match(/(?:hotel_name|city_name)-?(\d+)$/);
+	return match ? match[1] : '';
+}
+
+function resolveHotelSelectFromCity(cityRef) {
+	var $city = cityRef instanceof jQuery ? cityRef : $('#' + cityRef);
+	if (!$city.length) {
+		return $();
+	}
+
+	var $row = $city.closest('tr');
+	if ($row.length) {
+		var $hotelInRow = $row.find('select[id^="hotel_name"], select[name^="hotel_name"]').first();
+		if ($hotelInRow.length) {
+			return $hotelInRow;
+		}
+	}
+
+	var suffix = parseQuotationHotelRowSuffix($city.attr('id') || '');
+	if (!suffix) {
+		return $();
+	}
+
+	var $hotel = $('#hotel_name-' + suffix);
+	if ($hotel.length) {
+		return $hotel;
+	}
+
+	return $('#hotel_name' + suffix);
+}
+
+function hotel_name_list_load(id) {
+	var $city = $('#' + id);
+	var city_id = $city.val();
+	if (!city_id) {
+		return;
+	}
+
+	var $hotel = resolveHotelSelectFromCity($city);
+	if (!$hotel.length) {
+		console.warn('hotel_name_list_load: hotel select not found for city', id);
+		return;
+	}
+
+	if (typeof hotelDropdownLoadByCity === 'function') {
+		hotelDropdownLoadByCity(city_id, $hotel);
+		return;
+	}
+
+	var base_url = $('#base_url').val();
+	$.get(base_url + 'view/package_booking/quotation/home/hotel/hotel_name_load.php', {
+		city_id: city_id
+	}, function (data) {
+		if ($hotel.data('select2')) {
+			$hotel.select2('destroy');
+		}
+		$hotel.html(data);
+		var config = typeof captureHotelSelect2Config === 'function'
+			? captureHotelSelect2Config($hotel)
+			: { width: '160px', minimumResultsForSearch: 0 };
+		$hotel.select2(config);
+		if (typeof initHotelSelectAddNew === 'function') {
+			initHotelSelectAddNew($hotel);
+		}
+	});
+}
+
 function normalizeHotelLoadUrl(url) {
 	var base = ($('#base_url').val() || '').replace(/\/?$/, '/');
 	if (!url) {
@@ -2614,73 +2685,74 @@ function city_lzloading(element, placeholder = "City Name", valueasText = false)
 function destinationLoading(element, placeholder = "Destination", valueasText = false) {
 	var base_url = $("#base_url").val();
 	url = base_url + '/view/load_data/generic_destination_loading.php';
-	
-	// Store current selection before destroying
-	var currentValue = $(element).val();
-	var currentText = $(element).find('option:selected').text();
-	var currentOptgroup = $(element).find('option:selected').parent().attr('value');
-	
-	if ($(element).hasClass("select2-hidden-accessible")) {
-		$(element).select2('destroy');
-	}
 
-	$(element).select2({
-		placeholder: placeholder,
-		ajax: {
-			url: url,
-			dataType: 'json',
-			type: 'GET',
-			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
-			processResults: function (data) {
-				// If there was a pre-selected value, add it to the results
-				if(currentValue && currentText){
-					var found = false;
-					// Check if current value exists in results
-					for(var i=0; i<data.results.length; i++){
-						if(data.results[i].children){
-							for(var j=0; j<data.results[i].children.length; j++){
-								if(data.results[i].children[j].id === currentValue){
-									found = true;
-									break;
+	$(element).each(function () {
+		var $el = $(this);
+
+		// Store current selection before destroying (per element)
+		var currentValue = $el.val();
+		var currentText = $el.find('option:selected').text();
+		var currentOptgroup = $el.find('option:selected').parent().attr('value');
+
+		if ($el.hasClass("select2-hidden-accessible")) {
+			$el.select2('destroy');
+		}
+
+		$el.select2({
+			placeholder: placeholder,
+			ajax: {
+				url: url,
+				dataType: 'json',
+				type: 'GET',
+				data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
+				processResults: function (data) {
+					// If there was a pre-selected value, add it to the results
+					if (currentValue && currentText) {
+						var found = false;
+						for (var i = 0; i < data.results.length; i++) {
+							if (data.results[i].children) {
+								for (var j = 0; j < data.results[i].children.length; j++) {
+									if (data.results[i].children[j].id === currentValue) {
+										found = true;
+										break;
+									}
 								}
 							}
 						}
-					}
-					// If not found in results, add it
-					if(!found && currentOptgroup){
-						var groupLabel = currentOptgroup.charAt(0).toUpperCase() + currentOptgroup.slice(1) + ' Name';
-						var groupExists = false;
-						for(var i=0; i<data.results.length; i++){
-							if(data.results[i].text === groupLabel){
-								data.results[i].children.unshift({id: currentValue, text: currentText});
-								groupExists = true;
-								break;
+						if (!found && currentOptgroup) {
+							var groupLabel = currentOptgroup.charAt(0).toUpperCase() + currentOptgroup.slice(1) + ' Name';
+							var groupExists = false;
+							for (var k = 0; k < data.results.length; k++) {
+								if (data.results[k].text === groupLabel) {
+									data.results[k].children.unshift({ id: currentValue, text: currentText });
+									groupExists = true;
+									break;
+								}
+							}
+							if (!groupExists) {
+								data.results.unshift({
+									text: groupLabel,
+									children: [{ id: currentValue, text: currentText }]
+								});
 							}
 						}
-						if(!groupExists){
-							data.results.unshift({
-								text: groupLabel,
-								children: [{id: currentValue, text: currentText}]
-							});
+					}
+
+					let more = data.pagination;
+					return {
+						results: data.results,
+						pagination: {
+							more: more.more,
 						}
-					}
+					};
 				}
-				
-				let more = data.pagination;
-				return {
-					results: data.results,
-					pagination: {
-						more: more.more,
-					}
-				};
 			}
+		});
+
+		if (currentValue) {
+			$el.val(currentValue).trigger('change');
 		}
 	});
-	
-	// Restore the previous selection
-	if(currentValue){
-		$(element).val(currentValue).trigger('change');
-	}
 }
 //**Generic City save modal end**//
 

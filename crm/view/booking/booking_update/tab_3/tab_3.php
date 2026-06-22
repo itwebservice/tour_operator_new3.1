@@ -330,7 +330,7 @@ $total_seats = ($sq_pax == 1) ? 1 : ($total_adult + $total_child_b + $total_chil
                                     <div class="col-md-2 col-sm-3 col-xs-12 mg_bt_10 ">
                                         <select title="Select Tax" id="tcs_tax-" name="tcs_tax-" class="form-control" >
                                             <option value=""></option>
-											<option value="5" <?php if($tourwise_details['tcs_per']==5){ echo "selected"; } ?>>5% TCS</option>
+											<option value="2" <?php if($tourwise_details['tcs_per']==2){ echo "selected"; } ?>>2% TCS</option>
 											<option value="20" <?php if($tourwise_details['tcs_per']==20){ echo "selected"; } ?>>20% TCS</option>
                                         </select>
                 </div>

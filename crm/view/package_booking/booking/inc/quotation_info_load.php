@@ -18,10 +18,23 @@ $sq_quotation_1 = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_ma
 
 $sq_enquiry = mysqli_fetch_assoc(mysqlQuery("select * from enquiry_master where enquiry_id='$sq_quotation[enquiry_id]'"));
 $sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id'"));
+if (!$sq_costing) {
+	$sq_costing = array(
+		'tour_cost' => 0,
+		'transport_cost' => 0,
+		'excursion_cost' => 0,
+		'service_charge' => 0,
+		'service_tax_subtotal' => '',
+		'discount_in' => 'Percentage',
+		'discount' => 0,
+		'total_tour_cost' => 0,
+		'bsmValues' => '[{"tax_apply_on":"","tax_value":"","service":"","basic":"","tcsper":""}]'
+	);
+}
 
-$quot_info_arr['enquiry_spec'] = $sq_enquiry['enquiry_specification'];
+$quot_info_arr['enquiry_spec'] = isset($sq_enquiry['enquiry_specification']) ? $sq_enquiry['enquiry_specification'] : '';
 $quot_info_arr['total_passangers'] = $sq_quotation['total_passangers'];
-$quot_info_arr['tour_name'] = $sq_quotation_1['package_name'];
+$quot_info_arr['tour_name'] = isset($sq_quotation_1['package_name']) ? $sq_quotation_1['package_name'] : $sq_quotation['tour_name'];
 
 $quot_info_arr['package_id'] = $sq_quotation['package_id'];
 
@@ -70,41 +83,56 @@ while($row_transport = mysqli_fetch_assoc($sq_transport)){
 
 	$q_transport = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_transport[vehicle_name]'"));
 	// Pickup
+	$pickup = '';
+	$pickup_id = '';
 	if($row_transport['pickup_type'] == 'city'){
 		$row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[pickup]'"));
-		$pickup = $row['city_name'];
-		$pickup_id = $row['city_id'];
+		if($row){
+			$pickup = $row['city_name'];
+			$pickup_id = $row['city_id'];
+		}
 	}
 	else if($row_transport['pickup_type'] == 'hotel'){
 		$row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[pickup]'"));
-		$pickup_id = $row['hotel_id'];
-		$pickup = $row['hotel_name'];
+		if($row){
+			$pickup_id = $row['hotel_id'];
+			$pickup = $row['hotel_name'];
+		}
 	}
 	else{
 		$row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[pickup]'"));
-		$airport_nam = clean($row['airport_name']);
-		$airport_code = clean($row['airport_code']);
-		$pickup = $airport_nam." (".$airport_code.")";
-		$pickup_id = $row['airport_id'];
+		if($row){
+			$airport_nam = clean($row['airport_name']);
+			$airport_code = clean($row['airport_code']);
+			$pickup = $airport_nam." (".$airport_code.")";
+			$pickup_id = $row['airport_id'];
+		}
 	}
 	// Drop
+	$drop = '';
+	$drop_id = '';
 	if($row_transport['drop_type'] == 'city'){
 		$row = mysqli_fetch_assoc(mysqlQuery("select city_id,city_name from city_master where city_id='$row_transport[drop]'"));
-		$drop = $row['city_name'];
-		$drop_id = $row['city_id'];
+		if($row){
+			$drop = $row['city_name'];
+			$drop_id = $row['city_id'];
+		}
 	}
 	else if($row_transport['drop_type'] == 'hotel'){
 		$row = mysqli_fetch_assoc(mysqlQuery("select hotel_id,hotel_name from hotel_master where hotel_id='$row_transport[drop]'"));
-		$drop = $row['hotel_name'];
-		$drop_id = $row['hotel_id'];
+		if($row){
+			$drop = $row['hotel_name'];
+			$drop_id = $row['hotel_id'];
+		}
 	}
 	else{
 		$row = mysqli_fetch_assoc(mysqlQuery("select airport_name, airport_code, airport_id from airport_master where airport_id='$row_transport[drop]'"));
-		$airport_nam = clean($row['airport_name']);
-		$airport_code = clean($row['airport_code']);
-		$drop = $airport_nam." (".$airport_code.")";
-		$drop = $drop;
-		$drop_id = $row['airport_id'];
+		if($row){
+			$airport_nam = clean($row['airport_name']);
+			$airport_code = clean($row['airport_code']);
+			$drop = $airport_nam." (".$airport_code.")";
+			$drop_id = $row['airport_id'];
+		}
 	}
 
 	$start_date = get_datetime_user($row_transport['start_date']);
@@ -114,6 +142,7 @@ while($row_transport = mysqli_fetch_assoc($sq_transport)){
 	$vehicle_count = $row_transport['vehicle_count'];
 
 	$row1 = mysqli_fetch_assoc(mysqlQuery("select entry_id from service_duration_master where duration='$row_transport[service_duration]'"));
+	$s_duration_id = ($row1) ? $row1['entry_id'] : '';
 	$arr = array(
 		'start_date' => $start_date,
 		'end_date' => $end_date,
@@ -124,10 +153,10 @@ while($row_transport = mysqli_fetch_assoc($sq_transport)){
 		'pickup_type' => $pickup_type,
 		'drop_type' => $drop_type,
 		'vehicle_count' => $vehicle_count,
-		'vehicle_name' => $q_transport['vehicle_name'],
+		'vehicle_name' => isset($q_transport['vehicle_name']) ? $q_transport['vehicle_name'] : '',
 		'vehicle_id' => $row_transport['vehicle_name'],
 		'service_duration' => $row_transport['service_duration'],
-		's_duration_id' => $row1['entry_id']
+		's_duration_id' => $s_duration_id
 	);
 	array_push($transport_info_arr, $arr);
 }
@@ -137,9 +166,15 @@ $sq_exc = mysqlQuery("select * from package_tour_quotation_excursion_entries whe
 while($row_exc = mysqli_fetch_assoc($sq_exc)){
 
 	$sq_exc_id = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id = '$row_exc[excursion_name]'"));
-	$exc_name = $sq_exc_id['excursion_name'];
+	$exc_name = isset($sq_exc_id['excursion_name']) ? $sq_exc_id['excursion_name'] : '';
 	$sq_city_id = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id = '$row_exc[city_name]'"));
-	$city_name1 = $sq_city_id['city_name'];
+	$city_name1 = isset($sq_city_id['city_name']) ? $sq_city_id['city_name'] : '';
+	$vehicle_id = isset($row_exc['vehicles']) ? $row_exc['vehicles'] : '';
+	$vehicle_name = '';
+	if($vehicle_id != ''){
+		$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='$vehicle_id'"));
+		$vehicle_name = isset($sq_vehicle['vehicle_name']) ? $sq_vehicle['vehicle_name'] : '';
+	}
 
 	$arr2 = array(
 
@@ -149,6 +184,8 @@ while($row_exc = mysqli_fetch_assoc($sq_exc)){
 		'exc_name' => $exc_name,
 		'exc_date' => get_datetime_user($row_exc['exc_date']),
 		'transfer_option' => $row_exc['transfer_option'],
+		'vehicle_id' => $vehicle_id,
+		'vehicle_name' => $vehicle_name,
 		'adult' => $row_exc['adult'],
 		'chwb' => $row_exc['chwb'],
 		'chwob' => $row_exc['chwob'],
@@ -181,12 +218,21 @@ while($row_flight = mysqli_fetch_assoc($sq_flight)){
 
 	$arr_date = get_datetime_user($row_flight['arraval_time']);
 
+	$airline_id = $row_flight['airline_name'];
+	$airline_display = '';
+	if($airline_id != ''){
+		$sq_airline = mysqli_fetch_assoc(mysqlQuery("select airline_name, airline_code from airline_master where airline_id='$airline_id'"));
+		if($sq_airline){
+			$airline_display = $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')';
+		}
+	}
+
 	$arr1 = array(
 
 		'from_city_id' => $row_flight['from_city'],
 		'to_city_id' => $row_flight['to_city'],
-		'from_city' => $sq_city['city_name'],
-		'to_city' => $sq_city1['city_name'],
+		'from_city' => isset($sq_city['city_name']) ? $sq_city['city_name'] : '',
+		'to_city' => isset($sq_city1['city_name']) ? $sq_city1['city_name'] : '',
 
 		'departure_date' => $dep_date,
 
@@ -196,7 +242,8 @@ while($row_flight = mysqli_fetch_assoc($sq_flight)){
 
 		'to_location' => $row_flight['to_location'],
 
-		'airline_name' => $row_flight['airline_name'],
+		'airline_id' => $airline_id,
+		'airline_name' => $airline_display,
 		'class' => $row_flight['class']
 
 	);
@@ -233,10 +280,48 @@ while($row_hotel = mysqli_fetch_assoc($sq_hotel)){
 	array_push($hotel_package_type_arr, $arr2);
 }
 
+$hotel_info_arr = array();
+$sq_hotel_all = mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' order by id");
+while($row_hotel = mysqli_fetch_assoc($sq_hotel_all)){
+	$sq_hotel_id = mysqli_fetch_assoc(mysqlQuery("select * from hotel_master where hotel_id = '$row_hotel[hotel_name]'"));
+	$hotel_name1 = isset($sq_hotel_id['hotel_name']) ? $sq_hotel_id['hotel_name'] : '';
+	$sq_city_id = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id = '$row_hotel[city_name]'"));
+	$city_name1 = isset($sq_city_id['city_name']) ? $sq_city_id['city_name'] : '';
+	$check_in_val = $row_hotel['check_in'];
+	$check_out_val = $row_hotel['check_out'];
+	if($check_in_val != '' && $check_in_val != '0000-00-00' && strpos($check_in_val, ':') === false){
+		$check_in_val = get_date_user($check_in_val) . ' 00:00';
+	} else {
+		$check_in_val = get_datetime_user($check_in_val);
+	}
+	if($check_out_val != '' && $check_out_val != '0000-00-00' && strpos($check_out_val, ':') === false){
+		$check_out_val = get_date_user($check_out_val) . ' 00:00';
+	} else {
+		$check_out_val = get_datetime_user($check_out_val);
+	}
+	$arr_hotel = array(
+		'city_id' => $row_hotel['city_name'],
+		'city_name' => $city_name1,
+		'hotel_id1' => $row_hotel['hotel_name'],
+		'hotel_name1' => $hotel_name1,
+		'total_rooms' => $row_hotel['total_rooms'],
+		'check_in' => $check_in_val,
+		'check_out' => $check_out_val,
+		'room_category' => $row_hotel['room_category'],
+		'extra_bed' => $row_hotel['extra_bed'],
+		'meal_plan' => $row_hotel['meal_plan'],
+		'package_type' => $row_hotel['package_type']
+	);
+	array_push($hotel_info_arr, $arr_hotel);
+}
+
+$quot_info_arr['train_cost'] = $sq_quotation['train_cost'];
+$quot_info_arr['flight_cost'] = $sq_quotation['flight_cost'];
+$quot_info_arr['cruise_cost'] = $sq_quotation['cruise_cost'];
 $quot_info_arr['transport_info_arr'] = $transport_info_arr;
 $quot_info_arr['exc_info_arr'] = $exc_info_arr;
 $quot_info_arr['train_info_arr'] = $train_info_arr;
-// $quot_info_arr['hotel_info_arr'] = $hotel_info_arr;
+$quot_info_arr['hotel_info_arr'] = $hotel_info_arr;
 $quot_info_arr['flight_info_arr'] = $flight_info_arr;
 $quot_info_arr['cruise_info_arr'] = $cruise_info_arr;
 $quot_info_arr['hotel_package_type_arr'] = $hotel_package_type_arr;

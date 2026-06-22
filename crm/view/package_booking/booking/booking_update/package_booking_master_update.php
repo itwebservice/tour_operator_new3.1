@@ -83,6 +83,34 @@ $all_tab = ($hide_flight=='hidden' && $hide_cruise=='hidden' && $hide_train=='hi
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script src='../js/calculations.js'></script>
 <script src='../js/business_rule_calculation.js'></script>
+<script>
+$(document).on('click', '.bk_tab_head a', function () {
+	setTimeout(function () {
+		if ($('#tab_2').hasClass('active') && typeof init_package_booking_update_plane_rows === 'function') {
+			init_package_booking_update_plane_rows();
+		}
+		if ($('#tab_3').hasClass('active')) {
+			if (typeof init_booking_update_city_selects === 'function') {
+				init_booking_update_city_selects();
+			}
+			if (typeof init_booking_update_destination_selects === 'function') {
+				init_booking_update_destination_selects();
+			}
+			if (typeof generating_hotel_acc_date === 'function') {
+				generating_hotel_acc_date();
+			}
+		}
+		if ($('#tab_4').hasClass('active')) {
+			if (typeof calculate_tour_cost === 'function') {
+				calculate_tour_cost();
+			}
+			if (typeof get_auto_values === 'function') {
+				get_auto_values('booking_date', 'total_basic_amt', 'payment_mode', 'service_charge', 'markup', 'update', 'false', 'service_charge', 'discount_amt');
+			}
+		}
+	}, 400);
+});
+</script>
 <?php
 include_once('../../../layouts/fullwidth_app_footer.php');
 ?>

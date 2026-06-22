@@ -95,40 +95,18 @@ $('#txt_arrval1,#txt_dapart1, #train_arrival_date,#train_departure_date').dateti
 if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
     hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/package_booking/quotation/home/hotel/hotel_name_load.php';
 }
-function hotel_name_list_load(id) {
-    var city_id = $("#" + id).val();
-    if (!city_id) {
-        return;
-    }
-    var count = id.substring(9);
-    var $hotel = $("#hotel_name-" + count);
-    if (typeof hotelDropdownLoadByCity === 'function') {
-        hotelDropdownLoadByCity(city_id, $hotel);
-        return;
-    }
-    var base_url = $('#base_url').val();
-    $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_name_load.php", {
-        city_id: city_id
-    }, function(data) {
-        if ($hotel.data('select2')) {
-            $hotel.select2('destroy');
-        }
-        $hotel.html(data);
-        $hotel.select2({ width: '160px', minimumResultsForSearch: 0 });
-        if (typeof captureHotelSelect2Config === 'function') {
-            captureHotelSelect2Config($hotel);
-        }
-        initHotelSelectAddNew($hotel);
-    });
-}
+// hotel_name_list_load is provided by footer_scripts.js
 
 function hotel_type_load(id) {
     var hotel_id = $("#" + id).val();
-    var count = id.substring(10);
-    $.get("../hotel/hotel_type_load.php", {
+    var count = typeof parseQuotationHotelRowSuffix === 'function'
+        ? parseQuotationHotelRowSuffix(id)
+        : id.substring(10);
+    var base_url = $('#base_url').val();
+    $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_type_load.php", {
         hotel_id: hotel_id
     }, function(data) {
-        $("#hotel_type" + count).val(data);
+        $("#hotel_type-" + count).val(data);
     });
     hotel_type_load_cate(id);
 }
@@ -136,9 +114,12 @@ function hotel_type_load(id) {
 function hotel_type_load_cate(id)
 {
   var hotel_id = $("#"+id).val();
-  var count = id.substring(11);
+  var count = typeof parseQuotationHotelRowSuffix === 'function'
+      ? parseQuotationHotelRowSuffix(id)
+      : id.substring(11);
+  var base_url = $('#base_url').val();
   console.log("DEBUG: Loading room categories for hotel_id:", hotel_id, "count:", count);
-  $.get( "../hotel/hotel_category.php" , { hotel_id : hotel_id } , function ( data ) {
+  $.get( base_url + "view/package_booking/quotation/home/hotel/hotel_category.php" , { hotel_id : hotel_id } , function ( data ) {
         console.log("DEBUG: Room category data received:", data);
         $ ("#room_cat-"+count).html( data ) ;  
         
@@ -168,40 +149,108 @@ function get_excursion_list(id) {
 /**Excursion Amount load**/
 function get_excursion_amount()
 {
-    
-}
-/**Excursion Amount load**/
-function get_excursion_amount_update(eleid) {
     var base_url = $('#base_url').val();
-    var total_adult = $('#total_adult12').val();
-    var children_without_bed = $('#children_without_bed12').val();
-    var children_with_bed = $('#children_with_bed12').val();
-    var total_infant = $('#total_infant12').val();
-    var exc_date_arr = new Array();
-    var exc_arr = new Array();
-    var transfer_arr = new Array();
+    var exc_date_arr = [];
+    var exc_arr = [];
+    var transfer_arr = [];
+    var adult_arr = [];
+    var child_arr = [];
+    var childwo_arr = [];
+    var infant_arr = [];
+    var total_vehicles_arr = [];
 
-    var rowSuffix = eleid.replace(/^[^-]+-/, '');
+    var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
+    if (!table) return;
+    var rowCount = table.rows.length;
 
-    total_adult = (total_adult == '') ? 0 : total_adult;
-    children_without_bed = (children_without_bed == '') ? 0 : children_without_bed;
-    children_with_bed = (children_with_bed == '') ? 0 : children_with_bed;
-    total_infant = (total_infant == '') ? 0 : total_infant;
+    for (var i = 0; i < rowCount; i++) {
+        var row = table.rows[i];
+        var exc_date = row.cells[2].childNodes[0].value;
+        var exc = $(row.cells[4].childNodes[0]).val();
+        var transfer = $(row.cells[5].childNodes[0]).val();
+        var total_adult = row.cells[6].childNodes[0].value;
+        var total_children = row.cells[7].childNodes[0].value;
+        var total_childrenwo = row.cells[8].childNodes[0].value;
+        var total_infant = row.cells[9].childNodes[0].value;
+        var total_vehicles = row.cells[15] ? row.cells[15].childNodes[0].value : 0;
 
-    exc_date_arr.push($('#exc_date-' + rowSuffix).val());
-    exc_arr.push($('#excursion-' + rowSuffix).val());
-    transfer_arr.push($('#transfer_option-' + rowSuffix).val());
+        exc_date_arr.push(exc_date);
+        exc_arr.push(exc || '');
+        transfer_arr.push(transfer || '');
+        adult_arr.push(total_adult || 0);
+        child_arr.push(total_children || 0);
+        childwo_arr.push(total_childrenwo || 0);
+        infant_arr.push(total_infant || 0);
+        total_vehicles_arr.push(total_vehicles || 0);
+    }
 
     $.post(base_url + "view/package_booking/quotation/home/excursion_amount_load.php", {
         exc_date_arr: exc_date_arr,
         exc_arr: exc_arr,
         transfer_arr: transfer_arr,
-        total_adult: total_adult,
-        children_without_bed: children_without_bed,
-        children_with_bed: children_with_bed,
-        total_infant: total_infant
+        adult_arr: adult_arr,
+        child_arr: child_arr,
+        childwo_arr: childwo_arr,
+        infant_arr: infant_arr,
+        total_vehicles_arr: total_vehicles_arr
     }, function(data) {
         var amount_arr = JSON.parse(data);
+        for (var i = 0; i < amount_arr.length; i++) {
+            var row = table.rows[i];
+            var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+            if (checkbox && checkbox.checked) {
+                if (row.cells[10] && row.cells[10].childNodes[0]) {
+                    row.cells[10].childNodes[0].value = amount_arr[i]['total_cost'];
+                }
+                if (row.cells[11] && row.cells[11].childNodes[0]) {
+                    row.cells[11].childNodes[0].value = amount_arr[i]['adult_cost'];
+                }
+                if (row.cells[12] && row.cells[12].childNodes[0]) {
+                    row.cells[12].childNodes[0].value = amount_arr[i]['child_cost'];
+                }
+                if (row.cells[13] && row.cells[13].childNodes[0]) {
+                    row.cells[13].childNodes[0].value = amount_arr[i]['childwo_cost'];
+                }
+                if (row.cells[14] && row.cells[14].childNodes[0]) {
+                    row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
+                }
+            }
+        }
+    });
+}
+/**Excursion Amount load**/
+function get_excursion_amount_update(eleid) {
+    var base_url = $('#base_url').val();
+    var checkbox = document.getElementById(eleid);
+    if (!checkbox) return;
+    var row = checkbox.closest('tr');
+    if (!row) return;
+
+    var exc_date = row.cells[2].childNodes[0].value;
+    var exc = $(row.cells[4].childNodes[0]).val();
+    var transfer = $(row.cells[5].childNodes[0]).val();
+    var total_adult = row.cells[6].childNodes[0].value || 0;
+    var total_children = row.cells[7].childNodes[0].value || 0;
+    var total_childrenwo = row.cells[8].childNodes[0].value || 0;
+    var total_infant = row.cells[9].childNodes[0].value || 0;
+    var total_vehicles = row.cells[15] ? (row.cells[15].childNodes[0].value || 0) : 0;
+    var rowSuffix = eleid.replace(/^[^-]+-/, '');
+
+    $.post(base_url + "view/package_booking/quotation/home/excursion_amount_load.php", {
+        exc_date_arr: [exc_date],
+        exc_arr: [exc || ''],
+        transfer_arr: [transfer || ''],
+        adult_arr: [total_adult],
+        child_arr: [total_children],
+        childwo_arr: [total_childrenwo],
+        infant_arr: [total_infant],
+        total_vehicles_arr: [total_vehicles]
+    }, function(data) {
+        var amount_arr = JSON.parse(data);
+        if (!amount_arr.length) return;
+        if (row.cells[10] && row.cells[10].childNodes[0]) {
+            row.cells[10].childNodes[0].value = amount_arr[0]['total_cost'];
+        }
         $('#excursion_amount-' + rowSuffix).val(amount_arr[0]['total_cost']);
     });
 }
@@ -275,32 +324,11 @@ function processSelectedItineraryImageQuotation() {
 
 // Listen for modal close event and process selected image
 $(document).ready(function() {
-    console.log("QUOTATION UPDATE: Setting up modal event listeners");
-    
-    // Multiple event listeners to ensure we catch the modal close
     $(document).on('hidden.bs.modal', '#itinerary_detail_modal', function() {
-        console.log("QUOTATION UPDATE: Modal closed (hidden.bs.modal), processing selected image");
-        console.log("QUOTATION UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
         setTimeout(function() {
             processSelectedItineraryImageQuotation();
         }, 100);
     });
-    
-    $(document).on('hide.bs.modal', '#itinerary_detail_modal', function() {
-        console.log("QUOTATION UPDATE: Modal closing (hide.bs.modal), processing selected image");
-        console.log("QUOTATION UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
-        setTimeout(function() {
-            processSelectedItineraryImageQuotation();
-        }, 200);
-    });
-    
-    // Also check periodically if image data is available
-    setInterval(function() {
-        if (window.selectedItineraryImage) {
-            console.log("QUOTATION UPDATE: Periodic check found selectedItineraryImage, processing...");
-            processSelectedItineraryImageQuotation();
-        }
-    }, 1000);
 });
 
 </script>

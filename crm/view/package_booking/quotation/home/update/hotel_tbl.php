@@ -128,7 +128,7 @@ $(document).ready(function(){
     $('#hotel_name-1').select2({ width: '160px', minimumResultsForSearch: 0 });
     if (typeof initHotelSelectAddNew === 'function') {
         initHotelSelectAddNew('#hotel_name-1');
-        initAllHotelSelectAddNew('#tbl_package_tour_quotation_dynamic_hotel');
+        initAllHotelSelectAddNew('#tbl_package_tour_quotation_dynamic_hotel_update');
     }
 });
 

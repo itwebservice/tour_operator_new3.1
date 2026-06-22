@@ -524,6 +524,22 @@ $(document).on('click', '#tab2_head', function() {
     }
 
     // Function to save itinerary data immediately when tab2 is completed
+    function getItineraryImageKey(row, packageId, rowIndex) {
+        var fileInput = row.querySelector('input[id^="day_image_"]');
+        if (fileInput && fileInput.id) {
+            return fileInput.id.replace('day_image_', '');
+        }
+        return packageId + '_' + (rowIndex + 1);
+    }
+
+    function getItineraryDayNumber(row, rowIndex) {
+        var srNoInput = row.querySelector('input[name="username"]');
+        if (srNoInput && srNoInput.value) {
+            return srNoInput.value;
+        }
+        return String(rowIndex + 1);
+    }
+
     function saveItineraryData() {
         var attraction_arr = [];
         var program_arr = [];
@@ -599,26 +615,27 @@ $(document).on('click', '#tab2_head', function() {
                                 img = existingImgInput.value || '';
                             }
 
+                            var imageKey = getItineraryImageKey(row, package_id, i);
+                            var dayNumber = getItineraryDayNumber(row, i);
+
                             // Check if new image was uploaded
-                            var rowOffset = i + 1;
-                            if (window.quotationImages && window.quotationImages[rowOffset]) {
-                                var imageData = window.quotationImages[rowOffset];
+                            if (window.quotationImages && window.quotationImages[imageKey]) {
+                                var imageData = window.quotationImages[imageKey];
                                 if (imageData.image_url) {
                                     img = imageData.image_url;
                                 }
                             }
 
                             day_image_arr.push(img);
-                            console.log("Added image for row", i, ":", img);
+                            console.log("Added image for row", i, "key", imageKey, ":", img);
 
                             // Store image data if an image is selected (using the global storage)
-                            var dayOffset = i + 1;
-                            if (window.quotationImages && window.quotationImages[dayOffset]) {
+                            if (window.quotationImages && window.quotationImages[imageKey]) {
                                 var imageData = {
-                                    package_id: package_p_id,
-                                    day_number: dayOffset,
-                                    file: window.quotationImages[dayOffset].file,
-                                    offset: dayOffset
+                                    package_id: package_p_id || package_id,
+                                    day_number: dayNumber,
+                                    file: window.quotationImages[imageKey].file,
+                                    offset: imageKey
                                 };
 
                                 // Store image for later upload
@@ -626,9 +643,9 @@ $(document).on('click', '#tab2_head', function() {
                                     window.itineraryImages = [];
                                 }
                                 window.itineraryImages.push(imageData);
-                                console.log("Collected image for day " + dayOffset + ", package " + package_p_id + ", file: " + imageData.file.name);
+                                console.log("Collected image for day " + dayNumber + ", package " + imageData.package_id + ", file: " + imageData.file.name);
                             } else {
-                                console.log("No image found for day " + dayOffset);
+                                console.log("No image found for key " + imageKey);
                             }
                         } else {
                             console.log("Skipping row - missing required data");
@@ -852,6 +869,9 @@ $(document).on('click', '#tab2_head', function() {
     function proceedToTab3FromAi() {
         storeAiItinerarySession();
         saveItineraryData();
+        if (typeof syncQuotationTravelStayDates === 'function') {
+            syncQuotationTravelStayDates();
+        }
         $('#tab2_head').addClass('done');
         $('#tab3_head').addClass('active');
         $('.bk_tab').removeClass('active');
@@ -1158,12 +1178,24 @@ $(document).on('click', '#tab2_head', function() {
                             var row = table.rows[i];
                             row.cells[1].childNodes[0].value = (i + 1);
                             city_lzloading(row.cells[3].childNodes[0]);
-                            var newOption = $("<option selected='selected'></option>").val(hotel_arr[i]
-                                ['city_id']).text(hotel_arr[i]['city_name']);
-                            $(row.cells[3].childNodes[0]).append(newOption).trigger('change.select2');
-                            $(row.cells[4].childNodes[0]).html('<option value="' + hotel_arr[i][
-                                'hotel_id1'
-                            ] + '">' + hotel_arr[i]['hotel_name'] + '</option>');
+                            var $citySelect = $(row.cells[3].childNodes[0]);
+                            var $hotelSelect = $(row.cells[4].childNodes[0]);
+                            var newOption = $("<option selected='selected'></option>").val(hotel_arr[i]['city_id']).text(hotel_arr[i]['city_name']);
+                            $citySelect.append(newOption).trigger('change.select2');
+                            if (hotel_arr[i]['city_id'] && typeof hotelDropdownLoadByCity === 'function') {
+                                hotelDropdownLoadByCity(hotel_arr[i]['city_id'], $hotelSelect, function(success) {
+                                    if (success && hotel_arr[i]['hotel_id1']) {
+                                        if (typeof selectHotelInDropdown === 'function') {
+                                            selectHotelInDropdown($hotelSelect, hotel_arr[i]['hotel_id1'], hotel_arr[i]['hotel_name']);
+                                        } else {
+                                            $hotelSelect.val(hotel_arr[i]['hotel_id1']).trigger('change');
+                                        }
+                                    }
+                                });
+                            } else {
+                                $hotelSelect.html('<option value="' + hotel_arr[i]['hotel_id1'] + '">' + hotel_arr[i]['hotel_name'] + '</option>');
+                                $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
+                            }
                             row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
                             row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
                             row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
@@ -1172,7 +1204,6 @@ $(document).on('click', '#tab2_head', function() {
                             row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
                             row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
 
-                            $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
                             document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
                             $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");
                             document.getElementById(row.cells[5].childNodes[0].id).selectedIndex = 0;
@@ -1181,6 +1212,9 @@ $(document).on('click', '#tab2_head', function() {
                         }
                     } else {
                         console.log('Tab2 Next: Skipping hotel data population - preserving existing packages');
+                        if (typeof syncQuotationTravelStayDates === 'function') {
+                            syncQuotationTravelStayDates();
+                        }
                     }
                 }
             });
@@ -1300,6 +1334,10 @@ $(document).on('click', '#tab2_head', function() {
 
             // Store itinerary data in sessionStorage for later saving
             saveItineraryData();
+
+            if (typeof syncQuotationTravelStayDates === 'function') {
+                syncQuotationTravelStayDates();
+            }
 
             $('#tab2_head').addClass('done');
             $('#tab3_head').addClass('active');

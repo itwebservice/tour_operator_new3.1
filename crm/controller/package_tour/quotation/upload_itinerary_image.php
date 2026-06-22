@@ -36,9 +36,11 @@ try {
         }
         
         // Validate file type
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($fileType, $allowedTypes)) {
-            throw new Exception("Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.");
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'tif', 'ico', 'heic', 'heif', 'avif'];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $isImageMime = ($fileType && strpos($fileType, 'image/') === 0);
+        if (!$isImageMime && !in_array($fileExtension, $imageExtensions)) {
+            throw new Exception("Invalid file type. Please upload a valid image file.");
         }
         
         // Validate file size (max 5MB)
@@ -88,23 +90,44 @@ try {
             }
             
             // Update the package_quotation_program table with the image URL
+            global $conn;
+            $image_url_esc = addslashes($image_url_with_day);
+            $quotation_id_esc = addslashes($quotation_id);
+            $package_id_esc = addslashes($package_id);
+            $day_number_esc = addslashes($day_number);
+
             $update_query = "UPDATE package_quotation_program 
-                            SET day_image = '$image_url_with_day' 
-                            WHERE quotation_id = '$quotation_id' 
-                            AND package_id = '$package_id' 
-                            AND day_count = '$day_number'";
+                            SET day_image = '$image_url_esc' 
+                            WHERE quotation_id = '$quotation_id_esc' 
+                            AND package_id = '$package_id_esc' 
+                            AND day_count = '$day_number_esc'";
             
             error_log("DEBUG: Updating package_quotation_program with query: " . $update_query);
             $result = mysqlQuery($update_query);
-            error_log("DEBUG: Database update result: " . ($result ? 'SUCCESS' : 'FAILED'));
+            $affected = ($conn instanceof mysqli) ? mysqli_affected_rows($conn) : 0;
+            error_log("DEBUG: Database update result: " . ($result ? 'SUCCESS' : 'FAILED') . ", affected rows: " . $affected);
+
+            if ($affected === 0) {
+                $fallback_query = "UPDATE package_quotation_program 
+                            SET day_image = '$image_url_esc' 
+                            WHERE quotation_id = '$quotation_id_esc' 
+                            AND day_count = '$day_number_esc'
+                            ORDER BY id ASC
+                            LIMIT 1";
+                error_log("DEBUG: Fallback update query: " . $fallback_query);
+                mysqlQuery($fallback_query);
+                $affected = ($conn instanceof mysqli) ? mysqli_affected_rows($conn) : 0;
+                error_log("DEBUG: Fallback update affected rows: " . $affected);
+            }
             
-            if ($result) {
+            if ($result && $affected > 0) {
                 $response['success'] = true;
                 $response['message'] = "Image uploaded successfully";
                 $response['image_url'] = BASE_URL . $image_url_with_day;
+                $response['image_path'] = $image_url_with_day;
                 $response['day_number'] = $day_number;
             } else {
-                throw new Exception("Failed to save image to database");
+                throw new Exception("No matching itinerary row found for image update");
             }
             
         } else {

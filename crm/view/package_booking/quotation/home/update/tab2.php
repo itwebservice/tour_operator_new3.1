@@ -56,6 +56,11 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
     $image_path_clean = ltrim($image_path, '/');
 
+    // Paths saved after itinerary image upload (relative to project root)
+    if (strpos($image_path_clean, 'crm/uploads/quotation_images/') === 0) {
+        return $project_base_url . '/' . $image_path_clean;
+    }
+
     // For new quotations, prioritize itinerary_images folder
     if ($is_new_quotation) {
         // Check itinerary_images folder first for new quotations
@@ -340,15 +345,6 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                     echo '</td>';
                                                     echo '<td class="col-md-1 pad_8" style="width: 120px;">';
                                                     echo '<div style="margin-top: 35px;">';
-                                                    echo '<label for="day_image_1" class="btn btn-sm btn-success upload-btn-1" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i>Upload Image</label>';
-                                                    echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
-                                                    echo '</div>';
-                                                    echo '<div id="day_image_preview_1" style="display: none; margin-top: 5px;">';
-                                                    echo '<div class="image-zoom-container" style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">';
-                                                    echo '<img id="preview_img_1" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">';
-                                                    echo '<button type="button" onclick="removeDayImage(\'1\')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>';
-                                                    echo '</div>';
-                                                    echo '<div style="margin-top: 35px;">';
                                                     echo '<label for="day_image_1" class="btn btn-sm btn-success upload-btn-1" style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label>';
                                                     echo '<input type="file" id="day_image_1" name="day_image_1" accept="image/*" onchange="previewDayImage(this, \'1\')" style="display: none;">';
                                                     echo '</div>';
@@ -520,24 +516,31 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
     // Function to get package ID for a specific offset
     function getPackageIdForOffset(offset) {
-        // Use the package_id from PHP variables (already validated)
-        var packageId = '<?php echo $package_id; ?>';
-
-        // If package_id is still empty, try to get it from the hidden input
-        if (!packageId || packageId === '') {
-            var packageIdInput = $('input[name="package_id_n"]').first();
-            packageId = packageIdInput.val();
+        var packageId = '';
+        if (typeof offset === 'string' && offset.indexOf('_') !== -1) {
+            packageId = offset.split('_')[0];
         }
-
-        // If still empty, use the img_package_id hidden input
-        if (!packageId || packageId === '') {
+        if (!packageId) {
+            var fileInput = $('#day_image_' + offset);
+            if (fileInput.length) {
+                var rowPackageInput = fileInput.closest('tr').find('input[name="package_id_n"]');
+                if (rowPackageInput.length && rowPackageInput.val()) {
+                    packageId = rowPackageInput.val();
+                }
+            }
+        }
+        if (!packageId) {
             packageId = $('#img_package_id').val();
         }
-
-        // Final fallback - this should not happen if package_id is properly set
+        if (!packageId) {
+            packageId = $('input[name="custom_package"]:checked').val();
+        }
+        if (!packageId) {
+            packageId = $('input[name="package_id_n"]').first().val();
+        }
         if (!packageId || packageId === '') {
             console.error("ERROR: No package_id found for offset", offset);
-            packageId = '1'; // This should not be reached
+            packageId = '1';
         }
 
         console.log("DEBUG: Getting package ID for offset", offset, ":", packageId);
@@ -553,11 +556,8 @@ function findImageUrl($image_path, $is_new_quotation = false)
             console.log("Selected file details:", file.name, file.size, file.type);
 
             // Validate file type
-            var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            var fileType = file.type.toLowerCase();
-
-            if (!allowedTypes.includes(fileType)) {
-                alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+            if (typeof quotationIsValidImageFile === 'function' ? !quotationIsValidImageFile(file) : false) {
+                alert('Please select a valid image file');
                 input.value = '';
                 return;
             }
@@ -593,13 +593,17 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
                 // Get package ID for this row
                 var packageId = getPackageIdForOffset(offset);
+                var dayNumber = offset;
+                if (typeof offset === 'string' && offset.indexOf('_') !== -1) {
+                    dayNumber = offset.split('_').pop();
+                }
 
                 // Store image by offset for later upload (when quotation is updated)
                 window.quotationImages[offset] = {
                     file: file,
                     offset: offset,
                     package_id: packageId,
-                    day_number: offset,
+                    day_number: dayNumber,
                     preview_url: e.target.result,
                     uploaded: false
                 };
@@ -877,18 +881,23 @@ function findImageUrl($image_path, $is_new_quotation = false)
             // Look for image inputs in the row
             var imageInput = row.querySelector('input[id^="day_image_"]');
             var existingImageInput = row.querySelector('input[id^="existing_image_path_"]');
+            var imageKey = imageInput && imageInput.id ? imageInput.id.replace('day_image_', '') : String(i + 1);
 
             if (existingImageInput && existingImageInput.value && existingImageInput.value !== '') {
                 // Prioritize existing_image_path if it has a value (from modal selection)
                 existing_image_path = existingImageInput.value;
                 day_image = existingImageInput.value; // Use the same value for day_image
                 console.log("TAB2: Using existing_image_path for day", i, ":", existing_image_path);
+            } else if (window.quotationImages && window.quotationImages[imageKey] && window.quotationImages[imageKey].image_url) {
+                day_image = window.quotationImages[imageKey].image_url;
+                existing_image_path = day_image;
+                console.log("TAB2: Using uploaded image URL for key", imageKey, ":", day_image);
             } else if (imageInput) {
                 day_image = imageInput.value;
                 console.log("TAB2: Using day_image for day", i, ":", day_image);
             }
 
-            if (existingImageInput) {
+            if (existingImageInput && !existing_image_path) {
                 existing_image_path = existingImageInput.value;
             }
 
@@ -1087,6 +1096,10 @@ function findImageUrl($image_path, $is_new_quotation = false)
                     }
                 });
 
+                if (typeof syncQuotationTravelStayDates === 'function') {
+                    syncQuotationTravelStayDates();
+                }
+
                 $('#tab2_head').addClass('done');
                 $('#tab3_head').addClass('active');
                 $('.bk_tab').removeClass('active');
@@ -1103,6 +1116,9 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
                 // Fallback: proceed to tab 3 even if save fails
                 console.log('TAB2: Proceeding to tab 3 despite save error');
+                if (typeof syncQuotationTravelStayDates === 'function') {
+                    syncQuotationTravelStayDates();
+                }
                 $('#tab2_head').addClass('done');
                 $('#tab3_head').addClass('active');
                 $('.bk_tab').removeClass('active');
@@ -1181,23 +1197,6 @@ function findImageUrl($image_path, $is_new_quotation = false)
         setTimeout(function() {
             preselectPackage();
         }, 2000);
-
-        // Add click event listener for image upload buttons
-        $(document).on('click', 'label[for^="day_image_"]', function() {
-            var forAttr = $(this).attr('for');
-            var offset = forAttr.replace('day_image_', '');
-            console.log('Upload button clicked for offset:', offset);
-
-            // Trigger the file input click
-            $('#day_image_' + offset).click();
-        });
-
-        // Add change event listener for file inputs
-        $(document).on('change', 'input[id^="day_image_"]', function() {
-            var offset = $(this).attr('id').replace('day_image_', '');
-            console.log('File input changed for offset:', offset);
-            previewDayImage(this, offset);
-        });
 
         // Initialize image states on page load
         function initializeImageStates() {

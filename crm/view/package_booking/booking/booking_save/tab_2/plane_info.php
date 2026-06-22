@@ -29,27 +29,8 @@
 		<td><input type="text" name="to_sector-1" id="to_sector-1" style="width:300px" placeholder="*To Sector" title="To Sector">
 		</td>              -->
 
-        <td style="min-width:300px;">
-    <select name="from_sector-1" id="from_sector-1"
-        class="form-control app_select2 plane-airport-select"
-        data-sector-type="from"
-        title="From Sector"
-        data-add-new-option="true"
-        style="width:100%;">
-        <option value="">*From Sector</option>
-    </select>
-</td>
-
-<td style="min-width:300px;">
-    <select name="to_sector-1" id="to_sector-1"
-        class="form-control app_select2 plane-airport-select"
-        data-sector-type="to"
-        title="To Sector"
-        data-add-new-option="true"
-        style="width:100%;">
-        <option value="">*To Sector</option>
-    </select>
-</td>
+        <td style="min-width:300px;"><select name="from_sector-1" id="from_sector-1" class="form-control app_select2 plane-airport-select" data-sector-type="from" title="From Sector" data-add-new-option="true" style="width:100%;"><option value="">*From Sector</option></select></td>
+        <td style="min-width:300px;"><select name="to_sector-1" id="to_sector-1" class="form-control app_select2 plane-airport-select" data-sector-type="to" title="To Sector" data-add-new-option="true" style="width:100%;"><option value="">*To Sector</option></select></td>
 
         <td><select id="txt_plane_company-1" name="txt_plane_company-1" class="app_select2" style="width:150px" title="Airline Name" data-add-new-option="true">
             <option value="">*Airline Name</option>
