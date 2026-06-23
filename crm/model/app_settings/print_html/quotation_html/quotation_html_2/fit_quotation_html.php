@@ -26,6 +26,10 @@ $hero    = $q['hero'];
 $ov      = $q['tour_overview'];
 $hotels  = $q['hotels'];
 $flights = $q['flights'];
+// ========= Dipti
+$trains  = isset($q['trains']) ? $q['trains'] : array();
+$acts    = isset($q['activities']) ? $q['activities'] : array();
+// ================
 $vehs    = $q['vehicles'];
 $itin    = $q['itinerary'];
 $incx    = $q['inclusion_exclusion'];
@@ -35,11 +39,26 @@ $terms   = $q['terms_conditions'];
 $ty      = $q['thank_you'];
 $assets  = "assets/";
 
+// $testimonials = array();
+// $o2_cfg = function_exists('gqb_get_config') ? gqb_get_config() : array();
+// if (!empty($o2_cfg['testimonials']) && is_array($o2_cfg['testimonials'])) {
+//   $testimonials = $o2_cfg['testimonials'];
+// }
+
+// ============== Dipti
 $testimonials = array();
+$social_links = array();
+
 $o2_cfg = function_exists('gqb_get_config') ? gqb_get_config() : array();
+
 if (!empty($o2_cfg['testimonials']) && is_array($o2_cfg['testimonials'])) {
   $testimonials = $o2_cfg['testimonials'];
 }
+
+if (!empty($o2_cfg['social_links']) && is_array($o2_cfg['social_links'])) {
+  $social_links = $o2_cfg['social_links'];
+}
+// ===================
 
 $o2_page = 0;
 
@@ -163,11 +182,19 @@ $o2_total_pages = 4 + count($o2_itin_pages) + 5;
 
 $o2_banner = o2img(isset($hero['cover_image']) ? $hero['cover_image'] : '', $assets . 'banner.jpg');
 $o2_hero   = o2img(isset($hero['cover_image']) ? $hero['cover_image'] : '', $assets . 'hero.jpg');
-$o2_logo   = o2img(isset($hero['company_logo']) ? $hero['company_logo'] : '', $assets . 'logo.png');
-$o2_round  = o2img((!empty($o2_itin_list[0]['image']) ? $o2_itin_list[0]['image'] : ''), $assets . 'day.jpg');
+// $o2_logo   = o2img(isset($hero['company_logo']) ? $hero['company_logo'] : '', $assets . 'logo.png');
+$o2_logo = BASE_URL . 'images/logo-circle.png?v=' . time();
+// $o2_round  = o2img((!empty($o2_itin_list[0]['image']) ? $o2_itin_list[0]['image'] : ''), $assets . 'day.jpg');
+// =========== Dipti
+$o2_round = o2img(
+  isset($hero['destination_5th_gallery_image']) ? $hero['destination_5th_gallery_image'] : '',
+  $assets . 'day.jpg'
+);
+// =================
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -177,15 +204,1080 @@ $o2_round  = o2img((!empty($o2_itin_list[0]['image']) ? $o2_itin_list[0]['image'
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="option2.css">
 </head>
-<body class="cover-a">
-<div class="doc">
 
-  <!-- PAGE 1 · COVER -->
-  <section class="page cover">
-    <div class="cv cv-a">
-      <img class="cv-a__photo" src="<?= o2e($o2_hero) ?>" alt="<?= o2e($o2_dest) ?>">
-      <div class="cv-a__veil"></div>
-      <div class="cv-a__inner">
+<body class="cover-a">
+  <div class="doc">
+
+    <!-- PAGE 1 · COVER -->
+    <section class="page cover">
+      <div class="cv cv-a">
+        <img class="cv-a__photo" src="<?= o2e($o2_hero) ?>" alt="<?= o2e($o2_dest) ?>">
+        <div class="cv-a__veil"></div>
+        <div class="cv-a__inner">
+          <div class="logo">
+            <img class="logo__slot" src="<?= o2e($o2_logo) ?>" alt="Company logo">
+            <div>
+              <div class="logo__name"><?= o2e($o2_company) ?></div>
+              <div class="logo__tag"><?= o2e($o2_tagline) ?></div>
+            </div>
+          </div>
+          <div class="cv-a__eyebrow"><?= o2e(o2nv($hero['package_name'], o2nv($hero['tour_name'], 'Exclusive Tour'))) ?></div>
+          <h1 class="cv-a__dest"><?= o2e($o2_dest) ?></h1>
+          <div class="cv-a__badge"><?= o2e(o2nv($hero['duration_label'], o2nv($ov['duration_label'], ''))) ?></div>
+
+          <img class="cv-a__round" src="<?= o2e($o2_round) ?>" alt="Highlight">
+        </div>
+        <div class="cv-a__for">
+          <div class="l">Prepared Exclusively For</div>
+          <div class="n"><?= o2e($o2_client) ?></div>
+        </div>
+        <div class="incstrip">
+          <div class="incstrip__row">
+
+            <!-- Flight -->
+            <div class="incitem">
+              <span class="ico">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
+                </svg>
+              </span>
+              <span>DOMESTIC &amp;<br>INTERNATIONAL FLIGHTS</span>
+            </div>
+
+            <!-- Hotel -->
+            <div class="incitem">
+              <span class="ico">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M10 22v-6.57" />
+                  <path d="M12 11h.01" />
+                  <path d="M12 7h.01" />
+                  <path d="M14 15.43h.01" />
+                  <path d="M15 22v-6.57" />
+                  <path d="M15 16a5 5 0 0 0-6 0" />
+                  <path d="M16 11h.01" />
+                  <path d="M16 7h.01" />
+                  <path d="M8 11h.01" />
+                  <path d="M8 7h.01" />
+                  <rect x="4" y="2" width="16" height="20" rx="2" />
+                </svg>
+              </span>
+              <span>Premium<br>Hotels</span>
+            </div>
+
+            <!-- Breakfast -->
+            <div class="incitem">
+              <span class="ico">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 2v7c0 2.2 1.8 4 4 4h1v9"></path>
+                  <path d="M7 2v11"></path>
+                  <path d="M11 2v11"></path>
+                  <path d="M18 2v20"></path>
+                  <path d="M21 2c0 4-1 7-3 7s-3-3-3-7"></path>
+                </svg>
+              </span>
+              <span>QUALITY<br>MEALS</span>
+            </div>
+
+            <!-- Guide -->
+            <div class="incitem">
+              <span class="ico">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="m16.24 7.76-1.8 5.4a2 2 0 0 1-1.27 1.27l-5.4 1.8 1.8-5.4a2 2 0 0 1 1.27-1.27z"></path>
+                </svg>
+              </span>
+              <span>TOUR<br>SIGHTSEEING</span>
+            </div>
+
+            <!-- Transfer -->
+            <div class="incitem">
+              <span class="ico">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M14 16H9m10 0h2m-2 0a2 2 0 1 1-4 0m4 0H9m0 0a2 2 0 1 1-4 0m4 0H5m0 0H3v-4l2-5h11l3 5v4h-2" />
+                  <circle cx="7" cy="16" r="2" />
+                  <circle cx="17" cy="16" r="2" />
+                </svg>
+              </span>
+              <span>Private<br>Transfers</span>
+            </div>
+
+            <!-- Visa -->
+            <div class="incitem">
+              <span class="ico">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 2h8l4 4v16H4V2z"></path>
+                  <path d="M8 2v6h8"></path>
+                  <path d="M8 13h8"></path>
+                  <path d="M8 17h5"></path>
+                </svg>
+              </span>
+              <span>Visa &amp;<br>Insurance</span>
+            </div>
+
+          </div>
+          <div class="incstrip__foot"><b>INCLUSION:</b>&nbsp; <?= o2e(trim(strip_tags(o2nv(isset($incx['included']) ? $incx['included'] : '', 'Flights, Hotels, Transfers &amp; Sightseeing'))) !== '' ? 'See detailed inclusions inside' : 'As per itinerary') ?></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2 · OVERVIEW -->
+    <section class="page">
+      <?php o2_strip(o2e($o2_company) . ' · Travel Proposal', 'Your Journey', 'Quotation&nbsp; <b>' . o2e(o2nv($hero['quotation_code'], '')) . '</b>'); ?>
+      <div class="page__wm"></div>
+      <div class="page__body">
+        <div class="banner">
+          <div class="k">A Personalized Travel Experience</div>
+          <h2>Exclusively designed for <em><?= o2e($o2_client) ?></em> — an unforgettable journey through <?= o2e($o2_dest) ?>.</h2>
+        </div>
+        <p class="greet" style="margin:7mm 0 0">
+          Dear <b><?= o2e($o2_client_first !== '' ? $o2_client_first : $o2_client) ?></b>,<br>
+          Thank you for choosing <?= o2e($o2_company) ?> for your upcoming journey. We are delighted to present this carefully
+          crafted travel proposal, designed to deliver memorable experiences, seamless arrangements and exceptional
+          hospitality at every step of your trip.
+        </p>
+        <div style="margin-top:7mm">
+          <p class="kicker">Tour Overview</p>
+          <div class="ov-grid" style="margin-top:11px">
+            <div class="card ov"><span class="ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <path d="M14 2v6h6"></path>
+                  <path d="M16 13H8"></path>
+                  <path d="M16 17H8"></path>
+                  <path d="M10 9H8"></path>
+                </svg>
+              </span>
+              <div>
+                <div class="t">Quotation ID</div>
+                <div class="v sm"><?= o2e(o2nv($hero['quotation_code'], '')) ?></div>
+              </div>
+            </div>
+            <div class="card ov"><span class="ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M2 12h20"></path>
+                  <path d="M12 2a15 15 0 0 1 0 20"></path>
+                  <path d="M12 2a15 15 0 0 0 0 20"></path>
+                </svg>
+              </span>
+              <div>
+                <div class="t">Tour ID</div>
+                <div class="v sm"><?= o2e(o2nv($ov['tour_id'], '')) ?></div>
+              </div>
+            </div>
+            <div class="card ov"><span class="ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+              <div>
+                <div class="t">Quotation Date</div>
+                <div class="v sm"><?= o2e(o2nv($ov['quotation_date'], '')) ?></div>
+              </div>
+            </div>
+            <div class="card ov"><span class="ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
+                </svg>
+              </span>
+              <div>
+                <div class="t">Travel Dates</div>
+                <div class="v sm"><?= o2e($o2_travel_dates) ?></div>
+              </div>
+            </div>
+            <div class="card ov"><span class="ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 3a6 6 0 1 0 9 9A9 9 0 1 1 12 3z"></path>
+                </svg>
+              </span>
+              <div>
+                <div class="t">Duration</div>
+                <div class="v sm"><?= o2e(o2nv($ov['duration_label'], o2nv($hero['duration_label'], ''))) ?></div>
+              </div>
+            </div>
+            <div class="card ov"><span class="ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </span>
+              <div>
+                <div class="t">Guests</div>
+                <div class="v sm"><?= o2e($o2_guests) ?></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:7mm">
+          <p class="kicker">Prepared For</p>
+          <div class="prep" style="margin-top:11px">
+            <div class="card prep__card">
+              <img class="prep__photo" src="<?= o2e($assets . 'person.jpg') ?>" alt="Client">
+              <div class="meta">
+
+                <?php if (o2nv($ov['customer_email'], '') !== ''): ?>
+                  <span>
+                    <i class="fa-solid fa-envelope"></i>
+                    <a href="mailto:<?= o2e($ov['customer_email']) ?>">
+                      <?= o2e($ov['customer_email']) ?>
+                    </a>
+                  </span>
+                <?php endif; ?>
+
+                <?php if (o2nv($ov['customer_mobile'], '') !== ''): ?>
+                  <span>
+                    <i class="fa-solid fa-phone"></i>
+                    <a href="tel:<?= o2e(preg_replace('/\D+/', '', $ov['customer_mobile'])) ?>">
+                      <?= o2e($ov['customer_mobile']) ?>
+                    </a>
+                  </span>
+                <?php endif; ?>
+
+              </div>
+            </div>
+            <div class="card prep__card" style="flex:.85">
+              <!-- <span class="ic ic--navy" style="width:46px;height:46px"><i class="fa-solid fa-star" style="font-size:20px"></i></span> -->
+              <span class="ic ic--navy" style="width:46px;height:46px;display:flex;align-items:center;justify-content:center">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
+                  stroke-width="1">
+                  <path d="M11.48 3.5a.56.56 0 0 1 1.04 0l2.1 5.34a1 1 0 0 0 .84.63l5.76.42a.56.56 0 0 1 .31.98l-4.4 3.76a1 1 0 0 0-.33.95l1.38 5.62a.56.56 0 0 1-.84.61L12 18.54l-4.95 3.27a.56.56 0 0 1-.84-.61l1.38-5.62a1 1 0 0 0-.33-.95l-4.4-3.76a.56.56 0 0 1 .31-.98l5.76-.42a1 1 0 0 0 .84-.63z" />
+                </svg>
+              </span>
+              <div>
+                <div class="t" style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Package Type</div>
+                <div class="nm" style="font-size:16px;margin-top:2px"><?= o2e($o2_pkg) ?></div>
+                <div class="meta" style="margin-top:3px"><span style="color:var(--gold-deep);font-weight:500">Recommended for your group</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php o2_foot(); ?>
+    </section>
+
+    <!-- PAGE 3 · HOTELS -->
+    <section class="page<?= count((array) $hotels) > 4 ? ' page-flow' : '' ?>">
+      <?php o2_strip('Where You\'ll Stay', 'Accommodation', o2e($o2_pkg) . '&nbsp; <b>Package</b>'); ?>
+      <div class="page__wm"></div>
+      <div class="page__body">
+        <div class="sec-h">
+          <div>
+            <span class="gold-rule" style="display:block;margin-bottom:7px"></span>
+            <span class="t">Handpicked Stays Across <?= o2e($o2_dest) ?></span>
+          </div>
+          <span class="sec-tag"><?= o2e($o2_pkg) ?> Package</span>
+        </div>
+        <div class="hotel-grid">
+          <?php
+          $o2_hi = 0;
+          foreach ((array) $hotels as $h):
+            $o2_hi++;
+            // $o2_himg = o2img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . ((($o2_hi - 1) % 3) + 1) . '.jpg');
+            $dummy_hotel_img = BASE_URL . 'images/hotel.png';
+
+            $o2_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
+
+            if ($o2_hotel_photo == '' || stripos($o2_hotel_photo, 'dummy') !== false) {
+              $o2_himg = $dummy_hotel_img;
+            } else {
+              $o2_himg = o2img($o2_hotel_photo, $dummy_hotel_img);
+            }
+          ?>
+            <div class="card hotel">
+              <img class="hotel__img" src="<?= o2e($o2_himg) ?>" alt="Hotel">
+              <div class="hotel__b">
+                <div class="hotel__city"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($h['hotel_city'], '')) ?></div>
+                <div class="hotel__name"><?= o2e(o2nv($h['hotel_name'], 'Hotel')) ?></div>
+                <div class="hotel__cat"><?= o2e(o2nv($h['room_category'], o2nv($h['room_type'], o2nv($h['meal_plan'], '')))) ?></div>
+                <div class="hotel__stars"><?= o2_stars(isset($h['rating']) ? $h['rating'] : 5) ?></div>
+                <div class="hotel__dates">
+                  <div class="hotel__dt">
+                    <div class="l">Check-In</div>
+                    <div class="d"><?= o2e(o2nv($h['check_in'], 'NA')) ?></div>
+                  </div>
+                  <div class="hotel__dt">
+                    <div class="l">Check-Out</div>
+                    <div class="d"><?= o2e(o2nv($h['check_out'], 'NA')) ?></div>
+                  </div>
+                </div>
+                <?php if (!empty($h['meal_plan'])): ?>
+                  <div class="amen">
+                    <span><i class="fa-solid fa-mug-saucer"></i> <?= o2e($h['meal_plan']) ?></span>
+                  </div>
+                <?php endif; ?>
+              </div>
+            </div>
+          <?php endforeach; ?>
+          <?php if (empty($hotels)): ?>
+            <div class="card" style="padding:14px 15px;grid-column:1/-1;text-align:center;color:var(--muted)">No accommodation details available.</div>
+          <?php else: ?>
+            <div class="card" style="padding:14px 15px;display:flex;flex-direction:column;justify-content:center">
+              <div class="hotel__city" style="color:var(--gold-deep)"><i class="fa-solid fa-circle-info"></i> Common Amenities</div>
+              <div class="hotel__name" style="font-size:15px;margin-bottom:8px">Standard in Every Hotel</div>
+
+              <p class="muted" style="font-size:10px;line-height:1.2;margin-top:10px;font-style:italic;">
+                Enjoy a comfortable stay at carefully selected accommodations that offer a perfect blend of convenience, comfort, and hospitality.
+              </p>
+
+              <p class="muted" style="font-size:10px;line-height:1.2;margin-top:8px;font-style:italic;">
+                Each property is chosen to provide a relaxing environment and essential amenities, ensuring a pleasant experience throughout your journey.
+              </p>
+
+              <!-- <p class="muted" style="font-size:10px;line-height:1.2;margin-top:6px;font-style:italic;">
+                Whether you're unwinding after a day of sightseeing or preparing for the next adventure, your accommodation will serve as a welcoming retreat.
+              </p> -->
+              <div class="amen" style="border:0;padding:0;gap:9px 12px">
+                <span><i class="fa-solid fa-wifi"></i> Free Wi-Fi</span>
+                <span><i class="fa-solid fa-mug-saucer"></i> Daily Breakfast</span>
+                <span><i class="fa-solid fa-person-swimming"></i> Swimming Pool</span>
+                <span><i class="fa-solid fa-snowflake"></i> Air Conditioning</span>
+              </div>
+              <p class="muted" style="font-size:9px;margin:10px 0 0;line-height:1.5">All stays are on twin-sharing basis with daily breakfast unless stated otherwise. Room categories may be upgraded subject to availability.</p>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php o2_foot(); ?>
+    </section>
+
+    <!-- PAGE 4 · FLIGHTS & TRANSPORT -->
+    <section class="page page-flow">
+      <?php o2_strip('Getting There &amp; Around', 'Journey Plan', 'Flights · <b>Transfers</b>'); ?>
+      <div class="page__wm"></div>
+      <div class="page__body">
+        <p class="kicker">A · Flight Details</p>
+        <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
+          <?php if (!empty($flights)): $o2_fi = 0;
+            foreach ((array) $flights as $f): ?>
+              <div class="boarding">
+                <div class="boarding__main">
+                  <div class="boarding__top">
+                    <div class="airline">
+                      <img class="airline__logo" src="<?= o2e(o2img(isset($f['airline_logo']) ? $f['airline_logo'] : '', $assets . 'airline.png')) ?>" alt="Airline">
+                      <div>
+                        <div class="airline__name"><?= o2e(o2nv($f['airline_display'], o2nv($f['airline_name'], 'Flight'))) ?></div>
+                        <div class="airline__cls"><?= o2e(o2nv($f['class'], '')) ?></div>
+                      </div>
+                    </div>
+                    <div class="boarding__pnr"><?= o2e(o2_flight_label($o2_fi)) ?></div>
+                  </div>
+                  <div class="sector">
+                    <div class="pt">
+                      <div class="code"><?= o2e(o2_air_code(isset($f['from_city']) ? $f['from_city'] : '')) ?></div>
+                      <div class="city"><?= o2e(o2nv($f['from_city'], '')) ?></div>
+                    </div>
+                    <div class="mid"><i class="fa-solid fa-plane"></i>
+                      <div class="line"></div>
+                      <div class="dur">As per schedule</div>
+                    </div>
+                    <div class="pt">
+                      <div class="code"><?= o2e(o2_air_code(isset($f['to_city']) ? $f['to_city'] : '')) ?></div>
+                      <div class="city"><?= o2e(o2nv($f['to_city'], '')) ?></div>
+                    </div>
+                  </div>
+                  <div class="boarding__times">
+                    <div class="x">
+                      <div class="l">Departure</div>
+                      <div class="v"><?= o2e(o2nv($f['departure_datetime'], 'NA')) ?></div>
+                    </div>
+                    <div class="x">
+                      <div class="l">Arrival</div>
+                      <div class="v"><?= o2e(o2nv($f['arrival_datetime'], 'NA')) ?></div>
+                    </div>
+                    <div class="x">
+                      <div class="l">Flight</div>
+                      <div class="v"><?= o2e(o2nv($f['airline_code'], '—')) ?></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="boarding__stub">
+                  <div class="bl">Baggage</div>
+                  <div class="bv">As per airline</div>
+                  <div class="bl" style="margin-top:5px">Class</div>
+                  <div class="bv"><?= o2e(o2nv($f['class'], '—')) ?></div>
+                </div>
+              </div>
+            <?php $o2_fi++;
+            endforeach;
+          else: ?>
+            <div class="card" style="padding:14px;text-align:center;color:var(--muted)">No flight details available.</div>
+          <?php endif; ?>
+        </div>
+        <?php if (count((array) $flights) > 2): ?>
+          <p class="muted" style="font-size:9px;margin:7px 0 0">Additional internal sectors are included as per the itinerary on the respective travel dates.</p>
+        <?php endif; ?>
+
+        <?php if (!empty($trains)): ?>
+          <p class="kicker" style="margin-top:6mm">B · Train Details</p>
+
+          <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
+            <?php foreach ((array)$trains as $tr): ?>
+              <?php
+              $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
+              $to_loc   = isset($tr['to_location']) ? $tr['to_location'] : '';
+              $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
+              $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
+
+              $total_pax = 0;
+              if (isset($ov['pax']) && is_array($ov['pax'])) {
+                $total_pax =
+                  (int)o2nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
+                  (int)o2nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
+                  (int)o2nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
+                  (int)o2nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
+              }
+              ?>
+
+              <div class="boarding">
+                <div class="boarding__main">
+                  <div class="boarding__top">
+                    <div class="airline">
+                      <span class="airline__logo" style="display:flex;align-items:center;justify-content:center;background:#fff;color:var(--navy);font-size:18px">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" fill="currentColor">
+                          <path d="M96 0C43 0 0 43 0 96v192c0 35.3 28.7 64 64 64l-32 64H80l16-32H352l16 32h48l-32-64c35.3 0 64-28.7 64-64V96c0-53-43-96-96-96H96zm0 64H352c17.7 0 32 14.3 32 32V224H64V96c0-17.7 14.3-32 32-32zm-16 224a32 32 0 1 1 64 0 32 32 0 1 1-64 0zm224 0a32 32 0 1 1 64 0 32 32 0 1 1-64 0z" />
+                        </svg>
+                      </span>
+                      <div>
+                        <div class="airline__name">Train Journey</div>
+                        <div class="airline__cls"><?= o2e($train_class) ?></div>
+                      </div>
+                    </div>
+                    <div class="boarding__pnr">Rail Ticket</div>
+                  </div>
+
+                  <div class="sector">
+                    <div class="pt">
+                      <div class="code"><?= o2e(strtoupper(substr($from_loc, 0, 3))) ?></div>
+                      <div class="city"><?= o2e(o2nv($from_loc, 'NA')) ?></div>
+                    </div>
+                    <div class="mid">
+                      <i class="fa-solid fa-train"></i>
+                      <div class="line"></div>
+                      <div class="dur">Rail journey</div>
+                    </div>
+                    <div class="pt">
+                      <div class="code"><?= o2e(strtoupper(substr($to_loc, 0, 3))) ?></div>
+                      <div class="city"><?= o2e(o2nv($to_loc, 'NA')) ?></div>
+                    </div>
+                  </div>
+
+                  <div class="boarding__times">
+                    <div class="x">
+                      <div class="l">Date & Time</div>
+                      <div class="v"><?= o2e(o2nv($from_date, 'NA')) ?></div>
+                    </div>
+                    <div class="x">
+                      <div class="l">Total Pax</div>
+                      <div class="v"><?= o2e($total_pax) ?></div>
+                    </div>
+                    <div class="x">
+                      <div class="l">Class</div>
+                      <div class="v"><?= o2e($train_class) ?></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="boarding__stub">
+                  <div class="bl">Train</div>
+                  <div class="bv">As per schedule</div>
+                  <div class="bl" style="margin-top:5px">Class</div>
+                  <div class="bv"><?= o2e($train_class) ?></div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <!-- =============== Activity Details -->
+        <?php if (!empty($acts)): ?>
+          <p class="kicker" style="margin-top:6mm">C · Activity Details</p>
+
+          <div class="tline" style="margin-top:11px">
+            <?php foreach ((array)$acts as $a): ?>
+              <?php
+              $activity_img = BASE_URL . 'images/activity.jpg';
+
+              $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
+              $city_name     = isset($a['city_name']) ? $a['city_name'] : '';
+              $activity_date = isset($a['date']) ? $a['date'] : '';
+              $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
+
+              $total_pax = 0;
+              if (isset($a['pax']) && is_array($a['pax'])) {
+                $total_pax =
+                  (int)o2nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
+                  (int)o2nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
+                  (int)o2nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
+                  (int)o2nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
+              }
+              ?>
+
+              <div class="tnode">
+                <div class="card">
+                  <img class="tveh" src="<?= o2e($activity_img) ?>" alt="Activity">
+
+                  <div>
+                    <div class="nm"><?= o2e(o2nv($activity_name, 'Activity')) ?></div>
+                    <div class="rt">
+                      <i class="fa-solid fa-location-dot"></i>
+                      <?= o2e(o2nv($city_name, 'NA')) ?>
+                    </div>
+                  </div>
+
+                  <div class="meta">
+                    <?= o2e(o2nv($activity_date, 'NA')) ?><br>
+                    <span class="cat"><?= o2e(o2nv($transfer_type, 'Transfer')) ?></span><br>
+                    <span class="cat"><?= o2e($total_pax) ?> Pax</span>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+        <!-- ====================== -->
+        <p class="kicker" style="margin-top:6mm">D · Transportation</p>
+        <div class="tline" style="margin-top:11px">
+          <?php if (!empty($vehs)): foreach ((array) $vehs as $v): ?>
+              <div class="tnode">
+                <div class="card">
+                  <!-- <img class="tveh" src="<? //= o2e($assets . 'vehicle.png') 
+                                              ?>" alt="Vehicle"> -->
+                  <img class="tveh" src="<?= o2e(BASE_URL . 'images/vehicle.png') ?>" alt="Vehicle">
+                  <div>
+                    <div class="nm"><?= o2e(o2nv($v['vehicle_name'], 'Transfer')) ?></div>
+                    <div class="rt"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($v['pickup'], '')) ?><?php if (o2nv($v['drop'], '') !== ''): ?> → <?= o2e($v['drop']) ?><?php endif; ?></div>
+                  </div>
+                  <div class="meta"><?= o2e(o2nv($v['date'], '')) ?><?php if (!empty($v['description'])): ?><br><?= o2e($v['description']) ?><?php endif; ?><br><span class="cat"><?= o2e(o2nv($v['vehicle_type'], 'Private Transfer')) ?></span></div>
+                </div>
+              </div>
+            <?php endforeach;
+          else: ?>
+            <div class="card" style="padding:12px;color:var(--muted)">No transportation details available.</div>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php o2_foot(); ?>
+    </section>
+
+    <!-- ITINERARY PAGES -->
+    <?php
+    if (!empty($o2_itin_pages)):
+      foreach ($o2_itin_pages as $o2_chunk_idx => $o2_chunk):
+        $o2_first_day = isset($o2_chunk[0]['day_number']) ? (int) $o2_chunk[0]['day_number'] : 1;
+        $o2_last_day  = isset($o2_chunk[count($o2_chunk) - 1]['day_number']) ? (int) $o2_chunk[count($o2_chunk) - 1]['day_number'] : $o2_first_day;
+        $o2_day_label = 'Days ' . $o2_first_day . ($o2_last_day > $o2_first_day ? ' – ' . $o2_last_day : '');
+    ?>
+        <section class="page<?= count($o2_chunk) > 2 ? ' page-flow' : '' ?>">
+          <?php o2_strip('Day by Day', 'Itinerary', o2e($o2_day_label)); ?>
+          <div class="page__wm"></div>
+          <div class="page__body">
+            <div class="itin">
+              <?php foreach ($o2_chunk as $d):
+                $o2_dno   = (int) o2nv(isset($d['day_number']) ? $d['day_number'] : '', 0);
+                // $o2_dimg  = o2img(isset($d['image']) ? $d['image'] : '', $assets . 'day.jpg');
+                $dummy_day_img = BASE_URL . 'images/itinerary.png';
+
+                $o2_day_photo = isset($d['image']) ? trim($d['image']) : '';
+
+                if ($o2_day_photo == '' || stripos($o2_day_photo, 'dummy') !== false) {
+                  $o2_dimg = $dummy_day_img;
+                } else {
+                  $o2_dimg = o2img($o2_day_photo, $dummy_day_img);
+                }
+                $o2_attr  = o2nv($d['special_attraction'], o2nv($d['city'], 'Day ' . $o2_dno));
+                $o2_prog  = trim(isset($d['detailed_programme']) ? $d['detailed_programme'] : '');
+              ?>
+                <div class="card iday">
+                  <div class="iday__media">
+                    <img src="<?= o2e($o2_dimg) ?>" alt="Day <?= o2e($o2_dno) ?>">
+                    <div class="iday__tag"><span class="iday__no">DAY <?= o2e($o2_dno) ?></span><span class="iday__date"><?= o2e(o2nv($d['date'], '')) ?></span></div>
+                  </div>
+                  <div class="iday__b">
+                    <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · <?= o2e($o2_attr) ?></div>
+                    <div class="iday__field">
+                      <div class="iday__lbl">Detailed Programme</div>
+                      <div class="iday__val"><?= $o2_prog !== '' ? $o2_prog : 'Detailed programme will be shared.' ?></div>
+                    </div>
+                    <div class="iday__chips">
+                      <div class="ichip ichip--meal"><span class="b">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 2v7c0 2.2 1.8 4 4 4V22"></path>
+                            <path d="M7 2v20"></path>
+                            <path d="M11 2v7c0 2.2-1.8 4-4 4"></path>
+                            <path d="M18 2v20"></path>
+                            <path d="M18 2c2.2 0 4 2.7 4 6v4h-4"></path>
+                          </svg>
+                        </span>
+                        <div>
+                          <div class="l">Meal Plan</div>
+                          <div class="v"><?= o2e(o2nv($d['meal_plan'], '—')) ?></div>
+                        </div>
+                      </div>
+                      <div class="ichip ichip--stay"><span class="b">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 3a6 6 0 1 0 9 9A9 9 0 1 1 12 3z"></path>
+                          </svg>
+                        </span>
+                        <div>
+                          <div class="l">Overnight Stay</div>
+                          <div class="v"><?= o2e(o2nv($d['overnight_stay'], '—')) ?></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+          <?php o2_foot(); ?>
+        </section>
+    <?php endforeach;
+    endif; ?>
+
+    <!-- INCLUSIONS / EXCLUSIONS / COSTING -->
+    <section class="page page-flow">
+      <?php o2_strip('The Fine Detail', 'Inclusions', '&amp; <b>Investment</b>'); ?>
+      <div class="page__wm"></div>
+      <div class="page__body">
+        <div class="ie-grid">
+          <div class="card ie ie--in">
+            <h3><span class="b">
+                <svg width="16" height="16" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+              </span> What's Included</h3>
+            <ul>
+              <?php foreach (o2_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.') as $item): ?>
+                <li><svg width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6 9 17l-5-5"></path>
+                  </svg> <?= o2e($item) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+          <div class="card ie ie--ex">
+            <h3><span class="b">
+                <svg width="16" height="16" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6 6 18"></path>
+                  <path d="M6 6 18 18"></path>
+                </svg>
+              </span> What's Excluded</h3>
+            <ul>
+              <?php foreach (o2_list_items(isset($incx['excluded']) ? $incx['excluded'] : '', 'Exclusions will be shared as per final quotation.') as $item): ?>
+                <li><svg width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="M6 6 18 18"></path>
+                  </svg> <?= o2e($item) ?></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        </div>
+        <div style="margin-top:6mm">
+          <?php
+          $o2_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
+          $o2_is_per_person = ($o2_costing_type == 'per person');
+          ?>
+
+          <div class="sec-h">
+            <div><span class="gold-rule" style="display:block;margin-bottom:7px"></span><span class="t">Costing Details</span></div>
+            <span class="s">
+              All amounts in <?= o2e(o2nv($q['currency'], 'INR')) ?>
+              · <?= $o2_is_per_person ? 'Per Person' : 'For ' . o2e($o2_guests) ?>
+            </span>
+          </div>
+
+          <?php if (!$o2_is_per_person) { ?>
+
+            <table class="cost">
+              <thead>
+                <tr>
+                  <th>Package</th>
+                  <th>Tour Cost</th>
+                  <th>Tax (GST)</th>
+                  <th>TCS</th>
+                  <th>Travel Cost</th>
+                  <th>Grand Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                $o2_grp = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
+
+                if (empty($o2_grp)) {
+                  $o2_grp = array(array(
+                    'package_type' => 'Package',
+                    'tour_cost_display' => '0',
+                    'tax_display' => '0',
+                    'tcs_display' => '0',
+                    'travel_display' => '0',
+                    'total_display' => '0'
+                  ));
+                }
+
+                $o2_ci = 0;
+                foreach ($o2_grp as $o2_row):
+                  $o2_rec = ($o2_ci === 1 || (count($o2_grp) === 1));
+
+                  $tax_amount = 'INR 0.00';
+                  if (!empty($o2_row['tax_display'])) {
+                    preg_match('/INR\s*([\d,\.]+)/i', $o2_row['tax_display'], $matches);
+                    if (!empty($matches[1])) {
+                      $tax_amount = 'INR ' . $matches[1];
+                    }
+                  }
+                ?>
+                  <tr<?= $o2_rec ? ' class="rec"' : '' ?>>
+                    <td class="pk">
+                      <?php if ($o2_rec): ?>
+                        <span class="recbar">
+                          <?= o2e(o2nv($o2_row['package_type'], 'Package')) ?>
+                          <span class="tag">Recommended</span>
+                        </span>
+                      <?php else: ?>
+                        <?= o2e(o2nv($o2_row['package_type'], 'Package')) ?>
+                      <?php endif; ?>
+                    </td>
+
+                    <td>&#8377;<?= o2e(o2nv($o2_row['tour_cost_display'], 'INR 0.00')) ?></td>
+                    <td>&#8377;<?= o2e($tax_amount) ?></td>
+                    <td>&#8377;<?= o2e(o2nv($o2_row['tcs_display'], 'INR 0.00')) ?></td>
+                    <td>&#8377;<?= o2e(o2nv($o2_row['travel_display'], 'INR 0.00')) ?></td>
+                    <td class="gt">&#8377;<?= o2e(o2nv($o2_row['total_display'], 'INR 0.00')) ?></td>
+                    </tr>
+                  <?php
+                  $o2_ci++;
+                endforeach;
+                  ?>
+              </tbody>
+            </table>
+
+          <?php } else { ?>
+
+            <?php
+            $o2_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+            ?>
+
+            <?php if (!empty($o2_pp)) { ?>
+              <table class="cost">
+                <thead>
+                  <tr>
+                    <th>Package</th>
+                    <th>Adult</th>
+                    <th>CWB</th>
+                    <th>CWOB</th>
+                    <th>Infant</th>
+                    <th>Tax</th>
+                    <th>TCS</th>
+                    <th>Visa</th>
+                    <th>Guide</th>
+                    <th>Misc</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <?php foreach ($o2_pp as $i => $pp): ?>
+                    <?php
+                    $o2_rec = ($i === 1 || (count($o2_pp) === 1));
+
+                    $tax_amount = 'INR 0.00';
+                    if (!empty($pp['tax_display'])) {
+                      preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
+                      if (!empty($m[1])) {
+                        $tax_amount = 'INR ' . $m[1];
+                      }
+                    }
+                    ?>
+
+                    <tr<?= $o2_rec ? ' class="rec"' : '' ?>>
+                      <td class="pk">
+                        <?php if ($o2_rec): ?>
+                          <span class="recbar">
+                            <?= o2e(o2nv($pp['package_type'], 'Package')) ?>
+                            <span class="tag">Recommended</span>
+                          </span>
+                        <?php else: ?>
+                          <?= o2e(o2nv($pp['package_type'], 'Package')) ?>
+                        <?php endif; ?>
+                      </td>
+
+                      <td>&#8377;<?= o2e(o2nv($pp['pp_adult_display'], 'INR 0.00')) ?></td>
+                      <td>&#8377;<?= o2e(o2nv($pp['pp_cwb_display'], 'INR 0.00')) ?></td>
+                      <td>&#8377;<?= o2e(o2nv($pp['pp_cwnb_display'], 'INR 0.00')) ?></td>
+                      <td>&#8377;<?= o2e(o2nv($pp['pp_infant_display'], 'INR 0.00')) ?></td>
+                      <td>&#8377;<?= o2e($tax_amount) ?></td>
+                      <td>&#8377;<?= o2e(o2nv($pp['tcs_display'], 'INR 0.00')) ?></td>
+                      <td>&#8377;<?= o2e(o2nv($pp['visa_display'], 'INR 0.00')) ?></td>
+                      <td>&#8377;<?= o2e(o2nv($pp['guide_display'], 'INR 0.00')) ?></td>
+                      <td>&#8377;<?= o2e(o2nv($pp['misc_display'], 'INR 0.00')) ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                </tbody>
+              </table>
+            <?php } ?>
+
+          <?php } ?>
+
+          <p class="cost-note">
+            Prices are indicative and subject to availability and currency fluctuation at the time of confirmation.
+          </p>
+        </div>
+      </div>
+      <?php o2_foot(); ?>
+    </section>
+
+    <!-- PAYMENT -->
+    <section class="page">
+      <?php o2_strip('Securing Your Booking', 'Payment', 'Bank &amp; <b>UPI</b>'); ?>
+      <div class="page__wm"></div>
+      <div class="page__body">
+        <div class="pay-grid">
+          <div class="bankcard">
+            <div class="bankcard__top">
+              <div class="l">Bank Transfer Details</div>
+              <div class="bankcard__chip"></div>
+            </div>
+            <div class="bankrow solo">
+              <div class="f">
+                <div class="l">Account Name</div>
+                <div class="v"><?= o2e(o2nv($bank['account_name'], 'NA')) ?></div>
+              </div>
+            </div>
+            <div class="bankcard__div"></div>
+            <div class="bankrow">
+              <div class="f">
+                <div class="l">Account Number</div>
+                <div class="v mono"><?= o2e(o2nv($bank['account_no'], 'NA')) ?></div>
+              </div>
+              <div class="f">
+                <div class="l">IFSC Code</div>
+                <div class="v mono"><?= o2e(o2nv($bank['ifsc_code'], o2nv($bank['swift_code'], 'NA'))) ?></div>
+              </div>
+              <div class="f">
+                <div class="l">Bank Name</div>
+                <div class="v"><?= o2e(o2nv($bank['bank_name'], 'NA')) ?></div>
+              </div>
+              <div class="f">
+                <div class="l">Branch</div>
+                <div class="v"><?= o2e(o2nv($bank['branch_name'], 'NA')) ?></div>
+              </div>
+            </div>
+            <div class="bankcard__div"></div>
+            <div class="bankrow solo">
+              <div class="f">
+                <div class="l">UPI ID</div>
+                <div class="v mono"><?= o2e(o2nv($bank['upi_id'], 'NA')) ?></div>
+              </div>
+            </div>
+          </div>
+          <div class="card qrcard">
+            <div class="scan">Scan &amp; Pay</div>
+            <?php if (!empty($bank['qr_html'])): ?>
+              <div class="qr"><?= $bank['qr_html'] ?></div>
+            <?php elseif (!empty($bank['qr_code']) || !empty($bank['branch_qr_url'])): ?>
+              <img class="qr" src="<?= o2e(o2img(o2nv($bank['branch_qr_url'], o2nv($bank['qr_code'], '')), $assets . 'qr.png')) ?>" alt="UPI QR code">
+            <?php else: ?>
+              <img class="qr" src="<?= o2e($assets . 'qr.png') ?>" alt="UPI QR code">
+            <?php endif; ?>
+            <div class="upi"><?= o2e(o2nv($bank['upi_id'], '')) ?></div>
+            <p class="muted" style="font-size:9px;margin:0;line-height:1.5">Pay instantly via any UPI app — Google Pay, PhonePe, Paytm or BHIM.</p>
+          </div>
+        </div>
+        <div class="pay-panels" style="margin-top:6mm">
+          <div class="card panel">
+            <h4><i class="fa-solid fa-circle-info"></i> Payment Instructions</h4>
+            <ul>
+              <li>A 30% advance confirms your booking; the balance is due 21 days before travel.</li>
+              <li>Share the payment screenshot or UTR with your travel consultant.</li>
+              <li>All payments are accepted in <?= o2e(o2nv($q['currency'], 'Indian Rupees')) ?> only.</li>
+              <li>A GST invoice is issued against every confirmed payment.</li>
+            </ul>
+          </div>
+          <div class="card panel">
+            <h4><i class="fa-solid fa-shield-halved"></i> Booking Policy</h4>
+            <ul>
+              <li>Booking is confirmed only on receipt of the advance amount.</li>
+              <li>Rates are held for 7 days from the quotation date.</li>
+              <li>Visa, flights &amp; hotels are confirmed after full payment.</li>
+              <li>Names must match passports exactly to avoid charges.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <?php o2_foot(); ?>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="page<?= count($testimonials) > 2 ? ' page-flow' : '' ?>">
+      <?php o2_strip('Loved by Travellers', 'Their Words', o2e($o2_google_rating) . ' ★ <b>Rated</b>'); ?>
+      <div class="page__wm"></div>
+      <div class="page__body">
+        <div class="sec-h">
+          <div><span class="gold-rule" style="display:block;margin-bottom:7px"></span><span class="t">What Our Travellers Say</span></div>
+          <span class="s">Verified Google reviews</span>
+        </div>
+        <div class="testi-grid">
+          <?php if (!empty($testimonials)): foreach ($testimonials as $t):
+              $tphoto = o2_testi_photo(isset($t['photo']) ? $t['photo'] : '');
+          ?>
+              <div class="card testi">
+                <?php if ($tphoto !== ''): ?>
+                  <img class="testi__ph" src="<?= o2e($tphoto) ?>" alt="Reviewer">
+                <?php else: ?>
+                  <img class="testi__ph" src="<?= o2e($assets . 'person.jpg') ?>" alt="Reviewer">
+                <?php endif; ?>
+                <div>
+                  <div class="testi__stars">★★★★★</div>
+                  <div class="testi__quote"><span class="testi__mark">“</span> <?= o2e(o2nv(isset($t['review']) ? $t['review'] : '', o2nv(isset($t['message']) ? $t['message'] : '', ''))) ?></div>
+                  <div class="testi__by"><span class="n"><?= o2e(o2nv(isset($t['name']) ? $t['name'] : '', 'Traveller')) ?></span><span class="sep"></span><span class="d"><?= o2e(o2nv(isset($t['designation']) ? $t['designation'] : '', o2nv(isset($t['title']) ? $t['title'] : '', 'Customer'))) ?></span></div>
+                </div>
+              </div>
+            <?php endforeach;
+          else: ?>
+            <div class="card testi" style="grid-template-columns:1fr;padding:20px;text-align:center;color:var(--muted)">Customer testimonials can be managed from Quotation Builder settings.</div>
+          <?php endif; ?>
+        </div>
+        <div class="statbar">
+          <div class="st">
+            <div class="n"><?= o2e($o2_google_rating) ?>★</div>
+            <div class="l">Google Rating</div>
+          </div>
+          <div class="st">
+            <div class="n"><?= o2e($o2_review_count) ?></div>
+            <div class="l">Verified Reviews</div>
+          </div>
+          <div class="st">
+            <div class="n"><?= o2e($o2_traveller_cnt) ?></div>
+            <div class="l">Happy Travellers</div>
+          </div>
+        </div>
+      </div>
+      <?php o2_foot(); ?>
+    </section>
+
+    <!-- TERMS -->
+    <section class="page page-flow">
+      <?php o2_strip('Please Read Carefully', 'Terms', '&amp; <b>Conditions</b>'); ?>
+      <div class="page__wm"></div>
+      <div class="page__body">
+        <?php
+        $o2_terms_html = trim(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '');
+        if ($o2_terms_html !== ''):
+        ?>
+          <div class="terms-content" style="font-size:10px;line-height:1.55;color:var(--ink-soft);margin-top:2mm">
+            <?= $o2_terms_html ?>
+          </div>
+        <?php else: ?>
+          <div class="terms-grid" style="margin-top:2mm">
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-file-lines"></i></span>
+              <div>
+                <h4>Booking Policy</h4>
+                <p>A 30% advance confirms the booking; the balance is payable 21 days prior to departure. Confirmation is subject to availability at the time of payment.</p>
+              </div>
+            </div>
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-ban"></i></span>
+              <div>
+                <h4>Cancellation Policy</h4>
+                <p>Cancellations 30+ days before travel: 25% charge. 15–29 days: 50%. Within 14 days: 100%. Charges apply on the total tour value.</p>
+              </div>
+            </div>
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-rotate-left"></i></span>
+              <div>
+                <h4>Refund Policy</h4>
+                <p>Eligible refunds are processed within 15–21 working days to the original payment method, after deduction of applicable supplier charges.</p>
+              </div>
+            </div>
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-passport"></i></span>
+              <div>
+                <h4>Visa Disclaimer</h4>
+                <p>Visa approval is at the sole discretion of the issuing authority. Rejections are not the company's liability; fees are non-refundable.</p>
+              </div>
+            </div>
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-hotel"></i></span>
+              <div>
+                <h4>Hotel Policies</h4>
+                <p>Standard check-in is 14:00 and check-out 12:00. Room categories are confirmed on availability; early check-in is chargeable.</p>
+              </div>
+            </div>
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-plane"></i></span>
+              <div>
+                <h4>Flight Policies</h4>
+                <p>Flight timings and fares are subject to airline confirmation. Schedule changes and baggage rules are governed by airline terms.</p>
+              </div>
+            </div>
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-earth-americas"></i></span>
+              <div>
+                <h4>Force Majeure</h4>
+                <p>The company is not liable for disruptions caused by weather, natural events, political unrest or any circumstances beyond reasonable control.</p>
+              </div>
+            </div>
+            <div class="term"><span class="ic term__b"><i class="fa-solid fa-shield-halved"></i></span>
+              <div>
+                <h4>Travel Insurance</h4>
+                <p>Complimentary basic insurance is included where stated. Travellers are advised to review coverage and opt for enhanced protection if required.</p>
+              </div>
+            </div>
+          </div>
+        <?php endif; ?>
+        <div class="card" style="margin-top:6mm;padding:12px 15px;display:flex;gap:11px;align-items:center;background:var(--cream)">
+          <!-- <span class="ic ic--navy"><i class="fa-solid fa-circle-info"></i></span> -->
+          <span class="ic ic--navy">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
+          </span>
+          <p class="muted" style="font-size:10px;margin:0;line-height:1.5">By proceeding with payment, the traveller acknowledges and accepts all terms and conditions outlined above. This quotation is valid for 7 days from the date of issue.</p>
+        </div>
+      </div>
+      <?php o2_foot(); ?>
+    </section>
+
+    <!-- THANK YOU -->
+    <section class="page thanks">
+      <div class="page__wm thanks__wm"></div>
+      <div class="thanks__wrap">
         <div class="logo">
           <img class="logo__slot" src="<?= o2e($o2_logo) ?>" alt="Company logo">
           <div>
@@ -193,524 +1285,158 @@ $o2_round  = o2img((!empty($o2_itin_list[0]['image']) ? $o2_itin_list[0]['image'
             <div class="logo__tag"><?= o2e($o2_tagline) ?></div>
           </div>
         </div>
-        <div class="cv-a__eyebrow"><?= o2e(o2nv($hero['package_name'], o2nv($hero['tour_name'], 'Exclusive Tour'))) ?></div>
-        <h1 class="cv-a__dest"><?= o2e($o2_dest) ?></h1>
-        <div class="cv-a__badge"><?= o2e(o2nv($hero['duration_label'], o2nv($ov['duration_label'], ''))) ?></div>
-        <img class="cv-a__round" src="<?= o2e($o2_round) ?>" alt="Highlight">
-      </div>
-      <div class="cv-a__for">
-        <div class="l">Prepared Exclusively For</div>
-        <div class="n"><?= o2e($o2_client) ?></div>
-      </div>
-      <div class="incstrip">
-        <div class="incstrip__row">
-          <div class="incitem"><span class="ico"><i class="fa-solid fa-plane"></i></span><span>International &amp;<br>Internal Flights</span></div>
-          <div class="incitem"><span class="ico"><i class="fa-solid fa-hotel"></i></span><span>Premium<br>Hotels</span></div>
-          <div class="incitem"><span class="ico"><i class="fa-solid fa-utensils"></i></span><span>Daily<br>Breakfast</span></div>
-          <div class="incitem"><span class="ico"><i class="fa-solid fa-compass"></i></span><span>Sightseeing With<br>Tour Guide</span></div>
-          <div class="incitem"><span class="ico"><i class="fa-solid fa-car"></i></span><span>Private<br>Transfers</span></div>
-          <div class="incitem"><span class="ico"><i class="fa-solid fa-passport"></i></span><span>Visa &amp;<br>Insurance</span></div>
-        </div>
-        <div class="incstrip__foot"><b>INCLUSION:</b>&nbsp; <?= o2e(trim(strip_tags(o2nv(isset($incx['included']) ? $incx['included'] : '', 'Flights, Hotels, Transfers &amp; Sightseeing'))) !== '' ? 'See detailed inclusions inside' : 'As per itinerary') ?></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAGE 2 · OVERVIEW -->
-  <section class="page">
-    <?php o2_strip(o2e($o2_company) . ' · Travel Proposal', 'Your Journey', 'Quotation&nbsp; <b>' . o2e(o2nv($hero['quotation_code'], '')) . '</b>'); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <div class="banner">
-        <div class="k">A Personalized Travel Experience</div>
-        <h2>Exclusively designed for <em><?= o2e($o2_client) ?></em> — an unforgettable journey through <?= o2e($o2_dest) ?>.</h2>
-      </div>
-      <p class="greet" style="margin:7mm 0 0">
-        Dear <b><?= o2e($o2_client_first !== '' ? $o2_client_first : $o2_client) ?></b>,<br>
-        Thank you for choosing <?= o2e($o2_company) ?> for your upcoming journey. We are delighted to present this carefully
-        crafted travel proposal, designed to deliver memorable experiences, seamless arrangements and exceptional
-        hospitality at every step of your trip.
-      </p>
-      <div style="margin-top:7mm">
-        <p class="kicker">Tour Overview</p>
-        <div class="ov-grid" style="margin-top:11px">
-          <div class="card ov"><span class="ic"><i class="fa-solid fa-file-lines"></i></span><div><div class="t">Quotation ID</div><div class="v sm"><?= o2e(o2nv($hero['quotation_code'], '')) ?></div></div></div>
-          <div class="card ov"><span class="ic"><i class="fa-solid fa-earth-asia"></i></span><div><div class="t">Tour ID</div><div class="v sm"><?= o2e(o2nv($ov['tour_id'], '')) ?></div></div></div>
-          <div class="card ov"><span class="ic"><i class="fa-solid fa-calendar-day"></i></span><div><div class="t">Quotation Date</div><div class="v sm"><?= o2e(o2nv($ov['quotation_date'], '')) ?></div></div></div>
-          <div class="card ov"><span class="ic"><i class="fa-solid fa-plane"></i></span><div><div class="t">Travel Dates</div><div class="v sm"><?= o2e($o2_travel_dates) ?></div></div></div>
-          <div class="card ov"><span class="ic"><i class="fa-solid fa-moon"></i></span><div><div class="t">Duration</div><div class="v sm"><?= o2e(o2nv($ov['duration_label'], o2nv($hero['duration_label'], ''))) ?></div></div></div>
-          <div class="card ov"><span class="ic"><i class="fa-solid fa-users"></i></span><div><div class="t">Guests</div><div class="v sm"><?= o2e($o2_guests) ?></div></div></div>
-        </div>
-      </div>
-      <div style="margin-top:7mm">
-        <p class="kicker">Prepared For</p>
-        <div class="prep" style="margin-top:11px">
-          <div class="card prep__card">
-            <img class="prep__photo" src="<?= o2e($assets . 'person.jpg') ?>" alt="Client">
-            <div>
-              <div class="nm"><?= o2e($o2_client) ?></div>
-              <div class="meta">
-                <?php if (o2nv($ov['customer_email'], '') !== ''): ?><span><i class="fa-solid fa-envelope"></i> <?= o2e($ov['customer_email']) ?></span><?php endif; ?>
-                <?php if (o2nv($ov['customer_mobile'], '') !== ''): ?><span><i class="fa-solid fa-phone"></i> <?= o2e($ov['customer_mobile']) ?></span><?php endif; ?>
-              </div>
-            </div>
+        <div class="thanks__k">With Heartfelt Gratitude</div>
+        <h2 class="thanks__big">Thank You</h2>
+        <p class="thanks__msg">We look forward to creating unforgettable travel memories for you. Your journey through <?= o2e($o2_dest) ?> is just the beginning of many more to come.</p>
+        <div class="thanks__stats">
+          <div class="s">
+            <div class="n"><?= o2e($o2_google_rating) ?>★</div>
+            <div class="l">Google Rating</div>
           </div>
-          <div class="card prep__card" style="flex:.85">
-            <span class="ic ic--navy" style="width:46px;height:46px"><i class="fa-solid fa-star" style="font-size:20px"></i></span>
-            <div>
-              <div class="t" style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Package Type</div>
-              <div class="nm" style="font-size:16px;margin-top:2px"><?= o2e($o2_pkg) ?></div>
-              <div class="meta" style="margin-top:3px"><span style="color:var(--gold-deep);font-weight:500">Recommended for your group</span></div>
-            </div>
+          <div class="s">
+            <div class="n"><?= o2e($o2_review_count) ?></div>
+            <div class="l">Reviews</div>
+          </div>
+          <div class="s">
+            <div class="n"><?= o2e($o2_traveller_cnt) ?></div>
+            <div class="l">Happy Travellers</div>
           </div>
         </div>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
+        <div class="thanks__social">
+          <?php $o2_web = o2nv($ty['website'], ''); ?>
 
-  <!-- PAGE 3 · HOTELS -->
-  <section class="page<?= count((array) $hotels) > 4 ? ' page-flow' : '' ?>">
-    <?php o2_strip('Where You\'ll Stay', 'Accommodation', o2e($o2_pkg) . '&nbsp; <b>Package</b>'); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <div class="sec-h">
+          <!-- Website -->
+          <a href="<?= o2e($o2_web !== '' ? $o2_web : '#') ?>" aria-label="Website">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M2 12h20"></path>
+              <path d="M12 2a15.3 15.3 0 0 1 0 20"></path>
+              <path d="M12 2a15.3 15.3 0 0 0 0 20"></path>
+            </svg>
+          </a>
+
+          <!-- Email -->
+          <a href="mailto:<?= o2e(o2nv($ty['company_email'], '')) ?>" aria-label="Email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+              <path d="m3 7 9 6 9-6"></path>
+            </svg>
+          </a>
+
+          <!-- Phone -->
+          <a href="tel:<?= o2e(preg_replace('/\s+/', '', o2nv($ty['company_contact'], o2nv($ty['user_mobile'], '')))) ?>" aria-label="Phone">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.65 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.17a2 2 0 0 1 2.11-.45c.84.31 1.72.53 2.62.65A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </a>
+
+          <!-- Facebook -->
+          <a href="<?= !empty($social_links['facebook']) ? o2e($social_links['facebook']) : '#' ?>" aria-label="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12z" />
+            </svg>
+          </a>
+        </div>
+        <div class="thanks__contact">
+
+          <span class="c">
+            <i class="fa-solid fa-location-dot"></i>
+            <?= o2e(o2nv($ty['company_address'], '')) ?>
+          </span>
+
+          <span class="c">
+            <i class="fa-solid fa-phone"></i>
+            <a href="tel:<?= o2e(preg_replace('/\D+/', '', o2nv($ty['company_contact'], o2nv($ty['user_mobile'], '')))) ?>">
+              <?= o2e(o2nv($ty['company_contact'], o2nv($ty['user_mobile'], ''))) ?>
+            </a>
+          </span>
+
+          <span class="c">
+            <i class="fa-solid fa-envelope"></i>
+            <a href="mailto:<?= o2e(o2nv($ty['company_email'], '')) ?>">
+              <?= o2e(o2nv($ty['company_email'], '')) ?>
+            </a>
+          </span>
+
+          <span class="c">
+            <i class="fa-solid fa-earth-asia"></i>
+            <a href="<?= o2e($o2_web) ?>" target="_blank">
+              <?= o2e($o2_web) ?>
+            </a>
+          </span>
+
+        </div>
+      </div>
+      <div class="thanks__bar">
         <div>
-          <span class="gold-rule" style="display:block;margin-bottom:7px"></span>
-          <span class="t">Handpicked Stays Across <?= o2e($o2_dest) ?></span>
+          <div class="l">Prepared By</div>
+          <div class="n"><?= o2e(o2nv($ty['prepared_by'], o2nv($hero['login_user'], ''))) ?></div>
+          <div class="sub">Travel Consultant · <?= o2e($o2_company) ?></div>
         </div>
-        <span class="sec-tag"><?= o2e($o2_pkg) ?> Package</span>
+        <div style="text-align:right">
+          <div class="l">Quotation</div>
+          <div class="n"><?= o2e(o2nv($hero['quotation_code'], '')) ?></div>
+          <div class="sub">Issued <?= o2e(o2nv($ty['issue_date'], o2nv($ov['quotation_date'], ''))) ?></div>
+        </div>
       </div>
-      <div class="hotel-grid">
-        <?php
-        $o2_hi = 0;
-        foreach ((array) $hotels as $h):
-          $o2_hi++;
-          $o2_himg = o2img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . ((($o2_hi - 1) % 3) + 1) . '.jpg');
-        ?>
-        <div class="card hotel">
-          <img class="hotel__img" src="<?= o2e($o2_himg) ?>" alt="Hotel">
-          <div class="hotel__b">
-            <div class="hotel__city"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($h['hotel_city'], '')) ?></div>
-            <div class="hotel__name"><?= o2e(o2nv($h['hotel_name'], 'Hotel')) ?></div>
-            <div class="hotel__cat"><?= o2e(o2nv($h['room_category'], o2nv($h['room_type'], o2nv($h['meal_plan'], '')))) ?></div>
-            <div class="hotel__stars"><?= o2_stars(isset($h['rating']) ? $h['rating'] : 5) ?></div>
-            <div class="hotel__dates">
-              <div class="hotel__dt"><div class="l">Check-In</div><div class="d"><?= o2e(o2nv($h['check_in'], 'NA')) ?></div></div>
-              <div class="hotel__dt"><div class="l">Check-Out</div><div class="d"><?= o2e(o2nv($h['check_out'], 'NA')) ?></div></div>
-            </div>
-            <?php if (!empty($h['meal_plan'])): ?>
-            <div class="amen">
-              <span><i class="fa-solid fa-mug-saucer"></i> <?= o2e($h['meal_plan']) ?></span>
-            </div>
-            <?php endif; ?>
-          </div>
-        </div>
-        <?php endforeach; ?>
-        <?php if (empty($hotels)): ?>
-        <div class="card" style="padding:14px 15px;grid-column:1/-1;text-align:center;color:var(--muted)">No accommodation details available.</div>
-        <?php else: ?>
-        <div class="card" style="padding:14px 15px;display:flex;flex-direction:column;justify-content:center">
-          <div class="hotel__city" style="color:var(--gold-deep)"><i class="fa-solid fa-circle-info"></i> Common Amenities</div>
-          <div class="hotel__name" style="font-size:15px;margin-bottom:8px">Standard in Every Hotel</div>
-          <div class="amen" style="border:0;padding:0;gap:9px 12px">
-            <span><i class="fa-solid fa-wifi"></i> Free Wi-Fi</span>
-            <span><i class="fa-solid fa-mug-saucer"></i> Daily Breakfast</span>
-            <span><i class="fa-solid fa-person-swimming"></i> Swimming Pool</span>
-            <span><i class="fa-solid fa-snowflake"></i> Air Conditioning</span>
-          </div>
-          <p class="muted" style="font-size:9px;margin:10px 0 0;line-height:1.5">All stays are on twin-sharing basis with daily breakfast unless stated otherwise. Room categories may be upgraded subject to availability.</p>
-        </div>
-        <?php endif; ?>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
+    </section>
 
-  <!-- PAGE 4 · FLIGHTS & TRANSPORT -->
-  <section class="page page-flow">
-    <?php o2_strip('Getting There &amp; Around', 'Journey Plan', 'Flights · <b>Transfers</b>'); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <p class="kicker">A · Flight Details</p>
-      <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
-        <?php if (!empty($flights)): $o2_fi = 0; foreach ((array) $flights as $f): ?>
-        <div class="boarding">
-          <div class="boarding__main">
-            <div class="boarding__top">
-              <div class="airline">
-                <img class="airline__logo" src="<?= o2e(o2img(isset($f['airline_logo']) ? $f['airline_logo'] : '', $assets . 'airline.png')) ?>" alt="Airline">
-                <div><div class="airline__name"><?= o2e(o2nv($f['airline_display'], o2nv($f['airline_name'], 'Flight'))) ?></div><div class="airline__cls"><?= o2e(o2nv($f['class'], '')) ?></div></div>
-              </div>
-              <div class="boarding__pnr"><?= o2e(o2_flight_label($o2_fi)) ?></div>
-            </div>
-            <div class="sector">
-              <div class="pt"><div class="code"><?= o2e(o2_air_code(isset($f['from_city']) ? $f['from_city'] : '')) ?></div><div class="city"><?= o2e(o2nv($f['from_city'], '')) ?></div></div>
-              <div class="mid"><i class="fa-solid fa-plane"></i><div class="line"></div><div class="dur">As per schedule</div></div>
-              <div class="pt"><div class="code"><?= o2e(o2_air_code(isset($f['to_city']) ? $f['to_city'] : '')) ?></div><div class="city"><?= o2e(o2nv($f['to_city'], '')) ?></div></div>
-            </div>
-            <div class="boarding__times">
-              <div class="x"><div class="l">Departure</div><div class="v"><?= o2e(o2nv($f['departure_datetime'], 'NA')) ?></div></div>
-              <div class="x"><div class="l">Arrival</div><div class="v"><?= o2e(o2nv($f['arrival_datetime'], 'NA')) ?></div></div>
-              <div class="x"><div class="l">Flight</div><div class="v"><?= o2e(o2nv($f['airline_code'], '—')) ?></div></div>
-            </div>
-          </div>
-          <div class="boarding__stub">
-            <div class="bl">Baggage</div><div class="bv">As per airline</div>
-            <div class="bl" style="margin-top:5px">Class</div><div class="bv"><?= o2e(o2nv($f['class'], '—')) ?></div>
-          </div>
-        </div>
-        <?php $o2_fi++; endforeach; else: ?>
-        <div class="card" style="padding:14px;text-align:center;color:var(--muted)">No flight details available.</div>
-        <?php endif; ?>
-      </div>
-      <?php if (count((array) $flights) > 2): ?>
-      <p class="muted" style="font-size:9px;margin:7px 0 0">Additional internal sectors are included as per the itinerary on the respective travel dates.</p>
-      <?php endif; ?>
+  </div>
+  <script type="text/javascript">
+    (function() {
+      var printed = false;
 
-      <p class="kicker" style="margin-top:6mm">B · Transportation</p>
-      <div class="tline" style="margin-top:11px">
-        <?php if (!empty($vehs)): foreach ((array) $vehs as $v): ?>
-        <div class="tnode">
-          <div class="card">
-            <img class="tveh" src="<?= o2e($assets . 'vehicle.jpg') ?>" alt="Vehicle">
-            <div>
-              <div class="nm"><?= o2e(o2nv($v['vehicle_name'], 'Transfer')) ?></div>
-              <div class="rt"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($v['pickup'], '')) ?><?php if (o2nv($v['drop'], '') !== ''): ?> → <?= o2e($v['drop']) ?><?php endif; ?></div>
-            </div>
-            <div class="meta"><?= o2e(o2nv($v['date'], '')) ?><?php if (!empty($v['description'])): ?><br><?= o2e($v['description']) ?><?php endif; ?><br><span class="cat"><?= o2e(o2nv($v['vehicle_type'], 'Private Transfer')) ?></span></div>
-          </div>
-        </div>
-        <?php endforeach; else: ?>
-        <div class="card" style="padding:12px;color:var(--muted)">No transportation details available.</div>
-        <?php endif; ?>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
+      function doPrint() {
+        if (printed) return;
+        printed = true;
+        try {
+          window.focus();
+        } catch (e) {}
+        window.print();
+      }
 
-  <!-- ITINERARY PAGES -->
-  <?php
-  if (!empty($o2_itin_pages)):
-    foreach ($o2_itin_pages as $o2_chunk_idx => $o2_chunk):
-      $o2_first_day = isset($o2_chunk[0]['day_number']) ? (int) $o2_chunk[0]['day_number'] : 1;
-      $o2_last_day  = isset($o2_chunk[count($o2_chunk) - 1]['day_number']) ? (int) $o2_chunk[count($o2_chunk) - 1]['day_number'] : $o2_first_day;
-      $o2_day_label = 'Days ' . $o2_first_day . ($o2_last_day > $o2_first_day ? ' – ' . $o2_last_day : '');
-  ?>
-  <section class="page<?= count($o2_chunk) > 2 ? ' page-flow' : '' ?>">
-    <?php o2_strip('Day by Day', 'Itinerary', o2e($o2_day_label)); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <div class="itin">
-        <?php foreach ($o2_chunk as $d):
-          $o2_dno   = (int) o2nv(isset($d['day_number']) ? $d['day_number'] : '', 0);
-          $o2_dimg  = o2img(isset($d['image']) ? $d['image'] : '', $assets . 'day.jpg');
-          $o2_attr  = o2nv($d['special_attraction'], o2nv($d['city'], 'Day ' . $o2_dno));
-          $o2_prog  = trim(isset($d['detailed_programme']) ? $d['detailed_programme'] : '');
-        ?>
-        <div class="card iday">
-          <div class="iday__media">
-            <img src="<?= o2e($o2_dimg) ?>" alt="Day <?= o2e($o2_dno) ?>">
-            <div class="iday__tag"><span class="iday__no">DAY <?= o2e($o2_dno) ?></span><span class="iday__date"><?= o2e(o2nv($d['date'], '')) ?></span></div>
-          </div>
-          <div class="iday__b">
-            <div class="iday__attr"><i class="fa-solid fa-compass"></i> Special Attraction · <?= o2e($o2_attr) ?></div>
-            <div class="iday__field">
-              <div class="iday__lbl">Detailed Programme</div>
-              <div class="iday__val"><?= $o2_prog !== '' ? $o2_prog : 'Detailed programme will be shared.' ?></div>
-            </div>
-            <div class="iday__chips">
-              <div class="ichip ichip--meal"><span class="b"><i class="fa-solid fa-utensils"></i></span><div><div class="l">Meal Plan</div><div class="v"><?= o2e(o2nv($d['meal_plan'], '—')) ?></div></div></div>
-              <div class="ichip ichip--stay"><span class="b"><i class="fa-solid fa-moon"></i></span><div><div class="l">Overnight Stay</div><div class="v"><?= o2e(o2nv($d['overnight_stay'], '—')) ?></div></div></div>
-            </div>
-          </div>
-        </div>
-        <?php endforeach; ?>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
-  <?php endforeach; endif; ?>
+      function waitForImages() {
+        var imgs = Array.prototype.slice.call(document.images || []);
+        var pending = imgs.filter(function(img) {
+          return !img.complete;
+        });
+        if (pending.length === 0) return Promise.resolve();
+        return Promise.all(pending.map(function(img) {
+          return new Promise(function(resolve) {
+            img.addEventListener('load', resolve, {
+              once: true
+            });
+            img.addEventListener('error', resolve, {
+              once: true
+            });
+          });
+        }));
+      }
 
-  <!-- INCLUSIONS / EXCLUSIONS / COSTING -->
-  <section class="page page-flow">
-    <?php o2_strip('The Fine Detail', 'Inclusions', '&amp; <b>Investment</b>'); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <div class="ie-grid">
-        <div class="card ie ie--in">
-          <h3><span class="b"><i class="fa-solid fa-check"></i></span> What's Included</h3>
-          <ul>
-            <?php foreach (o2_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.') as $item): ?>
-            <li><i class="fa-solid fa-check"></i> <?= o2e($item) ?></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-        <div class="card ie ie--ex">
-          <h3><span class="b"><i class="fa-solid fa-xmark"></i></span> What's Excluded</h3>
-          <ul>
-            <?php foreach (o2_list_items(isset($incx['excluded']) ? $incx['excluded'] : '', 'Exclusions will be shared as per final quotation.') as $item): ?>
-            <li><i class="fa-solid fa-xmark"></i> <?= o2e($item) ?></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-      </div>
-      <div style="margin-top:6mm">
-        <div class="sec-h">
-          <div><span class="gold-rule" style="display:block;margin-bottom:7px"></span><span class="t">Costing Details</span></div>
-          <span class="s">All amounts in <?= o2e(o2nv($q['currency'], 'INR')) ?> · for <?= o2e($o2_guests) ?></span>
-        </div>
-        <table class="cost">
-          <thead>
-            <tr><th>Package</th><th>Tour Cost</th><th>Tax (GST)</th><th>TCS</th><th>Travel Cost</th><th>Grand Total</th></tr>
-          </thead>
-          <tbody>
-            <?php
-            $o2_grp = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
-            if (empty($o2_grp)) {
-              $o2_grp = array(array('package_type' => 'Package', 'tour_cost_display' => '0', 'tax_display' => '0', 'tcs_display' => '0', 'travel_display' => '0', 'total_display' => '0'));
-            }
-            $o2_ci = 0;
-            foreach ($o2_grp as $o2_row):
-              $o2_rec = ($o2_ci === 1 || (count($o2_grp) === 1));
-            ?>
-            <tr<?= $o2_rec ? ' class="rec"' : '' ?>>
-              <td class="pk"><?php if ($o2_rec): ?><span class="recbar"><?= o2e(o2nv($o2_row['package_type'], 'Package')) ?> <span class="tag">Recommended</span></span><?php else: ?><?= o2e(o2nv($o2_row['package_type'], 'Package')) ?><?php endif; ?></td>
-              <td><?= o2e($o2_row['tour_cost_display']) ?></td>
-              <td><?= o2e(o2nv($o2_row['tax_display'], '0')) ?></td>
-              <td><?= o2e($o2_row['tcs_display']) ?></td>
-              <td><?= o2e($o2_row['travel_display']) ?></td>
-              <td class="gt"><?= o2e($o2_row['total_display']) ?></td>
-            </tr>
-            <?php $o2_ci++; endforeach; ?>
-          </tbody>
-        </table>
-        <p class="cost-note"><i class="fa-solid fa-circle-info"></i> Prices are indicative and subject to availability and currency fluctuation at the time of confirmation.</p>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
+      function waitForFonts() {
+        if (document.fonts && document.fonts.ready) {
+          return document.fonts.ready.catch(function() {});
+        }
+        return Promise.resolve();
+      }
 
-  <!-- PAYMENT -->
-  <section class="page">
-    <?php o2_strip('Securing Your Booking', 'Payment', 'Bank &amp; <b>UPI</b>'); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <div class="pay-grid">
-        <div class="bankcard">
-          <div class="bankcard__top">
-            <div class="l">Bank Transfer Details</div>
-            <div class="bankcard__chip"></div>
-          </div>
-          <div class="bankrow solo">
-            <div class="f"><div class="l">Account Name</div><div class="v"><?= o2e(o2nv($bank['account_name'], 'NA')) ?></div></div>
-          </div>
-          <div class="bankcard__div"></div>
-          <div class="bankrow">
-            <div class="f"><div class="l">Account Number</div><div class="v mono"><?= o2e(o2nv($bank['account_no'], 'NA')) ?></div></div>
-            <div class="f"><div class="l">IFSC Code</div><div class="v mono"><?= o2e(o2nv($bank['ifsc_code'], o2nv($bank['swift_code'], 'NA'))) ?></div></div>
-            <div class="f"><div class="l">Bank Name</div><div class="v"><?= o2e(o2nv($bank['bank_name'], 'NA')) ?></div></div>
-            <div class="f"><div class="l">Branch</div><div class="v"><?= o2e(o2nv($bank['branch_name'], 'NA')) ?></div></div>
-          </div>
-          <div class="bankcard__div"></div>
-          <div class="bankrow solo">
-            <div class="f"><div class="l">UPI ID</div><div class="v mono"><?= o2e(o2nv($bank['upi_id'], 'NA')) ?></div></div>
-          </div>
-        </div>
-        <div class="card qrcard">
-          <div class="scan">Scan &amp; Pay</div>
-          <?php if (!empty($bank['qr_html'])): ?>
-            <div class="qr"><?= $bank['qr_html'] ?></div>
-          <?php elseif (!empty($bank['qr_code']) || !empty($bank['branch_qr_url'])): ?>
-            <img class="qr" src="<?= o2e(o2img(o2nv($bank['branch_qr_url'], o2nv($bank['qr_code'], '')), $assets . 'qr.png')) ?>" alt="UPI QR code">
-          <?php else: ?>
-            <img class="qr" src="<?= o2e($assets . 'qr.png') ?>" alt="UPI QR code">
-          <?php endif; ?>
-          <div class="upi"><?= o2e(o2nv($bank['upi_id'], '')) ?></div>
-          <p class="muted" style="font-size:9px;margin:0;line-height:1.5">Pay instantly via any UPI app — Google Pay, PhonePe, Paytm or BHIM.</p>
-        </div>
-      </div>
-      <div class="pay-panels" style="margin-top:6mm">
-        <div class="card panel">
-          <h4><i class="fa-solid fa-circle-info"></i> Payment Instructions</h4>
-          <ul>
-            <li>A 30% advance confirms your booking; the balance is due 21 days before travel.</li>
-            <li>Share the payment screenshot or UTR with your travel consultant.</li>
-            <li>All payments are accepted in <?= o2e(o2nv($q['currency'], 'Indian Rupees')) ?> only.</li>
-            <li>A GST invoice is issued against every confirmed payment.</li>
-          </ul>
-        </div>
-        <div class="card panel">
-          <h4><i class="fa-solid fa-shield-halved"></i> Booking Policy</h4>
-          <ul>
-            <li>Booking is confirmed only on receipt of the advance amount.</li>
-            <li>Rates are held for 7 days from the quotation date.</li>
-            <li>Visa, flights &amp; hotels are confirmed after full payment.</li>
-            <li>Names must match passports exactly to avoid charges.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <section class="page<?= count($testimonials) > 2 ? ' page-flow' : '' ?>">
-    <?php o2_strip('Loved by Travellers', 'Their Words', o2e($o2_google_rating) . ' ★ <b>Rated</b>'); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <div class="sec-h">
-        <div><span class="gold-rule" style="display:block;margin-bottom:7px"></span><span class="t">What Our Travellers Say</span></div>
-        <span class="s">Verified Google reviews</span>
-      </div>
-      <div class="testi-grid">
-        <?php if (!empty($testimonials)): foreach ($testimonials as $t):
-          $tphoto = o2_testi_photo(isset($t['photo']) ? $t['photo'] : '');
-        ?>
-        <div class="card testi">
-          <?php if ($tphoto !== ''): ?>
-          <img class="testi__ph" src="<?= o2e($tphoto) ?>" alt="Reviewer">
-          <?php else: ?>
-          <img class="testi__ph" src="<?= o2e($assets . 'person.jpg') ?>" alt="Reviewer">
-          <?php endif; ?>
-          <div>
-            <div class="testi__stars">★★★★★</div>
-            <div class="testi__quote"><span class="testi__mark">“</span> <?= o2e(o2nv(isset($t['review']) ? $t['review'] : '', o2nv(isset($t['message']) ? $t['message'] : '', ''))) ?></div>
-            <div class="testi__by"><span class="n"><?= o2e(o2nv(isset($t['name']) ? $t['name'] : '', 'Traveller')) ?></span><span class="sep"></span><span class="d"><?= o2e(o2nv(isset($t['designation']) ? $t['designation'] : '', o2nv(isset($t['title']) ? $t['title'] : '', 'Customer'))) ?></span></div>
-          </div>
-        </div>
-        <?php endforeach; else: ?>
-        <div class="card testi" style="grid-template-columns:1fr;padding:20px;text-align:center;color:var(--muted)">Customer testimonials can be managed from Quotation Builder settings.</div>
-        <?php endif; ?>
-      </div>
-      <div class="statbar">
-        <div class="st"><div class="n"><?= o2e($o2_google_rating) ?>★</div><div class="l">Google Rating</div></div>
-        <div class="st"><div class="n"><?= o2e($o2_review_count) ?></div><div class="l">Verified Reviews</div></div>
-        <div class="st"><div class="n"><?= o2e($o2_traveller_cnt) ?></div><div class="l">Happy Travellers</div></div>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
-
-  <!-- TERMS -->
-  <section class="page page-flow">
-    <?php o2_strip('Please Read Carefully', 'Terms', '&amp; <b>Conditions</b>'); ?>
-    <div class="page__wm"></div>
-    <div class="page__body">
-      <?php
-      $o2_terms_html = trim(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '');
-      if ($o2_terms_html !== ''):
-      ?>
-      <div class="terms-content" style="font-size:10px;line-height:1.55;color:var(--ink-soft);margin-top:2mm">
-        <?= $o2_terms_html ?>
-      </div>
-      <?php else: ?>
-      <div class="terms-grid" style="margin-top:2mm">
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-file-lines"></i></span><div><h4>Booking Policy</h4><p>A 30% advance confirms the booking; the balance is payable 21 days prior to departure. Confirmation is subject to availability at the time of payment.</p></div></div>
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-ban"></i></span><div><h4>Cancellation Policy</h4><p>Cancellations 30+ days before travel: 25% charge. 15–29 days: 50%. Within 14 days: 100%. Charges apply on the total tour value.</p></div></div>
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-rotate-left"></i></span><div><h4>Refund Policy</h4><p>Eligible refunds are processed within 15–21 working days to the original payment method, after deduction of applicable supplier charges.</p></div></div>
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-passport"></i></span><div><h4>Visa Disclaimer</h4><p>Visa approval is at the sole discretion of the issuing authority. Rejections are not the company's liability; fees are non-refundable.</p></div></div>
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-hotel"></i></span><div><h4>Hotel Policies</h4><p>Standard check-in is 14:00 and check-out 12:00. Room categories are confirmed on availability; early check-in is chargeable.</p></div></div>
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-plane"></i></span><div><h4>Flight Policies</h4><p>Flight timings and fares are subject to airline confirmation. Schedule changes and baggage rules are governed by airline terms.</p></div></div>
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-earth-americas"></i></span><div><h4>Force Majeure</h4><p>The company is not liable for disruptions caused by weather, natural events, political unrest or any circumstances beyond reasonable control.</p></div></div>
-        <div class="term"><span class="ic term__b"><i class="fa-solid fa-shield-halved"></i></span><div><h4>Travel Insurance</h4><p>Complimentary basic insurance is included where stated. Travellers are advised to review coverage and opt for enhanced protection if required.</p></div></div>
-      </div>
-      <?php endif; ?>
-      <div class="card" style="margin-top:6mm;padding:12px 15px;display:flex;gap:11px;align-items:center;background:var(--cream)">
-        <span class="ic ic--navy"><i class="fa-solid fa-circle-info"></i></span>
-        <p class="muted" style="font-size:10px;margin:0;line-height:1.5">By proceeding with payment, the traveller acknowledges and accepts all terms and conditions outlined above. This quotation is valid for 7 days from the date of issue.</p>
-      </div>
-    </div>
-    <?php o2_foot(); ?>
-  </section>
-
-  <!-- THANK YOU -->
-  <section class="page thanks">
-    <div class="page__wm thanks__wm"></div>
-    <div class="thanks__wrap">
-      <div class="logo">
-        <img class="logo__slot" src="<?= o2e($o2_logo) ?>" alt="Company logo">
-        <div>
-          <div class="logo__name"><?= o2e($o2_company) ?></div>
-          <div class="logo__tag"><?= o2e($o2_tagline) ?></div>
-        </div>
-      </div>
-      <div class="thanks__k">With Heartfelt Gratitude</div>
-      <h2 class="thanks__big">Thank You</h2>
-      <p class="thanks__msg">We look forward to creating unforgettable travel memories for you. Your journey through <?= o2e($o2_dest) ?> is just the beginning of many more to come.</p>
-      <div class="thanks__stats">
-        <div class="s"><div class="n"><?= o2e($o2_google_rating) ?>★</div><div class="l">Google Rating</div></div>
-        <div class="s"><div class="n"><?= o2e($o2_review_count) ?></div><div class="l">Reviews</div></div>
-        <div class="s"><div class="n"><?= o2e($o2_traveller_cnt) ?></div><div class="l">Happy Travellers</div></div>
-      </div>
-      <div class="thanks__social">
-        <?php $o2_web = o2nv($ty['website'], ''); ?>
-        <a href="<?= o2e($o2_web !== '' ? $o2_web : '#') ?>" aria-label="Website"><i class="fa-solid fa-earth-asia"></i></a>
-        <a href="mailto:<?= o2e(o2nv($ty['company_email'], '')) ?>" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
-        <a href="tel:<?= o2e(preg_replace('/\s+/', '', o2nv($ty['company_contact'], o2nv($ty['user_mobile'], '')))) ?>" aria-label="Phone"><i class="fa-solid fa-phone"></i></a>
-        <a href="<?= o2e($o2_web !== '' ? $o2_web : '#') ?>" aria-label="Company"><i class="fa-brands fa-facebook-f"></i></a>
-      </div>
-      <div class="thanks__contact">
-        <span class="c"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($ty['company_address'], '')) ?></span>
-        <span class="c"><i class="fa-solid fa-phone"></i> <?= o2e(o2nv($ty['company_contact'], o2nv($ty['user_mobile'], ''))) ?></span>
-        <span class="c"><i class="fa-solid fa-envelope"></i> <?= o2e(o2nv($ty['company_email'], '')) ?></span>
-        <span class="c"><i class="fa-solid fa-earth-asia"></i> <?= o2e($o2_web) ?></span>
-      </div>
-    </div>
-    <div class="thanks__bar">
-      <div>
-        <div class="l">Prepared By</div>
-        <div class="n"><?= o2e(o2nv($ty['prepared_by'], o2nv($hero['login_user'], ''))) ?></div>
-        <div class="sub">Travel Consultant · <?= o2e($o2_company) ?></div>
-      </div>
-      <div style="text-align:right">
-        <div class="l">Quotation</div>
-        <div class="n"><?= o2e(o2nv($hero['quotation_code'], '')) ?></div>
-        <div class="sub">Issued <?= o2e(o2nv($ty['issue_date'], o2nv($ov['quotation_date'], ''))) ?></div>
-      </div>
-    </div>
-  </section>
-
-</div>
-<script type="text/javascript">
-(function() {
-  var printed = false;
-  function doPrint() {
-    if (printed) return;
-    printed = true;
-    try { window.focus(); } catch (e) {}
-    window.print();
-  }
-  function waitForImages() {
-    var imgs = Array.prototype.slice.call(document.images || []);
-    var pending = imgs.filter(function(img) { return !img.complete; });
-    if (pending.length === 0) return Promise.resolve();
-    return Promise.all(pending.map(function(img) {
-      return new Promise(function(resolve) {
-        img.addEventListener('load', resolve, { once: true });
-        img.addEventListener('error', resolve, { once: true });
-      });
-    }));
-  }
-  function waitForFonts() {
-    if (document.fonts && document.fonts.ready) {
-      return document.fonts.ready.catch(function() {});
-    }
-    return Promise.resolve();
-  }
-  function ready() {
-    var safety = new Promise(function(resolve) { setTimeout(resolve, 4000); });
-    Promise.race([
-      Promise.all([waitForImages(), waitForFonts()]),
-      safety
-    ]).then(function() { setTimeout(doPrint, 150); });
-  }
-  if (document.readyState === 'complete') {
-    ready();
-  } else {
-    window.addEventListener('load', ready);
-  }
-})();
-</script>
+      function ready() {
+        var safety = new Promise(function(resolve) {
+          setTimeout(resolve, 4000);
+        });
+        Promise.race([
+          Promise.all([waitForImages(), waitForFonts()]),
+          safety
+        ]).then(function() {
+          setTimeout(doPrint, 2500);
+        });
+      }
+      if (document.readyState === 'complete') {
+        ready();
+      } else {
+        window.addEventListener('load', ready);
+      }
+    })();
+  </script>
 </body>
 </html>

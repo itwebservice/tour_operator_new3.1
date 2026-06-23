@@ -183,24 +183,24 @@ function app_cred_info_save()
 }
 
 function app_format_save(){
- 
-  $invoice_format_list = $_POST['invoice_format_list'];
-  $quot_format = $_POST['quot_format'];
-  $image = $_POST['image'];
-  $dest_id = $_POST['dest_id'];
-  $sq_invoice = mysqlQuery("update generic_count_master set invoice_format='$invoice_format_list' where id='1'");
- 
-  $sq_app_setting_count = mysqli_num_rows(mysqlQuery("select setting_id from app_settings"));
-  if($sq_app_setting_count == '0'){
-    $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(setting_id) as max from app_settings"));
- 
-    $setting_id = $sq_max['max'] + 1;
- 
-    $query = "insert into app_settings ( setting_id, quot_format, quot_img_url,format_dest_id) values ( '$setting_id', '$quot_format', '$image','$dest_id')";
- 
-    $sq_setting = mysqlQuery($query);
-  }
- 
+
+	$invoice_format_list = $_POST['invoice_format_list'];
+	$quot_format = $_POST['quot_format'];
+	$image = $_POST['image'];
+	$dest_id = $_POST['dest_id'];
+	$sq_invoice = mysqlQuery("update generic_count_master set invoice_format='$invoice_format_list' where id='1'");
+
+	$sq_app_setting_count = mysqli_num_rows(mysqlQuery("select setting_id from app_settings"));
+	if($sq_app_setting_count == '0'){
+		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(setting_id) as max from app_settings"));
+
+		$setting_id = $sq_max['max'] + 1;
+
+		$query = "insert into app_settings ( setting_id, quot_format, quot_img_url,format_dest_id) values ( '$setting_id', '$quot_format', '$image','$dest_id')";
+
+		$sq_setting = mysqlQuery($query);
+	}
+
     // =========================== Dipti
     else {
       if (empty($dest_id)) {
@@ -212,39 +212,39 @@ function app_format_save(){
       }
     }
   // ====================================
- 
-  // else{
-  //  if(empty($dest_id))
-  //  {
-  //    $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
-  //  }
-  //  mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
-  //  mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
-  // }
- 
- 
+
+	// else{
+	// 	if(empty($dest_id))
+	// 	{
+	// 		$sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
+	// 	}
+	// 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
+	// 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
+	// }
+
+
     // ========================== Dipti
     include_once(dirname(__FILE__) . '/print_html/quotation_html/generic_builder_config.php');
     $testimonials = isset($_POST['testimonials']) ? json_decode($_POST['testimonials'], true) : array();
- 
+
     $config = gqb_get_config();
     $config['testimonials'] = is_array($testimonials) ? $testimonials : array();
-   
+    
     //==============================
     $social_links = isset($_POST['social_links']) ? json_decode($_POST['social_links'], true) : array();
     $config['social_links'] = is_array($social_links) ? $social_links : array();
-   
+    
     // =============================
     gqb_save_config($config);
- 
+
     if($sq_invoice){
-    echo "Company profile details are saved successfully!! ";
-    exit;
-  }
-  else{
-    echo "error--Sorry, Company profile details are not saved!";
-  }
- 
+		echo "Company profile details are saved successfully!! ";
+		exit;
+	}
+	else{
+		echo "error--Sorry, Company profile details are not saved!";
+	}
+
 }
 
 

@@ -66,7 +66,10 @@ body{
   position:relative;
   z-index:2;
   flex:1;
-  padding:11mm var(--pad) 0;
+  /* padding:11mm var(--pad) 0; */
+  /* ======== Dipti */
+  padding:2mm var(--pad) 0; 
+  /* ================= */
   display:flex;
   flex-direction:column;
 }
@@ -375,6 +378,21 @@ body.cover-b .cv-b{ display:flex; }
 
 /* generic section title inside body */
 .sec-h{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:11px; }
+
+/* ======= Dipti */
+.sec-h{
+  margin-top:0 !important;
+  margin-bottom:8px !important;
+}
+.meta a{
+    color: inherit;
+    text-decoration: none;
+}
+.thanks__contact a{
+    color: inherit;
+    text-decoration: none;
+}
+/* ================ */
 .sec-h .t{ font-family:var(--serif); font-weight:700; font-size:18px; color:var(--navy); }
 .sec-h .s{ font-size:10px; color:var(--muted); }
 .sec-tag{
@@ -645,6 +663,20 @@ img{ display:block; max-width:100%; }
   margin-top:auto;
 }
 
+.thanks__social svg{
+    width:16px;
+    height:16px;
+    display:block;
+}
+/* ======================== Dipti  */
+.incitem .ico svg{
+    width:18px;
+    height:18px;
+    display:block;
+    margin:auto;
+}
+
+/* ====================== */
 /* ============================================================
    PRINT
    ============================================================ */

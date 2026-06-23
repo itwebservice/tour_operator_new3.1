@@ -78,33 +78,33 @@ $api_url = BASE_URL . 'model/app_settings/print_html/quotation_html/quotation_da
     </div>
 
     <!-- Testimonials -->
-    <div class="row mg_tp_20">
+    <!-- <div class="row mg_tp_20">
         <div class="col-md-12">
             <div class="panel panel-default panel-body app_panel_style feildset-panel">
                 <legend>Customer Testimonials</legend>
                 <div id="qb_testimonials_wrap">
                     <?php
-                    if (!empty($testims)) {
-                        foreach ($testims as $t) {
-                            $name = isset($t['name']) ? htmlspecialchars($t['name']) : '';
-                            $desig = isset($t['designation']) ? htmlspecialchars($t['designation']) : '';
-                            $review = isset($t['review']) ? htmlspecialchars($t['review']) : '';
-                            $photo = isset($t['photo']) ? htmlspecialchars($t['photo']) : '';
+                    // if (!empty($testims)) {
+                    //     foreach ($testims as $t) {
+                    //         $name = isset($t['name']) ? htmlspecialchars($t['name']) : '';
+                    //         $desig = isset($t['designation']) ? htmlspecialchars($t['designation']) : '';
+                    //         $review = isset($t['review']) ? htmlspecialchars($t['review']) : '';
+                    //         $photo = isset($t['photo']) ? htmlspecialchars($t['photo']) : '';
                     ?>
                             <div class="row qb_testm_row mg_bt_10">
-                                <div class="col-md-3"><input type="text" class="form-control qb_t_name" placeholder="Traveller Name" value="<?= $name ?>"></div>
-                                <div class="col-md-2"><input type="text" class="form-control qb_t_desig" placeholder="Designation" value="<?= $desig ?>"></div>
-                                <div class="col-md-3"><input type="text" class="form-control qb_t_review" placeholder="Review" value="<?= $review ?>"></div>
-                                <div class="col-md-3"><input type="text" class="form-control qb_t_photo" placeholder="Photo URL" value="<?= $photo ?>"></div>
+                                <div class="col-md-3"><input type="text" class="form-control qb_t_name" placeholder="Traveller Name" value="<?//= $name ?>"></div>
+                                <div class="col-md-2"><input type="text" class="form-control qb_t_desig" placeholder="Designation" value="<?//= $desig ?>"></div>
+                                <div class="col-md-3"><input type="text" class="form-control qb_t_review" placeholder="Review" value="<?//= $review ?>"></div>
+                                <div class="col-md-3"><input type="text" class="form-control qb_t_photo" placeholder="Photo URL" value="<?//= $photo ?>"></div>
                                 <div class="col-md-1"><button type="button" class="btn btn-danger btn-sm qb_remove_testm"><i class="fa fa-trash"></i></button></div>
                             </div>
-                    <?php }
-                    } ?>
+                    <?//php }
+                    //} ?>
                 </div>
                 <button type="button" class="btn btn-info btn-sm mg_tp_10" id="qb_add_testm"><i class="fa fa-plus"></i>&nbsp;Add Testimonial</button>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="row mg_tp_20">
         <div class="col-md-12 text-right">

@@ -32,6 +32,43 @@
       box-shadow: 0 4px 40px rgba(0,0,0,.22);
     }
 
+    /* =============== Dipti */
+    @media print {
+  .page {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    overflow: hidden !important;
+  }
+
+  .page.page-flow {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .page-divider {
+    display: none !important;
+  }
+
+  .page-header {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .hotel-card,
+  .flight-card,
+  .transport-card,
+  .day-card,
+  .testi-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+/* =========================== */
+
     /* ══════════════════ COVER ══════════════════ */
     .cover {
       position: relative;
@@ -64,7 +101,39 @@
     .cover-icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .cover-icon-circle { width: 64px; height: 64px; border-radius: 50%; border: 2.5px solid var(--gold); background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center; font-size: 24px; }
     .cover-icon-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--white); text-transform: uppercase; }
-    .cover-strip { display: flex; width: 100%; height: 170px; overflow: hidden; }
+
+    /* .cover-strip { display: flex; width: 100%; height: 170px; overflow: hidden; } */
+    /* ================= Dipti */
+    .cover-strip{
+  display:flex;
+  gap:8px;
+  padding:10px 14px;
+  background:#001a44;
+}
+
+.cover-strip-item{
+  flex:1;
+  height:120px;
+  border-radius:12px;
+  overflow:hidden;
+  border:2px solid #b88a2c;
+}
+
+.cover-strip-item img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.ty-contact-card{
+  text-decoration:none;
+  color:inherit;
+}
+.pf-row a{
+  color: inherit;
+  text-decoration: none;
+}
+    /* ================ */
     .cover-strip div { flex: 1; background-size: cover; background-position: center; }
 
     /* ══════════════════ PAGE HEADER ══════════════════ */

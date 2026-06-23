@@ -300,8 +300,11 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
   </div>
 </div>
 
-        <div class="col-md-1"><button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('.testimonial_row').remove()">X</button></div>
-    </div>`;
+<div class="col-md-1">
+  <button type="button" class="btn btn-danger btn-sm qb_remove_testm">
+    <i class="fa fa-trash"></i>
+  </button>
+</div>    </div>`;
     $('#testimonial_rows').append(html);
   }
 
