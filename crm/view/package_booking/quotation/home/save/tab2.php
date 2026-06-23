@@ -1176,33 +1176,42 @@ $(document).on('click', '#tab2_head', function() {
                         console.log('Tab2 Next: Populating hotel data for rebuilt table');
                         for (var i = 0; i < hotel_arr.length; i++) {
                             var row = table.rows[i];
+                            var hotelData = hotel_arr[i];
                             row.cells[1].childNodes[0].value = (i + 1);
-                            city_lzloading(row.cells[3].childNodes[0]);
-                            var $citySelect = $(row.cells[3].childNodes[0]);
                             var $hotelSelect = $(row.cells[4].childNodes[0]);
-                            var newOption = $("<option selected='selected'></option>").val(hotel_arr[i]['city_id']).text(hotel_arr[i]['city_name']);
-                            $citySelect.append(newOption).trigger('change.select2');
-                            if (hotel_arr[i]['city_id'] && typeof hotelDropdownLoadByCity === 'function') {
-                                hotelDropdownLoadByCity(hotel_arr[i]['city_id'], $hotelSelect, function(success) {
-                                    if (success && hotel_arr[i]['hotel_id1']) {
-                                        if (typeof selectHotelInDropdown === 'function') {
-                                            selectHotelInDropdown($hotelSelect, hotel_arr[i]['hotel_id1'], hotel_arr[i]['hotel_name']);
-                                        } else {
-                                            $hotelSelect.val(hotel_arr[i]['hotel_id1']).trigger('change');
-                                        }
-                                    }
-                                });
+                            if (typeof setQuotationCitySelect === 'function') {
+                                setQuotationCitySelect(row.cells[3].childNodes[0], hotelData['city_id'], hotelData['city_name']);
                             } else {
-                                $hotelSelect.html('<option value="' + hotel_arr[i]['hotel_id1'] + '">' + hotel_arr[i]['hotel_name'] + '</option>');
+                                city_lzloading(row.cells[3].childNodes[0]);
+                                var $citySelect = $(row.cells[3].childNodes[0]);
+                                var newOption = $("<option selected='selected'></option>").val(hotelData['city_id']).text(hotelData['city_name']);
+                                $citySelect.append(newOption).trigger('change.select2');
+                            }
+                            if (typeof loadQuotationHotelFromPackage === 'function') {
+                                loadQuotationHotelFromPackage(hotelData, $hotelSelect);
+                            } else if (hotelData['city_id'] && typeof hotelDropdownLoadByCity === 'function') {
+                                (function (data, $hotel) {
+                                    hotelDropdownLoadByCity(data['city_id'], $hotel, function (success) {
+                                        if (success && data['hotel_id1']) {
+                                            if (typeof selectHotelInDropdown === 'function') {
+                                                selectHotelInDropdown($hotel, data['hotel_id1'], data['hotel_name']);
+                                            } else {
+                                                $hotel.val(data['hotel_id1']).trigger('change');
+                                            }
+                                        }
+                                    });
+                                })(hotelData, $hotelSelect);
+                            } else {
+                                $hotelSelect.html('<option value="' + hotelData['hotel_id1'] + '">' + hotelData['hotel_name'] + '</option>');
                                 $('#' + row.cells[4].childNodes[0].id).select2().trigger("change");
                             }
-                            row.cells[6].childNodes[0].value = hotel_arr[i]['check_in_date'];
-                            row.cells[7].childNodes[0].value = hotel_arr[i]['check_out_date'];
-                            row.cells[8].childNodes[0].value = hotel_arr[i]['hotel_type'];
+                            row.cells[6].childNodes[0].value = hotelData['check_in_date'];
+                            row.cells[7].childNodes[0].value = hotelData['check_out_date'];
+                            row.cells[8].childNodes[0].value = hotelData['hotel_type'];
                             row.cells[9].childNodes[0].value = total_days;
                             row.cells[10].childNodes[0].value = '';
-                            row.cells[12].childNodes[0].value = hotel_arr[i]['package_name'];
-                            row.cells[14].childNodes[0].value = hotel_arr[i]['package_id'];
+                            row.cells[12].childNodes[0].value = hotelData['package_name'];
+                            row.cells[14].childNodes[0].value = hotelData['package_id'];
 
                             document.getElementById(row.cells[2].childNodes[0].id).selectedIndex = 0;
                             $('#' + row.cells[2].childNodes[0].id).select2().trigger("change");

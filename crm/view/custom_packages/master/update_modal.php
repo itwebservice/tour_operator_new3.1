@@ -757,6 +757,9 @@ function fixImagePreviewDisplay() {
 
 // Function to process selected itinerary image after modal closes
 function processSelectedItineraryImageUpdate() {
+    if (typeof applySelectedItineraryImagePreview === 'function' && applySelectedItineraryImagePreview()) {
+        return;
+    }
     console.log("PACKAGE UPDATE: processSelectedItineraryImageUpdate called");
     console.log("PACKAGE UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
     

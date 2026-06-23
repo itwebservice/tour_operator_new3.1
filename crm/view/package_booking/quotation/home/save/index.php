@@ -145,6 +145,81 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
             }, 100);
         });
     }
+
+    function setQuotationCitySelect(cityEl, cityId, cityName) {
+        if (!cityEl || !cityId) {
+            return;
+        }
+        var $city = $(cityEl);
+        if ($city.data('select2')) {
+            $city.select2('destroy');
+        }
+        city_lzloading(cityEl);
+        var savedOnchange = cityEl.getAttribute('onchange');
+        if (savedOnchange) {
+            cityEl.removeAttribute('onchange');
+        }
+        if (typeof selectCityInLazyDropdown === 'function') {
+            selectCityInLazyDropdown($city, cityId, cityName, { triggerChange: false });
+        } else {
+            $city.append(new Option(cityName, cityId, true, true));
+            $city.val(String(cityId)).trigger('change.select2');
+        }
+        if (savedOnchange) {
+            cityEl.setAttribute('onchange', savedOnchange);
+        }
+    }
+
+    function applyQuotationHotelSelect($hotelSelect, hotelId, hotelName) {
+        if (!$hotelSelect || !$hotelSelect.length || !hotelId) {
+            return;
+        }
+        var id = String(hotelId);
+        var hotelEl = $hotelSelect[0];
+        var savedOnchange = hotelEl.getAttribute('onchange');
+        if (savedOnchange) {
+            hotelEl.removeAttribute('onchange');
+        }
+        if ($hotelSelect.find('option').filter(function () { return String(this.value) === id; }).length === 0) {
+            $hotelSelect.append($('<option></option>').attr('value', id).text(hotelName || ''));
+        }
+        $hotelSelect.val(id).trigger('change.select2');
+        if (typeof initHotelSelectAddNew === 'function') {
+            initHotelSelectAddNew($hotelSelect);
+        }
+        if (savedOnchange) {
+            hotelEl.setAttribute('onchange', savedOnchange);
+        }
+        var selectId = $hotelSelect.attr('id') || '';
+        if (selectId && typeof hotel_type_load === 'function') {
+            hotel_type_load(selectId);
+        }
+    }
+
+    function loadQuotationHotelFromPackage(hotelData, $hotelSelect) {
+        if (!hotelData || !$hotelSelect || !$hotelSelect.length) {
+            return;
+        }
+        if (hotelData.city_id && typeof hotelDropdownLoadByCity === 'function') {
+            hotelDropdownLoadByCity(hotelData.city_id, $hotelSelect, function (success) {
+                if (success && hotelData.hotel_id1) {
+                    applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name);
+                } else if (hotelData.hotel_id1) {
+                    $hotelSelect.html('<option value="">*Hotel Name</option><option value="' + hotelData.hotel_id1 + '">' + (hotelData.hotel_name || '') + '</option>');
+                    if (!$hotelSelect.data('select2')) {
+                        $hotelSelect.select2({ width: '160px', minimumResultsForSearch: 0 });
+                    }
+                    applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name);
+                }
+            });
+        } else if (hotelData.hotel_id1) {
+            $hotelSelect.html('<option value="' + hotelData.hotel_id1 + '">' + (hotelData.hotel_name || '') + '</option>');
+            if (!$hotelSelect.data('select2')) {
+                $hotelSelect.select2({ width: '160px', minimumResultsForSearch: 0 });
+            }
+            applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name);
+        }
+    }
     /**Excursion Name load**/
     function get_excursion_list(id) {
         var city_id = $("#" + id).val();

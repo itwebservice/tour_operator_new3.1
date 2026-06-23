@@ -2634,8 +2634,7 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
                 populateHotelRow(row, hotel, i, hotel_arr);
             });
 
-            // Initialize city dropdowns ONLY for newly added rows
-            initializeCityDropdowns(table, hotel_arr, startRowIndex);
+            // City/hotel already set in populateHotelRow
 
             // Hide hotel package if needed
             const selectedPackagevalue = table.rows[1]?.cells[2]?.childNodes[0]?.value || '';
@@ -2649,15 +2648,22 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
 function populateHotelRow(row, hotel, i, hotel_arr) {
     const hotelSelect = $(row.cells[4].childNodes[0]);
     const roomCatSelect = $(row.cells[5].childNodes[0]);
-    const citySelect = $(row.cells[3].childNodes[0]);
+    const cityEl = row.cells[3].childNodes[0];
 
-    city_lzloading(citySelect);
-    if (hotel.city_id && hotel.city_name) {
-        const cityOption = new Option(hotel.city_name, hotel.city_id, true, true);
-        citySelect.append(cityOption).trigger('change.select2');
+    if (typeof setQuotationCitySelect === 'function') {
+        setQuotationCitySelect(cityEl, hotel.city_id, hotel.city_name);
+    } else {
+        city_lzloading(cityEl);
+        if (hotel.city_id && hotel.city_name) {
+            const citySelect = $(cityEl);
+            const cityOption = new Option(hotel.city_name, hotel.city_id, true, true);
+            citySelect.append(cityOption).trigger('change.select2');
+        }
     }
 
-    if (hotel.city_id && typeof hotelDropdownLoadByCity === 'function') {
+    if (typeof loadQuotationHotelFromPackage === 'function') {
+        loadQuotationHotelFromPackage(hotel, hotelSelect);
+    } else if (hotel.city_id && typeof hotelDropdownLoadByCity === 'function') {
         hotelDropdownLoadByCity(hotel.city_id, hotelSelect, function(success) {
             if (success && hotel.hotel_id1) {
                 if (typeof selectHotelInDropdown === 'function') {

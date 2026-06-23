@@ -2494,6 +2494,10 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
     // Function to process selected itinerary image after modal closes
     function processSelectedItineraryImageQuotation() {
+        if (typeof applySelectedItineraryImagePreview === 'function') {
+            applySelectedItineraryImagePreview();
+            return;
+        }
         console.log("QUOTATION: processSelectedItineraryImageQuotation called");
         console.log("QUOTATION: window.selectedItineraryImage =", window.selectedItineraryImage);
 

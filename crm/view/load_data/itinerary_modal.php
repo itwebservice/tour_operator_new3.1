@@ -233,9 +233,13 @@ $('#itinerary_detail_frm').validate({
                   console.log('ITINERARY MODAL: All available day_image_preview elements:', $('[id^="day_image_preview_"]').map(function() { return this.id; }).get());
                   
                   if (dayId && img) {
-                      // Store the image data for later use after modal closes
+                      var imageKey = typeof resolveItineraryImageKeyFromSpa === 'function'
+                          ? resolveItineraryImageKeyFromSpa(spa)
+                          : dayId;
                       window.selectedItineraryImage = {
                           dayId: dayId,
+                          imageKey: imageKey,
+                          spa: spa,
                           img: img
                       };
                       console.log('ITINERARY MODAL: Stored image data for later processing:', window.selectedItineraryImage);

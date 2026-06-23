@@ -175,6 +175,9 @@ function removeDayImageCreate(offset) {
 
 // Function to process selected itinerary image after modal closes
 function processSelectedItineraryImage() {
+    if (typeof applySelectedItineraryImagePreview === 'function' && applySelectedItineraryImagePreview()) {
+        return;
+    }
     if (window.selectedItineraryImage) {
         var dayId = window.selectedItineraryImage.dayId;
         var img = window.selectedItineraryImage.img;

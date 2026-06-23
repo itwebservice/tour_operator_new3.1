@@ -257,6 +257,10 @@ function get_excursion_amount_update(eleid) {
 
 // Function to process selected itinerary image after modal closes
 function processSelectedItineraryImageQuotation() {
+    if (typeof applySelectedItineraryImagePreview === 'function') {
+        applySelectedItineraryImagePreview();
+        return;
+    }
     console.log("QUOTATION UPDATE: processSelectedItineraryImageQuotation called");
     console.log("QUOTATION UPDATE: window.selectedItineraryImage =", window.selectedItineraryImage);
     

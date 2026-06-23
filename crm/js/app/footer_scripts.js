@@ -4059,6 +4059,93 @@ function check_updated_amount(payment_old_value, payment_amount) {
 		return true;
 	}
 }
+function resolveItineraryImageKeyFromSpa(spaFieldId) {
+	if (!spaFieldId) {
+		return '';
+	}
+
+	var $spa = $('#' + spaFieldId);
+	if ($spa.length) {
+		var $row = $spa.closest('tr');
+		if ($row.length) {
+			var $preview = $row.find('img[id^="preview_img_"]').first();
+			if ($preview.length) {
+				return String($preview.attr('id') || '').replace(/^preview_img_/, '');
+			}
+			var $hidden = $row.find('input[id^="existing_image_path_"], input[id^="day_image_path_"]').first();
+			if ($hidden.length) {
+				return String($hidden.attr('id') || '')
+					.replace(/^existing_image_path_/, '')
+					.replace(/^day_image_path_/, '');
+			}
+			var $file = $row.find('input[type="file"][id^="day_image_"]').first();
+			if ($file.length) {
+				return String($file.attr('id') || '').replace(/^day_image_/, '');
+			}
+		}
+	}
+
+	var match = String(spaFieldId).match(/(?:special_attaraction|special_attraction)(.+?)(?:-u)?$/i);
+	return match ? String(match[1]).replace(/-u$/, '') : '';
+}
+
+function buildItineraryImagePreviewUrl(imgPath) {
+	if (!imgPath || imgPath === 'NULL') {
+		return '';
+	}
+	var path = String(imgPath).trim();
+	if (path.indexOf('http') === 0) {
+		return path;
+	}
+	var base = ($('#base_url').val() || '').replace(/\/crm\/?$/, '').replace(/\/$/, '');
+	if (!base && window.location.href.indexOf('/crm/') > -1) {
+		base = window.location.href.substring(0, window.location.href.indexOf('/crm/'));
+	}
+	return base + '/' + path.replace(/^\//, '');
+}
+
+function applySelectedItineraryImagePreview() {
+	var data = window.selectedItineraryImage;
+	if (!data || !data.img) {
+		return false;
+	}
+
+	var imageKey = data.imageKey || data.dayId || '';
+	if (!imageKey) {
+		return false;
+	}
+
+	var img = data.img;
+	var imageUrl = buildItineraryImagePreviewUrl(img);
+
+	$('#existing_image_path_' + imageKey + ', #day_image_path_' + imageKey).val(img);
+
+	var previewImg = $('#preview_img_' + imageKey);
+	var previewDiv = $('#day_image_preview_' + imageKey);
+	var uploadContainer = $('#upload_btn_container_' + imageKey);
+
+	if (!previewImg.length || !previewDiv.length) {
+		console.warn('applySelectedItineraryImagePreview: preview not found for key', imageKey, 'spa:', data.spa);
+		window.selectedItineraryImage = null;
+		return false;
+	}
+
+	previewImg.attr('src', imageUrl).show();
+	previewDiv.attr('style', 'display: block !important; margin-top: 5px;').show();
+	if (uploadContainer.length) {
+		uploadContainer.hide();
+	}
+	$('label[for="day_image_' + imageKey + '"]').hide();
+	previewDiv.find('button[onclick*="removeDayImage"]').css('display', 'flex').show();
+
+	window.selectedItineraryImage = null;
+	return true;
+}
+
+window.resolveItineraryImageKeyFromSpa = resolveItineraryImageKeyFromSpa;
+window.buildItineraryImagePreviewUrl = buildItineraryImagePreviewUrl;
+window.applySelectedItineraryImagePreview = applySelectedItineraryImagePreview;
+
 function add_itinerary(dest_id1, spa, dwp, ovs, dayp) {
 
 	var day_id = dayp.split('-');
