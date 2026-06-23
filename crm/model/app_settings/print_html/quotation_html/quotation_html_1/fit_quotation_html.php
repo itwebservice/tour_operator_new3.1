@@ -1223,7 +1223,7 @@ function o1_flight_date($v)
                 </circle>
               </svg> Day-Wise Itinerary
             </h2>
-            <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Your Journey Â· Day by Day</span>
+            <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Your Journey · Day by Day</span>
           </div>
           <hr class="gold-rule mt-2" />
           <div class="mt-4 space-y-4">

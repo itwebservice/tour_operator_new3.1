@@ -146,6 +146,131 @@
 
 }
 
+/* =========== Dipti */
+.info-item a{
+  color: inherit;
+  text-decoration: none;
+}
+.service svg{
+  width:34px;
+  height:34px;
+  display:block;
+  margin:0 auto 10px;
+  color:#ffc107;
+}
+.flight-card svg{
+  width:24px;
+  height:24px;
+  display:block;
+  margin:0 auto 10px;
+  color:#ffc107;
+}
+.flight-section svg{
+  width:24px;
+  height:24px;
+  display:block;
+  margin:0 auto 10px;
+  color:#ffc107;
+}
+.flight-footer svg{
+  width:20px;
+  height:20px;
+  display:block;
+  margin:0 auto 10px;
+  color:#ffc107;
+}
+.package-card.included svg{
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+  color:#ffc107;
+  display:inline-block;
+  margin:0;
+}
+.package-card.excluded svg{
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+    color:#ef4444; 
+      display:inline-block;
+  margin:0;
+}
+.itinerary-card svg{
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+  color:#ffc107;
+  display:inline-block;
+  margin:0;
+}
+.transport-section svg{
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+  color:#ffc107;
+  display:inline-block;
+  margin:0;
+}
+
+.location-row{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+}
+
+.location-row svg{
+  margin-top:3px;
+}
+
+.footer-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.footer-card svg{
+  margin:0;
+}
+.info-item{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.info-item svg{
+    width:20px;
+    height:20px;
+    flex-shrink:0;
+    color:#ffc107;
+}
+
+/* Prepared By */
+.info-item.right{
+    justify-content:flex-end;
+}
+
+.info-item.right svg{
+    order:2;
+    margin-left:15px;
+    margin-right:0;
+}
+
+.info-item.right > div{
+    order:1;
+    text-align:right;
+}
+.costing-table th,
+.costing-table td{
+    padding:8px 4px;
+    font-size:12px;
+}
+
+.social-icons svg{
+    width:22px;
+    height:22px;
+    fill:#ffffff; 
+}
+/* ============= */
 .service{
 
     width:72px;

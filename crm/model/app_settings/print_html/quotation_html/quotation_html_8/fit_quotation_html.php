@@ -260,12 +260,62 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
         <h1 class="hero-title"><?= o8e(strtoupper(o8nv($hero['tour_name'], $o8_dest))) ?></h1>
         <p class="hero-subtitle">Discover Extraordinary Experiences</p>
         <div class="hero-services">
-          <div class="service"><i class="fa-solid fa-hotel"></i><span>Hotels</span></div>
-          <?php if ($o8_show_flights) : ?><div class="service"><i class="fa-solid fa-plane"></i><span>Flights</span></div><?php endif; ?>
-          <div class="service"><i class="fa-solid fa-car-side"></i><span>Transfer</span></div>
-          <div class="service"><i class="fa-solid fa-location-dot"></i><span>Touring</span></div>
-          <div class="service"><i class="fa-solid fa-utensils"></i><span>Meals</span></div>
-          <div class="service"><i class="fa-regular fa-compass"></i><span>Activity</span></div>
+          <div class="service"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hotel w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+              <path d="M10 22v-6.57">
+              </path>
+              <path d="M12 11h.01">
+              </path>
+              <path d="M12 7h.01">
+              </path>
+              <path d="M14 15.43V22">
+              </path>
+              <path d="M15 16a5 5 0 0 0-6 0">
+              </path>
+              <path d="M16 11h.01">
+              </path>
+              <path d="M16 7h.01">
+              </path>
+              <path d="M8 11h.01">
+              </path>
+              <path d="M8 7h.01">
+              </path>
+              <rect x="4" y="2" width="16" height="20" rx="2">
+              </rect>
+            </svg><span>Hotels</span></div>
+          <?php if ($o8_show_flights) : ?><div class="service"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+                <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z">
+                </path>
+              </svg><span>Flights</span></div><?php endif; ?>
+          <div class="service"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2">
+              </path>
+              <circle cx="7" cy="17" r="2">
+              </circle>
+              <path d="M9 17h6">
+              </path>
+              <circle cx="17" cy="17" r="2">
+              </circle>
+            </svg><span>Transfer</span></div>
+          <div class="service"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+              <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
+              </path>
+              <circle cx="12" cy="10" r="3">
+              </circle>
+            </svg><span>Touring</span></div>
+          <div class="service"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+              <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2">
+              </path>
+              <path d="M7 2v20">
+              </path>
+              <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7">
+              </path>
+            </svg><span>Meals</span></div>
+          <div class="service"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+              <path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z">
+              </path>
+              <circle cx="12" cy="13" r="3">
+              </circle>
+            </svg></i><span>Activity</span></div>
         </div>
         <div class="hero-client">
           <small>Prepared Exclusively For</small>
@@ -299,7 +349,21 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
           <div class="overview-card"><label>Quotation ID</label><strong><?= o8e($o8_quot_code) ?></strong></div>
           <div class="overview-card"><label>Tour ID</label><strong><?= o8e($o8_tour_id) ?></strong></div>
           <div class="overview-card"><label>Quotation Date</label><strong><?= o8e(o8nv($ov['quotation_date'], '')) ?></strong></div>
-          <div class="overview-card"><label>Travel Date</label><strong><?= o8e($o8_travel_range) ?></strong></div>
+          <!-- <div class="overview-card"><label>Travel Date</label><strong><? //= o8e($o8_travel_range) 
+                                                                            ?></strong></div> -->
+          <div class="overview-card">
+            <label>Travel Date</label>
+
+            <?php
+            $travel_dates = explode('—', $o8_travel_range);
+            ?>
+
+            <strong>
+              <?= o8e(trim(isset($travel_dates[0]) ? $travel_dates[0] : '')) ?>
+              <br>
+              <?= o8e(trim(isset($travel_dates[1]) ? $travel_dates[1] : '')) ?>
+            </strong>
+          </div>
           <div class="overview-card"><label>Duration</label><strong><?= o8e($o8_duration) ?></strong></div>
           <div class="overview-card"><label>Total Guests</label><strong><?= o8e(o8_guest_label($ov)) ?></strong></div>
         </div>
@@ -311,31 +375,83 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
           <div class="prepared-col">
             <h3>Prepared For</h3>
             <div class="info-item">
-              <i class="fa-regular fa-user"></i>
+              <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                <circle cx="12" cy="8" r="4"></circle>
+              </svg>
               <div><span>Client Name</span><strong><?= o8e($o8_client) ?></strong></div>
             </div>
             <div class="info-item">
-              <i class="fa-regular fa-envelope"></i>
-              <div><span>Email Address</span><strong><?= o8e(o8nv($ov['customer_email'], o8nv($hero['user_email_id'], ''))) ?></strong></div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
+                <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7">
+                </path>
+                <rect x="2" y="4" width="20" height="16" rx="2">
+                </rect>
+              </svg>
+              <div>
+                <span>Email Address</span>
+                <strong>
+                  <a href="mailto:<?= o8e(o8nv($ov['customer_email'], o8nv($hero['user_email_id'], ''))) ?>">
+                    <?= o8e(o8nv($ov['customer_email'], o8nv($hero['user_email_id'], ''))) ?>
+                  </a>
+                </strong>
+              </div>
             </div>
+
             <div class="info-item">
-              <i class="fa-solid fa-phone"></i>
-              <div><span>Mobile Number</span><strong><?= o8e(o8nv($ov['customer_mobile'], o8nv($hero['user_contact'], ''))) ?></strong></div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
+                <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
+                </path>
+              </svg>
+              <div>
+                <span>Mobile Number</span>
+                <strong>
+                  <a href="tel:<?= preg_replace('/\s+/', '', o8nv($ov['customer_mobile'], o8nv($hero['user_contact'], ''))) ?>">
+                    <?= o8e(o8nv($ov['customer_mobile'], o8nv($hero['user_contact'], ''))) ?>
+                  </a>
+                </strong>
+              </div>
             </div>
           </div>
           <div class="prepared-col prepared-by">
             <h3>Prepared By</h3>
             <div class="info-item right">
               <div><span>Username</span><strong><?= o8e($o8_consult_name) ?></strong></div>
-              <i class="fa-regular fa-user"></i>
+              <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                <circle cx="12" cy="8" r="4"></circle>
+              </svg>
             </div>
             <div class="info-item right">
-              <div><span>Email ID</span><strong><?= o8e($o8_consult_email) ?></strong></div>
-              <i class="fa-regular fa-envelope"></i>
+              <div>
+                <span>Email ID</span>
+                <strong>
+                  <a href="mailto:<?= o8e($o8_consult_email) ?>">
+                    <?= o8e($o8_consult_email) ?>
+                  </a>
+                </strong>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
+                <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7">
+                </path>
+                <rect x="2" y="4" width="20" height="16" rx="2">
+                </rect>
+              </svg>
             </div>
+
             <div class="info-item right">
-              <div><span>Mobile Number</span><strong><?= o8e($o8_consult_phone) ?></strong></div>
-              <i class="fa-solid fa-phone"></i>
+              <div>
+                <span>Mobile Number</span>
+                <strong>
+                  <a href="tel:<?= preg_replace('/\s+/', '', $o8_consult_phone) ?>">
+                    <?= o8e($o8_consult_phone) ?>
+                  </a>
+                </strong>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-[color:var(--teal)]" aria-hidden="true">
+                <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
+                </path>
+              </svg>
             </div>
           </div>
         </div>
@@ -399,9 +515,16 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
             ?>
               <div class="flight-card">
                 <div class="flight-route">
-                  <div class="route-point"><span>From</span><h3><?= o8e($from_code) ?></h3></div>
-                  <div class="route-plane"><i class="fa-solid fa-plane"></i></div>
-                  <div class="route-point text-right"><span>To</span><h3><?= o8e($to_code) ?></h3></div>
+                  <div class="route-point"><span>From</span>
+                    <h3><?= o8e($from_code) ?></h3>
+                  </div>
+                  <div class="route-plane"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+                      <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z">
+                      </path>
+                    </svg></div>
+                  <div class="route-point text-right"><span>To</span>
+                    <h3><?= o8e($to_code) ?></h3>
+                  </div>
                 </div>
                 <div class="flight-info">
                   <div class="info-block"><label>AIRLINE</label><strong><?= o8e(o8nv($f['airline_display'], o8nv($f['airline_name'], ''))) ?></strong></div>
@@ -411,13 +534,99 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                 </div>
                 <div class="flight-footer">
                   <div class="footer-box">
-                    <i class="fa-regular fa-clock"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10">
+                      </circle>
+                      <path d="M12 6v6l4 2">
+                      </path>
+                    </svg>
                     <div><small>Duration</small><strong><?= o8e($duration) ?></strong></div>
                   </div>
                   <div class="footer-box">
-                    <i class="fa-solid fa-suitcase"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor">
+                      <path d="M176 64h160c35.3 0 64 28.7 64 64v32h32c44.2 0 80 35.8 80 80v192c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V240c0-44.2 35.8-80 80-80h32V128c0-35.3 28.7-64 64-64zm0 64v32h160V128H176z" />
+                    </svg>
                     <div><small>Baggage</small><strong><?= o8e($baggage) ?></strong></div>
                   </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      </section>
+    </div>
+  <?php endif; ?>
+
+  <?php if (!empty($trains)) : ?>
+    <div class="page">
+      <section class="flight-section">
+        <div class="container">
+          <h2 class="flight-title">Train Details</h2>
+          <div class="flight-grid">
+            <?php foreach ($trains as $tr) :
+              $from_loc = o8nv($tr['from_location'], '');
+              $to_loc = o8nv($tr['to_location'], '');
+              $train_class = o8nv($tr['class'], 'NA');
+              $from_date = o8nv($tr['from_date'], 'NA');
+            ?>
+              <div class="flight-card">
+                <div class="flight-route">
+                  <div class="route-point"><span>From</span>
+                    <h3><?= o8e(o8_air_code($from_loc)) ?></h3>
+                  </div>
+                  <div class="route-plane"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16" fill="currentColor">
+                      <path d="M96 0C43 0 0 43 0 96v192c0 35.3 28.7 64 64 64l-32 64H80l16-32H352l16 32h48l-32-64c35.3 0 64-28.7 64-64V96c0-53-43-96-96-96H96zm0 64H352c17.7 0 32 14.3 32 32V224H64V96c0-17.7 14.3-32 32-32zm-16 224a32 32 0 1 1 64 0 32 32 0 1 1-64 0zm224 0a32 32 0 1 1 64 0 32 32 0 1 1-64 0z" />
+                    </svg></div>
+                  <div class="route-point text-right"><span>To</span>
+                    <h3><?= o8e(o8_air_code($to_loc)) ?></h3>
+                  </div>
+                </div>
+
+                <div class="flight-info">
+                  <div class="info-block"><label>FROM</label><strong><?= o8e($from_loc) ?></strong></div>
+                  <div class="info-block"><label>TO</label><strong><?= o8e($to_loc) ?></strong></div>
+                  <div class="info-block"><label>CLASS</label><strong><?= o8e($train_class) ?></strong></div>
+                  <div class="info-block"><label>DATE</label><strong><?= o8e($from_date) ?></strong></div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      </section>
+    </div>
+  <?php endif; ?>
+
+
+  <?php if (!empty($acts)) : ?>
+    <div class="page">
+      <section class="flight-section">
+        <div class="container">
+          <h2 class="flight-title">Activity Details</h2>
+          <div class="flight-grid">
+            <?php foreach ($acts as $a) :
+              $activity_name = o8nv($a['activity_name'], 'Activity');
+              $city_name = o8nv($a['city_name'], 'NA');
+              $activity_date = o8nv($a['date'], 'NA');
+              $transfer_type = o8nv($a['transfer_type'], 'NA');
+            ?>
+              <div class="flight-card">
+                <div class="flight-route">
+                  <div class="route-point"><span>Activity</span>
+                    <h3>ACT</h3>
+                  </div>
+                  <div class="route-plane"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor">
+                      <path d="M448 256c0 106-86 192-192 192S64 362 64 256 150 64 256 64s192 86 192 192zm-64 0c0-70.7-57.3-128-128-128S128 185.3 128 256s57.3 128 128 128 128-57.3 128-128zm-64 0c0 35.3-28.7 64-64 64s-64-28.7-64-64 28.7-64 64-64 64 28.7 64 64z" />
+                    </svg></div>
+                  <div class="route-point text-right"><span>City</span>
+                    <h3><?= o8e(o8_air_code($city_name)) ?></h3>
+                  </div>
+                </div>
+
+                <div class="flight-info">
+                  <div class="info-block"><label>ACTIVITY</label><strong><?= o8e($activity_name) ?></strong></div>
+                  <div class="info-block"><label>CITY</label><strong><?= o8e($city_name) ?></strong></div>
+                  <div class="info-block"><label>DATE</label><strong><?= o8e($activity_date) ?></strong></div>
+                  <div class="info-block"><label>TRANSFER</label><strong><?= o8e($transfer_type) ?></strong></div>
                 </div>
               </div>
             <?php endforeach; ?>
@@ -448,21 +657,45 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                 </div>
                 <div class="pickup-drop-box">
                   <div class="location-row">
-                    <i class="fa-solid fa-location-dot"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+                      <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
+                      </path>
+                      <circle cx="12" cy="10" r="3">
+                      </circle>
+                    </svg>
                     <div><span>PICKUP</span><strong><?= o8e(o8nv($v['pickup'], 'NA')) ?></strong></div>
                   </div>
                   <div class="location-row">
-                    <i class="fa-solid fa-location-dot"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+                      <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
+                      </path>
+                      <circle cx="12" cy="10" r="3">
+                      </circle>
+                    </svg>
                     <div><span>DROP</span><strong><?= o8e(o8nv($v['drop'], 'NA')) ?></strong></div>
                   </div>
                 </div>
                 <div class="transport-footer">
                   <div class="footer-card">
-                    <i class="fa-regular fa-clock"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10">
+                      </circle>
+                      <path d="M12 6v6l4 2">
+                      </path>
+                    </svg>
                     <div><small>Duration</small><strong><?= o8e($v_dur) ?></strong></div>
                   </div>
                   <div class="footer-card">
-                    <i class="fa-solid fa-car-side"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+                      <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2">
+                      </path>
+                      <circle cx="7" cy="17" r="2">
+                      </circle>
+                      <path d="M9 17h6">
+                      </path>
+                      <circle cx="17" cy="17" r="2">
+                      </circle>
+                    </svg>
                     <div><small>Vehicle</small><strong><?= o8e(o8nv($v['vehicle_count'], '1')) ?></strong></div>
                   </div>
                 </div>
@@ -484,8 +717,15 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
         <div class="container">
           <?php foreach ($itin as $day) :
             $day_img_raw = isset($day['image']) ? trim($day['image']) : '';
-            $day_img = ($day_img_raw === '' || stripos($day_img_raw, 'dummy') !== false)
-              ? $dummy_itin : o8img($day_img_raw, $dummy_itin);
+            $dummy_day_img = BASE_URL . 'images/itinerary.png';
+
+            $day_img_raw = isset($day['image']) ? trim($day['image']) : '';
+
+            if ($day_img_raw == '' || stripos($day_img_raw, 'dummy') !== false) {
+              $day_img = $dummy_day_img;
+            } else {
+              $day_img = o8img($day_img_raw, $dummy_day_img);
+            }
             $day_title = o8nv($day['special_attraction'], o8nv($day['city'], 'Sightseeing'));
           ?>
             <div class="itinerary-card">
@@ -499,7 +739,10 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                 <div class="date-box"><span>DATE</span><strong><?= o8e(o8nv($day['date'], '')) ?></strong></div>
               </div>
               <div class="program-row">
-                <i class="fa-regular fa-map"></i>
+                <!-- Map Icon (Font Awesome fa-regular fa-map equivalent) -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="20" height="20" fill="currentColor">
+                  <path d="M560.02 80c-1.98 0-3.98 .25-5.96 .75L416 115.2 224 48 20.84 115.72C8.38 119.88 0 131.54 0 144.68V464c0 17.67 14.33 32 32 32c1.98 0 3.98-.25 5.96-.75L160 460.8 352 528l203.16-67.72C567.62 456.12 576 444.46 576 431.32V112c0-17.67-14.33-32-32-32zM224 118.53l128 44.8v230.14l-128-44.8V118.53zm-32 230.14l-128 42.67V168.53l128-42.67V348.67zm320-42.67l-128 42.67V125.86l128-42.67V306z" />
+                </svg>
                 <div>
                   <label>DETAILED PROGRAM</label>
                   <p><?= o8e(o8nv($day['detailed_programme'], '')) ?></p>
@@ -507,11 +750,19 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
               </div>
               <div class="itinerary-footer">
                 <div class="footer-item">
-                  <i class="fa-regular fa-moon"></i>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3a6 6 0 1 0 9 9A9 9 0 1 1 12 3z"></path>
+                  </svg>
                   <div><small>OVERNIGHT STAY</small><strong><?= o8e(o8nv($day['overnight_stay'], '')) ?></strong></div>
                 </div>
                 <div class="footer-item">
-                  <i class="fa-solid fa-utensils"></i>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 2v7c0 2.2 1.8 4 4 4V22"></path>
+                    <path d="M7 2v20"></path>
+                    <path d="M11 2v7c0 2.2-1.8 4-4 4"></path>
+                    <path d="M18 2v20"></path>
+                    <path d="M18 2c2.2 0 4 2.7 4 6v4h-4"></path>
+                  </svg>
                   <div><small>MEAL PLAN</small><strong><?= o8e(o8nv($day['meal_plan'], '')) ?></strong></div>
                 </div>
               </div>
@@ -537,7 +788,13 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
             <h3>What's Included</h3>
             <ul>
               <?php foreach ($o8_included as $item) : ?>
-                <li><i class="fa-solid fa-check"></i> <?= o8e($item) ?></li>
+                <li><svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"
+                    width="20"
+                    height="20"
+                    fill="currentColor">
+                    <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.2 0z" />
+                  </svg><?= o8e($item) ?></li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -545,7 +802,13 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
             <h3>What's Excluded</h3>
             <ul>
               <?php foreach ($o8_excluded as $item) : ?>
-                <li><i class="fa-solid fa-xmark"></i> <?= o8e($item) ?></li>
+                <li><svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 384 512"
+                    width="20"
+                    height="20"
+                    fill="currentColor">
+                    <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                  </svg> <?= o8e($item) ?></li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -554,71 +817,130 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
     </section>
 
     <div class="container">
+      <?php
+      $o8_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
+      $o8_is_per_person = ($o8_costing_type == 'per person');
+
+      $o8_grp = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
+      if (empty($o8_grp)) {
+        $o8_grp = array(array(
+          'package_type' => 'Package',
+          'tour_cost_display' => '0',
+          'tax_display' => '0',
+          'tcs_display' => '0',
+          'travel_display' => '0',
+          'total_display' => '0'
+        ));
+      }
+
+      $o8_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+      ?>
+
       <h2 class="section-title">Costing Details</h2>
+
       <div class="costing-card">
-        <table class="costing-table">
-          <?php if (!$o8_is_per_person) : ?>
+        <?php if (!$o8_is_per_person) { ?>
+
+          <table class="costing-table" style="table-layout:fixed;width:100%;">
             <thead>
               <tr>
                 <th>Package Type</th>
                 <th>Tour Cost</th>
                 <th>Tax</th>
                 <th>TCS</th>
+                <th>Travel Cost</th>
                 <th>Grand Total</th>
               </tr>
             </thead>
+
             <tbody>
               <?php
-              $o8_gcnt = count($o8_cost_grp);
-              foreach ($o8_cost_grp as $ci => $row) :
+              $o8_gcnt = count($o8_grp);
+              foreach ($o8_grp as $ci => $row) :
                 $is_rec = o8_is_recommended_pkg(o8nv($row['package_type'], ''), $ci, $o8_gcnt);
+
+                $tax_amount = '0.00';
+                if (!empty($row['tax_display'])) {
+                  preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
+                  if (!empty($m[1])) {
+                    $tax_amount = $m[1];
+                  }
+                }
               ?>
+
                 <tr<?= $is_rec ? ' class="recommended-row"' : '' ?>>
                   <td>
                     <strong><?= o8e(o8nv($row['package_type'], 'Package')) ?></strong>
-                    <?php if ($is_rec) : ?><span class="recommended-badge">RECOMMENDED</span><?php endif; ?>
+                    <?php if ($is_rec) : ?><span class=" recommended-badge">RECOMMENDED</span><?php endif; ?>
                   </td>
                   <td><?= o8e(o8nv($row['tour_cost_display'], '0')) ?></td>
-                  <td><?= o8e(o8nv($row['tax_display'], '0')) ?></td>
+                  <td>INR <?= o8e($tax_amount) ?></td>
                   <td><?= o8e(o8nv($row['tcs_display'], '0')) ?></td>
-                  <td class="<?= $is_rec ? 'highlight-total' : 'grand-total' ?>"><?= o8e(o8nv($row['total_display'], '0')) ?></td>
-                </tr>
-              <?php endforeach; ?>
+                  <td><?= o8e(o8nv($row['travel_display'], '0')) ?></td>
+                  <td class="<?= $is_rec ? 'highlight-total' : 'grand-total' ?>">
+                    <?= o8e(o8nv($row['total_display'], '0')) ?>
+                  </td>
+                  </tr>
+
+                <?php endforeach; ?>
             </tbody>
-          <?php else : ?>
+          </table>
+
+        <?php } ?>
+
+        <?php if ($o8_is_per_person && !empty($o8_pp)) { ?>
+
+          <table class="costing-table" style="table-layout:fixed;width:100%;">
             <thead>
               <tr>
-                <th>Package Type</th>
+                <th>Package</th>
                 <th>Adult</th>
                 <th>CWB</th>
-                <th>CWNB</th>
+                <th>CWOB</th>
                 <th>Infant</th>
-                <th>Grand Total</th>
+                <th>Tax</th>
+                <th>TCS</th>
+                <th>Visa</th>
+                <th>Guide</th>
+                <th>Misc</th>
               </tr>
             </thead>
+
             <tbody>
-              <?php
-              $o8_pcnt = count($o8_cost_pp);
-              foreach ($o8_cost_pp as $pi => $row) :
-                $is_rec = o8_is_recommended_pkg(o8nv($row['package_type'], ''), $pi, $o8_pcnt);
+              <?php foreach ($o8_pp as $i => $pp) :
+
+                $tax_amount = '0.00';
+                if (!empty($pp['tax_display'])) {
+                  preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
+                  if (!empty($m[1])) {
+                    $tax_amount = $m[1];
+                  }
+                }
               ?>
-                <tr<?= $is_rec ? ' class="recommended-row"' : '' ?>>
-                  <td>
-                    <strong><?= o8e(o8nv($row['package_type'], 'Package')) ?></strong>
-                    <?php if ($is_rec) : ?><span class="recommended-badge">RECOMMENDED</span><?php endif; ?>
-                  </td>
-                  <td><?= o8e(o8nv($row['pp_adult_display'], '0')) ?></td>
-                  <td><?= o8e(o8nv($row['pp_cwb_display'], '0')) ?></td>
-                  <td><?= o8e(o8nv($row['pp_cwnb_display'], '0')) ?></td>
-                  <td><?= o8e(o8nv($row['pp_infant_display'], '0')) ?></td>
-                  <td class="<?= $is_rec ? 'highlight-total' : 'grand-total' ?>"><?= o8e(o8nv($row['grand_total_display'], '0')) ?></td>
+
+                <tr>
+                  <td><strong><?= o8e(o8nv($pp['package_type'], 'Package')) ?></strong></td>
+                  <td><?= o8e(o8nv($pp['pp_adult_display'], '0')) ?></td>
+                  <td><?= o8e(o8nv($pp['pp_cwb_display'], '0')) ?></td>
+                  <td><?= o8e(o8nv($pp['pp_cwnb_display'], '0')) ?></td>
+                  <td><?= o8e(o8nv($pp['pp_infant_display'], '0')) ?></td>
+                  <td>INR <?= o8e($tax_amount) ?></td>
+                  <td><?= o8e(o8nv($pp['tcs_display'], '0')) ?></td>
+                  <td><?= o8e(o8nv($pp['visa_display'], '0')) ?></td>
+                  <td><?= o8e(o8nv($pp['guide_display'], '0')) ?></td>
+                  <td><?= o8e(o8nv($pp['misc_display'], '0')) ?></td>
                 </tr>
+
               <?php endforeach; ?>
             </tbody>
-          <?php endif; ?>
-        </table>
+          </table>
+
+        <?php } ?>
       </div>
-      <div class="cost-note"><strong>Note:</strong> <?= o8e($o8_cost_note) ?></div>
+
+      <div class=" cost-note">
+        <strong>Note:</strong> <?= o8e($o8_cost_note) ?>
+      </div>
     </div>
   </div>
 
@@ -637,25 +959,35 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
           <div class="bank-card">
             <h3>Bank Account Details</h3>
             <div class="bank-row">
-              <div><label>ACCOUNT NAME</label><p><?= o8e(o8nv($bank['account_name'], o8nv($ty['company_name'], $o8_company))) ?></p></div>
+              <div><label>ACCOUNT NAME</label>
+                <p><?= o8e(o8nv($bank['account_name'], o8nv($ty['company_name'], $o8_company))) ?></p>
+              </div>
               <i class="fa-regular fa-copy"></i>
             </div>
             <div class="bank-row">
-              <div><label>ACCOUNT NUMBER</label><p><?= o8e(o8nv($bank['account_no'], 'NA')) ?></p></div>
+              <div><label>ACCOUNT NUMBER</label>
+                <p><?= o8e(o8nv($bank['account_no'], 'NA')) ?></p>
+              </div>
               <i class="fa-regular fa-copy"></i>
             </div>
             <div class="bank-row">
-              <div><label>BANK NAME</label><p><?= o8e(o8nv($bank['bank_name'], 'NA')) ?></p></div>
+              <div><label>BANK NAME</label>
+                <p><?= o8e(o8nv($bank['bank_name'], 'NA')) ?></p>
+              </div>
               <i class="fa-regular fa-copy"></i>
             </div>
             <?php if (!empty($bank['ifsc_code'])) : ?>
               <div class="bank-row">
-                <div><label>IFSC CODE</label><p><?= o8e($bank['ifsc_code']) ?></p></div>
+                <div><label>IFSC CODE</label>
+                  <p><?= o8e($bank['ifsc_code']) ?></p>
+                </div>
                 <i class="fa-regular fa-copy"></i>
               </div>
             <?php endif; ?>
             <div class="bank-row last">
-              <div><label>UPI ID</label><p><?= o8e(o8nv($bank['upi_id'], 'NA')) ?></p></div>
+              <div><label>UPI ID</label>
+                <p><?= o8e(o8nv($bank['upi_id'], 'NA')) ?></p>
+              </div>
               <i class="fa-regular fa-copy"></i>
             </div>
           </div>
@@ -884,9 +1216,25 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
           <h3>Follow Us On Social Media</h3>
           <div class="social-icons">
             <?php if (!empty($ty['website'])) : ?>
-              <a href="<?= o8e($ty['website']) ?>" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
-              <a href="<?= o8e($ty['website']) ?>" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
-              <a href="<?= o8e($ty['website']) ?>" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i></a>
+              <a href="<?= o8e($ty['website']) ?>" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="18" height="18" fill="currentColor">
+                  <path d="M279.14 288l14.22-92.66h-88.91V135.97c0-25.35 12.42-50.06 52.24-50.06H297V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
+                </svg></a>
+              <a href="<?= o8e($ty['website']) ?>" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <circle cx="17" cy="7" r="0.5"></circle>
+                </svg></a>
+              <a href="<?= o8e($ty['website']) ?>" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="18" height="18" fill="currentColor">
+                  <path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8A53.79 53.79 0 0 1 53.79 0a53.79 53.79 0 0 1 53.79 53.8c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.3 0-55.7 37.7-55.7 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.7-48.3 87.88-48.3 94 0 111.2 61.9 111.2 142.3V448z" />
+                </svg></a>
             <?php else : ?>
               <a href="#"><i class="fab fa-facebook-f"></i></a>
               <a href="#"><i class="fab fa-instagram"></i></a>
@@ -897,6 +1245,69 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
       </div>
     </section>
   </div>
+
+  <script type="text/javascript">
+    (function() {
+      var printed = false;
+
+      function doPrint() {
+        if (printed) return;
+        printed = true;
+        try {
+          window.focus();
+        } catch (e) {}
+        window.print();
+      }
+
+      function waitForImages() {
+        var imgs = Array.prototype.slice.call(document.images || []);
+        var pending = imgs.filter(function(img) {
+          return !img.complete;
+        });
+
+        if (pending.length === 0) {
+          return Promise.resolve();
+        }
+
+        return Promise.all(pending.map(function(img) {
+          return new Promise(function(resolve) {
+            img.addEventListener('load', resolve, {
+              once: true
+            });
+            img.addEventListener('error', resolve, {
+              once: true
+            });
+          });
+        }));
+      }
+
+      function waitForFonts() {
+        if (document.fonts && document.fonts.ready) {
+          return document.fonts.ready.catch(function() {});
+        }
+        return Promise.resolve();
+      }
+
+      function ready() {
+        var safety = new Promise(function(resolve) {
+          setTimeout(resolve, 4000);
+        });
+
+        Promise.race([
+          Promise.all([waitForImages(), waitForFonts()]),
+          safety
+        ]).then(function() {
+          setTimeout(doPrint, 150);
+        });
+      }
+
+      if (document.readyState === 'complete') {
+        ready();
+      } else {
+        window.addEventListener('load', ready);
+      }
+    })();
+  </script>
 
 </body>
 
