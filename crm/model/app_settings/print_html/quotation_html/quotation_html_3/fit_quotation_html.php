@@ -460,7 +460,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         foreach ($hotels as $h) :
           $o3_hi++;
           // $hphoto = o3img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . (($o3_hi - 1) % 3 + 1) . '.jpg');
-          $dummy_hotel_img = BASE_URL . 'uploads/quotation_images/hotel.png';
+          $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
           $o3_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
 
@@ -671,7 +671,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </div>
 
         <?php foreach ($acts as $a) :
-          $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+          $activity_img = BASE_URL . 'images/activity.jpg';
 
           $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
           $city_name = isset($a['city_name']) ? $a['city_name'] : '';
@@ -739,7 +739,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
             <!-- <img src="<? //= o3e(o3img(isset($v['vehicle_image']) ? $v['vehicle_image'] : '', $assets . 'vehicle.jpg')) 
                             ?>" alt="<? //= o3e(o3nv($v['vehicle_name'], 'Vehicle')) 
                                       ?>" /> -->
-            <?php $vehicle_img = BASE_URL . 'uploads/quotation_images/vehicle.png'; ?>
+            <?php $vehicle_img = BASE_URL . 'images/vehicle.png'; ?>
 
             <img src="<?= o3e($vehicle_img) ?>"
               alt="<?= o3e(o3nv($v['vehicle_name'], 'Vehicle')) ?>" />
@@ -804,7 +804,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
       <?php if (!empty($itin)) :
         foreach ($itin as $day) :
           // $day_img = o3img(isset($day['image']) ? $day['image'] : '', $assets . 'day-' . ((($day['day_number'] - 1) % 6) + 1) . '.jpg');
-          $dummy_day_img = BASE_URL . 'uploads/quotation_images/itinerary.png';
+          $dummy_day_img = BASE_URL . 'images/itinerary.png';
 
           $o3_day_photo = isset($day['image']) ? trim($day['image']) : '';
 

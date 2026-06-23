@@ -514,7 +514,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
         foreach ($hotels as $h) :
           $o5_hi++;
           // $hphoto = o5img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . (($o5_hi - 1) % 3 + 1) . '.jpg');
-          $dummy_hotel_img = BASE_URL . 'uploads/quotation_images/hotel.png';
+          $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
           $o5_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
 
@@ -725,7 +725,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
           </div>
 
           <?php foreach ($acts as $a) :
-            $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+            $activity_img = BASE_URL . 'images/activity.jpg';
             $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
             $city_name = isset($a['city_name']) ? $a['city_name'] : '';
             $activity_date = isset($a['date']) ? $a['date'] : '';
@@ -818,7 +818,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
         <?php if (!empty($itin)) :
           foreach ($itin as $day) :
             // $day_img = o5img(isset($day['image']) ? $day['image'] : '', $assets . 'day-' . ((($day['day_number'] - 1) % 6) + 1) . '.jpg');
-            $dummy_day_img = BASE_URL . 'uploads/quotation_images/itinerary.png';
+            $dummy_day_img = BASE_URL . 'images/itinerary.png';
 
             $o5_day_photo = isset($day['image']) ? trim($day['image']) : '';
 

@@ -499,7 +499,7 @@ $o2_round = o2img(
           foreach ((array) $hotels as $h):
             $o2_hi++;
             // $o2_himg = o2img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . ((($o2_hi - 1) % 3) + 1) . '.jpg');
-            $dummy_hotel_img = BASE_URL . 'uploads/quotation_images/hotel.png';
+            $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
             $o2_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
 
@@ -719,7 +719,7 @@ $o2_round = o2img(
           <div class="tline" style="margin-top:11px">
             <?php foreach ((array)$acts as $a): ?>
               <?php
-              $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+              $activity_img = BASE_URL . 'images/activity.jpg';
 
               $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
               $city_name     = isset($a['city_name']) ? $a['city_name'] : '';
@@ -766,7 +766,7 @@ $o2_round = o2img(
                 <div class="card">
                   <!-- <img class="tveh" src="<? //= o2e($assets . 'vehicle.png') 
                                               ?>" alt="Vehicle"> -->
-                  <img class="tveh" src="<?= o2e(BASE_URL . 'uploads/quotation_images/vehicle.png') ?>" alt="Vehicle">
+                  <img class="tveh" src="<?= o2e(BASE_URL . 'images/vehicle.png') ?>" alt="Vehicle">
                   <div>
                     <div class="nm"><?= o2e(o2nv($v['vehicle_name'], 'Transfer')) ?></div>
                     <div class="rt"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($v['pickup'], '')) ?><?php if (o2nv($v['drop'], '') !== ''): ?> → <?= o2e($v['drop']) ?><?php endif; ?></div>
@@ -799,7 +799,7 @@ $o2_round = o2img(
               <?php foreach ($o2_chunk as $d):
                 $o2_dno   = (int) o2nv(isset($d['day_number']) ? $d['day_number'] : '', 0);
                 // $o2_dimg  = o2img(isset($d['image']) ? $d['image'] : '', $assets . 'day.jpg');
-                $dummy_day_img = BASE_URL . 'uploads/quotation_images/itinerary.png';
+                $dummy_day_img = BASE_URL . 'images/itinerary.png';
 
                 $o2_day_photo = isset($d['image']) ? trim($d['image']) : '';
 

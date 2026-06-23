@@ -388,7 +388,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
           // $hphoto = o4img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . (($o4_hi - 1) % 3 + 1) . '.jpg');
           $hphoto = !empty($h['hotel_photo'])
             ? o4img($h['hotel_photo'], '')
-            : BASE_URL . 'uploads/quotation_images/hotel.png';
+            : BASE_URL . 'images/hotel.png';
           $room_label = o4nv($h['room_category'], o4nv($h['room_type'], ''));
           $nights = o4nv($h['total_nights'], '');
       ?>
@@ -628,7 +628,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
           <div class="sec-heading">Activity Details</div>
 
           <?php foreach ($acts as $a) :
-            $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+            $activity_img = BASE_URL . 'images/activity.jpg';
 
             $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
             $city_name = isset($a['city_name']) ? $a['city_name'] : '';
@@ -689,7 +689,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
           <div class="sec-heading">Private Transfers</div>
 
           <?php foreach ($vehs as $v) :
-            $vimg = BASE_URL . 'uploads/quotation_images/vehicle.png';
+            $vimg = BASE_URL . 'images/vehicle.png';
             $vtype = o4nv($v['vehicle_type'], 'Private Transfer');
             if (!empty($v['vehicle_count'])) {
               $vtype .= ' (' . $v['vehicle_count'] . ' Unit' . ((int) $v['vehicle_count'] > 1 ? 's' : '') . ')';

@@ -803,7 +803,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
       </div>
 
       <?php foreach ($acts as $a) :
-        $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+        $activity_img = BASE_URL . 'images/activity.jpg';
 
         $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
         $city_name = isset($a['city_name']) ? $a['city_name'] : '';

@@ -582,7 +582,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
           foreach ($hotels as $h) :
             $o7_hi++;
             // $hphoto = o7img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', !empty($o7_cover_imgs[($o7_hi - 1) % 5]) ? $o7_cover_imgs[($o7_hi - 1) % 5] : $assets . 'hotel.jpg');
-            $dummy_hotel_img = BASE_URL . 'uploads/quotation_images/hotel.png';
+            $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
             $o7_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
 
@@ -830,7 +830,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
           </div>
 
           <?php foreach ($acts as $a) :
-            $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+            $activity_img = BASE_URL . 'images/activity.jpg';
 
             $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
             $city_name = isset($a['city_name']) ? $a['city_name'] : '';
@@ -923,7 +923,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
           ?>
             <div class="transport-card" style="margin-bottom:14px;">
               <div class="transport-inner">
-                <div class="transport-img"><img src="<?= o7e(BASE_URL . 'uploads/quotation_images/vehicle.png') ?>"
+                <div class="transport-img"><img src="<?= o7e(BASE_URL . 'images/vehicle.png') ?>"
                     alt="<?= o7e($v_name) ?>" /></div>
                 <div class="transport-body">
                   <div class="transport-name"><?= o7e(strtoupper($v_name)) ?></div>
@@ -970,7 +970,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
           <?php if (!empty($itin)) :
             foreach ($itin as $day) :
               // $day_img = o7img(isset($day['image']) ? $day['image'] : '', $o7_cover_bg);
-              $dummy_day_img = BASE_URL . 'uploads/quotation_images/day.jpg';
+              $dummy_day_img = BASE_URL . 'images/day.jpg';
 
               $o7_day_photo = isset($day['image']) ? trim($day['image']) : '';
 
