@@ -141,7 +141,7 @@ function copy_details(){
 		var customer_id = $('#customer_id_p').val();
 		var base_url = $('#base_url').val();
 		
-		if(customer_id != '' || customer_id != 0){
+		if(customer_id != '' && customer_id != 0 && customer_id != 'ncust'){
 			$.ajax({
 			type:'post',
 			url:base_url+'view/load_data/customer_info_load.php',
@@ -149,16 +149,21 @@ function copy_details(){
 			success:function(result){
 				result = JSON.parse(result);
 				var table = document.getElementById("tbl_package_tour_member");
-				var rowCount = table.rows.length;
 				var row = table.rows[0];
 				
+				var honorific = 'Mr';
+				if (result.gender == 'Female') {
+					honorific = 'Mrs';
+				}
+				row.cells[2].childNodes[0].value = honorific;
+				changeGender(row.cells[2].childNodes[0].id);
+
 				row.cells[3].childNodes[0].value = result.first_name;
 				row.cells[4].childNodes[0].value = result.middle_name;
 				row.cells[5].childNodes[0].value = result.last_name;
 				row.cells[6].childNodes[0].value = result.gender;
 				row.cells[7].childNodes[0].value = result.birth_date;
 				row.cells[8].childNodes[0].value = result.age;
-				adolescence_reflect('m_birthdate1');
 				calculate_age_member('m_birthdate1');
 			}
 			});	

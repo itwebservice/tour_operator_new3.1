@@ -56,16 +56,7 @@ $financial_year_id = $_SESSION['financial_year_id'];
 <div class="app_panel_content">
 
 
-     <div class="row text-center text_left_sm_xs mg_bt_10">	
-    <label for="standardPackage" class="app_dual_button mg_bt_10 active">
-        <input type="radio" id="standardPackage" name="quotation_package" checked onchange="package_booking_reflect()">
-        &nbsp;&nbsp;Standard Package
-    </label>    
-    <label for="aiBuilder" class="app_dual_button mg_bt_10">
-        <input type="radio" id="aiBuilder" name="quotation_package" onchange="package_booking_reflect()">
-        &nbsp;&nbsp;AI Builder
-    </label>
-    </div> 
+     
 
 
     <div class="row">
@@ -377,9 +368,17 @@ function quotation_list_reflect() {
         financial_year_id: financial_year_id_filter,
         quotation_source_type: quotation_source_type
     }, function(data) {
+        if (!data || (typeof data === 'string' && !$.trim(data))) {
+            console.warn('quotation_list_reflect: empty response, using empty list');
+            data = '[]';
+        }
         pagination_load(data, column, true, false, 20, 'package_table');
         $('.loader').remove();
-    })
+    }).fail(function(xhr, status, error) {
+        console.error('quotation_list_reflect request failed:', status, error);
+        pagination_load('[]', column, true, false, 20, 'package_table');
+        $('.loader').remove();
+    });
 }
 
     function quotation_clone(quotation_id) {

@@ -1,35 +1,45 @@
-<form id="frm_tab4">
+<form id="frm_tab4" novalidate method="post" action="javascript:void(0);" onsubmit="return false;">
     <div class="app_panel">
         <div class="container" style="width:100% !important;">
             <div class="row">
-                <div class="col-md-12 app_accordion">
-                    <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
-                        <!-- Accordian-1 Start --><!-- Group Costing -->
-                        <div class="accordion_content main_block mg_bt_20">
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading1">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="true" aria-controls="collapse1" id="collapsed1">
-                                        <div class="col-md-12"><span>Group Costing</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapse1" class="panel-collapse collapse in main_block" role="tabpanel" aria-labelledby="heading1">
-                                    <div class="panel-body">
+                <div class="col-md-12">
+                         <div class="row text-center text_left_sm_xs mg_bt_10">	
+                             <label for="group_costing" class="app_dual_button mg_bt_10 active">
+                                 <input type="radio" id="group_costing" name="costing_tab" checked onchange="costing_reflect()">
+                                 &nbsp;&nbsp;Group Costing
+                             </label>    
+                             <label for="perperson_costing" class="app_dual_button mg_bt_10">
+                                 <input type="radio" id="perperson_costing" name="costing_tab"  onchange="costing_reflect()">
+                                 &nbsp;&nbsp;Per Person Costing
+                             </label>
+                           </div>
+                        </div>
+                        <!-- Group Costing -->
+                        <div id="group_costing_tab" class="costing_section main_block mg_bt_20">
                                         <div class="row mg_tp_10">
                                             <div class="col-xs-12">
-                                                <h3 class="editor_title">Land Cost</h3>
                                                 <div class="panel panel-default panel-body app_panel_style">
-                                                    <div class="row">
-                                                        <div class="col-xs-12">
-                                                            <div class="table-responsive">
-                                                                <table id="tbl_package_tour_quotation_dynamic_costing" name="tbl_package_tour_quotation_dynamic_costing" class="table border_0 no-marg">
-                                                                    <tr>
-                                                                        <td class="header_btn" style="display:none;"><input class="css-checkbox" id="chk_costing1" type="checkbox" checked disabled><span class="css-label" for="chk_costing1"> </span></td>
-                                                                        <td class="header_btn hidden" style="display:none;">
+                                                    <legend>Land Cost</legend>
+                                                    <div>
+                                                        <div>
+                                                            <div>
+                                                                <div id="tbl_package_tour_quotation_dynamic_costing" name="tbl_package_tour_quotation_dynamic_costing" class="table border_0 no-marg">
+                                                                    <div style="display: grid;  grid-template-columns: 150px  auto;   gap: 15px;">
+                                                                        <div class="header_btn " style="display:none;"><input class="css-checkbox" id="chk_costing1" type="checkbox" checked disabled><span class="css-label" for="chk_costing1"> </span>
+                                                                        </div>
+                                                                        
+                                                                        <div class="header_btn " style="display:none;">
                                                                             <small>&nbsp;</small><input type="text" maxlength="15" value="1" name="username" placeholder="Sr. No." class="form-control" disabled />
-                                                                        </td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text" id="package_type-" name="package_type-" placeholder="Package Type" title="Package Type" style="width:150px" readonly><span>Package Type</span></td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="number" id="tour_cost-" name="tour_cost-" placeholder="Hotel Cost" title="Hotel Cost" value="0" onchange="quotation_cost_calculate(this.id);" style="width:100px"><span>Hotel Cost</span></td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="number" id="transport_cost1-" name="transport_cost1-" placeholder="Transport Cost" title="Transport Cost" onchange="quotation_cost_calculate(this.id);" style="width:100px" value="0"><span>Transport Cost</span></td>
+                                                                        </div>
+
+                                                                        <div class="" ><small>&nbsp;</small><span>Package Type</span><input type="text" id="package_type-" name="package_type-" placeholder="Package Type" title="Package Type"  readonly></div>
+
+                                                                        <div>
+                                                                        <div style="display: grid; grid-template-columns: repeat(7, 1fr);  gap: 15px">                                                                        
+                                                                        <div class=" "><small>&nbsp;</small><span>Hotel Cost</span><input type="number" id="tour_cost-" name="tour_cost-" placeholder="Hotel Cost" title="Hotel Cost" value="0" onchange="quotation_cost_calculate(this.id);" ></div>
+
+                                                                        <div class=" " ><small>&nbsp;</small><span>Transport Cost</span><input type="number" id="transport_cost1-" name="transport_cost1-" placeholder="Transport Cost" title="Transport Cost" onchange="quotation_cost_calculate(this.id);"  value="0"></div>
+
                                                                         <?php
                                                                         $add_class1 = '';
                                                                         if ($role == 'B2b') {
@@ -37,125 +47,173 @@
                                                                         } else {
                                                                             $add_class1 = "number";
                                                                         } ?>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="number" id="excursion_cost-" name="excursion_cost-" onchange="quotation_cost_calculate(this.id);" placeholder="Activity Cost" title="Activity Cost" style="width:100px" value="0"><span>Activity Cost</span></td>
+                                                                        <div class="" ><small>&nbsp;</small><span>Activity Cost</span><input type="number" id="excursion_cost-" name="excursion_cost-" onchange="quotation_cost_calculate(this.id);" placeholder="Activity Cost" title="Activity Cost"  value="0"></div>
 
-                                                                        <td class="header_btn"><small id="basic_show-" style="color:#000000">&nbsp;</small><input type="<?= $add_class1 ?>" id="basic_amount-" name="basic_amount-" onchange="get_business(this.id,'true');;" placeholder="Basic Amount" title="Basic Amount" style="width:100px" readonly><span>Basic Amount</span></td>
-                                                                        <td class="header_btn"><small id="service_show-" style="color:#000000">&nbsp;</small><input type="<?= $add_class1 ?>" id="service_charge-" name="service_charge-" onchange="get_business(this.id,'false');quotation_cost_calculate(this.id); " value="0.00" placeholder="Service charge" title="Service charge" style="width:100px"><span>Service charge</span></td>
-                                                                        <td class="header_btn">
+                                                                        <div class="" ><small id="basic_show-" style="color:#000000">&nbsp;</small><span>Basic Amount</span><input type="<?= $add_class1 ?>" id="basic_amount-" name="basic_amount-" onchange="get_business(this.id,'true');;" placeholder="Basic Amount" title="Basic Amount"  readonly></div>
+
+                                                                        <div class="" ><small id="service_show-" style="color:#000000">&nbsp;</small><span>Service charge</span><input type="<?= $add_class1 ?>" id="service_charge-" name="service_charge-" onchange="get_business(this.id,'false');quotation_cost_calculate(this.id); " value="0.00" placeholder="Service charge" title="Service charge" ></div>
+
+                                                                        <div class="" >
                                                                             <small id="discount_in_show-">&nbsp;</small>
-                                                                            <select title="Discount In" id="discount_in-" name="discount_in-" class="form-control" onchange="get_business(this.id,'true');quotation_cost_calculate(this.id);" style="width: 150px!important;">
+                                                                            <span>Discount In</span>
+                                                                            <select title="Discount In" id="discount_in-" name="discount_in-" class="form-control" onchange="get_business(this.id,'true');quotation_cost_calculate(this.id);" >
                                                                                 <option value="Percentage">Percentage</option>
                                                                                 <option value="Flat">Flat</option>
-                                                                            </select> <span>Discount In</span></td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="<?= $add_class1 ?>" id="discount_amt-" name="discount_amt-" onchange="get_business(this.id,'true');quotation_cost_calculate(this.id); " placeholder="Discount" title="Discount" style="width:100px"><span>Discount</span></td>
-                                                                        <td class="header_btn">
+                                                                            </select> 
+                                                                        </div>
+
+                                                                        <div class="" ><small>&nbsp;</small><span>Discount</span><input type="<?= $add_class1 ?>" id="discount_amt-" name="discount_amt-" onchange="get_business(this.id,'true');quotation_cost_calculate(this.id); " placeholder="Discount" title="Discount" ></div>
+                                                                        </div>
+
+                                                                        <div style="display: grid; grid-template-columns: repeat(7, 1fr);   gap: 15px; margin-top: 15px;">
+                                                                        <div class="" >
                                                                             <small id="tax_apply_show-" style="color:#000000">&nbsp;</small>
-                                                                            <select title="Tax Apply On" id="tax_apply_on-" name="tax_apply_on-" class="form-control" onchange="get_business(this.id,'true');" style="width: 150px!important;">
+                                                                            <span>Tax Apply On</span>
+                                                                            <select title="Tax Apply On" id="tax_apply_on-" name="tax_apply_on-" class="form-control" onchange="get_business(this.id,'true');" >
                                                                                 <option value="">*Tax Apply On</option>
                                                                                 <option value="1">Basic Amount</option>
                                                                                 <option value="2">Service Charge</option>
                                                                                 <option value="3">Total</option>
-                                                                            </select><span>Tax Apply On</span>
-                                                                        </td>
-                                                                        <td class="header_btn">
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class=" " >
                                                                             <small id="tax_show-" style="color:#000000">&nbsp;</small>
-                                                                            <select title="Select Tax" id="tax_value-" name="tax_value-" class="form-control" onchange="get_business(this.id,'true');" style="width: 180px!important;">
+                                                                            <span>Select Tax</span>
+                                                                            <select title="Select Tax" id="tax_value-" name="tax_value-" class="form-control" onchange="get_business(this.id,'true');" >
                                                                                 <option value="">*Select Tax</option>
                                                                                 <?php get_tax_dropdown('Income') ?>
-                                                                            </select><span>Select Tax</span>
-                                                                        </td>
+                                                                            </select>
+                                                                        </div>
 
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text" id="service_tax_subtotal-" name="service_tax_subtotal-" readonly placeholder="Tax Amount" title="Tax Amount" style="width:180px"><span>Tax Amount</span></td>
-                                                                        <td class="header_btn">
+                                                                        <div class=" " ><small>&nbsp;</small><span>Tax Amount</span><input type="text" id="service_tax_subtotal-" name="service_tax_subtotal-" readonly placeholder="Tax Amount" title="Tax Amount" ></div>
+
+                                                                        <div class="" >
                                                                             <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small>
-                                                                            <select title="TCS" id="tcs_tax-" name="tcs_tax-" class="form-control" style="width: 150px!important;">
+                                                                            <span>TCS</span>
+                                                                            <select title="TCS" id="tcs_tax-" name="tcs_tax-" class="form-control" >
                                                                                 <option value="0">*TCS Tax</option>
                                             									<option value="2">2% TCS</option>
                                             									<option value="20">20% TCS</option>
-                                                                            </select><span>TCS</span>
-                                                                        </td>
-                                                                        <td class="header_btn">
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="" >
                                                                             <small id="tcs1_show-" style="color:#000000">&nbsp;</small>
+                                                                            <span>TCS</span>
                                                                              <input type="number" name="tcs-" id="tcs1-" readonly class="text-right"
-                                                                                placeholder="TCS" title="TCS" value="0.00" style="width: 100px!important;">
-                                                                                <span>TCS</span>
-                                                                        </td>        
+                                                                                placeholder="TCS" title="TCS" value="0.00" >                                                                                
+                                                                        </div>        
+
                                                                         
-                                                                        
-                                                                        <td class="header_btn" style="display:none;">
+                                                                        <div class=" "  style="display:none; ">
                                                                             <small id="tds_show-" style="color:#000000">&nbsp;</small>
+                                                                            <span>TDS</span>
                                                                              <input type="hidden" name="tds-" id="tds-" readonly class="text-right"
-                                                                                placeholder="TDS" title="TDS" value="0.00" style="width: 100px!important;">
-                                                                                <span>TDS</span>
-                                                                        </td>
+                                                                                placeholder="TDS" title="TDS" value="0.00" >
+                                                                        </div>
                                                                         
-                                                                        <td class="header_btn">
+                                                                        <div class=" " >
                                                                             <small>&nbsp;</small>
-                                                                            <input type="text" id="total_tour_cost-" class="amount_feild_highlight text-right" name="total_tour_cost-" placeholder="Total Cost" title="Total Cost" style="width: 100px;" readonly><span>Total Cost</span></td>
+                                                                            <span>Total Cost</span>
+                                                                            <input type="text" id="total_tour_cost-" class="amount_feild_highlight text-right" name="total_tour_cost-" placeholder="Total Cost" title="Total Cost"  readonly>
+                                                                         </div>
 
-                                                                        <td class="header_btn hidden" style="display:none;">
-                                                                            <small>&nbsp;</small><input type="text" id="package_name1" name="package_name1" placeholder="Package Name" title="Package Name" style="width: 160px;display:none;" readonly>
-                                                                        </td>
+                                                                        <div class="header_btn hidden" style="display:none; ">
+                                                                            <small>&nbsp;</small><input type="text" id="package_name1" name="package_name1" placeholder="Package Name" title="Package Name" style="display:none;" readonly>
+                                                                        </div>
 
-                                                                        <td class="header_btn hidden" style="display:none;">
+                                                                        <div  class="header_btn hidden " style="display:none;">
                                                                             <small>&nbsp;</small><input type="text" id="package_id1" name="package_id1" placeholder="Package ID" title="Package ID" style="display:none;">
-                                                                        </td>
-                                                                    </tr>
-                                                                </table>
-                                                            </div>
+                                                                        </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    </div>
+                                                                </div>
+                                                           </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                             </div>
                                         </div>
-                                        <div class="row mg_tp_20">
+
+                                        <div class="row mg_tp_30">
                                             <div class="col-xs-12">
-                                                <h3 class="editor_title">Travel Cost</h3>
                                                 <div class="panel panel-default panel-body app_panel_style">
+                                                <legend>Travel Cost</legend>
                                                     <!-- Other costs -->
-                                                    <div class="row">
-                                                        <div class="col-md-4 header_btn mg_bt_10">
+                                                    <div class="row ">
+                                                        <div class="col-md-2  mg_bt_10">
                                                             <span>Flight Cost</span>
                                                             <input type="text" id="flight_cost" name="flight_cost" placeholder="Flight Cost" title="Flight Cost" onchange="">
                                                         </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
+                                                        <div class="col-md-2  col-xs-12 mg_bt_10">
                                                             <span>Train Cost</span>
                                                             <input type="text" id="train_cost" name="train_cost" placeholder="Train Cost" title="Train Cost" onchange="">
                                                         </div>
-                                                        <div class="col-md-4 header_btn mg_bt_10">
+                                                        <div class="col-md-2  mg_bt_10">
                                                             <span>Cruise Cost</span>
                                                             <input type="text" id="cruise_cost" name="cruise_cost" placeholder="Cruise Cost" title="Cruise Cost" onchange="">
                                                         </div>
+                                                        <div class="col-md-2  mg_bt_10">
+                                                                  <span>Visa Cost</span>
+                                                                  <input type="text" id="visa_cost" name="visa_cost" placeholder="Visa Cost" title="Visa Cost" onchange="">
+                                                                  </div>
+                                                                <div class="col-md-2  mg_bt_10">
+                                                                    <span>Guide Cost</span>
+                                                                    <input type="text" id="guide_cost" name="guide_cost" placeholder="Guide Cost" title="Guide Cost" onchange="">
+                                                                </div>
+                                                                <div class="col-md-2  mg_bt_10">
+                                                                    <span>Miscellaneous Cost</span>
+                                                                    <input type="text" id="misc_cost" name="misc_cost" placeholder="Miscellaneous Cost" title="Miscellaneous Cost" onchange="">
+                                                                </div>
+                                                                <div class="col-md-4  mg_bt_10">
+                                                                    <span>Miscellaneous Description</span>
+                                                                    <textarea id="other_desc" name="other_desc" placeholder="Miscellaneous Description" title="Miscellaneous Description"></textarea>
+                                                                </div>
+                                                                <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10 ">
+                                                                    <span>Currency</span>
+                            <select name="currency_code" id="currency_code" title="Currency" style="width:100%" data-toggle="tooltip" required>
+                                <?php
+                                $sq_app_setting = mysqli_fetch_assoc(mysqlQuery("select currency from app_settings"));
+                                if ($sq_app_setting['currency'] != '0') {
+
+                                    $sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . $sq_app_setting['currency']));
+                                ?>
+                                    <option value="<?= $sq_currencyd['id'] ?>"><?= $sq_currencyd['currency_code'] ?>
+                                    </option>
+                                <?php } ?>
+                                <option value=''>*Select Currency</option>
+                                <?php
+                                $sq_currency = mysqlQuery("select * from currency_name_master order by currency_code");
+                                while ($row_currency = mysqli_fetch_assoc($sq_currency)) {
+                                ?>
+                                    <option value="<?= $row_currency['id'] ?>"><?= $row_currency['currency_code'] ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                        <!-- Accordian-1 End-->
-                        <!-- Accordian-2 Start --><!-- Per person Costing -->
-                        <div class="accordion_content main_block">
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading2">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="true" aria-controls="collapse2" id="collapsed2">
-                                        <div class="col-md-12"><span>Per Person Costing</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2">
-                                    <div class="panel-body">
+
+                        <!-- Per Person Costing -->
+                        <div id="per_person_costing_tab" class="costing_section main_block mg_bt_20" style="display: none;">
                                         <div class="row mg_tp_10">
                                             <div class="col-xs-12">
-                                                <h3 class="editor_title">Land Cost</h3>
                                                 <div class="panel panel-default panel-body app_panel_style">
+                                                    <legend>Land Cost</legend>
                                                     <div class="row">
                                                         <div class="col-xs-12">
                                                             <div class="table-responsive">
                                                                 <table id="tbl_adult_child_head" name="tbl_adult_child_head" class="table border_0 no-marg">
                                                                     <tr>
-                                                                        <td class="col-md-3 " style="padding-left: 0 !important;"><span>Package Type</span></th>
+                                                                        <td class="col-md-1 " style="padding-left: 0 !important;"><span>Package Type</span></th>
+                                                                        <td class="col-md-3 " style="padding-left: 0 !important;"><span>Currency</span></th>
                                                                     </tr>
+                                                                    
                                                                 </table>
                                                                 <div>
                                                                 </div>
@@ -167,6 +225,21 @@
                                                                        <table id="tbl_package_tour_quotation_adult_child" name="tbl_package_tour_quotation_adult_child" class="table border_0 no-marg">
                                                                             <tr>
                                                                                 <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;"><input type="text" id="ppackage_type1" name="ppackage_type1" placeholder="Package Type" title="Package Type" readonly></td>
+                                                                                <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;">
+                                                                                         <select name="currency_code_pp" id="currency_code_pp" title="Currency" style="width:100%" data-toggle="tooltip">
+                                                                                          <option value="">*Select Currency</option>
+                                                                                          <option value="1">USD</option>
+                                                                                          <option value="2">EUR</option>
+                                                                                          <option value="3">GBP</option>
+                                                                                          <option value="4">INR</option>
+                                                                                          <option value="5">AUD</option>
+                                                                                          <option value="6">CAD</option>
+                                                                                          <option value="7">CHF</option>
+                                                                                          <option value="8">CNY</option>
+                                                                                          <option value="9">JPY</option>
+                                                                                         </select>                       
+                                                                                </td>
+                                                                                
                                                                                 <td><input type="text" onchange=";" id="adult_cost" name="adult_cost" placeholder="Adult Cost" title="Adult Cost" style="display:none;"></td>
                                                                                 <td><input type="text" onchange=";" id="child_with" name="child_with" placeholder="Child with Bed Cost" title="Child with Bed Cost" style="display:none;"></td>
                                                                                 <td><input type="text" onchange=";" id="child_without" name="child_without" placeholder="Child w/o Bed Cost" title="Child w/o Bed Cost"style="display:none;"></td>
@@ -177,6 +250,7 @@
                                                                                 <td><input type="hidden" id="cweb_landcost" name="cweb_landcost"></td>
                                                                                 <td><input type="hidden" id="cwnb_landcost" name="cwnb_landcost"></td>
                                                                                 <td><input type="hidden" id="infant_landcost" name="infant_landcost"></td>
+                                                                       
                                                                             </tr>
                                                                         </table>
                                                                     </div>
@@ -185,7 +259,7 @@
                                                             </div>
 
                                                                     <div class="costing-content-wp">
-                                                <div class="costing-card-wp">
+                                                                  <div class="costing-card-wp">
                                                     <div class="row">
                                                         <div class="col-md-3">
                                                             <div class="costing-card">
@@ -684,99 +758,27 @@
                                                 </div>
                                             </div>
                                         </div>
-                                       
-                                    </div>
-                                </div>
-                            </div>
+                                         
                         </div>
-                        <!-- Accordian-2 End-->
-                    </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-xs-12">
-                    <h3 class="editor_title">Other Costing</h3>
-                    <div class="panel panel-default panel-body app_panel_style">
-                        <div class="col-md-3 header_btn mg_bt_10">
-                            <span>Visa Cost</span>
-                            <input type="text" id="visa_cost" name="visa_cost" placeholder="Visa Cost" title="Visa Cost" onchange="">
-                        </div>
-                        <div class="col-md-3 header_btn mg_bt_10">
-                            <span>Guide Cost</span>
-                            <input type="text" id="guide_cost" name="guide_cost" placeholder="Guide Cost" title="Guide Cost" onchange="">
-                        </div>
-                        <div class="col-md-3 header_btn mg_bt_10">
-                            <span>Miscellaneous Cost</span>
-                            <input type="text" id="misc_cost" name="misc_cost" placeholder="Miscellaneous Cost" title="Miscellaneous Cost" onchange="">
-                        </div>
-                        <div class="col-md-3 header_btn mg_bt_10">
-                            <span>Miscellaneous Description</span>
-                            <textarea id="other_desc" name="other_desc" placeholder="Miscellaneous Description" title="Miscellaneous Description"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
+         
 
             <div class="row">
                 <div class="col-xs-12">
 
-                    <div class="row">
-                        <div class="col-md-3 col-sm-6 col-sm-12 mg_bt_10 hidden">
-                            <input type="hidden" id="discount" name="discount" placeholder="Discount" title="Discount" />
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-sm-12 mg_bt_10">
-                            <select name="costing_type" id="costing_type" title="Select Costing type" class="form-control">
-                                <option value="1">Group Costing</option>
-                                <option value="2">Per Person costing</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
-                            <select name="currency_code" id="currency_code" title="Currency" style="width:100%" data-toggle="tooltip" required>
-                                <?php
-                                $sq_app_setting = mysqli_fetch_assoc(mysqlQuery("select currency from app_settings"));
-                                if ($sq_app_setting['currency'] != '0') {
-
-                                    $sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . $sq_app_setting['currency']));
-                                ?>
-                                    <option value="<?= $sq_currencyd['id'] ?>"><?= $sq_currencyd['currency_code'] ?>
-                                    </option>
-                                <?php } ?>
-                                <option value=''>*Select Currency</option>
-                                <?php
-                                $sq_currency = mysqlQuery("select * from currency_name_master order by currency_code");
-                                while ($row_currency = mysqli_fetch_assoc($sq_currency)) {
-                                ?>
-                                    <option value="<?= $row_currency['id'] ?>"><?= $row_currency['currency_code'] ?>
-                                    </option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-12">
-                            <div class="div-upload">
-                                <div id="price_structure" class="upload-button1"><span>Price Structure</span></div>
-                                <span id="photo_status"></span>
-                                <ul id="files"></ul>
-                                <input type="hidden" id="upload_url" name="upload_url">
-                            </div>
-	                        <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : Only Excel or Word files are allowed."><i class="fa fa-question-circle"></i></button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 col-sm-6 col-sm-12 mg_bt_10"></div>
-                        <div class="col-md-6 col-sm-12">
-	                        <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : Group Costing or Per person costing to display on quotation."><i class="fa fa-question-circle"></i></button>
-                        </div>
-                    </div>
+                 
                     <div class="row mg_tp_20 text-center mg_bt_30">
                         <div class="col-md-12">
                             <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab3()"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
                             &nbsp;&nbsp;
-                            <button class="btn btn-sm btn-success" id="btn_quotation_save"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
+                            <button class="btn btn-sm btn-success" type="button" id="btn_quotation_save"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
                         </div>
                     </div>
                 </div>
                 <input type="hidden" id="login_id" name="login_id" value="<?= $login_id ?>">
+                <input type="hidden" id="upload_url" name="upload_url" value="">
             </div>
         </div>
     </div>
@@ -927,12 +929,11 @@ if (input) {
         });
     }
 
-    $('#currency_code').select2();
-
-    upload_price_struct();
-
     function upload_price_struct() {
         var btnUpload = $('#price_structure');
+        if (!btnUpload.length || typeof AjaxUpload === 'undefined') {
+            return;
+        }
         $(btnUpload).find('span').text('Price Structure');
 
         new AjaxUpload(btnUpload, {
@@ -957,6 +958,7 @@ if (input) {
             }
         });
     }
+
     function get_business(id, flag, change = false) {
 
         var offset = id.split('-');
@@ -975,6 +977,26 @@ if (input) {
         }, 200);
     }
 
+    function resetQuotationSaveState() {
+        window.quotationSaveInProgress = false;
+        $('#btn_quotation_save').prop('disabled', false);
+        try { $('#btn_quotation_save').button('reset'); } catch (e) {}
+    }
+
+    function initQuotationSaveForm() {
+        if ($('#currency_code').length && !$('#currency_code').data('select2')) {
+            $('#currency_code').select2();
+        }
+        upload_price_struct();
+
+        if ($('#frm_tab4').data('validator')) {
+            return;
+        }
+
+        $('#frm_tab4').on('submit', function(e) {
+            e.preventDefault();
+        });
+
     $('#frm_tab4').validate({
 
         rules: {
@@ -987,10 +1009,10 @@ if (input) {
             console.log("QUOTATION SAVE: Form validation failed");
             console.log("Validation errors:", validator.numberOfInvalids());
             console.log("Invalid fields:", validator.invalid);
+            resetQuotationSaveState();
         },
 
-        submitHandler: function(form, e) {
-            e.preventDefault();
+        submitHandler: function(form) {
             
             console.log("QUOTATION SAVE: Form submission started");
             
@@ -1005,8 +1027,7 @@ if (input) {
             setTimeout(function() {
                 if (window.quotationSaveInProgress) {
                     console.log("QUOTATION SAVE: Timeout reached, resetting flag");
-                    window.quotationSaveInProgress = false;
-                    $('#btn_quotation_save').prop('disabled', false);
+                    resetQuotationSaveState();
                 }
             }, 30000); // 30 second timeout
             
@@ -1130,7 +1151,7 @@ if (input) {
                     {
 
                         error_msg_alert('Enter train from location in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
 
                     }
@@ -1142,7 +1163,7 @@ if (input) {
                     {
 
                         error_msg_alert('Enter train to location in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
 
                     }
@@ -1215,7 +1236,7 @@ if (input) {
                     {
 
                         error_msg_alert('Enter from sector in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
 
                         return false;
 
@@ -1228,7 +1249,7 @@ if (input) {
                     {
 
                         error_msg_alert('Enter to sector in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
 
                         return false;
 
@@ -1242,7 +1263,7 @@ if (input) {
                     {
 
                         error_msg_alert('Arrival Date time is required in row:' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
 
                         return false;
 
@@ -1253,7 +1274,7 @@ if (input) {
                     {
 
                         error_msg_alert("Daparture Date time is required in row:" + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
 
                         return false;
 
@@ -1301,23 +1322,23 @@ if (input) {
 
                     if (cruise_from_date == "") {
                         error_msg_alert('Enter cruise departure datetime in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
                     }
 
                     if (cruise_to_date == "") {
                         error_msg_alert('Enter cruise departure datetime  in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
                     }
                     if (route == "") {
                         error_msg_alert('Enter route in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
                     }
                     if (cabin == "") {
                         error_msg_alert('Enter cabin in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
                     }
                     cruise_departure_date_arr.push(cruise_from_date);
@@ -1370,18 +1391,18 @@ if (input) {
 
                     if (city_name == "") {
                         error_msg_alert('Select hotel city in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
                     }
                     if (hotel_id == "") {
                         error_msg_alert('Enter hotel in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
                     }
 
                     if (hotel_stay_days1 == "") {
                         error_msg_alert('Enter hotel total days in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         return false;
                     }
 
@@ -1439,7 +1460,7 @@ if (input) {
 
                     if (transport_id == "") {
                         error_msg_alert('Select Transport Vehicle in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         $('.accordion_content').removeClass("indicator");
                         $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
                             '.accordion_content').addClass("indicator");
@@ -1447,7 +1468,7 @@ if (input) {
                     }
                     if (travel_date == "") {
                         error_msg_alert('Enter Travel date in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         $('.accordion_content').removeClass("indicator");
                         $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
                             '.accordion_content').addClass("indicator");
@@ -1455,7 +1476,7 @@ if (input) {
                     }
                     if (pickup == "") {
                         error_msg_alert('Select pickup location in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         $('.accordion_content').removeClass("indicator");
                         $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
                             '.accordion_content').addClass("indicator");
@@ -1463,7 +1484,7 @@ if (input) {
                     }
                     if (drop == "") {
                         error_msg_alert('Select drop location in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
+                        resetQuotationSaveState();
                         $('.accordion_content').removeClass("indicator");
                         $('#tbl_package_tour_quotation_dynamic_transport').parent('div').closest(
                             '.accordion_content').addClass("indicator");
@@ -1517,22 +1538,22 @@ if (input) {
 
                 if (exc_date == "") {
                     error_msg_alert('Select Activity date in row' + (e + 1));
-                    $('#btn_quotation_save').prop('disabled', false);
+                    resetQuotationSaveState();
                     return false;
                 }
                 if (city_name == "") {
                     error_msg_alert('Select Activity city in row' + (e + 1));
-                    $('#btn_quotation_save').prop('disabled', false);
+                    resetQuotationSaveState();
                     return false;
                 }
                 if (excursion_name == "") {
                     error_msg_alert('Select Activity name in row' + (e + 1));
-                    $('#btn_quotation_save').prop('disabled', false);
+                    resetQuotationSaveState();
                     return false;
                 }
                 if (transfer_option == "") {
                     error_msg_alert('Select Transfer option in row' + (e + 1));
-                    $('#btn_quotation_save').prop('disabled', false);
+                    resetQuotationSaveState();
                     return false;
                 }
                 exc_date_arr_e.push(exc_date);
@@ -1562,92 +1583,70 @@ if (input) {
             var package_type_c_arr = [];
             var discount_in_arr = [];
             var discount_arr = [];
-            
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-            var rowCount = table.rows.length;
-               
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                if (row.cells[0].childNodes[0].checked) {
-                    console.log(row.cells[16].childNodes);
-                    var package_type_c = row.cells[2].childNodes[1].value;
-                    var tour_cost = row.cells[3].childNodes[1].value;
-                    var transport_cost = row.cells[4].childNodes[1].value;
-                    var excursion_cost = row.cells[5].childNodes[1].value;
-                    var basic_cost = row.cells[6].childNodes[1].value;
-                    var service_tax = row.cells[7].childNodes[1].value;
-                    var discount_in = row.cells[8].childNodes[3].value;
-                    var discount = row.cells[9].childNodes[1].value;
-                    var tax_apply_on = row.cells[10].childNodes[3].value;
-                    var tax_value = row.cells[11].childNodes[3].value;
-                    var service_tax_subtotal = row.cells[12].childNodes[1].value;
-                    var tcs = row.cells[13].childNodes[3].value;
-                    var tcsvalue = row.cells[14].childNodes[3].value;
-                    var tdsvalue = row.cells[15].childNodes[3].value;
-                    var total_tour_cost = row.cells[16].childNodes[3].value;
-                    var package_name3 = row.cells[17].childNodes[1].value;
-                    var pkg_id=row.cells[18].childNodes[1].value;
 
-                    if (tour_cost == "") {
-                        error_msg_alert('Select Hotel cost in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
-                        return false;
-                    }
-                    if (tax_apply_on == "") {
-                        error_msg_alert('Select Tax Apply On in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
-                        return false;
-                    }
-                    if (tax_value == "") {
-                        error_msg_alert('Select Tax in row' + (i + 1));
-                        $('#btn_quotation_save').prop('disabled', false);
-                        return false;
-                    }
-                    tour_cost_arr.push(tour_cost);
-                    transport_cost_arr.push(transport_cost);
-                    excursion_cost_arr.push(excursion_cost);
-                    basic_amount_arr.push(basic_cost);
-                    service_charge_arr.push(service_tax);
-                    discount_in_arr.push(discount_in);
-                    discount_arr.push(discount);
-                    service_tax_subtotal_arr.push(service_tax_subtotal);
-                    tcs_arr.push(tcs);
-                    tcsvalue_arr.push(tcsvalue);
-                    total_tour_cost_arr.push(total_tour_cost);
-                    package_name_arr2.push(package_name3);
-                    package_type_c_arr.push(package_type_c);
+            var costingEntries = (typeof collectGroupCostingEntries === 'function')
+                ? collectGroupCostingEntries()
+                : [];
+
+            if (!costingEntries.length) {
+                error_msg_alert('Please enter land costing details before saving.');
+                resetQuotationSaveState();
+                return false;
+            }
+
+            for (var i = 0; i < costingEntries.length; i++) {
+                var entry = costingEntries[i];
+                var package_type_c = entry.package_type_c;
+                var tour_cost = entry.tour_cost;
+                var transport_cost = entry.transport_cost;
+                var excursion_cost = entry.excursion_cost;
+                var basic_cost = entry.basic_cost;
+                var service_tax = entry.service_tax;
+                var discount_in = entry.discount_in;
+                var discount = entry.discount;
+                var tax_apply_on = entry.tax_apply_on;
+                var tax_value = entry.tax_value;
+                var service_tax_subtotal = entry.service_tax_subtotal;
+                var tcs = entry.tcs;
+                var tcsvalue = entry.tcsvalue;
+                var total_tour_cost = entry.total_tour_cost;
+                var package_name3 = entry.package_name3;
+                var pkg_id = entry.pkg_id;
+
+                if (tour_cost == "") {
+                    error_msg_alert('Select Hotel cost in row' + (i + 1));
+                    resetQuotationSaveState();
+                    return false;
                 }
+                if (tax_apply_on == "") {
+                    error_msg_alert('Select Tax Apply On in row' + (i + 1));
+                    resetQuotationSaveState();
+                    return false;
+                }
+                if (tax_value == "") {
+                    error_msg_alert('Select Tax in row' + (i + 1));
+                    resetQuotationSaveState();
+                    return false;
+                }
+                tour_cost_arr.push(tour_cost);
+                transport_cost_arr.push(transport_cost);
+                excursion_cost_arr.push(excursion_cost);
+                basic_amount_arr.push(basic_cost);
+                service_charge_arr.push(service_tax);
+                discount_in_arr.push(discount_in);
+                discount_arr.push(discount);
+                service_tax_subtotal_arr.push(service_tax_subtotal);
+                tcs_arr.push(tcs);
+                tcsvalue_arr.push(tcsvalue);
+                total_tour_cost_arr.push(total_tour_cost);
+                package_name_arr2.push(package_name3);
+                package_type_c_arr.push(package_type_c);
             }
             
             //BSM value Costing Information  
-            var bsmValues = [];
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-            var rowCount = table.rows.length;
-
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                var bsmvaluesEach = [];
-
-                if (row.cells[0].childNodes[0].checked) 
-                {
-                    var basic_show = $(row.cells[6].childNodes[2]).find('span').text();
-                    var service_show = $(row.cells[7].childNodes[2]).find('span').text();
-                    var tax_apply_on = row.cells[10].childNodes[3].value;
-                    var tax_value = row.cells[11].childNodes[3].value;
-                     var tcs = row.cells[13].childNodes[3].value;
-                     var tcsvalue = row.cells[14].childNodes[3].value;
-                    
-                    bsmvaluesEach.push({
-                        "basic": 'basic',
-                        "service": 'service',
-                        'tax_apply_on': tax_apply_on,
-                        'tax_value': tax_value,
-                        'tcsper':tcs,
-                        'tcsvalue':tcsvalue,
-                    });
-                    bsmValues.push(bsmvaluesEach);
-                }
-            }
+            var bsmValues = (typeof collectGroupCostingBsmValues === 'function')
+                ? collectGroupCostingBsmValues()
+                : [];
             //Adult & Child Costing Information  
             var c_package_id_arr = [];
             var adult_cost_arr = [];
@@ -1655,22 +1654,11 @@ if (input) {
             var child_with_arr = [];
             var child_without_arr = [];
 
-            var table = document.getElementById("tbl_package_tour_quotation_adult_child");
-            var rowCount = table.rows.length;
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                var adult_cost = row.cells[1].childNodes[0].value;
-                var child_with = row.cells[2].childNodes[0].value;
-                var child_without = row.cells[3].childNodes[0].value;
-                var infant_cost = row.cells[4].childNodes[0].value;
-                var c_package_id = row.cells[5].childNodes[0].value;
-
-                adult_cost_arr.push(adult_cost);
-                infant_cost_arr.push(infant_cost);
-                child_with_arr.push(child_with);
-                child_without_arr.push(child_without);
-                c_package_id_arr.push(c_package_id);
-            }
+            adult_cost_arr.push($('#adult_cost').val() || '');
+            child_with_arr.push($('#child_with').val() || '');
+            child_without_arr.push($('#child_without').val() || '');
+            infant_cost_arr.push($('#infant_cost').val() || '');
+            c_package_id_arr.push($('#pacakge_id2').val() || '');
 
             var package_id_arr1 = [];
             var incl_arr = [];
@@ -1749,7 +1737,7 @@ if (input) {
 
                             if (program == "") {
                                 error_msg_alert('Daywise program is mandatory in row' + (i + 1));
-                                $('#btn_quotation_save').prop('disabled', false);
+                                resetQuotationSaveState();
                                 return false;
                             }
                             
@@ -1847,7 +1835,7 @@ if (input) {
 
             var price_str_url = $("#upload_url").val();
             var pckg_daywise_url = $('#pckg_daywise_url').val();
-            var currency_code = $('#currency_code').val();
+            var currency_code = $('#currency_code').val() || $('#currency_code_pp').val();
             var discount = $('#discount').val();
             var base_url = $('#base_url').val();
 
@@ -2077,13 +2065,18 @@ if (input) {
                         $('#btn_quotation_save').prop('disabled', false);
                     }
                 }
-            }).fail(function() {
-                console.log("QUOTATION SAVE: AJAX failed, resetting flag");
-                window.quotationSaveInProgress = false; // Reset flag on error
-                $('#btn_quotation_save').button('reset');
-                $('#btn_quotation_save').prop('disabled', false);
             });
         }
+    });
+
+        $('#btn_quotation_save').off('click.quotationSave').on('click.quotationSave', function(e) {
+            e.preventDefault();
+            $('#frm_tab4').submit();
+        });
+    }
+
+    $(document).ready(function() {
+        initQuotationSaveForm();
     });
     
     
@@ -2390,7 +2383,7 @@ $(document).ready(function () {
 
     console.log("READY RUNNING");
 
-    quotation_cost_calculate();
+    quotation_cost_calculate('tour_cost-');
     calculateCostingCards();
 
   
@@ -2401,19 +2394,27 @@ $(document).ready(function () {
         '#visa_cost, #guide_cost, #misc_cost, #total_pax',
         function () {
             console.log("INPUT CHANGED");
-            quotation_cost_calculate();
+            quotation_cost_calculate('tour_cost-');
             calculateCostingCards();
         }
     );
 
 });
 
+function costing_reflect()
+{
+	var id = $('input[name="costing_tab"]:checked').attr('id');
+	if(id=="group_costing"){
+		$('#group_costing_tab').show();
+		$('#per_person_costing_tab').hide();
+	}
+	if(id=="perperson_costing"){
+		$('#group_costing_tab').hide();
+		$('#per_person_costing_tab').show();
+	}
 
-$(document).on('shown.bs.collapse', '#collapse2', function () {
-    console.log('Collapse 2 opened');
-
-    calculateCostingCards();
-});
+}
+costing_reflect();
 
 
 </script>

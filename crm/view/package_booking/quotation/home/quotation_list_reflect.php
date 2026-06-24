@@ -64,14 +64,19 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	$cust_user_name = '';
 	if ($row_quotation['user_id'] != 0) {
 		$row_user = mysqli_fetch_assoc(mysqlQuery("Select name from customer_users where user_id ='$row_quotation[user_id]'"));
-		$cust_user_name = ' (' . $row_user['name'] . ')';
+		if ($row_user && isset($row_user['name'])) {
+			$cust_user_name = ' (' . $row_user['name'] . ')';
+		}
 	}
 	$sq_emp =  mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id = '$row_quotation[emp_id]'"));
-	$emp_name = ($row_quotation['emp_id'] != 0) ? $sq_emp['first_name'] . ' ' . $sq_emp['last_name'] : 'Admin';
+	$emp_name = ($row_quotation['emp_id'] != 0 && $sq_emp) ? $sq_emp['first_name'] . ' ' . $sq_emp['last_name'] : 'Admin';
 	$quotation_date = $row_quotation['quotation_date'];
 	$yr = explode("-", $quotation_date);
 	$year = $yr[0];
 	$sq_package_program = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id ='".get_quotation_package_lookup_id($row_quotation)."'"));
+	$package_name = ($sq_package_program && isset($sq_package_program['package_name']) && $sq_package_program['package_name'] !== '')
+		? $sq_package_program['package_name']
+		: (isset($row_quotation['tour_name']) ? $row_quotation['tour_name'] : 'NA');
 	
 	// Only show parent quotations on the list page
 	$is_sub_quotation = false;
@@ -115,7 +120,7 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 				$act_discount = ($service_charge != 0) ? $discount : 0;
 			}
 			$service_charge = $service_charge - (float)($act_discount);
-			$total_pax = (float)($sq_quotation['total_adult']) + (float)($sq_quotation['children_with_bed']) + (float)($sq_quotation['children_without_bed']) + (float)($sq_quotation['total_infant']);
+			$total_pax = (float)($row_quotation['total_adult']) + (float)($row_quotation['children_with_bed']) + (float)($row_quotation['children_without_bed']) + (float)($row_quotation['total_infant']);
 			$total_pax = $adults + $child_wb + $child_wob + $infants;
 
 			$total_pax = !empty($total_pax) ? (float)($total_pax) : 1;
@@ -544,7 +549,7 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	$temp_arr = array("data" => array(
 		(int)(++$count),
 		$quotation_id_display,
-		$sq_package_program['package_name'],
+		$package_name,
 		$row_quotation['customer_name'] . $cust_user_name,
 		get_date_user($row_quotation['quotation_date']),
 		($row_quotation['costing_type'] == 2) ?

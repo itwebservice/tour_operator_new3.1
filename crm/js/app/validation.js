@@ -1460,6 +1460,10 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "cmb_m_honorific" + foo.counter
     );
+    row.cells[2].childNodes[0].setAttribute(
+      "onchange",
+      "changeGender(this.id);"
+    );
     row.cells[3].childNodes[0].setAttribute(
       "id",
       "txt_m_first_name" + foo.counter
@@ -1507,7 +1511,7 @@ function foo(tableID, quot_table_id, rowCounts) {
 
     row.cells[11].childNodes[0].setAttribute(
       "id",
-      "txt_m_passport_birth_date" + foo.counter
+      "txt_m_passport_issue_date" + foo.counter
     );
     dynamic_date(row.cells[11].childNodes[0].id);
 
@@ -1524,6 +1528,14 @@ function foo(tableID, quot_table_id, rowCounts) {
       "onchange",
       "validate_pastDate(id)"
     );
+    row.cells[2].childNodes[0].selectedIndex = 0;
+    changeGender(row.cells[2].childNodes[0].id);
+    if (typeof calculate_age_member === "function") {
+      calculate_age_member(row.cells[7].childNodes[0].id);
+    }
+    if (!row.cells[9].childNodes[0].value) {
+      row.cells[9].childNodes[0].value = "Adult";
+    }
     $("[name='txt_train_total_seat1']").val(rowCount);
     $("[name='txt_plane_seats-1']").val(rowCount);
     $("[name='txt_cruise_total_seat1']").val(rowCount);
@@ -1538,8 +1550,8 @@ function foo(tableID, quot_table_id, rowCounts) {
       "check-btn-hotel-acm-" + foo.counter
     );
 
-    row.cells[2].childNodes[0].setAttribute("id", "city_name1" + foo.counter);
-    row.cells[3].childNodes[0].setAttribute("id", "hotel_name1" + foo.counter);
+    row.cells[2].childNodes[0].setAttribute("id", "city_name" + foo.counter);
+    row.cells[3].childNodes[0].setAttribute("id", "hotel_name" + foo.counter);
 
     $(row.cells[2].childNodes[0]).next("span").remove();
     city_lzloading(row.cells[2].childNodes[0]);
@@ -4852,8 +4864,22 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
         // reset values properly
         if (cloned.tagName === "SELECT") {
-            cloned.value = "";
-            cloned.classList.add("app_select2");
+            if (tableID === "tbl_package_tour_member") {
+                if (cloned.id && cloned.id.indexOf("txt_m_adolescence") === 0) {
+                    cloned.value = "Adult";
+                } else {
+                    cloned.selectedIndex = 0;
+                }
+            } else if (
+                cloned.id &&
+                (cloned.id.indexOf("plane_class-") === 0 ||
+                 cloned.id.indexOf("txt_m_adolescence") === 0)
+            ) {
+                cloned.selectedIndex = 0;
+            } else {
+                cloned.value = "";
+                cloned.classList.add("app_select2");
+            }
         } else if (["text","number","hidden","textarea"].includes(cloned.type)) {
             cloned.value = "";
         } else if (cloned.type === "checkbox") {
@@ -4865,7 +4891,9 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     }
 
     // ✅ Initialize Select2 only for the new row selects
-    $(row).find('.app_select2').select2({ width: "100%" });
+    if (tableID !== "tbl_package_tour_member") {
+        $(row).find('select.app_select2').not('[id^="plane_class-"], [id^="hotel_name"], [id^="txt_catagory"]').select2({ width: "100%" });
+    }
 
     // ✅ Initialize datepicker for new row
     $(row).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
@@ -4892,6 +4920,23 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // Update serial numbers or custom logic
     foo(tableID, quot_table, rowCount);
+
+    if (tableID === "tbl_package_hotel_infomration") {
+        var $hotelSelect = $(row).find('select[id^="hotel_name"]');
+        if ($hotelSelect.length) {
+            if ($hotelSelect.data('select2')) {
+                $hotelSelect.select2('destroy');
+            }
+            $hotelSelect.select2({ width: '170px', minimumResultsForSearch: 0 });
+            if (typeof initHotelSelectAddNew === 'function') {
+                initHotelSelectAddNew($hotelSelect);
+            }
+        }
+        var $roomCatSelect = $(row).find('select[id^="txt_catagory"]');
+        if ($roomCatSelect.length && typeof refreshRoomCategorySelectAfterLoad === 'function') {
+            refreshRoomCategorySelectAfterLoad($roomCatSelect, { width: '140px' });
+        }
+    }
     
     // Ensure checkbox has onchange handler for hotel table
     if (tableID === "tbl_package_tour_quotation_dynamic_hotel") {

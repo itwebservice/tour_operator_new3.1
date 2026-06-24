@@ -3646,7 +3646,19 @@ function pagination_load(
 ) {
 	//1. dataset,2.columns titles,3.if want bg color,4.if want footer,5.manual pagelength change
 	var html = '';
-	var dataset_main = JSON.parse(dataset);
+	if (!dataset || (typeof dataset === 'string' && !$.trim(dataset))) {
+		dataset = '[]';
+	}
+	var dataset_main;
+	try {
+		dataset_main = JSON.parse(dataset);
+	} catch (e) {
+		console.error('pagination_load: invalid JSON response', e, dataset);
+		dataset_main = [];
+	}
+	if (!Array.isArray(dataset_main)) {
+		dataset_main = [];
+	}
 	if (bg_stat) {
 		var table_data = [];
 		var bg = [];
@@ -3657,7 +3669,7 @@ function pagination_load(
 		table_data = JSON.parse(JSON.stringify(table_data));
 	}
 	else {
-		var table_data = JSON.parse(dataset);
+		var table_data = dataset_main;
 	}
 	if (footer_string) {
 		table_data.pop();

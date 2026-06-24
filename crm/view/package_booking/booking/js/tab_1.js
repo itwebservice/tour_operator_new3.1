@@ -8,7 +8,24 @@ var date = new Date();
 var yest = date.setDate(date.getDate() - 1);
 
 $('#m_birthdate1').datetimepicker({ timepicker: false, maxDate: yest, format: 'd-m-Y' });
-$('#customer_id_p, #country_name,#currency_code,#quotation_id').select2();
+
+function formatQuotationOption(data) {
+	if (!data.id) {
+		return data.text;
+	}
+	var $option = $(data.element);
+	var bg = $option.data('bg') || $option.attr('data-bg');
+	if (bg) {
+		return $('<span style="display:block;padding:3px 6px;background-color:' + bg + ';">' + data.text + '</span>');
+	}
+	return data.text;
+}
+
+$('#customer_id_p, #country_name,#currency_code').select2();
+$('#quotation_id').select2({
+	templateResult: formatQuotationOption,
+	templateSelection: formatQuotationOption
+});
 
 function total_days_reflect(offset = '') {
 	var from_date = $('#txt_package_from_date' + offset).val();
@@ -88,6 +105,9 @@ function customer_info_load(div_id, offset = '') {
 			else {
 				$('#credit_amount' + offset).addClass('hidden');
 				$('#credit_amount' + offset).val(0);
+			}
+			if ($('#copy_details1').is(':checked')) {
+				copy_details();
 			}
 		}
 	});
@@ -198,6 +218,9 @@ function calculate_age_member(id) {
 			adl = 'Children';
 		}
 		if (no_days > 4383) {
+			adl = 'Adult';
+		}
+		if (adl === '' && ydiff >= 12) {
 			adl = 'Adult';
 		}
 
@@ -512,14 +535,16 @@ function apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatE
 	if (savedOnchange) {
 		hotelEl.removeAttribute('onchange');
 	}
-	if (!$hotel.find('option[value="' + hid.replace(/"/g, '\\"') + '"]').length) {
+	if (!$hotel.find('option').filter(function () { return String(this.value) === hid; }).length) {
 		$hotel.append(new Option(hotelName || ('Hotel ' + hid), hid, true, true));
 	}
-	$hotel.val(hid);
 	if ($hotel.data('select2')) {
-		$hotel.trigger('change.select2');
-	} else {
-		$hotel.select2({ width: '170px', minimumResultsForSearch: 0 });
+		$hotel.select2('destroy');
+	}
+	$hotel.select2({ width: '170px', minimumResultsForSearch: 0 });
+	$hotel.val(hid).trigger('change');
+	if (typeof captureHotelSelect2Config === 'function') {
+		captureHotelSelect2Config($hotel);
 	}
 	if (typeof initHotelSelectAddNew === 'function') {
 		initHotelSelectAddNew($hotel);
@@ -542,7 +567,7 @@ function refresh_booking_hotel_select2_display() {
 			return;
 		}
 		if ($sel.data('select2')) {
-			$sel.val(val).trigger('change.select2');
+			$sel.val(val).trigger('change');
 		}
 	});
 }
@@ -593,10 +618,8 @@ function set_booking_hotel_room_category(roomCatEl, hotelId, roomCategory) {
 	$.get('../inc/hotel_category.php', { hotel_id: hotelId, quotation_id: quotationId }, function (data) {
 		$roomCat.html(data);
 		if (roomCategory) {
-			if (!$roomCat.find('option[value="' + roomCategory + '"]').length) {
-				$roomCat.prepend(
-					$('<option></option>').attr('value', roomCategory).text(roomCategory)
-				);
+			if (!$roomCat.find('option').filter(function () { return String(this.value) === String(roomCategory); }).length) {
+				$roomCat.append($('<option></option>').attr('value', roomCategory).text(roomCategory));
 			}
 		}
 		if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
@@ -605,7 +628,7 @@ function set_booking_hotel_room_category(roomCatEl, hotelId, roomCategory) {
 			$roomCat.select2({ width: '140px' });
 		}
 		if (roomCategory) {
-			$roomCat.val(roomCategory).trigger('change.select2');
+			$roomCat.val(roomCategory).trigger('change');
 		}
 	});
 }
@@ -633,16 +656,26 @@ function load_booking_hotel_table(hotel_info_arr) {
 		return;
 	}
 
-	var pendingHotelLoads = 0;
+	var rowIndex = 0;
 
-	function hotelRowLoadDone() {
-		pendingHotelLoads--;
-		if (pendingHotelLoads <= 0) {
-			setTimeout(refresh_booking_hotel_select2_display, 100);
+	function load_next_booking_hotel_row() {
+		rowIndex++;
+		if (rowIndex < hotel_info_arr.length) {
+			populate_booking_hotel_row(rowIndex);
+		} else {
+			setTimeout(function () {
+				if (typeof initAllHotelSelectAddNew === 'function') {
+					initAllHotelSelectAddNew('#tbl_package_hotel_infomration');
+				}
+				if (typeof initAllRoomCategorySelectAddNew === 'function') {
+					initAllRoomCategorySelectAddNew('#tbl_package_hotel_infomration');
+				}
+				refresh_booking_hotel_select2_display();
+			}, 120);
 		}
 	}
 
-	for (var i = 0; i < hotel_info_arr.length; i++) {
+	function populate_booking_hotel_row(i) {
 		var row = table.rows[i];
 		var data = hotel_info_arr[i] || {};
 		var chkEl = booking_table_cell_control(row.cells[0]);
@@ -656,6 +689,7 @@ function load_booking_hotel_table(hotel_info_arr) {
 		var extraBedEl = booking_table_cell_control(row.cells[9]);
 		var hotelId = data.hotel_id1 || data.hotel_id || '';
 		var hotelName = data.hotel_name1 || data.hotel_name || '';
+		var roomCategory = data.room_category || '';
 
 		if (chkEl) {
 			chkEl.checked = true;
@@ -678,44 +712,38 @@ function load_booking_hotel_table(hotel_info_arr) {
 		}
 
 		if (hotelEl && hotelId) {
-			pendingHotelLoads++;
 			var $hotel = $(hotelEl);
+			function finishHotelRow() {
+				apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, roomCategory);
+				load_next_booking_hotel_row();
+			}
 			if (data.city_id && typeof hotelDropdownLoadByCity === 'function') {
-				hotelDropdownLoadByCity(data.city_id, $hotel, function (success) {
-					if (success) {
-						apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, data.room_category || '');
-					} else {
-						if ($hotel.data('select2')) {
-							$hotel.select2('destroy');
-						}
-						$hotel.html('<option value="' + hotelId + '" selected="selected">' + hotelName + '</option>');
-						apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, data.room_category || '');
-					}
-					hotelRowLoadDone();
+				hotelDropdownLoadByCity(data.city_id, $hotel, function () {
+					finishHotelRow();
 				});
 			} else {
 				if ($hotel.data('select2')) {
 					$hotel.select2('destroy');
 				}
-				$hotel.html('<option value="' + hotelId + '" selected="selected">' + hotelName + '</option>');
-				apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, data.room_category || '');
-				hotelRowLoadDone();
+				$hotel.html('<option value="">*Hotel Name</option>');
+				finishHotelRow();
 			}
-		} else if (roomCatEl && data.room_category) {
-			var $roomCat = $(roomCatEl);
-			if (!$roomCat.find('option[value="' + data.room_category + '"]').length) {
-				$roomCat.prepend($('<option></option>').attr('value', data.room_category).text(data.room_category));
+		} else {
+			if (roomCatEl && roomCategory) {
+				var $roomCat = $(roomCatEl);
+				if (!$roomCat.find('option').filter(function () { return String(this.value) === String(roomCategory); }).length) {
+					$roomCat.append($('<option></option>').attr('value', roomCategory).text(roomCategory));
+				}
+				if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+					refreshRoomCategorySelectAfterLoad(roomCatEl, { width: '140px' });
+				}
+				$roomCat.val(roomCategory).trigger('change');
 			}
-			if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
-				refreshRoomCategorySelectAfterLoad(roomCatEl, { width: '140px' });
-			}
-			$roomCat.val(data.room_category).trigger('change.select2');
+			load_next_booking_hotel_row();
 		}
 	}
 
-	if (pendingHotelLoads === 0) {
-		setTimeout(refresh_booking_hotel_select2_display, 100);
-	}
+	populate_booking_hotel_row(0);
 }
 
 function load_booking_excursion_table(exc_info_arr) {
@@ -930,14 +958,17 @@ function load_booking_flight_table(flight_info_arr, flightCost) {
 
 		if (classEl && data.class) {
 			var $class = $(classEl);
-			if (!$class.find('option[value="' + data.class + '"]').length) {
-				$class.prepend($('<option></option>').attr('value', data.class).text(data.class).prop('selected', true));
+			if ($class.data('select2')) {
+				$class.select2('destroy');
 			}
-			classEl.value = data.class;
+			if (!$class.find('option[value="' + data.class + '"]').length) {
+				$class.append($('<option></option>').attr('value', data.class).text(data.class));
+			}
+			$class.val(data.class);
 		}
 
-		if (amountEl && flightCost && parseFloat(flightCost) > 0) {
-			amountEl.value = (parseFloat(flightCost) / flight_info_arr.length).toFixed(2);
+		if (amountEl) {
+			amountEl.value = '';
 		}
 
 		if (depEl && depEl.id && typeof dynamic_datetime === 'function') {
@@ -947,6 +978,12 @@ function load_booking_flight_table(flight_info_arr, flightCost) {
 			dynamic_datetime(arrEl.id);
 		}
 	}
+
+	$('#tbl_plane_travel_details_dynamic_row select[id^="plane_class-"]').each(function () {
+		if ($(this).data('select2')) {
+			$(this).select2('destroy');
+		}
+	});
 
 	if (typeof initAllAirlineSelectAddNew === 'function') {
 		initAllAirlineSelectAddNew('#tbl_plane_travel_details_dynamic_row');

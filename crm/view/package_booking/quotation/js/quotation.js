@@ -183,6 +183,9 @@ function group_quotation_cost_calculate(id) {
 }
 function quotation_cost_calculate(id) {
 
+	if (!id) {
+		id = 'tour_cost-';
+	}
 	var offset = id.split('-');
 	var tour_cost = $('#tour_cost-' + offset[1]).val();
 	var transport_cost = $('#transport_cost1-' + offset[1]).val();

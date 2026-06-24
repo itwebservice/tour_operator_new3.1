@@ -2727,3 +2727,6 @@ textarea.ai-chat-textarea.form-control:focus,
 #tbl_package_tour_member .select2-container .select2-selection--single{
     width:70px !important;
 }
+.sector-select .select2-container{
+	width: 300px !important;
+}

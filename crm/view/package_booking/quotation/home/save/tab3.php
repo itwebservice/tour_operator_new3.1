@@ -290,17 +290,17 @@
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                            <td style="width: 300px;" class="sector-select"><select name="from_sector-1" id="from_sector-1"
                                                                     class="form-control app_select2 plane-airport-select"
                                                                     data-sector-type="from" title="From Sector"
-                                                                    style="width: 300px;" data-add-new-option="true">
+                                                                     data-add-new-option="true">
                                                                     <option value="">*From Sector</option>
                                                                 </select>
                                                             </td>
-                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                            <td style="width: 300px;" class="sector-select"><select name="to_sector-1" id="to_sector-1"
                                                                     class="form-control app_select2 plane-airport-select"
                                                                     data-sector-type="to" title="To Sector"
-                                                                    style="width: 300px;" data-add-new-option="true">
+                                                                     data-add-new-option="true">
                                                                     <option value="">*To Sector</option>
                                                                 </select>
                                                             </td>
@@ -987,11 +987,234 @@
         });
     }
 
+    function isQuotationGroupCostingDiv() {
+        var el = document.getElementById('tbl_package_tour_quotation_dynamic_costing');
+        return el && el.tagName === 'DIV';
+    }
+
+    function populateGroupCostingFromHotels(hotel_main_arr, hotel_per_person_arr) {
+        var table = document.getElementById('tbl_package_tour_quotation_dynamic_costing');
+        if (!table) {
+            return;
+        }
+
+        if (isQuotationGroupCostingDiv()) {
+            if (!hotel_per_person_arr || hotel_per_person_arr.length === 0) {
+                $('#package_type-').val('NA');
+                $('#tour_cost-').val(0);
+                return;
+            }
+
+            var totalHotelCost = 0;
+            var packageTypes = [];
+            var packageId = '';
+
+            for (var k = 0; k < hotel_main_arr.length; k++) {
+                totalHotelCost += parseFloat(hotel_main_arr[k]['cost']) || 0;
+                if (hotel_main_arr[k]['type']) {
+                    packageTypes.push(hotel_main_arr[k]['type']);
+                }
+                if (!packageId && hotel_main_arr[k]['id']) {
+                    packageId = hotel_main_arr[k]['id'];
+                }
+            }
+
+            $('#package_type-').val(packageTypes.join(', '));
+            $('#tour_cost-').val(totalHotelCost);
+            if (packageId) {
+                $('#package_id1').val(packageId);
+            }
+            return;
+        }
+
+        if (!table.rows) {
+            return;
+        }
+
+        if (table.rows.length == 1) {
+            for (var k = 1; k < table.rows.length; k++) {
+                document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(k);
+            }
+        } else {
+            while (table.rows.length > 1) {
+                document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(
+                    (table.rows.length - 1));
+                table.rows.length--;
+            }
+        }
+        if (table.rows.length != hotel_main_arr.length) {
+            for (var i = 1; i < hotel_main_arr.length; i++) {
+                addRow('tbl_package_tour_quotation_dynamic_costing');
+            }
+        }
+        if (!hotel_per_person_arr || hotel_per_person_arr.length === 0) {
+            var row = table.rows[0];
+            row.cells[2].childNodes[1].value = 'NA';
+            row.cells[3].childNodes[1].value = 0;
+        }
+        for (var k = 0; k < hotel_main_arr.length; k++) {
+            var row = table.rows[k];
+            row.cells[2].childNodes[1].value = hotel_main_arr[k]['type'];
+            row.cells[3].childNodes[1].value = hotel_main_arr[k]['cost'];
+        }
+    }
+
+    function setGroupExcursionCost(total_amount, rowCount) {
+        if (isQuotationGroupCostingDiv()) {
+            $('#excursion_cost-').val(total_amount);
+            return;
+        }
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+        if (!table || !table.rows) {
+            return;
+        }
+        for (var j = 0; j < rowCount; j++) {
+            var row = table.rows[j];
+            row.cells[5].childNodes[1].value = total_amount;
+        }
+    }
+
+    function applyGroupCostingTransportTotals(unique_package_id_arr, package_type_count) {
+        var transport_cost = 0;
+        if (unique_package_id_arr.length && unique_package_id_arr[0]) {
+            transport_cost = unique_package_id_arr[0]['transport_cost'] || 0;
+        }
+
+        if (isQuotationGroupCostingDiv()) {
+            var hotel_cost = parseFloat($('#tour_cost-').val()) || 0;
+            $('#transport_cost1-').val(transport_cost);
+            $('#total_tour_cost-').val(parseFloat(transport_cost) + hotel_cost);
+
+            var total_cost = ($('#package_name1').val() == '') ? ($('#package_name1').val() || 0) : 0;
+            var exc_cost = ($('#excursion_cost-').val() == '') ? ($('#excursion_cost-').val() || 0) : 0;
+            $('#basic_amount-').val(parseFloat(total_cost) + parseFloat(exc_cost));
+            $('#total_tour_cost-').val(parseFloat(total_cost) + parseFloat(exc_cost));
+            $('#basic_amount-').trigger('change');
+            if (typeof get_business === 'function') {
+                get_business('tour_cost-', 'true');
+            }
+            if (typeof quotation_cost_calculate === 'function') {
+                quotation_cost_calculate('tour_cost-');
+            }
+            return;
+        }
+
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+        if (!table || !table.rows) {
+            return;
+        }
+        for (var j = 0; j < package_type_count; j++) {
+            var row = table.rows[j];
+            var hotel_cost = row.cells[3].childNodes[1].value;
+            row.cells[4].childNodes[1].value = transport_cost;
+            row.cells[13].childNodes[1].value = parseFloat(transport_cost) + parseFloat(hotel_cost);
+
+            var total_cost = (row.cells[11].childNodes[1].value == '') ? row.cells[11].childNodes[1].value : 0;
+            var exc_cost = (row.cells[5].childNodes[1].value == '') ? row.cells[5].childNodes[1].value : 0;
+            row.cells[6].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
+            row.cells[13].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
+            $(row.cells[6].childNodes[1]).trigger('change');
+            get_business(row.cells[3].childNodes[1].id, 'true');
+        }
+    }
+
+    function collectGroupCostingEntries() {
+        if (isQuotationGroupCostingDiv()) {
+            return [{
+                package_type_c: $('#package_type-').val(),
+                tour_cost: $('#tour_cost-').val(),
+                transport_cost: $('#transport_cost1-').val(),
+                excursion_cost: $('#excursion_cost-').val(),
+                basic_cost: $('#basic_amount-').val(),
+                service_tax: $('#service_charge-').val(),
+                discount_in: $('#discount_in-').val(),
+                discount: $('#discount_amt-').val(),
+                tax_apply_on: $('#tax_apply_on-').val(),
+                tax_value: $('#tax_value-').val(),
+                service_tax_subtotal: $('#service_tax_subtotal-').val(),
+                tcs: $('#tcs_tax-').val(),
+                tcsvalue: $('#tcs1-').val(),
+                tdsvalue: ($('#tds-').val() || 0),
+                total_tour_cost: $('#total_tour_cost-').val(),
+                package_name3: $('#package_name1').val(),
+                pkg_id: $('#package_id1').val()
+            }];
+        }
+
+        var entries = [];
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+        if (!table || !table.rows) {
+            return entries;
+        }
+
+        for (var i = 0; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            if (row.cells[0].childNodes[0].checked) {
+                entries.push({
+                    package_type_c: row.cells[2].childNodes[1].value,
+                    tour_cost: row.cells[3].childNodes[1].value,
+                    transport_cost: row.cells[4].childNodes[1].value,
+                    excursion_cost: row.cells[5].childNodes[1].value,
+                    basic_cost: row.cells[6].childNodes[1].value,
+                    service_tax: row.cells[7].childNodes[1].value,
+                    discount_in: row.cells[8].childNodes[3].value,
+                    discount: row.cells[9].childNodes[1].value,
+                    tax_apply_on: row.cells[10].childNodes[3].value,
+                    tax_value: row.cells[11].childNodes[3].value,
+                    service_tax_subtotal: row.cells[12].childNodes[1].value,
+                    tcs: row.cells[13].childNodes[3].value,
+                    tcsvalue: row.cells[14].childNodes[3].value,
+                    tdsvalue: row.cells[15].childNodes[3].value,
+                    total_tour_cost: row.cells[16].childNodes[3].value,
+                    package_name3: row.cells[17].childNodes[1].value,
+                    pkg_id: row.cells[18].childNodes[1].value
+                });
+            }
+        }
+        return entries;
+    }
+
+    function collectGroupCostingBsmValues() {
+        if (isQuotationGroupCostingDiv()) {
+            return [[{
+                "basic": 'basic',
+                "service": 'service',
+                'tax_apply_on': $('#tax_apply_on-').val(),
+                'tax_value': $('#tax_value-').val(),
+                'tcsper': $('#tcs_tax-').val(),
+                'tcsvalue': $('#tcs1-').val()
+            }]];
+        }
+
+        var bsmValues = [];
+        var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
+        if (!table || !table.rows) {
+            return bsmValues;
+        }
+
+        for (var i = 0; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            if (row.cells[0].childNodes[0].checked) {
+                bsmValues.push([{
+                    "basic": 'basic',
+                    "service": 'service',
+                    'tax_apply_on': row.cells[10].childNodes[3].value,
+                    'tax_value': row.cells[11].childNodes[3].value,
+                    'tcsper': row.cells[13].childNodes[3].value,
+                    'tcsvalue': row.cells[14].childNodes[3].value
+                }]);
+            }
+        }
+        return bsmValues;
+    }
+
     $(function() {
         $('#frm_tab3').validate({
             rules: {},
             submitHandler: function(form, e) {
-                e.preventDefault();
+                if (e && typeof e.preventDefault === 'function') {
+                    e.preventDefault();
+                }
 
                 // Before validation, ensure all hotel dropdowns have proper values
                 ensureHotelSelections();
@@ -1253,7 +1476,18 @@
                 var unique_package_id_arr = [];
                 var hotel_main_arr = [];
                 var hotel_per_person_arr = [];
-                var per_person_costing = JSON.parse($('#hotel_pp_costing').val());
+                var per_person_costing = [];
+                try {
+                    var hotel_pp_val = $('#hotel_pp_costing').val();
+                    if (hotel_pp_val) {
+                        per_person_costing = JSON.parse(hotel_pp_val);
+                    }
+                } catch (err) {
+                    per_person_costing = [];
+                }
+                if (!Array.isArray(per_person_costing)) {
+                    per_person_costing = [];
+                }
 
                 //Creating unique package id wise array
                 for (var i = 0; i < unique_package_type_arr.length; i++) {
@@ -1336,34 +1570,7 @@
                     var package_type_arr = hotel_per_person_arr.length;
                 }
                 //Group Costing
-                var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-                if (table.rows.length == 1) {
-                    for (var k = 1; k < table.rows.length; k++) {
-                        document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(
-                            k);
-                    }
-                } else {
-                    while (table.rows.length > 1) {
-                        document.getElementById("tbl_package_tour_quotation_dynamic_costing").deleteRow(
-                            (table.rows.length - 1));
-                        table.rows.length--;
-                    }
-                }
-                if (table.rows.length != hotel_main_arr.length) {
-                    for (var i = 1; i < hotel_main_arr.length; i++) {
-                        addRow('tbl_package_tour_quotation_dynamic_costing');
-                    }
-                }
-                if (hotel_per_person_arr.length === 0) {
-                    var row = table.rows[0];
-                    row.cells[2].childNodes[1].value = 'NA';
-                    row.cells[3].childNodes[1].value = 0;
-                }
-                for (var k = 0; k < hotel_main_arr.length; k++) {
-                    var row = table.rows[k];
-                    row.cells[2].childNodes[1].value = hotel_main_arr[k]['type'];
-                    row.cells[3].childNodes[1].value = hotel_main_arr[k]['cost'];
-                }
+                populateGroupCostingFromHotels(hotel_main_arr, hotel_per_person_arr);
                 var per_adult = [];
                 var per_cwb = [];
                 var per_cwob = [];
@@ -1629,12 +1836,7 @@
                     }
                 }
                 //Group costing
-                var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-                var rowCount = table.rows.length;
-                for (var j = 0; j < package_type_arr; j++) {
-                    var row = table.rows[j];
-                    row.cells[5].childNodes[1].value = total_amount;
-                }
+                setGroupExcursionCost(total_amount, package_type_arr);
                 //Per person costing//Adult/Child costing
                 var adult_cost_total = 0;
                 var cwb_cost_total = 0;
@@ -1712,26 +1914,7 @@ $("#infant_activity_pp").val(
                         parseFloat(infant_cost_total1)).toFixed(2);
                 }
 
-                var table = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
-                var rowCount = table.rows.length;
-                for (var j = 0; j < package_type_arr; j++) {
-
-                    var row = table.rows[j];
-                    var package_id2 = row.cells[11].childNodes[1].value;
-                    var hotel_cost = row.cells[3].childNodes[1].value;
-                    row.cells[4].childNodes[1].value = unique_package_id_arr[0]['transport_cost'];
-                    var total_tour_cost = parseFloat(unique_package_id_arr[0]['transport_cost']) +
-                        parseFloat(hotel_cost);
-
-                    row.cells[13].childNodes[1].value = total_tour_cost;
-
-                    var total_cost = (row.cells[11].childNodes[1].value == '') ? row.cells[11].childNodes[1].value : 0;
-                    var exc_cost = (row.cells[5].childNodes[1].value == '') ? row.cells[5].childNodes[1].value : 0;
-                    row.cells[6].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
-                    row.cells[13].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
-                    $(row.cells[6].childNodes[1]).trigger('change');
-                    get_business(row.cells[3].childNodes[1].id, 'true');
-                }
+                applyGroupCostingTransportTotals(unique_package_id_arr, package_type_arr);
 
                 // Populate tab4 costing table before switching
                 populateTab4CostingTable();
@@ -1955,6 +2138,22 @@ $("#infant_activity_pp").val(
         var costingTable = document.getElementById("tbl_package_tour_quotation_dynamic_costing");
         if (!costingTable) {
             console.log("Costing table not found in tab4");
+            return;
+        }
+
+        if (isQuotationGroupCostingDiv()) {
+            populateGroupCostingFromHotels(hotel_main_arr, hotel_main_arr.length ? hotel_main_arr : []);
+            var totalCost = 0;
+            for (var j = 0; j < hotel_main_arr.length; j++) {
+                totalCost += parseFloat(hotel_main_arr[j]['cost']) || 0;
+            }
+            $('#excursion_cost-').val(0);
+            $('#basic_amount-').val(totalCost);
+            $('#total_tour_cost-').val(totalCost);
+            if (typeof quotation_cost_calculate === 'function') {
+                quotation_cost_calculate('tour_cost-');
+            }
+            console.log("Tab4 costing populated with", unique_package_type_arr.length, "package types");
             return;
         }
 

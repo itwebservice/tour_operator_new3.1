@@ -108,7 +108,7 @@
                                         $currency_amount = '';
                                     }
                                 ?>
-                                    <option style="background-color:<?= $bg ?> !important;" value="<?= $row_quotation['quotation_id'] ?>">
+                                    <option style="background-color:<?= $bg ?> !important;" data-bg="<?= $bg ?>" value="<?= $row_quotation['quotation_id'] ?>">
                                         <?= get_quotation_id($row_quotation['quotation_id'], $yr[0]) . ' : ' . $row_quotation['customer_name'] . $cust_user_name . ' : ' . $quotation_cost . ' /-' . $currency_amount ?>
                                     </option>
                                 <?php } ?>

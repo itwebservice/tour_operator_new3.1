@@ -66,6 +66,63 @@ if (!function_exists('o1nv')) {
     return ($v !== null && $v !== '') ? $v : $f;
   }
 }
+if (!function_exists('o1_list_item_text')) {
+  function o1_list_item_text($html)
+  {
+    $html = preg_replace('/<br\s*\/?>/i', ' ', (string)$html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = str_replace("\xC2\xA0", ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim($text);
+  }
+}
+if (!function_exists('o1_list_items')) {
+  function o1_list_items($html, $default = '')
+  {
+    $html = (string)$html;
+    $items = array();
+
+    if (trim($html) === '') {
+      return $default !== '' ? array($default) : array();
+    }
+
+    if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o1_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o1_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items)) {
+      $plain = o1_list_item_text($html);
+      $parts = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $plain);
+      foreach ((array)$parts as $part) {
+        $text = trim($part);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items) && $default !== '') {
+      $items[] = $default;
+    }
+
+    return $items;
+  }
+}
 // Image url with local-asset fallback when the data has no image.
 if (!function_exists('o1img')) {
   function o1img($url, $fallback)
@@ -274,7 +331,7 @@ function o1_flight_date($v)
 
       <!-- ====================================  Dipti -->
       <div class="relative z-10 mt-7 px-12">
-        <div class="grid grid-cols-4 gap-2 h-32" style="margin-top:155px;">
+        <div class="grid grid-cols-4 gap-2 h-32" style="margin-top:50px;">
           <?php
           $first_page_images = array();
 
@@ -471,10 +528,7 @@ function o1_flight_date($v)
                 </div>
                 <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--navy)]/60">Travel Dates</div>
               </div>
-              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]">
-                <?= o1e($ov['travel_from']) ?><br>
-                <?= o1e($ov['travel_to']) ?>
-              </div>
+              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]"><?= o1e($ov['travel_from']) ?> &ndash; <?= o1e($ov['travel_to']) ?></div>
             </div>
             <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
               <div class="flex items-center gap-2.5">
@@ -671,7 +725,7 @@ function o1_flight_date($v)
             $o1_hi++;
             $o1_hnights = (int) o1nv(isset($h['total_nights']) ? $h['total_nights'] : '', 0);
             // $o1_hphoto  = o1img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . ((($o1_hi - 1) % 3) + 1) . '.jpg');
-            $dummy_hotel_img = BASE_URL . 'images/hotel.png';
+            $dummy_hotel_img = BASE_URL . 'uploads/quotation_images/hotel.png';
 
             $o1_hphoto = '';
             if (!empty($h['hotel_photo'])) {
@@ -789,7 +843,7 @@ function o1_flight_date($v)
             </div>
           </div>
           <div class="text-cream text-right">
-            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Flights · Transfers · Itinerary</div>
+            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Flights Â· Transfers Â· Itinerary</div>
             <div class="font-display text-sm"><?= o1e($hero['quotation_code']) ?> &middot; <?= o1e(o1nv($ov['destination'], $hero['tour_name'])) ?></div>
           </div>
           <div class="flex items-center gap-2">
@@ -936,7 +990,7 @@ function o1_flight_date($v)
               <?php foreach ((array)$trains as $tr) { ?>
 
                 <?php
-                $train_img = BASE_URL . 'images/train.jpg';
+                $train_img = BASE_URL . 'uploads/quotation_images/train.jpg';
 
                 $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
                 $to_loc   = isset($tr['to_location']) ? $tr['to_location'] : '';
@@ -1058,7 +1112,7 @@ function o1_flight_date($v)
 
               <?php
               // $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
-              $dummy_activity_img = BASE_URL . 'images/activity.jpg';
+              $dummy_activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
 
               $activity_img = '';
               if (!empty($a['activity_image'])) {
@@ -1157,7 +1211,7 @@ function o1_flight_date($v)
               style="box-shadow:var(--shadow-card)">
 
               <div class="col-span-2 bg-[color:var(--navy)] grid place-items-center p-4">
-                <?php $vehicle_img = BASE_URL . 'images/vehicle.png'; ?>
+                <?php $vehicle_img = BASE_URL . 'uploads/quotation_images/vehicle.jpg'; ?>
                 <img src="<?= o1e($vehicle_img) ?>"
                   alt="Vehicle"
                   style="width:100%;height:auto;object-fit:contain;" />
@@ -1223,7 +1277,7 @@ function o1_flight_date($v)
                 </circle>
               </svg> Day-Wise Itinerary
             </h2>
-            <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Your Journey · Day by Day</span>
+            <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Your Journey Â· Day by Day</span>
           </div>
           <hr class="gold-rule mt-2" />
           <div class="mt-4 space-y-4">
@@ -1231,16 +1285,7 @@ function o1_flight_date($v)
             $o1_itin = is_array($itin) ? $itin : array();
             foreach ($o1_itin as $d):
               $o1_dno    = str_pad((string) (int) o1nv(isset($d['day_number']) ? $d['day_number'] : '', 0), 2, '0', STR_PAD_LEFT);
-              // $o1_dimg   = o1img(isset($d['image']) ? $d['image'] : '', $assets . 'day-1.jpg');
-              $dummy_day_img = BASE_URL . 'images/itinerary.png';
-
-              $o1_day_photo = isset($d['image']) ? trim($d['image']) : '';
-
-              if ($o1_day_photo == '' || stripos($o1_day_photo, 'dummy') !== false) {
-                $o1_dimg = $dummy_day_img;
-              } else {
-                $o1_dimg = o1img($o1_day_photo, $dummy_day_img);
-              }
+              $o1_dimg   = o1img(isset($d['image']) ? $d['image'] : '', $assets . 'day-1.jpg');
               $o1_dtitle = o1nv(isset($d['special_attraction']) ? $d['special_attraction'] : '', o1nv(isset($d['city']) ? $d['city'] : '', 'Day ' . $o1_dno));
               $o1_dprog  = isset($d['detailed_programme']) ? trim($d['detailed_programme']) : '';
             ?>
@@ -1261,8 +1306,13 @@ function o1_flight_date($v)
                   </div>
                 </div>
                 <div class="col-span-8 p-4 relative">
+                  <!-- <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">&#10022; Day <?= o1e((int) o1nv(isset($d['day_number']) ? $d['day_number'] : '', 0)) ?></div> -->
 
                   <!-- ============== Dipti -->
+                  <!-- <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">
+                    <? //= o1e(o1nv($d['date'] ?? '', '')) 
+                    ?>
+                  </div> -->
                   <?php $o1_day_date = isset($d['date']) ? trim($d['date']) : ''; ?>
 
                   <?php if ($o1_day_date != '') { ?>
@@ -1282,6 +1332,8 @@ function o1_flight_date($v)
                         <circle cx="12" cy="10" r="3">
                         </circle>
                       </svg> <!-- --><?= o1e(o1nv($d['special_attraction'] ?? '', $o1_dtitle)) ?>
+                      <!-- <? //= o1e(o1nv(isset($d['overnight_stay']) ? $d['overnight_stay'] : '', $o1_dtitle)) 
+                            ?> -->
                     </div>
                   <?php endif; ?>
                   <p class="text-[12px] text-[color:var(--ink)]/85 mt-2 leading-relaxed font-serif-soft" style="font-size:13px"><?= ($o1_dprog !== '' ? $o1_dprog : 'Detailed programme will be shared.') ?></p>
@@ -1458,7 +1510,7 @@ function o1_flight_date($v)
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>04<!-- --> / 09</span>
       </div>
@@ -1483,7 +1535,7 @@ function o1_flight_date($v)
             </div>
           </div>
           <div class="text-cream text-right">
-            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Inclusions · Exclusions · Pricing</div>
+            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">Inclusions Â· Exclusions Â· Pricing</div>
             <div class="font-display text-sm"><?= o1e($hero['quotation_code']) ?> &middot; <?= o1e(o1nv($ov['destination'], $hero['tour_name'])) ?></div>
           </div>
           <div class="flex items-center gap-2">
@@ -1507,12 +1559,10 @@ function o1_flight_date($v)
             <hr class="gold-rule mt-2" />
             <ul class="mt-3 space-y-2">
               <?php
-              $o1_included = trim(strip_tags(isset($incx['included']) ? $incx['included'] : ''));
-              $o1_included_items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $o1_included);
-              $o1_included_items = array_values(array_filter(array_map('trim', (array)$o1_included_items)));
-              if (empty($o1_included_items)) {
-                $o1_included_items = array('Inclusions will be shared as per final quotation.');
-              }
+              $o1_included_items = o1_list_items(
+                isset($incx['included']) ? $incx['included'] : '',
+                'Inclusions will be shared as per final quotation.'
+              );
               foreach ($o1_included_items as $o1_item):
               ?>
                 <li class="flex items-start gap-2 text-[12px] text-[color:var(--ink)]/85">
@@ -1540,12 +1590,10 @@ function o1_flight_date($v)
             <hr class="gold-rule mt-2" />
             <ul class="mt-3 space-y-2">
               <?php
-              $o1_excluded = trim(strip_tags(isset($incx['excluded']) ? $incx['excluded'] : ''));
-              $o1_excluded_items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $o1_excluded);
-              $o1_excluded_items = array_values(array_filter(array_map('trim', (array)$o1_excluded_items)));
-              if (empty($o1_excluded_items)) {
-                $o1_excluded_items = array('Exclusions will be shared as per final quotation.');
-              }
+              $o1_excluded_items = o1_list_items(
+                isset($incx['excluded']) ? $incx['excluded'] : '',
+                'Exclusions will be shared as per final quotation.'
+              );
               foreach ($o1_excluded_items as $o1_item):
               ?>
                 <li class="flex items-start gap-2 text-[12px] text-[color:var(--ink)]/85">
@@ -1624,7 +1672,7 @@ function o1_flight_date($v)
               endforeach; ?>
             <?php } ?>
           </div>
-          <!-- <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div> -->
+          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
         </div>
 
         <?php
@@ -1741,12 +1789,11 @@ function o1_flight_date($v)
                 </tbody>
               </table>
             <?php } ?>
-            
+            </div>
           </div>
-        </div>
-        <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
+          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
           <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
             <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
             <span>05<!-- --> / 09</span>
           </div>
@@ -3010,12 +3057,12 @@ function o1_flight_date($v)
           </div>
         </div>
         <div class="mt-10 text-center">
-          <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></span>
-          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1">FreezeMyTrip · Luxury Voyages · Est. 2014</div>
+          <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div>
+          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1">FreezeMyTrip Â· Luxury Voyages Â· Est. 2014</div>
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>09<!-- --> / 09</span>
       </div>

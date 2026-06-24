@@ -50,6 +50,10 @@
         background: #fd7e14 !important;
     }
     
+    .action-icon-btn[data-icon-type="hotel"]:hover {
+        background: #fd7e14 !important;
+    }
+    
     .action-icon-btn[data-icon-type="backoffice"]:hover {
         background: #6c757d !important;
     }
@@ -670,6 +674,14 @@ $quotation_count = mysqli_num_rows($sq_query);
             <i class="fa fa-eye view-icon"></i>
             <span class="action-label">View</span>
         </a>  
+        <button type="button" class="btn btn-sm action-icon-btn" 
+            data-icon-type="hotel"
+            onclick="view_request(<?php echo $row_tours['quotation_id']; ?>)"
+            data-toggle="tooltip" data-placement="top" title="Hotel Availability">
+            <i class="fa fa-bed hotel-icon"></i>
+            <span class="action-label">Hotel</span>
+        </button>
+      
         <button type="button" class="btn btn-sm action-icon-btn" 
                 data-icon-type="backoffice"
                 onclick="quotation_email_send_backoffice_modal(<?php echo $row_tours['quotation_id']; ?>);btnDisableEnable('email_backoffice_btn-<?php echo $row_tours['quotation_id']; ?>')"

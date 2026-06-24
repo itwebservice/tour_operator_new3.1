@@ -1,36 +1,68 @@
-
-<form id="frm_tab4">
+<style>
+  .app_dual_button input[type="radio"]{
+display: none;
+}
+.app_dual_button{
+padding: 6px 6px;
+border: 1px solid <?= $theme_color ?>;
+margin-right: -5px;
+background: #fff;
+margin-bottom: 0;
+cursor: pointer;
+font-weight: 300;
+font-size: 14px;
+}
+.app_dual_button label{
+margin:0;
+}
+.app_dual_button.active{
+background: <?= $theme_color ?>;
+color: #fff;
+}
+.app_dual_button:first-child{
+border-top-left-radius:20px;
+border-bottom-left-radius:20px;
+}
+.app_dual_button:last-child{
+border-top-right-radius:20px;
+border-bottom-right-radius:20px;
+}
+label input.labelauty:checked + label{
+<!-- background-color: rgba(0, 0, 0, 0.42); -->
+color: #ffffff;
+}
+input.labelauty + label, input.labelauty:checked + label, input.labelauty:checked:not([disabled]) + label:hover{
+background-color:<?= $theme_color ?>;
+}
+</style>
+<form id="frm_tab4" novalidate method="post" action="javascript:void(0);" onsubmit="return false;">
 
     <div class="app_panel">
 
         <div class="container" style="width:100% !important;">
             <div class="row">
-                <div class="col-md-12 app_accordion">
-                    <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
-
-                        <!-- Accordian-1 Start --><!-- Group Costing -->
-                        <div class="accordion_content main_block mg_bt_20">
-
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="headingl1">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse"
-                                        data-parent="#accordion" href="#collapsel1" aria-expanded="true"
-                                        aria-controls="collapsel1" id="collapsedl1">
-                                        <div class="col-md-12"><span>Group Costing</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapsel1" class="panel-collapse collapse in main_block" role="tabpanel"
-                                    aria-labelledby="headingl1">
-                                    <div class="panel-body">
-
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <h3 class="editor_title">Land Cost</h3>
+                <div class="col-md-12">
+                <div class="row text-center text_left_sm_xs mg_bt_10">	
+                             <label for="group_costing" class="app_dual_button mg_bt_10 active">
+                                 <input type="radio" id="group_costing" name="costing_tab" checked onchange="costing_reflect()">
+                                 &nbsp;&nbsp;Group Costing
+                             </label>    
+                             <label for="perperson_costing" class="app_dual_button mg_bt_10">
+                                 <input type="radio" id="perperson_costing" name="costing_tab"  onchange="costing_reflect()">
+                                 &nbsp;&nbsp;Per Person Costing
+                             </label>
+                           </div>
+                        </div>
+                        <!-- Group Costing -->
+                        <div id="group_costing_tab" class="costing_section main_block mg_bt_20">
+                                        <div class="row mg_tp_10">
+                                            <div class="col-xs-12" >
                                                 <div class="panel panel-default panel-body app_panel_style">
+                                                    <legend >Land Cost</legend>
                                                     <div class="row mg_bt_20_sm_xs">
                                                         <div class="col-xs-12">
                                                             <div class="table-responsive">
-                                                                <table id="tbl_package_tour_quotation_dynamic_costing"
+                                                                <div id="tbl_package_tour_quotation_dynamic_costing"
                                                                     name="tbl_package_tour_quotation_dynamic_costing" class="table no-marg border_0"
                                                                     disabled>
                                                                     <?php
@@ -83,114 +115,130 @@
                                                                             $tax_apply_on = '';
                                                                         }
                                                                     ?>
-                                                                    <tr>
-                                                                        <td class="header_btn hidden" style="display:none;"><small>&nbsp;</small><input class="css-checkbox" id="chk_costing<?= $count ?>" type="checkbox" checked disabled><span class="css-label" for="chk_costing<?= $count ?>"></span></td>
-                                                                        <td class="header_btn hidden" style="display:none;">
-                                                                            <small>&nbsp;</small><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /><span>SR.NO</span></td>
-                                                                        <td><small>&nbsp;</small><input type="text" id="package_type-<?= $count ?>" name="package_type-" placeholder="Package Type" title="Package Type" style="width:150px" value="<?= $row_q_costing['package_type'] ?>" readonly><span>Package Type</span></td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text"
-                                                                                id="tour_cost-<?= $count ?>" name="tour_cost"
-                                                                                placeholder="Hotel Cost" title="Hotel Cost"
-                                                                                onchange="validate_balance(this.id);quotation_cost_calculate1(this.id);"
-                                                                                value="<?php echo $row_q_costing['tour_cost']; ?>"
-                                                                                style="width:100px"><span>Hotel Cost</span></td>
+                                                                    <div>
+                                                                        <div class="header_btn hidden" style="display:none;"><small>&nbsp;</small><input class="css-checkbox" id="chk_costing<?= $count ?>" type="checkbox" checked disabled><span class="css-label" for="chk_costing<?= $count ?>"></span></div>
 
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text"
-                                                                                id="transport_cost-<?= $count ?>" name="transport_cost"
-                                                                                placeholder="Transport Cost" title="Transport Cost"
-                                                                                onchange="validate_balance(this.id);quotation_cost_calculate1(this.id)"
-                                                                                value="<?php echo $row_q_costing['transport_cost']; ?>"
-                                                                                style="width:100px"><span>Transport Cost</span></td>
+                                                                        <div class="header_btn hidden" style="display:none;">
+                                                                            <small>&nbsp;</small><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /><span>SR.NO</span></div>
 
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text"
-                                                                                id="excursion_cost-<?= $count ?>" name="excursion_cost"
-                                                                                onchange="quotation_cost_calculate1(this.id); validate_balance(this.id)"
-                                                                                placeholder="Activity Cost" title="Activity Cost"
-                                                                                value="<?= $row_q_costing['excursion_cost'] ?>"
-                                                                                style="width:150px"><span>Activity Cost</span></td>
-
-                                                                        <td class="header_btn"><small id="basic_show-"
-                                                                                style="color:#000000">&nbsp;</small><input type="<?= $add_class1 ?>"
-                                                                                id="basic_amount-<?= $count ?>" name="basic_amount" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'true');validate_balance(this.id)"
-                                                                                placeholder="Basic Amount" title="Basic Amount" style="width:100px"
-                                                                                value="<?= $row_q_costing['basic_amount'] ?>" readonly><span>Basic
-                                                                                Amount</span></td>
-
-                                                                        <td class="header_btn"><small id="service_show-"
-                                                                                style="color:#000000">&nbsp;</small><input type="<?= $add_class1 ?>"
-                                                                                id="service_charge-<?= $count ?>" name="service_charge"
-                                                                                onchange="get_business(this.id,'false');quotation_cost_calculate1(this.id); validate_balance(this.id)" style="width:150px" placeholder="Service charge" title="Service charge" value="<?= $row_q_costing['service_charge'] ?>"><span>Service charge</span></td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><select title="Discount In" id="discount_in-<?= $count ?>" name="discount_in-" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'true');" style="width: 150px!important;">
-                                                                            <option value="<?= $row_q_costing['discount_in']?>"><?= $row_q_costing['discount_in']?></option>
-                                                                            <?php if($row_q_costing['discount_in'] != 'Percentage'){ ?>
-                                                                                <option value="Percentage">Percentage</option>
-                                                                            <?php } ?>
-                                                                            <?php if($row_q_costing['discount_in'] != 'Flat'){ ?>
-                                                                                <option value="Flat">Flat</option>
-                                                                            <?php } ?>
-                                                                            </select> <span>Discount In</span></td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="<?= $add_class1 ?>" id="discount_amt-<?= $count ?>" name="discount_amt-" onchange="quotation_cost_calculate1(this.id); get_business(this.id,'false');validate_balance(this.id)" placeholder="Discount" title="Discount" value="<?= $row_q_costing['discount'] ?>" style="width:100px"><span>Discount</span></td>
-                                                                        <td class="header_btn"><small id="tax_apply_show-" style="color:#000000">&nbsp;</small><select title="Tax Apply On" id="atax_apply_on-<?= $count ?>" name="atax_apply_on-<?= $count ?>" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'false');" style="width: 150px!important;">
-                                                                        <option value="<?php echo $bsmValues[0]->tax_apply_on ?>"><?php echo $tax_apply_on ?></option>
-                                                                                <option value="">*Tax Apply On</option>
-                                                                                <option value="1">Basic Amount</option>
-                                                                                <option value="2">Service Charge</option>
-                                                                                <option value="3">Total</option>
-                                                                            </select><span>Tax Apply On</span></td>
-                                                                        
-                                                                        <td class="header_btn"><small id="tax_show-" style="color:#000000">&nbsp;</small><select title="Select Tax" id="tax_value1-<?= $count ?>" name="tax_value1-<?= $count ?>" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'false');" style="width: 250px!important;">
-                                                                            <option value="<?php echo $bsmValues[0]->tax_value ?>"><?php echo $bsmValues[0]->tax_value ?></option>
-                                                                            <option value="">*Select Tax</option>
-                                                                            <?php get_tax_dropdown('Income') ?>
-                                                                            </select><span>Select Tax</span></td>
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text"
-                                                                                id="service_tax_subtotal-<?= $count ?>" name="service_tax_subtotal"
-                                                                                readonly placeholder="Tax Amount" title="Tax Amount"
-                                                                                value="<?= $row_q_costing['service_tax_subtotal'] ?>"
-                                                                                style="width:250px"><span>Tax Amount</span></td>
+                                                                       <div style="display: grid; grid-template-columns: 150px auto;  gap: 15px">
+                                                                       <div><small>&nbsp;</small><span>Package Type</span><input type="text" id="package_type-<?= $count ?>" name="package_type-" placeholder="Package Type" title="Package Type" style="width:150px" value="<?= $row_q_costing['package_type'] ?>" readonly></div>
                                                                        
-                                                                         <td class="header_btn">
-                                                                            <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small>
-                                                                            <select title="TCS" id="tcs_tax-<?= $count ?>" name="tcs_tax-<?= $count ?>" class="form-control" style="width: 150px!important;">
-                                                                                <option value="">*TCS Tax</option>
-                                            									<option value="2" <?php if($bsmValues[0]->tcsper==2) { echo "selected"; } ?> >2% TCS</option>
-                                            									<option value="20" <?php if($bsmValues[0]->tcsper==20) { echo "selected"; } ?>>20% TCS</option>
-                                                                            </select><span>TCS</span>
-                                                                        </td>
-                                                                 <td class="header_btn">
-                                                                            <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small>
-                                                                             <input type="number" name="tcs-<?= $count ?>" id="tcs1-<?= $count ?>" readonly class="text-right"
-                                                                                placeholder="TCS" title="TCS" value="<?= $bsmValues[0]->tcsvalue ?>" style="width: 100px!important;">
-                                                                                <span>TCS</span>
-                                                                        </td>        
-                                                                        
-                                                                        
-                                                                        <td class="header_btn" style="display:none;">
-                                                                            <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small>
-                                                                             <input type="number" name="tds-<?= $count ?>" id="tds" readonly class="text-right"
-                                                                                placeholder="TDS" title="TDS" value="0.00" style="width: 100px!important;">
-                                                                                <span>TDSss</span>
-                                                                        </td>
-                                                                        
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text"
-                                                                                id="total_tour_cost-<?= $count ?>"
-                                                                                class="amount_feild_highlight text-right" name="total_tour_cost"
-                                                                                placeholder="Total Cost" title="Total Cost"
-                                                                                value="<?= $row_q_costing['total_tour_cost'] ?>"
-                                                                                style="width: 100px;" readonly><span>Total Cost</span></td>
+                                                                       <div>
+                                                                       <div style="display: grid; grid-template-columns: repeat(7, 1fr);  gap: 15px">
+                                                                       <div ><small>&nbsp;</small><span>Hotel Cost</span><input type="text"
+                                                                               id="tour_cost-<?= $count ?>" name="tour_cost"
+                                                                               placeholder="Hotel Cost" title="Hotel Cost"
+                                                                               onchange="validate_balance(this.id);quotation_cost_calculate1(this.id);"
+                                                                               value="<?php echo $row_q_costing['tour_cost']; ?>"
+                                                                               ></div>
 
-                                                                        <td class="header_btn"><small>&nbsp;</small><input type="text"
-                                                                                id="package_name1-<?= $count ?>" name="package_name1"
-                                                                                placeholder="Package Name" title="Package Name"
-                                                                                value="<?php echo '0'; ?>" style="display: none" readonly>
-                                                                        </td>
-                                                                        <td class="header_btn"><input type="hidden"
-                                                                                value="<?= $bsmValues[0]->tax_apply_on ?>" id="atax_apply_on-<?= $count ?>"></td>
+                                                                       <div ><small>&nbsp;</small><span>Transport Cost</span><input type="text"
+                                                                               id="transport_cost-<?= $count ?>" name="transport_cost"
+                                                                               placeholder="Transport Cost" title="Transport Cost"
+                                                                               onchange="validate_balance(this.id);quotation_cost_calculate1(this.id)"
+                                                                               value="<?php echo $row_q_costing['transport_cost']; ?>"
+                                                                               ></div>
 
-                                                                        <td class="header_btn"><input type="hidden"
-                                                                                value="<?= $row_q_costing['id'] ?>"></td>
+                                                                       <div ><small>&nbsp;</small><span>Activity Cost</span><input type="text"
+                                                                               id="excursion_cost-<?= $count ?>" name="excursion_cost"
+                                                                               onchange="quotation_cost_calculate1(this.id); validate_balance(this.id)"
+                                                                               placeholder="Activity Cost" title="Activity Cost"
+                                                                               value="<?= $row_q_costing['excursion_cost'] ?>"
+                                                                               ></div>
 
-                                                                    </tr>
+                                                                       <div ><small id="basic_show-"
+                                                                               style="color:#000000">&nbsp;</small><span>Basic
+                                                                               Amount</span><input type="<?= $add_class1 ?>"
+                                                                               id="basic_amount-<?= $count ?>" name="basic_amount" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'true');validate_balance(this.id)"
+                                                                               placeholder="Basic Amount" title="Basic Amount" 
+                                                                               value="<?= $row_q_costing['basic_amount'] ?>" readonly></div>
+
+                                                                       <div ><small id="service_show-"
+                                                                               style="color:#000000">&nbsp;</small><span>Service charge</span><input type="<?= $add_class1 ?>"
+                                                                               id="service_charge-<?= $count ?>" name="service_charge"
+                                                                               onchange="get_business(this.id,'false');quotation_cost_calculate1(this.id); validate_balance(this.id)"  placeholder="Service charge" title="Service charge" value="<?= $row_q_costing['service_charge'] ?>"></div>
+
+                                                                       <div ><small>&nbsp;</small> <span>Discount In</span><select title="Discount In" id="discount_in-<?= $count ?>" name="discount_in-" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'true');" style="width: >
+                                                                           <option value="<?= $row_q_costing['discount_in']?>"><?= $row_q_costing['discount_in']?></option>
+                                                                           <?php if($row_q_costing['discount_in'] != 'Percentage'){ ?>
+                                                                               <option value="Percentage">Percentage</option>
+                                                                           <?php } ?>
+                                                                           <?php if($row_q_costing['discount_in'] != 'Flat'){ ?>
+                                                                               <option value="Flat">Flat</option>
+                                                                           <?php } ?>
+                                                                           </select></div>
+
+                                                                       <div ><small>&nbsp;</small><span>Discount</span><input type="<?= $add_class1 ?>" id="discount_amt-<?= $count ?>" name="discount_amt-" onchange="quotation_cost_calculate1(this.id); get_business(this.id,'false');validate_balance(this.id)" placeholder="Discount" title="Discount" value="<?= $row_q_costing['discount'] ?>" ></div>
+                                                                       </div>
+
+                                                                      <div style="display: grid; grid-template-columns: repeat(7, 1fr);  gap: 15px ;margin-top: 15px;">
+                                                                      <div ><small id="tax_apply_show-" style="color:#000000">&nbsp;</small><span>Tax Apply On</span><select title="Tax Apply On" id="atax_apply_on-<?= $count ?>" name="atax_apply_on-<?= $count ?>" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'false');" >
+                                                                       <option value="<?php echo $bsmValues[0]->tax_apply_on ?>"><?php echo $tax_apply_on ?></option>
+                                                                               <option value="">*Tax Apply On</option>
+                                                                               <option value="1">Basic Amount</option>
+                                                                               <option value="2">Service Charge</option>
+                                                                               <option value="3">Total</option>
+                                                                           </select></div>
+                                                                       
+                                                                       <div ><small id="tax_show-" style="color:#000000">&nbsp;</small><span>Select Tax</span><select title="Select Tax" id="tax_value1-<?= $count ?>" name="tax_value1-<?= $count ?>" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'false');" >
+                                                                           <option value="<?php echo $bsmValues[0]->tax_value ?>"><?php echo $bsmValues[0]->tax_value ?></option>
+                                                                           <option value="">*Select Tax</option>
+                                                                           <?php get_tax_dropdown('Income') ?>
+                                                                           </select></div>
+
+                                                                       <div ><small>&nbsp;</small><span>Tax Amount</span><input type="text"
+                                                                               id="service_tax_subtotal-<?= $count ?>" name="service_tax_subtotal"
+                                                                               readonly placeholder="Tax Amount" title="Tax Amount"
+                                                                               value="<?= $row_q_costing['service_tax_subtotal'] ?>"
+                                                                               ></div>
+                                                                      
+                                                                        <div >
+                                                                           <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small><span>TCS</span>
+                                                                           <select title="TCS" id="tcs_tax-<?= $count ?>" name="tcs_tax-<?= $count ?>" class="form-control" >
+                                                                               <option value="">*TCS Tax</option>
+                                                                               <option value="2" <?php if($bsmValues[0]->tcsper==2) { echo "selected"; } ?> >2% TCS</option>
+                                                                               <option value="20" <?php if($bsmValues[0]->tcsper==20) { echo "selected"; } ?>>20% TCS</option>
+                                                                           </select>
+                                                                       </div>
+
+                                                                <div >
+                                                                           <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small><span>TCS</span>
+                                                                            <input type="number" name="tcs-<?= $count ?>" id="tcs1-<?= $count ?>" readonly class="text-right"
+                                                                               placeholder="TCS" title="TCS" value="<?= $bsmValues[0]->tcsvalue ?>" >
+                                                                               
+                                                                       </div>        
+                                                                       
+                                                                       
+                                                                       <div  style="display:none;"> <span>TDSss</span>
+                                                                           <small id="tcs_tax_show-" style="color:#000000">&nbsp;</small>
+                                                                            <input type="number" name="tds-<?= $count ?>" id="tds" readonly class="text-right"
+                                                                               placeholder="TDS" title="TDS" value="0.00" >
+                                                                              
+                                                                       </div>
+                                                                       
+                                                                       <div ><small>&nbsp;</small><span>Total Cost</span><input type="text"
+                                                                               id="total_tour_cost-<?= $count ?>"
+                                                                               class="amount_feild_highlight text-right" name="total_tour_cost"
+                                                                               placeholder="Total Cost" title="Total Cost"
+                                                                               value="<?= $row_q_costing['total_tour_cost'] ?>"
+                                                                               readonly></div>
+
+                                                                       <div ><small>&nbsp;</small><input type="text"
+                                                                               id="package_name1-<?= $count ?>" name="package_name1"
+                                                                               placeholder="Package Name" title="Package Name"
+                                                                               value="<?php echo '0'; ?>" style="display: none" readonly>
+                                                                       </div>
+                                                                           <div ><input type="hidden"
+                                                                               value="<?= $bsmValues[0]->tax_apply_on ?>" id="atax_apply_on-<?= $count ?>"></div>
+
+                                                                       <div ><input type="hidden" id="costing_entry_id-<?= $count ?>"
+                                                                               value="<?= $row_q_costing['id'] ?>"></div>
+
+                                                                           </div>
+                                                                      </div>
+                                                                       </div>
+                                                                       </div>
 
                                                                     <?php
 
@@ -198,7 +246,7 @@
 
                                                                     ?>
 
-                                                                </table>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -206,73 +254,97 @@
                                             </div>
                                         </div>
 
-                                        <div class="row mg_tp_10">
-                                            <div class="col-xs-12">
-                                                <h3 class="editor_title">Travel Cost</h3>
+                                        <div class="row mg_tp_30">
+                                            <div class="col-xs-12" >
                                                 <div class="panel panel-default panel-body app_panel_style">
+                                                    <legend >Travel Cost</legend>
                                                     <!-- Other costs -->
                                                     <div class="row">
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
+                                                        <div class="col-md-2  col-xs-12 mg_bt_10">
                                                             <span>Flight Cost</span>
                                                             <input type="text" id="flight_cost1" value="<?php echo $sq_quotation['flight_cost']; ?>"
                                                                 name="flight_cost" placeholder="Flight Cost" title="Flight Cost"
                                                                 onchange="validate_balance(this.id)">
                                                         </div>
-                                                        <div class="col-md-4 header_btn col-xs-12 mg_bt_10">
+                                                        <div class="col-md-2  col-xs-12 mg_bt_10">
                                                             <span>Train Cost</span>
                                                             <input type="text" id="train_cost1" name="train_cost"
                                                                 value="<?php echo $sq_quotation['train_cost']; ?>" placeholder="Train Cost"
                                                                 title="Train Cost" onchange="validate_balance(this.id)">
                                                         </div>
-                                                        <div class="col-md-4 header_btn mg_bt_10">
+                                                        <div class="col-md-2  mg_bt_10">
                                                             <span>Cruise Cost</span>
                                                             <input type="text" id="cruise_cost1" name="cruise_cost1" placeholder="Cruise Cost"
                                                                 value="<?php echo $sq_quotation['cruise_cost']; ?>" title="Cruise Cost"
                                                                 onchange="validate_balance(this.id)">
                                                         </div>
+                                                        <div class="col-md-2  col-xs-12 mg_bt_10">
+                            <span>Visa Cost</span>
+                            <input type="text" id="visa_cost1" value="<?php echo $sq_quotation['visa_cost']; ?>"
+                                name="visa_cost" placeholder="Visa Cost" title="Visa Cost"
+                                onchange="validate_balance(this.id)">
+                        </div>
+                        <div class="col-md-2  mg_bt_10">
+                            <span>Guide Cost</span>
+                            <input type="text" id="guide_cost1" name="guide_cost1" placeholder="Guide Cost"
+                                value="<?php echo $sq_quotation['guide_cost']; ?>" title="Guide Cost"
+                                onchange="validate_balance(this.id)">
+                        </div>
+                        <div class="col-md-2  mg_bt_10">
+                            <span>Miscellaneous Cost</span>
+                            <input type="text" id="misc_cost1" name="misc_cost1" placeholder="Miscellaneous Cost"
+                                value="<?php echo $sq_quotation['misc_cost']; ?>" title="Miscellaneous Cost"
+                                onchange="validate_balance(this.id)">
+                        </div>
+                        <div class="col-md-4  mg_bt_10">
+                            <span>Miscellaneous Description</span>
+                            <textarea id="other_desc1" name="other_desc1" placeholder="Miscellaneous Description" title="Miscellaneous Description"><?php echo $sq_quotation['other_desc']; ?></textarea>
+                        </div>
+                        <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
+                        <span>Currency</span>
+
+                    <select name="currency_code1" id="currency_code1" title="Currency" style="width:100%"
+                        data-toggle="tooltip" required>
+                        <?php
+						$sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . $sq_quotation['currency_code']));
+						?>
+                        <option value="<?= $sq_currencyd['id'] ?>"><?= $sq_currencyd['currency_code'] ?></option>
+                        <option value=''>*Select Currency</option>
+                        <?php
+						$sq_currency = mysqlQuery("select * from currency_name_master order by currency_code");
+						while ($row_currency = mysqli_fetch_assoc($sq_currency)) {
+						?>
+                        <option value="<?= $row_currency['id'] ?>"><?= $row_currency['currency_code'] ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
                                                     </div>
 
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                        <!-- Accordian-1 End --><!-- Group Costing -->
-                        <!-- Accordian-2 Start --><!-- Per person Costing -->
-                        <div class="accordion_content main_block">
-
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="headingl_2">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse"
-                                        data-parent="#accordion" href="#collapsel2" aria-expanded="true"
-                                        aria-controls="collapsel2" id="collapsedl2">
-                                        <div class="col-md-12"><span>Per Person Costing</span></div>
-                                    </div>
-                                </div>
+                        <!-- Per Person Costing -->
+                        <div id="per_person_costing_tab" class="costing_section main_block mg_bt_20" style="display: none;">
                               <?php 
-$pp_costing = [];
-
-$sq_pp = mysqlQuery("SELECT * FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
-if ($sq_pp) {
-    while ($row = mysqli_fetch_assoc($sq_pp)) {
-        $pp_costing[$row['pax_type']] = $row;
-    }
-}
-
-// Safe getter function
-function get_pp_val($pp_costing, $type, $field){
-    return isset($pp_costing[$type][$field]) ? $pp_costing[$type][$field] : '';
-}
-?>
-                                <div id="collapsel2" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="headingl_2">
-                                    <div class="panel-body">
+                                     $pp_costing = [];
+                                     
+                                     $sq_pp = mysqlQuery("SELECT * FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
+                                     if ($sq_pp) {
+                                         while ($row = mysqli_fetch_assoc($sq_pp)) {
+                                             $pp_costing[$row['pax_type']] = $row;
+                                         }
+                                     }
+                                     
+                                     // Safe getter function
+                                     function get_pp_val($pp_costing, $type, $field){
+                                         return isset($pp_costing[$type][$field]) ? $pp_costing[$type][$field] : '';
+                                     }
+                                     ?>
                                         <div class="row">
                                             <div class="col-xs-12">
-                                                <h3 class="editor_title">Land Cost</h3>
                                                 <div class="panel panel-default panel-body app_panel_style">
+                                                    <legend >Land Cost</legend>
                                                     <!-- Adult & child cost -->
                                                     <?php
                                                     $count = 0;
@@ -287,11 +359,27 @@ function get_pp_val($pp_costing, $type, $field){
                                                         $id = $row_q_costing1['id'];
                                                     ?>
                                                     <div class="row mg_tp_10">
-                                                        <div class="col-md-3">
+                                                        <div class="col-md-2">
                                                             <span>Package Type</span>
                                                             <input type="text" id="package_type<?= $countp ?>" onchange="validate_balance(this.id);"
                                                                 name="package_type" placeholder="Package Type" title="Package Type"
                                                                 value="<?= $row_q_costing1['package_type'] ?>" readonly>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                                                  <span>Currency</span>
+                                                                                         <select name="currency_code_pp" id="currency_code_pp" title="Currency" style="width:100%" data-toggle="tooltip">
+                                                                                          <option value="">*Select Currency</option>
+                                                                                          <option value="1">USD</option>
+                                                                                          <option value="2">EUR</option>
+                                                                                          <option value="3">GBP</option>
+                                                                                          <option value="4">INR</option>
+                                                                                          <option value="5">AUD</option>
+                                                                                          <option value="6">CAD</option>
+                                                                                          <option value="7">CHF</option>
+                                                                                          <option value="8">CNY</option>
+                                                                                          <option value="9">JPY</option>
+                                                                                         </select>
+                       
                                                         </div>
                                                         <div class="col-md-2">
                                                             <span>Adult Cost</span>
@@ -323,8 +411,8 @@ function get_pp_val($pp_costing, $type, $field){
                                                     <?php $countp++;
                                                     } ?>
 
-                                                      <div class="costing-content-wp">
-                                                <div class="costing-card-wp">
+                                            <div class="costing-content-wp">
+                                                <div class="costing-card-wp mg_tp_10">
                                                     <div class="row">
                                                         <div class="col-md-3">
                                                             <div class="costing-card">
@@ -821,94 +909,21 @@ function get_pp_val($pp_costing, $type, $field){
 
                                             </div>
 
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-            </div></div></div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <h3 class="editor_title">Other Costing</h3>
-                    <div class="panel panel-default panel-body app_panel_style">
-                        <div class="col-md-3 header_btn col-xs-12 mg_bt_10">
-                            <span>Visa Cost</span>
-                            <input type="text" id="visa_cost1" value="<?php echo $sq_quotation['visa_cost']; ?>"
-                                name="visa_cost" placeholder="Visa Cost" title="Visa Cost"
-                                onchange="validate_balance(this.id)">
-                        </div>
-                        <div class="col-md-3 header_btn mg_bt_10">
-                            <span>Guide Cost</span>
-                            <input type="text" id="guide_cost1" name="guide_cost1" placeholder="Guide Cost"
-                                value="<?php echo $sq_quotation['guide_cost']; ?>" title="Guide Cost"
-                                onchange="validate_balance(this.id)">
-                        </div>
-                        <div class="col-md-3 header_btn mg_bt_10">
-                            <span>Miscellaneous Cost</span>
-                            <input type="text" id="misc_cost1" name="misc_cost1" placeholder="Miscellaneous Cost"
-                                value="<?php echo $sq_quotation['misc_cost']; ?>" title="Miscellaneous Cost"
-                                onchange="validate_balance(this.id)">
-                        </div>
-                        <div class="col-md-3 header_btn mg_bt_10">
-                            <span>Miscellaneous Description</span>
-                            <textarea id="other_desc1" name="other_desc1" placeholder="Miscellaneous Description" title="Miscellaneous Description"><?php echo $sq_quotation['other_desc']; ?></textarea>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3 col-sm-6 col-sm-12 mg_bt_10 hidden">
-                    <input type="hidden" id="discount1" name="discount" placeholder="Discount" title="Discount"
-                        value="<?= $sq_quotation['discount'] ?>" />
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <select name="costing_type1" id="costing_type1" title="Select Costing type" class="form-control">
-                        <?php $costing_type = ($sq_quotation['costing_type'] == 1) ? 'Group Costing' : 'Per Person costing'; ?>
-                        <option value="<?= $sq_quotation['costing_type'] ?>"><?= $costing_type ?></option>
-                        <option value="1">Group Costing</option>
-                        <option value="2">Per Person costing</option>
-                    </select>
-                </div>
-                <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
-                    <select name="currency_code1" id="currency_code1" title="Currency" style="width:100%"
-                        data-toggle="tooltip" required>
-                        <?php
-						$sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . $sq_quotation['currency_code']));
-						?>
-                        <option value="<?= $sq_currencyd['id'] ?>"><?= $sq_currencyd['currency_code'] ?></option>
-                        <option value=''>*Select Currency</option>
-                        <?php
-						$sq_currency = mysqlQuery("select * from currency_name_master order by currency_code");
-						while ($row_currency = mysqli_fetch_assoc($sq_currency)) {
-						?>
-                        <option value="<?= $row_currency['id'] ?>"><?= $row_currency['currency_code'] ?></option>
-                        <?php } ?>
-                    </select>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <div class="div-upload">
-                        <div id="price_structure1" class="upload-button1"><span>Price Structure</span></div>
-                        <span id="photo_status"></span>
-                        <ul id="files"></ul>
-                        <input type="hidden" id="upload_url1" name="upload_url1"
-                            value="<?= $sq_quotation['price_str_url'] ?>">
-                    </div>
-	                <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : Only Excel or Word files are allowed."><i class="fa fa-question-circle"></i></button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3 col-sm-6 col-sm-12"></div>
-                <div class="col-md-6 col-sm-12">
-                    <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : Group Costing or Per person costing to display on quotation."><i class="fa fa-question-circle"></i></button>
-                </div>
-            </div>
-            <div class="row mg_tp_20 mg_bt_20 text-center">
+        </div>
+      </div>
+
+                 
+            
+            <div class="row  mg_tp_20 text-center row  text-center mg_bt_30">
                 <div class="col-xs-12">
                     <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab3()"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
                     &nbsp;&nbsp;
-                    <button class="btn btn-sm btn-success" id="btn_quotation_update"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                    <button class="btn btn-sm btn-success" type="button" id="btn_quotation_update"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
                 </div>
             </div>
-        </div>
+         
     </div>
 </form>
 <?= end_panel(); ?>
@@ -940,7 +955,6 @@ function getInclusionsExclusionsForQuotation() {
         exclusions: getQuotationEditorContent('exclusions1')
     };
 }
-$('#currency_code1').select2();
 function get_business(id, flag, change = false) {
     var offset = id.split('-');
     get_auto_values('quotation_date', 'basic_amount-' + offset[1], 'payment_mode', 'service_charge-' + offset[1],'markup', 'update', flag, 'markup', 'discount_amt-'+ offset[1], offset[1], change);
@@ -956,9 +970,11 @@ function switch_to_tab3() {
     }, 200);
 }
 
-upload_price_struct();
 function upload_price_struct() {
     var btnUpload = $('#price_structure1');
+    if (!btnUpload.length || typeof AjaxUpload === 'undefined') {
+        return;
+    }
     $(btnUpload).find('span').text('Price Structure');
 
     new AjaxUpload(btnUpload, {
@@ -1049,19 +1065,20 @@ function quotation_cost_calculate1(id) {
     $('#total_tour_cost-' + offset[1]).val(total_amt.toFixed(2));
 }
 
+function initQuotationUpdateForm() {
+    if ($('#currency_code1').length && !$('#currency_code1').data('select2')) {
+        $('#currency_code1').select2();
+    }
+    upload_price_struct();
+
+    if ($('#frm_tab4').data('validator')) {
+        return;
+    }
+
 $('#frm_tab4').validate({
 
     rules: {
 
-        markup_cost1: {
-            required: true,
-            number: true
-        },
-
-        tour_cost1: {
-            required: true,
-            number: true
-        },
         currency_code1: {
             required: true
         }
@@ -1099,8 +1116,116 @@ $('#frm_tab4').validate({
             var table = document.getElementById(tableId);
             return (table && table.rows) ? table.rows : [];
         }
-        
-        // Prevent double submission
+
+        function collectUpdateCostingEntries() {
+            var el = document.getElementById('tbl_package_tour_quotation_dynamic_costing');
+            if (!el) {
+                return [];
+            }
+            if (el.tagName === 'DIV') {
+                var entries = [];
+                $(el).find('[id^="tour_cost-"]').each(function() {
+                    var suffix = this.id.replace('tour_cost-', '');
+                    if (!suffix) {
+                        return;
+                    }
+                    var checkbox = document.getElementById('chk_costing' + suffix);
+                    if (checkbox && !checkbox.checked) {
+                        return;
+                    }
+                    entries.push({
+                        package_type_c: $('#package_type-' + suffix).val() || '',
+                        tour_cost: $('#tour_cost-' + suffix).val() || '',
+                        transport_cost: $('#transport_cost-' + suffix).val() || '',
+                        excursion_cost: $('#excursion_cost-' + suffix).val() || '',
+                        basic_amount: $('#basic_amount-' + suffix).val() || '',
+                        service_charge: $('#service_charge-' + suffix).val() || '',
+                        discount_in: $('#discount_in-' + suffix).val() || '',
+                        discount: $('#discount_amt-' + suffix).val() || '',
+                        tax_apply_on: $('#atax_apply_on-' + suffix).val() || '',
+                        tax_value: $('#tax_value1-' + suffix).val() || '',
+                        service_tax_subtotal: $('#service_tax_subtotal-' + suffix).val() || '',
+                        total_tour_cost: $('#total_tour_cost-' + suffix).val() || '',
+                        package_name3: $('#package_name1-' + suffix).val() || '',
+                        costing_id: $('#costing_entry_id-' + suffix).val() || ''
+                    });
+                });
+                return entries;
+            }
+            var rows = getTableRows('tbl_package_tour_quotation_dynamic_costing');
+            var tableEntries = [];
+            for (var r = 0; r < rows.length; r++) {
+                var row = rows[r];
+                tableEntries.push({
+                    package_type_c: getRowInputValue(row, 2),
+                    tour_cost: getRowInputValue(row, 3),
+                    transport_cost: getRowInputValue(row, 4),
+                    excursion_cost: getRowInputValue(row, 5),
+                    basic_amount: getRowInputValue(row, 6),
+                    service_charge: getRowInputValue(row, 7),
+                    discount_in: getRowInputValue(row, 8),
+                    discount: getRowInputValue(row, 9),
+                    tax_apply_on: getRowInputValue(row, 10),
+                    tax_value: getRowInputValue(row, 11),
+                    service_tax_subtotal: getRowInputValue(row, 12),
+                    total_tour_cost: getRowInputValue(row, 16),
+                    package_name3: getRowInputValue(row, 17),
+                    costing_id: getRowInputValue(row, 19)
+                });
+            }
+            return tableEntries;
+        }
+
+        function collectUpdateCostingBsmValues() {
+            var el = document.getElementById('tbl_package_tour_quotation_dynamic_costing');
+            if (!el) {
+                return [];
+            }
+            if (el.tagName === 'DIV') {
+                var bsmValues = [];
+                $(el).find('[id^="tour_cost-"]').each(function() {
+                    var suffix = this.id.replace('tour_cost-', '');
+                    if (!suffix) {
+                        return;
+                    }
+                    var checkbox = document.getElementById('chk_costing' + suffix);
+                    if (checkbox && !checkbox.checked) {
+                        return;
+                    }
+                    bsmValues.push([{
+                        "basic": 'basic',
+                        "service": 'service',
+                        'tax_apply_on': $('#atax_apply_on-' + suffix).val() || '',
+                        'tax_value': $('#tax_value1-' + suffix).val() || '',
+                        'tcsper': $('#tcs_tax-' + suffix).val() || '',
+                        'tcsvalue': $('#tcs1-' + suffix).val() || ''
+                    }]);
+                });
+                return bsmValues;
+            }
+            var rows = getTableRows('tbl_package_tour_quotation_dynamic_costing');
+            var bsmValues = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                if (getRowCheckboxChecked(row, 0) === 'true') {
+                    bsmValues.push([{
+                        "basic": 'basic',
+                        "service": 'service',
+                        'tax_apply_on': getRowInputValue(row, 10),
+                        'tax_value': getRowInputValue(row, 11),
+                        'tcsper': getRowInputValue(row, 13),
+                        'tcsvalue': getRowInputValue(row, 14)
+                    }]);
+                }
+            }
+            return bsmValues;
+        }
+
+        function resetQuotationUpdateState() {
+            window.quotationUpdateInProgress = false;
+            $('#btn_quotation_update').prop('disabled', false);
+            try { $('#btn_quotation_update').button('reset'); } catch (e) {}
+        }
         if (window.quotationUpdateInProgress) {
             console.log("QUOTATION UPDATE: Already in progress, preventing double submission");
             return false;
@@ -1576,38 +1701,44 @@ $('#frm_tab4').validate({
         var discount_in_arr = [];
         var discount_arr = [];
 
-        var costingRows = getTableRows("tbl_package_tour_quotation_dynamic_costing");
-        for (var i = 0; i < costingRows.length; i++) {
+        var costingEntries = collectUpdateCostingEntries();
+        if (!costingEntries.length) {
+            error_msg_alert('Please enter land costing details before updating.');
+            resetQuotationUpdateState();
+            return false;
+        }
 
-            var row = costingRows[i];
-            var package_type_c = getRowInputValue(row, 2);
-            var tour_cost = getRowInputValue(row, 3);
-            var transport_cost = getRowInputValue(row, 4);
-            var excursion_cost = getRowInputValue(row, 5);
-            var basic_amount = getRowInputValue(row, 6);
-            var service_charge = getRowInputValue(row, 7);
-            var discount_in = getRowInputValue(row, 8);
-            var discount = getRowInputValue(row, 9);
-            var tax_apply_on = getRowInputValue(row, 10);
-            var tax_value = getRowInputValue(row, 11);
-            var service_tax_subtotal = getRowInputValue(row, 12);
-            var total_tour_cost = getRowInputValue(row, 16);
-            var package_name3 = getRowInputValue(row, 17);
-            var costing_id = getRowInputValue(row, 19);
+        for (var i = 0; i < costingEntries.length; i++) {
+
+            var entry = costingEntries[i];
+            var package_type_c = entry.package_type_c;
+            var tour_cost = entry.tour_cost;
+            var transport_cost = entry.transport_cost;
+            var excursion_cost = entry.excursion_cost;
+            var basic_amount = entry.basic_amount;
+            var service_charge = entry.service_charge;
+            var discount_in = entry.discount_in;
+            var discount = entry.discount;
+            var tax_apply_on = entry.tax_apply_on;
+            var tax_value = entry.tax_value;
+            var service_tax_subtotal = entry.service_tax_subtotal;
+            var total_tour_cost = entry.total_tour_cost;
+            var package_name3 = entry.package_name3;
+            var costing_id = entry.costing_id;
 
             if (tour_cost == "") {
                 error_msg_alert('Select Tour cost in row' + (i + 1));
-                $('#btn_quotation_update').prop('disabled', false);
+                resetQuotationUpdateState();
                 return false;
             }
             if (tax_apply_on == "") {
                 error_msg_alert('Select Tax Apply On in row' + (i + 1));
-                $('#btn_quotation_update').prop('disabled', false);
+                resetQuotationUpdateState();
                 return false;
             }
             if (tax_value == "") {
                 error_msg_alert('Select Tax in row' + (i + 1));
-                $('#btn_quotation_update').prop('disabled', false);
+                resetQuotationUpdateState();
                 return false;
             }
 
@@ -1624,30 +1755,7 @@ $('#frm_tab4').validate({
             package_name_arr2.push(package_name3);
             costing_id_arr.push(costing_id);
         }
-        var bsmValues = [];
-
-        for (var i = 0; i < costingRows.length; i++) {
-            var row = costingRows[i];
-            var bsmvaluesEach = [];
-            if (getRowCheckboxChecked(row, 0)) {
-                    var basic_show = $(row.cells[6]).find('span').last().text();
-                    var service_show = $(row.cells[7]).find('span').last().text();
-                    var tax_apply_on = getRowInputValue(row, 10);
-                    var tax_value = getRowInputValue(row, 11);
-                    var tcs = getRowInputValue(row, 13);
-                    var tcsvalue = getRowInputValue(row, 14);
-                
-                    bsmvaluesEach.push({
-                        "basic": 'basic',
-                        "service": 'service',
-                        'tax_apply_on': tax_apply_on,
-                        'tax_value': tax_value,
-                        'tcsper':tcs,
-                        'tcsvalue':tcsvalue,
-                    });
-                bsmValues.push(bsmvaluesEach);
-            }
-        }
+        var bsmValues = collectUpdateCostingBsmValues();
         // PP Costing
         var adult_cost_arr = [];
         var infant_cost_arr = [];
@@ -1922,6 +2030,16 @@ $('#frm_tab4').validate({
             }
         });
     }
+});
+
+    $('#btn_quotation_update').off('click.quotationUpdate').on('click.quotationUpdate', function(e) {
+        e.preventDefault();
+        $('#frm_tab4').submit();
+    });
+}
+
+$(document).ready(function() {
+    initQuotationUpdateForm();
 });
 
 // $(document).on("change","#tcs_tax",function() {
@@ -2421,5 +2539,19 @@ $(document).ready(function () {
     });
 
 });
+function costing_reflect()
+{
+	var id = $('input[name="costing_tab"]:checked').attr('id');
+	if(id=="group_costing"){
+		$('#group_costing_tab').show();
+		$('#per_person_costing_tab').hide();
+	}
+	if(id=="perperson_costing"){
+		$('#group_costing_tab').hide();
+		$('#per_person_costing_tab').show();
+	}
+
+}
+costing_reflect();
 </script>
 </script>

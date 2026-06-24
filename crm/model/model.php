@@ -37,12 +37,12 @@ $password = "";
 
 // $db_name = "tour_operator_theme";
 
-$db_name = "tour_operator_new_3_1";
+$db_name = "itours_latest";
 
 global $conn;
 $conn = new mysqli($servername, $username, $password, $db_name);
 
-define('BASE_URL', 'http://localhost/tour_operator_new3.1/crm/');
+define('BASE_URL', 'http://localhost/tour_operator_new3.1-niharika-latest/crm/');
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");
 $b2b_index_url = BASE_URL . 'Tours_B2B/view/index.php';
