@@ -725,7 +725,7 @@ function o1_flight_date($v)
             $o1_hi++;
             $o1_hnights = (int) o1nv(isset($h['total_nights']) ? $h['total_nights'] : '', 0);
             // $o1_hphoto  = o1img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . ((($o1_hi - 1) % 3) + 1) . '.jpg');
-            $dummy_hotel_img = BASE_URL . 'uploads/quotation_images/hotel.png';
+            $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
             $o1_hphoto = '';
             if (!empty($h['hotel_photo'])) {
@@ -990,7 +990,7 @@ function o1_flight_date($v)
               <?php foreach ((array)$trains as $tr) { ?>
 
                 <?php
-                $train_img = BASE_URL . 'uploads/quotation_images/train.jpg';
+                $train_img = BASE_URL . 'images/train.jpg';
 
                 $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
                 $to_loc   = isset($tr['to_location']) ? $tr['to_location'] : '';
@@ -1112,7 +1112,7 @@ function o1_flight_date($v)
 
               <?php
               // $activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
-              $dummy_activity_img = BASE_URL . 'uploads/quotation_images/activity.jpg';
+              $dummy_activity_img = BASE_URL . 'images/activity.jpg';
 
               $activity_img = '';
               if (!empty($a['activity_image'])) {
@@ -1211,7 +1211,7 @@ function o1_flight_date($v)
               style="box-shadow:var(--shadow-card)">
 
               <div class="col-span-2 bg-[color:var(--navy)] grid place-items-center p-4">
-                <?php $vehicle_img = BASE_URL . 'uploads/quotation_images/vehicle.jpg'; ?>
+                <?php $vehicle_img = BASE_URL . 'images/vehicle.jpg'; ?>
                 <img src="<?= o1e($vehicle_img) ?>"
                   alt="Vehicle"
                   style="width:100%;height:auto;object-fit:contain;" />

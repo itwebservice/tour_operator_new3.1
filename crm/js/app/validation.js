@@ -2108,24 +2108,53 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[12].style.display = "none";
     row.cells[13].style.display = "none";
     row.cells[14].style.display = "none";
-    row.cells[15].childNodes[0].setAttribute("id", "no_vehicles-" + foo.counter + excursionIdSuffix);
-
-    if (!row.cells[16]) {
-      var excursionIdCell = row.insertCell(-1);
-      excursionIdCell.className = "hidden";
-      excursionIdCell.style.display = "none";
+    if (row.cells[15] && row.cells[15].childNodes[0]) {
+      row.cells[15].childNodes[0].setAttribute(
+        "id",
+        "vehicle_id-" + foo.counter + excursionIdSuffix
+      );
+      if (row.cells[15].childNodes[0].tagName === "SELECT") {
+        row.cells[15].childNodes[0].value = "";
+        row.cells[15].childNodes[0].setAttribute(
+          "onchange",
+          function_name
+        );
+        $(row.cells[15].childNodes[0]).select2({ width: "155px" });
+      }
     }
-    row.cells[16].innerHTML =
-      '<input type="hidden" id="excursion_id-' + foo.counter + excursionIdSuffix + '" value="">';
-    row.cells[16].style.display = "none";
+    if (row.cells[16] && row.cells[16].childNodes[0]) {
+      row.cells[16].childNodes[0].setAttribute(
+        "id",
+        "no_vehicles-" + foo.counter + excursionIdSuffix
+      );
+      if (row.cells[16].childNodes[0].tagName === "INPUT") {
+        row.cells[16].childNodes[0].value = "";
+        row.cells[16].childNodes[0].setAttribute(
+          "onchange",
+          function_name
+        );
+      }
+    }
+
+    if (excursionIdSuffix === "_u") {
+      if (!row.cells[17]) {
+        var excursionIdCell = row.insertCell(-1);
+        excursionIdCell.className = "hidden";
+        excursionIdCell.style.display = "none";
+      }
+      row.cells[17].innerHTML =
+        '<input type="hidden" id="excursion_id-' + foo.counter + excursionIdSuffix + '" value="">';
+      row.cells[17].style.display = "none";
+    } else if (row.cells[17] && row.cells[17].childNodes[0]) {
+      row.cells[17].childNodes[0].setAttribute(
+        "id",
+        "transfer_total-" + foo.counter
+      );
+      row.cells[17].style.display = "none";
+    }
 
     if (excursionIdSuffix === "_u" && typeof city_lzloading === "function") {
       city_lzloading($(row.cells[3].childNodes[0]), '*City');
-    }
-
-    if (row.cells[17]) {
-      row.cells[17].innerHTML = "";
-      row.cells[17].style.display = "none";
     }
   }
 
@@ -2673,15 +2702,21 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "to_sector-" + prefix + foo.counter
     );
+    $(row.cells[2]).addClass("sector-select").css("width", "300px");
+    $(row.cells[3]).addClass("sector-select").css("width", "300px");
+    $(row.cells[2].childNodes[0]).addClass("plane-airport-select app_select2 form-control");
+    $(row.cells[3].childNodes[0]).addClass("plane-airport-select app_select2 form-control");
     event_airport(tableID);
     row.cells[4].childNodes[0].setAttribute(
       "id",
       "airline_name-" + prefix + foo.counter
     );
+    $(row.cells[4].childNodes[0]).css("width", "120px");
     row.cells[5].childNodes[0].setAttribute(
       "id",
       "plane_class-" + prefix + foo.counter
     );
+    $(row.cells[5].childNodes[0]).css("width", "170px");
 
     for (var i = row.cells[6].childNodes[0].attributes.length; i-- > 0; )
       row.cells[6].childNodes[0].removeAttributeNode(
@@ -2744,6 +2779,8 @@ function foo(tableID, quot_table_id, rowCounts) {
     jQuery(row.cells[7].childNodes[0])
       .addClass("form-control")
       .datetimepicker({ format: "d-m-Y H:i" });
+    $(row.cells[6].childNodes[0]).css("width", "150px");
+    $(row.cells[7].childNodes[0]).css("width", "150px");
 
     row.cells[8].childNodes[0].setAttribute(
       "id",
@@ -4844,6 +4881,13 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             newcell.classList.add("package_type_td");
             //newcell.style.display = "none"; // hide column
         }
+            if (oldCell.classList.contains("sector-select")) {
+            newcell.classList.add("sector-select");
+            if (oldCell.getAttribute("style")) {
+                newcell.setAttribute("style", oldCell.getAttribute("style"));
+            }
+        }
+
 
         if (!oldInput) {
             newcell.innerHTML = oldCell.innerHTML;
@@ -4892,7 +4936,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // ✅ Initialize Select2 only for the new row selects
     if (tableID !== "tbl_package_tour_member") {
-        $(row).find('select.app_select2').not('[id^="plane_class-"], [id^="hotel_name"], [id^="txt_catagory"]').select2({ width: "100%" });
+        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"]').select2({ width: "100%" });
     }
 
     // ✅ Initialize datepicker for new row
@@ -4920,6 +4964,29 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // Update serial numbers or custom logic
     foo(tableID, quot_table, rowCount);
+
+    if (
+        tableID === "tbl_package_tour_quotation_dynamic_plane" ||
+        tableID === "tbl_package_tour_quotation_dynamic_plane_update"
+    ) {
+        var $airlineSelect = $(row).find('select[id^="airline_name"]');
+        if ($airlineSelect.length) {
+            if ($airlineSelect.data('select2')) {
+                $airlineSelect.select2('destroy');
+            }
+              $airlineSelect.css('width', '170px');
+            $airlineSelect.select2({ width: '120px' });
+        }
+        var $planeClassSelect = $(row).find('select[id^="plane_class"]');
+        if ($planeClassSelect.length) {
+            if ($planeClassSelect.data('select2')) {
+                $planeClassSelect.select2('destroy');
+            }
+            $planeClassSelect.css('width', '170px');
+            $planeClassSelect.select2({ width: '170px' });
+        }
+        $(row).find('input[id^="txt_dapart"], input[id^="txt_arrval"], input[id^="train_arrival_date"]').css('width', '150px');
+    }
 
     if (tableID === "tbl_package_hotel_infomration") {
         var $hotelSelect = $(row).find('select[id^="hotel_name"]');
@@ -4975,6 +5042,9 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             // Initialize city dropdown without pre-selection if no previous row
             city_lzloading($(row.cells[3].childNodes[0]));
         }
+        if (typeof window.initPackageQuotationMealPlanSelect === 'function') {
+            window.initPackageQuotationMealPlanSelect(row);
+        }
     }
     
     // Handle city dropdown initialization for custom package hotel master table
@@ -5019,7 +5089,7 @@ function handleItineraryAddRow(table, row, rowCount) {
     imageCell.setAttribute("style", "padding-left:5px !important;");
     
     imageCell.innerHTML = `
-        <div style="margin-top:35px;">
+        <div style="margin-top:35px; display: flex; align-items: center; gap: 10px;">
             <label for="day_image_${dataRowId}" class="btn btn-sm btn-success" 
                    style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
                 Upload Image
@@ -5041,9 +5111,15 @@ function handleItineraryAddRow(table, row, rowCount) {
                 </div>
             </div>
             <input type="hidden" id="itinerary_image_path_${dataRowId}" name="itinerary_image_path_${dataRowId}" />
+             <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Image Size Should Be Less Than 100KB, Resolution : 900 X 900 and Format: Jpg/JEPG/Png"><i class="fa fa-question-circle " style="display:flex; align-items: center; justify-content: center;"></i></button>
         </div>
     `;
     console.log("DEBUG: Image upload structure FORCED for row", rowCount, "with data row ID", dataRowId);
+
+    $(imageCell).find('[data-toggle="tooltip"]').tooltip({ placement: "bottom", container: "body" });
+    $(imageCell).find('[data-toggle="tooltip"]').click(function () {
+      $(".tooltip").remove();
+    });
 
     // Image upload is now handled by the onchange event directly
     console.log("DEBUG: Image upload structure ready for row", rowCount, "with data row ID", dataRowId);

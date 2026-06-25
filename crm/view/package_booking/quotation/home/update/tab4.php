@@ -43,12 +43,15 @@ background-color:<?= $theme_color ?>;
             <div class="row">
                 <div class="col-md-12">
                 <div class="row text-center text_left_sm_xs mg_bt_10">	
-                             <label for="group_costing" class="app_dual_button mg_bt_10 active">
-                                 <input type="radio" id="group_costing" name="costing_tab" checked onchange="costing_reflect()">
+                    <?php
+                    $is_group_costing = (intval($sq_quotation['costing_type']) != 2);
+                    ?>
+                             <label for="group_costing" class="app_dual_button mg_bt_10 <?= $is_group_costing ? 'active' : '' ?>">
+                                 <input type="radio" id="group_costing" name="costing_tab" <?= $is_group_costing ? 'checked' : '' ?> onchange="costing_reflect()">
                                  &nbsp;&nbsp;Group Costing
                              </label>    
-                             <label for="perperson_costing" class="app_dual_button mg_bt_10">
-                                 <input type="radio" id="perperson_costing" name="costing_tab"  onchange="costing_reflect()">
+                             <label for="perperson_costing" class="app_dual_button mg_bt_10 <?= !$is_group_costing ? 'active' : '' ?>">
+                                 <input type="radio" id="perperson_costing" name="costing_tab" <?= !$is_group_costing ? 'checked' : '' ?> onchange="costing_reflect()">
                                  &nbsp;&nbsp;Per Person Costing
                              </label>
                            </div>
@@ -115,6 +118,7 @@ background-color:<?= $theme_color ?>;
                                                                             $tax_apply_on = '';
                                                                         }
                                                                     ?>
+                                                                    <div class="quotation-group-costing-row mg_bt_20">
                                                                     <div>
                                                                         <div class="header_btn hidden" style="display:none;"><small>&nbsp;</small><input class="css-checkbox" id="chk_costing<?= $count ?>" type="checkbox" checked disabled><span class="css-label" for="chk_costing<?= $count ?>"></span></div>
 
@@ -239,6 +243,7 @@ background-color:<?= $theme_color ?>;
                                                                       </div>
                                                                        </div>
                                                                        </div>
+                                                                    </div>
 
                                                                     <?php
 
@@ -1656,9 +1661,9 @@ $('#frm_tab4').validate({
             var chwob = getRowInputValue(row, 8);
             var infant = getRowInputValue(row, 9);
             var excursion_amount = getRowInputValue(row, 10);
-            var vehicle_id = '';
-            var vehicles = getRowInputValue(row, 15);
-            var excursion_id = getRowInputValue(row, 16);
+            var vehicle_id = getRowInputValue(row, 15);
+            var vehicles = getRowInputValue(row, 16);
+            var excursion_id = getRowInputValue(row, 17);
             exc_status_arr.push(status);
             exc_date_arr_e.push(exc_date);
             city_name_arr_e.push(city_name);
@@ -1789,7 +1794,7 @@ $('#frm_tab4').validate({
         var cruise_icost = $('#cruise_icost1').val();
         var other_desc = $('#other_desc1').val();
 
-        var costing_type = $('#costing_type1').val();
+        var costing_type = getQuotationCostingType();
         var inclExclData = getInclusionsExclusionsForQuotation();
         var inclusions = inclExclData.inclusions;
         var exclusions = inclExclData.exclusions;
@@ -2539,9 +2544,17 @@ $(document).ready(function () {
     });
 
 });
+function getQuotationCostingType()
+{
+	var selectedId = $('input[name="costing_tab"]:checked').attr('id');
+	return (selectedId === 'perperson_costing') ? 2 : 1;
+}
+
 function costing_reflect()
 {
 	var id = $('input[name="costing_tab"]:checked').attr('id');
+	$('label[for="group_costing"], label[for="perperson_costing"]').removeClass('active');
+	$('label[for="' + id + '"]').addClass('active');
 	if(id=="group_costing"){
 		$('#group_costing_tab').show();
 		$('#per_person_costing_tab').hide();

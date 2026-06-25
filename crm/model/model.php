@@ -751,6 +751,20 @@ function ensure_quotation_refer_id_column()
   return true;
 }
 
+function ensure_excursion_vehicle_id_column()
+{
+  static $checked = false;
+  if ($checked) {
+    return true;
+  }
+  $checked = true;
+  $result = mysqlQuery("SHOW COLUMNS FROM package_tour_quotation_excursion_entries LIKE 'vehicle_id'");
+  if (mysqli_num_rows($result) == 0) {
+    mysqlQuery("ALTER TABLE package_tour_quotation_excursion_entries ADD COLUMN vehicle_id INT(11) NOT NULL DEFAULT 0 AFTER vehicles");
+  }
+  return true;
+}
+
 function get_quotation_refer_id_by_dest($dest_id)
 {
   $dest_id = intval($dest_id);

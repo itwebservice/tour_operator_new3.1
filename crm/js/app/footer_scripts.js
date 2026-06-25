@@ -3646,15 +3646,19 @@ function pagination_load(
 ) {
 	//1. dataset,2.columns titles,3.if want bg color,4.if want footer,5.manual pagelength change
 	var html = '';
-	if (!dataset || (typeof dataset === 'string' && !$.trim(dataset))) {
-		dataset = '[]';
-	}
 	var dataset_main;
-	try {
-		dataset_main = JSON.parse(dataset);
-	} catch (e) {
-		console.error('pagination_load: invalid JSON response', e, dataset);
-		dataset_main = [];
+	if (typeof dataset === 'object' && dataset !== null) {
+		dataset_main = Array.isArray(dataset) ? dataset : [];
+	} else {
+		if (!dataset || (typeof dataset === 'string' && !$.trim(dataset))) {
+			dataset = '[]';
+		}
+		try {
+			dataset_main = JSON.parse(dataset);
+		} catch (e) {
+			console.error('pagination_load: invalid JSON response', e, dataset);
+			dataset_main = [];
+		}
 	}
 	if (!Array.isArray(dataset_main)) {
 		dataset_main = [];
@@ -3711,7 +3715,10 @@ function pagination_load(
 		createdRow: function (row, data, dataIndex) {
 			// adds bg color for every invalid point
 			if (bg_stat) $(row).addClass(bg[dataIndex]);
-			$(row.cells[1].childNodes[0]).labelauty({ label: false, maximum_width: '20px' });
+			var cellNode = row.cells[1] && row.cells[1].childNodes[0];
+			if (cellNode && cellNode.nodeName === 'INPUT') {
+				$(cellNode).labelauty({ label: false, maximum_width: '20px' });
+			}
 		},
 		initComplete: function (settings, json) {
 			$("[data-toggle='tooltip']").tooltip({ placement: 'bottom' });

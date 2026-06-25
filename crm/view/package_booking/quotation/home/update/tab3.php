@@ -451,6 +451,20 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                 <td style="display:none"><input type="number"
                                                                         id="infant_total-1" name="infant_total-1"
                                                                         style="width:100px;display:none;"></td>
+                                                                <td><select name="vehicle_id-1_u" id="vehicle_id-1_u"
+                                                                        style="width: 155px"
+                                                                        class="form-control app_select2"
+                                                                        title="Select Vehicle"
+                                                                        onchange="get_excursion_amount_update(this.id);">
+                                                                        <option value=''>Select Vehicle</option>
+                                                                        <?php
+                                                                        $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                                        while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                                        ?>
+                                                                            <option value="<?= $row_vehicle['entry_id'] ?>">
+                                                                                <?= $row_vehicle['vehicle_name'] ?></option>
+                                                                        <?php } ?>
+                                                                    </select></td>
                                                                 <td><input type="number" id="no_vehicles-1_u" name="no_vehicles-1_u"
                                                                         placeholder="No.Of Vehicles" title="No.Of Vehicles"
                                                                         style="width:150px" onchange="get_excursion_amount_update(this.id);">
@@ -459,6 +473,7 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                             </tr>
                                                             <script>
                                                                 $('#city_name-1_u').select2();
+                                                                $('#vehicle_id-1_u').select2({ width: '155px' });
                                                                 $("#exc_date-1_u").datetimepicker({
                                                                     format: 'd-m-Y H:i'
                                                                 });
@@ -570,11 +585,36 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                     <td style="display:none"><input type="number"
                                                                             id="infant_total-1" name="infant_total-1"
                                                                             style="width:100px;display:none;"></td>
+                                                                    <td><select name="vehicle_id-<?= $count ?>_u" id="vehicle_id-<?= $count ?>_u"
+                                                                            style="width: 155px"
+                                                                            class="form-control app_select2"
+                                                                            title="Select Vehicle"
+                                                                            onchange="get_excursion_amount_update(this.id);">
+                                                                        <?php
+                                                                        $saved_vehicle_id = isset($row_q_ex['vehicle_id']) ? $row_q_ex['vehicle_id'] : '';
+                                                                        if ($saved_vehicle_id != '' && $saved_vehicle_id != '0') {
+                                                                            $sq_vehicle_sel = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$saved_vehicle_id'"));
+                                                                            if ($sq_vehicle_sel) {
+                                                                        ?>
+                                                                                <option value="<?= $sq_vehicle_sel['entry_id'] ?>" selected>
+                                                                                    <?= $sq_vehicle_sel['vehicle_name'] ?></option>
+                                                                        <?php }
+                                                                        } ?>
+                                                                        <option value=''>Select Vehicle</option>
+                                                                        <?php
+                                                                        $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                                        while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                                        ?>
+                                                                            <option value="<?= $row_vehicle['entry_id'] ?>">
+                                                                                <?= $row_vehicle['vehicle_name'] ?></option>
+                                                                        <?php } ?>
+                                                                    </select></td>
                                                                     <td><input type="number" id="no_vehicles-<?= $count ?>_u" name="no_vehicles-<?= $count ?>_u" placeholder="No.Of Vehicles" title="No.Of Vehicles" style="width:150px" onchange="get_excursion_amount_update(this.id);" value="<?php echo $row_q_ex['vehicles'] ?>"></td>
                                                                     <td class="hidden"><input type="hidden" id="excursion_id-<?= $count ?>_u" value="<?= $row_q_ex['id'] ?>"></td>
                                                                 </tr>
                                                                 <script>
                                                                     $('#city_name-<?= $count ?>_u').select2();
+                                                                    $('#vehicle_id-<?= $count ?>_u').select2({ width: '155px' });
                                                                     $('#exc_date-<?= $count ?>_u').datetimepicker({
                                                                         format: "d-m-Y H:i"
                                                                     });

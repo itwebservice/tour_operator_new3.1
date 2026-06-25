@@ -15,12 +15,12 @@
 				<tr>
 	                <td><input class="css-checkbox" id="chk_plan1" type="checkbox"><label class="css-label" for="chk_plan1"> </label></td>
 	                <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-	                <td>
+	                <td class="sector-select">
 						<select name="from_sector-1" id="from_sector-1" class="form-control app_select2 plane-airport-select" data-sector-type="from" title="From Sector" style="width: 150px;" data-add-new-option="true">
 							<option value="">*From Sector</option>
 						</select>
 					</td>
-					<td>
+					<td class="sector-select">
 						<select name="to_sector-1" id="to_sector-1" class="form-control app_select2 plane-airport-select" data-sector-type="to" title="To Sector" style="width: 150px;" data-add-new-option="true">
 							<option value="">*To Sector</option>
 						</select>
@@ -29,7 +29,7 @@
 		                    <option value="">Airline Name</option>
 		                    <?php get_airline_name_dropdown(); ?>
 		            </select></td>
-		            <td title="Class"><select name="plane_class" id="plane_class1" title="Class" class="form-control" style="width:100px">
+		            <td title="Class"><select name="plane_class" id="plane_class1" title="Class" class="form-control app_select2" style="width:100px">
                             	<?php get_flight_class_dropdown(); ?>
 				            </select></td>
 		            <td><input type="text" id="txt_dapart1" name="txt_dapart1"  class="app_datetimepicker" placeholder="Departure Date and time" onchange="get_to_datetime(this.id,'txt_arrval1')" title="Departure Date and time" style="width:180px" /></td>	           
@@ -41,6 +41,7 @@
 		        <script>
 		            $('#txt_dapart1, #txt_arrval1').datetimepicker({ timepicker:true, format:'d-m-Y H:i' });
 	            	$('#txt_arrval1, #txt_dapart1').datetimepicker({format:'d-m-Y H:i' });
+	            	$('#plane_class1').select2({ width: '100px' });
 	            </script>
 				<?php
 			}
@@ -55,7 +56,7 @@
 					<tr>
 						<td><input class="css-checkbox" id="chk_plan<?= $count ?>_1" type="checkbox" checked><label class="css-label" for="chk_plan<?= $count ?>_1"> </label></td>
 		                <td><input maxlength="15" value="<?= $count ?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-		                <td>
+		                <td class="sector-select">
 							<select name="from_sector-1" id="from_sector-<?= $count ?>_1" class="form-control app_select2 plane-airport-select" data-sector-type="from" title="From Sector" style="width: 250px;" data-add-new-option="true">
 								<?php if(($sq_city['city_name']) && ($row_q_plane['from_location']!='')){ ?>
 									<option value="<?= $sq_city['city_name']." - ".$row_q_plane['from_location'] ?>" selected><?= $sq_city['city_name']." - ".$row_q_plane['from_location'] ?></option>
@@ -63,7 +64,7 @@
 								<option value="">*From Sector</option>
 							</select>
 						</td>
-						<td>
+						<td class="sector-select">
 							<select name="to_sector-1" id="to_sector-<?= $count ?>_1" class="form-control app_select2 plane-airport-select" data-sector-type="to" title="To Sector" style="width: 250px;" data-add-new-option="true">
 								<?php if(($sq_city2['city_name']) && ($row_q_plane['to_location']!='')){ ?>
 									<option value="<?= $sq_city2['city_name']." - ".$row_q_plane['to_location'] ?>" selected><?= $sq_city2['city_name']." - ".$row_q_plane['to_location'] ?></option>
@@ -71,7 +72,7 @@
 								<option value="">*To Sector</option>
 							</select>
 						</td>
-			            <td title="Airline Name"><select id="airline_name<?= $count ?>_1" class="form-control app_select2" title="Airline Name" name="airline_name1" style="width: 110px;" data-add-new-option="true">
+			            <td title="Airline Name"><select id="airline_name<?= $count ?>_1" class="form-control app_select2" title="Airline Name" name="airline_name1" style="width: 120px;" data-add-new-option="true">
 			            	<?php if($row_q_plane['airline_name']!=''){
 			            	$sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_q_plane[airline_name]'"));?>
 			            	    <option value="<?= $sq_airline['airline_id'] ?>"><?= $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' ?></option>
@@ -79,14 +80,14 @@
 			                     <option value="">Airline Name</option>
 			                    <?php get_airline_name_dropdown(); ?>
 			            </select></td>	
-			            <td><select name="plane_class" id="plane_class<?= $count ?>_1" title="Class" class="form-control" style="width:110px">
+			            <td><select name="plane_class" id="plane_class<?= $count ?>_1" title="Class" class="form-control app_select2" style="width:170px">
 			            	<?php if($row_q_plane['class']!=''){ ?>
 			            		<option value="<?= $row_q_plane['class'] ?>"><?= $row_q_plane['class'] ?></option>
 			                <?php }
                             	get_flight_class_dropdown(); ?> 
 				            </select></td>
-			            <td><input type="text" id="txt_dapart<?= $count ?>_1" name="txt_dapart" class="app_datetimepicker" placeholder="Departure Date and time" title="Departure Date and time" onchange="get_to_datetime(this.id,'txt_arrval<?= $count ?>_1')" value="<?= date('d-m-Y H:i', strtotime($row_q_plane['dapart_time'])) ?>" style="width:180px" /></td>
-			            <td><input type="text" id="txt_arrval<?= $count ?>_1" name="txt_arrval" class="app_datetimepicker" placeholder="Arrival Date and time" title="Arrival Date and time" value="<?= date('d-m-Y H:i', strtotime($row_q_plane['arraval_time'])) ?>" style="width:180px" onchange="validate_validDatetime('txt_dapart<?= $count ?>_1',this.id)"/></td>
+			            <td><input type="text" id="txt_dapart<?= $count ?>_1" name="txt_dapart" class="app_datetimepicker" placeholder="Departure Date and time" title="Departure Date and time" onchange="get_to_datetime(this.id,'txt_arrval<?= $count ?>_1')" value="<?= date('d-m-Y H:i', strtotime($row_q_plane['dapart_time'])) ?>" style="width:150px" /></td>
+			            <td><input type="text" id="txt_arrval<?= $count ?>_1" name="txt_arrval" class="app_datetimepicker" placeholder="Arrival Date and time" title="Arrival Date and time" value="<?= date('d-m-Y H:i', strtotime($row_q_plane['arraval_time'])) ?>" style="width:150px" onchange="validate_validDatetime('txt_dapart<?= $count ?>_1',this.id)"/></td>
 						<td><input type="hidden" id="from_city-<?= $count ?>_1" value="<?= $row_q_plane['from_city'] ?>"></td>
 						<td><input type="hidden" id="to_city-<?= $count ?>_1" value="<?= $row_q_plane['to_city'] ?>"></td>
 			            <td><input type="hidden" value="<?= $row_q_plane['id'] ?>"></td></tr>
@@ -94,7 +95,8 @@
 
 		            <script>
 		            	$('#txt_arrval<?= $count ?>_1, #txt_dapart<?= $count ?>_1').datetimepicker({ format:'d-m-Y H:i' });
-		            	$('#airline_name<?= $count ?>_1').select2();
+		            	$('#airline_name<?= $count ?>_1').select2({ width: '120px' });
+		            	$('#plane_class<?= $count ?>_1').select2({ width: '170px' });
 		            </script>
 					<?php
 				}
@@ -106,16 +108,42 @@
 </div>
 <script>
 	init_plane_airport_select2_update();
+	init_plane_class_select2_update();
 
 	// Keep default event_airport for other tables. For this table use Select2 airport search.
 	var original_event_airport_update = event_airport;
 	event_airport = function(id, fromSectornum = 2, toSectornum = 3) {
 		if (id === 'tbl_package_tour_quotation_dynamic_plane') {
 			init_plane_airport_select2_update();
+			init_plane_class_select2_update();
 			return;
 		}
 		original_event_airport_update(id, fromSectornum, toSectornum);
 	};
+
+	function get_plane_class_select2_width($select) {
+		var style = $select.attr('style') || '';
+		if (style.indexOf('170px') !== -1) {
+			return '170px';
+		}
+		if (style.indexOf('170px') !== -1) {
+			return '170px';
+		}
+		if (style.indexOf('170px') !== -1) {
+			return '170px';
+		}
+		return '170px';
+	}
+
+	function init_plane_class_select2_update() {
+		$('#tbl_package_tour_quotation_dynamic_plane select[id^="plane_class"]').each(function() {
+			var $select = $(this);
+			if ($select.data('select2')) {
+				return;
+			}
+			$select.select2({ width: get_plane_class_select2_width($select) });
+		});
+	}
 
 	function init_plane_airport_select2_update() {
 		var base_url = $('#base_url').val();

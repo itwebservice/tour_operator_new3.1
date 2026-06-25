@@ -4,6 +4,7 @@ class quotation_save{
 public function quotation_master_save()
 {
 	ensure_quotation_refer_id_column();
+	ensure_excursion_vehicle_id_column();
 	$login_id = $_POST['login_id'];
 	$emp_id = $_POST['emp_id'];
 	$enquiry_id = $_POST['enquiry_id'];
@@ -35,7 +36,10 @@ public function quotation_master_save()
 	$incl_arr = $_POST['incl_arr']; 
 	$excl_arr = $_POST['excl_arr'];
 	$pckg_daywise_url = $_POST['pckg_daywise_url'];
-	$costing_type = $_POST['costing_type'];
+	$costing_type = isset($_POST['costing_type']) ? intval($_POST['costing_type']) : 1;
+	if ($costing_type !== 1 && $costing_type !== 2) {
+		$costing_type = 1;
+	}
 	$currency_code = $_POST['currency_code'];
 
 	$pp_costing_arr = isset($_POST['pp_costing_arr']) ? json_decode($_POST['pp_costing_arr'], true) : [];
@@ -104,6 +108,7 @@ public function quotation_master_save()
 	$chwob_arr = isset($_POST['chwob_arr']) ? (array)$_POST['chwob_arr'] : [];
 	$infant_arr = isset($_POST['infant_arr']) ? (array)$_POST['infant_arr'] : [];
 	$vehicles_arr = isset($_POST['vehicles_arr']) ? (array)$_POST['vehicles_arr'] : [];
+	$vehicle_id_arr_e = isset($_POST['vehicle_id_arr_e']) ? (array)$_POST['vehicle_id_arr_e'] : [];
 	
 	//Costing
 	$tour_cost_arr = isset($_POST['tour_cost_arr']) ? $_POST['tour_cost_arr']: [];
@@ -211,7 +216,7 @@ public function quotation_master_save()
 
 		$this->costing_entries_save($tcs_arr,$tcsvalue_arr,$quotation_id,$tour_cost_arr,$basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr,$transport_cost_arr,$excursion_cost_arr,$adult_cost_arr,$infant_cost_arr,$child_with_arr,$child_without_arr,$bsmValues,$package_type_c_arr,$discount_in_arr,$discount_arr);
 		$this->pp_costing_save($quotation_id_arr, $pp_costing_arr);
-		$this->excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr);
+		$this->excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr,$vehicle_id_arr_e);
 		// Update temporary quotation IDs with actual quotation IDs
 		$this->update_temporary_quotation_ids($quotation_id_arr, $temp_quotation_id);
 		
@@ -347,7 +352,7 @@ public function tranport_entries_save($quotation_id_arr,$vehicle_name_arr,$start
 	}
 }
 
-public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr)
+public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excursion_name_arr, $excursion_amt_arr,$exc_date_arr_e,$transfer_option_arr,$adult_arr,$chwb_arr,$chwob_arr,$infant_arr,$vehicles_arr,$vehicle_id_arr_e = [])
 {
 	if (empty($city_name_arr_e) || !is_array($city_name_arr_e)) {
 		return;
@@ -371,8 +376,9 @@ public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excu
 			$chwob = intval($chwob_arr[$j] ?? 0);
 			$infant = intval($infant_arr[$j] ?? 0);
 			$vehicles = intval($vehicles_arr[$j] ?? 0);
+			$vehicle_id = intval($vehicle_id_arr_e[$j] ?? 0);
 
-			$sq_plane = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles ) values ( '$id', '$quotation_id_arr[$i]', '$city_name', '$excursion_name', '$excursion_amt', '$exc_date', '$transfer_option', '$adult', '$chwb', '$chwob', '$infant', '$vehicles')");
+			$sq_plane = mysqlQuery("insert into package_tour_quotation_excursion_entries ( id, quotation_id, city_name, excursion_name, excursion_amount,exc_date,transfer_option,adult,chwb,chwob,infant,vehicles,vehicle_id ) values ( '$id', '$quotation_id_arr[$i]', '$city_name', '$excursion_name', '$excursion_amt', '$exc_date', '$transfer_option', '$adult', '$chwb', '$chwob', '$infant', '$vehicles', '$vehicle_id')");
 			if (!$sq_plane) {
 				echo "error--Activity information not saved!";
 				exit;

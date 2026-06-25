@@ -169,9 +169,9 @@ while($row_exc = mysqli_fetch_assoc($sq_exc)){
 	$exc_name = isset($sq_exc_id['excursion_name']) ? $sq_exc_id['excursion_name'] : '';
 	$sq_city_id = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id = '$row_exc[city_name]'"));
 	$city_name1 = isset($sq_city_id['city_name']) ? $sq_city_id['city_name'] : '';
-	$vehicle_id = isset($row_exc['vehicles']) ? $row_exc['vehicles'] : '';
+	$vehicle_id = isset($row_exc['vehicle_id']) ? $row_exc['vehicle_id'] : '';
 	$vehicle_name = '';
-	if($vehicle_id != ''){
+	if($vehicle_id != '' && $vehicle_id != '0'){
 		$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='$vehicle_id'"));
 		$vehicle_name = isset($sq_vehicle['vehicle_name']) ? $sq_vehicle['vehicle_name'] : '';
 	}

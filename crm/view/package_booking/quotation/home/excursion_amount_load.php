@@ -8,6 +8,7 @@ $exc_date_arr = isset($_POST['exc_date_arr']) ? (array)$_POST['exc_date_arr'] : 
 $exc_arr = isset($_POST['exc_arr']) ? (array)$_POST['exc_arr'] : [];
 $transfer_arr = isset($_POST['transfer_arr']) ? (array)$_POST['transfer_arr'] : [];
 $total_vehicles_arr = isset($_POST['total_vehicles_arr']) ? (array)$_POST['total_vehicles_arr'] : [];
+$vehicle_arr = isset($_POST['vehicle_arr']) ? (array)$_POST['vehicle_arr'] : [];
 $amount_arr = array();
 
 //Get selected currency rate
@@ -24,6 +25,13 @@ for ($i = 0; $i < sizeof($exc_arr); $i++) {
 	$from_currency_rate = isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0;
 
 	$sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff_basics where exc_id='$exc_arr[$i]' and transfer_option='$transfer_arr[$i]' and (from_date <='$exc_date' and to_date>='$exc_date')"));
+	if (isset($vehicle_arr[$i]) && $vehicle_arr[$i] != '' && $vehicle_arr[$i] != '0') {
+		$vehicle_id = intval($vehicle_arr[$i]);
+		$sq_costing_vehicle = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff_basics where exc_id='$exc_arr[$i]' and transfer_option='$transfer_arr[$i]' and vehicle_id='$vehicle_id' and (from_date <='$exc_date' and to_date>='$exc_date')"));
+		if (!empty($sq_costing_vehicle)) {
+			$sq_costing = $sq_costing_vehicle;
+		}
+	}
 	$echild_cost = isset($sq_costing['child_cost']) ? $sq_costing['child_cost'] : 0;
 	$eadult_cost = isset($sq_costing['adult_cost']) ? $sq_costing['adult_cost'] : 0;
 	$ecinfant_cost = isset($sq_costing['infant_cost']) ? $sq_costing['infant_cost'] : 0;

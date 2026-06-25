@@ -71,7 +71,8 @@ textarea.form-control {
                     <td class="col-md-5 no-pad" style="padding-left: 5px !important;max-width: 594px;overflow: hidden;position: relative;" ><textarea id="day_program" name="day_program" class="form-control day_program" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"   style="overflow:hidden;resize:none;height:900px;"  
     rows="1"></textarea><span class="style_text" style="position: absolute !important; right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important; padding: 0px 14px !important; top: 0px !important;"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>
                     <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay" name="overnight_stay" style="margin-top:35px;"  onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay"></td>
-                    <td class="col-md-2 no-pad" style="padding-left:5px !important;">
+                    <td class="col-md-2 no-pad" style="padding-left:5px !important; ">
+                      <div style="display: flex; align-items: center; gap: 10px;">
                       <div style="margin-top:35px;">
                         <label for="day_image_1" class="btn btn-sm btn-success" 
                                style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
@@ -94,6 +95,8 @@ textarea.form-control {
                             </div>
                         </div>
                         <input type="hidden" id="itinerary_image_path_1" name="itinerary_image_path_1" />
+                      </div>
+                      <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Image Size Should Be Less Than 100KB, Resolution : 900 X 900 and Format: Jpg/JEPG/Png"><i class="fa fa-question-circle " style="margin-top: 33px; display:flex; align-items: center; justify-content: center;"></i></button>
                       </div>
                     </td>
                   </tr>
@@ -120,10 +123,24 @@ textarea.form-control {
 
 <script>
 // Wait for jQuery to be available with fallback
+function initializeItineraryTooltips() {
+    $('#itinerary_save_modal [data-toggle="tooltip"]').each(function () {
+        var $el = $(this);
+        if ($el.data('bs.tooltip')) {
+            $el.tooltip('destroy');
+        }
+        $el.tooltip({ placement: 'bottom', container: 'body' });
+    });
+    $('#itinerary_save_modal [data-toggle="tooltip"]').off('click.itinerary-tooltip').on('click.itinerary-tooltip', function () {
+        $('.tooltip').remove();
+    });
+}
+
 function initializeModal() {
     if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
 $('#dest_ids').select2();
 $('#itinerary_save_modal').modal('show');
+initializeItineraryTooltips();
     } else {
         // Fallback - try again after a short delay
         setTimeout(initializeModal, 100);
@@ -244,6 +261,7 @@ function itinerary_form_csv_save(){
                       }
                   }
               }
+              initializeItineraryTooltips();
             }
         }
     });
@@ -437,7 +455,7 @@ $(document).ready(function() {
                         console.log("Adding image upload structure to row", rowId);
                         console.log("Row cells[5] current content:", row.cells[5].innerHTML.substring(0, 100));
                         row.cells[5].innerHTML = `
-                            <div style="margin-top:35px;">
+                            <div style="margin-top:35px; display: flex; align-items: center; gap: 10px;">
                                 <label for="day_image_${rowId}" class="btn btn-sm btn-success" 
                                        style="margin-bottom: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;">
                                     Upload Image
@@ -459,6 +477,7 @@ $(document).ready(function() {
                                     </div>
                                 </div>
                                 <input type="hidden" id="itinerary_image_path_${rowId}" name="itinerary_image_path_${rowId}" />
+                                <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Image Size Should Be Less Than 100KB, Resolution : 900 X 900 and Format: Jpg/JEPG/Png"><i class="fa fa-question-circle " style="display:flex; align-items: center; justify-content: center;"></i></button>
                             </div>
                             `;
                             console.log("Row", rowId, "new content:", row.cells[5].innerHTML.substring(0, 200));
@@ -505,6 +524,7 @@ $(document).ready(function() {
                     }
                 }
             }
+            initializeItineraryTooltips();
         }
     };
 
@@ -565,6 +585,7 @@ $(document).ready(function() {
                                         </div>
                                     </div>
                                     <input type="hidden" id="itinerary_image_path_${rowId}" name="itinerary_image_path_${rowId}" />
+                                    <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Image Size Should Be Less Than 100KB, Resolution : 900 X 900 and Format: Jpg/JEPG/Png"><i class="fa fa-question-circle " style="display:flex; align-items: center; justify-content: center;"></i></button>
                                 </div>
                             `;
                         } else {
@@ -593,6 +614,7 @@ $(document).ready(function() {
                         }
                     }
                 }
+                initializeItineraryTooltips();
             }, 300);
         }
     };

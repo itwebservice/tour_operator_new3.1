@@ -82,6 +82,9 @@ $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotat
 
 <script>
 $('#enquiry_id, #currency_code, #transport_vehicle1').select2();
+if (typeof initAllVehicleSelectAddNew === 'function') {
+    initAllVehicleSelectAddNew('#tbl_package_tour_quotation_dynamic_excursion');
+}
 $('#from_date12, #to_date12, #quotation_date').datetimepicker({
     timepicker: false,
     format: 'd-m-Y',
@@ -158,6 +161,7 @@ function get_excursion_amount()
     var childwo_arr = [];
     var infant_arr = [];
     var total_vehicles_arr = [];
+    var vehicle_arr = [];
 
     var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
     if (!table) return;
@@ -172,7 +176,8 @@ function get_excursion_amount()
         var total_children = row.cells[7].childNodes[0].value;
         var total_childrenwo = row.cells[8].childNodes[0].value;
         var total_infant = row.cells[9].childNodes[0].value;
-        var total_vehicles = row.cells[15] ? row.cells[15].childNodes[0].value : 0;
+        var vehicle_id = row.cells[15] ? ($(row.cells[15].childNodes[0]).val() || row.cells[15].childNodes[0].value || '') : '';
+        var total_vehicles = row.cells[16] ? row.cells[16].childNodes[0].value : 0;
 
         exc_date_arr.push(exc_date);
         exc_arr.push(exc || '');
@@ -181,6 +186,7 @@ function get_excursion_amount()
         child_arr.push(total_children || 0);
         childwo_arr.push(total_childrenwo || 0);
         infant_arr.push(total_infant || 0);
+        vehicle_arr.push(vehicle_id || '');
         total_vehicles_arr.push(total_vehicles || 0);
     }
 
@@ -192,6 +198,7 @@ function get_excursion_amount()
         child_arr: child_arr,
         childwo_arr: childwo_arr,
         infant_arr: infant_arr,
+        vehicle_arr: vehicle_arr,
         total_vehicles_arr: total_vehicles_arr
     }, function(data) {
         var amount_arr = JSON.parse(data);
@@ -233,7 +240,8 @@ function get_excursion_amount_update(eleid) {
     var total_children = row.cells[7].childNodes[0].value || 0;
     var total_childrenwo = row.cells[8].childNodes[0].value || 0;
     var total_infant = row.cells[9].childNodes[0].value || 0;
-    var total_vehicles = row.cells[15] ? (row.cells[15].childNodes[0].value || 0) : 0;
+    var vehicle_id = row.cells[15] ? ($(row.cells[15].childNodes[0]).val() || row.cells[15].childNodes[0].value || '') : '';
+    var total_vehicles = row.cells[16] ? (row.cells[16].childNodes[0].value || 0) : 0;
     var rowSuffix = eleid.replace(/^[^-]+-/, '');
 
     $.post(base_url + "view/package_booking/quotation/home/excursion_amount_load.php", {
@@ -244,6 +252,7 @@ function get_excursion_amount_update(eleid) {
         child_arr: [total_children],
         childwo_arr: [total_childrenwo],
         infant_arr: [total_infant],
+        vehicle_arr: [vehicle_id],
         total_vehicles_arr: [total_vehicles]
     }, function(data) {
         var amount_arr = JSON.parse(data);

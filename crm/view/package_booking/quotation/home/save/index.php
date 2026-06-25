@@ -244,6 +244,7 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
         var childwo_arr = new Array();
         var infant_arr = new Array();
         var total_vehicles_arr = [];
+        var vehicle_arr = [];
 
         var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
         var rowCount = table.rows.length;
@@ -259,7 +260,8 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
             var total_children = row.cells[7].childNodes[0].value;
             var total_childrenwo = row.cells[8].childNodes[0].value;
             var total_infant = row.cells[9].childNodes[0].value;
-            var total_vehicles = row.cells[15].childNodes[0].value;
+            var vehicle_id = row.cells[15] ? ($(row.cells[15].childNodes[0]).val() || row.cells[15].childNodes[0].value || '') : '';
+            var total_vehicles = row.cells[16] ? row.cells[16].childNodes[0].value : 0;
 
             total_adult = (total_adult == '') ? 0 : total_adult;
             total_children = (total_children == '') ? 0 : total_children;
@@ -274,6 +276,7 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
             child_arr.push(total_children);
             childwo_arr.push(total_childrenwo);
             infant_arr.push(total_infant);
+            vehicle_arr.push(vehicle_id || '');
             total_vehicles_arr.push(total_vehicles);
         }
         var exc_adult_cost = 0;
@@ -288,6 +291,7 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
             child_arr: child_arr,
             childwo_arr: childwo_arr,
             infant_arr: infant_arr,
+            vehicle_arr: vehicle_arr,
             total_vehicles_arr: total_vehicles_arr
         }, function(data) {
             var amount_arr = JSON.parse(data);
@@ -301,14 +305,18 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
                     row.cells[12].childNodes[0].value = amount_arr[i]['child_cost'];
                     row.cells[13].childNodes[0].value = amount_arr[i]['childwo_cost'];
                     row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
-                    row.cells[16].childNodes[0].value = amount_arr[i]['transfer_cost'];
+                    if (row.cells[17] && row.cells[17].childNodes[0]) {
+                        row.cells[17].childNodes[0].value = amount_arr[i]['transfer_cost'];
+                    }
                 } else {
                     row.cells[10].childNodes[0].value = 0;
                     row.cells[11].childNodes[0].value = 0;
                     row.cells[12].childNodes[0].value = 0;
                     row.cells[13].childNodes[0].value = 0;
                     row.cells[14].childNodes[0].value = 0;
-                    row.cells[16].childNodes[0].value = 0;
+                    if (row.cells[17] && row.cells[17].childNodes[0]) {
+                        row.cells[17].childNodes[0].value = 0;
+                    }
                 }
             }
         });

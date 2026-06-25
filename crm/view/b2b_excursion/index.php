@@ -37,10 +37,9 @@ require_once('../layouts/admin_header.php');
 <?= end_panel() ?>
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
+<script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
 
 <script>
-    city_lzloading('#city_id_filter1');
-
     function save_modal() {
         $('#btn_save_modal').button('loading');
         $.post('save_modal.php', {}, function(data) {
@@ -74,6 +73,7 @@ require_once('../layouts/admin_header.php');
     ];
 
     function list_reflect() {
+        $('#div_list .loader').remove();
         $('#div_list').append('<div class="loader"></div>');
         var active_flag = $('#active_flag_filter').val();
         var city_id = $('#city_id_filter1').val();
@@ -82,13 +82,23 @@ require_once('../layouts/admin_header.php');
             active_flag: active_flag,
             city_id: city_id
         }, function(data) {
-            setTimeout(() => {
-                pagination_load(data, columns, true, false, 20, 'exc_master_tab');
-                $('.loader').remove();
-            }, 800);
+            if (!data || (typeof data === 'string' && !$.trim(data))) {
+                console.warn('Activity list_reflect: empty response from server');
+                data = '[]';
+            }
+            pagination_load(data, columns, true, false, 20, 'exc_master_tab');
+            $('#div_list .loader').remove();
+        }, 'text').fail(function(xhr) {
+            console.warn('Activity list_reflect failed:', xhr.status, xhr.responseText);
+            $('#div_list .loader').remove();
+            pagination_load('[]', columns, true, false, 20, 'exc_master_tab');
         });
     }
-    list_reflect();
+
+    $(function() {
+        city_lzloading('#city_id_filter1');
+        list_reflect();
+    });
 
     function update_modal(service_id) {
         $('#edit-' + service_id).prop('disabled', true);

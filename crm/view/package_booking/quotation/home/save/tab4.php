@@ -24,6 +24,7 @@
                                                         <div>
                                                             <div>
                                                                 <div id="tbl_package_tour_quotation_dynamic_costing" name="tbl_package_tour_quotation_dynamic_costing" class="table border_0 no-marg">
+                                                                    <div class="quotation-group-costing-row mg_bt_20">
                                                                     <div style="display: grid;  grid-template-columns: 150px  auto;   gap: 15px;">
                                                                         <div class="header_btn " style="display:none;"><input class="css-checkbox" id="chk_costing1" type="checkbox" checked disabled><span class="css-label" for="chk_costing1"> </span>
                                                                         </div>
@@ -120,13 +121,14 @@
                                                                          </div>
 
                                                                         <div class="header_btn hidden" style="display:none; ">
-                                                                            <small>&nbsp;</small><input type="text" id="package_name1" name="package_name1" placeholder="Package Name" title="Package Name" style="display:none;" readonly>
+                                                                            <small>&nbsp;</small><input type="text" id="package_name1-" name="package_name1-" placeholder="Package Name" title="Package Name" style="display:none;" readonly>
                                                                         </div>
 
                                                                         <div  class="header_btn hidden " style="display:none;">
-                                                                            <small>&nbsp;</small><input type="text" id="package_id1" name="package_id1" placeholder="Package ID" title="Package ID" style="display:none;">
+                                                                            <small>&nbsp;</small><input type="text" id="package_id1-" name="package_id1-" placeholder="Package ID" title="Package ID" style="display:none;">
                                                                         </div>
                                                                         </div>
+                                                                    </div>
                                                                     </div>
                                                                     </div>
                                                                 </div>
@@ -1094,7 +1096,7 @@ if (input) {
 
             var guide_cost = $('#guide_cost').val();
             var misc_cost = $('#misc_cost').val();
-            var costing_type = $('#costing_type').val();
+            var costing_type = getQuotationCostingType();
 
             //Train Information
 
@@ -1534,7 +1536,11 @@ if (input) {
                 var infant = row.cells[9].childNodes[0].value || 0;
                 var excursion_amount = (row.cells[10] && row.cells[10].childNodes[0]) ? (row.cells[10].childNodes[0].value || 0) : 0;
                 var vehicle_id = '';
-                var vehicles = (row.cells[15] && row.cells[15].childNodes[0]) ? (row.cells[15].childNodes[0].value || 0) : 0;
+                if (row.cells[15] && row.cells[15].childNodes[0]) {
+                    var $vehicleSelect = $(row.cells[15].childNodes[0]);
+                    vehicle_id = $vehicleSelect.data('select2') ? ($vehicleSelect.val() || '') : (row.cells[15].childNodes[0].value || '');
+                }
+                var vehicles = (row.cells[16] && row.cells[16].childNodes[0]) ? (row.cells[16].childNodes[0].value || 0) : 0;
 
                 if (exc_date == "") {
                     error_msg_alert('Select Activity date in row' + (e + 1));
@@ -2092,24 +2098,27 @@ $(document).on("change", "[id^=tcs_tax-]", function() {
 function customTcsTax(id)
 {
 
-   
-    var offset = id.split('-');
-    
+    var suffix = (typeof quotationCostingFieldSuffix === 'function')
+        ? quotationCostingFieldSuffix(id)
+        : ('-' + (id.split('-')[1] || ''));
+    if (suffix === '-') {
+        suffix = '-';
+    }
 
-    var tcs_tax=$("#tcs_tax-" + offset[1]).val();
+    var tcs_tax=$("#tcs_tax" + suffix).val();
     //alert(tcs_tax);
     //console.log(tcs_tax);
     if(tcs_tax!=='')
     {
-       var  subtotal=$("#basic_amount-" + offset[1]).val();
-       var  servicecharge=$("#service_charge-" + offset[1]).val();
-       var txt_actual_tour_cost1=$("#total_tour_cost-" + offset[1]).val();
-       var discount1=$('#discount_amt-' + offset[1]).val() || 0;
+       var  subtotal=$("#basic_amount" + suffix).val();
+       var  servicecharge=$("#service_charge" + suffix).val();
+       var txt_actual_tour_cost1=$("#total_tour_cost" + suffix).val();
+       var discount1=$('#discount_amt' + suffix).val() || 0;
       
 
 
           // Get the discount type
-          var discountIn = $("#discount_in-" + offset[1]).val();
+          var discountIn = $("#discount_in" + suffix).val();
         
         // Calculate discount if it's in percentage
         if (discountIn === "Percentage") {
@@ -2117,7 +2126,7 @@ function customTcsTax(id)
         }
         // alert( discount1);
        var  service_tax_amount=0;
-       var  tax_subtotal=$("#service_tax_subtotal-" + offset[1]).val();
+       var  tax_subtotal=$("#service_tax_subtotal" + suffix).val();
        var service_tax_subtotal1 = tax_subtotal.split(',');
 	   for (var i = 0; i < service_tax_subtotal1.length; i++) {
 		    var service_tax = service_tax_subtotal1[i].split(':');
@@ -2127,28 +2136,28 @@ function customTcsTax(id)
        var tcsamount=parseFloat(parseFloat(service_tax_amount1)+parseFloat(subtotal)+parseFloat(servicecharge))*parseFloat(tcs_tax)/100;
 
     //    var tcsamount=parseFloat(txt_actual_tour_cost1)*parseFloat(tcs_tax)/100;
-       var totalTcs=$("#tcs1-" + offset[1]).val();
+       var totalTcs=$("#tcs1" + suffix).val();
        if(totalTcs=='')
        {
         totalTcs=0;   
        }
-       $("#tcs1-" + offset[1]).val(tcsamount.toFixed(2));
+       $("#tcs1" + suffix).val(tcsamount.toFixed(2));
        txt_actual_tour_cost1=parseFloat(txt_actual_tour_cost1)-parseFloat(totalTcs);
        var txt_actual_tour_cost1total=parseFloat(tcsamount)+parseFloat(txt_actual_tour_cost1);
-    //    $("#total_tour_cost-" + offset[1]).val(Math.round(txt_actual_tour_cost1total).toFixed(2));
+    //    $("#total_tour_cost" + suffix).val(Math.round(txt_actual_tour_cost1total).toFixed(2));
 
-     $("#total_tour_cost-" + offset[1]).val(txt_actual_tour_cost1total.toFixed(2));
+     $("#total_tour_cost" + suffix).val(txt_actual_tour_cost1total.toFixed(2));
     }
     else
     {
-        var totalTcs=$("#tcs1-" + offset[1]).val();
-        $("#tcs1-" + offset[1]).val(0.00);
-        var txt_actual_tour_cost1=$("#total_tour_cost-" + offset[1]).val();
+        var totalTcs=$("#tcs1" + suffix).val();
+        $("#tcs1" + suffix).val(0.00);
+        var txt_actual_tour_cost1=$("#total_tour_cost" + suffix).val();
         var txt_actual_tour_cost1total=parseFloat(txt_actual_tour_cost1)-parseFloat(totalTcs);
-        // $("#total_tour_cost-" + offset[1]).val(Math.round(txt_actual_tour_cost1total).toFixed(2));
+        // $("#total_tour_cost" + suffix).val(Math.round(txt_actual_tour_cost1total).toFixed(2));
 
 
-         $("#total_tour_cost-" + offset[1]).val(txt_actual_tour_cost1total.toFixed(2));
+         $("#total_tour_cost" + suffix).val(txt_actual_tour_cost1total.toFixed(2));
     }    
 
 }
@@ -2401,9 +2410,17 @@ $(document).ready(function () {
 
 });
 
+function getQuotationCostingType()
+{
+	var selectedId = $('input[name="costing_tab"]:checked').attr('id');
+	return (selectedId === 'perperson_costing') ? 2 : 1;
+}
+
 function costing_reflect()
 {
 	var id = $('input[name="costing_tab"]:checked').attr('id');
+	$('label[for="group_costing"], label[for="perperson_costing"]').removeClass('active');
+	$('label[for="' + id + '"]').addClass('active');
 	if(id=="group_costing"){
 		$('#group_costing_tab').show();
 		$('#per_person_costing_tab').hide();

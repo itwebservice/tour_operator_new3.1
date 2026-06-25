@@ -7560,7 +7560,8 @@ CREATE TABLE `package_tour_quotation_excursion_entries` (
   `chwb` int(11) NOT NULL,
   `chwob` int(11) NOT NULL,
   `infant` int(11) NOT NULL,
-  `vehicles` int(11) NOT NULL
+  `vehicles` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
