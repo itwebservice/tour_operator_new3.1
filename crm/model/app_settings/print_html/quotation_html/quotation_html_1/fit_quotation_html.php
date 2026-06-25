@@ -1216,7 +1216,7 @@ function o1_flight_date($v)
               style="box-shadow:var(--shadow-card)">
 
               <div class="col-span-2 bg-[color:var(--navy)] grid place-items-center p-4">
-                <?php $vehicle_img = BASE_URL . 'images/vehicle.jpg'; ?>
+                <?php $vehicle_img = BASE_URL . 'images/vehicle.png'; ?>
                 <img src="<?= o1e($vehicle_img) ?>"
                   alt="Vehicle"
                   style="width:100%;height:auto;object-fit:contain;" />
