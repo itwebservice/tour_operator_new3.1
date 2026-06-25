@@ -34,13 +34,12 @@ $ty           = $q['thank_you'];
 $present      = $q['sections_present'];
 $gallery      = isset($q['gallery_images']) && is_array($q['gallery_images']) ? $q['gallery_images'] : array();
 $assets       = "assets/";
-$testimonials = array();
+// $testimonials = array();
+$testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
+  ? $q['testimonials']
+  : array();
+
 $o7_cfg       = array();
-if (function_exists('gqb_get_config')) {
-  $o7_cfg = gqb_get_config();
-  $testimonials = isset($o7_cfg['testimonials']) && is_array($o7_cfg['testimonials'])
-    ? $o7_cfg['testimonials'] : array();
-}
 
 if (!function_exists('o7e')) {
   function o7e($v)
@@ -1261,12 +1260,12 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
       <div class="reviews-inner">
         <div class="review-cards-grid">
           <?php if (!empty($testimonials)) :
-            $o7_ti = 0;
+            // $o7_ti = 0;
             foreach ($testimonials as $t) :
-              if ($o7_ti >= 3) {
-                break;
-              }
-              $o7_ti++;
+            //   if ($o7_ti >= 3) {
+            //     break;
+            //   }
+            //   $o7_ti++;
               $photo = o7_media_url(isset($t['photo']) ? $t['photo'] : '');
           ?>
               <div class="review-card">

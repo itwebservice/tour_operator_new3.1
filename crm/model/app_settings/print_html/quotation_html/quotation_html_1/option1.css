@@ -91,11 +91,61 @@
 @media print {
   .page {
     height: auto !important;
-    min-height: 297mm !important;
+    /* min-height: 297mm !important; */
+        min-height: auto !important;
     overflow: visible !important;
-    page-break-after: always;
+        page-break-after: auto !important;
+    /* page-break-after: always; */
+        break-after: auto !important;
+
+  }
+/* ========= Dipti */
+.page-hero {
+    min-height: 297mm !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  .itinerary-page {
+    page-break-before: always !important;
+    break-before: page !important;
+    min-height: auto !important;
+  }
+  .itinerary-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 12px !important;
+  }
+  .itinerary-card img {
+    height: 140px !important;
+    object-fit: cover !important;
+  }
+   .print-section,
+  .payment-card,
+  .bank-card,
+  .policy-card,
+  .rounded-xl,
+  .rounded-2xl {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
+  .print-section {
+    display: block !important;
+    margin-bottom: 14px !important;
+  }
+
+  .thankyou-page {
+    page-break-before: always !important;
+    break-before: page !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+    min-height: 297mm !important;
+      height: 297mm !important;
+
+      display: flex !important;
+      flex-direction: column !important;
+  }
+  /* =============== */
   .page .relative,
   .page .px-10,
   .page .py-7 {
@@ -466,16 +516,21 @@ a{
   }
 
   html {
-    background: #f5f1ea;
-    background: lab(95.3886% .58049 3.77289);
+        background: #ffffff;
+    background: lab(100% 0 0);
+
+    /* background: #f5f1ea;
+    background: lab(95.3886% .58049 3.77289); */
   }
 
   body {
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-color: #f5f1ea;
-    background-color: lab(95.3886% .58049 3.77289);
+    background-color: #ffffff;
+    background-color: lab(100% 0 0);
+    /* background-color: #f5f1ea;
+    background-color: lab(95.3886% .58049 3.77289); */
   }
 }
 
@@ -1719,7 +1774,9 @@ a{
   }
 
   .bg-\[color\:var\(--cream\)\] {
-    background-color: var(--cream);
+    /* background-color: var(--cream); */
+        background-color: #ffffff !important;
+
   }
 
   .bg-\[color\:var\(--gold\)\] {
@@ -1787,7 +1844,9 @@ a{
   }
 
   .bg-cream {
-    background-color: var(--cream);
+    /* background-color: var(--cream); */
+        background-color: #ffffff !important;
+
   }
 
   .bg-destructive {
@@ -4202,7 +4261,8 @@ a{
   --gold: #e5ac4c;
   --gold-soft: #f3dba9;
   --teal: #138282;
-  --cream: #faf6ee;
+  --cream: #ffffff !important;
+  /* --cream: #faf6ee; */
   --ink: #11161f;
   --background: #fff;
   --foreground: var(--ink);

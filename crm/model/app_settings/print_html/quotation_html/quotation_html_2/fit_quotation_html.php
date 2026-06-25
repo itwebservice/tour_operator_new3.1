@@ -47,14 +47,16 @@ $assets  = "assets/";
 
 // ============== Dipti
 $testimonials = array();
+$testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
+  ? $q['testimonials'] : array();
+  
 $social_links = array();
 
 $o2_cfg = function_exists('gqb_get_config') ? gqb_get_config() : array();
 
-if (!empty($o2_cfg['testimonials']) && is_array($o2_cfg['testimonials'])) {
-  $testimonials = $o2_cfg['testimonials'];
-}
-
+// if (!empty($o2_cfg['testimonials']) && is_array($o2_cfg['testimonials'])) {
+//   $testimonials = $o2_cfg['testimonials'];
+// }
 if (!empty($o2_cfg['social_links']) && is_array($o2_cfg['social_links'])) {
   $social_links = $o2_cfg['social_links'];
 }
@@ -177,7 +179,8 @@ $o2_review_count  = '2,400+';
 $o2_traveller_cnt = '18,500+';
 
 $o2_itin_list   = is_array($itin) ? $itin : array();
-$o2_itin_pages  = !empty($o2_itin_list) ? array_chunk($o2_itin_list, 3) : array();
+// $o2_itin_pages  = !empty($o2_itin_list) ? array_chunk($o2_itin_list, 3) : array();
+$o2_itin_pages  = !empty($o2_itin_list) ? array($o2_itin_list) : array();
 $o2_total_pages = 4 + count($o2_itin_pages) + 5;
 
 $o2_banner = o2img(isset($hero['cover_image']) ? $hero['cover_image'] : '', $assets . 'banner.jpg');
@@ -343,9 +346,9 @@ $o2_round = o2img(
       <div class="page__body">
         <div class="banner">
           <div class="k">A Personalized Travel Experience</div>
-          <h2>Exclusively designed for <em><?= o2e($o2_client) ?></em> — an unforgettable journey through <?= o2e($o2_dest) ?>.</h2>
+          <h2 style="font-size: 20px;">Exclusively designed for <em><?= o2e($o2_client) ?></em> — an unforgettable journey through <?= o2e($o2_dest) ?>.</h2>
         </div>
-        <p class="greet" style="margin:7mm 0 0">
+        <p class="greet" style="margin:7mm 0 0; font-size: 13px;">
           Dear <b><?= o2e($o2_client_first !== '' ? $o2_client_first : $o2_client) ?></b>,<br>
           Thank you for choosing <?= o2e($o2_company) ?> for your upcoming journey. We are delighted to present this carefully
           crafted travel proposal, designed to deliver memorable experiences, seamless arrangements and exceptional
@@ -432,13 +435,16 @@ $o2_round = o2img(
         <div style="margin-top:7mm">
           <p class="kicker">Prepared For</p>
           <div class="prep" style="margin-top:11px">
-            <div class="card prep__card">
+            <div class="card prep__card prep__contact-card">
               <img class="prep__photo" src="<?= o2e($assets . 'person.jpg') ?>" alt="Client">
               <div class="meta">
 
                 <?php if (o2nv($ov['customer_email'], '') !== ''): ?>
                   <span>
-                    <i class="fa-solid fa-envelope"></i>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                      <path d="m3 7 9 6 9-6"></path>
+                    </svg>
                     <a href="mailto:<?= o2e($ov['customer_email']) ?>">
                       <?= o2e($ov['customer_email']) ?>
                     </a>
@@ -447,7 +453,9 @@ $o2_round = o2img(
 
                 <?php if (o2nv($ov['customer_mobile'], '') !== ''): ?>
                   <span>
-                    <i class="fa-solid fa-phone"></i>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.65 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.17a2 2 0 0 1 2.11-.45c.84.31 1.72.53 2.62.65A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
                     <a href="tel:<?= o2e(preg_replace('/\D+/', '', $ov['customer_mobile'])) ?>">
                       <?= o2e($ov['customer_mobile']) ?>
                     </a>
@@ -482,7 +490,7 @@ $o2_round = o2img(
     </section>
 
     <!-- PAGE 3 · HOTELS -->
-    <section class="page<?= count((array) $hotels) > 4 ? ' page-flow' : '' ?>">
+    <section class="page print-section<?= count((array) $hotels) > 4 ? ' page-flow' : '' ?>">
       <?php o2_strip('Where You\'ll Stay', 'Accommodation', o2e($o2_pkg) . '&nbsp; <b>Package</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">
@@ -548,16 +556,6 @@ $o2_round = o2img(
               <p class="muted" style="font-size:10px;line-height:1.2;margin-top:8px;font-style:italic;">
                 Each property is chosen to provide a relaxing environment and essential amenities, ensuring a pleasant experience throughout your journey.
               </p>
-
-              <!-- <p class="muted" style="font-size:10px;line-height:1.2;margin-top:6px;font-style:italic;">
-                Whether you're unwinding after a day of sightseeing or preparing for the next adventure, your accommodation will serve as a welcoming retreat.
-              </p> -->
-              <div class="amen" style="border:0;padding:0;gap:9px 12px">
-                <span><i class="fa-solid fa-wifi"></i> Free Wi-Fi</span>
-                <span><i class="fa-solid fa-mug-saucer"></i> Daily Breakfast</span>
-                <span><i class="fa-solid fa-person-swimming"></i> Swimming Pool</span>
-                <span><i class="fa-solid fa-snowflake"></i> Air Conditioning</span>
-              </div>
               <p class="muted" style="font-size:9px;margin:10px 0 0;line-height:1.5">All stays are on twin-sharing basis with daily breakfast unless stated otherwise. Room categories may be upgraded subject to availability.</p>
             </div>
           <?php endif; ?>
@@ -567,7 +565,7 @@ $o2_round = o2img(
     </section>
 
     <!-- PAGE 4 · FLIGHTS & TRANSPORT -->
-    <section class="page page-flow">
+    <section class="page page-flow ">
       <?php o2_strip('Getting There &amp; Around', 'Journey Plan', 'Flights · <b>Transfers</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">
@@ -793,7 +791,7 @@ $o2_round = o2img(
         $o2_last_day  = isset($o2_chunk[count($o2_chunk) - 1]['day_number']) ? (int) $o2_chunk[count($o2_chunk) - 1]['day_number'] : $o2_first_day;
         $o2_day_label = 'Days ' . $o2_first_day . ($o2_last_day > $o2_first_day ? ' – ' . $o2_last_day : '');
     ?>
-        <section class="page<?= count($o2_chunk) > 2 ? ' page-flow' : '' ?>">
+        <section class="page itinerary-page<?= count($o2_chunk) > 2 ? ' page-flow' : '' ?>">
           <?php o2_strip('Day by Day', 'Itinerary', o2e($o2_day_label)); ?>
           <div class="page__wm"></div>
           <div class="page__body">
@@ -861,7 +859,7 @@ $o2_round = o2img(
     endif; ?>
 
     <!-- INCLUSIONS / EXCLUSIONS / COSTING -->
-    <section class="page page-flow">
+    <section class="page page-flow inclusion-page">
       <?php o2_strip('The Fine Detail', 'Inclusions', '&amp; <b>Investment</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">
@@ -1196,59 +1194,8 @@ $o2_round = o2img(
         $o2_terms_html = trim(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '');
         if ($o2_terms_html !== ''):
         ?>
-          <div class="terms-content" style="font-size:10px;line-height:1.55;color:var(--ink-soft);margin-top:2mm">
+          <div class="terms-content" style="font-size:12px;line-height:1.55;color:var(--ink-soft);margin-top:2mm">
             <?= $o2_terms_html ?>
-          </div>
-        <?php else: ?>
-          <div class="terms-grid" style="margin-top:2mm">
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-file-lines"></i></span>
-              <div>
-                <h4>Booking Policy</h4>
-                <p>A 30% advance confirms the booking; the balance is payable 21 days prior to departure. Confirmation is subject to availability at the time of payment.</p>
-              </div>
-            </div>
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-ban"></i></span>
-              <div>
-                <h4>Cancellation Policy</h4>
-                <p>Cancellations 30+ days before travel: 25% charge. 15–29 days: 50%. Within 14 days: 100%. Charges apply on the total tour value.</p>
-              </div>
-            </div>
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-rotate-left"></i></span>
-              <div>
-                <h4>Refund Policy</h4>
-                <p>Eligible refunds are processed within 15–21 working days to the original payment method, after deduction of applicable supplier charges.</p>
-              </div>
-            </div>
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-passport"></i></span>
-              <div>
-                <h4>Visa Disclaimer</h4>
-                <p>Visa approval is at the sole discretion of the issuing authority. Rejections are not the company's liability; fees are non-refundable.</p>
-              </div>
-            </div>
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-hotel"></i></span>
-              <div>
-                <h4>Hotel Policies</h4>
-                <p>Standard check-in is 14:00 and check-out 12:00. Room categories are confirmed on availability; early check-in is chargeable.</p>
-              </div>
-            </div>
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-plane"></i></span>
-              <div>
-                <h4>Flight Policies</h4>
-                <p>Flight timings and fares are subject to airline confirmation. Schedule changes and baggage rules are governed by airline terms.</p>
-              </div>
-            </div>
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-earth-americas"></i></span>
-              <div>
-                <h4>Force Majeure</h4>
-                <p>The company is not liable for disruptions caused by weather, natural events, political unrest or any circumstances beyond reasonable control.</p>
-              </div>
-            </div>
-            <div class="term"><span class="ic term__b"><i class="fa-solid fa-shield-halved"></i></span>
-              <div>
-                <h4>Travel Insurance</h4>
-                <p>Complimentary basic insurance is included where stated. Travellers are advised to review coverage and opt for enhanced protection if required.</p>
-              </div>
-            </div>
           </div>
         <?php endif; ?>
         <div class="card" style="margin-top:6mm;padding:12px 15px;display:flex;gap:11px;align-items:center;background:var(--cream)">
@@ -1268,14 +1215,14 @@ $o2_round = o2img(
               <path d="M12 8h.01"></path>
             </svg>
           </span>
-          <p class="muted" style="font-size:10px;margin:0;line-height:1.5">By proceeding with payment, the traveller acknowledges and accepts all terms and conditions outlined above. This quotation is valid for 7 days from the date of issue.</p>
+          <p class="muted" style="font-size:11px;margin:0;line-height:1.5">By proceeding with payment, the traveller acknowledges and accepts all terms and conditions outlined above. This quotation is valid for 7 days from the date of issue.</p>
         </div>
       </div>
       <?php o2_foot(); ?>
     </section>
 
     <!-- THANK YOU -->
-    <section class="page thanks">
+    <section class="page thanks thanks-page">
       <div class="page__wm thanks__wm"></div>
       <div class="thanks__wrap">
         <div class="logo">
@@ -1340,26 +1287,41 @@ $o2_round = o2img(
         <div class="thanks__contact">
 
           <span class="c">
-            <i class="fa-solid fa-location-dot"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+              <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
+              </path>
+              <circle cx="12" cy="10" r="3">
+              </circle>
+            </svg>
             <?= o2e(o2nv($ty['company_address'], '')) ?>
           </span>
 
           <span class="c">
-            <i class="fa-solid fa-phone"></i>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.65 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.17a2 2 0 0 1 2.11-.45c.84.31 1.72.53 2.62.65A2 2 0 0 1 22 16.92z"></path>
+            </svg>
             <a href="tel:<?= o2e(preg_replace('/\D+/', '', o2nv($ty['company_contact'], o2nv($ty['user_mobile'], '')))) ?>">
               <?= o2e(o2nv($ty['company_contact'], o2nv($ty['user_mobile'], ''))) ?>
             </a>
           </span>
 
           <span class="c">
-            <i class="fa-solid fa-envelope"></i>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+              <path d="m3 7 9 6 9-6"></path>
+            </svg>
             <a href="mailto:<?= o2e(o2nv($ty['company_email'], '')) ?>">
               <?= o2e(o2nv($ty['company_email'], '')) ?>
             </a>
           </span>
 
           <span class="c">
-            <i class="fa-solid fa-earth-asia"></i>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M2 12h20"></path>
+              <path d="M12 2a15.3 15.3 0 0 1 0 20"></path>
+              <path d="M12 2a15.3 15.3 0 0 0 0 20"></path>
+            </svg>
             <a href="<?= o2e($o2_web) ?>" target="_blank">
               <?= o2e($o2_web) ?>
             </a>
@@ -1439,4 +1401,5 @@ $o2_round = o2img(
     })();
   </script>
 </body>
+
 </html>

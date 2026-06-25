@@ -36,8 +36,10 @@ $testimonials = array();
 $o8_cfg       = array();
 if (function_exists('gqb_get_config')) {
   $o8_cfg = gqb_get_config();
-  $testimonials = isset($o8_cfg['testimonials']) && is_array($o8_cfg['testimonials'])
-    ? $o8_cfg['testimonials'] : array();
+  $testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
+    ? $q['testimonials'] : array();
+  // $testimonials = isset($o8_cfg['testimonials']) && is_array($o8_cfg['testimonials'])
+  //   ? $o8_cfg['testimonials'] : array();
 }
 
 if (!function_exists('o8e')) {
@@ -1177,7 +1179,12 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
           <div class="footer-info-card">
             <h3>Contact Us</h3>
             <ul>
-              <li><i class="fa-solid fa-phone"></i> <?= o8e(o8nv($ty['company_contact'], '')) ?></li>
+              <li>
+                <i class="fa-solid fa-phone"></i>
+                <a href="tel:<?= preg_replace('/\s+/', '', o8nv($ty['company_contact'], '')) ?>">
+                  <?= o8e(o8nv($ty['company_contact'], '')) ?>
+                </a>
+              </li>
               <li><i class="fa-solid fa-envelope"></i> <?= o8e(o8nv($ty['company_email'], '')) ?></li>
               <li><i class="fa-solid fa-globe"></i> <?= o8e(o8nv($ty['website'], '')) ?></li>
             </ul>

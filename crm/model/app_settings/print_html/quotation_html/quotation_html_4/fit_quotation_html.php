@@ -36,11 +36,9 @@ $gallery      = isset($q['gallery_images']) && is_array($q['gallery_images']) ? 
 $assets       = "assets/";
 $testimonials = array();
 $o4_cfg       = array();
-if (function_exists('gqb_get_config')) {
-  $o4_cfg = gqb_get_config();
-  $testimonials = isset($o4_cfg['testimonials']) && is_array($o4_cfg['testimonials'])
-    ? $o4_cfg['testimonials'] : array();
-}
+
+$testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
+  ? $q['testimonials'] : array();
 
 if (!function_exists('o4e')) {
   function o4e($v)
@@ -147,8 +145,10 @@ if (!function_exists('o4_render_vl_logo')) {
         <div class="vl-logo-icon" <?= $icon_style ?>>◎</div>
       <?php endif; ?>
       <div class="vl-logo-text">
-        <div class="name" <?= $name_style ?>><?= o4e($name) ?></div>
-        <div class="tagline">Curated Luxury Journeys</div>
+        <!-- <div class="name" <? //= $name_style 
+                                ?>><? //= o4e($name) 
+                                    ?></div>
+        <div class="tagline">Curated Luxury Journeys</div> -->
       </div>
     </div>
   <?php
@@ -734,63 +734,64 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     <?php endif; ?>
 
     <!-- PAGE 5 – ITINERARY -->
-    <?php o4_render_page_header($hero, 'Day-Wise Itinerary'); ?>
+    <div class="itinerary-start">
+      <?php o4_render_page_header($hero, 'Day-Wise Itinerary'); ?>
 
-    <div class="page-section">
-      <div class="sec-eyebrow">Your Day-by-Day Journey</div>
-      <div class="sec-heading">Itinerary</div>
+      <div class="page-section">
+        <div class="sec-eyebrow">Your Day-by-Day Journey</div>
+        <div class="sec-heading">Itinerary</div>
 
-      <?php if (!empty($itin)) :
-        foreach ($itin as $day) :
-          $day_num = str_pad((string) o4nv($day['day_number'], ''), 2, '0', STR_PAD_LEFT);
-      ?>
-          <div class="itin-day">
-            <div class="itin-day-header">
-              <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n"><?= o4e($day_num) ?></span></div>
-              <div class="itin-day-date"><?= o4e(o4nv($day['date'], '')) ?></div>
-            </div>
-            <div class="itin-day-body">
-              <div class="itin-attraction">🌐 Special Attraction · <?= o4e(o4nv($day['special_attraction'], o4nv($day['city'], 'Sightseeing'))) ?></div>
-              <div class="itin-prog-lbl">Detailed Programme</div>
-              <div class="itin-prog"><?= o4e(o4nv($day['detailed_programme'], '')) ?></div>
-              <div class="itin-chips">
-                <?php if (!empty($day['meal_plan'])) : ?>
-                  <div class="itin-chip meal">
-                    <div class="itin-chip-icon">🍽️</div>
-                    <div>
-                      <div class="itin-chip-lbl">Meal Plan</div>
-                      <div class="itin-chip-val"><?= o4e($day['meal_plan']) ?></div>
+        <?php if (!empty($itin)) :
+          foreach ($itin as $day) :
+            $day_num = str_pad((string) o4nv($day['day_number'], ''), 2, '0', STR_PAD_LEFT);
+        ?>
+            <div class="itin-day">
+              <div class="itin-day-header">
+                <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n"><?= o4e($day_num) ?></span></div>
+                <div class="itin-day-date"><?= o4e(o4nv($day['date'], '')) ?></div>
+              </div>
+              <div class="itin-day-body">
+                <div class="itin-attraction">🌐 Special Attraction · <?= o4e(o4nv($day['special_attraction'], o4nv($day['city'], 'Sightseeing'))) ?></div>
+                <div class="itin-prog-lbl">Detailed Programme</div>
+                <div class="itin-prog"><?= o4e(o4nv($day['detailed_programme'], '')) ?></div>
+                <div class="itin-chips">
+                  <?php if (!empty($day['meal_plan'])) : ?>
+                    <div class="itin-chip meal">
+                      <div class="itin-chip-icon">🍽️</div>
+                      <div>
+                        <div class="itin-chip-lbl">Meal Plan</div>
+                        <div class="itin-chip-val"><?= o4e($day['meal_plan']) ?></div>
+                      </div>
                     </div>
-                  </div>
-                <?php endif; ?>
-                <?php if (!empty($day['overnight_stay'])) : ?>
-                  <div class="itin-chip stay">
-                    <div class="itin-chip-icon">🌙</div>
-                    <div>
-                      <div class="itin-chip-lbl">Overnight Stay</div>
-                      <div class="itin-chip-val"><?= o4e($day['overnight_stay']) ?></div>
+                  <?php endif; ?>
+                  <?php if (!empty($day['overnight_stay'])) : ?>
+                    <div class="itin-chip stay">
+                      <div class="itin-chip-icon">🌙</div>
+                      <div>
+                        <div class="itin-chip-lbl">Overnight Stay</div>
+                        <div class="itin-chip-val"><?= o4e($day['overnight_stay']) ?></div>
+                      </div>
                     </div>
-                  </div>
-                <?php endif; ?>
+                  <?php endif; ?>
+                </div>
               </div>
             </div>
+          <?php
+          endforeach;
+        else :
+          ?>
+          <div class="itin-day">
+            <div class="itin-day-body">
+              <div class="itin-prog">Itinerary details will be shared upon confirmation.</div>
+            </div>
           </div>
-        <?php
-        endforeach;
-      else :
-        ?>
-        <div class="itin-day">
-          <div class="itin-day-body">
-            <div class="itin-prog">Itinerary details will be shared upon confirmation.</div>
-          </div>
-        </div>
-      <?php endif; ?>
+        <?php endif; ?>
+      </div>
+      <div class="page-num">PAGE 05 / 09</div>
+
+      <!-- PAGE 6 – PRICING -->
+      <?php o4_render_page_header($hero, 'Pricing & Coverage'); ?>
     </div>
-    <div class="page-num">PAGE 05 / 09</div>
-
-    <!-- PAGE 6 – PRICING -->
-    <?php o4_render_page_header($hero, 'Pricing & Coverage'); ?>
-
     <div class="page-section">
       <div class="inc-exc-grid">
         <div class="inc-card">
@@ -1085,42 +1086,23 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
         <div class="sec-eyebrow">Please Read Carefully</div>
         <div class="sec-heading"><?= o4e(o4nv($terms['title'], 'Terms & Conditions')) ?></div>
 
-        <div class="tnc-grid">
-          <?php if (!empty($o4_term_lines)) :
-            foreach ($o4_term_lines as $ti => $line) :
-              $num = str_pad((string) ($ti + 1), 2, '0', STR_PAD_LEFT);
-              $title = 'Terms';
-              $body = $line;
-              if (strpos($line, ':') !== false) {
-                list($title, $body) = array_map('trim', explode(':', $line, 2));
-              }
-          ?>
-              <div class="tnc-card">
-                <div class="tnc-num"><?= o4e($num) ?></div>
-                <div class="tnc-title"><?= o4e($title) ?></div>
-                <div class="tnc-body"><?= o4e($body) ?></div>
-              </div>
-            <?php
-            endforeach;
-          else :
-            ?>
-            <div class="tnc-card">
-              <div class="tnc-num">01</div>
-              <div class="tnc-title">Terms &amp; Conditions</div>
-              <div class="tnc-body">Terms and conditions will be shared as per company policy.</div>
-            </div>
-          <?php endif; ?>
-        </div>
+        <div class="tnc-list">
+          <?php
+          $terms_html = isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '';
 
-        <div class="tnc-footer">
-          <span class="tnc-footer-icon">📄</span>
-          By confirming this booking, the traveller acknowledges and agrees to all terms and conditions stated above.
+          if ($terms_html != '') {
+            echo $terms_html;
+          } else {
+            echo '<h4>Terms &amp; Conditions</h4>';
+            echo '<p>Terms and conditions will be shared as per company policy.</p>';
+          }
+          ?>
         </div>
       </div>
       <div class="page-num">PAGE 09 / 09</div>
 
       <!-- THANK YOU PAGE -->
-      <div class="ty-page" style="background: linear-gradient(to bottom,rgba(10,22,50,.7) 0%,rgba(10,22,50,.78) 60%,rgba(10,22,50,.95) 100%), url('<?= o4e($o4_cover_img) ?>') center/cover no-repeat;">
+      <div class="ty-page thankyou-page thanks-page" style="background: linear-gradient(to bottom,rgba(10,22,50,.7) 0%,rgba(10,22,50,.78) 60%,rgba(10,22,50,.95) 100%), url('<?= o4e($o4_cover_img) ?>') center/cover no-repeat;">
         <div class="ty-top">
           <?php o4_render_vl_logo($hero, true); ?>
         </div>
@@ -1184,7 +1166,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
             </div>
           </div>
         </div>
-        <div style="height:28px;"></div>
+        <!-- <div style="height:28px;"></div> -->
       </div>
 
     </div>

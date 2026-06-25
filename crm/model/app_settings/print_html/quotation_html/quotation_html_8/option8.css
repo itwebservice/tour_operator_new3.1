@@ -270,6 +270,11 @@
     height:22px;
     fill:#ffffff; 
 }
+
+.footer-info-card li a{
+  color: inherit;
+  text-decoration: none;
+}
 /* ============= */
 .service{
 

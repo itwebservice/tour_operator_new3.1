@@ -34,12 +34,14 @@ $ty           = $q['thank_you'];
 $present      = $q['sections_present'];
 $assets       = "assets/";
 $testimonials = array();
-if (function_exists('gqb_get_config')) {
-  $o3_cfg = gqb_get_config();
-  $testimonials = isset($o3_cfg['testimonials']) && is_array($o3_cfg['testimonials'])
-    ? $o3_cfg['testimonials'] : array();
-}
-
+// if (function_exists('gqb_get_config')) {
+//   $o3_cfg = gqb_get_config();
+//   $testimonials = isset($o3_cfg['testimonials']) && is_array($o3_cfg['testimonials'])
+//     ? $o3_cfg['testimonials'] : array();
+// }
+$testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
+  ? $q['testimonials'] : array();
+  
 if (!function_exists('o3e')) {
   function o3e($v)
   {
@@ -274,16 +276,23 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
       <div class="cover-logo">
         <div class="brand">
           <?php if ($o3_logo !== '') : ?>
-            <img src="<?= o3e($o3_logo) ?>" alt="<?= o3e($hero['company_name']) ?>" class="company-logo-img" />
+            <!-- <img src="<? //= o3e($o3_logo) 
+                            ?>" alt="<? //= o3e($hero['company_name']) 
+                                      ?>" class="company-logo-img" /> -->
+            <img src="<?= BASE_URL ?>images/Admin-Area-Logo.png"
+              alt="Logo"
+              class="company-logo-img" />
           <?php else : ?>
             <svg class="plane-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 28 L42 14 L36 30 L22 28 L14 40 L12 30 Z" fill="#c8973a" />
             </svg>
           <?php endif; ?>
-          <div class="brand-text">
-            <div class="freeze"><?= o3e($o3_b1) ?></div>
-            <div class="my-trip"><?= o3e($o3_b2) ?></div>
-          </div>
+          <!-- <div class="brand-text">
+            <div class="freeze"><? //= o3e($o3_b1) 
+                                ?></div>
+            <div class="my-trip"><? //= o3e($o3_b2) 
+                                  ?></div>
+          </div> -->
         </div>
         <div class="tagline">Journey Beyond Dreams</div>
       </div>
@@ -522,11 +531,11 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
     <hr class="page-divider" />
 
     <!-- FLIGHTS & TRANSPORT -->
-    <div class="prep-exclusively">
+    <!-- <div class="prep-exclusively">
       <div class="prep-label">PREPARED EXCLUSIVELY FOR</div>
       <div class="prep-name"><?= o3e($o3_client) ?></div>
       <div class="prep-deco">✦ ❁ ✦</div>
-    </div>
+    </div> -->
     <?php o3_render_page_header($hero, $ov, $assets); ?>
 
     <div class="flight-section page-flow-section" style="padding-top:28px;">
@@ -793,11 +802,14 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
 
     <hr class="page-divider" />
 
+
+    <div class="page-break"></div>
     <!-- ITINERARY -->
     <?php o3_render_page_header($hero, $ov, $assets); ?>
 
     <div class="itinerary-section page-flow-section">
-      <div class="section-sub-heading">
+      <!-- <div class="section-sub-heading"> -->
+      <div class="section-sub-heading keep-with-next">
         <div class="badge-letter">C</div>DAY WISE ITINERARY
       </div>
 
@@ -1122,43 +1134,16 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
 
     <div class="terms-section page-flow-section">
       <h2><?= o3e(o3nv($terms['title'], 'Terms & Conditions')) ?></h2>
-      <div class="terms-grid">
-        <?php if (!empty($o3_term_lines)) :
-          foreach ($o3_term_lines as $ti => $line) :
-            $icon = $o3_term_icons[$ti % count($o3_term_icons)];
-            $cls = $o3_term_classes[$ti % count($o3_term_classes)];
-            $label = $line;
-            $desc = '';
-            if (strpos($line, ':') !== false) {
-              list($label, $desc) = array_map('trim', explode(':', $line, 2));
-            }
-        ?>
-            <div class="term-item">
-              <div class="term-icon-box <?= o3e($cls) ?>"><?= $icon ?></div>
-              <div>
-                <div class="term-label"><?= o3e($label) ?></div>
-                <?php if ($desc !== '') : ?><div class="term-desc"><?= o3e($desc) ?></div><?php endif; ?>
-              </div>
-            </div>
-          <?php
-          endforeach;
-        else :
-          ?>
-          <div class="term-item">
-            <div class="term-icon-box ti-gold">🗓️</div>
-            <div>
-              <div class="term-label">Terms &amp; Conditions</div>
-              <div class="term-desc">Terms and conditions will be shared as per company policy.</div>
-            </div>
-          </div>
-        <?php endif; ?>
+
+      <div class="terms-content terms-content-icons">
+        <?= isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '' ?>
       </div>
     </div>
 
     <hr class="page-divider" />
 
     <!-- THANK YOU -->
-    <div class="thankyou-page">
+    <div class="thankyou-page print-section">
       <div class="ty-circle-1"></div>
       <div class="ty-circle-2"></div>
       <div class="ty-circle-3"></div>
@@ -1305,4 +1290,5 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
     })();
   </script>
 </body>
+
 </html>

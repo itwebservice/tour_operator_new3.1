@@ -34,13 +34,13 @@ $ty           = $q['thank_you'];
 $present      = $q['sections_present'];
 $gallery      = isset($q['gallery_images']) && is_array($q['gallery_images']) ? $q['gallery_images'] : array();
 $assets       = "assets/";
-$testimonials = array();
+// $testimonials = array();
+
+$testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
+  ? $q['testimonials']
+  : array();
+
 $o6_cfg       = array();
-if (function_exists('gqb_get_config')) {
-  $o6_cfg = gqb_get_config();
-  $testimonials = isset($o6_cfg['testimonials']) && is_array($o6_cfg['testimonials'])
-    ? $o6_cfg['testimonials'] : array();
-}
 
 if (!function_exists('o6e')) {
   function o6e($v)
@@ -1220,10 +1220,10 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
         <?php if (!empty($testimonials)) :
           $o6_ti = 0;
           foreach ($testimonials as $t) :
-            if ($o6_ti >= 3) {
-              break;
-            }
-            $o6_ti++;
+            // if ($o6_ti >= 3) {
+            //   break;
+            // }
+            // $o6_ti++;
             $photo = o6_media_url(isset($t['photo']) ? $t['photo'] : '');
         ?>
             <div class="testimonial-card-v2 card-container">
@@ -1291,7 +1291,6 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
   <!-- PAGE 11 — THANK YOU -->
   <div class="page thank-you-page">
     <div class="thank-you-main-core">
-      <span class="jp-closing-text">ありがとうございます</span>
       <h1 class="thank-you-headline">Thank You</h1>
       <p class="thank-you-subtext">for choosing us as your premium travel partner</p>
       <div class="closing-divider-diamond"></div>
@@ -1426,5 +1425,4 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
     })();
   </script>
 </body>
-
 </html>
