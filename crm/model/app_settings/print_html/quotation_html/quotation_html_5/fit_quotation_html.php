@@ -36,12 +36,10 @@ $gallery      = isset($q['gallery_images']) && is_array($q['gallery_images']) ? 
 $assets       = "assets/";
 $testimonials = array();
 $o5_cfg       = array();
-if (function_exists('gqb_get_config')) {
-  $o5_cfg = gqb_get_config();
-  $testimonials = isset($o5_cfg['testimonials']) && is_array($o5_cfg['testimonials'])
-    ? $o5_cfg['testimonials'] : array();
-}
 
+$testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
+  ? $q['testimonials'] : array();
+  
 if (!function_exists('o5e')) {
   function o5e($v)
   {
@@ -1021,12 +1019,6 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
       <div class="costing-note">
         <strong>Note:</strong>
         <?= o5e(o5nv(isset($incx['note']) ? $incx['note'] : '', 'Rates are subject to availability at the time of confirmation.')) ?>
-      </div>
-
-      <div class="pricing-cta">
-        <div class="from">Starting From</div>
-        <div class="amount"><?= o5e($o5_start_total) ?></div>
-        <div class="sub">For <?= o5e(o5_guest_label($ov)) ?> &nbsp;|&nbsp; <?= o5e($o5_duration) ?></div>
       </div>
     </div>
 

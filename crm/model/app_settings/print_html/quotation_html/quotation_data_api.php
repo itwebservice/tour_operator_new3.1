@@ -67,7 +67,7 @@ if (empty($data['found'])) {
 }
 
 // Surface admin-managed testimonials from config alongside the quotation data.
-$data['testimonials'] = isset($config['testimonials']) ? $config['testimonials'] : array();
+// $data['testimonials'] = isset($config['testimonials']) ? $config['testimonials'] : array();
 
 // Section visibility from config (data is always present; this tells the
 // consumer which sections the company has chosen to render).

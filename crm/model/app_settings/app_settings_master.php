@@ -211,25 +211,41 @@ function app_format_save(){
         mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
       }
     }
-  // ====================================
+    // ====================================
 
-	// else{
-	// 	if(empty($dest_id))
-	// 	{
-	// 		$sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
-	// 	}
-	// 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
-	// 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
-	// }
+    // else{
+    // 	if(empty($dest_id))
+    // 	{
+    // 		$sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
+    // 	}
+    // 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
+    // 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
+    // }
 
 
     // ========================== Dipti
     include_once(dirname(__FILE__) . '/print_html/quotation_html/generic_builder_config.php');
-    $testimonials = isset($_POST['testimonials']) ? json_decode($_POST['testimonials'], true) : array();
+    // $testimonials = isset($_POST['testimonials']) ? json_decode($_POST['testimonials'], true) : array();
 
     $config = gqb_get_config();
-    $config['testimonials'] = is_array($testimonials) ? $testimonials : array();
-    
+    // $config['testimonials'] = is_array($testimonials) ? $testimonials : array();
+    $testimonials = isset($_POST['testimonials']) ? json_decode($_POST['testimonials'], true) : array();
+
+    mysqlQuery("TRUNCATE TABLE quotation_testimonial");
+
+    if (is_array($testimonials)) {
+      foreach ($testimonials as $t) {
+        $name = mysqlREString($t['name'] ?? '');
+        $designation = mysqlREString($t['designation'] ?? '');
+        $review = mysqlREString($t['review'] ?? '');
+        $photo = mysqlREString($t['photo'] ?? '');
+
+        mysqlQuery("INSERT INTO quotation_testimonial 
+      (name, designation, review, photo, active_flag) 
+      VALUES 
+      ('$name', '$designation', '$review', '$photo', 'Active')");
+      }
+    }
     //==============================
     $social_links = isset($_POST['social_links']) ? json_decode($_POST['social_links'], true) : array();
     $config['social_links'] = is_array($social_links) ? $social_links : array();

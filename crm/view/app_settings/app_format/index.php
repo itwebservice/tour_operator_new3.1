@@ -113,9 +113,22 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
             <div class="row">
               <div class="col-md-12 no-pad">
                 <?php
-                include_once(__DIR__ . '/../../../model/app_settings/print_html/quotation_html/generic_builder_config.php');
-                $gqb_config = gqb_get_config();
-                $testimonials = isset($gqb_config['testimonials']) ? $gqb_config['testimonials'] : array();
+                $testimonials = array();
+
+                $sq_testm = mysqlQuery("SELECT * FROM quotation_testimonial WHERE active_flag='Active' ORDER BY testimonial_id ASC");
+
+                while ($row_testm = mysqli_fetch_assoc($sq_testm)) {
+                  $testimonials[] = array(
+                    'testimonial_id' => $row_testm['testimonial_id'],
+                    'name' => $row_testm['name'],
+                    'designation' => $row_testm['designation'],
+                    'review' => $row_testm['review'],
+                    'photo' => $row_testm['photo']
+                  );
+                }
+                // include_once(__DIR__ . '/../../../model/app_settings/print_html/quotation_html/generic_builder_config.php');
+                // $gqb_config = gqb_get_config();
+                // $testimonials = isset($gqb_config['testimonials']) ? $gqb_config['testimonials'] : array();
 
                 if (empty($testimonials)) {
                   $testimonials = array(
@@ -139,28 +152,48 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
                     <div id="testimonial_rows">
                       <?php foreach ($testimonials as $i => $t) { ?>
                         <div class="row testimonial_row mg_bt_10">
+
+                          <input type="hidden" class="testimonial_id" value="<?= htmlspecialchars($t['testimonial_id'] ?? '') ?>">
+
                           <div class="col-md-2">
-                            <input type="text" class="form-control testimonial_name" placeholder="Name" value="<?= htmlspecialchars($t['name'] ?? '') ?>">
+                            <input type="text" class="form-control testimonial_name"
+                              placeholder="Name"
+                              value="<?= htmlspecialchars($t['name'] ?? '') ?>">
                           </div>
+
                           <div class="col-md-2">
-                            <input type="text" class="form-control testimonial_designation" placeholder="Designation" value="<?= htmlspecialchars($t['designation'] ?? '') ?>">
+                            <input type="text" class="form-control testimonial_designation"
+                              placeholder="Designation"
+                              value="<?= htmlspecialchars($t['designation'] ?? '') ?>">
                           </div>
-                          <div class="col-md-4">
-                            <input type="text" class="form-control testimonial_review" placeholder="Review" value="<?= htmlspecialchars($t['review'] ?? '') ?>">
+
+                          <div class="col-md-5">
+                            <input type="text" class="form-control testimonial_review"
+                              placeholder="Review"
+                              value="<?= htmlspecialchars($t['review'] ?? '') ?>">
                           </div>
-                          <div class="col-md-3">
-                            <!-- <input type="text" class="form-control testimonial_photo" placeholder="Photo URL" value="<?= htmlspecialchars($t['photo'] ?? '') ?>"> -->
-                            <input type="hidden" class="testimonial_photo" value="<?= htmlspecialchars($t['photo'] ?? '') ?>">
+
+                          <div class="col-md-2 text-right">
+
+                            <input type="hidden"
+                              class="testimonial_photo"
+                              value="<?= htmlspecialchars($t['photo'] ?? '') ?>">
 
                             <div class="div-upload">
                               <div class="upload-button1 testimonial_upload_btn">
                                 <span><?= !empty($t['photo']) ? 'Uploaded' : 'Image' ?></span>
                               </div>
                             </div>
+
                           </div>
-                          <div class="col-md-1">
-                            <button type="button" class="btn btn-danger btn-sm qb_remove_testm"><i class="fa fa-trash"></i></button>
+
+                          <div class="col-md-1 text-center">
+                            <button type="button"
+                              class="btn btn-danger btn-sm qb_remove_testm">
+                              <i class="fa fa-trash"></i>
+                            </button>
                           </div>
+
                         </div>
                       <?php } ?>
                     </div>
@@ -168,9 +201,9 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
                     <button type="button" class="btn btn-info btn-sm" onclick="add_testimonial_row()">+ Add Testimonial</button>
                   </div>
                 </div>
-                <!-- =========================================== -->
               </div>
             </div>
+            <!-- =========================================== -->
 
             <?php
             $social_links = isset($gqb_config['social_links']) ? $gqb_config['social_links'] : array();
@@ -288,24 +321,39 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
   function add_testimonial_row() {
     var html = `
     <div class="row testimonial_row mg_bt_10">
-        <div class="col-md-2"><input type="text" class="form-control testimonial_name" placeholder="Name"></div>
-        <div class="col-md-2"><input type="text" class="form-control testimonial_designation" placeholder="Designation"></div>
-        <div class="col-md-4"><input type="text" class="form-control testimonial_review" placeholder="Review"></div>
+      <input type="hidden" class="testimonial_id" value="">
 
-        <div class="col-md-3">
-  <input type="hidden" class="testimonial_photo">
-  <div class="div-upload">
-    <div class="upload-button1 testimonial_upload_btn"><span>Image</span></div>
-    <span class="testimonial_upload_status"></span>
-  </div>
-</div>
+      <div class="col-md-2">
+        <input type="text" class="form-control testimonial_name" placeholder="Name">
+      </div>
 
-<div class="col-md-1">
-  <button type="button" class="btn btn-danger btn-sm qb_remove_testm">
-    <i class="fa fa-trash"></i>
-  </button>
-</div>    </div>`;
+      <div class="col-md-2">
+        <input type="text" class="form-control testimonial_designation" placeholder="Designation">
+      </div>
+
+      <div class="col-md-5">
+        <input type="text" class="form-control testimonial_review" placeholder="Review">
+      </div>
+
+      <div class="col-md-2 text-right">
+        <input type="hidden" class="testimonial_photo" value="">
+        <div class="div-upload">
+          <div class="upload-button1 testimonial_upload_btn">
+            <span>Image</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-1 text-center">
+        <button type="button" class="btn btn-danger btn-sm qb_remove_testm">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>`;
+
     $('#testimonial_rows').append(html);
+
+    init_testimonial_uploads(); // important
   }
 
   function init_testimonial_uploads() {
