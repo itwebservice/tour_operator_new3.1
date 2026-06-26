@@ -152,16 +152,13 @@ $sq_countc = mysqli_num_rows(mysqlQuery("select * from hotel_contracted_tarrif w
         minimumInputLength: 1
     });
     city_lzloading('#cmb_city_id1');
+    $('#cmb_city_id1').on('change select2:select', function () {
+        if (typeof hotel_name_list_load === 'function') {
+            hotel_name_list_load(this.id);
+        }
+    });
     //**Hotel Name load start**//
-    function hotel_name_list_load(id) {
-        var city_id = $("#" + id).val();
-        var base_url = $('#base_url').val();
-        $.get(base_url + "view/hotels/master/b2b_tarrif/hotel_name_load.php", {
-            city_id: city_id
-        }, function(data) {
-            $("#hotel_id1").html(data);
-        });
-    }
+    // hotel_name_list_load is provided by footer_scripts.js (resolveHotelSelectFromCity).
     $('#frm_tab1').validate({
         rules: {
             cmb_city_id1: {

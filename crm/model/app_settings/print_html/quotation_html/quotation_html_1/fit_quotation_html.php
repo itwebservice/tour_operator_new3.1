@@ -71,6 +71,7 @@ if (!function_exists('o1nv')) {
     return ($v !== null && $v !== '') ? $v : $f;
   }
 }
+
 if (!function_exists('o1_list_item_text')) {
   function o1_list_item_text($html)
   {
@@ -128,6 +129,7 @@ if (!function_exists('o1_list_items')) {
     return $items;
   }
 }
+
 // Image url with local-asset fallback when the data has no image.
 if (!function_exists('o1img')) {
   function o1img($url, $fallback)

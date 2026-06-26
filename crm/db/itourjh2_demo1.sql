@@ -11380,3 +11380,16 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-06-24  6:01:47
+
+DROP TABLE IF EXISTS `quotation_testimonial`;
+
+CREATE TABLE `quotation_testimonial` (
+  `testimonial_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT '',
+  `designation` varchar(255) DEFAULT '',
+  `review` text,
+  `photo` varchar(500) DEFAULT '',
+  `active_flag` varchar(20) DEFAULT 'Active',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`testimonial_id`)
+);

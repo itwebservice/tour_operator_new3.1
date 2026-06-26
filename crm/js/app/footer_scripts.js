@@ -2145,23 +2145,49 @@ function resolveHotelSelectFromCity(cityRef) {
 
 	var $row = $city.closest('tr');
 	if ($row.length) {
-		var $hotelInRow = $row.find('select[id^="hotel_name"], select[name^="hotel_name"]').first();
+		var $hotelInRow = $row.find('select[id^="hotel_name"], select[name^="hotel_name"], select[id^="hotel_id"]').first();
 		if ($hotelInRow.length) {
 			return $hotelInRow;
 		}
 	}
 
-	var suffix = parseQuotationHotelRowSuffix($city.attr('id') || '');
-	if (!suffix) {
-		return $();
+	var cityFieldId = $city.attr('id') || '';
+
+	// Hotel B2B tariff screens: cmb_city_id1 -> hotel_id1
+	var cmbCityMatch = cityFieldId.match(/^cmb_city_id(\d*)$/);
+	if (cmbCityMatch) {
+		var tariffHotelId = 'hotel_id' + (cmbCityMatch[1] || '1');
+		var $tariffHotel = $('#' + tariffHotelId);
+		if ($tariffHotel.length) {
+			return $tariffHotel;
+		}
 	}
 
-	var $hotel = $('#hotel_name-' + suffix);
-	if ($hotel.length) {
-		return $hotel;
+	// Hotel tariff list filter
+	if (cityFieldId === 'city_id_filter') {
+		var $filterHotel = $('#hotel_id_filter');
+		if ($filterHotel.length) {
+			return $filterHotel;
+		}
 	}
 
-	return $('#hotel_name' + suffix);
+	var suffix = parseQuotationHotelRowSuffix(cityFieldId);
+	if (suffix) {
+		var $hotel = $('#hotel_name-' + suffix);
+		if ($hotel.length) {
+			return $hotel;
+		}
+		$hotel = $('#hotel_name' + suffix);
+		if ($hotel.length) {
+			return $hotel;
+		}
+	}
+
+	if ($('#hotel_name').length) {
+		return $('#hotel_name');
+	}
+
+	return $();
 }
 
 function hotel_name_list_load(id) {

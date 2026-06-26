@@ -580,7 +580,18 @@ $(function () {
 
     }
 
+    function resetPackageSaveState() {
+        window.packageSaveInProgress = false;
+        var $btn = $('#btn_save1');
+        if ($btn.length) {
+            $btn.prop('disabled', false);
+            try { $btn.button('reset'); } catch (e) {}
+            $btn.val('Save');
+        }
+    }
+
     $(function() {
+        window.packageSaveInProgress = false;
 
         $('#frm_package_master_save').validate({
 
@@ -604,16 +615,18 @@ $(function () {
                 },
             },
 
-            submitHandler: function(form, event) {
+            invalidHandler: function() {
+                resetPackageSaveState();
+            },
+
+            submitHandler: function(form) {
                 console.log("FORM SUBMIT: Form submission started");
-                event.preventDefault();
                 
                 // Prevent double submission
                 if (window.packageSaveInProgress) {
                     console.log("FORM SUBMIT: Already in progress, preventing double submission");
                     return false;
                 }
-                window.packageSaveInProgress = true;
                 
                 var base_url = $('#base_url').val();
 
@@ -862,6 +875,7 @@ $(function () {
                 }
 
                 var tour_type = $('#tour_type').val();
+                window.packageSaveInProgress = true;
                 $('#btn_save1').button('loading');
                 $("#vi_confirm_box").vi_confirm_box({
 
@@ -918,25 +932,21 @@ $(function () {
 
                                 function(data) {
                                     console.log("FORM SUBMIT: Response received");
-                                    window.packageSaveInProgress = false; // Reset flag
+                                    resetPackageSaveState();
                                     var msg = data.split('--');
                                     if (msg[0] == "error") {
                                         error_msg_alert(msg[1]);
-                                        $('#btn_save1').button('reset');
                                         return false;
                                     } else {
                                         booking_save_message(data);
-                                        $('#btn_save1').button('reset');
                                     }
                                 }).fail(function() {
                                     console.log("FORM SUBMIT: AJAX failed");
-                                    window.packageSaveInProgress = false; // Reset flag on error
-                                    $('#btn_save1').button('reset');
+                                    resetPackageSaveState();
                                 });
                         } else {
                             console.log("FORM SUBMIT: User cancelled, resetting flag");
-                            window.packageSaveInProgress = false; // Reset flag
-                            $('#btn_save1').button('reset');
+                            resetPackageSaveState();
                         }
                     }
 

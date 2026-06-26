@@ -51,6 +51,11 @@ $('#hotel_id_filter').select2();
 $('#from_date_filter,#to_date_filter').datetimepicker({ format:'d-m-Y H:i' });
 $('#city_id_filter').select2({minimumInputLength: 1});
 city_lzloading('#city_id_filter');
+$('#city_id_filter').on('change select2:select', function () {
+    if (typeof hotel_name_list_load === 'function') {
+        hotel_name_list_load(this.id);
+    }
+});
 var columns = [
     { title: "S_NO" },
     { title: "Created_At" },
@@ -74,12 +79,6 @@ function tarrif_list_reflect(){
 	});
 }
 tarrif_list_reflect();
-function hotel_name_list_load(id){
-    var city_id = $("#"+id).val();
-    $.get('b2b_tarrif/hotel_name_load.php', {city_id : city_id}, function(data){
-        $ ("#hotel_id_filter").html( data );
-    });
-}
 function view_modal(pricing_id){
     $('#viewt_btn-'+pricing_id).button('loading');
     $('#viewt_btn-'+pricing_id).prop('disabled',true);
@@ -88,6 +87,11 @@ function view_modal(pricing_id){
         $('#viewt_btn-'+pricing_id).button('reset');
         $('#viewt_btn-'+pricing_id).prop('disabled',false);
     });
+}
+</script>
+<script>
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+    hotelSupplierQuickLoadUrl = '<?= BASE_URL ?>view/hotels/master/b2b_tarrif/hotel_name_load.php';
 }
 </script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

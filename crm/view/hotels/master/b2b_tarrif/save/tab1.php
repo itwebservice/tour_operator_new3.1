@@ -81,6 +81,9 @@ $role_id = $_SESSION['role_id'];
 <script>
     $('#currency_code1,#hotel_id1').select2();
     city_lzloading('#cmb_city_id1');
+    $('#cmb_city_id1').on('change select2:select', function () {
+        hotel_name_list_load(this.id);
+    });
 
     function seasonal_csv() {
         var base_url = $('#base_url').val();
@@ -88,15 +91,7 @@ $role_id = $_SESSION['role_id'];
     }
 
     //**Hotel Name load start**//
-    function hotel_name_list_load(id) {
-        var city_id = $("#" + id).val();
-        var base_url = $('#base_url').val();
-        $.get(base_url + "view/hotels/master/b2b_tarrif/hotel_name_load.php", {
-            city_id: city_id
-        }, function(data) {
-            $("#hotel_id1").html(data);
-        });
-    }
+    // hotel_name_list_load is provided by footer_scripts.js (resolveHotelSelectFromCity).
 
     hotel_tarrif_save1();
 

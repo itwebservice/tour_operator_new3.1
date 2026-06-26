@@ -49,6 +49,11 @@ $pricing_id = $_POST['pricing_id'];
 </div>
 
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
+<script>
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+    hotelSupplierQuickLoadUrl = '<?= BASE_URL ?>view/hotels/master/b2b_tarrif/hotel_name_load.php';
+}
+</script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/field_validation.js"></script>
 <?php

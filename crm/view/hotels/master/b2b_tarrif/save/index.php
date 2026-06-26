@@ -53,4 +53,9 @@ include_once('../../../../layouts/fullwidth_app_header.php');
 <?php
 include_once('../../../../layouts/fullwidth_app_footer.php');
 ?>
+<script>
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+    hotelSupplierQuickLoadUrl = '<?= BASE_URL ?>view/hotels/master/b2b_tarrif/hotel_name_load.php';
+}
+</script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

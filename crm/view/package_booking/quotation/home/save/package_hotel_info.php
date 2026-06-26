@@ -1,11 +1,31 @@
 <?php
 include_once('../../../../../model/model.php');
 $package_id_arr = $_POST['package_id_arr'];
-$from_date = $_POST['from_date'];
-$from_date = date('d-m-Y',strtotime($from_date));
+$chain_ts = quotation_chain_parse_dmY($_POST['from_date']);
+$travel_start_date = $chain_ts ? date('d-m-Y', $chain_ts) : date('d-m-Y');
+$from_date = $travel_start_date;
+
+function quotation_chain_parse_dmY($date_str) {
+	$date_str = trim(explode(' ', $date_str)[0]);
+	$parts = explode('-', $date_str);
+	if (sizeof($parts) !== 3) {
+		return false;
+	}
+	return mktime(0, 0, 0, (int)$parts[1], (int)$parts[0], (int)$parts[2]);
+}
+
+function quotation_chain_add_days_dmY($date_str, $days) {
+	$ts = quotation_chain_parse_dmY($date_str);
+	if (!$ts) {
+		return $date_str;
+	}
+	return date('d-m-Y', strtotime('+' . intval($days) . ' days', $ts));
+}
 
 $train_info_arr = array();
 for($i=0; $i<sizeof($package_id_arr); $i++){
+
+	$from_date = $travel_start_date;
 
 	$sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$package_id_arr[$i]'"));		
 	$sq_count = mysqli_num_rows(mysqlQuery("select * from custom_package_hotels where package_id = '$package_id_arr[$i]'"));
@@ -39,7 +59,7 @@ for($i=0; $i<sizeof($package_id_arr); $i++){
 			$city_name1 = $sq_city_id['city_name'];
 
 			$check_in_date = $from_date;
-			$check_out_date = date('d-m-Y', strtotime($check_in_date . ' +'.$total_nights.' days'));
+			$check_out_date = quotation_chain_add_days_dmY($check_in_date, $total_nights);
 
 			$arr = array(
 				'city_id' => $row_train['city_name'],

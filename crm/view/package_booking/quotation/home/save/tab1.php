@@ -218,6 +218,13 @@ $("#tour_name").autocomplete({
 		$("#tour_name").val(ui.item.label);
         var newOption = $("<option selected='selected'></option>").val(ui.item.dest_id).text(ui.item.label);
         
+        if (typeof quotationResetPackageLoadCache === 'function') {
+            quotationResetPackageLoadCache();
+        }
+        if (typeof clearQuotationPackageListUi === 'function') {
+            clearQuotationPackageListUi();
+        }
+
         // Store selected destination for package filtering
         sessionStorage.setItem('selected_destination_id', ui.item.dest_id);
         sessionStorage.setItem('selected_destination_name', ui.item.label);
@@ -246,6 +253,9 @@ $("#tour_name").autocomplete({
 
 // New Customization ----start
 $(document).ready(function() {
+    if (typeof initQuotationSavePageSession === 'function') {
+        initQuotationSavePageSession();
+    }
     let searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get('enquiry_id')) {
         $('#enquiry_id').val(searchParams.get('enquiry_id'));

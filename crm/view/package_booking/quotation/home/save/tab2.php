@@ -66,7 +66,7 @@ background-color:<?= $theme_color ?>;
                     }
                     ?>
                     <select name="dest_name" id="dest_name" title="Select Destination"
-                        onchange="load_packages_with_filter()" style="width:100%" data-add-new-option="true">
+                        onchange="quotationOnDestinationChange(this)" style="width:100%" data-add-new-option="true">
                         <option value="">*Select Destination</option>
                         <?php
                         $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'");
@@ -238,6 +238,32 @@ if (typeof initAllDestinationSelectAddNew === 'function') {
     initAllDestinationSelectAddNew('#frm_tab2');
 }
 
+function quotationOnDestinationChange(selectEl) {
+    var $select = $(selectEl);
+    var destId = $select.val();
+    var destName = $select.find('option:selected').text();
+    if (destId) {
+        sessionStorage.setItem('selected_destination_id', destId);
+        sessionStorage.setItem('selected_destination_name', destName);
+        var tourName = ($('#tour_name').val() || '').trim();
+        if (!tourName || tourName !== destName) {
+            $('#tour_name').val(destName);
+        }
+    } else {
+        sessionStorage.removeItem('selected_destination_id');
+        sessionStorage.removeItem('selected_destination_name');
+    }
+    if (typeof quotationResetPackageLoadCache === 'function') {
+        quotationResetPackageLoadCache();
+    }
+    if (typeof clearQuotationPackageListUi === 'function') {
+        clearQuotationPackageListUi();
+    }
+    if (typeof load_packages_with_filter === 'function') {
+        load_packages_with_filter(true);
+    }
+}
+
 // Force destination sync on page load
 setTimeout(function() {
     console.log("Force sync - checking for destination from Tab1...");
@@ -264,9 +290,22 @@ setTimeout(function() {
 $(document).on('click', '#tab2_head', function() {
     console.log("Tab2 clicked - forcing destination sync...");
     setTimeout(function() {
-        var tab1Destination = $('#tour_name').val();
-        console.log("Tab2 clicked - Tab1 destination:", tab1Destination);
-        
+        var tab1Destination = ($('#tour_name').val() || '').trim();
+        var storedDestName = sessionStorage.getItem('selected_destination_name');
+        if (tab1Destination && storedDestName && tab1Destination !== storedDestName) {
+            sessionStorage.removeItem('selected_destination_id');
+            sessionStorage.removeItem('selected_destination_name');
+            if (typeof quotationResetPackageLoadCache === 'function') {
+                quotationResetPackageLoadCache();
+            }
+            if (typeof clearQuotationPackageListUi === 'function') {
+                clearQuotationPackageListUi();
+            }
+        }
+        if (typeof syncDestinationFromTab1 === 'function') {
+            syncDestinationFromTab1(true);
+            return;
+        }
         if (tab1Destination) {
             var destinations = JSON.parse($('#destinations').val() || '[]');
             for (var i = 0; i < destinations.length; i++) {
@@ -275,7 +314,6 @@ $(document).on('click', '#tab2_head', function() {
                     $('#dest_name').val(destinations[i].dest_id).trigger('change');
                     sessionStorage.setItem('selected_destination_id', destinations[i].dest_id);
                     sessionStorage.setItem('selected_destination_name', destinations[i].label);
-                    console.log("Tab2 clicked - Destination set to:", destinations[i].label);
                     break;
                 }
             }
@@ -398,12 +436,22 @@ $(document).on('click', '#tab2_head', function() {
     var lastLoadedDestId = null;
     var lastLoadedNights = null;
 
+    window.__quotationResetPackageCache = function () {
+        lastLoadedDestId = null;
+        lastLoadedNights = null;
+        isLoadingPackages = false;
+        if (packageLoadingTimer) {
+            clearTimeout(packageLoadingTimer);
+            packageLoadingTimer = null;
+        }
+    };
+
     // Function to load packages with both destination and nights filter
-    function load_packages_with_filter() {
+    function load_packages_with_filter(forceReload) {
         var dest_id = $('#dest_name').val();
         var total_nights = $('#nights_filter').val() || sessionStorage.getItem('selected_nights');
 
-        console.log("load_packages_with_filter called - dest_id:", dest_id, "total_nights:", total_nights);
+        console.log("load_packages_with_filter called - dest_id:", dest_id, "total_nights:", total_nights, "forceReload:", forceReload);
 
         // Prevent multiple simultaneous loads
         if (isLoadingPackages) {
@@ -411,8 +459,8 @@ $(document).on('click', '#tab2_head', function() {
             return;
         }
 
-        // Prevent loading same data
-        if (lastLoadedDestId === dest_id && lastLoadedNights === total_nights) {
+        // Prevent loading same data unless forced
+        if (!forceReload && lastLoadedDestId === dest_id && lastLoadedNights === total_nights) {
             console.log("Same data already loaded, skipping...");
             return;
         }
@@ -869,9 +917,9 @@ $(document).on('click', '#tab2_head', function() {
     function proceedToTab3FromAi() {
         storeAiItinerarySession();
         saveItineraryData();
-        if (typeof syncQuotationTravelStayDates === 'function') {
-            syncQuotationTravelStayDates();
-        }
+            if (typeof syncQuotationTravelStayDates === 'function') {
+                syncQuotationTravelStayDates({ preserveHotelDates: true });
+            }
         $('#tab2_head').addClass('done');
         $('#tab3_head').addClass('active');
         $('.bk_tab').removeClass('active');
@@ -1208,7 +1256,12 @@ $(document).on('click', '#tab2_head', function() {
                             row.cells[6].childNodes[0].value = hotelData['check_in_date'];
                             row.cells[7].childNodes[0].value = hotelData['check_out_date'];
                             row.cells[8].childNodes[0].value = hotelData['hotel_type'];
-                            row.cells[9].childNodes[0].value = total_days;
+                            if (typeof quotationComputeNightsFromDates === 'function') {
+                                var hotelNights = quotationComputeNightsFromDates(hotelData['check_in_date'], hotelData['check_out_date']);
+                                row.cells[9].childNodes[0].value = hotelNights > 0 ? hotelNights : (hotelData['total_days'] || '');
+                            } else {
+                                row.cells[9].childNodes[0].value = hotelData['total_days'] || '';
+                            }
                             row.cells[10].childNodes[0].value = '';
                             row.cells[12].childNodes[0].value = hotelData['package_name'];
                             row.cells[14].childNodes[0].value = hotelData['package_id'];
@@ -1219,10 +1272,15 @@ $(document).on('click', '#tab2_head', function() {
                             $('#' + row.cells[5].childNodes[0].id).select2().trigger("change");
                             calculate_total_nights(row.cells[7].childNodes[0].id);
                         }
+                        if (typeof quotationSyncTravelStaySectionsFromHotels === 'function') {
+                            quotationSyncTravelStaySectionsFromHotels();
+                        } else if (typeof syncQuotationTravelStayDates === 'function') {
+                            syncQuotationTravelStayDates({ preserveHotelDates: true });
+                        }
                     } else {
                         console.log('Tab2 Next: Skipping hotel data population - preserving existing packages');
                         if (typeof syncQuotationTravelStayDates === 'function') {
-                            syncQuotationTravelStayDates();
+                            syncQuotationTravelStayDates({ preserveHotelDates: true });
                         }
                     }
                 }
@@ -1267,8 +1325,8 @@ $(document).on('click', '#tab2_head', function() {
                         row.cells[1].childNodes[0].value = (i + 1);
                         row.cells[2].childNodes[0].value = transport_arr[i]['bus_id'];
 
-                        row.cells[3].childNodes[0].value = $from_date;
-                        row.cells[4].childNodes[0].value = $to_date;
+                        row.cells[3].childNodes[0].value = transport_arr[i]['start_date'] || $from_date;
+                        row.cells[4].childNodes[0].value = transport_arr[i]['end_date'] || $to_date;
                         $(row.cells[5].childNodes[0]).prepend('<optgroup value=' + transport_arr[i][
                                 'pickup_type'
                             ] + ' label="' + (transport_arr[i]['pickup_type']).charAt(0)
@@ -1301,6 +1359,11 @@ $(document).on('click', '#tab2_head', function() {
                         $('#' + row.cells[7].childNodes[0].id).select2().trigger("change");
                         destinationLoading($(row.cells[5].childNodes[0]), 'Pickup Location');
                         destinationLoading($(row.cells[6].childNodes[0]), 'Drop-off Location');
+                    }
+                    if (typeof quotationSyncTravelStaySectionsFromHotels === 'function') {
+                        quotationSyncTravelStaySectionsFromHotels();
+                    } else if (typeof syncQuotationTravelStayDates === 'function') {
+                        syncQuotationTravelStayDates({ preserveHotelDates: true });
                     }
                 }
             });
@@ -1345,7 +1408,7 @@ $(document).on('click', '#tab2_head', function() {
             saveItineraryData();
 
             if (typeof syncQuotationTravelStayDates === 'function') {
-                syncQuotationTravelStayDates();
+                syncQuotationTravelStayDates({ preserveHotelDates: true });
             }
 
             $('#tab2_head').addClass('done');
@@ -1363,9 +1426,24 @@ $(document).on('click', '#tab2_head', function() {
     $(document).ready(function() {
         console.log("Tab 2 loading - checking for stored destination and nights...");
         
-        // Get stored destination
+        var tab1Destination = ($('#tour_name').val() || '').trim();
         var storedDestId = sessionStorage.getItem('selected_destination_id');
         var storedDestName = sessionStorage.getItem('selected_destination_name');
+
+        // Discard stale session data when Tab1 destination does not match stored destination
+        if (tab1Destination && storedDestName && tab1Destination !== storedDestName) {
+            console.log("Stale destination in sessionStorage - clearing:", storedDestName, "vs Tab1:", tab1Destination);
+            sessionStorage.removeItem('selected_destination_id');
+            sessionStorage.removeItem('selected_destination_name');
+            storedDestId = null;
+            storedDestName = null;
+            if (typeof window.__quotationResetPackageCache === 'function') {
+                window.__quotationResetPackageCache();
+            }
+            if (typeof clearQuotationPackageListUi === 'function') {
+                clearQuotationPackageListUi();
+            }
+        }
         
         // Get total days from tab1 as primary source for nights
         var total_days = $('#total_days').val();
@@ -1384,7 +1462,6 @@ $(document).on('click', '#tab2_head', function() {
         }
         
         // Try to get destination from Tab1 input field as fallback
-        var tab1Destination = $('#tour_name').val();
         console.log("Tab1 destination input value:", tab1Destination);
         
         // If no stored destination but Tab1 has a value, try to find the destination ID
@@ -1445,7 +1522,7 @@ $(document).on('click', '#tab2_head', function() {
             setTimeout(function() {
                 console.log("Calling load_packages_with_filter()...");
                 if (typeof load_packages_with_filter === 'function') {
-                    load_packages_with_filter();
+                    load_packages_with_filter(true);
                 } else {
                     console.error("load_packages_with_filter function not found");
                 }

@@ -1044,11 +1044,8 @@
     }
 
     function isQuotationGroupCostingDiv() {
-        return (typeof window.isQuotationGroupCostingDiv === 'function' && window.isQuotationGroupCostingDiv()) ||
-            (function () {
-                var el = document.getElementById('tbl_package_tour_quotation_dynamic_costing');
-                return el && el.tagName === 'DIV';
-            })();
+        var el = document.getElementById('tbl_package_tour_quotation_dynamic_costing');
+        return !!(el && el.tagName === 'DIV');
     }
 
     function populateGroupCostingFromHotels(hotel_main_arr, hotel_per_person_arr, costingOptions) {
@@ -2828,19 +2825,30 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
 
     const total_adult = $('#total_adult').val();
     const total_children = $('#total_children').val();
-    const from_date = $('#from_date').val();
     const to_date = $('#to_date').val();
     const total_days = $('#total_days').val();
+    const packagesToLoad = typeof quotationFilterNewPackageIds === 'function'
+        ? quotationFilterNewPackageIds(package_id_arr)
+        : package_id_arr;
+    const from_date = typeof quotationGetReferenceTravelStartDate === 'function'
+        ? quotationGetReferenceTravelStartDate()
+        : $('#from_date').val();
 
     // Ajax to save data and update the table
     $.ajax({
         type: 'post',
         url: '../save/package_hotel_info.php',
-        data: { package_id_arr, from_date },
+        data: { package_id_arr: packagesToLoad, from_date },
         success: function(result) {
             const hotel_arr = JSON.parse(result);
             const table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-            const startRowIndex = table.rows.length;
+            let lastRowNo = 0;
+            for (let r = 1; r < table.rows.length; r++) {
+                const rowNo = parseInt(table.rows[r].cells[1].childNodes[0].value, 10);
+                if (!isNaN(rowNo) && rowNo > lastRowNo) {
+                    lastRowNo = rowNo;
+                }
+            }
 
             // Append new rows from hotel data
             hotel_arr.forEach((hotel, i) => {
@@ -2850,11 +2858,10 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
 
                 if (!row || !row.cells || row.cells.length < 17) return;
 
-                // Continuous numbering for new row
-                row.cells[1].childNodes[0].value = startRowIndex + i;
+                row.cells[1].childNodes[0].value = lastRowNo + i + 1;
 
                 // Populate dropdowns and fields with hotel data
-                populateHotelRow(row, hotel, i, hotel_arr);
+                populateHotelRow(row, hotel, i, hotel_arr, { useReferenceDates: lastRowNo > 0 });
             });
 
             // City/hotel already set in populateHotelRow
@@ -2862,13 +2869,49 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
             // Hide hotel package if needed
             const selectedPackagevalue = table.rows[1]?.cells[2]?.childNodes[0]?.value || '';
             hideHotelPackage(selectedPackagevalue);
+
+            if (typeof get_hotel_cost === 'function') {
+                get_hotel_cost();
+            }
+
+            $.ajax({
+                type: 'post',
+                url: '../save/package_transport_info.php',
+                data: {
+                    package_id_arr: packagesToLoad,
+                    from_date: from_date,
+                    total_adult: total_adult
+                },
+                success: function(transportResult) {
+                    const transport_arr = JSON.parse(transportResult);
+                    if (typeof quotationPopulateTransportRows === 'function') {
+                        quotationPopulateTransportRows(transport_arr, {
+                            append: true,
+                            from_date: from_date,
+                            to_date: to_date
+                        });
+                    }
+
+                    if (typeof quotationSyncTravelStaySectionsFromHotels === 'function') {
+                        quotationSyncTravelStaySectionsFromHotels();
+                    } else if (typeof syncQuotationTravelStayDates === 'function') {
+                        syncQuotationTravelStayDates({ preserveHotelDates: true });
+                    }
+                    if (typeof get_transport_cost === 'function') {
+                        get_transport_cost();
+                    }
+                    if (typeof get_excursion_amount === 'function') {
+                        get_excursion_amount();
+                    }
+                }
+            });
         }
     });
 }
 
 // Helper function to populate hotel row
-// Helper function to populate hotel row
-function populateHotelRow(row, hotel, i, hotel_arr) {
+function populateHotelRow(row, hotel, i, hotel_arr, options) {
+    options = options || {};
     const hotelSelect = $(row.cells[4].childNodes[0]);
     const roomCatSelect = $(row.cells[5].childNodes[0]);
     const cityEl = row.cells[3].childNodes[0];
@@ -2907,12 +2950,26 @@ function populateHotelRow(row, hotel, i, hotel_arr) {
         initHotelSelectAddNew(hotelSelect);
     }
 
+    let checkIn = hotel.check_in_date || '';
+    let checkOut = hotel.check_out_date || '';
+    if (options.useReferenceDates && typeof quotationGetReferenceHotelDateRange === 'function') {
+        const refDates = quotationGetReferenceHotelDateRange();
+        if (refDates) {
+            checkIn = refDates.check_in;
+            checkOut = refDates.check_out;
+        }
+    }
+
     // Set other fields (dates, package details, etc.)
-    row.cells[6].childNodes[0].value = hotel.check_in_date || '';
-    row.cells[7].childNodes[0].value = hotel.check_out_date || '';
+    row.cells[6].childNodes[0].value = checkIn;
+    row.cells[7].childNodes[0].value = checkOut;
     row.cells[8].childNodes[0].value = hotel.hotel_type || '';
     if (row.cells[9] && row.cells[9].childNodes[0]) {
-        row.cells[9].childNodes[0].value = hotel.total_days || hotel.package_name || '';
+        var nights = 0;
+        if (typeof quotationComputeNightsFromDates === 'function') {
+            nights = quotationComputeNightsFromDates(checkIn, checkOut);
+        }
+        row.cells[9].childNodes[0].value = nights > 0 ? nights : (hotel.total_days || '');
     }
     if (row.cells[14] && row.cells[14].childNodes[0]) {
         row.cells[14].childNodes[0].value = hotel.package_id || '';

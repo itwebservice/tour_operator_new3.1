@@ -94,18 +94,78 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
     }
     // Hotel name list load is defined in footer_scripts.js (resolveHotelSelectFromCity).
 
-    function hotel_type_load(id) {
+    function quotationSelectDefaultRoomCategory(count, onComplete) {
+        var $roomCat = $("#room_cat-" + count);
+        if (!$roomCat.length) {
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
+            return;
+        }
+        var deluxeOption = $roomCat.find("option[value*='Deluxe']");
+        if (deluxeOption.length > 0) {
+            $roomCat.val(deluxeOption.first().val());
+        } else {
+            var firstOption = $roomCat.find('option').filter(function () {
+                return this.value && this.value !== '';
+            }).first();
+            if (firstOption.length) {
+                $roomCat.val(firstOption.val());
+            }
+        }
+        $roomCat.trigger('change.select2');
+        if (typeof onComplete === 'function') {
+            onComplete();
+        }
+    }
+
+    function hotel_type_load_cate(id, onComplete) {
+        var hotel_id = $("#" + id).val();
+        var count = typeof parseQuotationHotelRowSuffix === 'function'
+            ? parseQuotationHotelRowSuffix(id)
+            : id.substring(11);
+        if (!hotel_id || !count) {
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
+            return;
+        }
+        var base_url = $('#base_url').val();
+        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_category.php", {
+            hotel_id: hotel_id
+        }, function(data) {
+            $("#room_cat-" + count).html(data);
+            if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+                refreshRoomCategorySelectAfterLoad("#room_cat-" + count, { width: '145px' });
+            }
+            setTimeout(function () {
+                quotationSelectDefaultRoomCategory(count, onComplete);
+            }, 100);
+        }).fail(function () {
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
+        });
+    }
+
+    function hotel_type_load(id, onComplete) {
         var hotel_id = $("#" + id).val();
         var count = typeof parseQuotationHotelRowSuffix === 'function'
             ? parseQuotationHotelRowSuffix(id)
             : id.substring(10);
+        if (!hotel_id) {
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
+            return;
+        }
         var base_url = $('#base_url').val();
         $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_type_load.php", {
             hotel_id: hotel_id
         }, function(data) {
             $("#hotel_type-" + count).val(data);
         });
-        hotel_type_load_cate(id);
+        hotel_type_load_cate(id, onComplete);
     }
 
     function hotel_type_load1(id) {
@@ -118,34 +178,6 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
         });
 
     }
-    //roomcategory load
-    function hotel_type_load_cate(id) {
-        var hotel_id = $("#" + id).val();
-        var count = typeof parseQuotationHotelRowSuffix === 'function'
-            ? parseQuotationHotelRowSuffix(id)
-            : id.substring(11);
-        var base_url = $('#base_url').val();
-        console.log("DEBUG: Loading room categories for hotel_id:", hotel_id, "count:", count);
-        $.get(base_url + "view/package_booking/quotation/home/hotel/hotel_category.php", {
-            hotel_id: hotel_id
-        }, function(data) {
-            console.log("DEBUG: Room category data received:", data);
-            $("#room_cat-" + count).html(data);
-            if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
-                refreshRoomCategorySelectAfterLoad("#room_cat-" + count, { width: '145px' });
-            }
-            
-            // Check if Deluxe Room is available and select it
-            setTimeout(function() {
-                var deluxeOption = $("#room_cat-" + count + " option[value*='Deluxe']");
-                if (deluxeOption.length > 0) {
-                    $("#room_cat-" + count).val(deluxeOption.first().val());
-                    $("#room_cat-" + count).trigger('change');
-                }
-            }, 100);
-        });
-    }
-
     function setQuotationCitySelect(cityEl, cityId, cityName) {
         if (!cityEl || !cityId) {
             return;
@@ -170,8 +202,11 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
         }
     }
 
-    function applyQuotationHotelSelect($hotelSelect, hotelId, hotelName) {
+    function applyQuotationHotelSelect($hotelSelect, hotelId, hotelName, onComplete) {
         if (!$hotelSelect || !$hotelSelect.length || !hotelId) {
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
             return;
         }
         var id = String(hotelId);
@@ -192,24 +227,30 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
         }
         var selectId = $hotelSelect.attr('id') || '';
         if (selectId && typeof hotel_type_load === 'function') {
-            hotel_type_load(selectId);
+            hotel_type_load(selectId, onComplete);
+        } else if (typeof onComplete === 'function') {
+            onComplete();
         }
     }
 
-    function loadQuotationHotelFromPackage(hotelData, $hotelSelect) {
+    function loadQuotationHotelFromPackage(hotelData, $hotelSelect, onComplete) {
         if (!hotelData || !$hotelSelect || !$hotelSelect.length) {
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
             return;
         }
+        var finish = function () {
+            if (typeof onComplete === 'function') {
+                onComplete();
+            }
+        };
         if (hotelData.city_id && typeof hotelDropdownLoadByCity === 'function') {
-            hotelDropdownLoadByCity(hotelData.city_id, $hotelSelect, function (success) {
-                if (success && hotelData.hotel_id1) {
-                    applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name);
-                } else if (hotelData.hotel_id1) {
-                    $hotelSelect.html('<option value="">*Hotel Name</option><option value="' + hotelData.hotel_id1 + '">' + (hotelData.hotel_name || '') + '</option>');
-                    if (!$hotelSelect.data('select2')) {
-                        $hotelSelect.select2({ width: '160px', minimumResultsForSearch: 0 });
-                    }
-                    applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name);
+            hotelDropdownLoadByCity(hotelData.city_id, $hotelSelect, function () {
+                if (hotelData.hotel_id1) {
+                    applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name, finish);
+                } else {
+                    finish();
                 }
             });
         } else if (hotelData.hotel_id1) {
@@ -217,8 +258,47 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
             if (!$hotelSelect.data('select2')) {
                 $hotelSelect.select2({ width: '160px', minimumResultsForSearch: 0 });
             }
-            applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name);
+            applyQuotationHotelSelect($hotelSelect, hotelData.hotel_id1, hotelData.hotel_name, finish);
+        } else {
+            finish();
         }
+    }
+
+    function populateQuotationHotelRowsSequential(table, hotel_arr, options) {
+        options = options || {};
+        var dataIndex = 0;
+        var baseRowIndex = typeof options.startRowIndex === 'number' ? options.startRowIndex : 0;
+
+        function loadRow() {
+            if (dataIndex >= hotel_arr.length) {
+                if (typeof options.onComplete === 'function') {
+                    options.onComplete();
+                }
+                return;
+            }
+
+            var row = table.rows[baseRowIndex + dataIndex];
+            var hotel = hotel_arr[dataIndex];
+            if (!row || !hotel) {
+                dataIndex++;
+                loadRow();
+                return;
+            }
+
+            row.cells[1].childNodes[0].value = baseRowIndex + dataIndex + 1;
+
+            if (typeof populateHotelRow === 'function') {
+                populateHotelRow(row, hotel, dataIndex, hotel_arr, options, function () {
+                    dataIndex++;
+                    loadRow();
+                });
+            } else {
+                dataIndex++;
+                loadRow();
+            }
+        }
+
+        loadRow();
     }
     /**Excursion Name load**/
     function get_excursion_list(id) {
