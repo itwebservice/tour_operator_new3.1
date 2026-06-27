@@ -93,7 +93,8 @@ var column = [
 	{ title : "Purchased_From"},
 	{ title : "Branch"},
 	{ title : "Booked_By"},
-	{ title : "Incentive" }
+	{ title : "Incentive", className:"text-right"},
+	{ title : "Invoice_&_Receipt", className:"text-center action_width"}
 	
 ];
 function list_reflect()
@@ -201,4 +202,16 @@ $(function () {
     $("[data-toggle='tooltip']").tooltip({placement: 'bottom'});
 });
 </script>
+<style>
+.action_width {
+    white-space: nowrap;
+    min-width: 120px;
+}
+.table-icon-btns {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 2px;
+}
+</style>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

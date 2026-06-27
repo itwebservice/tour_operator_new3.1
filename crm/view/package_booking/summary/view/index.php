@@ -409,11 +409,17 @@ if($sq_act_count > 0){
 					while($row_entry = mysqli_fetch_assoc($sq_entry)){
 						$q_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
 						$sq_ex = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
-						// Get vehicle name
+						// Get vehicle name from vehicle_id (legacy vehicle_name column supported)
 						$vehicle_display = '';
-						if(isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0' && $row_entry['vehicle_name'] != null){
-							$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_entry['vehicle_name']."'"));
-							if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
+						$vehicle_id_ref = 0;
+						if (isset($row_entry['vehicle_id']) && $row_entry['vehicle_id'] != '' && $row_entry['vehicle_id'] != '0') {
+							$vehicle_id_ref = intval($row_entry['vehicle_id']);
+						} elseif (isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0') {
+							$vehicle_id_ref = intval($row_entry['vehicle_name']);
+						}
+						if ($vehicle_id_ref > 0) {
+							$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='$vehicle_id_ref'"));
+							if ($sq_vehicle && isset($sq_vehicle['vehicle_name'])) {
 								$vehicle_display = $sq_vehicle['vehicle_name'];
 							}
 						}

@@ -765,6 +765,25 @@ function ensure_excursion_vehicle_id_column()
   return true;
 }
 
+function ensure_booking_excursion_vehicle_id_column()
+{
+  static $checked = false;
+  if ($checked) {
+    return true;
+  }
+  $checked = true;
+  $result = mysqlQuery("SHOW COLUMNS FROM package_tour_excursion_master LIKE 'vehicle_id'");
+  if (mysqli_num_rows($result) == 0) {
+    $has_vehicle_name = mysqli_num_rows(mysqlQuery("SHOW COLUMNS FROM package_tour_excursion_master LIKE 'vehicle_name'")) > 0;
+    mysqlQuery("ALTER TABLE package_tour_excursion_master ADD COLUMN vehicle_id INT(11) NOT NULL DEFAULT 0 AFTER infant");
+    if ($has_vehicle_name) {
+      mysqlQuery("UPDATE package_tour_excursion_master SET vehicle_id = CASE WHEN vehicle_name REGEXP '^[0-9]+$' AND vehicle_name != '' THEN CAST(vehicle_name AS UNSIGNED) ELSE 0 END");
+      mysqlQuery("ALTER TABLE package_tour_excursion_master DROP COLUMN vehicle_name");
+    }
+  }
+  return true;
+}
+
 function get_quotation_refer_id_by_dest($dest_id)
 {
   $dest_id = intval($dest_id);

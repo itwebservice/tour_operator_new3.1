@@ -362,13 +362,19 @@
                                                     <option value="Sharing Transfer">Sharing Transfer</option>
                                                     <option value="SIC">SIC</option>
                                                 </select></td>
-                                            <td><select name="vehicle_name-1<?= $count_et ?>" id="vehicle_name-1<?= $count_et ?>" style="width: 200px" class="form-control app_select2" title="Select Vehicle">
+                                            <td><select name="vehicle_id-1<?= $count_et ?>" id="vehicle_id-1<?= $count_et ?>" style="width: 200px" class="form-control app_select2" title="Select Vehicle">
                                                     <?php
                                                     $vehicle_selected = '';
-                                                    if($row_exc_acc['vehicle_name'] != '' && $row_exc_acc['vehicle_name'] != '0'){
-                                                        $sq_vehicle_sel = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$row_exc_acc[vehicle_name]'"));
-                                                        if($sq_vehicle_sel){
-                                                            $vehicle_selected = '<option value="'.$sq_vehicle_sel['entry_id'].'" selected>'.$sq_vehicle_sel['vehicle_name'].'</option>';
+                                                    $vehicle_id_ref = 0;
+                                                    if (isset($row_exc_acc['vehicle_id']) && $row_exc_acc['vehicle_id'] != '' && $row_exc_acc['vehicle_id'] != '0') {
+                                                        $vehicle_id_ref = intval($row_exc_acc['vehicle_id']);
+                                                    } elseif (isset($row_exc_acc['vehicle_name']) && $row_exc_acc['vehicle_name'] != '' && $row_exc_acc['vehicle_name'] != '0') {
+                                                        $vehicle_id_ref = intval($row_exc_acc['vehicle_name']);
+                                                    }
+                                                    if ($vehicle_id_ref > 0) {
+                                                        $sq_vehicle_sel = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='$vehicle_id_ref'"));
+                                                        if ($sq_vehicle_sel) {
+                                                            $vehicle_selected = '<option value="' . $sq_vehicle_sel['entry_id'] . '" selected>' . $sq_vehicle_sel['vehicle_name'] . '</option>';
                                                         }
                                                     }
                                                     echo $vehicle_selected;
@@ -609,6 +615,10 @@ function hotel_name_list_load1(id) {
 //roomcategory load
 function hotel_type_load_cate2(id)
 {
+  if (typeof hotel_type_load_cate === 'function') {
+    hotel_type_load_cate(id);
+    return;
+  }
   var hotel_id = $("#"+id).val();
   var count = '1';
   if (id.indexOf('hotel_name') === 0) {

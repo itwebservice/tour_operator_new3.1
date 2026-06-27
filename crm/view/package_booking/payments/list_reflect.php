@@ -1,6 +1,6 @@
 <?php
 include "../../../model/model.php";
-global $modify_entries_switch;
+global $modify_entries_switch, $delete_flag;
 $customer_id = isset($_POST['customer_id']) ? $_POST['customer_id'] : '';
 $booking_id = isset($_POST['booking_id']) ? $_POST['booking_id'] : '';
 $payment_for = $_POST['payment_for'];
@@ -194,8 +194,8 @@ while ($row_payment = mysqli_fetch_assoc($sq_payment)) {
 			get_date_user($row_payment['date']),
 			$payshow,
 			number_format($row_payment['amount'] + $row_payment['credit_charges'], 2) . $currency_amount,
-			'<a onclick="loadOtherPage(\'' . $url1 . '\')" data-toggle="tooltip" class="btn btn-info btn-sm" title="Download Receipt"><i class="fa fa-print"></i></a>
-			' . $edit_btn . $delete_btn
+			'<div class="table-icon-btns"><a onclick="loadOtherPage(\'' . $url1 . '\')" data-toggle="tooltip" class="btn btn-info btn-sm" title="Download Receipt"><i class="fa fa-print"></i></a>
+			' . $edit_btn . $delete_btn . '</div>'
 		), "bg" => $bg);
 		array_push($array_s, $temp_arr);
 	}

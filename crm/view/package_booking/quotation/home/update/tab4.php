@@ -34,6 +34,11 @@ color: #ffffff;
 input.labelauty + label, input.labelauty:checked + label, input.labelauty:checked:not([disabled]) + label:hover{
 background-color:<?= $theme_color ?>;
 }
+#tbl_package_tour_quotation_dynamic_costing .quotation-package-costing-separator {
+    border: 0;
+    border-top: 2px solid #e0e0e0;
+    margin: 22px 0;
+}
 </style>
 <form id="frm_tab4" novalidate method="post" action="javascript:void(0);" onsubmit="return false;">
 
@@ -118,6 +123,9 @@ background-color:<?= $theme_color ?>;
                                                                             $tax_apply_on = '';
                                                                         }
                                                                     ?>
+                                                                    <?php if ($count > 1) { ?>
+                                                                    <hr class="quotation-package-costing-separator">
+                                                                    <?php } ?>
                                                                     <div class="quotation-group-costing-row mg_bt_20">
                                                                     <div>
                                                                         <div class="header_btn hidden" style="display:none;"><small>&nbsp;</small><input class="css-checkbox" id="chk_costing<?= $count ?>" type="checkbox" checked disabled><span class="css-label" for="chk_costing<?= $count ?>"></span></div>

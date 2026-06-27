@@ -291,7 +291,14 @@ function delete_entry(booking_id) {
 </script>
 <style>
 .action_width {
-    display: flex;
+    white-space: nowrap;
+    min-width: 180px;
+}
+.table-icon-btns {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 2px;
 }
 </style>
 <?= end_panel() ?>

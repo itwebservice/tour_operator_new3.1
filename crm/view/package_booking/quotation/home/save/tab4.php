@@ -1,3 +1,10 @@
+<style>
+#tbl_package_tour_quotation_dynamic_costing .quotation-package-costing-separator {
+    border: 0;
+    border-top: 2px solid #e0e0e0;
+    margin: 22px 0;
+}
+</style>
 <form id="frm_tab4" novalidate method="post" action="javascript:void(0);" onsubmit="return false;">
     <div class="app_panel">
         <div class="container" style="width:100% !important;">

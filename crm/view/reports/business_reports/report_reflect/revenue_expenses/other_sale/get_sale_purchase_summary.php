@@ -4,7 +4,7 @@ include_once('sale_type_generic_function.php');
 $sale_type = $_POST['sale_type'];
 
 
-global $currency, $$modify_entries_switch;
+global $currency, $modify_entries_switch;
 $emp_id = $_SESSION['emp_id'];
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];

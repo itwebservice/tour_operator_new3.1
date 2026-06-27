@@ -70,3 +70,6 @@
         }
     });
 </script>
+<script>
+    window.bookingHotelRoomCategoryFromTariff = <?php echo ($room_category_switch == 'Yes') ? 'true' : 'false'; ?>;
+</script>

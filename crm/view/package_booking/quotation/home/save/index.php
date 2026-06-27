@@ -285,10 +285,24 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
                 return;
             }
 
-            row.cells[1].childNodes[0].value = baseRowIndex + dataIndex + 1;
+            var rowOptions = $.extend({}, options);
+            if (options.templateReferenceRows && options.templateReferenceRows.length) {
+                rowOptions.referenceRow = options.templateReferenceRows[dataIndex]
+                    || options.templateReferenceRows[options.templateReferenceRows.length - 1];
+            } else if (!options.freshPackageLoad && dataIndex > 0) {
+                var prevRow = table.rows[baseRowIndex + dataIndex - 1];
+                if (prevRow && typeof quotationGetHotelRowReference === 'function') {
+                    var prevRef = quotationGetHotelRowReference(prevRow);
+                    if (prevRef) {
+                        rowOptions.referenceRow = prevRef;
+                    }
+                }
+            } else if (options.referenceRow) {
+                rowOptions.referenceRow = options.referenceRow;
+            }
 
             if (typeof populateHotelRow === 'function') {
-                populateHotelRow(row, hotel, dataIndex, hotel_arr, options, function () {
+                populateHotelRow(row, hotel, dataIndex, hotel_arr, rowOptions, function () {
                     dataIndex++;
                     loadRow();
                 });

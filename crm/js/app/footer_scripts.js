@@ -4191,14 +4191,28 @@ window.resolveItineraryImageKeyFromSpa = resolveItineraryImageKeyFromSpa;
 window.buildItineraryImagePreviewUrl = buildItineraryImagePreviewUrl;
 window.applySelectedItineraryImagePreview = applySelectedItineraryImagePreview;
 
+function resolveItineraryDestId(preferredFieldId) {
+	var dest_id = preferredFieldId ? $('#' + preferredFieldId).val() : '';
+	if (!dest_id || dest_id === '0') {
+		dest_id = $('#dest_name2').val();
+	}
+	if (!dest_id || dest_id === '0') {
+		dest_id = $('#booking_itinerary_dest_id').val();
+	}
+	if (!dest_id || dest_id === '0') {
+		dest_id = $('#dest_name').val();
+	}
+	return dest_id;
+}
+
 function add_itinerary(dest_id1, spa, dwp, ovs, dayp) {
 
 	var day_id = dayp.split('-');
 
 	$('#itinerary'+day_id[1]).prop('disabled',true);
 	var base_url = $('#base_url').val();
-	var dest_id = $('#' + dest_id1).val();
-	if (dest_id == '') {
+	var dest_id = resolveItineraryDestId(dest_id1);
+	if (!dest_id || dest_id === '' || dest_id === '0') {
 		error_msg_alert('Please select destination!');
 		$('#itinerary'+day_id[1]).prop('disabled',false);
 		return false;
@@ -4213,8 +4227,8 @@ function add_itinerary(dest_id1, spa, dwp, ovs, dayp) {
 function get_dest_itinerary(dest_id1) {
 
 	var base_url = $('#base_url').val();
-	var dest_id = $('#' + dest_id1).val();
-	if (dest_id == '' || dest_id == 0) {
+	var dest_id = resolveItineraryDestId(dest_id1);
+	if (!dest_id || dest_id === '' || dest_id === '0') {
 		error_msg_alert('Please select destination!');
 		$('#itinerary_data').html('');
 		return false;

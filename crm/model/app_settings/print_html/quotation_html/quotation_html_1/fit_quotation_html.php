@@ -1298,7 +1298,7 @@ function o1_flight_date($v)
           // $o1_dimg   = o1img(isset($d['image']) ? $d['image'] : '', $assets . 'day-1.jpg');
           $dummy_day_img = BASE_URL . 'images/itinerary.png';
 
-          $o1_day_photo = isset($d['image']) ? trim($d['image']) : '';
+          $o1_day_photo = isset($d['itinerary_image']) ? trim($d['itinerary_image']) : '';
 
           if ($o1_day_photo == '' || stripos($o1_day_photo, 'dummy') !== false) {
             $o1_dimg = $dummy_day_img;

@@ -31,6 +31,16 @@
                                     $bg = ($sq_enq_count == 0) ? '' : '#7ab676';
 
                                     $sq_cost =  mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id = '$row_quotation[quotation_id]'"));
+                                    if (!$sq_cost) {
+                                        $sq_cost = array(
+                                            'basic_amount' => 0,
+                                            'service_charge' => 0,
+                                            'service_tax_subtotal' => '',
+                                            'discount_in' => 'Percentage',
+                                            'discount' => 0,
+                                            'bsmValues' => '[{"tax_apply_on":"","tax_value":"","service":"","basic":"","tcsper":"","tcsvalue":0}]'
+                                        );
+                                    }
 
                                     $cust_user_name = '';
                                     if ($row_quotation['user_id'] != 0) {
@@ -44,7 +54,10 @@
                                     $service_tax_amount = 0;
                                     $tax_show = '';
 
-                                    $bsmValues = json_decode($sq_cost['bsmValues'], true);
+                                    $bsmValues = json_decode($sq_cost['bsmValues']);
+                                    if (!is_array($bsmValues) || !isset($bsmValues[0])) {
+                                        $bsmValues = array((object) array('service' => '', 'basic' => '', 'tcsper' => '', 'tcsvalue' => 0));
+                                    }
                                     $discount_in = $sq_cost['discount_in'];
                                     $discount = $sq_cost['discount'];
                                     if ($discount_in == 'Percentage') {
@@ -64,7 +77,7 @@
                                             $percent = $service_tax[1];
                                         }
                                     }
-                                    if ($bsmValues[0]->service != '') {   //inclusive service charge
+                                    if (isset($bsmValues[0]->service) && $bsmValues[0]->service != '') {   //inclusive service charge
                                         $newBasic = $tour_cost + $service_tax_amount;
                                         $tax_show = '';
                                     } else {
@@ -73,14 +86,14 @@
                                     }
 
                                     ////////////Basic Amount Rules
-                                    if ($bsmValues[0]->basic != '') { //inclusive markup
+                                    if (isset($bsmValues[0]->basic) && $bsmValues[0]->basic != '') { //inclusive markup
                                         $newBasic = $tour_cost + $service_tax_amount;
                                         $tax_show = '';
                                     }
 
                                     $quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $row_quotation['train_cost'] + $row_quotation['cruise_cost'] + $row_quotation['flight_cost'] + $row_quotation['visa_cost'] + $row_quotation['guide_cost'] + $row_quotation['misc_cost'];
 
-                                    $tcs_percentage = $bsmValues[0]->tcsper;
+                                    $tcs_percentage = isset($bsmValues[0]->tcsper) ? $bsmValues[0]->tcsper : 0;
 
                                     // if ($bsmValues[0]->tcsper != '') { 
                                     //     $tcs_amount = ($quotation_cost * $tcs_percentage) / 100;
@@ -88,9 +101,9 @@
                                     // }
 
 
-                                    if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-                                        $tcsper = $bsmValues[0]['tcsper'];
-                                        $tcsvalue = $bsmValues[0]['tcsvalue'];
+                                    if (isset($bsmValues[0]->tcsper) && $bsmValues[0]->tcsper != 'NaN') {
+                                        $tcsper = $bsmValues[0]->tcsper;
+                                        $tcsvalue = isset($bsmValues[0]->tcsvalue) ? $bsmValues[0]->tcsvalue : 0;
                                     } else {
                                         $tcsper = 0;
                                         $tcsvalue = 0;

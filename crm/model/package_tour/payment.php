@@ -25,8 +25,8 @@ class payment
 
     $currency_code =$_POST['currency_code'];
 
-    $vendor_type = $_POST['vendor_type'];
-  $vendor_type_id=$_POST['vendor_type_id'];
+    $vendor_type = isset($_POST['vendor_type']) ? $_POST['vendor_type'] : '';
+    $vendor_type_id = isset($_POST['vendor_type_id']) ? $_POST['vendor_type_id'] : 0;
 
     begin_t();
 
@@ -97,9 +97,9 @@ class payment
   $clearance_status = ($payment_mode=="Cheque" || $payment_mode=="Credit Card") ? "Pending" : "";
   $financial_year_id = $_SESSION['financial_year_id'];
   $canc_status = $_POST['canc_status'];
-  $vendor_type = $_POST['vendor_type'];
-  $vendor_type_id=$_POST['vendor_type_id'];
-  $estimate_id = $_POST['estimate_id'];
+  $vendor_type = isset($_POST['vendor_type']) ? $_POST['vendor_type'] : '';
+  $vendor_type_id = isset($_POST['vendor_type_id']) ? $_POST['vendor_type_id'] : 0;
+  $estimate_id = isset($_POST['estimate_id']) ? $_POST['estimate_id'] : 0;
   
 
   $created_at = date('Y-m-d H:i');
@@ -126,8 +126,8 @@ class payment
     $credit_card_details = $_POST['credit_card_details'];
     $branch_admin_id = $_POST['branch_admin_id'];
     $canc_status = $_POST['canc_status'];
-
-    
+    $vendor_type = isset($_POST['vendor_type']) ? $_POST['vendor_type'] : '';
+    $vendor_type_id = isset($_POST['vendor_type_id']) ? $_POST['vendor_type_id'] : 0;
 
     $payment_date = date('Y-m-d', strtotime($payment_date1));
     $year1 = explode("-", $payment_date);
@@ -150,10 +150,11 @@ class payment
       $type = 'BANK RECEIPT';
     }
 
-    //Getting supplier Ledger
-	  $sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
-	  $supplier_gl = $sq_cust['ledger_id'];
-
+    $supplier_gl = 0;
+    if ($payment_mode == 'To Supplier' && $vendor_type != '' && $vendor_type_id != 0) {
+      $sq_supplier = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
+      $supplier_gl = isset($sq_supplier['ledger_id']) ? $sq_supplier['ledger_id'] : 0;
+    }
 
     $payment_amount1 = (float)($payment_amount1) + (float)($credit_charges);
     //Getting customer Ledger
@@ -324,9 +325,16 @@ class payment
 
     $payment_amount1 = (float)($payment_amount) + (float)($credit_charges);
 
-    //Getting supplier Ledger
-   $sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
-   $supplier_gl = $sq_cust['ledger_id'];
+    $supplier_gl = 0;
+    if ($payment_mode == 'To Supplier') {
+      $sq_vendor = mysqli_fetch_assoc(mysqlQuery("select * from package_payment_master where booking_id='$booking_id' and payment_mode='To Supplier' and payment_id='$payment_id'"));
+      $vendor_type = isset($sq_vendor['vendor_type']) ? $sq_vendor['vendor_type'] : '';
+      $vendor_type_id = isset($sq_vendor['supplier_id']) ? $sq_vendor['supplier_id'] : 0;
+      if ($vendor_type != '' && $vendor_type_id != 0) {
+        $sq_supplier = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
+        $supplier_gl = isset($sq_supplier['ledger_id']) ? $sq_supplier['ledger_id'] : 0;
+      }
+    }
 
     $delete_master->delete_master_entries('Receipt(' . $payment_mode . ')', 'Package Tour Receipt', $payment_id, get_package_booking_payment_id($payment_id, $yr2), $cust_name, $payment_amount);
     //////////Payment Amount///////////
@@ -652,13 +660,16 @@ class payment
     }
 
 
-     //Vendor Type And vendor_type Id
-  $sq_vendor = mysqli_fetch_assoc(mysqlQuery("select * from package_payment_master where booking_id='$booking_id' and payment_mode='To Supplier' and payment_id='$payment_id'"));
-  $vendor_type= $sq_vendor['vendor_type'];
-  $vendor_type_id= $sq_vendor['supplier_id']; 
-     //Getting supplier Ledger
-	$sq_supplier = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
-	$supplier_gl = $sq_supplier['ledger_id']; 
+    $supplier_gl = 0;
+    if ($payment_mode == 'To Supplier') {
+      $sq_vendor = mysqli_fetch_assoc(mysqlQuery("select * from package_payment_master where booking_id='$booking_id' and payment_mode='To Supplier' and payment_id='$payment_id'"));
+      $vendor_type = isset($sq_vendor['vendor_type']) ? $sq_vendor['vendor_type'] : '';
+      $vendor_type_id = isset($sq_vendor['supplier_id']) ? $sq_vendor['supplier_id'] : 0;
+      if ($vendor_type != '' && $vendor_type_id != 0) {
+        $sq_supplier = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$vendor_type_id' and user_type='$vendor_type' and group_sub_id='105'"));
+        $supplier_gl = isset($sq_supplier['ledger_id']) ? $sq_supplier['ledger_id'] : 0;
+      }
+    }
 
     //Getting customer Ledger
     $sq_cust = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where customer_id='$customer_id' and user_type='customer'"));

@@ -525,6 +525,22 @@ function set_booking_city_select(cityEl, cityId, cityName) {
 	}
 }
 
+function set_booking_meal_plan_select(mealPlanEl, mealPlan) {
+	if (!mealPlanEl || mealPlan === undefined || mealPlan === null || mealPlan === '') {
+		return;
+	}
+	var $mealPlan = $(mealPlanEl);
+	if ($mealPlan.data('select2')) {
+		$mealPlan.select2('destroy');
+	}
+	$mealPlan.removeClass('app_select2');
+	var mealValue = String(mealPlan).trim();
+	if (!$mealPlan.find('option').filter(function () { return String(this.value) === mealValue; }).length) {
+		$mealPlan.append($('<option></option>').attr('value', mealValue).text(mealValue));
+	}
+	$mealPlan.val(mealValue).trigger('change');
+}
+
 function apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, roomCategory) {
 	if (!hotelEl || !hotelId) {
 		return;
@@ -615,7 +631,8 @@ function set_booking_hotel_room_category(roomCatEl, hotelId, roomCategory) {
 	}
 	var $roomCat = $(roomCatEl);
 	var quotationId = $('#quotation_id').val() || 0;
-	$.get('../inc/hotel_category.php', { hotel_id: hotelId, quotation_id: quotationId }, function (data) {
+	var base_url = $('#base_url').val();
+	$.get(base_url + 'view/package_booking/booking/inc/hotel_category.php', { hotel_id: hotelId, quotation_id: quotationId }, function (data) {
 		$roomCat.html(data);
 		if (roomCategory) {
 			if (!$roomCat.find('option').filter(function () { return String(this.value) === String(roomCategory); }).length) {
@@ -671,6 +688,13 @@ function load_booking_hotel_table(hotel_info_arr) {
 					initAllRoomCategorySelectAddNew('#tbl_package_hotel_infomration');
 				}
 				refresh_booking_hotel_select2_display();
+				for (var mp = 0; mp < hotel_info_arr.length; mp++) {
+					var mpRow = table.rows[mp];
+					var mpData = hotel_info_arr[mp] || {};
+					if (mpRow && mpData.meal_plan) {
+						set_booking_meal_plan_select(booking_table_cell_control(mpRow.cells[8]), mpData.meal_plan);
+					}
+				}
 			}, 120);
 		}
 	}
@@ -700,11 +724,12 @@ function load_booking_hotel_table(hotel_info_arr) {
 		if (roomsEl) {
 			roomsEl.value = data.total_rooms || '';
 		}
-		if (mealPlanEl && data.meal_plan) {
-			mealPlanEl.value = data.meal_plan;
-		}
 		if (extraBedEl) {
 			extraBedEl.value = data.extra_bed || '0';
+		}
+
+		function finishHotelRowPopulation() {
+			set_booking_meal_plan_select(mealPlanEl, data.meal_plan || '');
 		}
 
 		if (cityEl && data.city_id && data.city_name) {
@@ -715,6 +740,7 @@ function load_booking_hotel_table(hotel_info_arr) {
 			var $hotel = $(hotelEl);
 			function finishHotelRow() {
 				apply_booking_hotel_row_selection(hotelEl, hotelId, hotelName, roomCatEl, roomCategory);
+				finishHotelRowPopulation();
 				load_next_booking_hotel_row();
 			}
 			if (data.city_id && typeof hotelDropdownLoadByCity === 'function') {
@@ -739,6 +765,7 @@ function load_booking_hotel_table(hotel_info_arr) {
 				}
 				$roomCat.val(roomCategory).trigger('change');
 			}
+			finishHotelRowPopulation();
 			load_next_booking_hotel_row();
 		}
 	}
@@ -1108,6 +1135,12 @@ function load_booking_transport_table(transport_info_arr) {
 
 	if (typeof initAllVehicleSelectAddNew === 'function') {
 		initAllVehicleSelectAddNew('#tbl_package_transport_infomration');
+	}
+	if (typeof initBookingServiceDurationSelects === 'function') {
+		initBookingServiceDurationSelects();
+	}
+	if (typeof initBookingTransportPickupDrop === 'function') {
+		initBookingTransportPickupDrop();
 	}
 }
 

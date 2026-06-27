@@ -1670,7 +1670,11 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[8].childNodes[0].setAttribute("id", "no_vehicles" + foo.counter);
     $(row.cells[5].childNodes[0]).select2().trigger("change");
     $(row.cells[6].childNodes[0]).select2().trigger("change");
-    $(row.cells[7].childNodes[0]).select2().trigger("change");
+    $(row.cells[7].childNodes[0]).select2({ width: '170px', minimumResultsForSearch: 0 }).trigger("change");
+
+    if (typeof initBookingTransportPickupDrop === 'function') {
+      initBookingTransportPickupDrop(row);
+    }
 
     if (row.cells[9]) {
       row.cells[9].style.display = "none";
@@ -4917,7 +4921,8 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             } else if (
                 cloned.id &&
                 (cloned.id.indexOf("plane_class-") === 0 ||
-                 cloned.id.indexOf("txt_m_adolescence") === 0)
+                 cloned.id.indexOf("txt_m_adolescence") === 0 ||
+                 cloned.id.indexOf("cmb_meal_plan") === 0)
             ) {
                 cloned.selectedIndex = 0;
             } else {
@@ -4936,7 +4941,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // ✅ Initialize Select2 only for the new row selects
     if (tableID !== "tbl_package_tour_member") {
-        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"]').select2({ width: "100%" });
+        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"]').select2({ width: "100%" });
     }
 
     // ✅ Initialize datepicker for new row
@@ -4989,6 +4994,11 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     }
 
     if (tableID === "tbl_package_hotel_infomration") {
+        var $mealPlanSelect = $(row).find('select[id^="cmb_meal_plan"]');
+        if ($mealPlanSelect.length && $mealPlanSelect.data('select2')) {
+            $mealPlanSelect.select2('destroy');
+        }
+        $mealPlanSelect.removeClass('app_select2');
         var $hotelSelect = $(row).find('select[id^="hotel_name"]');
         if ($hotelSelect.length) {
             if ($hotelSelect.data('select2')) {
@@ -5003,10 +5013,29 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         if ($roomCatSelect.length && typeof refreshRoomCategorySelectAfterLoad === 'function') {
             refreshRoomCategorySelectAfterLoad($roomCatSelect, { width: '140px' });
         }
+        var $hotelEl = row.cells[3] && row.cells[3].childNodes[0];
+        if ($hotelEl && window.bookingHotelRoomCategoryFromTariff) {
+            var hotelOnchange = $hotelEl.getAttribute('onchange') || '';
+            if (hotelOnchange.indexOf('hotel_type_load_cate') === -1) {
+                $hotelEl.setAttribute('onchange', 'hotel_type_load_cate(this.id);' + hotelOnchange);
+            }
+        }
+    }
+
+    if (tableID === "tbl_package_transport_infomration") {
+        if (typeof initBookingServiceDurationSelects === 'function') {
+            initBookingServiceDurationSelects(row);
+        }
+        if (typeof initBookingTransportPickupDrop === 'function') {
+            initBookingTransportPickupDrop(row);
+        }
+        if (typeof initAllVehicleSelectAddNew === 'function') {
+            initAllVehicleSelectAddNew(row);
+        }
     }
     
     // Ensure checkbox has onchange handler for hotel table
-    if (tableID === "tbl_package_tour_quotation_dynamic_hotel") {
+    if (tableID === "tbl_package_tour_quotation_dynamic_hotel" || tableID === "tbl_package_tour_quotation_dynamic_hotel_update") {
         // Remove any existing onchange handlers first
         $(row).find('input[type="checkbox"]').removeAttr('onchange');
         // Add the onchange handler
@@ -5016,30 +5045,30 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         var checkboxId = $(row).find('input[type="checkbox"]').attr('id');
         $(row).find('label').attr('for', checkboxId);
         
-        // Copy city selection from previous row
-        var previousRow = table.rows[table.rows.length - 2]; // Previous row (current row - 1)
-        if (previousRow && previousRow.cells[3] && previousRow.cells[3].childNodes[0]) {
+        // Copy city, dates, rooms, extra bed and meal plan from previous row
+        var previousRow = table.rows[table.rows.length - 2];
+        if (!window.quotationFreshPackageLoad && previousRow && typeof quotationGetHotelRowReference === 'function' && typeof quotationApplyHotelRowReference === 'function') {
+            var prevRef = quotationGetHotelRowReference(previousRow);
+            if (prevRef) {
+                quotationApplyHotelRowReference(row, prevRef, {
+                    skipHotelLoad: !!window.quotationBatchPopulatingHotels
+                });
+            } else {
+                city_lzloading($(row.cells[3].childNodes[0]));
+            }
+        } else if (previousRow && previousRow.cells[3] && previousRow.cells[3].childNodes[0]) {
             var previousCitySelect = previousRow.cells[3].childNodes[0];
             var newCitySelect = row.cells[3].childNodes[0];
-            
-            // Get the selected city value and text from previous row
             var selectedCityValue = $(previousCitySelect).val();
             var selectedCityText = $(previousCitySelect).find('option:selected').text();
-            
-            // If there's a selected city in the previous row, copy it to the new row
             if (selectedCityValue && selectedCityValue !== "" && selectedCityText && selectedCityText !== "*City Name") {
-                // Initialize city dropdown first
                 city_lzloading($(newCitySelect));
-                
-                // Add the selected city option to the new dropdown
                 var newOption = new Option(selectedCityText, selectedCityValue, true, true);
                 $(newCitySelect).append(newOption).trigger('change');
             } else {
-                // Initialize city dropdown without pre-selection
                 city_lzloading($(newCitySelect));
             }
         } else {
-            // Initialize city dropdown without pre-selection if no previous row
             city_lzloading($(row.cells[3].childNodes[0]));
         }
         if (typeof window.initPackageQuotationMealPlanSelect === 'function') {

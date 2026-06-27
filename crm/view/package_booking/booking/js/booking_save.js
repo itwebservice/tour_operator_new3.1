@@ -392,7 +392,7 @@ $(function () {
 		var exc_city_arr = [];
 		var exc_name_arr = [];
 		var transfer_arr = [];
-		var vehicle_name_arr = [];
+		var vehicle_id_arr = [];
 		var adult_arr = [];
 		var cwb_arr = [];
 		var cwob_arr = [];
@@ -409,7 +409,7 @@ $(function () {
 				var exc_city = row.cells[3].childNodes[0].value;
 				var exc_name = row.cells[4].childNodes[0].value;
 				var transfer_option = row.cells[5].childNodes[0].value;
-				var vehicle_name = row.cells[6].childNodes[0].value;
+				var vehicle_id = row.cells[6].childNodes[0].value;
 				var adult = row.cells[7].childNodes[0].value;
 				var cwb = row.cells[8].childNodes[0].value;
 				var cwob = row.cells[9].childNodes[0].value;
@@ -419,7 +419,7 @@ $(function () {
 				exc_city_arr.push(exc_city);
 				exc_name_arr.push(exc_name);
 				transfer_arr.push(transfer_option);
-				vehicle_name_arr.push(vehicle_name);
+				vehicle_id_arr.push(vehicle_id);
 				adult_arr.push(adult);
 				cwb_arr.push(cwb);
 				cwob_arr.push(cwob);
@@ -790,7 +790,7 @@ $(function () {
 														exc_name_arr: exc_name_arr,
 														exc_date_arr:exc_date_arr,
 														transfer_arr:transfer_arr,
-														vehicle_name_arr:vehicle_name_arr,
+														vehicle_id_arr: vehicle_id_arr,
 														adult_arr:adult_arr,
 														cwb_arr:cwb_arr,
 														cwob_arr:cwob_arr,

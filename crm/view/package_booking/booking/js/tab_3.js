@@ -2,6 +2,12 @@ $('#transport_agency_id, #transport_bus_id,#city_name,#txt_catagory1,#hotel_name
 if (typeof initAllRoomCategorySelectAddNew === 'function') {
   initAllRoomCategorySelectAddNew('#tbl_package_hotel_infomration');
 }
+if (typeof initBookingServiceDurationSelects === 'function') {
+  initBookingServiceDurationSelects();
+}
+if (typeof initBookingTransportPickupDrop === 'function') {
+  initBookingTransportPickupDrop();
+}
 if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
   hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/package_booking/booking/inc/hotel_name_load.php';
 }
@@ -21,21 +27,56 @@ function get_booking_room_category_id_from_hotel(hotelSelectId) {
   if (!hotelSelectId) {
     return 'txt_catagory1';
   }
-  if (hotelSelectId === 'hotel_name1') {
-    return 'txt_catagory1';
+  if (hotelSelectId.indexOf('hotel_name') === 0) {
+    var suffix = hotelSelectId.substring('hotel_name'.length) || '1';
+    var candidates = ['txt_catagory' + suffix, 'txt_catagory' + suffix + '_h'];
+    for (var i = 0; i < candidates.length; i++) {
+      if (document.getElementById(candidates[i])) {
+        return candidates[i];
+      }
+    }
+    return 'txt_catagory' + suffix;
   }
-  if (hotelSelectId.indexOf('hotel_name1') === 0) {
-    var rowSuffix = hotelSelectId.substring('hotel_name1'.length);
-    return 'txt_catagory' + (rowSuffix || '1');
+  return 'txt_catagory1';
+}
+
+function initBookingServiceDurationSelects(container) {
+  var $scope = container ? $(container) : $('#tbl_package_transport_infomration');
+  $scope.find('select[id^="duration"]').each(function () {
+    var $el = $(this);
+    if ($el.data('select2')) {
+      $el.select2('destroy');
+    }
+    $el.select2({ width: '170px', minimumResultsForSearch: 0 });
+  });
+}
+
+function initBookingTransportPickupDrop(container) {
+  if (typeof destinationLoading !== 'function') {
+    return;
   }
-  var suffix = hotelSelectId.substring('hotel_name'.length) || '1';
-  return 'txt_catagory' + suffix;
+  var $scope = container ? $(container) : $('#tbl_package_transport_infomration');
+  $scope.find('select[id^="pickup_from"]').each(function () {
+    destinationLoading($(this), 'Pickup Location');
+  });
+  $scope.find('select[id^="drop_to"]').each(function () {
+    destinationLoading($(this), 'Drop-off Location');
+  });
 }
 
 $(document).on('click', '#tab_3_head', function () {
   setTimeout(function () {
     if (typeof refresh_booking_hotel_select2_display === 'function') {
       refresh_booking_hotel_select2_display();
+    }
+    if (typeof initAllRoomCategorySelectAddNew === 'function') {
+      initAllRoomCategorySelectAddNew('#tbl_package_hotel_infomration');
+    }
+    if (typeof initBookingServiceDurationSelects === 'function') {
+      initBookingServiceDurationSelects();
+    }
+    if (typeof initBookingTransportPickupDrop === 'function') {
+      initBookingTransportPickupDrop();
     }
   }, 200);
 });
@@ -86,14 +127,23 @@ function hotel_type_load_cate(id)
     return;
   }
 
-  var quotation_id = $("#quotation_id").val();
+  var quotation_id = $("#quotation_id").val() || 0;
   var categorySelectId = get_booking_room_category_id_from_hotel(id);
-  $.get( "../inc/hotel_category.php" , { hotel_id : hotel_id,quotation_id:quotation_id } , function ( data ) {
-        $("#" + categorySelectId).html( data ) ;
-        if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
-            refreshRoomCategorySelectAfterLoad("#" + categorySelectId, { width: '140px' });
+  var base_url = $('#base_url').val();
+  $.get(base_url + "view/package_booking/booking/inc/hotel_category.php", { hotel_id : hotel_id, quotation_id: quotation_id }, function ( data ) {
+        var $cat = $("#" + categorySelectId);
+        if (!$cat.length) {
+          return;
         }
-  } ) ;   
+        $cat.html(data);
+        if (typeof refreshRoomCategorySelectAfterLoad === 'function') {
+            refreshRoomCategorySelectAfterLoad($cat, { width: '140px' });
+        } else if (!$cat.data('select2')) {
+            $cat.select2({ width: '140px', minimumResultsForSearch: 0 });
+        }
+  }).fail(function () {
+        error_msg_alert('Unable to load room categories for the selected hotel.');
+  });
 }
 /////////////////////////////////////Package Tour hotel name list load end/////////////////////////////////////
 
@@ -194,4 +244,9 @@ function package_tour_booking_tab3_validate()
 
 }
 /////////////////////////////////////Package Tour Master Tab3 validate end/////////////////////////////////////
+
+window.initBookingServiceDurationSelects = initBookingServiceDurationSelects;
+window.initBookingTransportPickupDrop = initBookingTransportPickupDrop;
+window.hotel_type_load_cate = hotel_type_load_cate;
+window.get_booking_room_category_id_from_hotel = get_booking_room_category_id_from_hotel;
 

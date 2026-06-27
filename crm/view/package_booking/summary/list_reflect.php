@@ -306,7 +306,9 @@ $currency_amount2 = currency_conversion($currency,$row_package['currency_code'],
 		'<button class="btn btn-info btn-sm" id="supplierv_btn-' . $row_package['booking_id'] . '" onclick="supplier_view_modal(' . $row_package['booking_id'] . ')" data-toggle="tooltip" title="View Details" id="sview-' . $row_package['booking_id'] . '"><i class="fa fa-eye" aria-hidden="true"></i></button>',
 		$branch_name,
 		$emp_name,
-		number_format((float)($incentive_amount), 2)
+		number_format((float)($incentive_amount), 2),
+		'<div class="table-icon-btns"><a data-toggle="tooltip" onclick="loadOtherPage(\'' . $url1 . '\')" class="btn btn-info btn-sm" title="Download Invoice"><i class="fa fa-print"></i></a>' .
+		'<a data-toggle="tooltip" onclick="loadOtherPage(\'' . $b_url . '\')" class="btn btn-info btn-sm" title="Download Booking Form"><i class="fa fa-print"></i></a></div>'
 	), "bg" => $bg);
 	array_push($array_s, $temp_arr);
 }

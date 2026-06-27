@@ -122,7 +122,7 @@ textarea.form-control {
             </div>
         <?php }
         else{
-          if($dest_id != '' || $dest_id != 0){ ?>
+          if($dest_id != '' && $dest_id != 0){ ?>
             <div class="col-md-12 col-sm-6 col-xs-12 mg_tp_10">
             <?php echo '<h4 class="no-pad">Itinerary not added for this destination! <a href="'.BASE_URL.'view/other_masters/index.php" target="_blank" title="Add Itinerary"><i class="fa fa-plus"></i>&nbsp;&nbsp;Itinerary</a></h4> '; ?>
             </div>
@@ -151,6 +151,9 @@ textarea.form-control {
 <script>
 $('#itinerary_detail_modal').modal('show');
 $('#dest_ids1').select2();
+if ($('#dest_ids1').val() && $('#dest_ids1').val() !== '0' && <?= (int)$sq_itinerary_c ?> === 0 && typeof get_dest_itinerary === 'function') {
+    get_dest_itinerary('dest_ids1');
+}
 $('#itinerary_detail_frm').validate({
     rules:{
       dest_names1 : {required:true}
@@ -249,6 +252,9 @@ $('#itinerary_detail_frm').validate({
               }
           }
           console.log('ITINERARY MODAL: Closing modal');
+          if (typeof applySelectedItineraryImagePreview === 'function') {
+              applySelectedItineraryImagePreview();
+          }
           $('#itinerary_detail_modal').modal('hide');
         }
         else{

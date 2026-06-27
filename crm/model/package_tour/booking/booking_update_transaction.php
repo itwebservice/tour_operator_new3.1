@@ -30,13 +30,23 @@ public function finance_update($booking_id, $row_spec,$particular)
   $cust_gl = $sq_cust['ledger_id'];
 
   $reflections = json_decode(json_encode($_POST['reflections']));
+  $reflection_entry = (is_array($reflections) && isset($reflections[0])) ? $reflections[0] : null;
   $bsmValues = json_decode(json_encode($_POST['bsmValues']));
-  foreach($bsmValues[0] as $key => $value){
-      switch($key){
-      case 'basic' : $basic_amount = ($value != "") ? $value : $basic_amount;break;
-      case 'service' : $service_charge = ($value != "") ? $value : $service_charge;break;
+  if (is_array($bsmValues) && isset($bsmValues[0])) {
+    $bsm_entry = is_array($bsmValues[0]) ? (object) $bsmValues[0] : $bsmValues[0];
+    if (is_object($bsm_entry)) {
+      foreach ($bsm_entry as $key => $value) {
+        switch ($key) {
+          case 'basic':
+            $basic_amount = ($value != "") ? $value : $basic_amount;
+            break;
+          case 'service':
+            $service_charge = ($value != "") ? $value : $service_charge;
+            break;
+        }
       }
     }
+  }
   $total_sale_amount = $basic_amount;
   
   ////////////Sales/////////////
@@ -60,7 +70,7 @@ public function finance_update($booking_id, $row_spec,$particular)
   $payment_date = $booking_date;
   $payment_particular = $particular;
   $ledger_particular = get_ledger_particular('To','Package Sales');
-  $old_gl_id = $gl_id = ($reflections[0]->hotel_sc != '') ? $reflections[0]->hotel_sc : 185;
+  $old_gl_id = $gl_id = ($reflection_entry && isset($reflection_entry->hotel_sc) && $reflection_entry->hotel_sc != '') ? $reflection_entry->hotel_sc : 185;
   $payment_side = "Credit";
   $clearance_status = "";
   $transaction_master->transaction_update($module_name, $module_entry_id, $transaction_id, $payment_amount, $payment_date, $payment_particular,$old_gl_id, $gl_id,'', $payment_side, $clearance_status, $row_spec,$ledger_particular,'INVOICE');
@@ -81,7 +91,7 @@ public function finance_update($booking_id, $row_spec,$particular)
   /////////Service Charge Tax Amount////////
   // Eg. CGST:(9%):24.77, SGST:(9%):24.77
   $service_tax_subtotal = explode(',',$tour_service_tax_subtotal);
-  $tax_ledgers = explode(',',$reflections[0]->hotel_taxes);
+  $tax_ledgers = explode(',', ($reflection_entry && isset($reflection_entry->hotel_taxes)) ? $reflection_entry->hotel_taxes : '');
   for($i=0;$i<sizeof($service_tax_subtotal);$i++){
 
     $service_tax = explode(':',$service_tax_subtotal[$i]);

@@ -1,6 +1,6 @@
 <?php
 include "../../../model/model.php";
-global $currency, $$modify_entries_switch;
+global $currency, $modify_entries_switch, $delete_flag;
 $emp_id = $_SESSION['emp_id'];
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
@@ -253,11 +253,10 @@ while ($row_booking = mysqli_fetch_assoc($sq_booking)) {
 		number_format($balance_amount, 2) . '<br/>' . $currency_amount,
 		$emp_name,
 		get_date_user($row_booking['booking_date']),
-		$conf_form . '
-		<a data-toggle="tooltip" onclick="loadOtherPage(\'' . $url1 . '\')" class="btn btn-info btn-sm" title="Download Invoice"><i class="fa fa-print" data-toggle="tooltip"></i></a>'
-			. $service_voucher . $update_btn .
-			'<button style="display:inline-block" class="btn btn-info btn-sm" onclick="package_view_modal(' . $row_booking['booking_id'] . ');btnDisableEnable(this.id)" id="package_view_modal_btn-' . $row_booking['booking_id'] . '" title="View Details" data-toggle="tooltip"><i class="fa fa-eye" aria-hidden="true"></i></button>
-		' . $delete_btn,
+		'<div class="table-icon-btns">' . $conf_form . $service_voucher . $update_btn .
+			'<a data-toggle="tooltip" onclick="loadOtherPage(\'' . $url1 . '\')" class="btn btn-info btn-sm" title="Download Invoice"><i class="fa fa-print"></i></a>
+			<button class="btn btn-info btn-sm" onclick="package_view_modal(' . $row_booking['booking_id'] . ');btnDisableEnable(this.id)" id="package_view_modal_btn-' . $row_booking['booking_id'] . '" title="View Details" data-toggle="tooltip"><i class="fa fa-eye" aria-hidden="true"></i></button>
+		' . $delete_btn . '</div>',
 
 	), "bg" => $bg);
 	array_push($array_s, $temp_arr);

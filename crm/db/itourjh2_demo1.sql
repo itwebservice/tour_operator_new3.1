@@ -7012,6 +7012,8 @@ CREATE TABLE `package_payment_master` (
   `status` varchar(10) NOT NULL,
   `delete_status` int(11) NOT NULL,
   `currency_code` varchar(255) DEFAULT NULL,
+  `vendor_type` varchar(100) NOT NULL DEFAULT '',
+  `supplier_id` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`payment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -7411,6 +7413,7 @@ CREATE TABLE `package_tour_excursion_master` (
   `chwb` int(11) NOT NULL,
   `chwob` int(11) NOT NULL,
   `infant` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -10825,6 +10828,7 @@ DROP TABLE IF EXISTS `vendor_payment_master`;
 CREATE TABLE `vendor_payment_master` (
   `payment_id` int(11) NOT NULL,
   `estimate_id` int(11) NOT NULL,
+  `receipt_payment_id` int(11) NOT NULL DEFAULT 0,
   `financial_year_id` int(11) NOT NULL,
   `branch_admin_id` int(11) NOT NULL,
   `emp_id` int(11) NOT NULL,
@@ -11380,16 +11384,3 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-06-24  6:01:47
-
-DROP TABLE IF EXISTS `quotation_testimonial`;
-
-CREATE TABLE `quotation_testimonial` (
-  `testimonial_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT '',
-  `designation` varchar(255) DEFAULT '',
-  `review` text,
-  `photo` varchar(500) DEFAULT '',
-  `active_flag` varchar(20) DEFAULT 'Active',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`testimonial_id`)
-);

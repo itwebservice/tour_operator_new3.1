@@ -129,8 +129,20 @@
                     <?php
                     $count = 0;
                     $sq_tours_count = mysqli_num_rows(mysqlQuery("select * from package_tour_schedule_master where booking_id = '$sq_booking_info[booking_id]'"));
-                    if ($sq_booking_info['quotation_id'] == 0) { ?>
+                    if ($sq_booking_info['quotation_id'] == 0) {
+                        $booking_itinerary_dest_id = 0;
+                        if (!empty($sq_booking_info['dest_id'])) {
+                            $booking_itinerary_dest_id = (int)$sq_booking_info['dest_id'];
+                        } elseif (!empty($sq_booking_info['new_package_id'])) {
+                            $sq_pack_dest = mysqli_fetch_assoc(mysqlQuery("select dest_id from custom_package_master where package_id='" . $sq_booking_info['new_package_id'] . "'"));
+                            if ($sq_pack_dest && !empty($sq_pack_dest['dest_id'])) {
+                                $booking_itinerary_dest_id = (int)$sq_pack_dest['dest_id'];
+                            }
+                        }
+                    ?>
                     <input type="hidden" id="sq_tours_count" value="<?=$sq_tours_count?>"/>
+                    <input type="hidden" id="dest_name2" value="<?= $booking_itinerary_dest_id ?>" />
+                    <input type="hidden" id="booking_itinerary_dest_id" value="<?= $booking_itinerary_dest_id ?>" />
                     <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
 
                         <legend>Tour Itinerary Details</legend>
@@ -186,7 +198,7 @@
                                                                 <?php get_mealplan_dropdown(); ?>
                                                             </select>
                                                         </td>
-                                                        <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="margin-top: 35px; border:none;" onClick="add_itinerary('dest_name','special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?php echo $count; ?>-u','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button>
+                                                        <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="margin-top: 35px; border:none;" onClick="add_itinerary('dest_name2','special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?php echo $count; ?>-u','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button>
                                                         </td>
                                                         <td style="display:none"><input type="text" value="<?php echo $row_tours['entry_id'] ?>"></td>
                                                     </tr>

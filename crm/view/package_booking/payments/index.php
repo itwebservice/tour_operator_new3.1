@@ -354,7 +354,14 @@ function p_delete_entry(payment_id) {
 </script>
 <style>
 .action_width {
-    display: flex;
+    white-space: nowrap;
+    min-width: 140px;
+}
+.table-icon-btns {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 2px;
 }
 </style>
 <?= end_panel() ?>

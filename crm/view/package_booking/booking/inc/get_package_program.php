@@ -51,4 +51,12 @@ $sq_tours = mysqlQuery("select * from custom_package_program where package_id = 
         </div>
       </div>
 </div>
+<script>
+if ($('#dest_name2').length && '<?= (int)$sq_package['dest_id'] ?>' !== '0') {
+    $('#dest_name2').val('<?= (int)$sq_package['dest_id'] ?>');
+    if ($('#dest_name2').data('select2')) {
+        $('#dest_name2').trigger('change.select2');
+    }
+}
+</script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

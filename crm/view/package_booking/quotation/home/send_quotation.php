@@ -352,16 +352,6 @@ $quotation_count = mysqli_num_rows($sq_query);
 				
 				<div class="row">
 					<div class="col-xs-12">
-						<?php if ($specific_quotation_id) { ?>
-							<div class="alert alert-info">
-								<i class="fa fa-info-circle"></i> Displaying quotation ID <?= $specific_quotation_id ?> and its sub-quotations (<?= $quotation_count ?> total)
-							</div>
-						<?php } ?>
-						<input type="checkbox" id="check_all" name="check_all" onClick="select_all_check(this.id,'custom_package')">&nbsp;&nbsp;&nbsp;<span style="text-transform: initial;">Check All</span>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12">
 						<div class="table-responsive">
 							<table class="table table-hover table-bordered no-marg" id="tbl_tour_list">
 								<tr class="table-heading-row">

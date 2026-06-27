@@ -49,4 +49,10 @@
     if (typeof initAllVehicleSelectAddNew === 'function') {
         initAllVehicleSelectAddNew('#tbl_package_transport_infomration');
     }
+    if (typeof initBookingServiceDurationSelects === 'function') {
+        initBookingServiceDurationSelects();
+    }
+    if (typeof initBookingTransportPickupDrop === 'function') {
+        initBookingTransportPickupDrop();
+    }
 </script>

@@ -54,7 +54,7 @@ if($sq_itinerary_c >0){
     </table>
 <?php }
 else{
-    if($dest_id != '' || $dest_id != 0){ ?>
+    if($dest_id != '' && $dest_id != 0){ ?>
     <div class="col-md-12 col-sm-6 col-xs-12 mg_tp_10">
     <?php echo '<h4 class="no-pad">Itinerary not added for this destination! <a href="'.BASE_URL.'view/other_masters/index.php" target="_blank" title="Add Itinerary"><i class="fa fa-plus"></i>&nbsp;&nbsp;Itinerary</a></h4> '; ?>
     </div>
