@@ -1087,6 +1087,8 @@ body {
   margin-top: 1px;
 }
 .ie-text {
+  flex: 1;
+  min-width: 0;
   font-size: 12.5px;
   color: var(--slate);
   line-height: 1.5;

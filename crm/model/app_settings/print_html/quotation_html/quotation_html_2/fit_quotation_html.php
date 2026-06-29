@@ -82,12 +82,56 @@ if (!function_exists('o2img')) {
     return (is_string($url) && trim($url) !== '' && stripos($url, 'dummy') === false) ? $url : $fallback;
   }
 }
+if (!function_exists('o2_list_item_text')) {
+  function o2_list_item_text($html)
+  {
+    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = str_replace("\xC2\xA0", ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim($text);
+  }
+}
 if (!function_exists('o2_list_items')) {
   function o2_list_items($html, $fallback)
   {
-    $text = trim(strip_tags((string) $html));
-    $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
-    $items = array_values(array_filter(array_map('trim', (array) $items)));
+    $html = (string) $html;
+    $items = array();
+
+    if (trim($html) === '') {
+      return array($fallback);
+    }
+
+    if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o2_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o2_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items)) {
+      $plain = o2_list_item_text($html);
+      $parts = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $plain);
+      foreach ((array) $parts as $part) {
+        $text = trim($part);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
     return !empty($items) ? $items : array($fallback);
   }
 }
@@ -878,7 +922,7 @@ $o2_round = o2img(
                     fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 6 9 17l-5-5"></path>
-                  </svg> <?= o2e($item) ?></li>
+                  </svg><span><?= nl2br(o2e($item)) ?></span></li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -898,7 +942,7 @@ $o2_round = o2img(
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 6 6 18"></path>
                     <path d="M6 6 18 18"></path>
-                  </svg> <?= o2e($item) ?></li>
+                  </svg><span><?= nl2br(o2e($item)) ?></span></li>
               <?php endforeach; ?>
             </ul>
           </div>

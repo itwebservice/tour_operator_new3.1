@@ -95,12 +95,56 @@ if (!function_exists('o4_guest_label')) {
     return $parts ? implode(', ', $parts) : o4nv($ov['guest_count'], '-');
   }
 }
+if (!function_exists('o4_list_item_text')) {
+  function o4_list_item_text($html)
+  {
+    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = str_replace("\xC2\xA0", ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim($text);
+  }
+}
 if (!function_exists('o4_split_lines')) {
   function o4_split_lines($html, $fallback = array())
   {
-    $text = trim(strip_tags(str_replace(array('<br>', '<br/>', '<br />', '</p>', '</li>'), "\n", (string) $html)));
-    $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
-    $items = array_values(array_filter(array_map('trim', (array) $items)));
+    $html = (string) $html;
+    $items = array();
+
+    if (trim($html) === '') {
+      return $fallback;
+    }
+
+    if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o4_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o4_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items)) {
+      $plain = o4_list_item_text($html);
+      $parts = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $plain);
+      foreach ((array) $parts as $part) {
+        $text = trim($part);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
     return $items ? $items : $fallback;
   }
 }
@@ -746,7 +790,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
             $day_num = str_pad((string) o4nv($day['day_number'], ''), 2, '0', STR_PAD_LEFT);
         ?>
             <div class="itin-day">
-              <div class="itin-day-header">
+              <div class="itin-day-header"> 
                 <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n"><?= o4e($day_num) ?></span></div>
                 <div class="itin-day-date"><?= o4e(o4nv($day['date'], '')) ?></div>
               </div>
@@ -799,7 +843,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
           <div class="ie-heading">What's Included</div>
           <ul class="ie-list">
             <?php foreach ($o4_included as $item) : ?>
-              <li><span class="ie-icon-chk">✓</span> <?= o4e($item) ?></li>
+              <li><span class="ie-icon-chk">✓</span><span class="item-text"><?= nl2br(o4e($item)) ?></span></li>
             <?php endforeach; ?>
           </ul>
         </div>
@@ -808,7 +852,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
           <div class="ie-heading">What's Excluded</div>
           <ul class="ie-list">
             <?php foreach ($o4_excluded as $item) : ?>
-              <li><span class="ie-icon-x">✗</span> <?= o4e($item) ?></li>
+              <li><span class="ie-icon-x">✗</span><span class="item-text"><?= nl2br(o4e($item)) ?></span></li>
             <?php endforeach; ?>
           </ul>
         </div>

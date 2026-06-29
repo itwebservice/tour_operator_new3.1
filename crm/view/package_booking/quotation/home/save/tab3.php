@@ -1,5 +1,5 @@
 <form id="frm_tab3">
-    <div class="app_panel">
+    <div class="app_panel" style="overflow:hidden;">
 
         <div class="container" style="width:100% !important;">
             <input type="hidden" name="pckg_id_arr" id="pckg_id_arr" />
@@ -134,6 +134,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                     </div>
                                 </div>
                             </div>

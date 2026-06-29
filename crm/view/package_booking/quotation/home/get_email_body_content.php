@@ -121,6 +121,7 @@ $to_date_obj = new DateTime($sq_quotation['to_date']);
 $duration = $from_date_obj->diff($to_date_obj)->days;
 
 // Get hotel details (resolve IDs to names)
+global $similar_text;
 $hotel_details = '';
 $sq_hotel = mysqlQuery("SELECT * FROM package_tour_quotation_hotel_entries WHERE quotation_id = '$quotation_id'");
 $hotel_count = 0;
@@ -137,8 +138,10 @@ while ($row_hotel = mysqli_fetch_assoc($sq_hotel)) {
 
     $room_category_display = isset($row_hotel['room_category']) ? $row_hotel['room_category'] : (isset($row_hotel['hotel_type']) ? $row_hotel['hotel_type'] : '');
     $meal_plan_display = isset($row_hotel['meal_plan']) ? $row_hotel['meal_plan'] : '';
+    $similar_label = isset($similar_text) ? $similar_text : ' / Similar';
 
-    $hotel_details .= "*{$city_display}*  -*{$hotel_display}* - *{$room_category_display}*  -*{$meal_plan_display}*\n";
+    $hotel_details .= trim($city_display) . ' -' . trim($hotel_display) . $similar_label
+      . ' - ' . trim($room_category_display) . ' -' . trim($meal_plan_display) . "\n";
     $hotel_count++;
 }
 
@@ -154,11 +157,10 @@ $itinerary_count = 0;
 if (mysqli_num_rows($sq_package_program) > 0) {
     $itinerary_details = "\n 📅 *Itinerary*\n-----------\n";
     while ($row_itinerary = mysqli_fetch_assoc($sq_package_program)) {
-        $itinerary_details .= "*Day - {$count}*   " .
-                              "*" . htmlspecialchars($row_itinerary['attraction']) . "*      " .
-                              "*(" . htmlspecialchars($row_itinerary['stay']) . ")*     " .
-                              "*(" . htmlspecialchars($row_itinerary['meal_plan']) . ")*\n";
-
+    	$itinerary_details .= "*Day - {$count}*   \n" .
+					"" . htmlspecialchars($row_itinerary['attraction']) . "     \n " .
+					"(" . htmlspecialchars($row_itinerary['stay']) . ")     \n" .
+					"(" . htmlspecialchars($row_itinerary['meal_plan']) . ")\n";
         $count++;
         $j++;
         $itinerary_count++;
@@ -258,11 +260,13 @@ $itinerary_section = '';
 if ($hotel_count > 0) {
     $itinerary_section .= "🏨  *Hotels*\n";
     $itinerary_section .= "-----------\n";
-    $itinerary_section .= $hotel_details . "\n";
+    $itinerary_section .= rtrim($hotel_details) . "\n";
+    $itinerary_section .= "-----------\n\n";
 } elseif (!empty($hotel_details)) {
     $itinerary_section .= "🏨  *Hotels*\n";
     $itinerary_section .= "-----------\n";
-    $itinerary_section .= "Hotel details will be provided upon confirmation.\n\n";
+    $itinerary_section .= "Hotel details will be provided upon confirmation.\n";
+    $itinerary_section .= "-----------\n\n";
 }
 
 if ($itinerary_count > 0) {
@@ -358,17 +362,18 @@ function format_preview_section_html($section_key, $content) {
     if (trim($content) === '') {
         return '';
     }
-    $formatted = str_replace("\n", '<br>', $content);
+    $content = str_replace(array("\r\n", "\r"), "\n", $content);
+    $formatted = nl2br($content, false);
     return '<div class="preview-section-block" data-section="' . $section_key . '">' . $formatted . '</div>';
 }
 
 if ($sectioned) {
-    $email_content = '<div class="preview-section-block preview-section-header" data-section="header">' . str_replace("\n", '<br>', $header_content) . '</div>';
+    $email_content = '<div class="preview-section-block preview-section-header" data-section="header">' . nl2br($header_content, false) . '</div>';
     $email_content .= format_preview_section_html('price_structure', $price_section);
     $email_content .= format_preview_section_html('itinerary', $itinerary_section);
     $email_content .= format_preview_section_html('inclusion_exclusion', $inclusion_section);
     $email_content .= format_preview_section_html('terms_conditions', $terms_section);
-    $email_content .= '<div class="preview-section-block preview-section-footer" data-section="footer">' . str_replace("\n", '<br>', $footer_content) . '</div>';
+    $email_content .= '<div class="preview-section-block preview-section-footer" data-section="footer">' . nl2br($footer_content, false) . '</div>';
 } else {
     $email_content = $header_content;
 

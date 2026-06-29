@@ -95,12 +95,56 @@ if (!function_exists('o5_guest_label')) {
     return $parts ? implode(', ', $parts) : o5nv($ov['guest_count'], '-');
   }
 }
+if (!function_exists('o5_list_item_text')) {
+  function o5_list_item_text($html)
+  {
+    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = str_replace("\xC2\xA0", ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim($text);
+  }
+}
 if (!function_exists('o5_split_lines')) {
   function o5_split_lines($html, $fallback = array())
   {
-    $text = trim(strip_tags(str_replace(array('<br>', '<br/>', '<br />', '</p>', '</li>'), "\n", (string) $html)));
-    $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
-    $items = array_values(array_filter(array_map('trim', (array) $items)));
+    $html = (string) $html;
+    $items = array();
+
+    if (trim($html) === '') {
+      return $fallback;
+    }
+
+    if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o5_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o5_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items)) {
+      $plain = o5_list_item_text($html);
+      $parts = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $plain);
+      foreach ((array) $parts as $part) {
+        $text = trim($part);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
     return $items ? $items : $fallback;
   }
 }
@@ -899,7 +943,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
             <?php foreach ($o5_included as $item) : ?>
               <div class="ie-item">
                 <div class="ie-check">✓</div>
-                <div class="ie-text"><?= o5e($item) ?></div>
+                <div class="ie-text"><?= nl2br(o5e($item)) ?></div>
               </div>
             <?php endforeach; ?>
           </div>
@@ -910,7 +954,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
             <?php foreach ($o5_excluded as $item) : ?>
               <div class="ie-item">
                 <div class="ie-x">✗</div>
-                <div class="ie-text"><?= o5e($item) ?></div>
+                <div class="ie-text"><?= nl2br(o5e($item)) ?></div>
               </div>
             <?php endforeach; ?>
           </div>

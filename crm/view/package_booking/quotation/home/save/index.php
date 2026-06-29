@@ -53,7 +53,7 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
     </ul>
 </div>
 
-<div class="bk_tabs bg-white">
+<div class="bk_tabs bg-white" >
     <div id="tab1" class="bk_tab active">
         <?php include_once("tab1.php"); ?>
 

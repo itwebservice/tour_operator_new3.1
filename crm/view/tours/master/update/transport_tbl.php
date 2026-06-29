@@ -18,7 +18,7 @@
 			if($sq_transport_count==0){
 				?>
                 <tr>
-                    <td><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
+                    <td><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" autocomplete="off"><label for="chk_transport1"></label></td>
                     <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
                     <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2">
                             <option value="">Select Vehicle</option>

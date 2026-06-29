@@ -496,6 +496,7 @@ body.cover-b .cv-b{ display:flex; }
 .ie--ex h3 .b{ background:#f6eaea; color:#b24a45; }
 .ie ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
 .ie li{ display:flex; align-items:flex-start; gap:9px; font-size:11px; color:var(--ink-soft); line-height:1.35; }
+.ie li span{ flex:1; min-width:0; line-height:1.5; }
 .ie li svg{ width:15px;height:15px;flex:0 0 auto;margin-top:1px; }
 .ie--in li svg{ color:#2f7d4f; }
 .ie--ex li svg{ color:#b24a45; }

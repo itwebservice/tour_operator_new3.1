@@ -97,12 +97,56 @@ if (!function_exists('o8_guest_label')) {
     return $parts ? implode(', ', $parts) : o8nv($ov['guest_count'], '-');
   }
 }
+if (!function_exists('o8_list_item_text')) {
+  function o8_list_item_text($html)
+  {
+    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = str_replace("\xC2\xA0", ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim($text);
+  }
+}
 if (!function_exists('o8_split_lines')) {
   function o8_split_lines($html, $fallback = array())
   {
-    $text = trim(strip_tags(str_replace(array('<br>', '<br/>', '<br />', '</p>', '</li>'), "\n", (string) $html)));
-    $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
-    $items = array_values(array_filter(array_map('trim', (array) $items)));
+    $html = (string) $html;
+    $items = array();
+
+    if (trim($html) === '') {
+      return $fallback;
+    }
+
+    if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o8_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o8_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items)) {
+      $plain = o8_list_item_text($html);
+      $parts = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $plain);
+      foreach ((array) $parts as $part) {
+        $text = trim($part);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
     return $items ? $items : $fallback;
   }
 }
@@ -796,7 +840,7 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                     height="20"
                     fill="currentColor">
                     <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.2 0z" />
-                  </svg><?= o8e($item) ?></li>
+                  </svg><span><?= nl2br(o8e($item)) ?></span></li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -810,7 +854,7 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                     height="20"
                     fill="currentColor">
                     <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                  </svg> <?= o8e($item) ?></li>
+                  </svg><span><?= nl2br(o8e($item)) ?></span></li>
               <?php endforeach; ?>
             </ul>
           </div>

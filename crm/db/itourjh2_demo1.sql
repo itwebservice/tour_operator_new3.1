@@ -11366,6 +11366,56 @@ INSERT INTO `visa_vendor` (`vendor_id`, `vendor_name`, `email_id`, `contact_pers
 /*!40000 ALTER TABLE `visa_vendor` ENABLE KEYS */;
 UNLOCK TABLES;
 
+-- Migration: group tour transport entries (Travel & Tours >> Group Tour)
+-- Run once on databases that do not have tour_groups_transport.
+
+CREATE TABLE IF NOT EXISTS `tour_groups_transport` (
+  `entry_id` int(11) NOT NULL AUTO_INCREMENT,
+  `tour_id` int(11) NOT NULL,
+  `vehicle_name` varchar(255) NOT NULL DEFAULT '',
+  `pickup` varchar(500) NOT NULL DEFAULT '',
+  `pickup_type` varchar(50) NOT NULL DEFAULT '',
+  `drop_location` varchar(500) NOT NULL DEFAULT '',
+  `drop_type` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`entry_id`),
+  KEY `tour_id` (`tour_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `quotation_testimonial` (
+  `testimonial_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT '',
+  `designation` varchar(255) DEFAULT '',
+  `review` text,
+  `photo` varchar(500) DEFAULT '',
+  `active_flag` varchar(20) DEFAULT 'Active',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`testimonial_id`)
+);
+
+-- Migration: group tour booking transport details
+-- Run once on existing databases (e.g. itourjh2_demo1) where this table is missing.
+-- Required for Sales >> Group Tour booking save, update, and view.
+
+CREATE TABLE IF NOT EXISTS `group_tour_booking_transport_entries` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `traveler_group_id` int(11) NOT NULL,
+  `tour_id` int(11) NOT NULL DEFAULT 0,
+  `vehicle_name` int(11) NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `pickup` varchar(500) NOT NULL,
+  `pickup_type` varchar(50) NOT NULL,
+  `drop_location` varchar(500) NOT NULL,
+  `drop_type` varchar(50) NOT NULL,
+  `package_id` int(11) NOT NULL DEFAULT 0,
+  `vehicle_count` varchar(50) DEFAULT NULL,
+  `service_duration` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_traveler_group_id` (`traveler_group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
 --
 -- Dumping events for database 'itourjh2_demo1'
 --

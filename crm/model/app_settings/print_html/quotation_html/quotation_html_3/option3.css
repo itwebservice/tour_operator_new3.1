@@ -394,7 +394,8 @@
     .inc-badge { background: var(--gold); color: var(--navy); }
     .exc-badge { background: var(--red-x); color: var(--white); }
     .inc-list, .exc-list { list-style: none; }
-    .inc-list li, .exc-list li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-mid); padding: 5px 0; border-bottom: 1px solid var(--off-white); }
+    .inc-list li, .exc-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-mid); padding: 5px 0; border-bottom: 1px solid var(--off-white); }
+    .inc-list li .item-text, .exc-list li .item-text { flex: 1; min-width: 0; line-height: 1.5; }
     .inc-list li:last-child, .exc-list li:last-child { border-bottom: none; }
     .chk-icon { color: var(--green-chk); font-size: 15px; }
     .x-icon { color: var(--red-x); font-size: 15px; font-weight: 700; }

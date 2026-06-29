@@ -81,12 +81,56 @@ if (!function_exists('o3_guest_label')) {
     return $parts ? implode(', ', $parts) : o3nv($ov['guest_count'], '-');
   }
 }
+if (!function_exists('o3_list_item_text')) {
+  function o3_list_item_text($html)
+  {
+    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = str_replace("\xC2\xA0", ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim($text);
+  }
+}
 if (!function_exists('o3_split_lines')) {
   function o3_split_lines($html, $fallback = array())
   {
-    $text = trim(strip_tags(str_replace(array('<br>', '<br/>', '<br />', '</p>', '</li>'), "\n", (string) $html)));
-    $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
-    $items = array_values(array_filter(array_map('trim', (array) $items)));
+    $html = (string) $html;
+    $items = array();
+
+    if (trim($html) === '') {
+      return $fallback;
+    }
+
+    if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o3_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
+      foreach ($matches[1] as $chunk) {
+        $text = o3_list_item_text($chunk);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
+    if (empty($items)) {
+      $plain = o3_list_item_text($html);
+      $parts = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $plain);
+      foreach ((array) $parts as $part) {
+        $text = trim($part);
+        if ($text !== '') {
+          $items[] = $text;
+        }
+      }
+    }
+
     return $items ? $items : $fallback;
   }
 }
@@ -877,7 +921,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </div>
         <ul class="inc-list">
           <?php foreach ($o3_included as $item) : ?>
-            <li><span class="chk-icon">✅</span> <?= o3e($item) ?></li>
+            <li><span class="chk-icon">✅</span><span class="item-text"><?= nl2br(o3e($item)) ?></span></li>
           <?php endforeach; ?>
         </ul>
       </div>
@@ -887,7 +931,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </div>
         <ul class="exc-list">
           <?php foreach ($o3_excluded as $item) : ?>
-            <li><span class="x-icon">✗</span> <?= o3e($item) ?></li>
+            <li><span class="x-icon">✗</span><span class="item-text"><?= nl2br(o3e($item)) ?></span></li>
           <?php endforeach; ?>
         </ul>
       </div>
