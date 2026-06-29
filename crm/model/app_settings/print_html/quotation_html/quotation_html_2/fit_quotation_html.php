@@ -82,15 +82,37 @@ if (!function_exists('o2img')) {
     return (is_string($url) && trim($url) !== '' && stripos($url, 'dummy') === false) ? $url : $fallback;
   }
 }
+// if (!function_exists('o2_list_items')) {
+//   function o2_list_items($html, $fallback)
+//   {
+//     $text = trim(strip_tags((string) $html));
+//     $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
+//     $items = array_values(array_filter(array_map('trim', (array) $items)));
+//     return !empty($items) ? $items : array($fallback);
+//   }
+// }
+
 if (!function_exists('o2_list_items')) {
   function o2_list_items($html, $fallback)
   {
-    $text = trim(strip_tags((string) $html));
+    $html = (string)$html;
+
+    // li / br / p close tag কে line break বানাও
+    $html = preg_replace('/<\/li\s*>/i', "\n", $html);
+    $html = preg_replace('/<br\s*\/?>/i', "\n", $html);
+    $html = preg_replace('/<\/p\s*>/i', "\n", $html);
+
+    $text = trim(strip_tags($html));
+    $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
     $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
-    $items = array_values(array_filter(array_map('trim', (array) $items)));
+    $items = array_values(array_filter(array_map('trim', $items)));
+
     return !empty($items) ? $items : array($fallback);
   }
 }
+
+
 if (!function_exists('o2_stars')) {
   function o2_stars($rating)
   {
@@ -875,12 +897,17 @@ $o2_round = o2img(
                 </svg>
               </span> What's Included</h3>
             <ul>
-              <?php foreach (o2_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.') as $item): ?>
-                <li><svg width="16" height="16" viewBox="0 0 24 24"
+              
+              <?php 
+              foreach (o2_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.') as $item): ?>
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 6 9 17l-5-5"></path>
-                  </svg> <?= o2e($item) ?></li>
+                  </svg>
+                  <?= o2e($item) ?>
+                </li>
               <?php endforeach; ?>
             </ul>
           </div>
@@ -905,6 +932,8 @@ $o2_round = o2img(
             </ul>
           </div>
         </div>
+
+
         <div style="margin-top:6mm">
           <?php
           $o2_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
@@ -1140,7 +1169,7 @@ $o2_round = o2img(
     </section>
 
     <!-- TESTIMONIALS -->
-    <section class="page<?= count($testimonials) > 2 ? ' page-flow' : '' ?>">
+    <section class="page testimonial-page<?= count($testimonials) > 2 ? ' page-flow' : '' ?>">
       <?php o2_strip('Loved by Travellers', 'Their Words', o2e($o2_google_rating) . ' ★ <b>Rated</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">
@@ -1188,7 +1217,7 @@ $o2_round = o2img(
     </section>
 
     <!-- TERMS -->
-    <section class="page page-flow">
+    <section class="page page-flow terms-page">
       <?php o2_strip('Please Read Carefully', 'Terms', '&amp; <b>Conditions</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">

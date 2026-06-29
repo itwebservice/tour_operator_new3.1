@@ -1106,7 +1106,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
     <?php o5_render_page_header_strip($hero, 'Traveller Reviews'); ?>
 
     <!-- REVIEWS -->
-    <div class="page-section">
+    <div class="page-section print-section">
       <div class="sec-head">
         <h2>What Our Travellers Say</h2>
       </div>
@@ -1192,7 +1192,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
     <?php o5_render_page_header_strip($hero, 'Terms & Conditions'); ?>
 
     <!-- TERMS -->
-    <div class="page-section">
+    <div class="page-section print-section">
       <div class="sec-head">
         <h2><?= o5e(o5nv($terms['title'], 'Terms & Conditions')) ?></h2>
       </div>

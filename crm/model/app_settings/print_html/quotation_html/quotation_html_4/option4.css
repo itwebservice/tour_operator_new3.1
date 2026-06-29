@@ -45,8 +45,6 @@ body {
 
 /* â”€â”€ PAGE WRAPPER â”€â”€ */
 .doc {
-  /* width: 700px;
-  margin: 30px auto; */
   background: var(--white);
   box-shadow: 0 4px 40px rgba(0, 0, 0, 0.18);
 }
@@ -54,14 +52,6 @@ body {
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    COVER PAGE
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-/* .cover{
-  position:relative;
-  height:780px;
-  background:
-    linear-gradient(to bottom,rgba(10,22,50,.35) 0%,rgba(10,22,50,.55) 50%,rgba(10,22,50,.92) 100%),
-    url('https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=700&q=85') center/cover no-repeat;
-  display:flex;flex-direction:column;justify-content:space-between;
-} */
 
 /* ========== Dipti */
 .cover {
@@ -266,7 +256,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 28px;
+  padding: 18px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--white);
 }
@@ -277,19 +267,10 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
 }
-/* .page-num {
-  text-align: right;
-  padding: 10px 28px;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border);
-  margin-top: auto;
-} */
+
 .page-num {
   text-align: right;
-  padding: 10px 28px;
+  padding: 5px 28px;
   font-size: 9px;
   font-weight: 500;
   letter-spacing: 1.5px;
@@ -329,7 +310,7 @@ body {
    PAGE 2 â€“ OVERVIEW
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .page-section {
-  padding: 32px 28px;
+  padding: 10px 20px;
   background: var(--white);
 }
 .page-section + .page-section {
@@ -1031,7 +1012,7 @@ body {
   gap: 8px;
   font-size: 12px;
   color: var(--text-mid);
-  padding: 5px 0;
+  padding: 3px 0;
   border-bottom: 1px solid var(--bg2);
 }
 .ie-list li:last-child {
@@ -1339,12 +1320,7 @@ body {
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PAGE 9 â€“ T&C
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-/* .tnc-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-} */
+
 .tnc-card {
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1399,8 +1375,6 @@ body {
    THANK YOU PAGE
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .ty-page {
-  /* position: relative;
-  min-height: 680px; */
   background:
     linear-gradient(
       to bottom,
@@ -1410,8 +1384,6 @@ body {
     ),
     url('https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=700&q=80') center/cover
       no-repeat;
-  /* display: flex;
-  flex-direction: column; */
 }
 .ty-top {
   padding: 22px 28px;
@@ -1433,6 +1405,7 @@ body {
   align-items: center;
   gap: 14px;
   justify-content: center;
+  margin-top: 50px;
   margin-bottom: 14px;
 }
 .ty-line {
@@ -1624,11 +1597,9 @@ body {
 .tnc-list h4,
 .tnc-list b,
 .tnc-list strong {
-  /* display:block; */
-  font-size: 23px;
+  font-size: 15px;
   font-weight: 700;
   color: #080839;
-  /* margin:10px 0 8px; */
   margin-bottom: 15px;
   line-height: 0;
 }
@@ -1640,7 +1611,7 @@ body {
 
 .tnc-list li {
   margin-bottom: 8px;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.2;
   margin-top: 10px;
 }
@@ -1656,10 +1627,7 @@ body {
   margin-bottom: 8px;
   content: '';
 }
-/* .ty-page{
-    page-break-after: auto !important;
-    break-after: auto !important;
-} */
+
 @media print {
   *,
   *::before,
@@ -1675,15 +1643,10 @@ body {
     margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
-    /* background: #fff !important;
-    margin: 0 !important;
-    padding: 0 !important; */
   }
   .doc {
-    /* width: 100% !important; */
     width: 210mm !important;
     padding: 0 !important;
-    /* max-width: 210mm !important; */
     margin: 0 !important;
     box-shadow: none !important;
     overflow: visible !important;
@@ -1735,8 +1698,6 @@ body {
     page-break-inside: avoid !important;
   }
   .ty-page {
-    /* position: relative !important; */
-
     width: 210mm !important;
     height: 297mm !important;
     min-height: 297mm !important;
@@ -1744,9 +1705,6 @@ body {
 
     margin: 0 !important;
     padding: 0 !important;
-
-    /* display: flex !important;
-    flex-direction: column !important; */
 
     box-sizing: border-box !important;
     overflow: hidden !important;
@@ -1770,16 +1728,13 @@ body {
     flex-direction: column !important;
     justify-content: center !important;
   }
-
   .ty-bottom {
     margin-top: 80px !important;
     padding: 0 12mm 12mm !important;
   }
-
   .ty-page + * {
     display: none !important;
   }
-
   .ty-contact-card {
     margin: 0 !important;
   }
@@ -1798,11 +1753,28 @@ body {
   img {
     max-width: 100% !important;
   }
-}
 
+  .pdf-page {
+    display: block !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  .pdf-page .page-header {
+    margin: 0 !important;
+    page-break-before: auto !important;
+    break-before: auto !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+}
 @page {
   size: A4 portrait;
-  /* margin: 8mm; */
   margin: 0 !important;
   padding: 0 !important;
 }

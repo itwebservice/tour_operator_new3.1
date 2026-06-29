@@ -216,7 +216,7 @@ body.header-b .strip__content {
   position: relative;
   z-index: 2;
   margin-top: auto;
-  padding: 6mm var(--pad) 6mm;
+  padding: 2mm var(--pad) 6mm;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1171,7 +1171,7 @@ body.cover-b .cv-b {
 .itin {
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 8px;
 }
 .iday {
   display: flex;
@@ -1224,14 +1224,14 @@ body.cover-b .cv-b {
   backdrop-filter: blur(3px);
 }
 .iday__b {
-  padding: 13px 17px 15px;
+  padding: 13px 17px 10px;
 }
 .iday__attr {
   font-family: var(--serif);
   font-weight: 700;
-  font-size: 17px;
+  font-size: 15px;
   color: var(--navy);
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -1274,8 +1274,8 @@ body.cover-b .cv-b {
   padding: 10px 14px;
 }
 .ichip .b {
-  width: 34px;
-  height: 34px;
+  width: 24px;
+  height: 24px;
   border-radius: 9px;
   display: flex;
   align-items: center;
@@ -1340,6 +1340,22 @@ body.cover-b .cv-b {
 .ie {
   padding: 14px 16px;
 }
+
+.ie li {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-bottom: 7px;
+  line-height: 1.45;
+}
+
+.ie li svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  margin-top: 2px;
+}
+
 .ie h3 {
   font-family: var(--serif);
   font-weight: 700;
@@ -2139,11 +2155,19 @@ img {
   break-before: page !important;
   page-break-before: always !important;
 }
+.testimonial-page{
+  break-before: page !important;
+  page-break-before: always !important;
+}
 .inclusion-page {
     page-break-before: always !important;
     break-before: page !important;
   }
 .payment-page {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+.terms-page {
     page-break-before: always !important;
     break-before: page !important;
   }
@@ -2221,20 +2245,6 @@ img {
     font-size: 13px;
   }
 
-  /* html,
-  body,
-  .page,
-  .page__body,
-  .foot {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-  }
-
-  :root {
-    --cream: #ffffff !important;
-    --cream-deep: #ffffff !important;
-  } */
-
   /* ================= */
   .page:last-child {
     break-after: auto;
@@ -2266,4 +2276,5 @@ img {
     break-inside: avoid;
     page-break-inside: avoid;
   }
+
 }

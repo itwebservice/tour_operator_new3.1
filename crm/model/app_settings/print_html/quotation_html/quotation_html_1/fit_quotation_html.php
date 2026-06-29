@@ -1806,13 +1806,13 @@ function o1_flight_date($v)
               </tbody>
             </table>
           <?php } ?>
-        </div>
-        <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
-        <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-          <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
-          <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
-          <span>05<!-- --> / 09</span>
-        </div>
+          </div>
+          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
+          <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
+            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+            <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
+            <span>05<!-- --> / 09</span>
+          </div>
     </section>
     <section class="page print-section" style="--wm-url:url(assets/globe-watermark.png)">
       <div class="watermark" style="background-image:url(assets/globe-watermark.png)">
@@ -2929,8 +2929,6 @@ function o1_flight_date($v)
 
             <!-- =========================== Dipti -->
             <div class="flex gap-2 mt-4">
-              <!-- <pre><? //php print_r($social_links); 
-                        ?></pre> -->
 
               <?php if (!empty($social_links['instagram'])) { ?>
                 <a href="<?= o1e($social_links['instagram']) ?>" style="text-decoration:none; display:inline-block;">
@@ -2989,43 +2987,6 @@ function o1_flight_date($v)
 
             </div>
             <!-- ============================= -->
-
-            <!-- <div class="flex gap-2 mt-4">
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram w-3.5 h-3.5" aria-hidden="true">
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5">
-                  </rect>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z">
-                  </path>
-                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5">
-                  </line>
-                </svg>
-              </div>
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook w-3.5 h-3.5" aria-hidden="true">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z">
-                  </path>
-                </svg>
-              </div>
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin w-3.5 h-3.5" aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
-                  </path>
-                  <rect width="4" height="12" x="2" y="9">
-                  </rect>
-                  <circle cx="4" cy="4" r="2">
-                  </circle>
-                </svg>
-              </div>
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube w-3.5 h-3.5" aria-hidden="true">
-                  <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17">
-                  </path>
-                  <path d="m10 15 5-3-5-3z">
-                  </path>
-                </svg>
-              </div>
-            </div> -->
           </div>
           <div class="rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy);box-shadow:var(--shadow-card)">
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Prepared By</div>
@@ -3041,8 +3002,7 @@ function o1_flight_date($v)
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
                   <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
                   </path>
-                </svg> <? //= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) 
-                        ?>
+                </svg>
                 <a href="tel:<?= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) ?>">
                   <?= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) ?>
                 </a>
