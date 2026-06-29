@@ -74,11 +74,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width:210mm;
-    height:297mm;
+  width: 210mm;
+  height: 297mm;
 
-    min-height:297mm;
-    max-height:297mm;
+  min-height: 297mm;
+  max-height: 297mm;
   /* padding: 30px 40px 40px; */
   position: relative;
   overflow: hidden;
@@ -95,7 +95,9 @@ body {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 28px;
+  margin-bottom: 60px;
+  margin-top: 30px;
+  margin-left: 30px;
   position: relative;
   z-index: 2;
 }
@@ -125,13 +127,14 @@ body {
   font-style: italic;
   font-size: 16px;
   color: var(--gold2);
+  margin-right: 30px;
 }
 
 .cover-icons-row {
   display: flex;
   gap: 20px;
   justify-content: center;
-  margin-bottom: 28px;
+  margin-bottom: 38px;
   position: relative;
   z-index: 2;
 }
@@ -154,7 +157,7 @@ body {
   color: var(--gold2);
 }
 .cover-icon-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.8);
 }
@@ -168,11 +171,11 @@ body {
 .cover-singapore {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 72px;
-  font-weight: 700;
+  font-size: 92px;
+  font-weight: 730;
   color: var(--white);
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .cover-package-row {
   display: flex;
@@ -208,14 +211,15 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
-  width: 100%;
-  margin-bottom: 20px;
+  width: 95%;
+  margin-bottom: 40px;
   position: relative;
   z-index: 2;
+  margin-top: 140px;
 }
 .cover-img-grid img {
   width: 100%;
-  height: 130px;
+  height: 155px;
   object-fit: cover;
   border-radius: 12px;
 }
@@ -224,7 +228,7 @@ body {
   display: flex;
   gap: 16px;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 34px;
   position: relative;
   z-index: 2;
 }
@@ -250,14 +254,14 @@ body {
   z-index: 2;
 }
 .cover-for-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--gold2);
   margin-bottom: 4px;
 }
 .cover-for-name {
   font-family: 'Playfair Display', serif;
-  font-size: 38px;
+  font-size: 39px;
   font-weight: 700;
   color: var(--white);
 }
@@ -1529,23 +1533,27 @@ body {
   color: var(--navy);
 }
 .tnc-list {
-  list-style: none;
+  margin: 8px 0 0 18px;
+  padding: 0;
+  padding-left: 20px;
 }
+
 .tnc-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--slate);
-  padding: 4px 0;
-  line-height: 1.5;
+  list-style: disc;
+  margin-bottom: 6px;
+  line-height: 1.45;
 }
-.tnc-list li::before {
+
+.tnc-list-text {
+  line-height: 1.45;
+  margin-top: 8px;
+}
+/* .tnc-list li::before {
   content: 'â€º';
   color: var(--gold2);
   font-weight: 700;
   flex-shrink: 0;
-}
+} */
 .tnc-special {
   border-radius: 12px;
   padding: 14px 18px;
@@ -1664,11 +1672,11 @@ body {
 .ty-page {
   position: relative;
   /* min-height: 700px; */
-  width:210mm;
-    height:297mm;
+  width: 210mm;
+  height: 297mm;
 
-    min-height:297mm;
-    max-height:297mm;
+  min-height: 297mm;
+  max-height: 297mm;
   background:
     linear-gradient(rgba(15, 32, 68, 0.72), rgba(15, 32, 68, 0.82)),
     url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=780&q=80') center/cover
@@ -1714,14 +1722,14 @@ body {
 .ty-script {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 58px;
+  font-size: 78px;
   font-weight: 700;
   color: var(--gold2);
   line-height: 1;
   margin-bottom: 16px;
 }
 .ty-sub {
-  font-size: 14px;
+  font-size: 15.5px;
   color: rgba(255, 255, 255, 0.75);
   max-width: 420px;
   line-height: 1.7;
@@ -1755,7 +1763,7 @@ body {
 }
 .ty-stat-num {
   font-family: 'Playfair Display', serif;
-  font-size: 28px;
+  font-size: 38px;
   font-weight: 700;
   color: var(--gold2);
   line-height: 1;
@@ -1764,7 +1772,7 @@ body {
   color: var(--gold2);
 }
 .ty-stat-lbl {
-  font-size: 11px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.55);
   margin-top: 3px;
 }
@@ -1841,10 +1849,10 @@ body {
 }
 .phs-logo .company-logo-img {
   max-height: 34px;
-  filter: brightness(0) invert(1);
+  /* filter: brightness(0) invert(1); */
 }
 .cover-nav .company-logo-img {
-  max-height: 44px;
+  max-height: 48px;
 }
 .ty-top .company-logo-img {
   max-height: 42px;
@@ -1907,6 +1915,18 @@ body {
     break-before: page;
     /* min-height: 260mm; */
   }
+
+  .print-section,
+  .payment-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-section {
+    display: block !important;
+    margin-bottom: 14px !important;
+  }
+
   img {
     max-width: 100% !important;
   }

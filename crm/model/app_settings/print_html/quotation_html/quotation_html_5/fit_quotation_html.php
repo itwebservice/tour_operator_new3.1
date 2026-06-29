@@ -39,7 +39,7 @@ $o5_cfg       = array();
 
 $testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
   ? $q['testimonials'] : array();
-  
+
 if (!function_exists('o5e')) {
   function o5e($v)
   {
@@ -186,7 +186,8 @@ if (!function_exists('o5_render_page_header_strip')) {
         <?php else : ?>
           <div class="phs-logo-icon">✈</div>
         <?php endif; ?>
-        <div class="phs-logo-name"><?= o5e($name) ?></div>
+        <!-- <div class="phs-logo-name"><? //= o5e($name) 
+                                        ?></div> -->
       </div>
       <?php if ($badge) : ?>
         <span class="phs-pkg-badge"><?= o5e(strtoupper($right_label)) ?></span>
@@ -352,7 +353,8 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
           <?php else : ?>
             <div class="cover-logo-icon">✈</div>
           <?php endif; ?>
-          <div class="cover-logo-name"><?= o5e($o5_company) ?></div>
+          <!-- <div class="cover-logo-name"><? //= o5e($o5_company) 
+                                            ?></div> -->
         </div>
         <div class="cover-tagline-right">Discover Extraordinary Experiences</div>
       </div>
@@ -808,7 +810,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
     <?php o5_render_page_header_strip($hero, 'Day Wise Itinerary'); ?>
 
     <!-- ITINERARY -->
-    <div class="page-section">
+    <div class="page-section print-section">
       <div class="sec-head">
         <h2>Day Wise Itinerary</h2>
       </div>
@@ -1096,23 +1098,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
         </div>
       </div>
 
-      <div class="cancel-box">
-        <div class="cancel-head">✗ Cancellation Policy</div>
-        <div class="cancel-grid">
-          <?php foreach (array_slice($o5_cancel_notes, 0, 3) as $cn) :
-            $period = $cn;
-            $fee = '';
-            if (strpos($cn, ':') !== false) {
-              list($period, $fee) = array_map('trim', explode(':', $cn, 2));
-            }
-          ?>
-            <div class="cancel-item">
-              <div class="ci-period"><?= o5e($period) ?></div>
-              <?php if ($fee !== '') : ?><div class="ci-fee"><?= o5e($fee) ?></div><?php endif; ?>
-            </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
+
     </div>
 
     <hr class="page-divider" />
@@ -1212,6 +1198,35 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
       </div>
 
       <div class="tnc-grid">
+        <?php
+        $o5_terms_html = isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '';
+        $o5_terms_html = str_replace(array("\r", "\n"), '', $o5_terms_html);
+
+        $o5_term_cards = array();
+
+        preg_match_all('/<b[^>]*>(.*?)<\/b>\s*<br\s*\/?>(.*?)(?=<span[^>]*>\s*<br>\s*<b|<div><span[^>]*>\s*<b|<b[^>]*>|$)/is', $o5_terms_html, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $i => $m) {
+          $title = trim(strip_tags($m[1]));
+          $title = trim($title, " :\t\n\r\0\x0B");
+
+          $body = trim($m[2]);
+
+          if (preg_match('/<ul[^>]*>(.*?)<\/ul>/is', $body, $ul_match)) {
+            $body = '<ul class="tnc-list">' . $ul_match[1] . '</ul>';
+          } else {
+            $body = '<div class="tnc-list-text">' . strip_tags($body, '<br>') . '</div>';
+          }
+
+          if ($title != '') {
+            $o5_term_cards[] = array(
+              'num' => $i + 1,
+              'title' => $title,
+              'body' => $body
+            );
+          }
+        }
+        ?>
         <?php if (!empty($o5_term_cards)) :
           foreach ($o5_term_cards as $card) : ?>
             <div class="tnc-card">
@@ -1219,11 +1234,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
                 <div class="tnc-num"><?= o5e($card['num']) ?></div>
                 <div class="tnc-title"><?= o5e($card['title']) ?></div>
               </div>
-              <ul class="tnc-list">
-                <?php foreach ($card['items'] as $line) : ?>
-                  <li><?= o5e($line) ?></li>
-                <?php endforeach; ?>
-              </ul>
+              <?= $card['body'] ?>
             </div>
           <?php endforeach;
         else : ?>
@@ -1239,20 +1250,9 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
         <?php endif; ?>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-        <div class="tnc-special red">
-          <div class="sp-head">🚫 Force Majeure</div>
-          <p>Company shall not be liable for any failure or delay due to circumstances beyond control including natural disasters, war, government actions, pandemics, or strikes.</p>
-        </div>
-        <div class="tnc-special teal">
-          <div class="sp-head">🛡️ Travel Insurance</div>
-          <p>We strongly recommend comprehensive travel insurance covering medical emergencies, trip cancellation, baggage loss, and personal liability. Insurance can be arranged upon request.</p>
-        </div>
-      </div>
-
-      <div class="tnc-footer-note">
+      <!-- <div class="tnc-footer-note">
         📄 By confirming this booking, the client agrees to all the above terms and conditions and authorizes <strong><?= o5e($o5_company) ?></strong> to process payments and make necessary arrangements for the tour.
-      </div>
+      </div> -->
     </div>
 
     <!-- THANK YOU -->
@@ -1264,7 +1264,8 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
           <?php else : ?>
             <div class="ty-logo-icon">✈</div>
           <?php endif; ?>
-          <div class="ty-logo-name"><?= o5e($o5_company) ?></div>
+          <!-- <div class="ty-logo-name"><? //= o5e($o5_company) 
+                                          ?></div> -->
         </div>
       </div>
 

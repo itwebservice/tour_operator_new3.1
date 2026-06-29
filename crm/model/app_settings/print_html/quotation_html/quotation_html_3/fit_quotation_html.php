@@ -41,7 +41,7 @@ $testimonials = array();
 // }
 $testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
   ? $q['testimonials'] : array();
-  
+
 if (!function_exists('o3e')) {
   function o3e($v)
   {
