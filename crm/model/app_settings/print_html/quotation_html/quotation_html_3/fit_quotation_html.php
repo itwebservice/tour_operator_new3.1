@@ -193,8 +193,8 @@ if (!function_exists('o3_render_page_header')) {
           </svg>
         <?php endif; ?>
         <div class="pl-text">
-          <div class="freeze"><?= o3e($b1) ?></div>
-          <div class="mtrip"><?= o3e($b2) ?></div>
+          <!-- <div class="freeze"><?//= o3e($b1) ?></div>
+          <div class="mtrip"><?//= o3e($b2) ?></div> -->
           <div class="pl-tag">—Journey Beyond Dreams—</div>
         </div>
       </div>
