@@ -116,6 +116,7 @@ body {
   max-height: 48px;
   max-width: 140px;
   object-fit: contain;
+  margin: 20px;
 }
 .cover-logo {
   margin-top: 34px;
@@ -166,11 +167,12 @@ body {
 }
 .cover-title-block .main-title {
   font-family: 'Cinzel', serif;
-  font-size: 72px;
+  font-size: 68px;
   font-weight: 700;
   color: var(--white);
   letter-spacing: 5px;
   line-height: 1;
+  margin-top: 50px;
   text-shadow: 0 3px 20px rgba(0, 0, 0, 0.6);
 }
 .cover-title-block .sub-title {
@@ -179,7 +181,7 @@ body {
   font-weight: 600;
   color: var(--white);
   letter-spacing: 8px;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 .cover-title-block .discover {
   font-family: 'Playfair Display', serif;
@@ -192,7 +194,7 @@ body {
 .cover-icons {
   display: flex;
   gap: 22px;
-  margin: 18px 0 26px;
+  margin: 38px 0 26px;
   justify-content: center;
 }
 .cover-icon-item {
@@ -224,9 +226,10 @@ body {
 /* ================= Dipti */
 .cover-strip {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   padding: 10px 14px;
-  background: #001a44;
+  /* background: #001a44; */
+  margin-top: 380px;
 }
 
 .cover-strip-item {
@@ -238,7 +241,7 @@ body {
 }
 
 .cover-strip-item img {
-  width: 100%;
+  width: 150mm;
   height: 100%;
   object-fit: cover;
   display: block;
@@ -1432,8 +1435,8 @@ body {
 
 .terms-content-icons li {
   display: list-item !important;
-  font-size: 13px !important;
-  line-height: 1.3 !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
   color: var(--text-mid) !important;
 }
 
@@ -1637,10 +1640,10 @@ body {
 .ty-contact-label {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .ty-contact-value {
   font-size: 14px;
@@ -1790,8 +1793,24 @@ body {
   /* ==== Dipti */
 
   .itinerary-page {
-    page-break-before: always;
-    break-before: page;
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .payment-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .inclusion-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .testimonial-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .terms-page {
+    page-break-before: always !important;
+    break-before: page !important;
   }
 
   .day-card {
@@ -1831,6 +1850,19 @@ body {
     height: 297mm !important;
     min-height: 297mm !important;
     overflow: hidden !important;
+  }
+
+  .flight-page-break {
+    display: block !important;
+    border: 0 !important;
+    margin: 0 !important;
+    height: 0 !important;
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+
+  .flight-section {
+    padding-top: 28px !important;
   }
   /* ===================== */
 }

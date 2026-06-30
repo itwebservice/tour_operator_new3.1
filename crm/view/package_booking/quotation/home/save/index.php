@@ -318,12 +318,17 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
     function get_excursion_list(id) {
         var city_id = $("#" + id).val();
         var base_url = $('#base_url').val();
+        var count = id.replace(/^city_name-/, '');
+        var $excursion = $("#excursion-" + count);
 
-        var count = id.substring(10);
         $.post(base_url + "view/package_booking/quotation/home/excursion_name_load.php", {
             city_id: city_id
         }, function(data) {
-            $("#excursion-" + count).html(data);
+            if ($excursion.data('select2')) {
+                $excursion.select2('destroy');
+            }
+            $excursion.empty().html(data);
+            $excursion.select2({ width: '150px' });
         });
     }
 
@@ -347,8 +352,8 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
 
             var row = table.rows[i];
             var exc_date = row.cells[2].childNodes[0].value;
-            var exc = row.cells[4].childNodes[0].value;
-            var transfer = row.cells[5].childNodes[0].value;
+            var exc = $(row.cells[4].childNodes[0]).val() || '';
+            var transfer = $(row.cells[5].childNodes[0]).val() || '';
 
             var total_adult = row.cells[6].childNodes[0].value;
             var total_children = row.cells[7].childNodes[0].value;

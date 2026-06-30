@@ -17,7 +17,7 @@ include 'crm/model/app_settings/dropdown_master.php';
 $servername = "localhost";
 $username = "root";
 $password = "";
-$db_name = "tour_operator_new_2_2";
+$db_name = "itours_latest";
 
 // $db_name = "tour_operator_theme";
 global $connection;
@@ -30,8 +30,8 @@ if (!$connection) {
 }
 
 
-define('BASE_URL', 'http://localhost/tour_operator_new3.1-29-06-2026/crm/');   
-define('BASE_URL_B2C', 'http://localhost/tour_operator_new3.1-29-06-2026/');
+define('BASE_URL', 'http://localhost/tour_operator_new3.1/crm/');   
+define('BASE_URL_B2C', 'http://localhost/tour_operator_new3.1/');
 mysqli_query($connection, "SET SESSION sql_mode = ''");
 
 

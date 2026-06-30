@@ -361,7 +361,14 @@ public function excursion_entries_save($quotation_id_arr,$city_name_arr_e, $excu
 	for ($i = 0; $i < sizeof($quotation_id_arr); $i++) {
 		for ($j = 0; $j < sizeof($city_name_arr_e); $j++) {
 			$city_name = intval($city_name_arr_e[$j]);
-			$excursion_name = addslashes(trim((string)($excursion_name_arr[$j] ?? '')));
+			$excursion_name = trim((string)($excursion_name_arr[$j] ?? ''));
+			if ($excursion_name !== '' && !ctype_digit($excursion_name)) {
+				$sq_exc_lookup = mysqli_fetch_assoc(mysqlQuery("select entry_id from excursion_master_tariff where excursion_name='" . addslashes($excursion_name) . "' limit 1"));
+				if ($sq_exc_lookup) {
+					$excursion_name = (string)$sq_exc_lookup['entry_id'];
+				}
+			}
+			$excursion_name = addslashes($excursion_name);
 			if ($city_name <= 0 || $excursion_name === '') {
 				continue;
 			}

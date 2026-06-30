@@ -992,6 +992,21 @@ if (input) {
         try { $('#btn_quotation_save').button('reset'); } catch (e) {}
     }
 
+    function getExcursionRowValue(row, cellIndex) {
+        if (!row || !row.cells || !row.cells[cellIndex]) {
+            return '';
+        }
+        var input = row.cells[cellIndex].querySelector('input, select, textarea');
+        if (!input) {
+            return '';
+        }
+        var $input = $(input);
+        if ($input.data('select2')) {
+            return $input.val() || '';
+        }
+        return input.value || '';
+    }
+
     function initQuotationSaveForm() {
         if ($('#currency_code').length && !$('#currency_code').data('select2')) {
             $('#currency_code').select2();
@@ -1533,21 +1548,17 @@ if (input) {
                 if (!$checkbox.prop('checked')) {
                     continue;
                 }
-                var exc_date = row.cells[2].childNodes[0].value;
-                var city_name = $(row.cells[3].childNodes[0]).val() || '';
-                var excursion_name = $(row.cells[4].childNodes[0]).val() || '';
-                var transfer_option = $(row.cells[5].childNodes[0]).val() || '';
-                var adults = row.cells[6].childNodes[0].value || 0;
-                var chwb = row.cells[7].childNodes[0].value || 0;
-                var chwob = row.cells[8].childNodes[0].value || 0;
-                var infant = row.cells[9].childNodes[0].value || 0;
-                var excursion_amount = (row.cells[10] && row.cells[10].childNodes[0]) ? (row.cells[10].childNodes[0].value || 0) : 0;
-                var vehicle_id = '';
-                if (row.cells[15] && row.cells[15].childNodes[0]) {
-                    var $vehicleSelect = $(row.cells[15].childNodes[0]);
-                    vehicle_id = $vehicleSelect.data('select2') ? ($vehicleSelect.val() || '') : (row.cells[15].childNodes[0].value || '');
-                }
-                var vehicles = (row.cells[16] && row.cells[16].childNodes[0]) ? (row.cells[16].childNodes[0].value || 0) : 0;
+                var exc_date = getExcursionRowValue(row, 2);
+                var city_name = getExcursionRowValue(row, 3);
+                var excursion_name = getExcursionRowValue(row, 4);
+                var transfer_option = getExcursionRowValue(row, 5);
+                var adults = getExcursionRowValue(row, 6) || 0;
+                var chwb = getExcursionRowValue(row, 7) || 0;
+                var chwob = getExcursionRowValue(row, 8) || 0;
+                var infant = getExcursionRowValue(row, 9) || 0;
+                var excursion_amount = getExcursionRowValue(row, 10) || 0;
+                var vehicle_id = getExcursionRowValue(row, 15);
+                var vehicles = getExcursionRowValue(row, 16) || 0;
 
                 if (exc_date == "") {
                     error_msg_alert('Select Activity date in row' + (e + 1));

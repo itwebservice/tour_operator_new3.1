@@ -3,6 +3,53 @@ $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
 $is_ai_quotation = is_ai_package_quotation($sq_quotation) ? 1 : 0;
 $sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_lookup_id'"));
 $package_name = isset($sq_package['package_name']) ? $sq_package['package_name'] : '';
+
+if (!function_exists('quotation_resolve_excursion_tariff')) {
+    function quotation_resolve_excursion_tariff($stored_excursion_value)
+    {
+        $stored_excursion_value = trim((string)$stored_excursion_value);
+        if ($stored_excursion_value === '') {
+            return null;
+        }
+        if (ctype_digit($stored_excursion_value)) {
+            $sq_ex = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$stored_excursion_value'"));
+            if ($sq_ex) {
+                return $sq_ex;
+            }
+        }
+        return mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where excursion_name='" . addslashes($stored_excursion_value) . "' limit 1"));
+    }
+}
+
+if (!function_exists('quotation_excursion_options_html')) {
+    function quotation_excursion_options_html($city_id, $selected_entry_id = '')
+    {
+        $html = '<option value="">*Activity Name</option>';
+        $city_id = intval($city_id);
+        $selected_entry_id = trim((string)$selected_entry_id);
+        $found_selected = false;
+
+        if ($city_id > 0) {
+            $sq_exc_list = mysqlQuery("select entry_id, excursion_name from excursion_master_tariff where city_id='$city_id' and active_flag!='Inactive' order by excursion_name");
+            while ($row = mysqli_fetch_assoc($sq_exc_list)) {
+                $selected = ($selected_entry_id !== '' && (string)$row['entry_id'] === (string)$selected_entry_id) ? ' selected' : '';
+                if ($selected) {
+                    $found_selected = true;
+                }
+                $html .= '<option value="' . htmlspecialchars($row['entry_id']) . '"' . $selected . '>' . htmlspecialchars($row['excursion_name']) . '</option>';
+            }
+        }
+
+        if ($selected_entry_id !== '' && !$found_selected) {
+            $sq_orphan = mysqli_fetch_assoc(mysqlQuery("select entry_id, excursion_name from excursion_master_tariff where entry_id='" . addslashes($selected_entry_id) . "' limit 1"));
+            if ($sq_orphan) {
+                $html .= '<option value="' . htmlspecialchars($sq_orphan['entry_id']) . '" selected>' . htmlspecialchars($sq_orphan['excursion_name']) . '</option>';
+            }
+        }
+
+        return $html;
+    }
+}
 ?>
 <form id="frm_tab3">
 
@@ -472,12 +519,9 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                 <td class="hidden"><input type="hidden" id="excursion_id-1_u" value=""></td>
                                                             </tr>
                                                             <script>
-                                                                $('#city_name-1_u').select2();
-                                                                $('#vehicle_id-1_u').select2({ width: '155px' });
                                                                 $("#exc_date-1_u").datetimepicker({
                                                                     format: 'd-m-Y H:i'
                                                                 });
-                                                                city_lzloading('.act_city', '*City');
                                                             </script>
                                                             <?php
                                                         } else {
@@ -487,14 +531,15 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
 
                                                                 $count++;
                                                                 $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_q_ex[city_name]'"));
-                                                                $sq_ex = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_q_ex[excursion_name]'"));
+                                                                $sq_ex = quotation_resolve_excursion_tariff($row_q_ex['excursion_name']);
+                                                                $saved_exc_entry_id = $sq_ex ? $sq_ex['entry_id'] : $row_q_ex['excursion_name'];
                                                             ?>
                                                                 <tr>
                                                                     <td><input class="css-checkbox"
                                                                             id="chk_tour_group-<?= $count ?>_u" type="checkbox"
-                                                                            checked><label class="css-label"
-                                                                            for="chk_tour_group-<?= $count ?>_u"
-                                                                            onchange="get_excursion_amount_update(this.id);">
+                                                                            checked
+                                                                            onchange="get_excursion_amount_update(this.id);"><label class="css-label"
+                                                                            for="chk_tour_group-<?= $count ?>_u">
                                                                             <label></td>
                                                                     <td><input maxlength="15" value="<?= $count ?>" type="text"
                                                                             name="username1" placeholder="Sr. No."
@@ -523,9 +568,7 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                             title="Activity Name"
                                                                             name="excursion-<?= $count ?>_u" style="width:150px"
                                                                             onchange="get_excursion_amount_update(this.id);">
-                                                                            <option value="<?php echo $sq_ex['entry_id'] ?>">
-                                                                                <?php echo $sq_ex['excursion_name'] ?></option>
-                                                                            <option value="">*Activity Name</option>
+                                                                            <?= quotation_excursion_options_html($row_q_ex['city_name'], $saved_exc_entry_id) ?>
                                                                         </select></td>
                                                                     <td><select name="transfer_option-<?= $count ?>_u"
                                                                             id="transfer_option-<?= $count ?>_u"
@@ -613,17 +656,33 @@ $package_name = isset($sq_package['package_name']) ? $sq_package['package_name']
                                                                     <td class="hidden"><input type="hidden" id="excursion_id-<?= $count ?>_u" value="<?= $row_q_ex['id'] ?>"></td>
                                                                 </tr>
                                                                 <script>
-                                                                    $('#city_name-<?= $count ?>_u').select2();
-                                                                    $('#vehicle_id-<?= $count ?>_u').select2({ width: '155px' });
                                                                     $('#exc_date-<?= $count ?>_u').datetimepicker({
                                                                         format: "d-m-Y H:i"
                                                                     });
-                                                                    city_lzloading('.act_city', '*City');
                                                                 </script>
                                                         <?php
                                                             }
                                                         }
                                                         ?>
+                                                        <script>
+                                                            $(function () {
+                                                                $('#tbl_package_tour_quotation_dynamic_excursion .act_city').each(function () {
+                                                                    if (!$(this).data('select2')) {
+                                                                        city_lzloading(this, '*City');
+                                                                    }
+                                                                });
+                                                                $('#tbl_package_tour_quotation_dynamic_excursion select[id^="excursion-"], #tbl_package_tour_quotation_dynamic_excursion select[id^="transfer_option-"]').each(function () {
+                                                                    if (!$(this).data('select2')) {
+                                                                        $(this).select2({ width: '150px' });
+                                                                    }
+                                                                });
+                                                                $('#tbl_package_tour_quotation_dynamic_excursion select[id^="vehicle_id-"]').each(function () {
+                                                                    if (!$(this).data('select2')) {
+                                                                        $(this).select2({ width: '155px' });
+                                                                    }
+                                                                });
+                                                            });
+                                                        </script>
                                                     </table>
                                                 </div>
                                             </div>

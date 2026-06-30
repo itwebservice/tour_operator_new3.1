@@ -46,12 +46,14 @@ if (!function_exists('o4e')) {
     return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
   }
 }
+
 if (!function_exists('o4nv')) {
   function o4nv($v, $f = '')
   {
     return ($v !== null && $v !== '') ? $v : $f;
   }
 }
+
 if (!function_exists('o4_media_url')) {
   function o4_media_url($url)
   {
@@ -67,6 +69,7 @@ if (!function_exists('o4_media_url')) {
     return BASE_URL . ltrim($url, '/');
   }
 }
+
 if (!function_exists('o4img')) {
   function o4img($url, $fallback)
   {
@@ -74,6 +77,7 @@ if (!function_exists('o4img')) {
     return $resolved !== '' ? $resolved : $fallback;
   }
 }
+
 if (!function_exists('o4_guest_label')) {
   function o4_guest_label($ov)
   {
@@ -93,17 +97,6 @@ if (!function_exists('o4_guest_label')) {
       $parts[] = $inf . ' Infant' . ($inf > 1 ? 's' : '');
     }
     return $parts ? implode(', ', $parts) : o4nv($ov['guest_count'], '-');
-  }
-}
-if (!function_exists('o4_list_item_text')) {
-  function o4_list_item_text($html)
-  {
-    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
-    $text = strip_tags($html);
-    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $text = str_replace("\xC2\xA0", ' ', $text);
-    $text = preg_replace('/\s+/u', ' ', $text);
-    return trim($text);
   }
 }
 if (!function_exists('o4_split_lines')) {
@@ -148,6 +141,7 @@ if (!function_exists('o4_split_lines')) {
     return $items ? $items : $fallback;
   }
 }
+
 if (!function_exists('o4_air_code')) {
   function o4_air_code($loc)
   {
@@ -165,6 +159,7 @@ if (!function_exists('o4_air_code')) {
     return strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $loc), 0, 3));
   }
 }
+
 if (!function_exists('o4_vehicle_end_date')) {
   function o4_vehicle_end_date($v)
   {
@@ -174,6 +169,7 @@ if (!function_exists('o4_vehicle_end_date')) {
     return o4nv(isset($v['end_date_raw']) ? $v['end_date_raw'] : '', o4nv(isset($v['end_date']) ? $v['end_date'] : '', ''));
   }
 }
+
 if (!function_exists('o4_render_vl_logo')) {
   function o4_render_vl_logo($hero, $dark = false)
   {
@@ -188,16 +184,12 @@ if (!function_exists('o4_render_vl_logo')) {
       <?php else : ?>
         <div class="vl-logo-icon" <?= $icon_style ?>>◎</div>
       <?php endif; ?>
-      <div class="vl-logo-text">
-        <!-- <div class="name" <? //= $name_style 
-                                ?>><? //= o4e($name) 
-                                    ?></div>
-        <div class="tagline">Curated Luxury Journeys</div> -->
-      </div>
+      <div class="vl-logo-text"></div>
     </div>
   <?php
   }
 }
+
 if (!function_exists('o4_render_page_header')) {
   function o4_render_page_header($hero, $right_label)
   {
@@ -223,6 +215,7 @@ if (!empty($cost['computed']['group'][0]['package_type'])) {
 } elseif (!empty($hotels[0]['package_type'])) {
   $o4_pkg_badge = $hotels[0]['package_type'];
 }
+
 $o4_pkg_ov = o4nv($o4_pkg_badge, o4nv($ov['package_type_label'], 'Package'));
 $o4_included = o4_split_lines(isset($incx['included']) ? $incx['included'] : '', array('Inclusions as per itinerary.'));
 $o4_excluded = o4_split_lines(isset($incx['excluded']) ? $incx['excluded'] : '', array('Exclusions as per company policy.'));
@@ -237,6 +230,7 @@ if (empty($o4_cost_grp)) {
     'total_display' => '0',
   ));
 }
+
 $o4_featured_idx = count($o4_cost_grp) >= 3 ? 1 : 0;
 $o4_pay_notes = o4_split_lines(
   o4nv(isset($incx['quot_note']) ? $incx['quot_note'] : '', ''),
@@ -247,6 +241,7 @@ $o4_pay_notes = o4_split_lines(
     'Cheque payments to be drawn in the company name.',
   )
 );
+
 $o4_book_policy = o4_split_lines(
   o4nv(isset($incx['note']) ? $incx['note'] : '', ''),
   array(
@@ -256,11 +251,14 @@ $o4_book_policy = o4_split_lines(
     'All payments are protected and securely processed.',
   )
 );
+
 $o4_term_lines = o4_split_lines(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '', array());
 $o4_company    = o4nv($hero['company_name'], 'Travel Partner');
 $o4_salutation = o4nv($ov['client_name'], $o4_client);
 $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_media_url($gallery[0]) : $assets . 'cover.jpg');
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -268,7 +266,8 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= o4e($o4_dest) ?> Tour Package – <?= o4e($o4_company) ?></title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" /> -->
+  <link href="https://fonts.googleapis.com/css2?family=Prata&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="option4.css" rel="stylesheet" />
 </head>
 
@@ -276,7 +275,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
   <div class="doc">
 
     <!-- COVER -->
-    <div class="cover" style="background: linear-gradient(to bottom,rgba(10,22,50,.35) 0%,rgba(10,22,50,.55) 50%,rgba(10,22,50,.92) 100%), url('<?= o4e($o4_cover_img) ?>') center/cover no-repeat;">
+    <div class="cover"> 
       <img class="cover-bg-img"
         src="<?= o4e($o4_cover_img) ?>"
         alt="<?= o4e($o4_dest) ?>">
@@ -338,7 +337,6 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
 
     <!-- PAGE 2 – OVERVIEW -->
     <?php o4_render_page_header($hero, $o4_pkg_ov); ?>
-
     <div class="page-section">
       <div class="personal-banner">
         <div class="eyebrow">Personalized For You</div>
@@ -398,7 +396,6 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
               <?= o4e(o4nv($ov['customer_email'], o4nv($hero['user_email_id'], ''))) ?>
             </a>
           </div>
-
           <div class="prep-item">
             <span class="pi">📞</span>
             <a href="tel:<?= o4e(preg_replace('/\D+/', '', o4nv($ov['customer_mobile'], o4nv($hero['user_contact'], '')))) ?>">
@@ -411,86 +408,87 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     <div class="page-num">PAGE 02 / 09</div>
 
     <!-- PAGE 3 – ACCOMMODATION -->
-    <div class="page-header">
-      <?php o4_render_vl_logo($hero, false); ?>
-      <?php if ($o4_pkg_badge !== '') : ?>
-        <div class="pkg-pill"><?= o4e($o4_pkg_badge) ?></div>
-      <?php else : ?>
-        <div class="page-header-right"><?= o4e($o4_pkg_ov) ?></div>
-      <?php endif; ?>
-    </div>
+    <div class="pdf-page">
+      <div class="page-header">
+        <?php o4_render_vl_logo($hero, false); ?>
+        <?php if ($o4_pkg_badge !== '') : ?>
+          <div class="pkg-pill"><?= o4e($o4_pkg_badge) ?></div>
+        <?php else : ?>
+          <div class="page-header-right"><?= o4e($o4_pkg_ov) ?></div>
+        <?php endif; ?>
+      </div>
 
-    <div class="page-section">
-      <div class="sec-eyebrow">Where You'll Stay</div>
-      <div class="sec-heading">Accommodation Details</div>
+      <div class="page-section">
+        <div class="sec-eyebrow">Where You'll Stay</div>
+        <div class="sec-heading">Accommodation Details</div>
 
-      <?php
-      $o4_hi = 0;
-      if (!empty($hotels)) :
-        foreach ($hotels as $h) :
-          $o4_hi++;
-          // $hphoto = o4img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . (($o4_hi - 1) % 3 + 1) . '.jpg');
-          $hphoto = !empty($h['hotel_photo'])
-            ? o4img($h['hotel_photo'], '')
-            : BASE_URL . 'images/hotel.png';
-          $room_label = o4nv($h['room_category'], o4nv($h['room_type'], ''));
-          $nights = o4nv($h['total_nights'], '');
-      ?>
+        <?php
+        $o4_hi = 0;
+        if (!empty($hotels)) :
+          foreach ($hotels as $h) :
+            $o4_hi++;
+            $hphoto = !empty($h['hotel_photo'])
+              ? o4img($h['hotel_photo'], '')
+              : BASE_URL . 'images/hotel.png';
+            $room_label = o4nv($h['room_category'], o4nv($h['room_type'], ''));
+            $nights = o4nv($h['total_nights'], '');
+        ?>
+            <div class="hotel-card">
+              <div class="hotel-card-inner">
+                <div class="hotel-img">
+                  <img src="<?= o4e($hphoto) ?>" alt="<?= o4e(o4nv($h['hotel_name'], 'Hotel')) ?>" />
+                  <div class="hotel-img-badge">📍 <?= o4e(o4nv($h['hotel_city'], '')) ?></div>
+                </div>
+                <div class="hotel-body">
+                  <div class="hotel-head">
+                    <div class="hotel-name"><?= o4e(o4nv($h['hotel_name'], 'Hotel')) ?></div>
+                    <?php if ($nights !== '') : ?>
+                      <div class="nights-badge">⏱ <?= o4e($nights) ?> Night<?= ((int) $nights > 1 ? 's' : '') ?></div>
+                    <?php endif; ?>
+                  </div>
+                  <?php if ($room_label !== '') : ?>
+                    <div class="hotel-room">🛏️ <?= o4e($room_label) ?></div>
+                  <?php endif; ?>
+                  <div class="hotel-dates">
+                    <div class="date-chip">
+                      <div class="dlbl">Check-In</div>
+                      <div class="dval"><span class="dc-icon">→</span><?= o4e(o4nv($h['check_in'], '')) ?></div>
+                    </div>
+                    <div class="date-chip">
+                      <div class="dlbl">Check-Out</div>
+                      <div class="dval"><span class="dc-icon">↩</span><?= o4e(o4nv($h['check_out'], '')) ?></div>
+                    </div>
+                  </div>
+                  <div class="amenities">
+                    <?php if (!empty($h['meal_plan'])) : ?>
+                      <div class="amenity"><span class="a-icon">🍳</span> <?= o4e($h['meal_plan']) ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($h['rating'])) : ?>
+                      <div class="amenity"><span class="a-icon">⭐</span> <?= o4e($h['rating']) ?> Star</div>
+                    <?php endif; ?>
+                    <?php if (!empty($h['package_type'])) : ?>
+                      <div class="amenity"><span class="a-icon">🏷️</span> <?= o4e($h['package_type']) ?></div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <?php
+          endforeach;
+        else :
+          ?>
           <div class="hotel-card">
             <div class="hotel-card-inner">
-              <div class="hotel-img">
-                <img src="<?= o4e($hphoto) ?>" alt="<?= o4e(o4nv($h['hotel_name'], 'Hotel')) ?>" />
-                <div class="hotel-img-badge">📍 <?= o4e(o4nv($h['hotel_city'], '')) ?></div>
-              </div>
-              <div class="hotel-body">
-                <div class="hotel-head">
-                  <div class="hotel-name"><?= o4e(o4nv($h['hotel_name'], 'Hotel')) ?></div>
-                  <?php if ($nights !== '') : ?>
-                    <div class="nights-badge">⏱ <?= o4e($nights) ?> Night<?= ((int) $nights > 1 ? 's' : '') ?></div>
-                  <?php endif; ?>
-                </div>
-                <?php if ($room_label !== '') : ?>
-                  <div class="hotel-room">🛏️ <?= o4e($room_label) ?></div>
-                <?php endif; ?>
-                <div class="hotel-dates">
-                  <div class="date-chip">
-                    <div class="dlbl">Check-In</div>
-                    <div class="dval"><span class="dc-icon">→</span><?= o4e(o4nv($h['check_in'], '')) ?></div>
-                  </div>
-                  <div class="date-chip">
-                    <div class="dlbl">Check-Out</div>
-                    <div class="dval"><span class="dc-icon">↩</span><?= o4e(o4nv($h['check_out'], '')) ?></div>
-                  </div>
-                </div>
-                <div class="amenities">
-                  <?php if (!empty($h['meal_plan'])) : ?>
-                    <div class="amenity"><span class="a-icon">🍳</span> <?= o4e($h['meal_plan']) ?></div>
-                  <?php endif; ?>
-                  <?php if (!empty($h['rating'])) : ?>
-                    <div class="amenity"><span class="a-icon">⭐</span> <?= o4e($h['rating']) ?> Star</div>
-                  <?php endif; ?>
-                  <?php if (!empty($h['package_type'])) : ?>
-                    <div class="amenity"><span class="a-icon">🏷️</span> <?= o4e($h['package_type']) ?></div>
-                  <?php endif; ?>
-                </div>
+              <div class="hotel-body" style="padding:24px;">
+                <div class="hotel-name">Hotel details will be confirmed with your booking.</div>
               </div>
             </div>
           </div>
-        <?php
-        endforeach;
-      else :
-        ?>
-        <div class="hotel-card">
-          <div class="hotel-card-inner">
-            <div class="hotel-body" style="padding:24px;">
-              <div class="hotel-name">Hotel details will be confirmed with your booking.</div>
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
-      <div class="hotel-note">All hotels are subject to availability at the time of confirmation. Similar category alternatives may be offered.</div>
+        <?php endif; ?>
+        <div class="hotel-note">All hotels are subject to availability at the time of confirmation. Similar category alternatives may be offered.</div>
+      </div>
+      <div class="page-num">PAGE 03 / 09</div>
     </div>
-    <div class="page-num">PAGE 03 / 09</div>
 
     <!-- PAGE 4 – FLIGHTS & TRANSFERS -->
     <?php
@@ -778,372 +776,383 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     <?php endif; ?>
 
     <!-- PAGE 5 – ITINERARY -->
-    <div class="itinerary-start">
-      <?php o4_render_page_header($hero, 'Day-Wise Itinerary'); ?>
+    <div class="pdf-page">
+      <div class="itinerary-start">
+        <?php o4_render_page_header($hero, 'Day-Wise Itinerary'); ?>
 
-      <div class="page-section">
-        <div class="sec-eyebrow">Your Day-by-Day Journey</div>
-        <div class="sec-heading">Itinerary</div>
+        <div class="page-section">
+          <div class="sec-eyebrow">Your Day-by-Day Journey</div>
+          <div class="sec-heading">Itinerary</div>
 
-        <?php if (!empty($itin)) :
-          foreach ($itin as $day) :
-            $day_num = str_pad((string) o4nv($day['day_number'], ''), 2, '0', STR_PAD_LEFT);
-        ?>
-            <div class="itin-day">
-              <div class="itin-day-header"> 
-                <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n"><?= o4e($day_num) ?></span></div>
-                <div class="itin-day-date"><?= o4e(o4nv($day['date'], '')) ?></div>
-              </div>
-              <div class="itin-day-body">
-                <div class="itin-attraction">🌐 Special Attraction · <?= o4e(o4nv($day['special_attraction'], o4nv($day['city'], 'Sightseeing'))) ?></div>
-                <div class="itin-prog-lbl">Detailed Programme</div>
-                <div class="itin-prog"><?= o4e(o4nv($day['detailed_programme'], '')) ?></div>
-                <div class="itin-chips">
-                  <?php if (!empty($day['meal_plan'])) : ?>
-                    <div class="itin-chip meal">
-                      <div class="itin-chip-icon">🍽️</div>
-                      <div>
-                        <div class="itin-chip-lbl">Meal Plan</div>
-                        <div class="itin-chip-val"><?= o4e($day['meal_plan']) ?></div>
+          <?php if (!empty($itin)) :
+            foreach ($itin as $day) :
+              $day_num = str_pad((string) o4nv($day['day_number'], ''), 2, '0', STR_PAD_LEFT);
+          ?>
+              <div class="itin-day">
+                <div class="itin-day-header">
+                  <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n"><?= o4e($day_num) ?></span></div>
+                  <div class="itin-day-date"><?= o4e(o4nv($day['date'], '')) ?></div>
+                </div>
+                <div class="itin-day-body">
+                  <div class="itin-attraction">🌐 Special Attraction · <?= o4e(o4nv($day['special_attraction'], o4nv($day['city'], 'Sightseeing'))) ?></div>
+                  <div class="itin-prog-lbl">Detailed Programme</div>
+                  <div class="itin-prog"><?= o4e(o4nv($day['detailed_programme'], '')) ?></div>
+                  <div class="itin-chips">
+                    <?php if (!empty($day['meal_plan'])) : ?>
+                      <div class="itin-chip meal">
+                        <div class="itin-chip-icon">🍽️</div>
+                        <div>
+                          <div class="itin-chip-lbl">Meal Plan</div>
+                          <div class="itin-chip-val"><?= o4e($day['meal_plan']) ?></div>
+                        </div>
                       </div>
-                    </div>
-                  <?php endif; ?>
-                  <?php if (!empty($day['overnight_stay'])) : ?>
-                    <div class="itin-chip stay">
-                      <div class="itin-chip-icon">🌙</div>
-                      <div>
-                        <div class="itin-chip-lbl">Overnight Stay</div>
-                        <div class="itin-chip-val"><?= o4e($day['overnight_stay']) ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($day['overnight_stay'])) : ?>
+                      <div class="itin-chip stay">
+                        <div class="itin-chip-icon">🌙</div>
+                        <div>
+                          <div class="itin-chip-lbl">Overnight Stay</div>
+                          <div class="itin-chip-val"><?= o4e($day['overnight_stay']) ?></div>
+                        </div>
                       </div>
-                    </div>
-                  <?php endif; ?>
+                    <?php endif; ?>
+                  </div>
                 </div>
               </div>
+            <?php
+            endforeach;
+          else :
+            ?>
+            <div class="itin-day">
+              <div class="itin-day-body">
+                <div class="itin-prog">Itinerary details will be shared upon confirmation.</div>
+              </div>
             </div>
-          <?php
-          endforeach;
-        else :
-          ?>
-          <div class="itin-day">
-            <div class="itin-day-body">
-              <div class="itin-prog">Itinerary details will be shared upon confirmation.</div>
-            </div>
-          </div>
-        <?php endif; ?>
+          <?php endif; ?>
+        </div>
+        <div class="page-num">PAGE 05 / 09</div>
       </div>
-      <div class="page-num">PAGE 05 / 09</div>
 
       <!-- PAGE 6 – PRICING -->
-      <?php o4_render_page_header($hero, 'Pricing & Coverage'); ?>
-    </div>
-    <div class="page-section">
-      <div class="inc-exc-grid">
-        <div class="inc-card">
-          <div class="ie-eyebrow">Included</div>
-          <div class="ie-heading">What's Included</div>
-          <ul class="ie-list">
-            <?php foreach ($o4_included as $item) : ?>
-              <li><span class="ie-icon-chk">✓</span><span class="item-text"><?= nl2br(o4e($item)) ?></span></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-        <div class="exc-card">
-          <div class="ie-eyebrow" style="color:#e53e3e;">Excluded</div>
-          <div class="ie-heading">What's Excluded</div>
-          <ul class="ie-list">
-            <?php foreach ($o4_excluded as $item) : ?>
-              <li><span class="ie-icon-x">✗</span><span class="item-text"><?= nl2br(o4e($item)) ?></span></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-      </div>
+      <div class="pdf-page">
+        <?php o4_render_page_header($hero, 'Pricing & Coverage'); ?>
 
-      <div class="sec-eyebrow">Transparent Pricing</div>
-
-      <?php
-      $o4_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
-      $o4_is_per_person = ($o4_costing_type == 'per person');
-      $o4_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
-      ?>
-
-      <div class="sec-heading" style="margin-bottom:4px;">Costing Details</div>
-      <div class="pricing-note" style="margin-bottom:18px;">
-        <?= o4e(o4nv(isset($incx['note']) ? $incx['note'] : '', 'All figures are per package. Taxes & TCS shown separately.')) ?>
-      </div>
-
-      <?php if (!$o4_is_per_person) { ?>
-
-        <div class="pricing-grid">
-          <?php foreach ($o4_cost_grp as $ci => $row) :
-            $is_featured = ($ci === $o4_featured_idx);
-
-            $tax_amount = '0.00';
-            if (!empty($row['tax_display'])) {
-              preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-              if (!empty($m[1])) {
-                $tax_amount = $m[1];
-              }
-            }
-          ?>
-
-            <div class="pricing-card<?= $is_featured ? ' featured' : '' ?>">
-              <?php if ($is_featured) : ?>
-                <div class="rec-badge">⭐ Recommended</div>
-              <?php endif; ?>
-
-              <div class="pricing-name"><?= o4e(o4nv($row['package_type'], 'Package')) ?></div>
-
-              <div class="pricing-row">
-                <span>Tour Cost</span>
-                <span><?= o4e(o4nv($row['tour_cost_display'], '0')) ?></span>
-              </div>
-
-              <div class="pricing-row">
-                <span>Tax</span>
-                <span>INR <?= o4e($tax_amount) ?></span>
-              </div>
-
-              <div class="pricing-row">
-                <span>TCS</span>
-                <span><?= o4e(o4nv($row['tcs_display'], '0')) ?></span>
-              </div>
-
-              <div class="pricing-row">
-                <span>Travel Cost</span>
-                <span><?= o4e(o4nv($row['travel_display'], '0')) ?></span>
-              </div>
-
-              <div class="pricing-total-lbl">Grand Total</div>
-              <div class="pricing-total-val"><?= o4e(o4nv($row['total_display'], '0')) ?></div>
+        <div class="page-section">
+          <div class="inc-exc-grid">
+            <div class="inc-card">
+              <div class="ie-eyebrow">Included</div>
+              <div class="ie-heading">What's Included</div>
+              <ul class="ie-list">
+                <?php foreach ($o4_included as $item) : ?>
+                  <li><span class="ie-icon-chk">✓</span> <?= o4e($item) ?></li>
+                <?php endforeach; ?>
+              </ul>
             </div>
-
-          <?php endforeach; ?>
-        </div>
-
-      <?php } else { ?>
-
-        <?php if (!empty($o4_pp)) { ?>
-
-          <div class="pricing-grid">
-            <?php foreach ($o4_pp as $ci => $pp) :
-              $is_featured = ($ci === 0);
-
-              $tax_amount = '0.00';
-              if (!empty($pp['tax_display'])) {
-                preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                if (!empty($m[1])) {
-                  $tax_amount = $m[1];
-                }
-              }
-            ?>
-
-              <div class="pricing-card<?= $is_featured ? ' featured' : '' ?>">
-                <?php if ($is_featured) : ?>
-                  <div class="rec-badge">⭐ Recommended</div>
-                <?php endif; ?>
-
-                <div class="pricing-name"><?= o4e(o4nv($pp['package_type'], 'Package')) ?></div>
-
-                <div class="pricing-row">
-                  <span>Adult</span>
-                  <span><?= o4e(o4nv($pp['pp_adult_display'], 'INR 0.00')) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>CWB</span>
-                  <span><?= o4e(o4nv($pp['pp_cwb_display'], 'INR 0.00')) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>CWOB</span>
-                  <span><?= o4e(o4nv($pp['pp_cwnb_display'], 'INR 0.00')) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>Infant</span>
-                  <span><?= o4e(o4nv($pp['pp_infant_display'], 'INR 0.00')) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>Tax</span>
-                  <span>INR <?= o4e($tax_amount) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>TCS</span>
-                  <span><?= o4e(o4nv($pp['tcs_display'], 'INR 0.00')) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>Visa</span>
-                  <span><?= o4e(o4nv($pp['visa_display'], 'INR 0.00')) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>Guide</span>
-                  <span><?= o4e(o4nv($pp['guide_display'], 'INR 0.00')) ?></span>
-                </div>
-
-                <div class="pricing-row">
-                  <span>Misc</span>
-                  <span><?= o4e(o4nv($pp['misc_display'], 'INR 0.00')) ?></span>
-                </div>
-              </div>
-
-            <?php endforeach; ?>
+            <div class="exc-card">
+              <div class="ie-eyebrow" style="color:#e53e3e;">Excluded</div>
+              <div class="ie-heading">What's Excluded</div>
+              <ul class="ie-list">
+                <?php foreach ($o4_excluded as $item) : ?>
+                  <li><span class="ie-icon-x">✗</span> <?= o4e($item) ?></li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
           </div>
 
-        <?php } ?>
+          <div class="sec-eyebrow">Transparent Pricing</div>
 
-      <?php } ?></br>
-      <div class="page-num">PAGE 06 / 09</div>
+          <?php
+          $o4_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
+          $o4_is_per_person = ($o4_costing_type == 'per person');
+          $o4_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+          ?>
+
+          <div class="sec-heading" style="margin-bottom:4px;">Costing Details</div>
+          <div class="pricing-note" style="margin-bottom:18px;">
+            <?= o4e(o4nv(isset($incx['note']) ? $incx['note'] : '', 'All figures are per package. Taxes & TCS shown separately.')) ?>
+          </div>
+
+          <?php if (!$o4_is_per_person) { ?>
+
+            <div class="pricing-grid">
+              <?php foreach ($o4_cost_grp as $ci => $row) :
+                $is_featured = ($ci === $o4_featured_idx);
+
+                $tax_amount = '0.00';
+                if (!empty($row['tax_display'])) {
+                  preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
+                  if (!empty($m[1])) {
+                    $tax_amount = $m[1];
+                  }
+                }
+              ?>
+
+                <div class="pricing-card<?= $is_featured ? ' featured' : '' ?>">
+                  <?php if ($is_featured) : ?>
+                    <div class="rec-badge">⭐ Recommended</div>
+                  <?php endif; ?>
+
+                  <div class="pricing-name"><?= o4e(o4nv($row['package_type'], 'Package')) ?></div>
+
+                  <div class="pricing-row">
+                    <span>Tour Cost</span>
+                    <span><?= o4e(o4nv($row['tour_cost_display'], '0')) ?></span>
+                  </div>
+
+                  <div class="pricing-row">
+                    <span>Tax</span>
+                    <span>INR <?= o4e($tax_amount) ?></span>
+                  </div>
+
+                  <div class="pricing-row">
+                    <span>TCS</span>
+                    <span><?= o4e(o4nv($row['tcs_display'], '0')) ?></span>
+                  </div>
+
+                  <div class="pricing-row">
+                    <span>Travel Cost</span>
+                    <span><?= o4e(o4nv($row['travel_display'], '0')) ?></span>
+                  </div>
+
+                  <div class="pricing-total-lbl">Grand Total</div>
+                  <div class="pricing-total-val"><?= o4e(o4nv($row['total_display'], '0')) ?></div>
+                </div>
+
+              <?php endforeach; ?>
+            </div>
+
+          <?php } else { ?>
+
+            <?php if (!empty($o4_pp)) { ?>
+
+              <div class="pricing-grid">
+                <?php foreach ($o4_pp as $ci => $pp) :
+                  $is_featured = ($ci === 0);
+
+                  $tax_amount = '0.00';
+                  if (!empty($pp['tax_display'])) {
+                    preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
+                    if (!empty($m[1])) {
+                      $tax_amount = $m[1];
+                    }
+                  }
+                ?>
+
+                  <div class="pricing-card<?= $is_featured ? ' featured' : '' ?>">
+                    <?php if ($is_featured) : ?>
+                      <div class="rec-badge">⭐ Recommended</div>
+                    <?php endif; ?>
+
+                    <div class="pricing-name"><?= o4e(o4nv($pp['package_type'], 'Package')) ?></div>
+
+                    <div class="pricing-row">
+                      <span>Adult</span>
+                      <span><?= o4e(o4nv($pp['pp_adult_display'], 'INR 0.00')) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>CWB</span>
+                      <span><?= o4e(o4nv($pp['pp_cwb_display'], 'INR 0.00')) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>CWOB</span>
+                      <span><?= o4e(o4nv($pp['pp_cwnb_display'], 'INR 0.00')) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>Infant</span>
+                      <span><?= o4e(o4nv($pp['pp_infant_display'], 'INR 0.00')) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>Tax</span>
+                      <span>INR <?= o4e($tax_amount) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>TCS</span>
+                      <span><?= o4e(o4nv($pp['tcs_display'], 'INR 0.00')) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>Visa</span>
+                      <span><?= o4e(o4nv($pp['visa_display'], 'INR 0.00')) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>Guide</span>
+                      <span><?= o4e(o4nv($pp['guide_display'], 'INR 0.00')) ?></span>
+                    </div>
+
+                    <div class="pricing-row">
+                      <span>Misc</span>
+                      <span><?= o4e(o4nv($pp['misc_display'], 'INR 0.00')) ?></span>
+                    </div>
+                  </div>
+
+                <?php endforeach; ?>
+              </div>
+
+            <?php } ?>
+
+          <?php } ?>
+        </div></br>
+        <div class="page-num">PAGE 06 / 09</div>
+      </div>
 
       <!-- PAGE 7 – PAYMENT -->
-      <?php o4_render_page_header($hero, 'Secure Payments'); ?>
+      <div class="pdf-page">
+        <?php o4_render_page_header($hero, 'Secure Payments'); ?>
 
-      <div class="page-section">
-        <div class="sec-eyebrow">How to Pay</div>
-        <div class="sec-heading">Payment Information</div>
+        <div class="page-section">
+          <div class="sec-eyebrow">How to Pay</div>
+          <div class="sec-heading">Payment Information</div>
 
-        <div class="pay-grid">
-          <div class="bank-card">
-            <div class="bank-header">Bank Transfer Details</div>
-            <div class="bank-body">
-              <div class="bank-item">
-                <div class="bi-lbl">🏛️ Account Name</div>
-                <div class="bi-val"><?= o4e(o4nv($bank['account_name'], 'NA')) ?></div>
+          <div class="pay-grid">
+            <div class="bank-card">
+              <div class="bank-header">Bank Transfer Details</div>
+              <div class="bank-body">
+                <div class="bank-item">
+                  <div class="bi-lbl">🏛️ Account Name</div>
+                  <div class="bi-val"><?= o4e(o4nv($bank['account_name'], 'NA')) ?></div>
+                </div>
+                <div class="bank-item">
+                  <div class="bi-lbl"># Account Number</div>
+                  <div class="bi-val"><?= o4e(o4nv($bank['account_no'], 'NA')) ?></div>
+                </div>
+                <div class="bank-item">
+                  <div class="bi-lbl">🏦 Bank Name</div>
+                  <div class="bi-val"><?= o4e(o4nv($bank['bank_name'], 'NA')) ?></div>
+                </div>
+                <div class="bank-item">
+                  <div class="bi-lbl">📍 Branch</div>
+                  <div class="bi-val"><?= o4e(o4nv($bank['branch_name'], 'NA')) ?></div>
+                </div>
+                <div class="bank-item">
+                  <div class="bi-lbl">🔑 IFSC Code</div>
+                  <div class="bi-val"><?= o4e(o4nv($bank['ifsc_code'], o4nv($bank['swift_code'], 'NA'))) ?></div>
+                </div>
+                <?php if (!empty($bank['upi_id'])) : ?>
+                  <div class="bank-item">
+                    <div class="bi-lbl">📱 UPI ID</div>
+                    <div class="bi-val"><?= o4e($bank['upi_id']) ?></div>
+                  </div>
+                <?php endif; ?>
               </div>
-              <div class="bank-item">
-                <div class="bi-lbl"># Account Number</div>
-                <div class="bi-val"><?= o4e(o4nv($bank['account_no'], 'NA')) ?></div>
-              </div>
-              <div class="bank-item">
-                <div class="bi-lbl">🏦 Bank Name</div>
-                <div class="bi-val"><?= o4e(o4nv($bank['bank_name'], 'NA')) ?></div>
-              </div>
-              <div class="bank-item">
-                <div class="bi-lbl">📍 Branch</div>
-                <div class="bi-val"><?= o4e(o4nv($bank['branch_name'], 'NA')) ?></div>
-              </div>
-              <div class="bank-item">
-                <div class="bi-lbl">🔑 IFSC Code</div>
-                <div class="bi-val"><?= o4e(o4nv($bank['ifsc_code'], o4nv($bank['swift_code'], 'NA'))) ?></div>
+            </div>
+            <div class="qr-card">
+              <div class="qr-title">Scan to Pay</div>
+              <div class="qr-box">
+                <?php if (!empty($bank['qr_html'])) : ?>
+                  <?= $bank['qr_html'] ?>
+                <?php elseif (!empty($bank['qr_code']) || !empty($bank['branch_qr_url'])) : ?>
+                  <img src="<?= o4e(o4img(o4nv($bank['branch_qr_url'], $bank['qr_code']), $assets . 'qr-placeholder.png')) ?>" alt="Payment QR" style="width:90px;height:90px;object-fit:contain;" />
+                <?php else : ?>
+                  <span style="color:#fff;font-size:11px;">QR not configured</span>
+                <?php endif; ?>
               </div>
               <?php if (!empty($bank['upi_id'])) : ?>
-                <div class="bank-item">
-                  <div class="bi-lbl">📱 UPI ID</div>
-                  <div class="bi-val"><?= o4e($bank['upi_id']) ?></div>
-                </div>
+                <div class="qr-upi"><?= o4e($bank['upi_id']) ?></div>
+                <div class="qr-accepts">UPI · Google Pay · PhonePe · Paytm</div>
               <?php endif; ?>
             </div>
           </div>
-          <div class="qr-card">
-            <div class="qr-title">Scan to Pay</div>
-            <div class="qr-box">
-              <?php if (!empty($bank['qr_html'])) : ?>
-                <?= $bank['qr_html'] ?>
-              <?php elseif (!empty($bank['qr_code']) || !empty($bank['branch_qr_url'])) : ?>
-                <img src="<?= o4e(o4img(o4nv($bank['branch_qr_url'], $bank['qr_code']), $assets . 'qr-placeholder.png')) ?>" alt="Payment QR" style="width:90px;height:90px;object-fit:contain;" />
-              <?php else : ?>
-                <span style="color:#fff;font-size:11px;">QR not configured</span>
-              <?php endif; ?>
-            </div>
-            <?php if (!empty($bank['upi_id'])) : ?>
-              <div class="qr-upi"><?= o4e($bank['upi_id']) ?></div>
-              <div class="qr-accepts">UPI · Google Pay · PhonePe · Paytm</div>
-            <?php endif; ?>
-          </div>
-        </div>
 
-        <div class="pay-cards-grid">
-          <div class="pay-info-card">
-            <div class="pay-info-title"><span class="pay-info-icon">💡</span> Payment Instructions</div>
-            <ul class="pay-info-list">
-              <?php foreach ($o4_pay_notes as $note) : ?>
-                <li><?= o4e($note) ?></li>
-              <?php endforeach; ?>
-            </ul>
-          </div>
-          <div class="pay-info-card">
-            <div class="pay-info-title"><span class="pay-info-icon">✅</span> Booking Policy</div>
-            <ul class="pay-info-list">
-              <?php foreach (array_slice($o4_book_policy, 0, 4) as $pol) : ?>
-                <li><?= o4e($pol) ?></li>
-              <?php endforeach; ?>
-            </ul>
+          <div class="pay-cards-grid">
+            <div class="pay-info-card">
+              <div class="pay-info-title"><span class="pay-info-icon">💡</span> Payment Instructions</div>
+              <ul class="pay-info-list">
+                <?php foreach ($o4_pay_notes as $note) : ?>
+                  <li><?= o4e($note) ?></li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+            <div class="pay-info-card">
+              <div class="pay-info-title"><span class="pay-info-icon">✅</span> Booking Policy</div>
+              <ul class="pay-info-list">
+                <?php foreach (array_slice($o4_book_policy, 0, 4) as $pol) : ?>
+                  <li><?= o4e($pol) ?></li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
           </div>
         </div>
+        <div class="page-num">PAGE 07 / 09</div>
       </div>
-      <div class="page-num">PAGE 07 / 09</div>
 
       <!-- PAGE 8 – REVIEWS -->
-      <?php o4_render_page_header($hero, 'Reviews'); ?>
+      <div class="pdf-page">
+        <?php o4_render_page_header($hero, 'Reviews'); ?>
 
-      <div class="page-section">
-        <div class="sec-eyebrow">Loved by Travellers</div>
-        <div class="sec-heading">What Our Travellers Say</div>
+        <div class="page-section ">
+          <div class="sec-eyebrow">Loved by Travellers</div>
+          <div class="sec-heading">What Our Travellers Say</div>
 
-        <?php if (!empty($testimonials)) :
-          foreach ($testimonials as $t) :
-            $photo = isset($t['photo']) ? trim($t['photo']) : '';
-            if ($photo !== '' && strpos($photo, 'http') !== 0) {
-              $photo = BASE_URL . ltrim(str_replace('\\', '/', $photo), '/');
-            }
-        ?>
-            <div class="review-card">
-              <div class="review-stars">★★★★★</div>
-              <div class="review-quote">"</div>
-              <div class="review-text"><?= o4e(o4nv($t['review'], '')) ?></div>
-              <div class="review-footer">
-                <?php if ($photo !== '') : ?>
-                  <img class="review-avatar" src="<?= o4e($photo) ?>" alt="<?= o4e(o4nv($t['name'], '')) ?>" />
-                <?php else : ?>
-                  <div class="review-avatar" style="background:var(--navy);color:var(--gold-lt);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;"><?= o4e(strtoupper(substr(o4nv($t['name'], 'T'), 0, 1))) ?></div>
-                <?php endif; ?>
-                <div>
-                  <div class="review-name"><?= o4e(o4nv($t['name'], 'Traveller')) ?></div>
-                  <div class="review-meta"><?= o4e(o4nv($t['designation'], '')) ?></div>
+          <?php if (!empty($testimonials)) :
+            foreach ($testimonials as $t) :
+              $photo = isset($t['photo']) ? trim($t['photo']) : '';
+              if ($photo !== '' && strpos($photo, 'http') !== 0) {
+                $photo = BASE_URL . ltrim(str_replace('\\', '/', $photo), '/');
+              }
+          ?>
+              <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <div class="review-quote">"</div>
+                <div class="review-text"><?= o4e(o4nv($t['review'], '')) ?></div>
+                <div class="review-footer">
+                  <?php if ($photo !== '') : ?>
+                    <img class="review-avatar" src="<?= o4e($photo) ?>" alt="<?= o4e(o4nv($t['name'], '')) ?>" />
+                  <?php else : ?>
+                    <div class="review-avatar" style="background:var(--navy);color:var(--gold-lt);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;"><?= o4e(strtoupper(substr(o4nv($t['name'], 'T'), 0, 1))) ?></div>
+                  <?php endif; ?>
+                  <div>
+                    <div class="review-name"><?= o4e(o4nv($t['name'], 'Traveller')) ?></div>
+                    <div class="review-meta"><?= o4e(o4nv($t['designation'], '')) ?></div>
+                  </div>
                 </div>
               </div>
+            <?php
+            endforeach;
+          else :
+            ?>
+            <div class="review-card">
+              <div class="review-text">Customer testimonials can be managed from Quotation Builder settings.</div>
             </div>
-          <?php
-          endforeach;
-        else :
-          ?>
-          <div class="review-card">
-            <div class="review-text">Customer testimonials can be managed from Quotation Builder settings.</div>
-          </div>
-        <?php endif; ?>
+          <?php endif; ?>
 
-        <div class="rating-bar">
-          <span class="star">★</span>
-          <span class="num">4.9</span>
-          <span class="txt">rated by happy travellers across the globe</span>
+          <div class="rating-bar">
+            <span class="star">★</span>
+            <span class="num">4.9</span>
+            <span class="txt">rated by happy travellers across the globe</span>
+          </div>
         </div>
+        <div class="page-num">PAGE 08 / 09</div>
       </div>
-      <div class="page-num">PAGE 08 / 09</div>
 
       <!-- PAGE 9 – T&C -->
-      <?php o4_render_page_header($hero, 'Legal'); ?>
+      <div class="pdf-page">
+        <?php o4_render_page_header($hero, 'Legal'); ?>
 
-      <div class="page-section">
-        <div class="sec-eyebrow">Please Read Carefully</div>
-        <div class="sec-heading"><?= o4e(o4nv($terms['title'], 'Terms & Conditions')) ?></div>
+        <div class="page-section">
+          <div class="sec-eyebrow">Please Read Carefully</div>
+          <div class="sec-heading"><?= o4e(o4nv($terms['title'], 'Terms & Conditions')) ?></div>
 
-        <div class="tnc-list">
-          <?php
-          $terms_html = isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '';
+          <div class="tnc-list">
+            <?php
+            $terms_html = isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '';
 
-          if ($terms_html != '') {
-            echo $terms_html;
-          } else {
-            echo '<h4>Terms &amp; Conditions</h4>';
-            echo '<p>Terms and conditions will be shared as per company policy.</p>';
-          }
-          ?>
+            if ($terms_html != '') {
+              echo $terms_html;
+            } else {
+              echo '<h4>Terms &amp; Conditions</h4>';
+              echo '<p>Terms and conditions will be shared as per company policy.</p>';
+            }
+            ?>
+          </div>
         </div>
+        <div class="page-num">PAGE 09 / 09</div>
       </div>
-      <div class="page-num">PAGE 09 / 09</div>
 
       <!-- THANK YOU PAGE -->
       <div class="ty-page thankyou-page thanks-page" style="background: linear-gradient(to bottom,rgba(10,22,50,.7) 0%,rgba(10,22,50,.78) 60%,rgba(10,22,50,.95) 100%), url('<?= o4e($o4_cover_img) ?>') center/cover no-repeat;">
@@ -1153,7 +1162,6 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
 
         <div class="ty-main">
           <div class="ty-until">
-            <!-- <div class="ty-line"></div> -->
             <div class="ty-until-text">Until We Meet Again</div>
             <div class="ty-line"></div>
           </div>
@@ -1210,7 +1218,6 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
             </div>
           </div>
         </div>
-        <!-- <div style="height:28px;"></div> -->
       </div>
 
     </div>

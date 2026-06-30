@@ -2037,7 +2037,7 @@ function foo(tableID, quot_table_id, rowCounts) {
       row.cells[2].childNodes[0].removeAttributeNode(
         row.cells[2].childNodes[0].attributes[i]
       );
-    row.cells[2].childNodes[0].setAttribute("id", "exc_date-" + foo.counter);
+    row.cells[2].childNodes[0].setAttribute("id", "exc_date-" + foo.counter + excursionIdSuffix);
     row.cells[2].childNodes[0].placeholder = "Excursion Date";
 
     var today = new Date();

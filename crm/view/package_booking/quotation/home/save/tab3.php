@@ -692,6 +692,7 @@
     city_lzloading('#city_name1,#city_name-1');
     city_lzloading('#train_to_location1', "*To", true);
     city_lzloading('#train_from_location1', "*From", true);
+    $('#excursion-1, #transfer_option-1').select2({ width: '150px' });
 
     $('#hotel_name-1').select2({ width: '160px', minimumResultsForSearch: 0 });
     function initPackageQuotationMealPlanSelect(scope) {

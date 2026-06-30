@@ -141,11 +141,16 @@ function get_excursion_list(id) {
     var city_id = $("#" + id).val();
     var base_url = $('#base_url').val();
     var count = id.replace(/^city_name-/, '');
+    var $excursion = $("#excursion-" + count);
+
     $.post(base_url + "view/package_booking/quotation/home/excursion_name_load.php", {
         city_id: city_id
     }, function(data) {
-        $("#excursion-" + count).empty();
-        $("#excursion-" + count).html(data);
+        if ($excursion.data('select2')) {
+            $excursion.select2('destroy');
+        }
+        $excursion.empty().html(data);
+        $excursion.select2({ width: '150px' });
     });
 }
 

@@ -205,7 +205,22 @@ function o1_flight_date($v)
   return date('d M · H:i', strtotime($v));
 }
 // ===================================
+
+
+$o1_pkg_type = '';
+if (!empty($cost['computed']['group'][0]['package_type'])) {
+  $o1_pkg_type = $cost['computed']['group'][0]['package_type'];
+} elseif (!empty($hotels[0]['package_type'])) {
+  $o1_pkg_type = $hotels[0]['package_type'];
+} else {
+  $o1_pkg_type = 'Package';
+}
+
+$o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
+  ? $o1_pkg_type
+  : $o1_pkg_type . ' Package';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -223,10 +238,12 @@ function o1_flight_date($v)
 <body>
   <main class="min-h-screen py-6">
     <section class="page page-hero relative">
-      <!-- <img src="<? //= o1e(o1img($hero['cover_image'], $assets . 'hero-singapore.jpg')) 
-                      ?>" alt="<?= o1e(o1nv($ov['destination'], 'Tour')) ?>" class="absolute inset-0 w-full h-full object-cover" /> -->
-      <div class="absolute inset-0" style="background:var(--gradient-hero-overlay)">
-      </div>
+      <img src="<?= o1e(o1img($hero['cover_image'], $assets . 'hero-singapore.jpg')) ?>"
+        alt="<?= o1e(o1nv($ov['destination'], 'Tour')) ?>"
+        class="absolute inset-0 w-full h-full object-cover hero-bg" />
+      <!-- <div class="absolute inset-0" style="background:var(--gradient-hero-overlay)">
+      </div> -->
+      <div class="hero-blue-overlay"></div>
       <div class="relative z-10 px-10 pt-8 flex items-start justify-between">
         <div class="flex items-center gap-2.5">
           <div class="relative w-10 h-10 rounded-full grid place-items-center" style="background:var(--gradient-gold)">
@@ -670,7 +687,7 @@ function o1_flight_date($v)
             </div>
             <div>
               <div class="font-display text-3xl"><?= o1e(o1nv($ov['destination'], $hero['tour_name'])) ?></div>
-              <div class="text-cream/80 text-xs font-serif-soft italic">Where futuristic skylines meet tropical serenity.</div>
+              <div class="dest-mb text-cream/80 text-xs font-serif-soft italic">Where futuristic skylines meet tropical serenity.</div>
             </div>
           </div>
         </div>
@@ -681,6 +698,7 @@ function o1_flight_date($v)
         <span>02<!-- --> / 09</span>
       </div>
     </section>
+
     <section class="page" style="--wm-url:url(assets/globe-watermark.png)">
       <div class="watermark" style="background-image:url(assets/globe-watermark.png)">
       </div>
@@ -717,7 +735,9 @@ function o1_flight_date($v)
             <h2 class="font-display text-4xl text-[color:var(--navy)] mt-1">Accommodation Details</h2>
           </div>
           <div class="rounded-full px-4 py-1.5 text-cream text-xs uppercase tracking-[0.2em]" style="background:var(--gradient-navy)">
-            <span class="text-[color:var(--gold)] mr-2">✦</span>Royal Package
+            <span class="text-[color:var(--gold)] mr-2">✦</span>
+            
+            <?= o1e($o1_pkg_label) ?>
           </div>
         </div>
         <hr class="gold-rule mt-3" />
@@ -967,11 +987,6 @@ function o1_flight_date($v)
             <?php endif; ?>
           </div>
         </div>
-        <?php
-        // echo '<pre>';
-        // print_r($trains);
-        // echo '</pre>';
-        ?>
         <!-- ======================== Train Details  -->
         <?php if (!empty($trains)) { ?>
           <div class="mt-6">
@@ -1313,243 +1328,248 @@ function o1_flight_date($v)
           </div>
         </div>
       </div>
-      <div class="flex items-end justify-between">
-        <h2 class="font-display text-2xl text-[color:var(--navy)] flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera w-5 h-5 text-[color:var(--gold)]" aria-hidden="true">
-            <path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z">
-            </path>
-            <circle cx="12" cy="13" r="3">
-            </circle>
-          </svg> Day-Wise Itinerary
-        </h2>
-        <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Your Journey · Day by Day</span>
-      </div>
-      <hr class="gold-rule mt-2" />
-      <div class="mt-4 space-y-4">
-        <?php
-        $o1_itin = is_array($itin) ? $itin : array();
-        foreach ($o1_itin as $d):
-          $o1_dno    = str_pad((string) (int) o1nv(isset($d['day_number']) ? $d['day_number'] : '', 0), 2, '0', STR_PAD_LEFT);
-          // $o1_dimg   = o1img(isset($d['image']) ? $d['image'] : '', $assets . 'day-1.jpg');
-          $dummy_day_img = BASE_URL . 'images/itinerary.png';
+      <div class="relative px-10 py-7">
+        <div class="flex items-end justify-between">
+          <h2 class="font-display text-2xl text-[color:var(--navy)] flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera w-5 h-5 text-[color:var(--gold)]" aria-hidden="true">
+              <path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z">
+              </path>
+              <circle cx="12" cy="13" r="3">
+              </circle>
+            </svg> Day-Wise Itinerary
+          </h2>
+          <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Your Journey · Day by Day</span>
+        </div>
 
-          $o1_day_photo = isset($d['itinerary_image']) ? trim($d['itinerary_image']) : '';
+        <hr class="gold-rule mt-2" />
+        <div class="mt-4 space-y-4">
+          <?php
+          $o1_itin = is_array($itin) ? $itin : array();
+          foreach ($o1_itin as $d):
+            $o1_dno    = str_pad((string) (int) o1nv(isset($d['day_number']) ? $d['day_number'] : '', 0), 2, '0', STR_PAD_LEFT);
+            // $o1_dimg   = o1img(isset($d['image']) ? $d['image'] : '', $assets . 'day-1.jpg');
+            $dummy_day_img = BASE_URL . 'images/itinerary.png';
 
-          if ($o1_day_photo == '' || stripos($o1_day_photo, 'dummy') !== false) {
-            $o1_dimg = $dummy_day_img;
-          } else {
-            $o1_dimg = o1img($o1_day_photo, $dummy_day_img);
-          }
-          $o1_dtitle = o1nv(isset($d['special_attraction']) ? $d['special_attraction'] : '', o1nv(isset($d['city']) ? $d['city'] : '', 'Day ' . $o1_dno));
-          $o1_dprog  = isset($d['detailed_programme']) ? trim($d['detailed_programme']) : '';
-        ?>
-          <!-- <div class="relative rounded-2xl overflow-hidden bg-white border border-[color:var(--gold)]/30 grid grid-cols-12" style="box-shadow:var(--shadow-card)"> -->
-          <!-- ========================  Dipti add just itinerary-card  -->
-          <div class="itinerary-card relative rounded-2xl overflow-hidden bg-white border border-[color:var(--gold)]/30 grid grid-cols-12" style="box-shadow:var(--shadow-card)">
+            $o1_day_photo = isset($d['image']) ? trim($d['image']) : '';
+
+            if ($o1_day_photo == '' || stripos($o1_day_photo, 'dummy') !== false) {
+              $o1_dimg = $dummy_day_img;
+            } else {
+              $o1_dimg = o1img($o1_day_photo, $dummy_day_img);
+            }
+            $o1_dtitle = o1nv(isset($d['special_attraction']) ? $d['special_attraction'] : '', o1nv(isset($d['city']) ? $d['city'] : '', 'Day ' . $o1_dno));
+            $o1_dprog  = isset($d['detailed_programme']) ? trim($d['detailed_programme']) : '';
+          ?>
+            <!-- <div class="relative rounded-2xl overflow-hidden bg-white border border-[color:var(--gold)]/30 grid grid-cols-12" style="box-shadow:var(--shadow-card)"> -->
+            <!-- ========================  Dipti add just itinerary-card  -->
+            <div class="itinerary-card relative rounded-2xl overflow-hidden bg-white border border-[color:var(--gold)]/30 grid grid-cols-12" style="box-shadow:var(--shadow-card)">
+              <div class="col-span-4 relative">
+                <img src="<?= o1e($o1_dimg) ?>" alt="<?= o1e($o1_dtitle) ?>" class="w-full h-full object-cover absolute inset-0" />
+                <div class="absolute inset-0" style="background:linear-gradient(135deg, oklch(0.20 0.06 260 / 0.55), oklch(0.20 0.06 260 / 0.05) 60%)">
+                </div>
+                <div class="absolute top-3 left-3 rounded-xl px-3 py-2 text-cream backdrop-blur-md" style="background:oklch(0.20 0.06 260 / 0.75)">
+                  <div class="text-[8px] uppercase tracking-[0.3em] text-[color:var(--gold)] leading-none">Day</div>
+                  <div class="font-display text-3xl leading-none mt-0.5"><?= o1e($o1_dno) ?></div>
+                </div>
+                <div class="absolute bottom-3 left-3 right-3 text-cream">
+                  <!-- <div class="text-[10px] uppercase tracking-[0.25em] text-[color:var(--gold)]"><? //= o1e(o1nv(isset($d['date']) ? $d['date'] : '', '')) 
+                                                                                                      ?></div> -->
+                  <!-- <div class="font-display text-lg leading-tight drop-shadow"><? //= o1e($o1_dtitle) 
+                                                                                    ?></div> -->
+                </div>
+              </div>
+              <div class="col-span-8 p-4 relative">
+
+                <!-- ============== Dipti -->
+                <?php $o1_day_date = isset($d['date']) ? trim($d['date']) : ''; ?>
+
+                <?php if ($o1_day_date != '') { ?>
+                  <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl"
+                    style="background:var(--gradient-gold); z-index:50;">
+                    <?= o1e($o1_day_date) ?>
+                  </div>
+                <?php } ?>
+                <!-- ================================= -->
+
+
+                <?php if ($o1_dtitle !== ''): ?>
+                  <div class="flex items-center gap-2 text-[14px] uppercase tracking-[0.22em] text-[color:var(--teal)] mt-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3" aria-hidden="true">
+                      <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
+                      </path>
+                      <circle cx="12" cy="10" r="3">
+                      </circle>
+                    </svg> <!-- --><?= o1e(o1nv($d['special_attraction'] ?? '', $o1_dtitle)) ?>
+                  </div>
+                <?php endif; ?>
+                <p class="text-[13px] text-[color:var(--ink)]/85 mt-2 leading-relaxed font-serif-soft" style="font-size:13px"><?= ($o1_dprog !== '' ? $o1_dprog : 'Detailed programme will be shared.') ?></p>
+                <!-- ============================== Dipti -->
+                <div class="mt-3 pt-3 border-t border-dashed border-[color:var(--gold)]/40">
+                  <div class="flex flex-wrap items-center gap-3">
+
+                    <?php if (!empty($d['overnight_stay'])): ?>
+                      <span class="inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="lucide lucide-hotel w-3 h-3 text-[color:var(--gold)]">
+
+                          <path d="M10 22v-6.57"></path>
+                          <path d="M12 11h.01"></path>
+                          <path d="M12 7h.01"></path>
+                          <path d="M14 15.43V22"></path>
+                          <path d="M15 16a5 5 0 0 0-6 0"></path>
+                          <path d="M16 11h.01"></path>
+                          <path d="M16 7h.01"></path>
+                          <path d="M8 11h.01"></path>
+                          <path d="M8 7h.01"></path>
+                          <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+
+                        </svg>
+
+                        <strong>Overnight Stay:</strong>
+                        <?= o1e($d['overnight_stay']) ?>
+
+                      </span>
+                    <?php endif; ?>
+
+                    <?php if (!empty($d['meal_plan'])): ?>
+                      <span class="inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="lucide lucide-utensils w-3 h-3 text-[color:var(--gold)]">
+
+                          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                          <path d="M7 2v20"></path>
+                          <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
+
+                        </svg>
+
+                        <strong>Meal Plan:</strong>
+                        <?= o1e($d['meal_plan']) ?>
+
+                      </span>
+                    <?php endif; ?>
+
+                  </div>
+                </div>
+                <!-- ================================== -->
+              </div>
+            </div>
+          <?php endforeach; ?>
+          <?php if (empty($o1_itin)): ?>
+            <div class="rounded-2xl bg-white border border-[color:var(--gold)]/30 p-6 text-center text-[color:var(--ink)]/60 text-sm">Day-wise itinerary will be shared.</div>
+          <?php endif; ?>
+          <div class="relative rounded-2xl overflow-hidden bg-white border border-[color:var(--gold)]/30 grid grid-cols-12" style="box-shadow:var(--shadow-card)" hidden>
             <div class="col-span-4 relative">
-              <img src="<?= o1e($o1_dimg) ?>" alt="<?= o1e($o1_dtitle) ?>" class="w-full h-full object-cover absolute inset-0" />
+              <img src="assets/day-3.jpg" alt="Gardens by the Bay" class="w-full h-full object-cover absolute inset-0" loading="lazy" />
               <div class="absolute inset-0" style="background:linear-gradient(135deg, oklch(0.20 0.06 260 / 0.55), oklch(0.20 0.06 260 / 0.05) 60%)">
               </div>
               <div class="absolute top-3 left-3 rounded-xl px-3 py-2 text-cream backdrop-blur-md" style="background:oklch(0.20 0.06 260 / 0.75)">
                 <div class="text-[8px] uppercase tracking-[0.3em] text-[color:var(--gold)] leading-none">Day</div>
-                <div class="font-display text-3xl leading-none mt-0.5"><?= o1e($o1_dno) ?></div>
+                <div class="font-display text-3xl leading-none mt-0.5">03</div>
               </div>
               <div class="absolute bottom-3 left-3 right-3 text-cream">
-                <div class="text-[10px] uppercase tracking-[0.25em] text-[color:var(--gold)]"><?= o1e(o1nv(isset($d['date']) ? $d['date'] : '', '')) ?></div>
-                <div class="font-display text-lg leading-tight drop-shadow"><?= o1e($o1_dtitle) ?></div>
+                <div class="text-[10px] uppercase tracking-[0.25em] text-[color:var(--gold)]">12 Jul 2026</div>
+                <div class="font-display text-lg leading-tight drop-shadow">Gardens by the Bay</div>
               </div>
             </div>
-            <div class="col-span-8 p-4 relative">
-
-              <!-- ============== Dipti -->
-              <?php $o1_day_date = isset($d['date']) ? trim($d['date']) : ''; ?>
-
-              <?php if ($o1_day_date != '') { ?>
-                <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl"
-                  style="background:var(--gradient-gold); z-index:50;">
-                  <?= o1e($o1_day_date) ?>
+            <!-- <div class="col-span-8 p-4 relative"> -->
+            <div class="col-span-8 p-4 relative" style="position:relative;">
+              <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">âœ¦ <!-- -->30Â°C<!-- --> · <!-- -->Highlight</div>
+              <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-[color:var(--teal)] mt-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3" aria-hidden="true">
+                  <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
+                  </path>
+                  <circle cx="12" cy="10" r="3">
+                  </circle>
+                </svg> <!-- -->Supertree Grove &amp; Cloud Forest
+              </div>
+              <p class="text-[12px] text-[color:var(--ink)]/85 mt-2 leading-relaxed font-serif-soft" style="font-size:13px">Morning at Gardens by the Bay conservatories. Evening Garden Rhapsody show under the illuminated Supertrees.</p>
+              <div class="grid grid-cols-3 gap-2 mt-3">
+                <div class="rounded-lg bg-[color:var(--cream)] border border-[color:var(--gold)]/25 p-2 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-md grid place-items-center shrink-0" style="background:var(--gradient-navy)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10">
+                      </circle>
+                      <path d="M12 6v6l4 2">
+                      </path>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-display text-[12px] text-[color:var(--navy)] leading-none">10:00</div>
+                    <div class="text-[9.5px] uppercase tracking-[0.12em] text-[color:var(--ink)]/65 truncate">Cloud Forest</div>
+                  </div>
                 </div>
-              <?php } ?>
-              <!-- ================================= -->
-
-
-              <?php if ($o1_dtitle !== ''): ?>
-                <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-[color:var(--teal)] mt-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3" aria-hidden="true">
-                    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
+                <div class="rounded-lg bg-[color:var(--cream)] border border-[color:var(--gold)]/25 p-2 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-md grid place-items-center shrink-0" style="background:var(--gradient-navy)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10">
+                      </circle>
+                      <path d="M12 6v6l4 2">
+                      </path>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-display text-[12px] text-[color:var(--navy)] leading-none">13:00</div>
+                    <div class="text-[9.5px] uppercase tracking-[0.12em] text-[color:var(--ink)]/65 truncate">Flower Dome</div>
+                  </div>
+                </div>
+                <div class="rounded-lg bg-[color:var(--cream)] border border-[color:var(--gold)]/25 p-2 flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-md grid place-items-center shrink-0" style="background:var(--gradient-navy)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10">
+                      </circle>
+                      <path d="M12 6v6l4 2">
+                      </path>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-display text-[12px] text-[color:var(--navy)] leading-none">19:45</div>
+                    <div class="text-[9.5px] uppercase tracking-[0.12em] text-[color:var(--ink)]/65 truncate">Garden Rhapsody</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-dashed border-[color:var(--gold)]/40">
+                <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/40 text-[color:var(--navy)] border border-[color:var(--gold)]/30">âœ¦ <!-- -->Cloud Forest</span>
+                <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/40 text-[color:var(--navy)] border border-[color:var(--gold)]/30">âœ¦ <!-- -->Flower Dome</span>
+                <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/40 text-[color:var(--navy)] border border-[color:var(--gold)]/30">âœ¦ <!-- -->Garden Rhapsody</span>
+                <span class="ml-auto inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils w-3 h-3 text-[color:var(--gold)]" aria-hidden="true">
+                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2">
                     </path>
-                    <circle cx="12" cy="10" r="3">
-                    </circle>
-                  </svg> <!-- --><?= o1e(o1nv($d['special_attraction'] ?? '', $o1_dtitle)) ?>
-                </div>
-              <?php endif; ?>
-              <p class="text-[12px] text-[color:var(--ink)]/85 mt-2 leading-relaxed font-serif-soft" style="font-size:13px"><?= ($o1_dprog !== '' ? $o1_dprog : 'Detailed programme will be shared.') ?></p>
-              <!-- ============================== Dipti -->
-              <div class="mt-3 pt-3 border-t border-dashed border-[color:var(--gold)]/40">
-                <div class="flex flex-wrap items-center gap-3">
-
-                  <?php if (!empty($d['overnight_stay'])): ?>
-                    <span class="inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
-
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-hotel w-3 h-3 text-[color:var(--gold)]">
-
-                        <path d="M10 22v-6.57"></path>
-                        <path d="M12 11h.01"></path>
-                        <path d="M12 7h.01"></path>
-                        <path d="M14 15.43V22"></path>
-                        <path d="M15 16a5 5 0 0 0-6 0"></path>
-                        <path d="M16 11h.01"></path>
-                        <path d="M16 7h.01"></path>
-                        <path d="M8 11h.01"></path>
-                        <path d="M8 7h.01"></path>
-                        <rect x="4" y="2" width="16" height="20" rx="2"></rect>
-
-                      </svg>
-
-                      <strong>Overnight Stay:</strong>
-                      <?= o1e($d['overnight_stay']) ?>
-
-                    </span>
-                  <?php endif; ?>
-
-                  <?php if (!empty($d['meal_plan'])): ?>
-                    <span class="inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
-
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-utensils w-3 h-3 text-[color:var(--gold)]">
-
-                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
-                        <path d="M7 2v20"></path>
-                        <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
-
-                      </svg>
-
-                      <strong>Meal Plan:</strong>
-                      <?= o1e($d['meal_plan']) ?>
-
-                    </span>
-                  <?php endif; ?>
-
-                </div>
-              </div>
-              <!-- ================================== -->
-            </div>
-          </div>
-        <?php endforeach; ?>
-        <?php if (empty($o1_itin)): ?>
-          <div class="rounded-2xl bg-white border border-[color:var(--gold)]/30 p-6 text-center text-[color:var(--ink)]/60 text-sm">Day-wise itinerary will be shared.</div>
-        <?php endif; ?>
-        <div class="relative rounded-2xl overflow-hidden bg-white border border-[color:var(--gold)]/30 grid grid-cols-12" style="box-shadow:var(--shadow-card)" hidden>
-          <div class="col-span-4 relative">
-            <img src="assets/day-3.jpg" alt="Gardens by the Bay" class="w-full h-full object-cover absolute inset-0" loading="lazy" />
-            <div class="absolute inset-0" style="background:linear-gradient(135deg, oklch(0.20 0.06 260 / 0.55), oklch(0.20 0.06 260 / 0.05) 60%)">
-            </div>
-            <div class="absolute top-3 left-3 rounded-xl px-3 py-2 text-cream backdrop-blur-md" style="background:oklch(0.20 0.06 260 / 0.75)">
-              <div class="text-[8px] uppercase tracking-[0.3em] text-[color:var(--gold)] leading-none">Day</div>
-              <div class="font-display text-3xl leading-none mt-0.5">03</div>
-            </div>
-            <div class="absolute bottom-3 left-3 right-3 text-cream">
-              <div class="text-[10px] uppercase tracking-[0.25em] text-[color:var(--gold)]">12 Jul 2026</div>
-              <div class="font-display text-lg leading-tight drop-shadow">Gardens by the Bay</div>
-            </div>
-          </div>
-          <!-- <div class="col-span-8 p-4 relative"> -->
-          <div class="col-span-8 p-4 relative" style="position:relative;">
-            <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">âœ¦ <!-- -->30Â°C<!-- --> · <!-- -->Highlight</div>
-            <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-[color:var(--teal)] mt-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3" aria-hidden="true">
-                <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
-                </path>
-                <circle cx="12" cy="10" r="3">
-                </circle>
-              </svg> <!-- -->Supertree Grove &amp; Cloud Forest
-            </div>
-            <p class="text-[12px] text-[color:var(--ink)]/85 mt-2 leading-relaxed font-serif-soft" style="font-size:13px">Morning at Gardens by the Bay conservatories. Evening Garden Rhapsody show under the illuminated Supertrees.</p>
-            <div class="grid grid-cols-3 gap-2 mt-3">
-              <div class="rounded-lg bg-[color:var(--cream)] border border-[color:var(--gold)]/25 p-2 flex items-center gap-2">
-                <div class="w-7 h-7 rounded-md grid place-items-center shrink-0" style="background:var(--gradient-navy)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10">
-                    </circle>
-                    <path d="M12 6v6l4 2">
+                    <path d="M7 2v20">
                     </path>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-display text-[12px] text-[color:var(--navy)] leading-none">10:00</div>
-                  <div class="text-[9.5px] uppercase tracking-[0.12em] text-[color:var(--ink)]/65 truncate">Cloud Forest</div>
-                </div>
-              </div>
-              <div class="rounded-lg bg-[color:var(--cream)] border border-[color:var(--gold)]/25 p-2 flex items-center gap-2">
-                <div class="w-7 h-7 rounded-md grid place-items-center shrink-0" style="background:var(--gradient-navy)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10">
-                    </circle>
-                    <path d="M12 6v6l4 2">
+                    <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7">
                     </path>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-display text-[12px] text-[color:var(--navy)] leading-none">13:00</div>
-                  <div class="text-[9.5px] uppercase tracking-[0.12em] text-[color:var(--ink)]/65 truncate">Flower Dome</div>
-                </div>
-              </div>
-              <div class="rounded-lg bg-[color:var(--cream)] border border-[color:var(--gold)]/25 p-2 flex items-center gap-2">
-                <div class="w-7 h-7 rounded-md grid place-items-center shrink-0" style="background:var(--gradient-navy)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10">
-                    </circle>
-                    <path d="M12 6v6l4 2">
+                  </svg> <!-- -->Breakfast</span>
+                <span class="inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hotel w-3 h-3 text-[color:var(--gold)]" aria-hidden="true">
+                    <path d="M10 22v-6.57">
                     </path>
-                  </svg>
-                </div>
-                <div class="min-w-0">
-                  <div class="font-display text-[12px] text-[color:var(--navy)] leading-none">19:45</div>
-                  <div class="text-[9.5px] uppercase tracking-[0.12em] text-[color:var(--ink)]/65 truncate">Garden Rhapsody</div>
-                </div>
+                    <path d="M12 11h.01">
+                    </path>
+                    <path d="M12 7h.01">
+                    </path>
+                    <path d="M14 15.43V22">
+                    </path>
+                    <path d="M15 16a5 5 0 0 0-6 0">
+                    </path>
+                    <path d="M16 11h.01">
+                    </path>
+                    <path d="M16 7h.01">
+                    </path>
+                    <path d="M8 11h.01">
+                    </path>
+                    <path d="M8 7h.01">
+                    </path>
+                    <rect x="4" y="2" width="16" height="20" rx="2">
+                    </rect>
+                  </svg> <!-- -->The Fullerton Heritage</span>
               </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-dashed border-[color:var(--gold)]/40">
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/40 text-[color:var(--navy)] border border-[color:var(--gold)]/30">âœ¦ <!-- -->Cloud Forest</span>
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/40 text-[color:var(--navy)] border border-[color:var(--gold)]/30">âœ¦ <!-- -->Flower Dome</span>
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/40 text-[color:var(--navy)] border border-[color:var(--gold)]/30">âœ¦ <!-- -->Garden Rhapsody</span>
-              <span class="ml-auto inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils w-3 h-3 text-[color:var(--gold)]" aria-hidden="true">
-                  <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2">
-                  </path>
-                  <path d="M7 2v20">
-                  </path>
-                  <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7">
-                  </path>
-                </svg> <!-- -->Breakfast</span>
-              <span class="inline-flex items-center gap-1.5 text-[10px] text-[color:var(--ink)]/75">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hotel w-3 h-3 text-[color:var(--gold)]" aria-hidden="true">
-                  <path d="M10 22v-6.57">
-                  </path>
-                  <path d="M12 11h.01">
-                  </path>
-                  <path d="M12 7h.01">
-                  </path>
-                  <path d="M14 15.43V22">
-                  </path>
-                  <path d="M15 16a5 5 0 0 0-6 0">
-                  </path>
-                  <path d="M16 11h.01">
-                  </path>
-                  <path d="M16 7h.01">
-                  </path>
-                  <path d="M8 11h.01">
-                  </path>
-                  <path d="M8 7h.01">
-                  </path>
-                  <rect x="4" y="2" width="16" height="20" rx="2">
-                  </rect>
-                </svg> <!-- -->The Fullerton Heritage</span>
             </div>
           </div>
         </div>
@@ -1720,129 +1740,130 @@ function o1_flight_date($v)
           <?php } ?>
         </div>
         <!-- <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div> -->
-      </div>
 
-      <?php
-      $o1_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
-      ?>
-      <?php if ($is_per_person && !empty($o1_pp)) { ?>
-        <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-          <div style="margin-top:15px;border:1px solid #e4d3b3;border-radius:18px;overflow:hidden;">
-            <table style="width:100%; border-collapse:separate; border-spacing:0; font-family:Arial, Helvetica, sans-serif;">
-              <thead>
-                <tr style="background:#022b5b; color:#fff;">
-                  <th style="padding:12px 18px;font-size:10px;letter-spacing:3px;font-weight:normal;">
-                    PACKAGE
-                  </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    ADULT
-                  </th>
+        <?php
+        $o1_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+        ?>
+        <?php if ($is_per_person && !empty($o1_pp)) { ?>
+          <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+            <div style="margin-top:15px;border:1px solid #e4d3b3;border-radius:18px;overflow:hidden;">
+              <table style="width:100%; border-collapse:separate; border-spacing:0; font-family:Arial, Helvetica, sans-serif;">
+                <thead>
+                  <tr style="background:#022b5b; color:#fff;">
+                    <th style="padding:12px 18px;font-size:10px;letter-spacing:3px;font-weight:normal;">
+                      PACKAGE
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    CWB
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      ADULT
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    CWOB
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      CWB
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    INFANT
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      CWOB
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    TAX
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      INFANT
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    TCS
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      TAX
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    VISA
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      TCS
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    GUIDE
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      VISA
+                    </th>
 
-                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                    MISC
-                  </th>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      GUIDE
+                    </th>
 
-                </tr>
-              </thead>
+                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                      MISC
+                    </th>
 
-              <tbody>
-                <?php foreach ($o1_pp as $i => $pp) { ?>
-
-                  <?php
-                  $row_bg = ($i % 2 == 0) ? '#ffffff' : '#f6efdf';
-
-                  $tax_amount = 'INR 0.00';
-
-                  if (!empty($pp['tax_display'])) {
-                    preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                    if (!empty($m[1])) {
-                      $tax_amount = 'INR ' . $m[1];
-                    }
-                  }
-                  ?>
-
-                  <tr style="background:<?= $row_bg ?>;">
-
-                    <td style="padding:32px 18px;font-size:16px;color:#0b2343;font-family:Arial, Helvetica, sans-serif;">
-                      <?= o1e($pp['package_type']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['pp_adult_display']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['pp_cwb_display']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['pp_cwnb_display']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['pp_infant_display']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($tax_amount) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['tcs_display']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['visa_display']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['guide_display']) ?>
-                    </td>
-
-                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                      &#8377; <?= o1e($pp['misc_display']) ?>
-                    </td>
                   </tr>
-                <?php } ?>
-              </tbody>
-            </table>
-          <?php } ?>
-        </div>
-        <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
-        <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-          <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
-          <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
-          <span>05<!-- --> / 09</span>
-        </div>
+                </thead>
+
+                <tbody>
+                  <?php foreach ($o1_pp as $i => $pp) { ?>
+
+                    <?php
+                    $row_bg = ($i % 2 == 0) ? '#ffffff' : '#f6efdf';
+
+                    $tax_amount = 'INR 0.00';
+
+                    if (!empty($pp['tax_display'])) {
+                      preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
+                      if (!empty($m[1])) {
+                        $tax_amount = 'INR ' . $m[1];
+                      }
+                    }
+                    ?>
+
+                    <tr style="background:<?= $row_bg ?>;">
+
+                      <td style="padding:32px 18px;font-size:16px;color:#0b2343;font-family:Arial, Helvetica, sans-serif;">
+                        <?= o1e($pp['package_type']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['pp_adult_display']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['pp_cwb_display']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['pp_cwnb_display']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['pp_infant_display']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($tax_amount) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['tcs_display']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['visa_display']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['guide_display']) ?>
+                      </td>
+
+                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                        &#8377; <?= o1e($pp['misc_display']) ?>
+                      </td>
+                    </tr>
+                  <?php } ?>
+                </tbody>
+              </table>
+            <?php } ?>
+            </div>
+          </div>
+          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
+          <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
+            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+            <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
+            <span>05<!-- --> / 09</span>
+          </div>
     </section>
     <section class="page print-section" style="--wm-url:url(assets/globe-watermark.png)">
       <div class="watermark" style="background-image:url(assets/globe-watermark.png)">
@@ -2270,7 +2291,7 @@ function o1_flight_date($v)
             <div class="text-[11px] text-[color:var(--ink)]/60 font-serif-soft italic"><?= o1e(o1nv($bank['upi_id'], '')) ?></div>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4 mt-5">
+        <div class="payment-policy-row grid grid-cols-2 gap-4 mt-5">
           <div class="rounded-xl bg-white p-5 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check w-4 h-4 text-[color:var(--teal)]" aria-hidden="true">
@@ -2833,7 +2854,7 @@ function o1_flight_date($v)
           <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Travel insurance is strongly recommended and not included in the package unless specified explicitly.</p> -->
         </div>
       </div>
-      <div class="mt-6 rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy)">
+      <div class="terms-spacing mt-2 rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-5 h-5 text-[color:var(--gold)]" aria-hidden="true">
           <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z">
           </path>
@@ -2959,8 +2980,6 @@ function o1_flight_date($v)
 
             <!-- =========================== Dipti -->
             <div class="flex gap-2 mt-4">
-              <!-- <pre><? //php print_r($social_links); 
-                        ?></pre> -->
 
               <?php if (!empty($social_links['instagram'])) { ?>
                 <a href="<?= o1e($social_links['instagram']) ?>" style="text-decoration:none; display:inline-block;">
@@ -3019,43 +3038,6 @@ function o1_flight_date($v)
 
             </div>
             <!-- ============================= -->
-
-            <!-- <div class="flex gap-2 mt-4">
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram w-3.5 h-3.5" aria-hidden="true">
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5">
-                  </rect>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z">
-                  </path>
-                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5">
-                  </line>
-                </svg>
-              </div>
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook w-3.5 h-3.5" aria-hidden="true">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z">
-                  </path>
-                </svg>
-              </div>
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin w-3.5 h-3.5" aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
-                  </path>
-                  <rect width="4" height="12" x="2" y="9">
-                  </rect>
-                  <circle cx="4" cy="4" r="2">
-                  </circle>
-                </svg>
-              </div>
-              <div class="w-8 h-8 rounded-full grid place-items-center border border-[color:var(--gold)]/40 text-[color:var(--navy)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube w-3.5 h-3.5" aria-hidden="true">
-                  <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17">
-                  </path>
-                  <path d="m10 15 5-3-5-3z">
-                  </path>
-                </svg>
-              </div>
-            </div> -->
           </div>
           <div class="rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy);box-shadow:var(--shadow-card)">
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Prepared By</div>
@@ -3071,8 +3053,7 @@ function o1_flight_date($v)
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-[color:var(--gold)]" aria-hidden="true">
                   <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384">
                   </path>
-                </svg> <? //= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) 
-                        ?>
+                </svg>
                 <a href="tel:<?= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) ?>">
                   <?= o1e(o1nv($ty['user_mobile'], o1nv($ty['company_contact'], ''))) ?>
                 </a>

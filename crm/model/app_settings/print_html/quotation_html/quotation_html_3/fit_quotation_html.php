@@ -237,8 +237,10 @@ if (!function_exists('o3_render_page_header')) {
           </svg>
         <?php endif; ?>
         <div class="pl-text">
-          <div class="freeze"><?= o3e($b1) ?></div>
-          <div class="mtrip"><?= o3e($b2) ?></div>
+          <!-- <div class="freeze"><? //= o3e($b1) 
+                                    ?></div>
+          <div class="mtrip"><? //= o3e($b2) 
+                              ?></div> -->
           <div class="pl-tag">—Journey Beyond Dreams—</div>
         </div>
       </div>
@@ -331,20 +333,16 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
               <path d="M8 28 L42 14 L36 30 L22 28 L14 40 L12 30 Z" fill="#c8973a" />
             </svg>
           <?php endif; ?>
-          <!-- <div class="brand-text">
-            <div class="freeze"><? //= o3e($o3_b1) 
-                                ?></div>
-            <div class="my-trip"><? //= o3e($o3_b2) 
-                                  ?></div>
-          </div> -->
         </div>
         <div class="tagline">Journey Beyond Dreams</div>
       </div>
-      <div class="cover-hero-frame">
+      <!-- <div class="cover-hero-frame">
         <div class="cover-hero-inner">
-          <img src="<?= o3e($o3_cover_img) ?>" alt="<?= o3e($o3_dest) ?>" />
+          <img src="<? //= o3e($o3_cover_img) 
+                    ?>" alt="<? //= o3e($o3_dest) 
+                                                      ?>" />
         </div>
-      </div>
+      </div> -->
       <div class="cover-title-block">
         <div class="main-title"><?= o3e($o3_dest_up) ?></div>
         <div class="sub-title">TOUR PACKAGE</div>
@@ -572,286 +570,283 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
       <?php endif; ?>
     </div>
 
-    <hr class="page-divider" />
+    <hr class="page-divider flight-page-break"/>
 
     <!-- FLIGHTS & TRANSPORT -->
-    <!-- <div class="prep-exclusively">
-      <div class="prep-label">PREPARED EXCLUSIVELY FOR</div>
-      <div class="prep-name"><?= o3e($o3_client) ?></div>
-      <div class="prep-deco">✦ ❁ ✦</div>
-    </div> -->
-    <?php o3_render_page_header($hero, $ov, $assets); ?>
+    <!-- <div class=" prep-exclusively">
+    <div class="prep-label">PREPARED EXCLUSIVELY FOR</div>
+    <div class="prep-name"><?= o3e($o3_client) ?></div>
+    <div class="prep-deco">✦ ❁ ✦</div>
+  </div> -->
+  <?php o3_render_page_header($hero, $ov, $assets); ?>
 
-    <div class="flight-section page-flow-section" style="padding-top:28px;">
-      <?php if (!empty($flights)) : ?>
-        <div class="section-sub-heading">
-          <div class="badge-letter">A</div>FLIGHT DETAILS
-        </div>
-        <?php foreach ($flights as $f) :
-          $air_name = o3nv($f['airline_name'], o3nv($f['airline_display'], 'Flight'));
-          $air_html = str_replace(' ', '<br/>', o3e($air_name));
-          $from_code = o3_air_code(o3nv($f['from_city'], ''));
-          $to_code = o3_air_code(o3nv($f['to_city'], ''));
-          $flight_lbl = o3nv($f['airline_code'], o3nv($f['airline_display'], ''));
-        ?>
-          <div class="flight-card" style="padding-right:40px;">
-            <div>
-              <?php if (!empty($f['airline_logo'])) : ?>
-                <img src="<?= o3e($f['airline_logo']) ?>" alt="<?= o3e($air_name) ?>" class="airline-logo" style="max-height:40px;object-fit:contain;background:transparent;padding:0;" />
-              <?php else : ?>
-                <div class="airline-logo"><?= $air_html ?></div>
-              <?php endif; ?>
-              <div class="flight-route">
-                <div class="route-airport">
-                  <div class="code"><?= o3e($from_code) ?></div>
-                  <div class="city"><?= o3e(o3nv($f['from_city'], '')) ?></div>
-                </div>
-                <div class="route-arrow">→</div>
-                <div class="route-airport">
-                  <div class="code"><?= o3e($to_code) ?></div>
-                  <div class="city"><?= o3e(o3nv($f['to_city'], '')) ?></div>
-                </div>
+  <div class="flight-section page-flow-section" style="padding-top:28px;">
+    <?php if (!empty($flights)) : ?>
+      <div class="section-sub-heading">
+        <div class="badge-letter">A</div>FLIGHT DETAILS
+      </div>
+      <?php foreach ($flights as $f) :
+        $air_name = o3nv($f['airline_name'], o3nv($f['airline_display'], 'Flight'));
+        $air_html = str_replace(' ', '<br/>', o3e($air_name));
+        $from_code = o3_air_code(o3nv($f['from_city'], ''));
+        $to_code = o3_air_code(o3nv($f['to_city'], ''));
+        $flight_lbl = o3nv($f['airline_code'], o3nv($f['airline_display'], ''));
+      ?>
+        <div class="flight-card" style="padding-right:40px;">
+          <div>
+            <?php if (!empty($f['airline_logo'])) : ?>
+              <img src="<?= o3e($f['airline_logo']) ?>" alt="<?= o3e($air_name) ?>" class="airline-logo" style="max-height:40px;object-fit:contain;background:transparent;padding:0;" />
+            <?php else : ?>
+              <div class="airline-logo"><?= $air_html ?></div>
+            <?php endif; ?>
+            <div class="flight-route">
+              <div class="route-airport">
+                <div class="code"><?= o3e($from_code) ?></div>
+                <div class="city"><?= o3e(o3nv($f['from_city'], '')) ?></div>
               </div>
-            </div>
-            <div></div>
-            <div class="flight-num-class" style="text-align:right;">
-              <div class="flight-num"><?= o3e($flight_lbl) ?></div>
-              <div class="flight-class-label">Class</div>
-              <div class="flight-class"><?= o3e(o3nv($f['class'], 'Economy')) ?></div>
-            </div>
-            <div class="flight-footer">
-              <div class="ff-item">
-                <div class="ff-label">Depart</div>
-                <div class="ff-value"><?= o3e(o3nv($f['departure_datetime'], 'NA')) ?></div>
-              </div>
-              <div class="ff-item">
-                <div class="ff-label">Arrive</div>
-                <div class="ff-value"><?= o3e(o3nv($f['arrival_datetime'], 'NA')) ?></div>
-              </div>
-              <div class="ff-item">
-                <div class="ff-label">Route</div>
-                <div class="ff-value"><?= o3e(o3nv($f['from_city'], '')) ?> → <?= o3e(o3nv($f['to_city'], '')) ?></div>
-              </div>
-              <div class="ff-item">
-                <div class="ff-label">Airline</div>
-                <div class="ff-value"><?= o3e($air_name) ?></div>
-              </div>
-            </div>
-            <div class="ticket-stripe"></div>
-          </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-
-      <!-- ============= Train Details -->
-      <?php if (!empty($trains)) : ?>
-        <div class="section-sub-heading" style="margin-top:28px;">
-          <div class="badge-letter">B</div>TRAIN DETAILS
-        </div>
-
-        <?php foreach ($trains as $tr) :
-          $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
-          $to_loc = isset($tr['to_location']) ? $tr['to_location'] : '';
-          $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
-          $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
-
-          $total_pax = 0;
-          if (isset($ov['pax']) && is_array($ov['pax'])) {
-            $total_pax =
-              (int)o3nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
-              (int)o3nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
-              (int)o3nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
-              (int)o3nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
-          }
-        ?>
-          <div class="flight-card" style="padding-right:40px;">
-            <div>
-              <div class="airline-logo">TRAIN<br>JOURNEY</div>
-
-              <div class="flight-route">
-                <div class="route-airport">
-                  <div class="code"><?= o3e(o3_air_code($from_loc)) ?></div>
-                  <div class="city"><?= o3e(o3nv($from_loc, 'NA')) ?></div>
-                </div>
-
-                <div class="route-arrow">→</div>
-
-                <div class="route-airport">
-                  <div class="code"><?= o3e(o3_air_code($to_loc)) ?></div>
-                  <div class="city"><?= o3e(o3nv($to_loc, 'NA')) ?></div>
-                </div>
-              </div>
-            </div>
-
-            <div></div>
-
-            <div class="flight-num-class" style="text-align:right;">
-              <div class="flight-num">TRAIN</div>
-              <div class="flight-class-label">Class</div>
-              <div class="flight-class"><?= o3e($train_class) ?></div>
-            </div>
-
-            <div class="flight-footer">
-              <div class="ff-item">
-                <div class="ff-label">Date & Time</div>
-                <div class="ff-value"><?= o3e(o3nv($from_date, 'NA')) ?></div>
-              </div>
-
-              <div class="ff-item">
-                <div class="ff-label">From</div>
-                <div class="ff-value"><?= o3e(o3nv($from_loc, 'NA')) ?></div>
-              </div>
-
-              <div class="ff-item">
-                <div class="ff-label">To</div>
-                <div class="ff-value"><?= o3e(o3nv($to_loc, 'NA')) ?></div>
-              </div>
-
-              <div class="ff-item">
-                <div class="ff-label">Total Pax</div>
-                <div class="ff-value"><?= o3e($total_pax) ?></div>
-              </div>
-            </div>
-
-            <div class="ticket-stripe"></div>
-          </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-
-      <!-- ================== Activity Details -->
-      <?php if (!empty($acts)) : ?>
-        <div class="section-sub-heading" style="margin-top:28px;">
-          <div class="badge-letter">C</div>ACTIVITY DETAILS
-        </div>
-
-        <?php foreach ($acts as $a) :
-          $activity_img = BASE_URL . 'images/activity.jpg';
-
-          $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
-          $city_name = isset($a['city_name']) ? $a['city_name'] : '';
-          $activity_date = isset($a['date']) ? $a['date'] : '';
-          $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
-
-          $total_pax = 0;
-          if (isset($a['pax']) && is_array($a['pax'])) {
-            $total_pax =
-              (int)o3nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
-              (int)o3nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
-              (int)o3nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
-              (int)o3nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
-          }
-        ?>
-          <div class="transport-card" style="margin-bottom:14px;">
-            <img src="<?= o3e($activity_img) ?>" alt="<?= o3e(o3nv($activity_name, 'Activity')) ?>" />
-
-            <div style="display:flex;gap:16px;flex:1;">
-              <div class="transport-timeline" style="padding-top:8px;">
-                <div class="tl-dot"></div>
-                <div class="tl-line"></div>
-                <div class="tl-dot"></div>
-                <div class="tl-line"></div>
-                <div class="tl-person"></div>
-              </div>
-
-              <div class="transport-details">
-                <div class="td-row">
-                  <div class="td-label">Activity Name</div>
-                  <div class="td-value"><?= o3e(o3nv($activity_name, 'Activity')) ?></div>
-                </div>
-
-                <div class="td-row">
-                  <div class="td-label">City</div>
-                  <div class="td-value"><?= o3e(o3nv($city_name, 'NA')) ?></div>
-                </div>
-
-                <div class="td-row">
-                  <div class="td-label">Date</div>
-                  <div class="td-value"><?= o3e(o3nv($activity_date, 'NA')) ?></div>
-                </div>
-
-                <div class="td-row">
-                  <div class="td-label">Transfer Type</div>
-                  <div class="td-value"><?= o3e(o3nv($transfer_type, 'NA')) ?></div>
-                </div>
-
-                <div class="td-row">
-                  <div class="td-label">Total Pax</div>
-                  <div class="td-value"><?= o3e($total_pax) ?> Pax</div>
-                </div>
+              <div class="route-arrow">→</div>
+              <div class="route-airport">
+                <div class="code"><?= o3e($to_code) ?></div>
+                <div class="city"><?= o3e(o3nv($f['to_city'], '')) ?></div>
               </div>
             </div>
           </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-      <!-- ========================== -->
-      <?php if (!empty($vehs)) : ?>
-        <div class="section-sub-heading" style="margin-top:28px;">
-          <div class="badge-letter">D</div>TRANSPORTATION
+          <div></div>
+          <div class="flight-num-class" style="text-align:right;">
+            <div class="flight-num"><?= o3e($flight_lbl) ?></div>
+            <div class="flight-class-label">Class</div>
+            <div class="flight-class"><?= o3e(o3nv($f['class'], 'Economy')) ?></div>
+          </div>
+          <div class="flight-footer">
+            <div class="ff-item">
+              <div class="ff-label">Depart</div>
+              <div class="ff-value"><?= o3e(o3nv($f['departure_datetime'], 'NA')) ?></div>
+            </div>
+            <div class="ff-item">
+              <div class="ff-label">Arrive</div>
+              <div class="ff-value"><?= o3e(o3nv($f['arrival_datetime'], 'NA')) ?></div>
+            </div>
+            <div class="ff-item">
+              <div class="ff-label">Route</div>
+              <div class="ff-value"><?= o3e(o3nv($f['from_city'], '')) ?> → <?= o3e(o3nv($f['to_city'], '')) ?></div>
+            </div>
+            <div class="ff-item">
+              <div class="ff-label">Airline</div>
+              <div class="ff-value"><?= o3e($air_name) ?></div>
+            </div>
+          </div>
+          <div class="ticket-stripe"></div>
         </div>
-        <?php foreach ($vehs as $v) : ?>
-          <div class="transport-card" style="margin-bottom:14px;">
-            <!-- <img src="<? //= o3e(o3img(isset($v['vehicle_image']) ? $v['vehicle_image'] : '', $assets . 'vehicle.jpg')) 
-                            ?>" alt="<? //= o3e(o3nv($v['vehicle_name'], 'Vehicle')) 
+      <?php endforeach; ?>
+    <?php endif; ?>
+
+    <!-- ============= Train Details -->
+    <?php if (!empty($trains)) : ?>
+      <div class="section-sub-heading" style="margin-top:28px;">
+        <div class="badge-letter">B</div>TRAIN DETAILS
+      </div>
+
+      <?php foreach ($trains as $tr) :
+        $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
+        $to_loc = isset($tr['to_location']) ? $tr['to_location'] : '';
+        $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
+        $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
+
+        $total_pax = 0;
+        if (isset($ov['pax']) && is_array($ov['pax'])) {
+          $total_pax =
+            (int)o3nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
+            (int)o3nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
+            (int)o3nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
+            (int)o3nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
+        }
+      ?>
+        <div class="flight-card" style="padding-right:40px;">
+          <div>
+            <div class="airline-logo">TRAIN<br>JOURNEY</div>
+
+            <div class="flight-route">
+              <div class="route-airport">
+                <div class="code"><?= o3e(o3_air_code($from_loc)) ?></div>
+                <div class="city"><?= o3e(o3nv($from_loc, 'NA')) ?></div>
+              </div>
+
+              <div class="route-arrow">→</div>
+
+              <div class="route-airport">
+                <div class="code"><?= o3e(o3_air_code($to_loc)) ?></div>
+                <div class="city"><?= o3e(o3nv($to_loc, 'NA')) ?></div>
+              </div>
+            </div>
+          </div>
+
+          <div></div>
+
+          <div class="flight-num-class" style="text-align:right;">
+            <div class="flight-num">TRAIN</div>
+            <div class="flight-class-label">Class</div>
+            <div class="flight-class"><?= o3e($train_class) ?></div>
+          </div>
+
+          <div class="flight-footer">
+            <div class="ff-item">
+              <div class="ff-label">Date & Time</div>
+              <div class="ff-value"><?= o3e(o3nv($from_date, 'NA')) ?></div>
+            </div>
+
+            <div class="ff-item">
+              <div class="ff-label">From</div>
+              <div class="ff-value"><?= o3e(o3nv($from_loc, 'NA')) ?></div>
+            </div>
+
+            <div class="ff-item">
+              <div class="ff-label">To</div>
+              <div class="ff-value"><?= o3e(o3nv($to_loc, 'NA')) ?></div>
+            </div>
+
+            <div class="ff-item">
+              <div class="ff-label">Total Pax</div>
+              <div class="ff-value"><?= o3e($total_pax) ?></div>
+            </div>
+          </div>
+
+          <div class="ticket-stripe"></div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+
+    <!-- ================== Activity Details -->
+    <?php if (!empty($acts)) : ?>
+      <div class="section-sub-heading" style="margin-top:28px;">
+        <div class="badge-letter">C</div>ACTIVITY DETAILS
+      </div>
+
+      <?php foreach ($acts as $a) :
+        $activity_img = BASE_URL . 'images/activity.jpg';
+
+        $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
+        $city_name = isset($a['city_name']) ? $a['city_name'] : '';
+        $activity_date = isset($a['date']) ? $a['date'] : '';
+        $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
+
+        $total_pax = 0;
+        if (isset($a['pax']) && is_array($a['pax'])) {
+          $total_pax =
+            (int)o3nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
+            (int)o3nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
+            (int)o3nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
+            (int)o3nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
+        }
+      ?>
+        <div class="transport-card" style="margin-bottom:14px;">
+          <img src="<?= o3e($activity_img) ?>" alt="<?= o3e(o3nv($activity_name, 'Activity')) ?>" />
+
+          <div style="display:flex;gap:16px;flex:1;">
+            <div class="transport-timeline" style="padding-top:8px;">
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+              <div class="tl-person"></div>
+            </div>
+
+            <div class="transport-details">
+              <div class="td-row">
+                <div class="td-label">Activity Name</div>
+                <div class="td-value"><?= o3e(o3nv($activity_name, 'Activity')) ?></div>
+              </div>
+
+              <div class="td-row">
+                <div class="td-label">City</div>
+                <div class="td-value"><?= o3e(o3nv($city_name, 'NA')) ?></div>
+              </div>
+
+              <div class="td-row">
+                <div class="td-label">Date</div>
+                <div class="td-value"><?= o3e(o3nv($activity_date, 'NA')) ?></div>
+              </div>
+
+              <div class="td-row">
+                <div class="td-label">Transfer Type</div>
+                <div class="td-value"><?= o3e(o3nv($transfer_type, 'NA')) ?></div>
+              </div>
+
+              <div class="td-row">
+                <div class="td-label">Total Pax</div>
+                <div class="td-value"><?= o3e($total_pax) ?> Pax</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+    <!-- ========================== -->
+    <?php if (!empty($vehs)) : ?>
+      <div class="section-sub-heading" style="margin-top:28px;">
+        <div class="badge-letter">D</div>TRANSPORTATION
+      </div>
+      <?php foreach ($vehs as $v) : ?>
+        <div class="transport-card" style="margin-bottom:14px;">
+          <!-- <img src="<? //= o3e(o3img(isset($v['vehicle_image']) ? $v['vehicle_image'] : '', $assets . 'vehicle.jpg')) 
+                          ?>" alt="<? //= o3e(o3nv($v['vehicle_name'], 'Vehicle')) 
                                       ?>" /> -->
-            <?php $vehicle_img = BASE_URL . 'images/vehicle.png'; ?>
+          <?php $vehicle_img = BASE_URL . 'images/vehicle.png'; ?>
 
-            <img src="<?= o3e($vehicle_img) ?>"
-              alt="<?= o3e(o3nv($v['vehicle_name'], 'Vehicle')) ?>" />
+          <img src="<?= o3e($vehicle_img) ?>"
+            alt="<?= o3e(o3nv($v['vehicle_name'], 'Vehicle')) ?>" />
 
-            <div style="display:flex;gap:16px;flex:1;">
-              <div class="transport-timeline" style="padding-top:8px;">
-                <div class="tl-dot"></div>
-                <div class="tl-line"></div>
-                <div class="tl-dot"></div>
-                <div class="tl-line"></div>
-                <div class="tl-person"></div>
+          <div style="display:flex;gap:16px;flex:1;">
+            <div class="transport-timeline" style="padding-top:8px;">
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+              <div class="tl-dot"></div>
+              <div class="tl-line"></div>
+              <div class="tl-person"></div>
+            </div>
+            <div class="transport-details">
+              <div class="td-row">
+                <div class="td-label">Vehicle</div>
+                <div class="td-value"><?= o3e(o3nv($v['vehicle_name'], '')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o3e($v['vehicle_count']) ?> Unit<?= ((int)$v['vehicle_count'] > 1 ? 's' : '') ?>)<?php endif; ?></div>
               </div>
-              <div class="transport-details">
-                <div class="td-row">
-                  <div class="td-label">Vehicle</div>
-                  <div class="td-value"><?= o3e(o3nv($v['vehicle_name'], '')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o3e($v['vehicle_count']) ?> Unit<?= ((int)$v['vehicle_count'] > 1 ? 's' : '') ?>)<?php endif; ?></div>
-                </div>
-                <div class="td-row">
-                  <div class="td-label">Pickup Location</div>
-                  <div class="td-value"><?= o3e(o3nv($v['pickup'], 'NA')) ?></div>
-                </div>
-                <div class="td-row">
-                  <div class="td-label">Drop Location</div>
-                  <div class="td-value"><?= o3e(o3nv($v['drop'], 'NA')) ?></div>
-                </div>
-                <div class="td-row">
-                  <div class="td-label">Start Date</div>
-                  <div class="td-value"><?= o3e(o3nv($v['date'], '')) ?></div>
-                </div>
-                <div class="td-row">
-                  <div class="td-label">End Date</div>
-                  <div class="td-value"><?= o3e(o3_vehicle_end_date($v)) ?></div>
-                </div>
-                <div class="td-row">
-                  <div class="td-label">Service Duration</div>
-                  <div class="td-value"><?= o3e(o3nv($v['service_duration'], o3nv($v['description'], ''))) ?></div>
-                </div>
-                <div class="td-row">
-                  <div class="td-label">Vehicle Category</div>
-                  <div class="td-value"><?= o3e(o3nv($v['vehicle_type'], 'Private Transfer')) ?></div>
-                </div>
+              <div class="td-row">
+                <div class="td-label">Pickup Location</div>
+                <div class="td-value"><?= o3e(o3nv($v['pickup'], 'NA')) ?></div>
+              </div>
+              <div class="td-row">
+                <div class="td-label">Drop Location</div>
+                <div class="td-value"><?= o3e(o3nv($v['drop'], 'NA')) ?></div>
+              </div>
+              <div class="td-row">
+                <div class="td-label">Start Date</div>
+                <div class="td-value"><?= o3e(o3nv($v['date'], '')) ?></div>
+              </div>
+              <div class="td-row">
+                <div class="td-label">End Date</div>
+                <div class="td-value"><?= o3e(o3_vehicle_end_date($v)) ?></div>
+              </div>
+              <div class="td-row">
+                <div class="td-label">Service Duration</div>
+                <div class="td-value"><?= o3e(o3nv($v['service_duration'], o3nv($v['description'], ''))) ?></div>
+              </div>
+              <div class="td-row">
+                <div class="td-label">Vehicle Category</div>
+                <div class="td-value"><?= o3e(o3nv($v['vehicle_type'], 'Private Transfer')) ?></div>
               </div>
             </div>
           </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
 
+  <hr class="page-divider" />
 
+  <div class="page-break"></div>
+  <!-- ITINERARY -->
 
-
-    <hr class="page-divider" />
-
-
-    <div class="page-break"></div>
-    <!-- ITINERARY -->
+  <div class="itinerary-page">
     <?php o3_render_page_header($hero, $ov, $assets); ?>
-
-    <div class="itinerary-section page-flow-section">
+    <div class="itinerary-section page-flow-section ">
       <!-- <div class="section-sub-heading"> -->
       <div class="section-sub-heading keep-with-next">
         <div class="badge-letter">C</div>DAY WISE ITINERARY
@@ -908,13 +903,15 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </div>
       <?php endif; ?>
     </div>
+  </div>
 
-    <hr class="page-divider" />
+  <hr class="page-divider" />
+  <div class="page-break"></div>
 
-    <!-- INCLUSIONS / COSTING -->
+  <!-- INCLUSIONS / COSTING -->
+  <div class="print-section">
     <?php o3_render_page_header($hero, $ov, $assets); ?>
-
-    <div class="inc-exc-row page-flow-section">
+    <div class="inc-exc-row page-flow-section ">
       <div class="inc-card">
         <div class="inc-exc-title">
           <div class="inc-exc-badge inc-badge">A</div>WHAT'S INCLUDED
@@ -936,6 +933,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </ul>
       </div>
     </div>
+    </br>
 
     <!-- ======================= Costing -->
     <?php
@@ -1039,10 +1037,13 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         <?= o3e(o3nv(isset($incx['note']) ? $incx['note'] : '', 'Note: Rates are subject to availability at the time of confirmation.')) ?>
       </div>
     </div>
+  </div>
 
-    <hr class="page-divider" />
+  <hr class="page-divider" />
+  <div class="page-break"></div>
 
-    <!-- PAYMENT -->
+  <!-- PAYMENT -->
+  <div class="print-section">
     <?php o3_render_page_header($hero, $ov, $assets); ?>
 
     <div class="payment-section page-flow-section">
@@ -1129,10 +1130,13 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </div>
       </div>
     </div>
+  </div>
 
-    <hr class="page-divider" />
+  <hr class="page-divider" />
+  <div class="page-break"></div>
 
-    <!-- TESTIMONIALS -->
+  <!-- TESTIMONIALS -->
+  <div class="testimonial-page print-section">
     <?php o3_render_page_header($hero, $ov, $assets); ?>
 
     <div class="testimonials-section page-flow-section">
@@ -1170,9 +1174,12 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </div>
       <?php endif; ?>
     </div>
+  </div>
 
-    <hr class="page-divider" />
+  <hr class="page-divider" />
+  <div class="page-break"></div>
 
+  <div class="terms-page print-section">
     <!-- TERMS -->
     <?php o3_render_page_header($hero, $ov, $assets); ?>
 
@@ -1274,7 +1281,6 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </div>
       </div>
     </div>
-
   </div>
 
   <script type="text/javascript">
