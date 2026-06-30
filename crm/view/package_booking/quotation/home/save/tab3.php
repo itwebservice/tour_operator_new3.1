@@ -2915,11 +2915,31 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
                     get_hotel_cost();
                 }
 
+                const transportPackagesToLoad = typeof quotationFilterNewPackageIdsForTransport === 'function'
+                    ? quotationFilterNewPackageIdsForTransport(package_id_arr)
+                    : [];
+
+                const afterTransportOrSkip = function() {
+                    if (typeof quotationSyncTravelStaySectionsFromHotels === 'function') {
+                        quotationSyncTravelStaySectionsFromHotels();
+                    } else if (typeof syncQuotationTravelStayDates === 'function') {
+                        syncQuotationTravelStayDates({ preserveHotelDates: true });
+                    }
+                    if (typeof get_excursion_amount === 'function') {
+                        get_excursion_amount();
+                    }
+                };
+
+                if (!transportPackagesToLoad.length) {
+                    afterTransportOrSkip();
+                    return;
+                }
+
                 $.ajax({
                     type: 'post',
                     url: '../save/package_transport_info.php',
                     data: {
-                        package_id_arr: packagesToLoad,
+                        package_id_arr: transportPackagesToLoad,
                         from_date: from_date,
                         total_adult: total_adult
                     },
@@ -2933,16 +2953,9 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
                             });
                         }
 
-                        if (typeof quotationSyncTravelStaySectionsFromHotels === 'function') {
-                            quotationSyncTravelStaySectionsFromHotels();
-                        } else if (typeof syncQuotationTravelStayDates === 'function') {
-                            syncQuotationTravelStayDates({ preserveHotelDates: true });
-                        }
+                        afterTransportOrSkip();
                         if (typeof get_transport_cost === 'function') {
                             get_transport_cost();
-                        }
-                        if (typeof get_excursion_amount === 'function') {
-                            get_excursion_amount();
                         }
                     }
                 });

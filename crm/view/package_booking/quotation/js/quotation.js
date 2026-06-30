@@ -1218,6 +1218,37 @@ function quotationFilterNewPackageIds(package_id_arr) {
 	return newIds.length ? newIds : package_id_arr;
 }
 
+function quotationGetExistingTransportPackageIds() {
+	var ids = {};
+	var tableIds = ['tbl_package_tour_quotation_dynamic_transport', 'tbl_package_tour_quotation_dynamic_transport_u'];
+	for (var t = 0; t < tableIds.length; t++) {
+		var table = document.getElementById(tableIds[t]);
+		if (!table) continue;
+		for (var i = 0; i < table.rows.length; i++) {
+			var row = table.rows[i];
+			if (!quotationIsRowActive(row)) continue;
+			if (!row.cells[11] || !row.cells[11].childNodes[0]) continue;
+			var packageId = row.cells[11].childNodes[0].value;
+			if (packageId) {
+				ids[String(packageId)] = true;
+			}
+		}
+	}
+	return ids;
+}
+
+/** Package IDs that do not yet have transport rows (transport is per package, not per hotel tier). */
+function quotationFilterNewPackageIdsForTransport(package_id_arr) {
+	var existingIds = quotationGetExistingTransportPackageIds();
+	var newIds = [];
+	for (var i = 0; i < package_id_arr.length; i++) {
+		if (!existingIds[String(package_id_arr[i])]) {
+			newIds.push(package_id_arr[i]);
+		}
+	}
+	return newIds;
+}
+
 function quotationGetHotelDateList() {
 	var dates = [];
 	var tableIds = ['tbl_package_tour_quotation_dynamic_hotel', 'tbl_package_tour_quotation_dynamic_hotel_update'];
