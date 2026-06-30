@@ -335,6 +335,56 @@ function get_flight_enquiry_details(offset = '') {
 	}
 }
 
+function flightQuotationCellControl(cell) {
+	if (typeof getCellFormControl === 'function') {
+		return getCellFormControl(cell);
+	}
+	if (!cell) {
+		return null;
+	}
+	for (var i = 0; i < cell.childNodes.length; i++) {
+		if (cell.childNodes[i].nodeType === 1) {
+			return cell.childNodes[i];
+		}
+	}
+	return null;
+}
+
+function flightQuotationCellValue(cell) {
+	var el = flightQuotationCellControl(cell);
+	if (!el) {
+		return '';
+	}
+	var $el = $(el);
+	if ($el.data('select2')) {
+		var v = $el.val();
+		return (v === null || v === undefined) ? '' : String(v);
+	}
+	return el.value || '';
+}
+
+function isFlightQuotationPlaneRowChecked(row) {
+	var chk = flightQuotationCellControl(row.cells[0]);
+	return !!(chk && chk.checked);
+}
+
+function getFlightQuotationPlaneRowData(row) {
+	return {
+		from_sector: flightQuotationCellValue(row.cells[2]),
+		to_sector: flightQuotationCellValue(row.cells[3]),
+		airline_name: flightQuotationCellValue(row.cells[4]),
+		plane_class: flightQuotationCellValue(row.cells[5]),
+		total_adult: flightQuotationCellValue(row.cells[6]),
+		total_child: flightQuotationCellValue(row.cells[7]),
+		total_infant: flightQuotationCellValue(row.cells[8]),
+		dapart: flightQuotationCellValue(row.cells[9]),
+		arraval: flightQuotationCellValue(row.cells[10]),
+		from_city_id: flightQuotationCellValue(row.cells[11]),
+		to_city_id: flightQuotationCellValue(row.cells[12]),
+		plane_id: (row.cells[13] ? flightQuotationCellValue(row.cells[13]) : '')
+	};
+}
+
 function flight_quotation_cost_calculate(offset = '') {
 	var quotation_cost = 0;
 	var subtotal = $('#subtotal' + offset).val();

@@ -12,12 +12,17 @@ function hotel_name_list_load(id) {
     return;
   }
   var base_url = $('#base_url').val();
-  $.get(base_url + 'view/hotels/booking/booking/inc/hotel_name_load.php', { city_id: city_id }, function (data) {
+  $.get(base_url + 'view/hotels/booking/inc/hotel_name_load.php', { city_id: city_id }, function (data) {
     if ($hotel.data('select2')) {
       $hotel.select2('destroy');
     }
     $hotel.html(data);
-    $hotel.select2({ width: '170px', minimumResultsForSearch: 0 });
+    var hotelConfig = {
+      width: '170px',
+      minimumResultsForSearch: 0,
+      dropdownParent: $('#booking_save_modal').length ? $('#booking_save_modal') : undefined
+    };
+    $hotel.select2(hotelConfig);
     if (typeof captureHotelSelect2Config === 'function') {
       captureHotelSelect2Config($hotel);
     }
@@ -168,6 +173,9 @@ function get_quotation_details(){
         $('#markup_tax_value').val(data.costing_details[0]['costing']['markup_tax_value']);
         $('#sub_total').val(data.costing_details[0]['costing']['hotel_cost']);
         $('#sub_total').trigger('change');
+        if (typeof init_hotel_booking_row_select2 === 'function') {
+          init_hotel_booking_row_select2();
+        }
     });
   }
 }

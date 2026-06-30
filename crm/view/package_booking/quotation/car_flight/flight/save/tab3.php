@@ -171,19 +171,20 @@ $('#frm_tab3').validate({
 			var enquiry_content = Array();
 			for(var i=0; i<rowCount; i++){
 			var row = table.rows[i];
-				if(row.cells[0].childNodes[0].checked){
+				if(isFlightQuotationPlaneRowChecked(row)){
+					var planeRow = getFlightQuotationPlaneRowData(row);
 					var obj = {
-						// travel_datetime : row.cells[2].childNodes[0].value,
-							sector_from : row.cells[2].childNodes[0].value,
-							sector_to : row.cells[3].childNodes[0].value,
-							preffered_airline : row.cells[4].childNodes[0].value,
-							class_type : row.cells[5].childNodes[0].value,
-							total_adults_flight : row.cells[6].childNodes[0].value,
-							total_child_flight : row.cells[7].childNodes[0].value,
-							total_infant_flight : row.cells[8].childNodes[0].value,
-							travel_datetime : row.cells[9].childNodes[0].value,
-							from_city_id_flight : row.cells[11].childNodes[0].value,
-							to_city_id_flight : row.cells[12].childNodes[0].value,
+						// travel_datetime : planeRow.dapart,
+							sector_from : planeRow.from_sector,
+							sector_to : planeRow.to_sector,
+							preffered_airline : planeRow.airline_name,
+							class_type : planeRow.plane_class,
+							total_adults_flight : planeRow.total_adult,
+							total_child_flight : planeRow.total_child,
+							total_infant_flight : planeRow.total_infant,
+							travel_datetime : planeRow.dapart,
+							from_city_id_flight : planeRow.from_city_id,
+							to_city_id_flight : planeRow.to_city_id,
 							budget : 0
 						}
 						enquiry_content.push(obj); 
@@ -217,21 +218,21 @@ $('#frm_tab3').validate({
 		  for(var i=0; i<rowCount; i++){
 		    var row = table.rows[i];
 
-		    if(row.cells[0].childNodes[0].checked)
+		    if(isFlightQuotationPlaneRowChecked(row))
 		    {
 
-		       
-		       var from_sector = row.cells[2].childNodes[0].value;   
-		       var to_sector = row.cells[3].childNodes[0].value;
-		       var airline_name = row.cells[4].childNodes[0].value;  
-		       var plane_class = row.cells[5].childNodes[0].value;         
-		       var total_adult = row.cells[6].childNodes[0].value;
-			   var total_child = row.cells[7].childNodes[0].value;
-			   var total_infant = row.cells[8].childNodes[0].value;
-			   var dapart1 = row.cells[9].childNodes[0].value;
-			   var arraval1 = row.cells[10].childNodes[0].value;
-			   var from_city_id1 = row.cells[11].childNodes[0].value;
-			   var to_city_id1 = row.cells[12].childNodes[0].value;          
+		       var planeRow = getFlightQuotationPlaneRowData(row);
+		       var from_sector = planeRow.from_sector;
+		       var to_sector = planeRow.to_sector;
+		       var airline_name = planeRow.airline_name;
+		       var plane_class = planeRow.plane_class;
+		       var total_adult = planeRow.total_adult;
+			   var total_child = planeRow.total_child;
+			   var total_infant = planeRow.total_infant;
+			   var dapart1 = planeRow.dapart;
+			   var arraval1 = planeRow.arraval;
+			   var from_city_id1 = planeRow.from_city_id;
+			   var to_city_id1 = planeRow.to_city_id;
 		       if(from_sector=="")
 
 		       {

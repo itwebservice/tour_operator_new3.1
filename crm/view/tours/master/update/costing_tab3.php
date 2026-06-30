@@ -334,23 +334,15 @@ $('#frm_tour_update').validate({
 
             var row = table.rows[i];
 
-            if (row.cells[0].childNodes[0].checked)
+            if (isPackageTourHotelRowChecked(row))
 
             {
-
-                var city_name = row.cells[2].childNodes[0].value;
-
-                var hotel_name = row.cells[3].childNodes[0].value;
-
-                var hotel_type = row.cells[4].childNodes[0].value;
-
-                var total_days = row.cells[5].childNodes[0].value;
-
-                if (row.cells[6] && row.cells[6].childNodes[0]) {
-                    var hotel_entry_id = row.cells[6].childNodes[0].value;
-                } else {
-                    var plane_id = "";
-                }
+                var hotelRow = getPackageTourHotelRowData(row);
+                var city_name = hotelRow.city_name;
+                var hotel_name = hotelRow.hotel_name;
+                var hotel_type = hotelRow.hotel_type;
+                var total_days = hotelRow.total_days;
+                var hotel_entry_id = hotelRow.hotel_entry_id || "";
 
 
                 city_name_arr.push(city_name);

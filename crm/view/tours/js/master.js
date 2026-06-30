@@ -374,27 +374,18 @@ $('#frm_tour_master_save').validate({
 
 		var row = table.rows[i];
 
-	if(row.cells[0].childNodes[0].checked)
+	if(isPackageTourHotelRowChecked(row))
 
-	{  
+	{
+		var hotelRow = getPackageTourHotelRowData(row);
 
-		var city_name = row.cells[2].childNodes[0].value;
+		city_name_arr.push(hotelRow.city_name);
 
-		var hotel_name = row.cells[3].childNodes[0].value;
+		hotel_name_arr.push(hotelRow.hotel_name);
 
-		var hotel_type = row.cells[4].childNodes[0].value;
+		hotel_type_arr.push(hotelRow.hotel_type);
 
-		var total_days = row.cells[5].childNodes[0].value;
-
-
-
-		city_name_arr.push(city_name);
-
-		hotel_name_arr.push(hotel_name);
-
-		hotel_type_arr.push(hotel_type);  
-
-		total_days_arr.push(total_days);  
+		total_days_arr.push(hotelRow.total_days);
 
 	}
 
@@ -511,6 +502,61 @@ $('#frm_tour_master_save').validate({
 }
 });
 
+function packageTourHotelCellControl(cell) {
+	if (typeof packageHotelCellControl === 'function') {
+		return packageHotelCellControl(cell);
+	}
+	if (typeof getCellFormControl === 'function') {
+		return getCellFormControl(cell);
+	}
+	if (!cell) {
+		return null;
+	}
+	for (var i = 0; i < cell.childNodes.length; i++) {
+		if (cell.childNodes[i].nodeType === 1) {
+			return cell.childNodes[i];
+		}
+	}
+	return null;
+}
+
+function packageTourHotelCellValue(cell) {
+	if (typeof packageHotelCellValue === 'function') {
+		return packageHotelCellValue(cell);
+	}
+	var el = packageTourHotelCellControl(cell);
+	if (!el) {
+		return '';
+	}
+	var $el = $(el);
+	if ($el.data('select2')) {
+		var v = $el.val();
+		return (v === null || v === undefined) ? '' : String(v);
+	}
+	return el.value || '';
+}
+
+function isPackageTourHotelRowChecked(row) {
+	if (typeof isPackageHotelRowChecked === 'function') {
+		return isPackageHotelRowChecked(row);
+	}
+	var chk = packageTourHotelCellControl(row.cells[0]);
+	return !!(chk && chk.checked);
+}
+
+function getPackageTourHotelRowData(row) {
+	if (typeof getPackageHotelRowData === 'function') {
+		return getPackageHotelRowData(row);
+	}
+	return {
+		city_name: packageTourHotelCellValue(row.cells[2]),
+		hotel_name: packageTourHotelCellValue(row.cells[3]),
+		hotel_type: packageTourHotelCellValue(row.cells[4]),
+		total_days: packageTourHotelCellValue(row.cells[5]),
+		hotel_entry_id: row.cells[6] ? packageTourHotelCellValue(row.cells[6]) : ''
+	};
+}
+
 function hotel_name_list_load(id){
 
 	var city_id = $("#"+id).val();
@@ -542,9 +588,18 @@ function hotel_name_list_load(id){
 function hotel_type_load(id){
 
 	var base_url = $("#base_url").val();
-	var hotel_id = $("#"+id).val();
-	var count = id.substring(10);
+	var $hotel = $('#' + id);
+	var hotel_id = $hotel.data('select2') ? ($hotel.val() || '') : $hotel.val();
+	if (!hotel_id) {
+		return;
+	}
+	var $row = $hotel.closest('tr');
+	var $hotelType = $row.length ? $row.find('input[id^="hotel_type"]').first() : $();
+	if (!$hotelType.length) {
+		var count = id.replace(/^hotel_name/, '');
+		$hotelType = $('#hotel_type' + count);
+	}
 	$.get( base_url+"view/custom_packages/master/package/hotel/hotel_type_load.php" , { hotel_id : hotel_id } , function ( data ) {
-		$ ("#hotel_type"+count).val( data ) ;                            
+		$hotelType.val(data);
 	});
 }

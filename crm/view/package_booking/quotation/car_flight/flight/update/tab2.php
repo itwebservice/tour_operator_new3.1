@@ -77,35 +77,26 @@ $(function(){
 
 			     
 
-			    if(row.cells[0].childNodes[0].checked)
+			    if(isFlightQuotationPlaneRowChecked(row))
 
 			    {
 
-					var from_sector = row.cells[2].childNodes[0].value;   
-		       		var to_sector = row.cells[3].childNodes[0].value;
-			       var airline_name = row.cells[4].childNodes[0].value;  
+					var planeRow = getFlightQuotationPlaneRowData(row);
+					var from_sector = planeRow.from_sector;
+		       		var to_sector = planeRow.to_sector;
+			       var airline_name = planeRow.airline_name;
 
-			       var plane_class = row.cells[5].childNodes[0].value;         
-				   var total_adult = row.cells[6].childNodes[0].value;
-			   var total_child = row.cells[7].childNodes[0].value;
-			   var total_infant = row.cells[8].childNodes[0].value;   
-			       var dapart1 = row.cells[9].childNodes[0].value;
+			       var plane_class = planeRow.plane_class;
+				   var total_adult = planeRow.total_adult;
+			   var total_child = planeRow.total_child;
+			   var total_infant = planeRow.total_infant;
+			       var dapart1 = planeRow.dapart;
 
-				   var arraval1 = row.cells[10].childNodes[0].value;
-				   var from_city_id1 = row.cells[11].childNodes[0].value;
-			  		var to_city_id1 = row.cells[12].childNodes[0].value; 
+				   var arraval1 = planeRow.arraval;
+				   var from_city_id1 = planeRow.from_city_id;
+			  		var to_city_id1 = planeRow.to_city_id;
 					  selectedCount1++;
-			       if(row.cells[13] && row.cells[13].childNodes[0]){
-
-			       	var plane_id = row.cells[13].childNodes[0].value;
-
-			       }
-
-			       else{
-
-			       	var plane_id = "";
-
-			       }     
+			       var plane_id = planeRow.plane_id || "";
 
 
 			       if(from_sector=="")

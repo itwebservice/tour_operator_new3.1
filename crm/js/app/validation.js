@@ -5077,7 +5077,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     }
     
     // Handle city dropdown initialization for custom package hotel master table
-    if (tableID === "tbl_package_hotel_master") {
+    if (tableID === "tbl_package_hotel_master" || tableID === "tbl_package_hotel_master_dynamic_update") {
         // Initialize city dropdown for the new row
         var citySelect = $(row).find('select[name^="city_name"]');
         if (citySelect.length > 0) {
@@ -5085,6 +5085,34 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             
             // Add onchange handler for hotel loading
             citySelect.attr('onchange', 'hotel_name_list_load(this.id);');
+        }
+        var $hotelSelect = $(row).find('select[id^="hotel_name"]');
+        if ($hotelSelect.length) {
+            if ($hotelSelect.data('select2')) {
+                $hotelSelect.select2('destroy');
+            }
+            $hotelSelect
+                .empty()
+                .append($('<option value="">*Hotel Name</option>'))
+                .attr('data-add-new-option', 'true');
+            var hotelConfig = { width: '100%', minimumResultsForSearch: 0 };
+            if (typeof captureHotelSelect2Config === 'function') {
+                hotelConfig = $.extend({}, captureHotelSelect2Config($hotelSelect), hotelConfig);
+            }
+            $hotelSelect.select2(hotelConfig);
+            if (typeof captureHotelSelect2Config === 'function') {
+                captureHotelSelect2Config($hotelSelect);
+            }
+            if (typeof initHotelSelectAddNew === 'function') {
+                initHotelSelectAddNew($hotelSelect);
+            }
+            var hotelEl = $hotelSelect[0];
+            if (hotelEl) {
+                hotelEl.setAttribute('onchange', 'hotel_type_load(this.id);');
+            }
+        }
+        if (typeof initAllHotelSelectAddNew === 'function') {
+            initAllHotelSelectAddNew(row);
         }
     }
 }

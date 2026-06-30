@@ -67,12 +67,3 @@
         <td><input type="text" style="width:150px" data-toggle="tooltip" id="conf_no<?= $prefix ?>1"
         name="conf_no<?= $prefix ?>1" placeholder="Confirmation No." title="Confirmation No."></td>
 </tr>
-
-<script>
- $('#hotel_id1').select2({
-            width: '170px'
-        });
- if (typeof initHotelSelectAddNew === 'function') {
-     initHotelSelectAddNew('#hotel_id1');
- }
-</script>

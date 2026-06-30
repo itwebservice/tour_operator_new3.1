@@ -2252,27 +2252,29 @@ function resolveHotelLoadUrl() {
 }
 
 function captureHotelSelect2Config($select) {
+	var config;
 	if ($select.data('hsq-select2-config')) {
-		return $select.data('hsq-select2-config');
-	}
-	var config = {
-		width: '100%',
-		minimumResultsForSearch: 0
-	};
-	var s2 = $select.data('select2');
-	if (s2 && s2.options) {
-		var opts = s2.options.options || s2.options;
-		if (opts.width) {
-			config.width = opts.width;
-		}
-		if (opts.dropdownParent) {
-			config.dropdownParent = opts.dropdownParent;
-		}
-		if (opts.placeholder !== undefined) {
-			config.placeholder = opts.placeholder;
-		}
-		if (opts.allowClear !== undefined) {
-			config.allowClear = opts.allowClear;
+		config = $.extend({}, $select.data('hsq-select2-config'));
+	} else {
+		config = {
+			width: '100%',
+			minimumResultsForSearch: 0
+		};
+		var s2 = $select.data('select2');
+		if (s2 && s2.options) {
+			var opts = s2.options.options || s2.options;
+			if (opts.width) {
+				config.width = opts.width;
+			}
+			if (opts.dropdownParent) {
+				config.dropdownParent = opts.dropdownParent;
+			}
+			if (opts.placeholder !== undefined) {
+				config.placeholder = opts.placeholder;
+			}
+			if (opts.allowClear !== undefined) {
+				config.allowClear = opts.allowClear;
+			}
 		}
 	}
 	if (!config.dropdownParent) {
@@ -2389,10 +2391,18 @@ function selectHotelInDropdown($hotelSelect, hotelId, hotelName) {
 		return;
 	}
 	var id = String(hotelId);
-	if ($hotelSelect.find('option').filter(function () { return String(this.value) === id; }).length === 0) {
+	var $option = $hotelSelect.find('option').filter(function () { return String(this.value) === id; });
+	if (!$option.length) {
 		$hotelSelect.append($('<option></option>').attr('value', id).text(hotelName || ''));
+	} else if (hotelName) {
+		$option.text(hotelName);
 	}
-	$hotelSelect.val(id).trigger('change');
+	$hotelSelect.val(id);
+	if ($hotelSelect.data('select2')) {
+		$hotelSelect.trigger('change');
+	} else {
+		$hotelSelect.trigger('change');
+	}
 
 	var selectId = $hotelSelect.attr('id') || '';
 	if (selectId && typeof hotel_type_load === 'function') {
@@ -2429,11 +2439,11 @@ function reloadHotelAfterQuickSave(hotelSelectId, savedHotelId, savedHotelName, 
 	}
 
 	if (cityId) {
-		hotelDropdownLoadByCity(cityId, $hotel, function (ok) {
-			finishSelect();
+		hotelDropdownLoadByCity(cityId, $hotel, function () {
+			setTimeout(finishSelect, 0);
 		});
 	} else {
-		finishSelect();
+		setTimeout(finishSelect, 0);
 	}
 }
 
@@ -3303,6 +3313,43 @@ function getCellFormControl(cell) {
 	}
 	return null;
 }
+
+function packageHotelCellControl(cell) {
+	return getCellFormControl(cell);
+}
+
+function packageHotelCellValue(cell) {
+	var el = packageHotelCellControl(cell);
+	if (!el) {
+		return '';
+	}
+	var $el = $(el);
+	if ($el.data('select2')) {
+		var v = $el.val();
+		return (v === null || v === undefined) ? '' : String(v);
+	}
+	return el.value || '';
+}
+
+function isPackageHotelRowChecked(row) {
+	var chk = packageHotelCellControl(row.cells[0]);
+	return !!(chk && chk.checked);
+}
+
+function getPackageHotelRowData(row) {
+	return {
+		city_name: packageHotelCellValue(row.cells[2]),
+		hotel_name: packageHotelCellValue(row.cells[3]),
+		hotel_type: packageHotelCellValue(row.cells[4]),
+		total_days: packageHotelCellValue(row.cells[5]),
+		hotel_entry_id: row.cells[6] ? packageHotelCellValue(row.cells[6]) : ''
+	};
+}
+
+window.packageHotelCellControl = packageHotelCellControl;
+window.packageHotelCellValue = packageHotelCellValue;
+window.isPackageHotelRowChecked = isPackageHotelRowChecked;
+window.getPackageHotelRowData = getPackageHotelRowData;
 
 function event_airport_table_uses_select(tableId, fromCol, toCol) {
 	var table = document.getElementById(tableId);

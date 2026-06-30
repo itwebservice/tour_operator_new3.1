@@ -137,7 +137,7 @@ $tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
                                 <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button> 
                             </div>
                             <div class="col-md-6 text-right">
-                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_hotel_booking')"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_hotel_booking');init_hotel_booking_row_select2();"><i class="fa fa-plus"></i></button>
                                 <button type="button" class="btn btn-pdf btn-sm" title="Delete Row" onclick="deleteRow('tbl_hotel_booking');"><i class="fa fa-trash"></i></button>
                             </div>
                         </div>
@@ -354,7 +354,7 @@ $.get('../booking/inc/get_currency_dropdown.php', {quotation_id:''}, function (d
 });
 city_lzloading('.city_id');
 if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
-    hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/hotels/booking/booking/inc/hotel_name_load.php';
+    hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/hotels/booking/inc/hotel_name_load.php';
 }
 init_hotel_booking_row_select2();
 if (typeof initAllHotelSelectAddNew === 'function') {
@@ -369,31 +369,39 @@ $('#check_in1, #check_out1').datetimepicker({
 });
 
 function init_hotel_booking_row_select2() {
+    var $modal = $('#booking_save_modal');
+    var categoryConfig = {
+        dropdownParent: $modal,
+        width: '140px',
+        minimumResultsForSearch: 0
+    };
+    var hotelConfig = {
+        dropdownParent: $modal,
+        width: '170px',
+        minimumResultsForSearch: 0
+    };
+
     $('#tbl_hotel_booking .category_select2').each(function() {
-        if (!$(this).data('select2')) {
-            $(this).select2({
-                dropdownParent: $('#booking_save_modal'),
-                width: '140px',
-                minimumResultsForSearch: 0
-            });
+        var $el = $(this);
+        if ($el.data('select2')) {
+            $el.select2('destroy');
         }
+        $el.select2(categoryConfig);
         if (typeof initRoomCategoryAddNewInline === 'function') {
             initRoomCategoryAddNewInline(this);
         }
     });
     $('#tbl_hotel_booking select[id^="hotel_id"][data-add-new-option="true"]').each(function() {
-        if (!$(this).data('select2')) {
-            $(this).select2({
-                dropdownParent: $('#booking_save_modal'),
-                width: '170px',
-                minimumResultsForSearch: 0
-            });
+        var $el = $(this);
+        if ($el.data('select2')) {
+            $el.select2('destroy');
         }
+        $el.select2(hotelConfig);
         if (typeof captureHotelSelect2Config === 'function') {
-            captureHotelSelect2Config(this);
+            captureHotelSelect2Config($el);
         }
         if (typeof initHotelSelectAddNew === 'function') {
-            initHotelSelectAddNew(this);
+            initHotelSelectAddNew($el);
         }
     });
 }
@@ -409,6 +417,23 @@ $(document).on('focus', '#tbl_hotel_booking .category_select2', function() {
     }
     if (typeof initRoomCategoryAddNewInline === 'function') {
         initRoomCategoryAddNewInline(this);
+    }
+});
+
+$(document).on('focus', '#tbl_hotel_booking select[id^="hotel_id"]', function() {
+    var $el = $(this);
+    if (!$el.data('select2')) {
+        $el.select2({
+            dropdownParent: $('#booking_save_modal'),
+            width: '170px',
+            minimumResultsForSearch: 0
+        });
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($el);
+        }
+        if (typeof initHotelSelectAddNew === 'function') {
+            initHotelSelectAddNew($el);
+        }
     }
 });
 

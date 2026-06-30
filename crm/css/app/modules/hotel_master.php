@@ -23,4 +23,16 @@ header("Content-type: text/css");
 #tbl_hotel_booking_update td{
     padding: 8px 4px;
 }
+#booking_save_modal #hotel_booking_wrap .select2-container,
+#booking_update_modal #hotel_booking_wrap .select2-container {
+    z-index: 1;
+}
+#booking_save_modal .select2-container--open,
+#booking_update_modal .select2-container--open {
+    z-index: 10060 !important;
+}
+#booking_save_modal .select2-dropdown,
+#booking_update_modal .select2-dropdown {
+    z-index: 10060 !important;
+}
 /*=================Booking css end==================*/

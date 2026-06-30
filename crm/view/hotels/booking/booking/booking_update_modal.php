@@ -123,7 +123,7 @@ else if($reflections[0]->tax_apply_on == '3') {
 
                         <div class="row text-right mg_bt_10">
                             <div class="col-xs-12">
-                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_hotel_booking_update')"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_hotel_booking_update');init_update_hotel_select2();init_update_category_select2();"><i class="fa fa-plus"></i></button>
                             </div>
                         </div>
 
@@ -472,6 +472,9 @@ $('#check_in_u1, #check_out_u1, #check_in_u1_f, #check_out_u1_f').datetimepicker
     format: 'd-m-Y H:i'
 });
 city_lzloading(".city_id_u");
+if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+    hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/hotels/booking/inc/hotel_name_load.php';
+}
 
 function init_update_category_select2() {
     $('#tbl_hotel_booking_update .category_select2').each(function() {
@@ -486,13 +489,23 @@ function init_update_category_select2() {
 }
 
 function init_update_hotel_select2() {
+    var $modal = $('#booking_update_modal');
+    var hotelConfig = {
+        dropdownParent: $modal,
+        width: '150px',
+        minimumResultsForSearch: 0
+    };
     $('#tbl_hotel_booking_update select[id^="hotel_id"]').each(function() {
-        if (!$(this).data('select2')) {
-            $(this).select2({
-                dropdownParent: $('#booking_update_modal'),
-                width: '150px',
-                minimumResultsForSearch: 0
-            });
+        var $el = $(this);
+        if ($el.data('select2')) {
+            $el.select2('destroy');
+        }
+        $el.select2(hotelConfig);
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($el);
+        }
+        if (typeof initHotelSelectAddNew === 'function') {
+            initHotelSelectAddNew($el);
         }
     });
 }
@@ -504,6 +517,23 @@ $(document).on('focus', '#tbl_hotel_booking_update .category_select2', function(
             width: '130px',
             minimumResultsForSearch: 0
         });
+    }
+});
+
+$(document).on('focus', '#tbl_hotel_booking_update select[id^="hotel_id"]', function() {
+    var $el = $(this);
+    if (!$el.data('select2')) {
+        $el.select2({
+            dropdownParent: $('#booking_update_modal'),
+            width: '150px',
+            minimumResultsForSearch: 0
+        });
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($el);
+        }
+        if (typeof initHotelSelectAddNew === 'function') {
+            initHotelSelectAddNew($el);
+        }
     }
 });
 

@@ -2308,6 +2308,34 @@ INSERT INTO `car_rental_quotation_master` (`quotation_id`, `branch_admin_id`, `f
 UNLOCK TABLES;
 
 --
+-- Table structure for table `car_rental_quotation_program`
+--
+
+DROP TABLE IF EXISTS `car_rental_quotation_program`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `car_rental_quotation_program` (
+  `id` int(11) NOT NULL,
+  `quotation_id` int(11) NOT NULL,
+  `attraction` varchar(255) NOT NULL,
+  `day_wise_program` text NOT NULL,
+  `stay` varchar(80) NOT NULL,
+  `meal_plan` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_quotation_id` (`quotation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `car_rental_quotation_program`
+--
+
+LOCK TABLES `car_rental_quotation_program` WRITE;
+/*!40000 ALTER TABLE `car_rental_quotation_program` DISABLE KEYS */;
+/*!40000 ALTER TABLE `car_rental_quotation_program` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `car_rental_refund_master`
 --
 
@@ -5351,6 +5379,39 @@ LOCK TABLES `group_tour_quotation_train_entries` WRITE;
 /*!40000 ALTER TABLE `group_tour_quotation_train_entries` DISABLE KEYS */;
 INSERT INTO `group_tour_quotation_train_entries` (`id`, `quotation_id`, `from_location`, `to_location`, `class`, `arrival_date`, `departure_date`) VALUES (1,2,'Pune Maharashtra, India','Nashik','1A','2026-04-24 00:00:00','2026-04-24 00:00:00');
 /*!40000 ALTER TABLE `group_tour_quotation_train_entries` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `group_tour_quotation_transport_entries`
+--
+
+DROP TABLE IF EXISTS `group_tour_quotation_transport_entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_tour_quotation_transport_entries` (
+  `id` int(11) NOT NULL,
+  `quotation_id` int(11) NOT NULL,
+  `vehicle_name` varchar(150) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `pickup` varchar(500) NOT NULL,
+  `pickup_type` varchar(50) NOT NULL,
+  `drop_location` varchar(500) NOT NULL,
+  `drop_type` varchar(50) NOT NULL,
+  `service_duration` varchar(50) NOT NULL,
+  `vehicle_count` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_quotation_id` (`quotation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `group_tour_quotation_transport_entries`
+--
+
+LOCK TABLES `group_tour_quotation_transport_entries` WRITE;
+/*!40000 ALTER TABLE `group_tour_quotation_transport_entries` DISABLE KEYS */;
+/*!40000 ALTER TABLE `group_tour_quotation_transport_entries` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -11391,6 +11452,41 @@ CREATE TABLE IF NOT EXISTS `quotation_testimonial` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`testimonial_id`)
 );
+
+-- Migration: car rental quotation itinerary program
+-- Run once on existing databases (e.g. itourjh2_demo1) where this table is missing.
+-- Required for CRM >> Car Rental quotation save, update, and view.
+
+CREATE TABLE IF NOT EXISTS `car_rental_quotation_program` (
+  `id` int(11) NOT NULL,
+  `quotation_id` int(11) NOT NULL,
+  `attraction` varchar(255) NOT NULL,
+  `day_wise_program` text NOT NULL,
+  `stay` varchar(80) NOT NULL,
+  `meal_plan` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_quotation_id` (`quotation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- Migration: group tour quotation transport details
+-- Run once on existing databases (e.g. itourjh2_demo1) where this table is missing.
+-- Required for CRM >> Group Quotation save, update, and view.
+
+CREATE TABLE IF NOT EXISTS `group_tour_quotation_transport_entries` (
+  `id` int(11) NOT NULL,
+  `quotation_id` int(11) NOT NULL,
+  `vehicle_name` varchar(150) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `pickup` varchar(500) NOT NULL,
+  `pickup_type` varchar(50) NOT NULL,
+  `drop_location` varchar(500) NOT NULL,
+  `drop_type` varchar(50) NOT NULL,
+  `service_duration` varchar(50) NOT NULL,
+  `vehicle_count` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_quotation_id` (`quotation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Migration: group tour booking transport details
 -- Run once on existing databases (e.g. itourjh2_demo1) where this table is missing.
