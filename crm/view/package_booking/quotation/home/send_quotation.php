@@ -1079,6 +1079,123 @@ $(document).on('click', function () {
 			textDraft += '</div>';
 			$(draftArea).html(textDraft);
 		}
+
+		var htmlDraft = buildVisiblePreviewHtml(previewArea);
+		if (htmlDraft) {
+			$(draftArea).data('htmlDraft', htmlDraft);
+		}
+	}
+
+	function buildVisiblePreviewHtml(previewArea) {
+		var $preview = $(previewArea);
+		var $pdfStyle = $preview.find('.quotation-email-pdf-style').first();
+		var innerHtml = '';
+
+		if ($pdfStyle.length) {
+			var $wrapper = $('<div class="quotation-email-pdf-style"></div>');
+			$pdfStyle.children('link').each(function() {
+				$wrapper.append($(this).clone());
+			});
+			$pdfStyle.find('.preview-section-block:visible').each(function() {
+				$wrapper.append($(this).clone());
+			});
+			if ($wrapper.children('.preview-section-block').length === 0) {
+				$wrapper.append($pdfStyle.children(':not(link)').clone());
+			}
+			innerHtml = $wrapper.prop('outerHTML');
+		} else if ($preview.find('.preview-section-block').length) {
+			var $wrapper = $('<div></div>');
+			$preview.find('.preview-section-block:visible').each(function() {
+				$wrapper.append($(this).clone());
+			});
+			innerHtml = $wrapper.html();
+		} else {
+			innerHtml = $preview.html();
+		}
+
+		if (!innerHtml) {
+			return '';
+		}
+		var plainCheck = $('<div>').html(innerHtml).text().replace(/\s+/g, '');
+		if (plainCheck === '') {
+			return '';
+		}
+
+		return '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+			'<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">' +
+			'</head><body style="margin:0;padding:12px;font-family:Inter,Arial,sans-serif;background:#f8f9fa;">' +
+			innerHtml + '</body></html>';
+	}
+
+	function getVisiblePreviewPlainText(previewArea) {
+		var text = '';
+		$(previewArea).find('.preview-section-block:visible').each(function() {
+			var sectionText = $(this).text();
+			if (sectionText && sectionText.trim() !== '') {
+				text += sectionText.trim() + '\n\n';
+			}
+		});
+		if (!text.trim()) {
+			text = $(previewArea).text();
+		}
+		return text.trim();
+	}
+
+	function copyRichHtmlToClipboard(html, plainText, successMessage) {
+		successMessage = successMessage || 'Content copied to clipboard!';
+
+		if (navigator.clipboard && window.ClipboardItem && window.isSecureContext) {
+			var htmlBlob = new Blob([html], { type: 'text/html' });
+			var textBlob = new Blob([plainText], { type: 'text/plain' });
+			return navigator.clipboard.write([
+				new ClipboardItem({
+					'text/html': htmlBlob,
+					'text/plain': textBlob
+				})
+			]).then(function() {
+				msg_alert(successMessage);
+			}).catch(function() {
+				if (fallbackCopyHtmlToClipboard(html)) {
+					msg_alert(successMessage);
+				} else {
+					fallbackCopyTextToClipboard(plainText);
+				}
+			});
+		}
+
+		if (fallbackCopyHtmlToClipboard(html)) {
+			msg_alert(successMessage);
+			return $.Deferred().resolve().promise();
+		}
+		fallbackCopyTextToClipboard(plainText);
+		return $.Deferred().resolve().promise();
+	}
+
+	function fallbackCopyHtmlToClipboard(html) {
+		var container = document.createElement('div');
+		container.innerHTML = html;
+		container.contentEditable = 'true';
+		container.style.position = 'fixed';
+		container.style.left = '-9999px';
+		container.style.top = '0';
+		document.body.appendChild(container);
+
+		var range = document.createRange();
+		range.selectNodeContents(container);
+		var selection = window.getSelection();
+		selection.removeAllRanges();
+		selection.addRange(range);
+
+		var copied = false;
+		try {
+			copied = document.execCommand('copy');
+		} catch (e) {
+			copied = false;
+		}
+
+		selection.removeAllRanges();
+		document.body.removeChild(container);
+		return copied;
 	}
 
 	// Function to update content based on checkbox selections (fallback for non-sectioned content)
@@ -1151,22 +1268,20 @@ $(document).on('click', function () {
 		}
 	});
 
-		// Copy Email button
+		// Copy Email button — copy styled HTML from visible preview sections
 		$('#copyEmailBtn').click(function() {
-			var emailContent = $('#emailDraftArea').text();
-			if (emailContent && emailContent.trim() !== '') {
-				// Try modern clipboard API first
-				if (navigator.clipboard && window.isSecureContext) {
-					navigator.clipboard.writeText(emailContent).then(function() {
-						msg_alert('Email content copied to clipboard!');
-					}).catch(function(err) {
-						// Fallback for older browsers
-						fallbackCopyTextToClipboard(emailContent);
-					});
-				} else {
-					// Fallback for older browsers
-					fallbackCopyTextToClipboard(emailContent);
-				}
+			var htmlContent = buildVisiblePreviewHtml('#emailPreviewArea');
+			var plainText = getVisiblePreviewPlainText('#emailPreviewArea');
+
+			if (!htmlContent && !plainText) {
+				htmlContent = $('#emailDraftArea').data('htmlDraft') || '';
+				plainText = $('#emailDraftArea').text();
+			}
+
+			if (htmlContent && htmlContent.trim() !== '') {
+				copyRichHtmlToClipboard(htmlContent, plainText, 'Email copied with formatting!');
+			} else if (plainText && plainText.trim() !== '') {
+				fallbackCopyTextToClipboard(plainText);
 			} else {
 				error_msg_alert('No email content to copy. Please wait for content to load.');
 			}
@@ -2227,6 +2342,34 @@ $(document).on('click', function () {
         font-size: 14px;
         line-height: 1.6;
         color: #333;
+    }
+
+    #emailWhatsappModal .quotation-email-styled-preview {
+        background: #fff;
+    }
+
+    #emailWhatsappModal .quotation-email-pdf-style {
+        background: #f8f9fa;
+        padding: 4px;
+        border-radius: 6px;
+    }
+
+    #emailWhatsappModal .quotation-email-pdf-style .preview-section-block {
+        margin-bottom: 8px;
+    }
+
+    #emailWhatsappModal .quotation-email-pdf-style table {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+    #emailWhatsappModal .quotation-email-styled-preview .preview-section-block {
+        margin-bottom: 4px;
+    }
+
+    #emailWhatsappModal .quotation-email-styled-preview table {
+        width: 100% !important;
+        max-width: 100%;
     }
 
     #emailWhatsappModal #whatsappPreviewArea {

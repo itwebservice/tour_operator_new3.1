@@ -23,6 +23,7 @@ class custom_package{
       $value = mysqli_fetch_assoc($sq);
       $max_tour_id = $value['max'] + 1;
       begin_t();
+      $GLOBALS['flag'] = true;
 
       $inclusions = addslashes($inclusions);
       $exclusions = addslashes($exclusions);

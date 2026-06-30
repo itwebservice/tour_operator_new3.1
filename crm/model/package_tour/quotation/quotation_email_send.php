@@ -1,6 +1,8 @@
 <?php
 error_reporting(E_ALL);
 // include_once('../../model.php');
+include_once dirname(__FILE__) . '/quotation_email_pdf_style_renderer.php';
+
 class quotation_email_send
 {
 	public function quotation_email($custom_content = null)
@@ -274,6 +276,10 @@ class quotation_email_send
 			$subject = 'New Quotation : (' . $sq_tours_package['package_name'] . ' )';
 		}
 
+		if (!empty($theme_color) && $theme_color !== '#009898') {
+			$content = str_replace('background: #009898', 'background: ' . $theme_color, $content);
+		}
+
 		$model->app_email_send('8', $sq_quotation['customer_name'], $sq_quotation['email_id'], $content, $subject, '1');
 
 		echo "Quotation successfully sent.";
@@ -355,6 +361,13 @@ class quotation_email_send
 			$quotation_date = $sq_quotation['quotation_date'];
 			$yr = explode("-", $quotation_date);
 			$year = $yr[0];
+
+			$quote_link = BASE_URL . 'model/package_tour/quotation/single_quotation.php?quotation=' . base64_encode($quotation_id_arr[$i]);
+			$styled_email_html = render_quotation_email_pdf_style($quotation_id_arr[$i], $options, false, $quote_link);
+			if ($styled_email_html !== '') {
+				$content = $styled_email_html;
+				continue;
+			}
 
 			$content = '   
 			<tr>
@@ -1165,6 +1178,15 @@ class quotation_email_send
 			}
 		}
 	}
+		if (strpos($content, 'quotation-email-pdf-style') !== false) {
+			if (!empty($quot_note)) {
+				$note_html = '<div style="margin-top:16px;padding:12px 4px;border-top:1px solid #e5ac4c;font-weight:600;color:' . $theme_color . ';font-family:Inter,Arial,sans-serif;font-size:13px;">' . $quot_note . '</div>';
+				$pos = strrpos($content, '</div>');
+				if ($pos !== false) {
+					$content = substr($content, 0, $pos) . $note_html . substr($content, $pos);
+				}
+			}
+		} else {
 		$content .= '
 		<tr>
 			<table style="width:100%;margin-top:20px">
@@ -1173,6 +1195,11 @@ class quotation_email_send
 				</tr>
 			</table>	
 		<tr>';
+		}
+
+		if (!empty($theme_color) && $theme_color !== '#009898') {
+			$content = str_replace('background: #009898', 'background: ' . $theme_color, $content);
+		}
 
 		$subject = 'New Quotation : (' . $sq_tours_package['package_name'] . ' )';
 		$model->app_email_send('8', $sq_quotation['customer_name'], $sq_quotation['email_id'], $content, $subject, '1');

@@ -36,7 +36,7 @@ include '../../../../model/model.php';
             <td class='col-md-1 pad_8'><select id="meal_plan<?php echo $i; ?>" title="Meal Plan" name="meal_plan"
                     class="form-control mg_bt_10" style="width:140px;margin-top:15px;">
                     <?php get_mealplan_dropdown(); ?>
-            </td>
+            </select></td>
             <td class='col-md-1 pad_8'><button type="button" class="btn btn-excel btn-sm" title="Add Itinerary" style="margin-top:15px;"
                     id="itinerary<?php echo $i; ?>"
                     onclick="add_itinerary('dest_name_s','special_attaraction<?php echo $i; ?>','day_program<?php echo $i; ?>','overnight_stay<?php echo $i; ?>','Day-<?= $i ?>')"><i

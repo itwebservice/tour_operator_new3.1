@@ -121,8 +121,9 @@ $to_date_obj = new DateTime($sq_quotation['to_date']);
 $duration = $from_date_obj->diff($to_date_obj)->days;
 
 // Get hotel details (resolve IDs to names)
-global $similar_text;
+global $similar_text, $app_name, $theme_color, $app_contact_no;
 $hotel_details = '';
+$hotel_html_lines = array();
 $sq_hotel = mysqlQuery("SELECT * FROM package_tour_quotation_hotel_entries WHERE quotation_id = '$quotation_id'");
 $hotel_count = 0;
 while ($row_hotel = mysqli_fetch_assoc($sq_hotel)) {
@@ -142,6 +143,8 @@ while ($row_hotel = mysqli_fetch_assoc($sq_hotel)) {
 
     $hotel_details .= trim($city_display) . ' -' . trim($hotel_display) . $similar_label
       . ' - ' . trim($room_category_display) . ' -' . trim($meal_plan_display) . "\n";
+    $hotel_html_lines[] = trim($city_display) . ' - ' . trim($hotel_display) . $similar_label
+      . ' - ' . trim($room_category_display) . ' - ' . trim($meal_plan_display);
     $hotel_count++;
 }
 
@@ -149,6 +152,7 @@ error_log("Hotel count: " . $hotel_count);
 
 // Get itinerary details
 $itinerary_details = '';
+$itinerary_html_blocks = array();
 $sq_package_program = mysqlQuery("SELECT * FROM package_quotation_program WHERE quotation_id = '$quotation_id'");
 $count = 1;
 $j = 0;
@@ -161,6 +165,13 @@ if (mysqli_num_rows($sq_package_program) > 0) {
 					"" . htmlspecialchars($row_itinerary['attraction']) . "     \n " .
 					"(" . htmlspecialchars($row_itinerary['stay']) . ")     \n" .
 					"(" . htmlspecialchars($row_itinerary['meal_plan']) . ")\n";
+        $itinerary_html_blocks[] = array(
+            'day' => $count,
+            'attraction' => $row_itinerary['attraction'],
+            'stay' => $row_itinerary['stay'],
+            'meal_plan' => $row_itinerary['meal_plan'],
+            'program' => $row_itinerary['day_wise_program'],
+        );
         $count++;
         $j++;
         $itinerary_count++;
@@ -171,6 +182,7 @@ error_log("Itinerary count: " . $itinerary_count);
 
 // Get transportation details
 $transport_details = '';
+$transport_html_lines = array();
 $sq_transport = mysqlQuery("SELECT t.*, v.vehicle_name as actual_vehicle_name FROM package_tour_quotation_transport_entries2 t 
                            LEFT JOIN b2b_transfer_master v ON t.vehicle_name = v.entry_id 
                            WHERE t.quotation_id = '$quotation_id'");
@@ -222,6 +234,7 @@ while ($row_transport = mysqli_fetch_assoc($sq_transport)) {
     }
     
     $transport_details .= "*{$vehicle_name}* *{$from_date_trans}*    *{$to_date_trans}*    *{$pickup} to {$drop}*    *{$service_duration}*    *({$row_transport['vehicle_count']})*\n";
+    $transport_html_lines[] = $vehicle_name . ' | ' . $from_date_trans . ' - ' . $to_date_trans . ' | ' . $pickup . ' to ' . $drop . ' | ' . $service_duration . ' (' . $row_transport['vehicle_count'] . ')';
     $transport_count++;
 }
 
@@ -355,55 +368,166 @@ $quotation_encoded = base64_encode($quotation_id);
 $quotation_link = BASE_URL . "model/package_tour/quotation/single_quotation.php?quotation={$quotation_encoded}";
 
 $footer_content = "\n*Link* : {$quotation_link}\n\n";
-$footer_content .= "Please contact for more details : ITOURS LLP PVT LTDS +919168425999\n";
+$footer_content .= "Please contact for more details : " . (!empty($app_name) ? $app_name : 'ITOURS LLP PVT LTDS') . " " . (!empty($app_contact_no) ? $app_contact_no : '+919168425999') . "\n";
 $footer_content .= "Thank you.";
 
-function format_preview_section_html($section_key, $content) {
-    if (trim($content) === '') {
-        return '';
-    }
-    $content = str_replace(array("\r\n", "\r"), "\n", $content);
-    $formatted = nl2br($content, false);
-    return '<div class="preview-section-block" data-section="' . $section_key . '">' . $formatted . '</div>';
-}
+$use_styled_html = ($email_option != 'WhatsApp');
 
-if ($sectioned) {
-    $email_content = '<div class="preview-section-block preview-section-header" data-section="header">' . nl2br($header_content, false) . '</div>';
-    $email_content .= format_preview_section_html('price_structure', $price_section);
-    $email_content .= format_preview_section_html('itinerary', $itinerary_section);
-    $email_content .= format_preview_section_html('inclusion_exclusion', $inclusion_section);
-    $email_content .= format_preview_section_html('terms_conditions', $terms_section);
-    $email_content .= '<div class="preview-section-block preview-section-footer" data-section="footer">' . nl2br($footer_content, false) . '</div>';
+if ($use_styled_html) {
+    include_once __DIR__ . '/../../../../model/package_tour/quotation/quotation_email_pdf_style_renderer.php';
+    $pdf_style_html = render_quotation_email_pdf_style($quotation_id, $options, $sectioned, $quotation_link);
+    if ($pdf_style_html !== '') {
+        echo $pdf_style_html;
+        exit;
+    }
+
+    include __DIR__ . '/inc/quotation_email_html_helpers.php';
+
+    $display_app_name = !empty($app_name) ? $app_name : 'ITOURS LLP PVT LTDS';
+    $display_contact = !empty($app_contact_no) ? $app_contact_no : '+919168425999';
+    $accent = qeh_accent_color();
+
+    $header_html = qeh_greeting_block($display_app_name);
+    $header_html .= qeh_section_heading('Package Tour Details');
+    $header_html .= qeh_kv_table(array(
+        array('Package Name', qeh_esc($sq_package['package_name'])),
+        array('Duration', qeh_esc($sq_quotation['total_days'] . 'N/' . ($sq_quotation['total_days'] + 1) . 'D')),
+        array('Travel Date', qeh_esc($from_date . ' To ' . $to_date)),
+        array('Quotation ID', qeh_esc($quotation_id_display)),
+    ));
+    $header_html .= qeh_section_heading('Guest Details');
+    $header_html .= qeh_kv_table(array(
+        array('Adult(s)', qeh_esc($sq_quotation['total_adult'])),
+        array('Child With Bed', qeh_esc($sq_quotation['children_with_bed'])),
+        array('Child Without Bed', qeh_esc($sq_quotation['children_without_bed'])),
+        array('Infant(s)', qeh_esc($sq_quotation['total_infant'])),
+        array('Total', qeh_esc($sq_quotation['total_passangers'])),
+    ));
+
+    $price_html = qeh_section_heading('Costing Details');
+    $price_html .= qeh_kv_table(array(
+        array('Tour Amount', 'INR ' . number_format($quotation_cost - $travel_cost, 2)),
+        array('Travel Amount', 'INR ' . number_format($travel_cost, 2)),
+        array('Tax', 'INR ' . number_format($service_tax_amount, 2)),
+        array('TCS', 'INR ' . number_format($tcsvalue, 2)),
+        array('Total Price', '<strong style="color:' . $accent . ';">INR ' . number_format($quotation_cost, 2) . '</strong>'),
+    ));
+
+    $itinerary_html = '';
+    if ($hotel_count > 0) {
+        $hotel_list = '<ul style="margin:0;padding:8px 8px 8px 24px;color:#555;">';
+        foreach ($hotel_html_lines as $hotel_line) {
+            $hotel_list .= '<li style="margin-bottom:6px;">' . qeh_esc($hotel_line) . '</li>';
+        }
+        $hotel_list .= '</ul>';
+        $itinerary_html .= qeh_section_heading('Accommodation Details') . qeh_kv_table(array(array('full' => $hotel_list)));
+    }
+
+    if ($itinerary_count > 0) {
+        $itinerary_html .= qeh_section_heading('Tour Itinerary');
+        foreach ($itinerary_html_blocks as $day) {
+            $day_body = '<p style="margin:0 0 6px;"><strong>Day ' . qeh_esc($day['day']) . '</strong> &mdash; ' . qeh_esc($day['attraction']) . '</p>';
+            if (!empty($day['program'])) {
+                $day_body .= '<div style="margin:0 0 8px;color:#555;">' . $day['program'] . '</div>';
+            }
+            $day_body .= '<p style="margin:0;font-size:13px;color:#666;"><strong>Overnight:</strong> ' . qeh_esc($day['stay']) . ' &nbsp;|&nbsp; <strong>Meal Plan:</strong> ' . qeh_esc($day['meal_plan']) . '</p>';
+            $itinerary_html .= qeh_kv_table(array(array('full' => $day_body)));
+        }
+    } elseif ($hotel_count === 0) {
+        $itinerary_html .= qeh_rich_block('Tour Itinerary', 'Detailed itinerary will be provided upon confirmation.');
+    }
+
+    if ($transport_count > 0) {
+        $transport_list = '<ul style="margin:0;padding:8px 8px 8px 24px;color:#555;">';
+        foreach ($transport_html_lines as $transport_line) {
+            $transport_list .= '<li style="margin-bottom:6px;">' . qeh_esc($transport_line) . '</li>';
+        }
+        $transport_list .= '</ul>';
+        $itinerary_html .= qeh_section_heading('Transportation') . qeh_kv_table(array(array('full' => $transport_list)));
+    }
+
+    $inclusion_html = qeh_rich_block('Inclusions', !empty($sq_quotation['inclusions']) ? $sq_quotation['inclusions'] : '<span style="color:#777;">Inclusions will be provided upon confirmation.</span>');
+    $inclusion_html .= qeh_rich_block('Exclusions', !empty($sq_quotation['exclusions']) ? $sq_quotation['exclusions'] : '<span style="color:#777;">Exclusions will be provided upon confirmation.</span>');
+
+    $terms_html = qeh_rich_block('Terms and Conditions', !empty($terms_and_conditions_details) ? $terms_and_conditions_details : 'Standard terms and conditions apply. Details will be provided upon confirmation.');
+
+    $footer_html = qeh_section_heading('Quotation Link');
+    $footer_html .= qeh_kv_table(array(
+        array('View Online', '<a href="' . qeh_esc($quotation_link) . '" style="color:' . $accent . ';text-decoration:none;font-weight:600;">View Quotation</a>'),
+        array('Contact', qeh_esc($display_app_name . ' ' . $display_contact)),
+    ));
+    $footer_html .= '<p style="margin:12px 0 0;color:#555;">Thank you.</p>';
+
+    if ($sectioned) {
+        $email_content = '<div class="quotation-email-styled-preview">';
+        $email_content .= qeh_wrap_preview_section('header', $header_html);
+        $email_content .= qeh_wrap_preview_section('price_structure', $price_html);
+        $email_content .= qeh_wrap_preview_section('itinerary', $itinerary_html);
+        $email_content .= qeh_wrap_preview_section('inclusion_exclusion', $inclusion_html);
+        $email_content .= qeh_wrap_preview_section('terms_conditions', $terms_html);
+        $email_content .= qeh_wrap_preview_section('footer', $footer_html);
+        $email_content .= '</div>';
+    } else {
+        $email_content = '<div class="quotation-email-styled-preview">' . $header_html;
+        if (in_array('price_structure', $options)) {
+            $email_content .= $price_html;
+        }
+        if (in_array('itinerary', $options)) {
+            $email_content .= $itinerary_html;
+        }
+        if (in_array('inclusion_exclusion', $options)) {
+            $email_content .= $inclusion_html;
+        }
+        if (in_array('terms_conditions', $options)) {
+            $email_content .= $terms_html;
+        }
+        $email_content .= $footer_html . '</div>';
+    }
 } else {
-    $email_content = $header_content;
-
-    if (in_array('price_structure', $options)) {
-        $email_content .= $price_section;
-    }
-    if (in_array('itinerary', $options)) {
-        $email_content .= $itinerary_section;
-    }
-    if (in_array('inclusion_exclusion', $options)) {
-        $email_content .= $inclusion_section;
-    }
-    if (in_array('terms_conditions', $options)) {
-        $email_content .= $terms_section;
+    function format_preview_section_html($section_key, $content) {
+        if (trim($content) === '') {
+            return '';
+        }
+        $content = str_replace(array("\r\n", "\r"), "\n", $content);
+        $formatted = nl2br($content, false);
+        return '<div class="preview-section-block" data-section="' . $section_key . '">' . $formatted . '</div>';
     }
 
-    $email_content .= $footer_content;
-}
+    if ($sectioned) {
+        $email_content = '<div class="preview-section-block preview-section-header" data-section="header">' . nl2br($header_content, false) . '</div>';
+        $email_content .= format_preview_section_html('price_structure', $price_section);
+        $email_content .= format_preview_section_html('itinerary', $itinerary_section);
+        $email_content .= format_preview_section_html('inclusion_exclusion', $inclusion_section);
+        $email_content .= format_preview_section_html('terms_conditions', $terms_section);
+        $email_content .= '<div class="preview-section-block preview-section-footer" data-section="footer">' . nl2br($footer_content, false) . '</div>';
+    } else {
+        $email_content = $header_content;
 
-// If WhatsApp is requested, format content for WhatsApp (skip when sectioned preview HTML is used)
-if ($email_option == 'WhatsApp' && !$sectioned) {
-    error_log("Formatting for WhatsApp");
-    $email_content = str_replace(['<br>', '<br/>', '<br />'], "\n", $email_content);
-    $email_content = strip_tags($email_content);
-    $email_content = str_replace(['<b>', '</b>', '<strong>', '</strong>'], '*', $email_content);
-    $email_content = str_replace(['<i>', '</i>', '<em>', '</em>'], '_', $email_content);
-    $email_content = preg_replace('/\*+/', '*', $email_content);
-    $email_content = preg_replace('/\n\s*\n/', "\n\n", $email_content);
-} else {
-    error_log("Formatting for Email");
+        if (in_array('price_structure', $options)) {
+            $email_content .= $price_section;
+        }
+        if (in_array('itinerary', $options)) {
+            $email_content .= $itinerary_section;
+        }
+        if (in_array('inclusion_exclusion', $options)) {
+            $email_content .= $inclusion_section;
+        }
+        if (in_array('terms_conditions', $options)) {
+            $email_content .= $terms_section;
+        }
+
+        $email_content .= $footer_content;
+    }
+
+    if ($email_option == 'WhatsApp' && !$sectioned) {
+        error_log("Formatting for WhatsApp");
+        $email_content = str_replace(['<br>', '<br/>', '<br />'], "\n", $email_content);
+        $email_content = strip_tags($email_content);
+        $email_content = str_replace(['<b>', '</b>', '<strong>', '</strong>'], '*', $email_content);
+        $email_content = str_replace(['<i>', '</i>', '<em>', '</em>'], '_', $email_content);
+        $email_content = preg_replace('/\*+/', '*', $email_content);
+        $email_content = preg_replace('/\n\s*\n/', "\n\n", $email_content);
+    }
 }
 
 echo $email_content;

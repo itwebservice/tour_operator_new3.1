@@ -168,8 +168,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                         <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
                                             </select>
                                         </td>
-                                        <td>
-                                            <select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true">
+                                        <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true">
                                                 <option value="">*Hotel Name</option>
                                                 <?php 
                                                     $query = "select hotel_id, hotel_name from hotel_master where 1";
@@ -402,18 +401,27 @@ $(function () {
 
         //Special attraction table
         var table = document.getElementById("dynamic_table_list");
+        if (!table) {
+            error_msg_alert('Please enter total nights to generate itinerary rows.');
+            g_validate_status = false;
+            return false;
+        }
         var rowCount = table.rows.length;
 
         for (var i = 0; i < rowCount; i++) {
 
             var row = table.rows[i];
-            validate_dynamic_empty_fields(row.cells[0].childNodes[0]);
-            validate_dynamic_empty_fields(row.cells[1].childNodes[0]);
-            validate_dynamic_empty_fields(row.cells[2].childNodes[0]);
+            var itineraryData = getPackageItineraryRowData(row);
+            validate_dynamic_empty_fields(row.querySelector('input[name="special_attaraction"]'));
+            validate_dynamic_empty_fields(row.querySelector('textarea[name="day_program"]'));
+            validate_dynamic_empty_fields(row.querySelector('input[name="overnight_stay"]'));
 
-            var flag1 = validate_spattration(row.cells[0].childNodes[0].id);
-            var flag2 = validate_dayprogram(row.cells[1].childNodes[0].id);
-            var flag3 = validate_onstay(row.cells[2].childNodes[0].id);
+            var attractionInput = row.querySelector('input[name="special_attaraction"]');
+            var programInput = row.querySelector('textarea[name="day_program"]');
+            var stayInput = row.querySelector('input[name="overnight_stay"]');
+            var flag1 = attractionInput ? validate_spattration(attractionInput.id) : true;
+            var flag2 = programInput ? validate_dayprogram(programInput.id) : true;
+            var flag3 = stayInput ? validate_onstay(stayInput.id) : true;
             if (!flag1 || !flag2 || !flag3) {
                 return false;
             }
@@ -441,21 +449,22 @@ $(function () {
 
             if (row.cells[0].childNodes[0].checked) {
 
-                validate_dynamic_empty_fields(row.cells[2].childNodes[0]);
-                validate_dynamic_empty_fields(row.cells[3].childNodes[0]);
-                validate_dynamic_empty_fields(row.cells[4].childNodes[0]);
-                validate_dynamic_empty_fields(row.cells[5].childNodes[0]);
+                var hotelData = getPackageHotelRowData(row);
+                validate_dynamic_empty_fields(row.querySelector('select[name^="city_name"]'));
+                validate_dynamic_empty_fields(row.querySelector('select[name^="hotel_name"]'));
+                validate_dynamic_empty_fields(row.querySelector('input[name^="hotel_type"]'));
+                validate_dynamic_empty_fields(row.querySelector('input[name^="hotel_tota_days"]'));
 
-                if (row.cells[2].childNodes[0].value == "") {
+                if (hotelData.city_name == "") {
                     validate_message += "Enter City Name in row-" + (i + 1) + "<br>";
                 }
-                if (row.cells[3].childNodes[0].value == "") {
+                if (hotelData.hotel_name == "") {
                     validate_message += "Enter Hotel Name in row-" + (i + 1) + "<br>";
                 }
-                if (row.cells[4].childNodes[0].value == "") {
+                if (hotelData.hotel_type == "") {
                     validate_message += "Enter Hotel Type in row-" + (i + 1) + "<br>";
                 }
-                if (row.cells[5].childNodes[0].value == "") {
+                if (hotelData.total_days == "") {
                     validate_message += "Enter Total Nights in row-" + (i + 1) + "<br>";
                 }
             }
@@ -567,8 +576,8 @@ $(function () {
     function hotel_type_load(id) {
 
         var hotel_id = $("#" + id).val();
-
-        var count = id.substring(10);
+        var match = String(id || '').match(/^hotel_name(\d*)$/);
+        var count = match ? match[1] : '';
 
         $.get("hotel/hotel_type_load.php", {
             hotel_id: hotel_id
@@ -578,6 +587,36 @@ $(function () {
 
         });
 
+    }
+
+    function getPackageHotelRowElements(row) {
+        var $row = $(row);
+        return {
+            $citySelect: $row.find('select[name^="city_name"]'),
+            $hotelSelect: $row.find('select[name^="hotel_name"]'),
+            $hotelType: $row.find('input[name^="hotel_type"]'),
+            $totalNights: $row.find('input[name^="hotel_tota_days"]')
+        };
+    }
+
+    function getPackageItineraryRowData(row) {
+        var $row = $(row);
+        return {
+            special_attaraction: $.trim($row.find('input[name="special_attaraction"]').first().val() || ''),
+            day_program: $.trim($row.find('textarea[name="day_program"]').first().val() || ''),
+            overnight_stay: $.trim($row.find('input[name="overnight_stay"]').first().val() || ''),
+            meal_plan: $row.find('select[name="meal_plan"]').first().val() || ''
+        };
+    }
+
+    function getPackageHotelRowData(row) {
+        var els = getPackageHotelRowElements(row);
+        return {
+            city_name: $.trim(els.$citySelect.val() || ''),
+            hotel_name: $.trim(els.$hotelSelect.val() || ''),
+            hotel_type: $.trim(els.$hotelType.val() || ''),
+            total_days: $.trim(els.$totalNights.val() || '')
+        };
     }
 
     function resetPackageSaveState() {
@@ -675,14 +714,19 @@ $(function () {
                 var day_image_arr = new Array();
 
                 var table = document.getElementById("dynamic_table_list");
+                if (!table || !table.rows.length) {
+                    error_msg_alert('Please enter total nights to generate itinerary rows.');
+                    return false;
+                }
                 var rowCount = table.rows.length;
                 console.log("PACKAGE SAVE: Table found with", rowCount, "rows");
                 for (var i = 0; i < rowCount; i++) {
                     var row = table.rows[i];
-                    var special_attaraction = row.cells[0].childNodes[0].value;
-                    var day_program = row.cells[1].childNodes[0].value;
-                    var overnight_stay = row.cells[2].childNodes[0].value;
-                    var meal_plan = row.cells[3].childNodes[0].value;
+                    var itineraryData = getPackageItineraryRowData(row);
+                    var special_attaraction = itineraryData.special_attaraction;
+                    var day_program = itineraryData.day_program;
+                    var overnight_stay = itineraryData.overnight_stay;
+                    var meal_plan = itineraryData.meal_plan;
 
                     if (special_attaraction == "") {
                         error_msg_alert('Special attraction is mandatory in row' + (i + 1));
@@ -779,13 +823,11 @@ $(function () {
 
                     if (row.cells[0].childNodes[0].checked) {
                         count++;
-                        var city_name = row.cells[2].childNodes[0].value;
-
-                        var hotel_name = row.cells[3].childNodes[0].value;
-
-                        var hotel_type = row.cells[4].childNodes[0].value;
-
-                        var total_days = row.cells[5].childNodes[0].value;
+                        var hotelData = getPackageHotelRowData(row);
+                        var city_name = hotelData.city_name;
+                        var hotel_name = hotelData.hotel_name;
+                        var hotel_type = hotelData.hotel_type;
+                        var total_days = hotelData.total_days;
 
                         if (city_name == '') {
                             error_msg_alert("City Name is required");
@@ -1044,13 +1086,7 @@ $(function () {
         }
 
         function getHotelRowElements(row) {
-            var $row = $(row);
-            return {
-                $citySelect: $row.find('select[name^="city_name"]'),
-                $hotelSelect: $row.find('select[name^="hotel_name"]'),
-                $hotelType: $row.find('input[name^="hotel_type"]'),
-                $totalNights: $row.find('input[name^="hotel_tota_days"]')
-            };
+            return getPackageHotelRowElements(row);
         }
 
         function getTransportRowElements(row) {
