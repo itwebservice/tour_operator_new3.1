@@ -9,8 +9,8 @@
   --text-caption: #6e788a; /* Slate Muted Gray Label Secondary Elements */
   --bg-pdf-cream: #f5efe3; /* Warm Reference Cream/Beige Sheet Canvas Tonal */
   --border-line: #dfd8cb; /* Clean Subtle Bounding Grid Divider Borders */
-  --font-sans: "Montserrat", sans-serif;
-  --font-jp: "Noto Sans JP", sans-serif;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-jp: 'Noto Sans JP', sans-serif;
 }
 
 * {
@@ -22,7 +22,10 @@
 body {
   font-family: var(--font-sans);
   color: var(--text-slate);
-  background-color: #7f8c8d; /* Sandbox outer canvas layout display overlay */
+  /* background-color: #7f8c8d;  */
+  /* Sandbox outer canvas layout display overlay */
+
+  background-color: #dfd8cb; /* Sandbox outer canvas layout display overlay */
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -30,14 +33,14 @@ body {
 /* ==========================================================================
    2. PRINT SHEETS MASTER ENGINE ARCHITECTURE (A4 SPEC)
    ========================================================================== */
-.page {
+/* .page {
   width: 210mm;
   height: 297mm;
   min-height: 297mm;
   max-height: 297mm;
   background-color: var(--bg-pdf-cream);
-  margin: 10mm auto; /* Tighter development margins */
-  padding: 16mm 18mm; /* Reduced standard margins for better print containment */
+  margin: 10mm auto; 
+  padding: 16mm 18mm;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -45,7 +48,7 @@ body {
   box-shadow: 0 14px 45px rgba(0, 0, 0, 0.25);
   page-break-after: always;
   break-after: page;
-}
+} */
 
 .content-container {
   flex: 1;
@@ -54,7 +57,8 @@ body {
   justify-content: flex-start;
   position: relative;
   z-index: 5;
-  gap: 12px; /* Reduced layout spacing by 25% for tighter compact flow */
+  /* margin-top: 3px; */
+  gap: 20px; /* Reduced layout spacing by 25% for tighter compact flow */
 }
 
 /* ============ Dipti */
@@ -87,9 +91,9 @@ p a {
   justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid var(--primary-navy);
-  padding-bottom: 4px;
-  margin-bottom: 8px;
-  height: 26px;
+  /* padding-bottom: 4px; */
+  margin-bottom: 20px;
+  /* height: 26px; */
 }
 
 .header-brand {
@@ -97,6 +101,10 @@ p a {
   font-size: 0.85rem;
   color: var(--primary-navy);
   letter-spacing: 0.5px;
+}
+.header-brand img{
+  height: 50px;
+  width: 130px;
 }
 
 .header-topic {
@@ -107,7 +115,7 @@ p a {
   letter-spacing: 1px;
 }
 
-.page-footer {
+/* .page-footer {
   position: absolute;
   bottom: 10mm;
   left: 18mm;
@@ -117,7 +125,7 @@ p a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
+} */
 
 .footer-meta-text {
   font-size: 0.68rem;
@@ -199,22 +207,23 @@ p a {
   width: 45px;
   height: 4px;
   background-color: var(--japan-crimson);
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 .proposal-title-tag {
-  font-size: 0.75rem;
+  font-size: 0.77rem;
   font-weight: 600;
   letter-spacing: 2px;
   color: var(--text-caption);
   display: block;
+  margin-bottom: 5px;
 }
 .main-destination {
-  font-size: 3.6rem;
+  font-size: 3.8rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.3;
 }
 .sub-destination {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 300;
   letter-spacing: 3px;
   color: var(--text-caption);
@@ -227,7 +236,7 @@ p a {
   margin: 4px 0;
 }
 .hero-description {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: #cbd5e1;
 }
 
@@ -255,7 +264,7 @@ p a {
   display: block;
 }
 .glance-card h4 {
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-caption);
 }
@@ -319,15 +328,16 @@ p a {
 .section-context {
   font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   color: var(--japan-crimson);
   display: block;
+  margin-bottom: 6px;
 }
 .welcome-sub {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--primary-navy);
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 .japanese-watermark {
   position: absolute;
@@ -339,8 +349,8 @@ p a {
   color: rgba(22, 26, 43, 0.02);
 }
 .letter-para {
-  font-size: 0.78rem;
-  line-height: 1.45;
+  font-size: 0.77rem;
+  line-height: 1.43;
   text-align: justify;
   color: #3c4257;
 }
@@ -360,6 +370,18 @@ p a {
 .block-title i {
   color: var(--japan-crimson);
   margin-right: 4px;
+}
+.compass-icon{
+    width:15px;
+    height:15px;
+}
+.compass-icon-e{
+    width:11px;
+    height:11px;
+}
+.track-plane-icon{
+  width:18px;
+  height:18px;
 }
 .block-subtitle {
   font-size: 0.65rem;
@@ -439,9 +461,12 @@ p a {
   color: var(--primary-navy);
 }
 .identity-text p {
-  font-size: 0.68rem;
+  font-size: 0.70rem;
   color: var(--text-caption);
+  margin-bottom: 5px;
+  margin-top: 6px;
 }
+
 
 .pricing-tier-row {
   display: flex;
@@ -491,7 +516,8 @@ p a {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(35, 39, 51, 0.02);
   border: 1px solid var(--border-line);
-  height: 140px; /* Slimmer spacing */
+  height: 220px; /* Slimmer spacing */
+  margin-bottom: 15px;
 }
 .pass-left-main {
   flex: 3.2;
@@ -504,12 +530,14 @@ p a {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 }
 .pass-sector-route {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--japan-crimson);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  line-height: 1.5;
 }
 .pass-sector-route i {
   margin: 0 3px;
@@ -531,10 +559,19 @@ p a {
   margin-top: 2px;
 }
 .carrier-icon-square {
-  width: 24px;
-  height: 24px;
-  background-color: var(--primary-navy);
-  color: #ffffff;
+  width: 15px;
+  height: 15px;
+  background-color: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+.carrier-icon-square-t {
+  width: 20px;
+  height: 20px;
+  background-color: #dfd8cb;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -562,7 +599,7 @@ p a {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary-navy);
-  line-height: 1;
+  line-height: 1.5;
 }
 .airport-sub {
   font-size: 0.65rem;
@@ -587,6 +624,10 @@ p a {
   font-size: 0.62rem;
   color: var(--text-caption);
   font-weight: 500;
+  margin-top: 6px  !important;
+}
+.duration-lbl{
+    margin-bottom: 5px  !important;
 }
 .track-vector-line {
   height: 2px;
@@ -603,6 +644,13 @@ p a {
   padding: 0 3px;
   font-size: 0.65rem;
   color: var(--japan-crimson);
+}
+.track-vector-line-t{
+  width: 13px;
+  height: 13px;
+   position: relative;
+  top: -7px;
+  background-color: white;
 }
 
 .pass-footer-metrics {
@@ -635,7 +683,7 @@ p a {
   flex: 1;
   background-color: var(--japan-crimson);
   color: #ffffff;
-  padding: 12px;
+  padding: 10px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -686,17 +734,25 @@ p a {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(35, 39, 51, 0.01);
 }
-.card-left-stripbg {
-  width: 90px; /* Sized compactly */
-  background: repeating-linear-gradient(
-    45deg,
-    #eaddca,
-    #eaddca 12px,
-    #e6d8c5 12px,
-    #e6d8c5 24px
-  );
+/* .card-left-stripbg {
+  width: 90px; 
+  background: repeating-linear-gradient(45deg, #eaddca, #eaddca 12px, #e6d8c5 12px, #e6d8c5 24px);
   opacity: 0.5;
   border-right: 1px solid rgba(22, 26, 43, 0.03);
+} */
+.card-left-stripbg{
+    width:145px;
+    min-width:145px;
+    max-width:145px;
+    overflow:hidden;
+    flex-shrink:0;
+}
+
+.card-left-stripbg img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
 }
 .card-right-datacore {
   flex: 1;
@@ -783,12 +839,12 @@ p a {
    ========================================================================== */
 .itinerary-timeline-vertical {
   position: relative;
-  padding-left: 6px;
+  padding-left: 0 !important;
 }
 .itinerary-timeline-vertical::before {
-  content: "";
+  content: '';
   position: absolute;
-  left: 20px;
+  left: 14px;
   top: 8px;
   bottom: 8px;
   width: 2px;
@@ -806,8 +862,8 @@ p a {
   background-color: var(--japan-crimson);
   color: #ffffff;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -828,9 +884,15 @@ p a {
   margin-top: 1px;
 }
 
-.itinerary-split-card {
-  height: 130px;
+/* .itinerary-split-card {
+  height: 160px;
+} */
+ .itinerary-split-card{
+    min-height:160px;
+    height:auto;
+    align-items:stretch;
 }
+
 .day-header-meta .date-string {
   font-size: 0.6rem;
   font-weight: 700;
@@ -898,6 +960,7 @@ p a {
   width: 18px;
   height: 18px;
   background: rgba(255, 255, 255, 0.15);
+  color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -911,11 +974,6 @@ p a {
 
 .matrix-list-body {
   padding: 12px 16px;
-}
-.matrix-list-body ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 .matrix-scope-tag {
   font-size: 0.55rem;
@@ -933,41 +991,7 @@ p a {
   color: #3c4257;
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-}
-
-.matrix-list-body li .item-icon-wrap {
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  min-height: 16px;
-  margin-top: 1px;
-  line-height: 16px;
-  text-align: center;
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.matrix-list-body li .item-icon-wrap svg {
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  min-height: 16px;
-  display: block;
-  flex-shrink: 0;
-}
-.matrix-list-body li .item-icon-wrap--inc {
-  color: #1a5c3f;
-}
-.matrix-list-body li .item-icon-wrap--exc {
-  color: var(--japan-crimson);
-}
-.matrix-list-body li .item-text {
-  flex: 1;
-  min-width: 0;
-  line-height: 1.5;
+  gap: 6px;
 }
 .matrix-list-body li:last-child {
   border-bottom: none;
@@ -1022,8 +1046,7 @@ p a {
   gap: 12px;
 }
 .payment-solid-dark-box {
-  background:
-    radial-gradient(circle at top right, #381518 0%, #161517 50%), #161517;
+  background: radial-gradient(circle at top right, #381518 0%, #161517 50%), #161517;
   border-radius: 12px; /* Reduced by 50% from 24px */
   padding: 14px 18px;
   color: #ffffff;
@@ -1223,13 +1246,15 @@ p a {
   display: block;
 }
 .thank-you-headline {
-  font-size: 2.8rem;
+  font-size: 4rem;
   font-weight: 700;
   line-height: 1;
+  margin-top: 70px;
 }
 .thank-you-subtext {
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: #cbd5e1;
+  margin-top: 10px;
 }
 .closing-divider-diamond {
   width: 100px;
@@ -1238,7 +1263,7 @@ p a {
   margin: 12px auto;
 }
 .closing-personal-note {
-  font-size: 0.74rem;
+  font-size: 0.96rem;
   line-height: 1.45;
   max-width: 440px;
   margin: 0 auto;
@@ -1252,6 +1277,7 @@ p a {
   border: none;
   padding: 10px 0;
   border-radius: 6px;
+  margin-top: 230px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -1263,7 +1289,7 @@ p a {
   border-right: none;
 }
 .metric-node h3 {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--japan-crimson);
   line-height: 1;
@@ -1278,14 +1304,15 @@ p a {
 .closing-contact-card {
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 12px;
+  padding-top: 380px;
 }
 .contact-channel-row {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  font-size: 0.72rem;
+  gap: 400px;
+  font-size: 0.73rem;
   margin-bottom: 2px;
+  line-height: 0.1;
 }
 .contact-channel-row i {
   color: var(--japan-crimson);
@@ -1299,28 +1326,140 @@ p a {
 .page-footer.closing-version {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-
+.flight-icon{
+    width:24px;
+    height:24px;
+    /* color:#fff; */
+}
+.carrier-icon-square .flight-icon{
+      width:18px;
+    height:20px;
+    color:#fff;
+}
 /* ==========================================================================
    13. COMPREHENSIVE ENGINE PRINT DEPLOYMENT FORCING
    ========================================================================== */
-@page {
-  size: A4 portrait;
-  margin: 0;
-}
-
-@media print {
-  body {
-    background-color: #ffffff;
+   
+   @media print {
+  @page {
+    size: A4 portrait;
     margin: 0;
   }
-  .page {
+  /* body {
+    background-color: #ffffff;
+    margin: 0;
+  } */
+    html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #dfd8cb !important;
+  }
+  /* .page {
     margin: 0;
     box-shadow: none;
     page-break-after: always;
     break-after: page;
+  } */
+   .page {
+    width: 210mm !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 auto !important;
+    padding: 8mm 18mm !important;
+
+    overflow: visible !important;
+    display: block !important;
+    box-shadow: none !important;
+
+    page-break-before: auto !important;
+    page-break-after: auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
   }
-  .matrix-list-body li .item-icon-wrap svg {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+   .cover-page {
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+
+    overflow: hidden !important;
+
+    page-break-after: always !important;
+    break-after: page !important;
   }
+
+  /* Thank you always new page + full height */
+  /* ONLY FOR THANK YOU PAGE */
+.thank-you-page{
+    width:210mm !important;
+    height:297mm !important;
+    min-height:297mm !important;
+    max-height:297mm !important;
+
+    overflow:hidden !important;
+
+    page-break-before:always !important;
+    break-before:page !important;
+
+    page-break-after:auto !important;
+    break-after:auto !important;
+
+    box-sizing:border-box !important;
+}
+
+/* Last page hole ar kono blank page na */
+.thank-you-page:last-child{
+    page-break-after:auto !important;
+    break-after:auto !important;
+}
+
+  /* Footer normal flow, blank gap prevent */
+  /* .page-footer {
+    position: static !important;
+    width: 100% !important;
+    margin-top: 12px !important;
+  } */
+   .page-footer {
+  position: static !important;
+  width: 100% !important;
+  margin-top: 10px !important;
+  border-top: 1px solid var(--border-line);
+  padding-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+  /* Cards majhkhane cut hobe na */
+  .card-container,
+  .boarding-pass-container,
+  .layout-split-card,
+  .hotel-striped-card,
+  .timeline-day-block,
+  .matrix-column-wrapper,
+  .clause-node,
+  .testimonial-card-v2 {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  .itinerary-page{
+    page-break-before: always !important;
+    break-before: page !important;
+
+    width:210mm !important;
+    min-height:297mm !important;
+
+    padding:8mm 18mm !important;
+    box-sizing:border-box !important;
+}
 }

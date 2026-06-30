@@ -102,7 +102,7 @@ else if($bsmValues[0]->tax_apply_on == '3') {
 		<small id="tcs_tax_show-" style="color:#000000">&nbsp;</small>
                                                                             <select title="TCS" id="tcs_tax_1" name="tcs_tax_1" class="form-control" >
                                                                                 <option value="">*TCS Tax</option>
-                                            									<option value="5" <?php if($bsmValues[0]->tcsper==5) { echo "selected"; } ?> >5% TCS</option>
+                                            									<option value="2" <?php if($bsmValues[0]->tcsper==2) { echo "selected"; } ?> >2% TCS</option>
                                             									<option value="20" <?php if($bsmValues[0]->tcsper==20) { echo "selected"; } ?>>20% TCS</option>
                                                                             </select><span style="color:white;">TCS</span>
                                                                     

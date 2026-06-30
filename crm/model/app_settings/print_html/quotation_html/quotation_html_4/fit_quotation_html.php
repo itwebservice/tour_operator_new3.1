@@ -1153,7 +1153,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
 
         <div class="ty-main">
           <div class="ty-until">
-            <div class="ty-line"></div>
+            <!-- <div class="ty-line"></div> -->
             <div class="ty-until-text">Until We Meet Again</div>
             <div class="ty-line"></div>
           </div>

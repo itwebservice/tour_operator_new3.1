@@ -45,8 +45,8 @@ $assets  = "assets/"; // decorative/fallback images shipped with this design
 
 $testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
   ? $q['testimonials']
-  : array(); 
-  
+  : array();
+
 $social_links = array();
 
 if (function_exists('gqb_get_config')) {
@@ -676,7 +676,7 @@ function o1_flight_date($v)
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>02<!-- --> / 09</span>
       </div>
@@ -825,7 +825,7 @@ function o1_flight_date($v)
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>03<!-- --> / 09</span>
       </div>
@@ -1276,8 +1276,43 @@ function o1_flight_date($v)
         </div>
         <div>
     </section>
-    <section class="page itinerary-page">
+
+    <section class="page itinerary-page ">
       <div class="watermark"></div>
+      <div class="header-strip">
+        <div class="px-10 py-4 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="relative w-10 h-10 rounded-full grid place-items-center" style="background:var(--gradient-gold)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-compass w-5 h-5 text-[color:var(--navy)]" aria-hidden="true">
+                <circle cx="12" cy="12" r="10">
+                </circle>
+                <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z">
+                </path>
+              </svg>
+            </div>
+            <div class="leading-tight text-cream">
+              <div class="font-display text-lg font-bold tracking-wide">
+                <?= o1e(o1nv($hero['company_name'], 'ITOURS LLP PVT LTDS')) ?>
+              </div>
+              <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
+            </div>
+          </div>
+
+          <div class="text-cream text-right">
+            <div class="text-[10px] uppercase tracking-[0.3em] opacity-70">
+              Day Wise Itinerary
+            </div>
+            <div class="font-display text-sm">
+              <?= o1e($hero['quotation_code']) ?> · <?= o1e(o1nv($ov['destination'], $hero['tour_name'])) ?>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] uppercase tracking-[0.25em] opacity-70 text-cream">Page</span>
+            <span class="font-display text-2xl text-[color:var(--gold)]">05</span>
+          </div>
+        </div>
+      </div>
       <div class="flex items-end justify-between">
         <h2 class="font-display text-2xl text-[color:var(--navy)] flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera w-5 h-5 text-[color:var(--gold)]" aria-hidden="true">
@@ -1425,7 +1460,7 @@ function o1_flight_date($v)
           </div>
           <!-- <div class="col-span-8 p-4 relative"> -->
           <div class="col-span-8 p-4 relative" style="position:relative;">
-            <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">âœ¦ <!-- -->30Â°C<!-- --> Â· <!-- -->Highlight</div>
+            <div class="absolute top-0 right-0 px-3 py-1 text-[9px] uppercase tracking-[0.22em] text-[color:var(--navy)] rounded-bl-xl" style="background:var(--gradient-gold)">âœ¦ <!-- -->30Â°C<!-- --> · <!-- -->Highlight</div>
             <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-[color:var(--teal)] mt-3">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3" aria-hidden="true">
                 <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
@@ -1521,13 +1556,13 @@ function o1_flight_date($v)
       </div>
       </div>
       </div>
-      <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+      <div class="page-foot  absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>04<!-- --> / 09</span>
       </div>
     </section>
-    <section class="page page-flow" style="--wm-url:url(assets/globe-watermark.png)">
+    <section class="page page-flow  inclusion-page" style="--wm-url:url(assets/globe-watermark.png)">
       <div class="watermark" style="background-image:url(assets/globe-watermark.png)">
       </div>
       <div class="header-strip">
@@ -1552,7 +1587,7 @@ function o1_flight_date($v)
           </div>
           <div class="flex items-center gap-2">
             <span class="text-[10px] uppercase tracking-[0.25em] opacity-70 text-cream">Page</span>
-            <span class="font-display text-2xl text-[color:var(--gold)]">05</span>
+            <span class="font-display text-2xl text-[color:var(--gold)]">06</span>
           </div>
         </div>
       </div>
@@ -1621,194 +1656,193 @@ function o1_flight_date($v)
             </ul>
           </div>
         </div>
-        <div class="mt-4">
+        <div class="mt-4 payment-page>
           <?php
           $o1_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
           $is_per_person = ($o1_costing_type == 'per person');
           ?>
-          <div class="flex items-end justify-between">
-            <h3 class="font-display text-2xl text-[color:var(--navy)]">Costing Details</h3>
-            <!-- <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">All values in INR Â· per package</span> -->
-            <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">
-              All values in INR · <?= $is_per_person ? 'Per Person' : 'Per Package' ?>
-            </span>
-          </div>
-          <hr class="gold-rule mt-2" />
-          <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <?php if (!$is_per_person) { ?>
-              <div class="grid grid-cols-6 text-[10px] uppercase tracking-[0.2em] text-cream px-4 py-3" style="background:var(--gradient-navy)">
-                <div class="col-span-1">Package</div>
-                <div class="text-right">Tour Cost</div>
-                <div class="text-right">Tax</div>
-                <!-- <div class="text-right">Total Amount</div> -->
-                <div class="text-right">TCS</div>
-                <div class="text-right">Travel</div>
-                <div class="text-right text-[color:var(--gold)]">Grand Total</div>
-              </div>
-              <?php
-              $o1_grp = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
-              if (empty($o1_grp)) {
-                $o1_grp = array(array('package_type' => 'Package', 'tour_cost_display' => '0', 'tax_display' => '0', 'tcs_display' => '0', 'travel_display' => '0', 'total_display' => '0'));
-              }
-              $o1_ci = 0;
-              foreach ($o1_grp as $o1_row):
-                $o1_bg = ($o1_ci % 2 == 1) ? 'bg-[color:var(--gold-soft)]/30' : 'bg-white';
-              ?>
-                <div class="grid grid-cols-6 items-center px-4 py-3.5 text-[12.5px] <?= $o1_bg ?> border-t border-[color:var(--gold)]/20">
-                  <div class="col-span-1 flex items-center gap-2">
-                    <span class="font-display text-base text-[color:var(--navy)]"><?= o1e(o1nv($o1_row['package_type'], 'Package')) ?></span>
-                  </div>
-                  <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tour_cost_display']) ?></div>
-                  <!-- <div class="text-right text-[color:var(--ink)]/85"><? //= o1e(o1nv($o1_row['tax_display'], '&#8377; 0')) 
-                                                                          ?></div> -->
-                  <!-- ================== Dipti -->
-                  <?php
-                  $tax_amount = '0.00';
+          <div class=" flex items-end justify-between">
+          <h3 class="font-display text-2xl text-[color:var(--navy)]">Costing Details</h3>
+          <!-- <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">All values in INR · per package</span> -->
+          <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">
+            All values in INR · <?= $is_per_person ? 'Per Person' : 'Per Package' ?>
+          </span>
+        </div>
+        <hr class="gold-rule mt-2" />
+        <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <?php if (!$is_per_person) { ?>
+            <div class="grid grid-cols-6 text-[10px] uppercase tracking-[0.2em] text-cream px-4 py-3" style="background:var(--gradient-navy)">
+              <div class="col-span-1">Package</div>
+              <div class="text-right">Tour Cost</div>
+              <div class="text-right">Tax</div>
+              <!-- <div class="text-right">Total Amount</div> -->
+              <div class="text-right">TCS</div>
+              <div class="text-right">Travel</div>
+              <div class="text-right text-[color:var(--gold)]">Grand Total</div>
+            </div>
+            <?php
+            $o1_grp = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
+            if (empty($o1_grp)) {
+              $o1_grp = array(array('package_type' => 'Package', 'tour_cost_display' => '0', 'tax_display' => '0', 'tcs_display' => '0', 'travel_display' => '0', 'total_display' => '0'));
+            }
+            $o1_ci = 0;
+            foreach ($o1_grp as $o1_row):
+              $o1_bg = ($o1_ci % 2 == 1) ? 'bg-[color:var(--gold-soft)]/30' : 'bg-white';
+            ?>
+              <div class="grid grid-cols-6 items-center px-4 py-3.5 text-[12.5px] <?= $o1_bg ?> border-t border-[color:var(--gold)]/20">
+                <div class="col-span-1 flex items-center gap-2">
+                  <span class="font-display text-base text-[color:var(--navy)]"><?= o1e(o1nv($o1_row['package_type'], 'Package')) ?></span>
+                </div>
+                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tour_cost_display']) ?></div>
+                <!-- <div class="text-right text-[color:var(--ink)]/85"><? //= o1e(o1nv($o1_row['tax_display'], '&#8377; 0')) 
+                                                                        ?></div> -->
+                <!-- ================== Dipti -->
+                <?php
+                $tax_amount = '0.00';
 
-                  if (!empty($o1_row['tax_display'])) {
-                    preg_match('/INR\s*([\d,\.]+)/i', $o1_row['tax_display'], $matches);
-                    $tax_amount = isset($matches[1]) ? $matches[1] : '0.00';
+                if (!empty($o1_row['tax_display'])) {
+                  preg_match('/INR\s*([\d,\.]+)/i', $o1_row['tax_display'], $matches);
+                  $tax_amount = isset($matches[1]) ? $matches[1] : '0.00';
+                }
+                ?>
+
+                <div class="text-right text-[color:var(--ink)]/85">
+                  INR <?= o1e($tax_amount) ?>
+                </div>
+                <!-- <div class="text-right text-[color:var(--ink)]/85">&#8377; <? //= o1e(o1nv($o1_row['total_display'], '0')) 
+                                                                                ?></div> -->
+                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tcs_display']) ?></div>
+                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['travel_display']) ?></div>
+                <div class="text-right font-display text-lg text-[color:var(--navy)]">&#8377; <?= o1e($o1_row['total_display']) ?></div>
+              </div>
+            <?php $o1_ci++;
+            endforeach; ?>
+          <?php } ?>
+        </div>
+        <!-- <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div> -->
+      </div>
+
+      <?php
+      $o1_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+      ?>
+      <?php if ($is_per_person && !empty($o1_pp)) { ?>
+        <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+          <div style="margin-top:15px;border:1px solid #e4d3b3;border-radius:18px;overflow:hidden;">
+            <table style="width:100%; border-collapse:separate; border-spacing:0; font-family:Arial, Helvetica, sans-serif;">
+              <thead>
+                <tr style="background:#022b5b; color:#fff;">
+                  <th style="padding:12px 18px;font-size:10px;letter-spacing:3px;font-weight:normal;">
+                    PACKAGE
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    ADULT
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    CWB
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    CWOB
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    INFANT
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    TAX
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    TCS
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    VISA
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    GUIDE
+                  </th>
+
+                  <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
+                    MISC
+                  </th>
+
+                </tr>
+              </thead>
+
+              <tbody>
+                <?php foreach ($o1_pp as $i => $pp) { ?>
+
+                  <?php
+                  $row_bg = ($i % 2 == 0) ? '#ffffff' : '#f6efdf';
+
+                  $tax_amount = 'INR 0.00';
+
+                  if (!empty($pp['tax_display'])) {
+                    preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
+                    if (!empty($m[1])) {
+                      $tax_amount = 'INR ' . $m[1];
+                    }
                   }
                   ?>
 
-                  <div class="text-right text-[color:var(--ink)]/85">
-                    INR <?= o1e($tax_amount) ?>
-                  </div>
-                  <!-- <div class="text-right text-[color:var(--ink)]/85">&#8377; <? //= o1e(o1nv($o1_row['total_display'], '0')) 
-                                                                                  ?></div> -->
-                  <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tcs_display']) ?></div>
-                  <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['travel_display']) ?></div>
-                  <div class="text-right font-display text-lg text-[color:var(--navy)]">&#8377; <?= o1e($o1_row['total_display']) ?></div>
-                </div>
-              <?php $o1_ci++;
-              endforeach; ?>
-            <?php } ?>
-          </div>
-          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
-        </div>
+                  <tr style="background:<?= $row_bg ?>;">
 
-        <?php
-        $o1_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
-        ?>
-        <?php if ($is_per_person && !empty($o1_pp)) { ?>
-          <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
-            <div style="margin-top:15px;border:1px solid #e4d3b3;border-radius:18px;overflow:hidden;">
-              <table style="width:100%; border-collapse:separate; border-spacing:0; font-family:Arial, Helvetica, sans-serif;">
-                <thead>
-                  <tr style="background:#022b5b; color:#fff;">
-                    <th style="padding:12px 18px;font-size:10px;letter-spacing:3px;font-weight:normal;">
-                      PACKAGE
-                    </th>
+                    <td style="padding:32px 18px;font-size:16px;color:#0b2343;font-family:Arial, Helvetica, sans-serif;">
+                      <?= o1e($pp['package_type']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      ADULT
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['pp_adult_display']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      CWB
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['pp_cwb_display']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      CWOB
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['pp_cwnb_display']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      INFANT
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['pp_infant_display']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      TAX
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($tax_amount) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      TCS
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['tcs_display']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      VISA
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['visa_display']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      GUIDE
-                    </th>
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['guide_display']) ?>
+                    </td>
 
-                    <th style="padding:14px 8px;font-size:10px;letter-spacing:3px;text-align:center;">
-                      MISC
-                    </th>
-
+                    <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
+                      &#8377; <?= o1e($pp['misc_display']) ?>
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody>
-                  <?php foreach ($o1_pp as $i => $pp) { ?>
-
-                    <?php
-                    $row_bg = ($i % 2 == 0) ? '#ffffff' : '#f6efdf';
-
-                    $tax_amount = 'INR 0.00';
-
-                    if (!empty($pp['tax_display'])) {
-                      preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                      if (!empty($m[1])) {
-                        $tax_amount = 'INR ' . $m[1];
-                      }
-                    }
-                    ?>
-
-                    <tr style="background:<?= $row_bg ?>;">
-
-                      <td style="padding:32px 18px;font-size:16px;color:#0b2343;font-family:Arial, Helvetica, sans-serif;">
-                        <?= o1e($pp['package_type']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_adult_display']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_cwb_display']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_cwnb_display']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_infant_display']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($tax_amount) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['tcs_display']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['visa_display']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['guide_display']) ?>
-                      </td>
-
-                      <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['misc_display']) ?>
-                      </td>
-                    </tr>
-                  <?php } ?>
-                </tbody>
-              </table>
-            <?php } ?>
-            </div>
-          </div>
-          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
-          <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
-            <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
-            <span>05<!-- --> / 09</span>
-          </div>
+                <?php } ?>
+              </tbody>
+            </table>
+          <?php } ?>
+        </div>
+        <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
+        <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
+          <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+          <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
+          <span>05<!-- --> / 09</span>
+        </div>
     </section>
     <section class="page print-section" style="--wm-url:url(assets/globe-watermark.png)">
       <div class="watermark" style="background-image:url(assets/globe-watermark.png)">
@@ -1835,7 +1869,7 @@ function o1_flight_date($v)
           </div>
           <div class="flex items-center gap-2">
             <span class="text-[10px] uppercase tracking-[0.25em] opacity-70 text-cream">Page</span>
-            <span class="font-display text-2xl text-[color:var(--gold)]">06</span>
+            <span class="font-display text-2xl text-[color:var(--gold)]">07</span>
           </div>
         </div>
       </div>
@@ -2280,7 +2314,7 @@ function o1_flight_date($v)
         </div>
       </div>
       <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>06<!-- --> / 09</span>
       </div>
@@ -2310,16 +2344,16 @@ function o1_flight_date($v)
           </div>
           <div class="flex items-center gap-2">
             <span class="text-[10px] uppercase tracking-[0.25em] opacity-70 text-cream">Page</span>
-            <span class="font-display text-2xl text-[color:var(--gold)]">07</span>
+            <span class="font-display text-2xl text-[color:var(--gold)]">08</span>
           </div>
         </div>
       </div>
       <div class="relative px-10 py-8">
-          <?php
-              // echo '<pre>';
-              // print_r($testimonials);
-              // exit;
-          ?>
+        <?php
+        // echo '<pre>';
+        // print_r($testimonials);
+        // exit;
+        ?>
         <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Trusted by Travellers</div>
         <h2 class="font-display text-4xl text-[color:var(--navy)] mt-1">What Our Travellers Say</h2>
         <hr class="gold-rule mt-3" />
@@ -2388,7 +2422,7 @@ function o1_flight_date($v)
                 </div>
               </div>
               <div class="font-display text-sm text-[color:var(--navy)] mt-2 text-center">Anjali Mehta</div>
-              <div class="text-[10px] uppercase tracking-[0.18em] text-[color:var(--teal)]">Bali Â· 2025</div>
+              <div class="text-[10px] uppercase tracking-[0.18em] text-[color:var(--teal)]">Bali · 2025</div>
             </div>
             <div class="col-span-5 relative">
               <div class="font-display text-6xl text-[color:var(--gold)]/40 absolute -top-4 -left-1 leading-none">&quot;</div>
@@ -2431,7 +2465,7 @@ function o1_flight_date($v)
                 </div>
               </div>
               <div class="font-display text-sm text-[color:var(--navy)] mt-2 text-center">Rohan Kapoor</div>
-              <div class="text-[10px] uppercase tracking-[0.18em] text-[color:var(--teal)]">Dubai Â· 2025</div>
+              <div class="text-[10px] uppercase tracking-[0.18em] text-[color:var(--teal)]">Dubai · 2025</div>
             </div>
             <div class="col-span-5 relative">
               <div class="font-display text-6xl text-[color:var(--gold)]/40 absolute -top-4 -left-1 leading-none">&quot;</div>
@@ -2474,7 +2508,7 @@ function o1_flight_date($v)
                 </div>
               </div>
               <div class="font-display text-sm text-[color:var(--navy)] mt-2 text-center">Priya &amp; Vikram</div>
-              <div class="text-[10px] uppercase tracking-[0.18em] text-[color:var(--teal)]">Maldives Â· 2024</div>
+              <div class="text-[10px] uppercase tracking-[0.18em] text-[color:var(--teal)]">Maldives · 2024</div>
             </div>
             <div class="col-span-5 relative">
               <div class="font-display text-6xl text-[color:var(--gold)]/40 absolute -top-4 -left-1 leading-none">&quot;</div>
@@ -2520,7 +2554,7 @@ function o1_flight_date($v)
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>07<!-- --> / 09</span>
       </div>
@@ -2550,7 +2584,7 @@ function o1_flight_date($v)
           </div>
           <div class="flex items-center gap-2">
             <span class="text-[10px] uppercase tracking-[0.25em] opacity-70 text-cream">Page</span>
-            <span class="font-display text-2xl text-[color:var(--gold)]">08</span>
+            <span class="font-display text-2xl text-[color:var(--gold)]">09</span>
           </div>
         </div>
       </div>
@@ -2814,7 +2848,7 @@ function o1_flight_date($v)
       </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>08<!-- --> / 09</span>
       </div>
@@ -2844,7 +2878,7 @@ function o1_flight_date($v)
           </div>
           <div class="flex items-center gap-2">
             <span class="text-[10px] uppercase tracking-[0.25em] opacity-70 text-cream">Page</span>
-            <span class="font-display text-2xl text-[color:var(--gold)]">09</span>
+            <span class="font-display text-2xl text-[color:var(--gold)]">10</span>
           </div>
         </div>
       </div>

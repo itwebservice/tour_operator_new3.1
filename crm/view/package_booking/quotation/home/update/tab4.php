@@ -531,7 +531,7 @@ background-color:<?= $theme_color ?>;
                                                                             <td>TCS</td>
                                                                             <td ><select id="adult_select_tcs_pp_update" name="adult_select_tcs_pp_update"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>
@@ -652,7 +652,7 @@ background-color:<?= $theme_color ?>;
                                                                             <td>TCS</td>
                                                                             <td ><select id="cweb_select_tcs_pp_update" name="cweb_select_tcs_pp_update"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>
@@ -774,7 +774,7 @@ background-color:<?= $theme_color ?>;
                                                                             <td>TCS</td>
                                                                             <td ><select id="cwnb_select_tcs_pp_update" name="cwnb_select_tcs_pp_update"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>
@@ -896,7 +896,7 @@ background-color:<?= $theme_color ?>;
                                                                             <td>TCS</td>
                                                                             <td ><select id="adult_select_tcs_pp_update" name="adult_select_tcs_pp_update"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>

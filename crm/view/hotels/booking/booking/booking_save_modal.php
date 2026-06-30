@@ -222,7 +222,7 @@ $tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
                                 <label for="tcs_tax">TCS</label>
                                 <select title="Select Tax" id="tcs_tax" name="tcs_tax" class="form-control">
                                     <option value="">*Select Tax</option>
-									<option value="5">5% TCS</option>
+									<option value="2">2% TCS</option>
 									<option value="20">20% TCS</option>
                                 </select>
                             </div>

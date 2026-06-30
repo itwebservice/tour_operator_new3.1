@@ -148,7 +148,7 @@ body {
 .cover-badge {
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: rgba(255, 255, 255, 0.85);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -160,7 +160,7 @@ body {
   padding: 0 40px;
 }
 .cover-presents {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 4px;
   text-transform: uppercase;
@@ -169,11 +169,11 @@ body {
 }
 .cover-title {
   font-family: 'Playfair Display', serif;
-  font-size: 58px;
+  font-size: 90px;
   font-weight: 700;
   color: var(--white);
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .cover-subtitle {
   font-size: 14px;
@@ -207,11 +207,11 @@ body {
   min-width: 80px;
 }
 .cover-icon-pill .icon {
-  font-size: 18px;
+  font-size: 28px;
   color: var(--gold-lt);
 }
 .cover-icon-pill .label {
-  font-size: 8px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -287,15 +287,15 @@ body {
   border-top: 1px solid var(--border);
   margin-top: auto;
 } */
- .page-num{
-  text-align:right;
-  padding:10px 28px;
-  font-size:9px;
-  font-weight:500;
-  letter-spacing:1.5px;
-  color:var(--text-muted);
-  border-top:1px solid var(--border);
-  margin-top:8px !important;
+.page-num {
+  text-align: right;
+  padding: 10px 28px;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 8px !important;
 }
 
 /* Section label+heading pattern */
@@ -303,7 +303,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -322,7 +322,7 @@ body {
   font-size: 30px;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 17px !important;
+  margin-bottom: 0 !important;
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -360,7 +360,7 @@ body {
   color: rgba(255, 255, 255, 0.04);
 }
 .personal-banner .eyebrow {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -369,7 +369,7 @@ body {
 }
 .personal-banner h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--white);
   line-height: 1.35;
@@ -388,13 +388,13 @@ body {
 }
 .salutation-card .dear {
   font-family: 'Playfair Display', serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
 }
 .salutation-card p {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-mid);
   line-height: 1.7;
 }
@@ -413,8 +413,8 @@ body {
   padding: 14px 16px;
 }
 .ov-card .icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
   background: var(--bg2);
   display: flex;
@@ -425,7 +425,7 @@ body {
   color: var(--teal);
 }
 .ov-card .lbl {
-  font-size: 8.5px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -534,14 +534,14 @@ body {
 }
 .hotel-name {
   font-family: 'Playfair Display', serif;
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text);
 }
 .nights-badge {
   background: var(--bg2);
   color: var(--teal);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 1px;
   padding: 3px 10px;
@@ -555,7 +555,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-mid);
   margin-bottom: 12px;
 }
@@ -571,7 +571,7 @@ body {
   padding: 8px 10px;
 }
 .date-chip .dlbl {
-  font-size: 8.5px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -584,7 +584,7 @@ body {
   color: var(--text);
 }
 .date-chip .dval .dc-icon {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--gold);
   margin-right: 4px;
 }
@@ -608,7 +608,7 @@ body {
   background: var(--bg);
   border-radius: 8px;
   padding: 10px 14px;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-muted);
   text-align: center;
   margin-top: 8px;
@@ -697,7 +697,7 @@ body {
   line-height: 1;
 }
 .flight-city {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-muted);
 }
 .flight-middle {
@@ -709,7 +709,7 @@ body {
   padding-top: 4px;
 }
 .flight-duration {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 4px;
@@ -762,7 +762,7 @@ body {
   color: var(--gold);
 }
 .ff-lbl {
-  font-size: 8px;
+  font-size: 9px;
   color: var(--text-muted);
 }
 .ff-val {
@@ -1446,22 +1446,25 @@ body {
   background: var(--gold);
 }
 .ty-until-text {
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--gold);
+  margin-top: 30px !important;
+  margin-bottom: 30px !important;
 }
 .ty-heading {
   font-family: 'Playfair Display', serif;
-  font-size: 50px;
+  font-size: 90px;
   font-weight: 700;
   color: var(--white);
   margin-bottom: 14px;
+  margin-bottom: 18px !important;
   line-height: 1;
 }
 .ty-sub {
-  font-size: 13px;
+  font-size: 16px;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.7;
   margin-bottom: 36px;
@@ -1587,75 +1590,76 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 .vl-logo .company-logo-img {
-  max-height: 32px;
+  max-height: 43px;
 }
 .cover .vl-logo .company-logo-img {
-  max-height: 38px;
+  max-height: 51px;
   filter: none;
 }
 .page-header .company-logo-img {
-  max-height: 32px;
+  max-height: 45px;
 }
 
-.ty-top{
-    flex:0 0 auto;
+.ty-top {
+  flex: 0 0 auto;
 }
 
-.ty-main{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
+.ty-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.ty-bottom{
-    flex:0 0 auto;
+.ty-bottom {
+  flex: 0 0 auto;
 }
 
 /* ================= TERMS & CONDITIONS ================= */
 
-.tnc-list{
-    font-size:14px;
-    line-height:1.6;
-    color:#2c4674;
-    margin-top:8px;
+.tnc-list {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #000000;
+  margin-top: 0;
 }
 
 .tnc-list h4,
 .tnc-list b,
-.tnc-list strong{
-    /* display:block; */
-    font-size:23px;
-    font-weight:700;
-    color:#080839;
-    /* margin:10px 0 8px; */
-    margin-bottom: 15px;
-    line-height:0.8;
+.tnc-list strong {
+  /* display:block; */
+  font-size: 23px;
+  font-weight: 700;
+  color: #080839;
+  /* margin:10px 0 8px; */
+  margin-bottom: 15px;
+  line-height: 0;
 }
 
-.tnc-list ul{
-    margin:0 0 24px 28px;
-    padding-left:10px;
+.tnc-list ul {
+  margin: 0 0 24px 28px;
+  padding-left: 10px;
 }
 
-.tnc-list li{
-    margin-bottom:8px;
-    font-size:18px;
-    line-height:1.4;
+.tnc-list li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-top: 10px;
 }
 
-.tnc-list p{
-    margin:0 0 16px;
-    font-size:16px;
-    line-height:1.4;
+.tnc-list p {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.2;
 }
 
-.tnc-list br{
-    display:block;
-    margin-bottom:8px;
-    content:"";
+.tnc-list br {
+  display: block;
+  margin-bottom: 8px;
+  content: '';
 }
 /* .ty-page{
     page-break-after: auto !important;
@@ -1671,7 +1675,7 @@ body {
   }
   html,
   body {
-     width: 210mm !important;
+    width: 210mm !important;
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -1708,13 +1712,13 @@ body {
     min-height: 260mm;
     height: auto !important;
   }
-   .page-header,
+  .page-header,
   .page-section,
   .page-num {
-    break-before:auto !important;
-    break-after:auto !important;
-    page-break-before:auto !important;
-    page-break-after:auto !important;
+    break-before: auto !important;
+    break-after: auto !important;
+    page-break-before: auto !important;
+    page-break-after: auto !important;
   }
 
   .page-num:last-of-type {
@@ -1735,7 +1739,7 @@ body {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
-   .ty-page {
+  .ty-page {
     /* position: relative !important; */
 
     width: 210mm !important;
@@ -1765,15 +1769,15 @@ body {
   .ty-top {
     padding: 14mm 16mm 0 !important;
   }
-.ty-main {
+  .ty-main {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
   }
 
-    .ty-bottom {
-    margin-top: auto !important;
+  .ty-bottom {
+    margin-top: 80px !important;
     padding: 0 12mm 12mm !important;
   }
 
@@ -1781,7 +1785,7 @@ body {
     display: none !important;
   }
 
-   .ty-contact-card {
+  .ty-contact-card {
     margin: 0 !important;
   }
 

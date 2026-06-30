@@ -48,7 +48,7 @@ for($quot=1; $quot <= $nofquotation; $quot++){
                                     <small id="tcs_tax_show-<?=$quot?>" style="color:#000000">&nbsp;</small>
                                     <select title="TCS Tax" id="tcs_tax-<?=$quot?>" data-optionid="<?=$quot?>" name="tcs_tax-<?=$quot?>" class="form-control tcs_tax_calculation" style="width: 150px!important;">
                                         <option value="0">*TCS Tax</option>
-    									<option value="5">5% TCS</option>
+    									<option value="2">2% TCS</option>
     									<option value="20">20% TCS</option>
                                     </select><span>TCS Tax</span>
                                 </td>

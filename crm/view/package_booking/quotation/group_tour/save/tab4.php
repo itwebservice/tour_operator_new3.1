@@ -68,7 +68,7 @@
 			<small id="tcs_tax_show-" >&nbsp;TCS Tax</small>
 		<select title="TCS" id="tcs_tax-" name="tcs_tax-" class="form-control" >
                                                                                 <option value="0">*TCS Tax</option>
-                                            									<option value="5">5% TCS</option>
+                                            									<option value="2">2% TCS</option>
                                             									<option value="20">20% TCS</option>
                                                                             </select><span style="color:white;">TCS</span>
 

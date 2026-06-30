@@ -375,7 +375,7 @@
                                                                             <td>TCS</td>
                                                                             <td ><select id="adult_select_tcs_pp" name="adult_select_tcs_pp"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>
@@ -496,7 +496,7 @@
                                                                             <td>TCS</td>
                                                                             <td ><select id="cweb_select_tcs_pp" name="cweb_select_tcs_pp"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>
@@ -619,7 +619,7 @@
                                                                             <td>TCS</td>
                                                                             <td ><select id="cwnb_select_tcs_pp" name="cwnb_select_tcs_pp"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>
@@ -741,7 +741,7 @@
                                                                             <td>TCS</td>
                                                                             <td ><select id="infant_select_tcs_pp" name="infant_select_tcs_pp"  class="form-control">
                                                                                      <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">5% TCS</option>
+                                                                                     <option value="2">2% TCS</option>
                                                                                      <option value="3">20% TCS</option>
                                                                                 </select></td>
                                                                         </tr>

@@ -49,7 +49,7 @@ $assets  = "assets/";
 $testimonials = array();
 $testimonials = isset($q['testimonials']) && is_array($q['testimonials'])
   ? $q['testimonials'] : array();
-  
+
 $social_links = array();
 
 $o2_cfg = function_exists('gqb_get_config') ? gqb_get_config() : array();
@@ -229,6 +229,8 @@ $o2_total_pages = 4 + count($o2_itin_pages) + 5;
 
 $o2_banner = o2img(isset($hero['cover_image']) ? $hero['cover_image'] : '', $assets . 'banner.jpg');
 $o2_hero   = o2img(isset($hero['cover_image']) ? $hero['cover_image'] : '', $assets . 'hero.jpg');
+
+
 // $o2_logo   = o2img(isset($hero['company_logo']) ? $hero['company_logo'] : '', $assets . 'logo.png');
 $o2_logo = BASE_URL . 'images/logo-circle.png?v=' . time();
 // $o2_round  = o2img((!empty($o2_itin_list[0]['image']) ? $o2_itin_list[0]['image'] : ''), $assets . 'day.jpg');
@@ -835,7 +837,7 @@ $o2_round = o2img(
         $o2_last_day  = isset($o2_chunk[count($o2_chunk) - 1]['day_number']) ? (int) $o2_chunk[count($o2_chunk) - 1]['day_number'] : $o2_first_day;
         $o2_day_label = 'Days ' . $o2_first_day . ($o2_last_day > $o2_first_day ? ' – ' . $o2_last_day : '');
     ?>
-        <section class="page itinerary-page<?= count($o2_chunk) > 2 ? ' page-flow' : '' ?>">
+        <section class="page itinerary-page page-flow  <?= count($o2_chunk) > 2 ? ' page-flow' : '' ?>">
           <?php o2_strip('Day by Day', 'Itinerary', o2e($o2_day_label)); ?>
           <div class="page__wm"></div>
           <div class="page__body">
@@ -1101,7 +1103,7 @@ $o2_round = o2img(
     </section>
 
     <!-- PAYMENT -->
-    <section class="page">
+    <section class="page payment-page">
       <?php o2_strip('Securing Your Booking', 'Payment', 'Bank &amp; <b>UPI</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">
