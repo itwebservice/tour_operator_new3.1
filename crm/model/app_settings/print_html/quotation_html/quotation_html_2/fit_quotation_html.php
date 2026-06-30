@@ -189,7 +189,11 @@ if (!function_exists('o2_strip')) {
 }
 
 $o2_dest          = o2nv($ov['destination'], o2nv($hero['tour_name'], 'Tour'));
-$o2_pkg           = o2nv($ov['package_type_label'], o2nv(!empty($hotels[0]['package_type']) ? $hotels[0]['package_type'] : '', 'Package'));
+// $o2_pkg           = o2nv($ov['package_type_label'], o2nv(!empty($hotels[0]['package_type']) ? $hotels[0]['package_type'] : '', 'Package'));
+$o2_pkg = o2nv(
+  !empty($hotels[0]['package_type']) ? $hotels[0]['package_type'] : '',
+  o2nv($ov['package_type_label'], 'Package')
+);
 $o2_client        = o2nv($ov['client_name'], o2nv($hero['client_name'], ''));
 $o2_client_first  = trim((string) preg_replace('/\s+.*/', '', $o2_client));
 $o2_travel_dates  = trim(o2nv($ov['travel_from'], '') . (o2nv($ov['travel_to'], '') !== '' ? ' – ' . o2nv($ov['travel_to'], '') : ''));
@@ -502,9 +506,9 @@ $o2_round = o2img(
                 </svg>
               </span>
               <div>
-                <div class="t" style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Package Type</div>
-                <div class="nm" style="font-size:16px;margin-top:2px"><?= o2e($o2_pkg) ?></div>
-                <div class="meta" style="margin-top:3px"><span style="color:var(--gold-deep);font-weight:500">Recommended for your group</span></div>
+                <div class="t" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Package Type</div>
+                <div class="nm" style="font-size:16px;margin-top:2px">Tailored Package</div>
+                <div class="meta" style="margin-top:3px"><span style="color:var(--gold-deep);font-weight:500; font-size:14px;">Recommended for your group</span></div>
               </div>
             </div>
           </div>
@@ -515,7 +519,11 @@ $o2_round = o2img(
 
     <!-- PAGE 3 · HOTELS -->
     <section class="page print-section<?= count((array) $hotels) > 4 ? ' page-flow' : '' ?>">
-      <?php o2_strip('Where You\'ll Stay', 'Accommodation', o2e($o2_pkg) . '&nbsp; <b>Package</b>'); ?>
+      <?php o2_strip(
+        'Where You\'ll Stay',
+        'Accommodation',
+        o2e(strtoupper($o2_pkg)) . ' <b>PACKAGE</b>'
+      ); ?> 
       <div class="page__wm"></div>
       <div class="page__body">
         <div class="sec-h">
@@ -589,7 +597,7 @@ $o2_round = o2img(
     </section>
 
     <!-- PAGE 4 · FLIGHTS & TRANSPORT -->
-    <section class="page page-flow ">
+    <section class="page page-flow print-section">
       <?php o2_strip('Getting There &amp; Around', 'Journey Plan', 'Flights · <b>Transfers</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">
@@ -656,7 +664,7 @@ $o2_round = o2img(
         <?php endif; ?>
 
         <?php if (!empty($trains)): ?>
-          <p class="kicker" style="margin-top:6mm">B · Train Details</p>
+          <p class="kicker kicker-heading" style="margin-top:6mm">B · Train Details</p>
 
           <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
             <?php foreach ((array)$trains as $tr): ?>
@@ -738,7 +746,7 @@ $o2_round = o2img(
 
         <!-- =============== Activity Details -->
         <?php if (!empty($acts)): ?>
-          <p class="kicker" style="margin-top:6mm">C · Activity Details</p>
+          <p class="kicker kicker-heading" style="margin-top:6mm">C · Activity Details</p>
 
           <div class="tline" style="margin-top:11px">
             <?php foreach ((array)$acts as $a): ?>
@@ -783,7 +791,7 @@ $o2_round = o2img(
           </div>
         <?php endif; ?>
         <!-- ====================== -->
-        <p class="kicker" style="margin-top:6mm">D · Transportation</p>
+        <p class="kicker kicker-heading" style="margin-top:6mm">D · Transportation</p>
         <div class="tline" style="margin-top:11px">
           <?php if (!empty($vehs)): foreach ((array) $vehs as $v): ?>
               <div class="tnode">
@@ -887,18 +895,18 @@ $o2_round = o2img(
       <?php o2_strip('The Fine Detail', 'Inclusions', '&amp; <b>Investment</b>'); ?>
       <div class="page__wm"></div>
       <div class="page__body">
-        <div class="ie-grid">
+        <div class="ie-grid option1-ie-grid">
           <div class="card ie ie--in">
-            <h3><span class="b">
-                <svg width="16" height="16" viewBox="0 0 24 24"
-                  fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 6 9 17l-5-5"></path>
+            <h3><span class="b rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check w-4 h-4 text-[color:var(--navy)]" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5">
+                  </path>
                 </svg>
               </span> What's Included</h3>
+            <hr class="gold-rule mt-2">
             <ul>
-              
-              <?php 
+
+              <?php
               foreach (o2_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.') as $item): ?>
                 <li>
                   <svg width="16" height="16" viewBox="0 0 24 24"
@@ -912,7 +920,7 @@ $o2_round = o2img(
             </ul>
           </div>
           <div class="card ie ie--ex">
-            <h3><span class="b">
+            <h3><span class="b rounded-xl">
                 <svg width="16" height="16" viewBox="0 0 24 24"
                   fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -920,6 +928,8 @@ $o2_round = o2img(
                   <path d="M6 6 18 18"></path>
                 </svg>
               </span> What's Excluded</h3>
+            <hr class="gold-rule mt-2">
+
             <ul>
               <?php foreach (o2_list_items(isset($incx['excluded']) ? $incx['excluded'] : '', 'Exclusions will be shared as per final quotation.') as $item): ?>
                 <li><svg width="16" height="16" viewBox="0 0 24 24"
@@ -1000,11 +1010,11 @@ $o2_round = o2img(
                       <?php endif; ?>
                     </td>
 
-                    <td>&#8377;<?= o2e(o2nv($o2_row['tour_cost_display'], 'INR 0.00')) ?></td>
-                    <td>&#8377;<?= o2e($tax_amount) ?></td>
-                    <td>&#8377;<?= o2e(o2nv($o2_row['tcs_display'], 'INR 0.00')) ?></td>
-                    <td>&#8377;<?= o2e(o2nv($o2_row['travel_display'], 'INR 0.00')) ?></td>
-                    <td class="gt">&#8377;<?= o2e(o2nv($o2_row['total_display'], 'INR 0.00')) ?></td>
+                    <td><?= o2e(o2nv($o2_row['tour_cost_display'], 'INR 0.00')) ?></td>
+                    <td><?= o2e($tax_amount) ?></td>
+                    <td><?= o2e(o2nv($o2_row['tcs_display'], 'INR 0.00')) ?></td>
+                    <td><?= o2e(o2nv($o2_row['travel_display'], 'INR 0.00')) ?></td>
+                    <td class="gt"><?= o2e(o2nv($o2_row['total_display'], 'INR 0.00')) ?></td>
                     </tr>
                   <?php
                   $o2_ci++;
@@ -1280,11 +1290,11 @@ $o2_round = o2img(
             <div class="l">Happy Travellers</div>
           </div>
         </div>
-        <div class="thanks__social">
-          <?php $o2_web = o2nv($ty['website'], ''); ?>
 
-          <!-- Website -->
-          <a href="<?= o2e($o2_web !== '' ? $o2_web : '#') ?>" aria-label="Website">
+        <!-- <div class="thanks__social">
+          <?php $o2_web = o2nv($ty['website'], ''); ?>
+          
+          <a href="<//?= o2e($o2_web !== '' ? $o2_web : '#') ?>" aria-label="Website">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M2 12h20"></path>
@@ -1293,39 +1303,38 @@ $o2_round = o2img(
             </svg>
           </a>
 
-          <!-- Email -->
-          <a href="mailto:<?= o2e(o2nv($ty['company_email'], '')) ?>" aria-label="Email">
+          
+          <a href="mailto:<//?= o2e(o2nv($ty['company_email'], '')) ?>" aria-label="Email">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="5" width="18" height="14" rx="2"></rect>
               <path d="m3 7 9 6 9-6"></path>
             </svg>
           </a>
 
-          <!-- Phone -->
-          <a href="tel:<?= o2e(preg_replace('/\s+/', '', o2nv($ty['company_contact'], o2nv($ty['user_mobile'], '')))) ?>" aria-label="Phone">
+          
+          <a href="tel:<//?= o2e(preg_replace('/\s+/', '', o2nv($ty['company_contact'], o2nv($ty['user_mobile'], '')))) ?>" aria-label="Phone">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.65 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.17a2 2 0 0 1 2.11-.45c.84.31 1.72.53 2.62.65A2 2 0 0 1 22 16.92z"></path>
             </svg>
           </a>
 
-          <!-- Facebook -->
-          <a href="<?= !empty($social_links['facebook']) ? o2e($social_links['facebook']) : '#' ?>" aria-label="Facebook">
+          <a href="<//?= !empty($social_links['facebook']) ? o2e($social_links['facebook']) : '#' ?>" aria-label="Facebook">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12z" />
             </svg>
           </a>
-        </div>
+        </div> -->
         <div class="thanks__contact">
 
-          <span class="c">
+          <!-- <span class="c">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
               <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
               </path>
               <circle cx="12" cy="10" r="3">
               </circle>
             </svg>
-            <?= o2e(o2nv($ty['company_address'], '')) ?>
-          </span>
+            <//?= o2e(o2nv($ty['company_address'], '')) ?>
+          </span> -->
 
           <span class="c">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

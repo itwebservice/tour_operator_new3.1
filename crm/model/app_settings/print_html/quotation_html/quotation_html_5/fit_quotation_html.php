@@ -353,8 +353,6 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
           <?php else : ?>
             <div class="cover-logo-icon">✈</div>
           <?php endif; ?>
-          <!-- <div class="cover-logo-name"><? //= o5e($o5_company) 
-                                            ?></div> -->
         </div>
         <div class="cover-tagline-right">Discover Extraordinary Experiences</div>
       </div>
@@ -581,7 +579,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
           <div class="all-hotels-item"><span class="ai">🍽️</span> Multi-Cuisine Restaurant</div>
         </div>
       </div>
-    </div>~
+    </div>
 
     <hr class="page-divider" />
 

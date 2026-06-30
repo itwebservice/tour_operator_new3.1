@@ -234,7 +234,8 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= o4e($o4_dest) ?> Tour Package – <?= o4e($o4_company) ?></title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" /> -->
+  <link href="https://fonts.googleapis.com/css2?family=Prata&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="option4.css" rel="stylesheet" />
 </head>
 
@@ -242,7 +243,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
   <div class="doc">
 
     <!-- COVER -->
-    <div class="cover" style="background: linear-gradient(to bottom,rgba(10,22,50,.35) 0%,rgba(10,22,50,.55) 50%,rgba(10,22,50,.92) 100%), url('<?= o4e($o4_cover_img) ?>') center/cover no-repeat;">
+    <div class="cover"> 
       <img class="cover-bg-img"
         src="<?= o4e($o4_cover_img) ?>"
         alt="<?= o4e($o4_dest) ?>">
@@ -303,7 +304,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     </div>
 
     <!-- PAGE 2 – OVERVIEW -->
-    <?php o4_render_page_header($hero, $o4_pkg_ov); ?> 
+    <?php o4_render_page_header($hero, $o4_pkg_ov); ?>
     <div class="page-section">
       <div class="personal-banner">
         <div class="eyebrow">Personalized For You</div>

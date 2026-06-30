@@ -23,7 +23,8 @@
   --green: #38a169;
 }
 body {
-  font-family: 'Inter', sans-serif;
+  /* font-family: 'Inter', sans-serif; */
+  font-family: 'Prata', serif;
   background: #dde2e8;
   color: var(--text);
   font-size: 13px;
@@ -79,12 +80,9 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(10, 22, 50, 0.35) 0%,
-    rgba(10, 22, 50, 0.55) 50%,
-    rgba(10, 22, 50, 0.92) 100%
-  );
+  inset: 0;
+  background: rgb(3 10 26 / 63%);
+
   z-index: 1;
 }
 
@@ -96,6 +94,7 @@ body {
 .tc-val a {
   color: inherit;
   text-decoration: none;
+  font-size: 13px;
 }
 /* ============= */
 
@@ -122,7 +121,7 @@ body {
   color: var(--gold);
 }
 .vl-logo-text .name {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--white);
@@ -150,15 +149,15 @@ body {
   padding: 0 40px;
 }
 .cover-presents {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 4px;
+  letter-spacing: 4.5px;
   text-transform: uppercase;
   color: var(--gold-lt);
   margin-bottom: 12px;
 }
 .cover-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 90px;
   font-weight: 700;
   color: var(--white);
@@ -174,16 +173,17 @@ body {
   margin-bottom: 10px;
 }
 .cover-tagline {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-style: italic;
-  font-size: 13px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.65);
 }
 .cover-icons {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
   justify-content: center;
-  gap: 8px;
-  margin-top: 22px;
+  gap: 12px 16px;
+  margin-top: 24px;
 }
 .cover-icon-pill {
   background: rgba(255, 255, 255, 0.12);
@@ -194,7 +194,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  min-width: 80px;
+  min-width: 110px;
 }
 .cover-icon-pill .icon {
   font-size: 28px;
@@ -205,7 +205,7 @@ body {
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgb(250 244 244 / 84%);
 }
 .cover-bottom {
   padding: 28px 28px 0;
@@ -227,7 +227,7 @@ body {
   margin-bottom: 5px;
 }
 .cover-client-name {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 26px;
   font-weight: 600;
   color: var(--white);
@@ -244,7 +244,7 @@ body {
   margin-bottom: 3px;
 }
 .cover-trip-dates {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 15px;
   color: var(--white);
 }
@@ -284,9 +284,9 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 2.5px;
+  letter-spacing: 2.2px;
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 6px;
@@ -299,7 +299,7 @@ body {
   background: var(--gold);
 }
 .sec-heading {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 30px;
   font-weight: 700;
   color: var(--text);
@@ -310,7 +310,7 @@ body {
    PAGE 2 â€“ OVERVIEW
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .page-section {
-  padding: 10px 20px;
+  padding: 18px 20px;
   background: var(--white);
 }
 .page-section + .page-section {
@@ -321,6 +321,7 @@ body {
 .prep-item a {
   color: inherit;
   text-decoration: none;
+  font-size: 14px;
 }
 /* ====================== */
 /* Personalized banner */
@@ -341,15 +342,15 @@ body {
   color: rgba(255, 255, 255, 0.04);
 }
 .personal-banner .eyebrow {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 2.5px;
+  letter-spacing: 2.2px;
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 8px;
 }
 .personal-banner h2 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 20px;
   font-weight: 600;
   color: var(--white);
@@ -368,7 +369,7 @@ body {
   margin-bottom: 24px;
 }
 .salutation-card .dear {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
@@ -426,7 +427,7 @@ body {
   padding: 16px 20px;
 }
 .prep-bar .prep-lbl {
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -514,7 +515,7 @@ body {
   margin-bottom: 4px;
 }
 .hotel-name {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 20px;
   font-weight: 700;
   color: var(--text);
@@ -536,7 +537,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-mid);
   margin-bottom: 12px;
 }
@@ -552,7 +553,7 @@ body {
   padding: 8px 10px;
 }
 .date-chip .dlbl {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -578,7 +579,7 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-mid);
 }
 .amenity .a-icon {
@@ -635,7 +636,7 @@ body {
   margin-bottom: 2px;
 }
 .flight-class {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 16px;
   font-weight: 700;
   color: var(--white);
@@ -651,7 +652,7 @@ body {
   margin-bottom: 10px;
 }
 .flight-airline {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text);
 }
@@ -671,14 +672,14 @@ body {
   margin-bottom: 8px;
 }
 .flight-code {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 26px;
   font-weight: 700;
   color: var(--text);
   line-height: 1;
 }
 .flight-city {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 .flight-middle {
@@ -743,7 +744,7 @@ body {
   color: var(--gold);
 }
 .ff-lbl {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-muted);
 }
 .ff-val {
@@ -784,7 +785,7 @@ body {
   margin-bottom: 14px;
 }
 .transfer-name {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 16px;
   font-weight: 700;
   color: var(--white);
@@ -808,7 +809,7 @@ body {
   margin-bottom: 12px;
 }
 .transfer-item .tlbl {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -867,7 +868,7 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 .itin-day-num .day-n {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 22px;
   font-weight: 700;
   color: var(--white);
@@ -884,22 +885,22 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 6px;
 }
 .itin-prog-lbl {
-  font-size: 8.5px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 4px;
 }
 .itin-prog {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-mid);
   line-height: 1.65;
   margin-bottom: 12px;
@@ -997,7 +998,7 @@ body {
   background: var(--gold);
 }
 .ie-heading {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 20px;
   font-weight: 700;
   color: var(--text);
@@ -1031,12 +1032,39 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
+    grid-template-columns: 370px;
+
+  justify-content: center;
 }
 .pricing-card {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px 16px;
+  width: 370px;
 }
+.pricing-card {
+  text-align: center;
+}
+
+.pricing-name,
+.pricing-total-lbl,
+.pricing-total-val,
+.sec-heading,
+.pricing-note {
+  text-align: center;
+}
+
+.pricing-row {
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.pricing-row span,
+.pricing-row div {
+  text-align: center;
+}
+
 .pricing-card.featured {
   background: var(--navy);
   border-color: var(--navy);
@@ -1061,7 +1089,7 @@ body {
   gap: 4px;
 }
 .pricing-name {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 14px;
@@ -1075,7 +1103,7 @@ body {
 .pricing-row {
   display: flex;
   justify-content: space-between;
-  font-size: 11.5px;
+  font-size: 12px;
   padding: 4px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -1101,8 +1129,8 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 .pricing-total-val {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
+  font-family: 'Prata', serif;
+  font-size: 20px;
   font-weight: 700;
 }
 .pricing-card:not(.featured) .pricing-total-val {
@@ -1112,7 +1140,7 @@ body {
   color: var(--white);
 }
 .pricing-note {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-muted);
   margin-top: 10px;
 }
@@ -1147,7 +1175,7 @@ body {
   gap: 14px;
 }
 .bank-item .bi-lbl {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -1256,13 +1284,13 @@ body {
   top: 14px;
   right: 18px;
   color: var(--bg2);
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 44px;
   line-height: 1;
   color: var(--border);
 }
 .review-text {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-style: italic;
   font-size: 13px;
   color: var(--text-mid);
@@ -1307,7 +1335,7 @@ body {
   font-size: 16px;
 }
 .rating-bar .num {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 20px;
   font-weight: 700;
   color: var(--white);
@@ -1423,7 +1451,7 @@ body {
   margin-bottom: 30px !important;
 }
 .ty-heading {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 90px;
   font-weight: 700;
   color: var(--white);
@@ -1453,7 +1481,7 @@ body {
   margin-bottom: 8px;
 }
 .ty-stat-num {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 26px;
   font-weight: 700;
   color: var(--white);
@@ -1485,7 +1513,7 @@ body {
   margin-bottom: 14px;
 }
 .ty-contact-item .tc-lbl {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -1497,7 +1525,7 @@ body {
 }
 .ty-contact-item .tc-val {
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--white);
 }
 .ty-contact-right {
@@ -1542,7 +1570,7 @@ body {
   margin-bottom: 2px;
 }
 .ty-prepared .name {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-size: 13px;
   font-weight: 600;
   color: var(--gold-lt);
@@ -1552,7 +1580,7 @@ body {
   color: rgba(255, 255, 255, 0.45);
 }
 .ty-brand-footer {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Prata', serif;
   font-style: italic;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.5);
@@ -1658,7 +1686,18 @@ body {
     margin: 0 !important;
     overflow: hidden !important;
   }
+  .cover-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 1 !important;
+    background: rgb(3 10 26 / 63%) !important;
+    display: block !important;
+  }
 
+  .cover > *:not(.cover-bg-img):not(.cover-overlay) {
+    position: relative !important;
+    z-index: 2 !important;
+  }
   .cover-bg-img {
     width: 100% !important;
     height: 100% !important;

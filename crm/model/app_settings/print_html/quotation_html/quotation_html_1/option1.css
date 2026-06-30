@@ -2046,7 +2046,7 @@ a {
   }
 
   .p-5 {
-    padding: calc(var(--spacing) * 5);
+    padding: calc(var(--spacing) * 3);
   }
 
   .p-6 {
@@ -2098,7 +2098,7 @@ a {
   }
 
   .px-10 {
-    padding-inline: calc(var(--spacing) * 10);
+    padding-inline: calc(var(--spacing) * 9);
   }
 
   .px-12 {
@@ -2142,11 +2142,11 @@ a {
   }
 
   .py-7 {
-    padding-block: calc(var(--spacing) * 7);
+    padding-block: calc(var(--spacing) * 6);
   }
 
   .py-8 {
-    padding-block: calc(var(--spacing) * 8);
+    padding-block: calc(var(--spacing) * 6);
   }
 
   .pt-0 {
@@ -2166,7 +2166,7 @@ a {
   }
 
   .pt-10 {
-    padding-top: calc(var(--spacing) * 10);
+    padding-top: calc(var(--spacing) * 7);
   }
 
   .pt-24 {
@@ -2324,7 +2324,7 @@ a {
   }
 
   .text-\[11px\] {
-    font-size: 11px;
+    font-size: 15px;
   }
 
   .text-\[12\.5px\] {
@@ -2404,7 +2404,7 @@ a {
 
   .tracking-\[0\.4em\] {
     --tw-tracking: 0.4em;
-    letter-spacing: 0.4em;
+    letter-spacing: 0.2em;
   }
 
   .tracking-\[0\.12em\] {
@@ -4684,6 +4684,34 @@ a {
   color: var(--cream);
 }
 
+
+.page-hero {
+  position: relative !important;
+  overflow: hidden !important;
+  background: var(--navy) !important;
+}
+
+.page-hero .hero-bg {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: 0 !important;
+}
+
+.page-hero .hero-blue-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(8,18,40,0.45) 0%,
+    rgba(8,18,40,0.65) 55%,
+    rgba(8,18,40,0.92) 100%
+  ) !important;
+}
+
 .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.01em;
@@ -4771,6 +4799,21 @@ a {
   height: 1px;
 }
 
+  .payment-policy-row {
+  margin-bottom: 24px !important;
+}
+
+.payment-policy-row .payment-card,
+.payment-policy-row .policy-card {
+  margin-bottom: 18px !important;
+}
+.terms-spacing p{
+    margin-bottom: 40px !important;
+}
+.dest-mb{
+    margin-bottom: 20px !important;
+}
+
 @media print {
   /* Force browsers to keep background colors, gradients and background-images.
      Without this, Chrome/Edge/Firefox strip all backgrounds when printing,
@@ -4827,6 +4870,16 @@ a {
   .no-print {
     display: none !important;
   }
+.payment-policy-row {
+    margin-bottom: 28px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .payment-policy-row .payment-card,
+  .payment-policy-row .policy-card {
+    margin-bottom: 18px !important;
+  }
+
 }
 
 @page {
