@@ -475,13 +475,22 @@
         }
 
 
+        private function isB2cCmsImagePath($url)
+        {
+            return strstr($url, 'uploads') !== false
+                || strstr($url, 'images/banner') !== false
+                || strstr($url, 'images/testimonial') !== false
+                || strstr($url, 'images/call_to_action') !== false
+                || strstr($url, 'images/team') !== false;
+        }
+
         private function filterImgUrl($imgUrlMain)
         {
             if (empty($imgUrlMain)) {
                 return 0;
             }
             $url = $imgUrlMain;
-            $pos = strstr($url, 'uploads');
+            $pos = $this->isB2cCmsImagePath($url);
             if ($pos != false) {
                 $newUrl1 = preg_replace('/(\/+)/', '/', $imgUrlMain);
                 $newUrl = str_replace('../', '', $newUrl1);

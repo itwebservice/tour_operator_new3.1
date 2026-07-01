@@ -1,0 +1,658 @@
+<form id="frm_tour_master_save2">
+    <div class="app_panel">
+        <!--=======Header panel======-->
+        <div class="app_panel_content no-pad">
+            <div class="row">
+                <div class="col-md-12 app_accordion">
+                    <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
+
+                        <!-- Train Information -->
+                        <div class="accordion_content main_block mg_bt_10">
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="true" aria-controls="collapse1" id="collapsed1">
+                                        <div class="col-md-12"><span>Train Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse1" class="panel-collapse collapse in main_block" role="tabpanel" aria-labelledby="heading1">
+                                    <div class="panel-body">
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-6">
+                                                <button type="button" class="btn btn-excel btn-sm" title="Add City" onclick="city_ssave_modal()"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-md-6 text-right text_center_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_group_tour_save_dynamic_train');city_lzloading('.trainfrom','*From',true);city_lzloading('.trainto','*To',true)" title="Add Row"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_group_tour_save_dynamic_train')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_group_tour_save_dynamic_train" name="tbl_group_tour_save_dynamic_train" class="table table-bordered no-marg pd_bt_51">
+                                                        <tr>
+                                                            <td><input class="css-checkbox" id="chk_train1" type="checkbox"><label class="css-label" for="chk_train1"><label></td>
+                                                            <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                            <td class="col-md-4"><select onchange="validate_location('train_from_location1','train_to_location1')" id="train_from_location1" class="app_select2 form-control trainfrom" name="train_from_location1" title="From Location" style="width: 100%;" >
+                                                                    <option value="">*From</option>
+                                                                </select></td>
+                                                            <td class="col-md-4"><select id="train_to_location1" class="app_select2 form-control trainto" onchange="validate_location('train_to_location1','train_from_location1')" title="To Location" name="train_to_location1" style="width: 100%;" >
+                                                                    <option value="">*To</option>
+                                                                </select></td>
+                                                            <td class="col-md-4"><select name="train_class" id="train_class1" title="Class">
+                                                                    <option value="">*Class</option>
+                                                                    <option value="1A">1A</option>
+                                                                    <option value="2A">2A</option>
+                                                                    <option value="3A">3A</option>
+                                                                    <option value="FC">FC</option>
+                                                                    <option value="CC">CC</option>
+                                                                    <option value="SL">SL</option>
+                                                                    <option value="2S">2S</option>
+                                                                </select></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Hotel Information -->
+                        <div class="accordion_content main_block mg_bt_10">
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="collapsed2">
+                                        <div class="col-md-12"><span>Hotel Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2">
+                                    <div class="panel-body">
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-6">
+                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-md-6 text-right text_center_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name]');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_master');}" title="Add Row"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_hotel_master')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table table-bordered no-marg pd_bt_51">
+                                                        <tr>
+                                                            <td><input id="chk_dest" type="checkbox" checked></td>
+                                                            <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:250px;" title="Select City Name" data-add-new-option="true">
+                                                                </select></td>
+                                                            <td class="col-md-4"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" class="app_select2 form-control" style="width:100% !important" title="Select Hotel Name" data-add-new-option="true">
+                                                                    <option value="">*Hotel Name</option>
+                                                                </select></td>
+                                                            <td class="col-md-4"><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
+                                                            <td class="col-md-2"><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" placeholder="*Total Night" title="Total Night"></td>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transport Information -->
+        <div class="accordion_content main_block mg_bt_10">
+            <div class="panel panel-default main_block">
+                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2_5" aria-expanded="false" aria-controls="collapse2_5" id="collapsed2_5">
+                        <div class="col-md-12"><span>Transport Information</span></div>
+                    </div>
+                </div>
+                <div id="collapse2_5" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2_5">
+                    <div class="panel-body">
+                        <div class="row mg_bt_10">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
+                                <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('vehicle_name1')"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                            </div>
+                            <div class="col-md-6 text-right text_center_xs">
+                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_tour_transport');destinationLoading('select[name^=pickup_from]', 'Pickup Location');destinationLoading('select[name^=drop_to]', 'Drop-off Location');" title="Add Row"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_tour_transport')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="row mg_bt_10">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table id="tbl_package_tour_transport" name="tbl_package_tour_transport" class="table table-bordered no-marg pd_bt_51">
+                                        <tbody>
+                                            <tr>
+                                                <td class="col-md-1"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
+                                                <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
+                                                <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
+                                                        <option value="">Select Vehicle</option>
+                                                        <?php
+                                                        $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
+                                                        while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>
+                                                            <option value="<?php echo $row_dest['entry_id']; ?>">
+                                                                <?php echo $row_dest['vehicle_name']; ?></option>
+                                                        <?php } ?>
+                                                    </select></td>
+                                                <td class="col-md-3"><select name="pickup_from1" id="pickup_from1" style="width:100%;" title="Pickup Location" class="form-control app_minselect2">
+                                                    </select></td>
+                                                <td class="col-md-3"><select name="drop_to1" id="drop_to1" style="width:100%;" title="Drop-off Location" class="form-control app_minselect2">
+                                                    </select></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flight Information -->
+        <div class="accordion_content main_block mg_bt_10">
+            <div class="panel panel-default main_block">
+                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false" aria-controls="collapse3" id="collapsed3">
+                        <div class="col-md-12"><span>Flight Information</span></div>
+                    </div>
+                </div>
+                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading3">
+                                    <div class="panel-body">
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-6">
+                                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-md-6 text-right text_center_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_group_tour_quotation_dynamic_plane');" title="Add Row"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_group_tour_quotation_dynamic_plane')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_group_tour_quotation_dynamic_plane" name="tbl_group_tour_quotation_dynamic_plane" class="table table-bordered no-marg pd_bt_51">
+                                                        <tr>
+                                                            <td><input class="css-checkbox" id="chk_plan-" type="checkbox"><label class="css-label" for="chk_plan-"> <label></td>
+                                                            <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                           
+                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="to" title="To Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="col-md-2 no-pad"><select id="airline_name-1" class="app_select2 form-control" title="Airline Name" name="airline_name-1" style="width:100%;" data-add-new-option="true">
+                                                                    <option value="">*Airline Name</option>
+                                                                    <?php get_airline_name_dropdown(); ?>
+                                                                </select>
+                                                            </td>
+                                                            <td class="col-md-2 no-pad"><select name="plane_class-1" id="plane_class-1" title="Class" style="width:100%;">
+                                                                    <?php get_flight_class_dropdown(); ?>
+                                                                </select></td>
+                                                            <td class="hidden"><input type="hidden" id="from_city-1"></td>
+                                                            <td class="hidden"><input type="hidden" id="to_city-1"></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cruise Information -->
+                        <div class="accordion_content main_block">
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse4" aria-expanded="false" aria-controls="collapse4" id="collapsed4">
+                                        <div class="col-md-12"><span>Cruise Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse4" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading4">
+                                    <div class="panel-body">
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-12 text-right text_center_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_dynamic_cruise')" title="Add Row"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_dynamic_cruise')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_dynamic_cruise" name="tbl_dynamic_cruise" class="table table-bordered no-marg">
+                                                        <tr>
+                                                            <td><input class="css-checkbox" id="chk_cruise1" type="checkbox"><label class="css-label" for="chk_cruise1"><label></td>
+                                                            <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                            <td class="col-md-6"><input type="text" id="route" name="route" onchange="validate_specialChar(this.id);" placeholder="*Route" title="Route"></td>
+                                                            <td class="col-md-6"><input type="text" id="cabin" name="cabin" onchange="validate_specialChar(this.id);" placeholder="Cabin" title="Cabin"></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row text-center mg_tp_20">
+                <div class="col-md-12">
+                    <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab1()"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
+                    &nbsp;&nbsp;
+                    <button class="btn btn-sm btn-info ico_right" class="next_btn" id="btn_quotation_save">Next&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+        $('#vehicle_name1').select2({            
+        });
+        if (typeof initAllVehicleSelectAddNew === 'function') {
+            initAllVehicleSelectAddNew('#tbl_package_tour_transport');
+        }
+
+    $('#airline_name-1').select2();
+    if (typeof initAllAirlineSelectAddNew === 'function') {
+        initAllAirlineSelectAddNew('#tbl_group_tour_quotation_dynamic_plane');
+    }
+    // App_accordion
+    jQuery(document).ready(function() {
+        jQuery(".panel-heading").click(function() {
+            jQuery('#accordion .panel-heading').not(this).removeClass('isOpen');
+            jQuery(this).toggleClass('isOpen');
+            jQuery(this).next(".panel-collapse").addClass('thePanel');
+            jQuery('#accordion .panel-collapse').not('.thePanel').slideUp("slow");
+            jQuery(".thePanel").slideToggle("slow").removeClass('thePanel');
+        });
+        city_lzloading('.trainfrom', '*From', true);
+        city_lzloading('.trainto', '*To', true);
+        city_lzloading('select[name^="city_name"]');
+        $('#hotel_name').select2({
+            width: '100%',
+            minimumResultsForSearch: 0
+        });
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($('#hotel_name'));
+        }
+        if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
+            hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/custom_packages/master/package/hotel/hotel_name_load.php';
+        }
+        $(function () {
+            if (typeof initHotelSelectAddNew === 'function') {
+                initHotelSelectAddNew('#hotel_name');
+                initAllHotelSelectAddNew('#tbl_package_hotel_master');
+            } else {
+                setTimeout(function () {
+                    initHotelSelectAddNew('#hotel_name');
+                    initAllHotelSelectAddNew('#tbl_package_hotel_master');
+                }, 400);
+            }
+        });
+
+        destinationLoading('select[name^="pickup_from"]', 'Pickup Location');
+        destinationLoading('select[name^="drop_to"]', 'Drop-off Location');
+    });
+
+    function switch_to_tab1() {
+        $('#tab2_head').removeClass('active');
+        $('#tab1_head').addClass('active');
+        $('.bk_tab').removeClass('active');
+        $('#tab1').addClass('active');
+        $('html, body').animate({
+            scrollTop: $('.bk_tab_head').offset().top
+        }, 200);
+    }
+    function initGroupTourPlaneAirports() {
+        if (typeof refreshPlaneAirportSelect2In === 'function') {
+            refreshPlaneAirportSelect2In('#tbl_group_tour_quotation_dynamic_plane');
+        } else if (typeof initPlaneAirportSelect2 === 'function') {
+            initPlaneAirportSelect2('#tbl_group_tour_quotation_dynamic_plane');
+        } else {
+            setTimeout(initGroupTourPlaneAirports, 200);
+        }
+    }
+    jQuery(initGroupTourPlaneAirports);
+
+    $(function() {
+        $('#frm_tour_master_save2').validate({
+            submitHandler: function(form) { //Train Information
+                var train_from_location_arr = new Array();
+                var train_to_location_arr = new Array();
+                var train_class_arr = new Array();
+                var table = document.getElementById("tbl_group_tour_save_dynamic_train");
+                var rowCount = table.rows.length;
+                for (var i = 0; i < rowCount; i++) {
+
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+                        var train_from_location1 = row.cells[2].childNodes[0].value;
+                        var train_to_location1 = row.cells[3].childNodes[0].value;
+                        var train_class = row.cells[4].childNodes[0].value;
+
+                        if (train_from_location1 == "") {
+                            error_msg_alert('Enter train from location in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_group_tour_save_dynamic_train').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (train_to_location1 == "") {
+                            error_msg_alert('Enter train to location in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_group_tour_save_dynamic_train').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+                        if (train_class == "") {
+                            error_msg_alert('Enter train class in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_group_tour_save_dynamic_train').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+                        }
+
+                        train_from_location_arr.push(train_from_location1);
+                        train_to_location_arr.push(train_to_location1);
+                        train_class_arr.push(train_class);
+                    }
+                }
+
+                //Plane Information  
+                var from_city_id_arr = new Array();
+                var plane_from_location_arr = new Array();
+                var to_city_id_arr = new Array();
+                var plane_to_location_arr = new Array();
+
+                var airline_name_arr = new Array();
+
+                var plane_class_arr = new Array();
+
+
+                var table = document.getElementById("tbl_group_tour_quotation_dynamic_plane");
+
+                var rowCount = table.rows.length;
+
+
+
+                for (var i = 0; i < rowCount; i++)
+
+                {
+
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked)
+
+                    {
+
+                        var from_sector1 = row.cells[2].childNodes[0].value;
+                        var to_sector1 = row.cells[3].childNodes[0].value;
+
+                        var airline_name = row.cells[4].childNodes[0].value;
+
+                        var plane_class = row.cells[5].childNodes[0].value;
+                        var from_city1 = row.cells[6].childNodes[0].value;
+                        var to_city1 = row.cells[7].childNodes[0].value;
+                        if (from_sector1 == "")
+
+                        {
+
+                            error_msg_alert('Enter from sector in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_group_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+                            return false;
+
+                        }
+
+                        if (to_sector1 == "")
+
+                        {
+
+                            error_msg_alert('Enter to sector in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_group_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+
+                            return false;
+
+                        }
+
+                        if (airline_name == "")
+
+                        {
+                            error_msg_alert('Airline Name is required in row:' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_group_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+
+                            return false;
+                        }
+
+                        if (plane_class == "")
+
+                        {
+                            error_msg_alert("Class is required in row:" + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_group_tour_quotation_dynamic_plane').parent('div').closest(
+                                '.accordion_content').addClass("indicator");
+
+                            return false;
+                        }
+
+                        from_city_id_arr.push(from_city1);
+                        to_city_id_arr.push(to_city1);
+                        plane_from_location_arr.push(from_sector1);
+                        plane_to_location_arr.push(to_sector1);
+                        airline_name_arr.push(airline_name);
+                        plane_class_arr.push(plane_class);
+                    }
+                }
+                // Hotel Information
+                var city_name_arr = new Array();
+
+                var hotel_name_arr = new Array();
+
+                var hotel_type_arr = new Array();
+
+                var total_days_arr = new Array();
+
+                var table = document.getElementById("tbl_package_hotel_master");
+
+                var rowCount = table.rows.length;
+
+                for (var i = 0; i < rowCount; i++)
+
+                {
+
+                    var row = table.rows[i];
+
+                    if (isPackageTourHotelRowChecked(row))
+
+                    {
+                        var hotelRow = getPackageTourHotelRowData(row);
+                        var city_name = hotelRow.city_name;
+                        var hotel_name = hotelRow.hotel_name;
+                        var hotel_type = hotelRow.hotel_type;
+                        var total_days = hotelRow.total_days;
+                        if (city_name == "")
+
+                        {
+
+                            error_msg_alert('Enter city in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_hotel_master').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+
+                        }
+
+                        if (hotel_name == "")
+
+                        {
+
+                            error_msg_alert('Enter hotel name in row ' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_hotel_master').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+
+                            return false;
+
+                        }
+                        if (hotel_type == "")
+
+                        {
+
+                            error_msg_alert('Enter hotel from location in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_hotel_master').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+
+                            return false;
+
+                        }
+
+
+                        if (total_days == "")
+
+                        {
+                            error_msg_alert('Enter No. of nights in hotel row ' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_hotel_master').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+
+                            return false;
+
+                        }
+
+
+
+
+
+
+                        city_name_arr.push(city_name);
+
+                        hotel_name_arr.push(hotel_name);
+
+                        hotel_type_arr.push(hotel_type);
+
+                        total_days_arr.push(total_days);
+
+                    }
+
+                }
+
+                //Transport Information
+                var vehicle_name_arr = new Array();
+                var drop_arr = new Array();
+                var drop_type_arr = new Array();
+                var pickup_arr = new Array();
+                var pickup_type_arr = new Array();
+                var pickup_type = '';
+                var pickup = '';
+                var drop_type = '';
+                var drop = '';
+                var table = document.getElementById("tbl_package_tour_transport");
+                var rowCount = table.rows.length;
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+
+                        $('#' + row.cells[3].childNodes[0].id).find("option:selected").each(function() {
+                            pickup = row.cells[3].childNodes[0].value;
+                            pickup_type = $("option:selected", $("#" + row.cells[3].childNodes[0].id)).parent().attr('value');
+                        });
+                        $('#' + row.cells[4].childNodes[0].id).find("option:selected").each(function() {
+                            drop = row.cells[4].childNodes[0].value;
+                            drop_type = $("option:selected", $("#" + row.cells[4].childNodes[0].id)).parent().attr('value');
+                        });
+
+                        var vehicle_name = row.cells[2].childNodes[0].value;
+                        if (vehicle_name == "") {
+                            error_msg_alert('Transport Vehicle is mandatory in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_transport').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+                        }
+                        if (pickup_type == "") {
+                            error_msg_alert('Transport pickup location is mandatory in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_transport').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+                        }
+                        if (drop_type == "") {
+                            error_msg_alert('Transport drop location is mandatory in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_package_tour_transport').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+                        }
+
+                        vehicle_name_arr.push(vehicle_name);
+                        pickup_arr.push(pickup);
+                        pickup_type_arr.push(pickup_type);
+                        drop_arr.push(drop);
+                        drop_type_arr.push(drop_type);
+                    }
+                }
+
+                //Cruise Information
+
+                var route_arr = new Array();
+                var cabin_arr = new Array();
+
+                var table = document.getElementById("tbl_dynamic_cruise");
+                var rowCount = table.rows.length;
+
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
+                    if (row.cells[0].childNodes[0].checked) {
+                        var route = row.cells[2].childNodes[0].value;
+                        var cabin = row.cells[3].childNodes[0].value;
+                        if (route == "") {
+                            error_msg_alert('Enter route in row' + (i + 1));
+                            $('.accordion_content').removeClass("indicator");
+                            $('#tbl_dynamic_cruise').parent('div').closest('.accordion_content')
+                                .addClass("indicator");
+                            return false;
+                        }
+                        route_arr.push(route);
+                        cabin_arr.push(cabin);
+
+                    }
+                }
+                $('.accordion_content').removeClass("indicator");
+                $('#tab2_head').addClass('done');
+                $('#tab3_head').addClass('active');
+                $('.bk_tab').removeClass('active');
+                $('#tab3').addClass('active');
+                $('html, body').animate({
+                    scrollTop: $('.bk_tab_head').offset().top
+                }, 200);
+
+            }
+        });
+
+    });
+</script>
