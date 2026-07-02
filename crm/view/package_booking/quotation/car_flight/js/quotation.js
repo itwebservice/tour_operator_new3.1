@@ -1,4 +1,6 @@
-$('#quotation_date').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+if ($('#quotation_date').length) {
+	$('#quotation_date').datetimepicker({ timepicker: false, format: 'd-m-Y' });
+}
 
 function quotation_cost_calculate() {
 	var quotation_cost = 0;
@@ -279,7 +281,6 @@ function get_flight_enquiry_details(offset = '') {
 				var enquiry_content = JSON.parse(result.enquiry_content);
 				var count_td = 1;
 				var table = document.getElementById('tbl_flight_quotation_dynamic_plane');
-				// $('#tbl_flight_quotation_dynamic_plane').empty()
 				$("#tbl_flight_quotation_dynamic_plane").find("tr:gt(0)").remove();
 				$.each(enquiry_content, function (index, value) {
 
@@ -330,10 +331,93 @@ function get_flight_enquiry_details(offset = '') {
 		row.cells[6].childNodes[0].value = '';
 		row.cells[7].childNodes[0].value = '';
 		row.cells[8].childNodes[0].value = '';
-		// row.cells[9].childNodes[0].value = '';
-		// row.cells[10].childNodes[0].value = '';
 	}
 }
+
+function get_capacity(){
+	var vehicle_name = $('#vehicle_name').val();
+	var travel_type = $('#travel_type').val();
+	var base_url = $('#base_url').val();
+	$.ajax({
+		type:'post',
+		url: base_url+'view/package_booking/quotation/car_flight/car_rental/get_capacity.php',
+		data: { travel_type : travel_type, vehicle_name: vehicle_name },
+		success: function(result){
+			$('#capacity').val(result);
+		}
+	});
+}
+
+function add_itinerary_car_quotation(dest_id1, spa, dwp, ovs, meal, dayp) {
+	var day_id = dayp.split('-');
+	var $btn = $('#itinerary' + day_id[1]);
+	$btn.prop('disabled', true);
+	var base_url = $('#base_url').val();
+	var dest_id = 0;
+	if (dest_id1 && dest_id1 !== 0 && dest_id1 !== '0') {
+		dest_id = $('#' + dest_id1).val() || 0;
+	}
+	$btn.button('loading');
+	$.post(base_url + 'view/car_rental/booking/itinerary_modal.php', {
+		dest_id: dest_id,
+		spa: spa,
+		dwp: dwp,
+		ovs: ovs,
+		meal: meal,
+		dayp: dayp
+	}, function (data) {
+		$btn.button('reset');
+		$btn.prop('disabled', false);
+		var $container = $('#div_itinerary_modal').last();
+		$container.html(data);
+		if (typeof init_car_rental_itinerary_modal === 'function') {
+			init_car_rental_itinerary_modal();
+		}
+	});
+}
+
+function sync_car_itinerary_count() {
+	var count = $('#itinerary_data .sq_itinerary_count').first().val();
+	if (count !== undefined && count !== '') {
+		$('#sq_itinerary_c1').val(count);
+	}
+}
+
+function get_dest_itinerary_car_quotation(dest_id1) {
+	if (typeof get_dest_itinerary_car_rental === 'function') {
+		return get_dest_itinerary_car_rental(dest_id1);
+	}
+    var base_url = $('#base_url').val();
+    var dest_id = $('#' + dest_id1).val();
+    if (dest_id == '' || dest_id == 0) {
+        $('#itinerary_data').html('');
+        $('#sq_itinerary_c1').val(0);
+        return false;
+    }
+    $.post(base_url + 'view/car_rental/booking/get_itinerary_data.php', { dest_id: dest_id }, function (data) {
+        $('#itinerary_data').html(data);
+        sync_car_itinerary_count();
+        if (typeof initItineraryImagePreview === 'function') {
+            initItineraryImagePreview($('#itinerary_data'));
+        }
+        $("input[type='checkbox']", '#itinerary_detail_modal').labelauty({ label: false, maximum_width: '20px' });
+    });
+}
+
+function restore_car_quotation_parent_modal_scroll() {
+	if ($('#quotation_save_modal').is(':visible') || $('#quotation_update_modal').is(':visible')) {
+		$('body').addClass('modal-open');
+		var $backdrops = $('.modal-backdrop');
+		if ($backdrops.length > 1) {
+			$backdrops.last().remove();
+		}
+	}
+}
+
+window.add_itinerary_car_quotation = add_itinerary_car_quotation;
+window.get_dest_itinerary_car_quotation = get_dest_itinerary_car_quotation;
+window.sync_car_itinerary_count = sync_car_itinerary_count;
+window.restore_car_quotation_parent_modal_scroll = restore_car_quotation_parent_modal_scroll;
 
 function flightQuotationCellControl(cell) {
 	if (typeof getCellFormControl === 'function') {

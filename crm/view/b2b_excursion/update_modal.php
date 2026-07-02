@@ -401,11 +401,15 @@ $exc_name = ($sq_exc['excursion_name']);
 </form>
 <script>
 	$('#update_modal').modal('show');
-	$('#currency_code1,#agent_type,#off_days,#transfer_option').select2({
-		dropdownParent: $("#update_modal")
-	});
-
-	$('.app_select2').select2();
+	$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+	if (typeof initModalAppSelect2 === 'function') {
+		initModalAppSelect2('#update_modal');
+	} else {
+		$('.app_select2').select2({
+			dropdownParent: $('#update_modal'),
+			minimumResultsForSearch: 0
+		});
+	}
 	$('#rep_time').datetimepicker({
 		datepicker: false,
 		format: 'H:i A',

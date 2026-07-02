@@ -96,18 +96,52 @@ function payment_installment_reflect() {
   });
 }
 
+function payment_mode_requires_bank(payment_mode) {
+  var noBankModes = ['Cash', 'Credit Note', 'Credit Card', 'Online', 'Advance', 'Debit Note', 'To Supplier', ''];
+  return payment_mode && noBankModes.indexOf(payment_mode) === -1;
+}
+
+function payment_installment_clear_bank_validation(offset) {
+  var bankFieldIds = ['#bank_id' + offset, '#txt_bank_name' + offset, '#txt_transaction_id' + offset];
+  var $form = $(bankFieldIds[0]).closest('form');
+  if (!$form.length || !$form.data('validator')) {
+    return;
+  }
+  var validator = $form.validate();
+  bankFieldIds.forEach(function (selector) {
+    var $field = $(selector);
+    if ($field.length) {
+      $field.removeClass('error');
+      validator.element($field[0]);
+    }
+  });
+}
+
 function payment_installment_enable_disable_fields(offset = '') {
   var payment_mode = $("#cmb_payment_mode" + offset).val();
+  var bankNameId = "#txt_bank_name" + offset;
+  var transactionId = "#txt_transaction_id" + offset;
+  var bankId = "#bank_id" + offset;
 
-  if (payment_mode == 'Cash' || payment_mode == 'Credit Note' || payment_mode == 'Credit Card') {
-    $("#txt_bank_name" + offset).prop({ disabled: 'disabled', value: '' });
-    $("#txt_transaction_id" + offset).prop({ disabled: 'disabled', value: '' });
-    $("#bank_id" + offset).prop({ disabled: 'disabled', value: '' });
+  if (!payment_mode_requires_bank(payment_mode)) {
+    $(bankNameId).prop({ disabled: true, readonly: true }).val('');
+    $(transactionId).prop({ disabled: true, readonly: true }).val('');
+    $(bankId).prop({ disabled: true, readonly: true }).val('');
+  } else {
+    $(bankNameId).prop({ disabled: false, readonly: false });
+    $(transactionId).prop({ disabled: false, readonly: false });
+    $(bankId).prop({ disabled: false, readonly: false });
   }
-  if (payment_mode == 'Cheque' || payment_mode == 'NEFT' || payment_mode == 'RTGS' || payment_mode == 'IMPS' || payment_mode == 'DD' || payment_mode == 'Online' || payment_mode == 'Other') {
-    $("#txt_bank_name" + offset).prop({ disabled: '' });
-    $("#txt_transaction_id" + offset).prop({ disabled: '' });
-    $("#bank_id" + offset).prop({ disabled: '' });
+
+  payment_installment_clear_bank_validation(offset);
+
+  var $identifier = $('#identifier');
+  if ($identifier.length) {
+    if (payment_mode === 'Credit Card') {
+      $identifier.prop('required', true);
+    } else {
+      $identifier.prop('required', false).val('');
+    }
   }
 }
 

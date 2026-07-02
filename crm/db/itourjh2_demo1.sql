@@ -3508,6 +3508,22 @@ CREATE TABLE `car_rental_booking` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `car_rental_booking_program`
+--
+
+CREATE TABLE `car_rental_booking_program` (
+  `entry_id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `attraction` varchar(255) NOT NULL,
+  `day_wise_program` text NOT NULL,
+  `stay` varchar(80) NOT NULL,
+  `meal_plan` varchar(50) NOT NULL,
+  `day_count` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `car_rental_booking_vehicle_entries`
 --
 
@@ -18865,6 +18881,8 @@ CREATE TABLE `excursion_master` (
   `service_show` decimal(50,2) NOT NULL,
   `currency_code` int(11) NOT NULL,
   `invoice_pr_id` int(11) NOT NULL,
+  `guest_name` varchar(200) NOT NULL DEFAULT '',
+  `pick_point` varchar(500) NOT NULL DEFAULT '',
   `cancel_flag` int(11) NOT NULL,
   `delete_status` int(11) NOT NULL,
   `tax_value` varchar(50) NOT NULL,
@@ -18893,6 +18911,7 @@ CREATE TABLE `excursion_master_entries` (
   `status` varchar(300) NOT NULL,
   `total_infant` int(11) NOT NULL,
   `infant_cost` decimal(50,2) NOT NULL,
+  `vehicle_name` int(11) NOT NULL DEFAULT 0,
   `total_vehicles` int(11) NOT NULL,
   `transfer_cost` decimal(50,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
@@ -29866,6 +29885,7 @@ CREATE TABLE `ticket_master` (
   `roundoff` decimal(50,2) NOT NULL,
   `canc_policy` text NOT NULL,
   `guest_name` varchar(100) NOT NULL,
+  `pick_point` varchar(500) NOT NULL,
   `invoice_pr_id` int(11) NOT NULL,
   `cancel_flag` int(11) NOT NULL,
   `delete_status` int(11) NOT NULL,
@@ -34417,6 +34437,12 @@ ALTER TABLE `bus_tour_booking`
 --
 ALTER TABLE `car_rental_booking`
   ADD PRIMARY KEY (`booking_id`);
+
+--
+-- Indexes for table `car_rental_booking_program`
+--
+ALTER TABLE `car_rental_booking_program`
+  ADD PRIMARY KEY (`entry_id`);
 
 --
 -- Indexes for table `car_rental_booking_vehicle_entries`

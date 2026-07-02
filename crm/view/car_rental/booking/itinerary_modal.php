@@ -12,16 +12,30 @@ $sq_itinerary_c = mysqli_num_rows(mysqlQuery("select * from itinerary_master whe
 textarea.form-control {
     height: 120px !important;
 }
-#itinerary_detail_modal input.form-control {
-  margin-top: 35px;
+#itinerary_detail_modal {
+    z-index: 1060 !important;
 }
-
-#itinerary_detail_modal label {
-  margin-top: 45px;
+#itinerary_detail_modal .modal-body {
+    overflow: visible;
+}
+#itinerary_detail_modal .destination-select-wrap {
+    margin-bottom: 15px;
+}
+#itinerary_detail_modal .destination-select-wrap .select2-container {
+    width: 100% !important;
+    margin-top: 0 !important;
+}
+#itinerary_detail_modal #default_program_list input.form-control,
+#itinerary_detail_modal #default_program_list textarea.form-control,
+#itinerary_detail_modal #default_program_list select.form-control {
+    margin-top: 0;
+}
+.select2-container--open {
+    z-index: 1071 !important;
 }
 </style>
    
-<form id="itinerary_detail_frm">
+<form id="itinerary_detail_frm" data-sq-itinerary-c="<?= (int)$sq_itinerary_c ?>">
 
 <div class="modal fade" id="itinerary_detail_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
 
@@ -38,23 +52,26 @@ textarea.form-control {
       </div>
 
       <div class="modal-body">
+      <input type="hidden" id="sq_itinerary_c1" value="<?= (int)$sq_itinerary_c ?>">
       <input type="hidden" id="spa" value='<?=$spa ?>'/>
       <input type="hidden" id="dwp" value='<?=$dwp ?>'/>
       <input type="hidden" id="ovs" value='<?=$ovs ?>'/>
       <input type="hidden" id="meal" value='<?=$meal ?>'/>
         <div class="row">
-          <div class="text-left col-md-3 col-sm-6">
-            <select id="dest_ids1"  name="dest_names1" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_itinerary_booking(this.id)" required> 
+          <div class="text-left col-md-3 col-sm-6 destination-select-wrap">
+            <select id="dest_ids1" name="dest_names1" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_itinerary_car_rental(this.id)" required>
+              <option value="">*Destination</option>
               <?php
               if($dest_id !='' && $dest_id !='0'){
               $row_dest = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id = '$dest_id'"));
               ?>
-              <option value="<?php echo $row_dest['dest_id']; ?>"><?php echo $row_dest['dest_name']; ?></option>
+              <option value="<?php echo $row_dest['dest_id']; ?>" selected><?php echo $row_dest['dest_name']; ?></option>
               <?php } ?>
-              <option value="">*Destination</option>
               <?php 
               $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'"); 
-              while($row_dest = mysqli_fetch_assoc($sq_query)){ ?>
+              while($row_dest = mysqli_fetch_assoc($sq_query)){
+                  if($dest_id !='' && $dest_id !='0' && $row_dest['dest_id'] == $dest_id) continue;
+              ?>
                   <option value="<?php echo $row_dest['dest_id']; ?>"><?php echo $row_dest['dest_name']; ?></option>
                   <?php } ?>
             </select>
@@ -104,7 +121,7 @@ textarea.form-control {
         </div>
           <div class="row mg_tp_10">
             <div class="col-xs-12 text-center">
-              <button class="btn btn-sm btn-success" id="btn_update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
+              <button type="submit" class="btn btn-sm btn-success" id="btn_update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
             </div>
           </div>
 
@@ -119,68 +136,6 @@ textarea.form-control {
 </div>
 
 </form>
-
-<script>
-$('#itinerary_detail_modal').modal('show');
-$('#dest_ids1').select2();
-$('#itinerary_detail_frm').validate({
-    rules:{
-      dest_names1 : {required:true}
-    },
-    submitHandler:function(form){
-      
-        var sq_itinerary_c = $('#sq_itinerary_c1').val();
-        if(sq_itinerary_c != 0){
-          var dest_id = $('#dest_ids1').val();
-          var spa = $('#spa').val();
-          var dwp = $('#dwp').val();
-          var ovs = $('#ovs').val();
-          var meal = $('#meal').val();
-
-          if(dest_id == '' || dest_id == 0){
-            error_msg_alert("Please select destination!");
-            return false;
-          }
-          var table = document.getElementById("default_program_list");
-          var rowCount = table.rows.length;
-          var count = 0;
-          for(var i=0; i<rowCount; i++){
-              var row = table.rows[i];
-              if(row.cells[0].childNodes[0].checked){
-                  count++;
-              }
-          }
-          if(parseInt(count) != 1){
-              error_msg_alert("Please select one day program!");
-              return false;
-          }
-          for(var i=0; i<rowCount; i++){
-              var row = table.rows[i];
-              if(row.cells[0].childNodes[0].checked){
-
-                  var sp = row.cells[2].childNodes[0].value;
-                  var dwp1 = row.cells[3].childNodes[0].value;
-                  var os1 = row.cells[4].childNodes[0].value;
-                  var meal1 = row.cells[5].childNodes[0].value;
-                  $('#'+spa).val(sp);
-                  $('#'+dwp).val(dwp1);
-                  $('#'+ovs).val(os1);
-                  $('#'+meal).val(meal1);
-              }
-          }
-          $('#itinerary_detail_modal').modal('hide');
-        }
-        else{
-          error_msg_alert("You need to add itinerary for this destination first!");
-          return false;
-        }
-        
-    }
-});
-</script>
-<script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
-
-
 
 
 

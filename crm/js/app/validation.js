@@ -979,18 +979,12 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "itinerary" + (rowCounts + 1)
     );
-    row.cells[6].childNodes[0].setAttribute(
-      "onclick",
-      'add_itinerary("dest_name2","special_attaraction' +
-        foo.counter +
-        '","day_program' +
-        foo.counter +
-        '","overnight_stay' +
-        foo.counter +
-        '","Day-' +
-        (rowCounts + 1) +
-        '")'
-    );
+    var isCarRentalQuotation = $('#quotation_save_modal, #quotation_update_modal').length > 0;
+    var fieldSuffix = $('#quotation_update_modal').length ? '-u' : '';
+    var itineraryOnclick = isCarRentalQuotation
+      ? 'add_itinerary_car_quotation(0,"special_attaraction' + foo.counter + fieldSuffix + '","day_program' + foo.counter + fieldSuffix + '","overnight_stay' + foo.counter + fieldSuffix + '","meal_plan' + foo.counter + '","Day-' + (rowCounts + 1) + '")'
+      : 'add_itinerary("dest_name2","special_attaraction' + foo.counter + '","day_program' + foo.counter + '","overnight_stay' + foo.counter + '","Day-' + (rowCounts + 1) + '")';
+    row.cells[6].childNodes[0].setAttribute("onclick", itineraryOnclick);
     if (row.cells[7]) {
       $(row.cells[7]).addClass("hidden");
       row.cells[7].childNodes[0].setAttribute("value", "");
@@ -4269,7 +4263,18 @@ function foo(tableID, quot_table_id, rowCounts) {
     dynamic_date(row.cells[3].childNodes[0].id);
     row.cells[4].childNodes[0].value = get_date();
     dynamic_date(row.cells[4].childNodes[0].id);
-    $("#" + row.cells[8].childNodes[0].id).select2();
+    var agentSelect = $("#" + row.cells[8].childNodes[0].id);
+    if (agentSelect.data('select2')) {
+      agentSelect.select2('destroy');
+    }
+    var agentSelect2Config = { width: '100%', minimumResultsForSearch: 0 };
+    var $offerModalParent = typeof getModalSelect2Parent === 'function'
+      ? getModalSelect2Parent(agentSelect)
+      : agentSelect.closest('.modal');
+    if ($offerModalParent && $offerModalParent.length) {
+      agentSelect2Config.dropdownParent = $offerModalParent;
+    }
+    agentSelect.select2(agentSelect2Config);
     row.cells[3].childNodes[0].setAttribute(
       "onchange",
       'get_to_date(id,"' + row.cells[4].childNodes[0].id + '")'
@@ -4941,7 +4946,20 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // ✅ Initialize Select2 only for the new row selects
     if (tableID !== "tbl_package_tour_member") {
-        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"]').select2({ width: "100%" });
+        var $modalParent = typeof getModalSelect2Parent === 'function'
+            ? getModalSelect2Parent($(row).find('select.app_select2').first())
+            : $(row).closest('.modal');
+        var rowSelect2Config = { width: "100%", minimumResultsForSearch: 0 };
+        if ($modalParent && $modalParent.length) {
+            rowSelect2Config.dropdownParent = $modalParent;
+        }
+        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"]').each(function () {
+            var $el = $(this);
+            if ($el.data('select2')) {
+                $el.select2('destroy');
+            }
+            $el.select2(rowSelect2Config);
+        });
     }
 
     // ✅ Initialize datepicker for new row

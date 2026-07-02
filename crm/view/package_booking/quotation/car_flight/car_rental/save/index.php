@@ -56,6 +56,8 @@ $branch_status = $_POST['branch_status'];
 
 
 <script>
+$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
 $('#enquiry_id').select2();
 $('#quotation_date').datetimepicker({ timepicker:false, format:'d-m-Y', minDate: 0 });
 $('#traveling_date').datetimepicker({ format:'d-m-Y H:i' });

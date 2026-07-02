@@ -1,4 +1,8 @@
 //$('#txt_date').datetimepicker({ format:'d-m-Y H:i' });
+function reset_group_booking_save_button() {
+	$('#btn_save_booking').prop('disabled', false).text('Save');
+}
+
 $('#frm_tab_3').validate({
 	rules: {
 		txt_repeater_discount: { required: true },
@@ -114,15 +118,18 @@ $('#frm_tab_3').validate({
 
 		if (tour_payment == true) {
 			if (
-				payment_mode1 != 'Cash' &&
-				payment_mode1 != 'Credit Note' &&
-				payment_mode1 != 'Credit Card' &&
-				payment_mode1 != 'Online' &&
-				payment_mode1 != 'Advance' && payment_mode1 != '' &&
+				typeof payment_mode_requires_bank === 'function' ? payment_mode_requires_bank(payment_mode1) : (
+					payment_mode1 != 'Cash' &&
+					payment_mode1 != 'Credit Note' &&
+					payment_mode1 != 'Credit Card' &&
+					payment_mode1 != 'Online' &&
+					payment_mode1 != 'Advance' && payment_mode1 != ''
+				) &&
 				payment_amount1 != '0'
 			) {
 				if (bank_id1 == '') {
 					error_msg_alert('Select creditor bank name.');
+					reset_group_booking_save_button();
 					return false;
 				}
 			}
@@ -130,20 +137,24 @@ $('#frm_tab_3').validate({
 
 		if (traveling_payment == true) {
 			if (
-				payment_mode2 != 'Cash' &&
-				payment_mode2 != 'Credit Note' &&
-				payment_mode2 != 'Credit Card' &&
-				payment_mode2 != 'Online' &&
-				payment_mode2 != 'Advance' && payment_mode2 != '' &&
+				typeof payment_mode_requires_bank === 'function' ? payment_mode_requires_bank(payment_mode2) : (
+					payment_mode2 != 'Cash' &&
+					payment_mode2 != 'Credit Note' &&
+					payment_mode2 != 'Credit Card' &&
+					payment_mode2 != 'Online' &&
+					payment_mode2 != 'Advance' && payment_mode2 != ''
+				) &&
 				payment_amount2 != '0'
 			) {
 				if (bank_id2 == '') {
 					error_msg_alert('Select creditor bank name.');
+					reset_group_booking_save_button();
 					return false;
 				}
 			}
 			if (travel_of_type2 == '') {
 				error_msg_alert('Enter travel payment for.');
+				reset_group_booking_save_button();
 				return false;
 			}
 		}
@@ -153,14 +164,17 @@ $('#frm_tab_3').validate({
 		if (payment_mode1 == "Credit Note" && credit_amount != '') {
 			if (parseFloat(total_payment) > parseFloat(credit_amount)) {
 				error_msg_alert('Credit Note Balance is not available');
+				reset_group_booking_save_button();
 				return false;
 			}
 		} else if (payment_mode1 == "Credit Note" && credit_amount == '') {
 			error_msg_alert(`Credit Note Balance is not available.`);
+			reset_group_booking_save_button();
 			return false;
 		}
 		if (total_payment > parseFloat($('#txt_total_tour_fee').val())) {
 			error_msg_alert("Payment amount cannot be greater than selling amount.");
+			reset_group_booking_save_button();
 			return false;
 		}
 		save_booking_details();
@@ -624,13 +638,14 @@ function save_booking_details() {
 
 	var pay_for_tour = document.getElementById('chk_pay_for_tour').checked;
 	if (pay_for_tour == true) {
-		if (payment_mode1 == 'Cash') {
+		if (typeof payment_mode_requires_bank === 'function' ? !payment_mode_requires_bank(payment_mode1) : payment_mode1 == 'Cash') {
 			bank_name1 = '';
 			transaction_id1 = '';
 			bank_id1 = '';
 		}
 		if(payment_mode1=="Advance"){
 			error_msg_alert("Please select another payment mode.");
+			reset_group_booking_save_button();
 			return false;
 		}
 		payment_date.push(payment_date1);
@@ -645,13 +660,14 @@ function save_booking_details() {
 
 	var pay_for_traveling = document.getElementById('chk_pay_for_traveling').checked;
 	if (pay_for_traveling == true) {
-		if (payment_mode2 == 'Cash') {
+		if (typeof payment_mode_requires_bank === 'function' ? !payment_mode_requires_bank(payment_mode2) : payment_mode2 == 'Cash') {
 			bank_name2 = '';
 			transaction_id2 = '';
 			bank_id2 = '';
 		}
 		if(payment_mode2=="Advance"){
 			error_msg_alert("Please select another payment mode.");
+			reset_group_booking_save_button();
 			return false;
 		}
 		payment_date.push(payment_date2);
@@ -670,6 +686,7 @@ function save_booking_details() {
 	var summary_validate = validate_address('txt_special_request');
 	if (!summary_validate) {
 		error_msg_alert('More than 155 characters are not allowed.');
+		reset_group_booking_save_button();
 		return false;
 	}
 	var due_date1 = $('#txt_balance_due_date');
@@ -717,6 +734,7 @@ function save_booking_details() {
 	$.post(base_url + 'view/load_data/finance_date_validation.php', { check_date: check_date1 }, function (data) {
 		if (data !== 'valid') {
 			error_msg_alert('The Booking date does not match between selected Financial year.');
+			reset_group_booking_save_button();
 			return false;
 		}
 		else {
@@ -728,6 +746,7 @@ function save_booking_details() {
 					if (tour_payment == true) {
 						if (data !== 'valid') {
 							error_msg_alert('The Tour Payment date does not match between selected Financial year.');
+							reset_group_booking_save_button();
 							return false;
 						}
 					}
@@ -741,6 +760,7 @@ function save_booking_details() {
 									error_msg_alert(
 										'The Travel Payment date does not match between selected Financial year.'
 									);
+									reset_group_booking_save_button();
 									return false;
 								}
 							}
@@ -901,6 +921,7 @@ function save_booking_details() {
 										}
 										else {
 											$('#btn_save_booking').button('reset');
+											reset_group_booking_save_button();
 										}
 									}
 								});

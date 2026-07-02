@@ -49,6 +49,8 @@ $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_quotatio
 
 
 <script>
+$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
 $('#enquiry_id').select2();
 $('#quotation_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
 $('#from_date,#to_date').datetimepicker({ format:'d-m-Y' });

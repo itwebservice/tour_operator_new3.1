@@ -238,11 +238,10 @@ $branch_status = $_POST['branch_status'];
 
         bank_id: {
           required: function() {
-            if ($('#cmb_payment_mode').val() != "Cash") {
-              return true;
-            } else {
-              return false;
+            if (typeof payment_mode_requires_bank === 'function') {
+              return payment_mode_requires_bank($('#cmb_payment_mode').val());
             }
+            return $('#cmb_payment_mode').val() != "Cash";
           }
         },
 

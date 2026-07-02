@@ -607,11 +607,18 @@ function populate_booking_flight_sector($select, sectorLabel, cityId) {
 		$select.select2('destroy');
 	}
 	$select.empty().append(new Option(sectorLabel, sectorLabel, true, true));
-	if (!$select.data('select2')) {
+	$select.val(sectorLabel);
+	// Re-initialize with the airport ajax config so the pre-selected sector
+	// stays visible and the field remains searchable. initPlaneAirportSelect2
+	// searches for descendant selects, so scope it to the parent cell.
+	var $scope = $select.closest('td');
+	if (typeof initPlaneAirportSelect2 === 'function' && $scope.length) {
+		$select.removeData('pa-select2-config');
+		initPlaneAirportSelect2($scope);
+	} else if (!$select.data('select2')) {
 		$select.select2({ width: '100%' });
-	} else {
-		$select.trigger('change.select2');
 	}
+	$select.trigger('change.select2');
 	if (cityId && typeof syncSectorCityHidden === 'function') {
 		syncSectorCityHidden($select.attr('id') || '', cityId);
 	} else if (cityId) {
@@ -1277,6 +1284,10 @@ function quotation_info_load() {
 		});
 	}
 	else {
+		window._quotation_tcsper = '';
+		window._quotation_tcsvalue = 0;
+		$('#tcs_tax').val('');
+		$('#tcs1').val('0.00');
 		$('#txt_package_tour_name').val('');
 		$('#tour_type').val('');
 		$('#txt_package_from_date').val('');
@@ -1456,6 +1467,45 @@ function quotation_info_load() {
 	});
 }
 
+function mapQuotationTcsForSale(tcsper) {
+	tcsper = String(tcsper || '').trim();
+	if (tcsper === '' || tcsper === '0' || tcsper === '1' || tcsper === 'NaN') {
+		return '';
+	}
+	if (tcsper === '3') {
+		return '20';
+	}
+	if (tcsper === '2' || tcsper === '20') {
+		return (tcsper === '20') ? '20' : '2';
+	}
+	return '';
+}
+
+function applyQuotationTcs(tcsper, tcsvalue) {
+	var mappedTcs = mapQuotationTcsForSale(tcsper);
+	window._quotation_tcsper = mappedTcs;
+	window._quotation_tcsvalue = parseFloat(tcsvalue) || 0;
+	$('#tcs_tax').val(mappedTcs);
+	if (typeof customTcsTax === 'function') {
+		customTcsTax();
+	} else {
+		$('#tcs_tax').trigger('change');
+	}
+}
+
+function refreshQuotationTcsOnCostingTab() {
+	var quotation_id = $('#quotation_id').val();
+	if (!quotation_id || quotation_id === '0') {
+		return;
+	}
+	if (window._quotation_tcsper) {
+		$('#tcs_tax').val(window._quotation_tcsper);
+		if (typeof customTcsTax === 'function') {
+			customTcsTax();
+		}
+	}
+}
+
 function get_package_type_costing() {
 
 	var quotation_id = $('#quotation_id').val();
@@ -1478,6 +1528,7 @@ function get_package_type_costing() {
 				response.tour_cost = parseFloat(response.tour_cost).toFixed(2);
 			}
 			get_auto_values('txt_booking_date','total_basic_amt','payment_mode','service_charge','markup','save','true','service_charge','discount');
+			applyQuotationTcs(response.tcsper, response.tcsvalue);
 		}
 });
 }

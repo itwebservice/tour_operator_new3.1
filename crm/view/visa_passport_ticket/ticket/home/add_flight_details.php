@@ -508,14 +508,14 @@ if ($type == 'save') {
 											<input type="text" id="departure_datetime-<?= $i ?>" name="departure_datetime" class="app_datetimepicker departure_datetime" placeholder="*Departure Date-Time" title="Departure Date-Time"  data-dyn-valid="required">
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<!-- <input type="text"  name="arrival_datetime" class="app_datetimepicker arrival_datetime" placeholder="*Arrival Date-Time" id ="arrival_datetime-<?= $i ?>" title="Arrival Date-Time" data-dyn-valid="required"> -->
+											<input type="text"  name="arrival_datetime" class="app_datetimepicker arrival_datetime" placeholder="*Arrival Date-Time" id ="arrival_datetime-<?= $i ?>" title="Arrival Date-Time" data-dyn-valid="required">
 
-											                   <select name="from_sector-1" id="from_sector-1" style="width:100%"
+											                   <!-- <select name="from_sector-1" id="from_sector-1" style="width:100%"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="from" title="From Sector"
                                                                      data-add-new-option="true">
                                                                     <option value="">*From Sector</option>
-                                                                </select>
+                                                                </select> -->
                                                             
                                                             
 										</div>
@@ -532,20 +532,20 @@ if ($type == 'save') {
 											<input type="text" id="dterm-<?= $sq_trip_entries_count ?>" name="dterm" onchange="validate_specialChar(this.id)" placeholder="Departure Terminal" title="Departure Terminal" data-dyn-valid="" value="<?= $dep_terminal ?>">
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10 ">
-										<select name="to_sector-1" id="to_sector-1" style="width:100%"
+										<!-- <select name="to_sector-1" id="to_sector-1" style="width:100%"
                                                                     class="form-control app_select2 "
                                                                     data-sector-type="to" title="To Sector"
                                                                      data-add-new-option="true">
                                                                     <option value="">*To Sector</option>
-                                                                </select>
+                                                                </select> -->
 
-											<!-- <?php
+											<?php
 											$city_id = $to_city;
 											$sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='$city_id'"));
 											?>
 											<input id="airpt-<?= $i ?>" name="airpt" class="form-control autocomplete airpt" title="Enter Arrival Airport" data-toggle="tooltip" placeholder="*Enter Arrival Airport" data-dyn-valid="required" >
 											<input type="hidden" name="to_city" id="to_city-<?= $i  ?>" data-dyn-valid="required" />
-											<input type="hidden" name="arrival_city" id="arrival_city-<?= $i ?>" data-dyn-valid="required"  > -->
+											<input type="hidden" name="arrival_city" id="arrival_city-<?= $i ?>" data-dyn-valid="required"  >
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
 											<input type="text" id="aterm-<?= $sq_trip_entries_count ?>" name="aterm" onchange="validate_specialChar(this.id)" placeholder="Arrival Terminal" title="Arrival Terminal" data-dyn-valid="" value="<?= $arr_terminal ?>">

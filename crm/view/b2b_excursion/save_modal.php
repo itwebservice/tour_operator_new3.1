@@ -421,11 +421,15 @@ include "../../model/model.php";
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script>
     $('#save_modal').modal('show');
-    $('#off_days,#currency_code,#agent_type,#transfer_option').select2({
-        dropdownParent: $("#save_modal")
-    });
-
-    $('.app_select2').select2();
+    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+    if (typeof initModalAppSelect2 === 'function') {
+        initModalAppSelect2('#save_modal');
+    } else {
+        $('.app_select2').select2({
+            dropdownParent: $('#save_modal'),
+            minimumResultsForSearch: 0
+        });
+    }
     $('#rep_time').datetimepicker({
         datepicker: false,
         format: 'H:i A',

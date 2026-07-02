@@ -200,6 +200,9 @@ $(function(){
 			$('.bk_tab').removeClass('active');
 			$('#tab_4').addClass('active');
 			$('html, body').animate({scrollTop: $('.bk_tab_head').offset().top}, 200);
+			if (typeof refreshQuotationTcsOnCostingTab === 'function') {
+				refreshQuotationTcsOnCostingTab();
+			}
 
 		}
 	});

@@ -72,7 +72,7 @@ else{
 	$delete_btn = '<button class="'.$delete_flag.' btn btn-danger btn-sm" onclick="delete_entry('.$row_booking['booking_id'].')" title="Delete Entry"><i class="fa fa-trash"></i></button>';
 	// $duty_slip = '<button data-toggle="tooltip" display="inline" class="btn btn-danger btn-sm" onclick="booking_registration_pdf('.$row_booking['booking_id'] .')" title="Download Duty Slip"><i class="fa fa-file-pdf-o"></i></button>';
 
-	$duty_slip='<button data-toggle="tooltip" title="Download Duty Slip" class="btn btn-info btn-sm" onclick="voucher_car_modal('.$row_booking['booking_id'].')" id="servoucher_btn-'.$booking_id.'" ><i class="fa fa-print" data-toggle="tooltip"></i></button>';
+	$duty_slip='<button data-toggle="tooltip" title="Download Duty Slip" class="btn btn-info btn-sm" onclick="voucher_car_modal('.$row_booking['booking_id'].')" id="servoucher_btn-'.$row_booking['booking_id'].'" ><i class="fa fa-print" data-toggle="tooltip"></i></button>';
 }
 
 $date = $row_booking['created_at'];

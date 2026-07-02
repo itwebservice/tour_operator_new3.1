@@ -30,8 +30,8 @@ if (!$connection) {
 }
 
 
-define('BASE_URL', 'http://localhost/tour_operator_new3.1-latest-01-07-2026/crm/');   
-define('BASE_URL_B2C', 'http://localhost/tour_operator_new3.1-latest-01-07-2026/');
+define('BASE_URL', 'http://localhost/tour_opertor_3.1/crm/');   
+define('BASE_URL_B2C', 'http://localhost/tour_opertor_3.1/');
 mysqli_query($connection, "SET SESSION sql_mode = ''");
 
 
