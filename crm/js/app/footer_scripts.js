@@ -2665,29 +2665,82 @@ function city_master_dropdown_reload() {
 
 
 function getModalSelect2Parent($element) {
-	var $modal = $($element).closest('.modal');
-	return $modal.length ? $modal : $('body');
+	// Append dropdown to body so position stays correct inside scrollable modals/tables.
+	return $(document.body);
+}
+
+function resolveAppSelect2Width($el) {
+	var $select = $($el);
+	var styleAttr = $select.attr('style') || '';
+	var widthMatch = styleAttr.match(/(?:^|;)\s*width\s*:\s*([^;]+)/i);
+	if (widthMatch && widthMatch[1]) {
+		return $.trim(widthMatch[1]);
+	}
+	var outerWidth = $select.outerWidth();
+	return outerWidth > 0 ? outerWidth : '100%';
+}
+
+function cleanClonedSelectElement(selectEl) {
+	if (!selectEl || selectEl.tagName !== 'SELECT') {
+		return selectEl;
+	}
+	selectEl.classList.remove('select2-hidden-accessible');
+	selectEl.removeAttribute('tabindex');
+	selectEl.removeAttribute('aria-hidden');
+	selectEl.removeAttribute('data-select2-id');
+	if (selectEl.style.display === 'none') {
+		selectEl.style.display = '';
+	}
+	return selectEl;
+}
+
+function initAppSelect2Element(element, extraConfig) {
+	var $select = $(element);
+	if (!$select.length || !$select.is('select')) {
+		return $select;
+	}
+	extraConfig = extraConfig || {};
+
+	if ($select.data('select2')) {
+		$select.select2('destroy');
+	}
+
+	var config = $.extend({
+		width: resolveAppSelect2Width($select),
+		minimumResultsForSearch: 0,
+		dropdownParent: getModalSelect2Parent($select)
+	}, extraConfig);
+
+	$select.select2(config);
+	return $select;
 }
 
 function initModalAppSelect2(scope, extraConfig) {
 	var $scope = scope ? $(scope) : $(document);
 	extraConfig = extraConfig || {};
 	$scope.find('select.app_select2, select.form-contrl.app_select2').each(function () {
-		var $el = $(this);
-		if ($el.data('select2')) {
-			$el.select2('destroy');
-		}
-		var config = $.extend({
-			width: '100%',
-			minimumResultsForSearch: 0,
-			dropdownParent: getModalSelect2Parent($el)
-		}, extraConfig);
-		$el.select2(config);
+		initAppSelect2Element(this, extraConfig);
 	});
 }
 
 window.getModalSelect2Parent = getModalSelect2Parent;
+window.resolveAppSelect2Width = resolveAppSelect2Width;
+window.cleanClonedSelectElement = cleanClonedSelectElement;
+window.initAppSelect2Element = initAppSelect2Element;
 window.initModalAppSelect2 = initModalAppSelect2;
+
+$(document).on('shown.bs.modal', '.modal', function () {
+	initModalAppSelect2(this);
+});
+
+$(document).on('scroll.appSelect2', '.modal, .modal .table-responsive', function () {
+	$('select.app_select2, select.form-contrl.app_select2').each(function () {
+		var s2 = $(this).data('select2');
+		if (s2 && s2.isOpen()) {
+			$(this).select2('close');
+		}
+	});
+});
 
 function city_lzloading(element, placeholder = "City Name", valueasText = false) {
 	var base_url = $("#base_url").val();
@@ -2755,6 +2808,7 @@ function destinationLoading(element, placeholder = "Destination", valueasText = 
 		var currentText = $el.find('option:selected').text();
 		var currentOptgroup = $el.find('option:selected').parent().attr('value');
 
+		
 		if ($el.hasClass("select2-hidden-accessible")) {
 			$el.select2('destroy');
 		}

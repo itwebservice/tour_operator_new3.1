@@ -4248,6 +4248,12 @@ function foo(tableID, quot_table_id, rowCounts) {
     );
 
     $(row.cells[12]).addClass("hidden");
+
+    $(row).find('select.app_select2').each(function () {
+      if (typeof initAppSelect2Element === 'function') {
+        initAppSelect2Element(this);
+      }
+    });
   }
   if (tableID == "table_exc_tarrif_offer") {
     row.cells[0].childNodes[0].setAttribute("id", "chk_offer" + foo.counter);
@@ -4263,18 +4269,11 @@ function foo(tableID, quot_table_id, rowCounts) {
     dynamic_date(row.cells[3].childNodes[0].id);
     row.cells[4].childNodes[0].value = get_date();
     dynamic_date(row.cells[4].childNodes[0].id);
-    var agentSelect = $("#" + row.cells[8].childNodes[0].id);
-    if (agentSelect.data('select2')) {
-      agentSelect.select2('destroy');
-    }
-    var agentSelect2Config = { width: '100%', minimumResultsForSearch: 0 };
-    var $offerModalParent = typeof getModalSelect2Parent === 'function'
-      ? getModalSelect2Parent(agentSelect)
-      : agentSelect.closest('.modal');
-    if ($offerModalParent && $offerModalParent.length) {
-      agentSelect2Config.dropdownParent = $offerModalParent;
-    }
-    agentSelect.select2(agentSelect2Config);
+    $(row).find('select.app_select2').each(function () {
+      if (typeof initAppSelect2Element === 'function') {
+        initAppSelect2Element(this);
+      }
+    });
     row.cells[3].childNodes[0].setAttribute(
       "onchange",
       'get_to_date(id,"' + row.cells[4].childNodes[0].id + '")'
@@ -4899,11 +4898,33 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
 
         if (!oldInput) {
-            newcell.innerHTML = oldCell.innerHTML;
+            var rawSelect = oldCell.querySelector('select');
+            if (rawSelect) {
+                var clonedSelect = rawSelect.cloneNode(true);
+                if (typeof cleanClonedSelectElement === 'function') {
+                    clonedSelect = cleanClonedSelectElement(clonedSelect);
+                }
+                if (clonedSelect.id) {
+                    var selectBaseId = clonedSelect.id.replace(/[0-9]+$/, "");
+                    clonedSelect.id = selectBaseId + rowCount;
+                }
+                if (clonedSelect.name) {
+                    var selectBaseName = clonedSelect.name.replace(/[0-9]+$/, "");
+                    clonedSelect.name = selectBaseName + rowCount;
+                }
+                clonedSelect.selectedIndex = 0;
+                clonedSelect.classList.add('app_select2');
+                newcell.appendChild(clonedSelect);
+            } else {
+                newcell.innerHTML = oldCell.innerHTML;
+            }
             continue;
         }
 
         var cloned = oldInput.cloneNode(true);
+        if (cloned.tagName === "SELECT" && typeof cleanClonedSelectElement === 'function') {
+            cloned = cleanClonedSelectElement(cloned);
+        }
 
         // 🔹 Generate unique ID/Name for new row
         if (cloned.id) {
@@ -4946,19 +4967,23 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // ✅ Initialize Select2 only for the new row selects
     if (tableID !== "tbl_package_tour_member") {
-        var $modalParent = typeof getModalSelect2Parent === 'function'
-            ? getModalSelect2Parent($(row).find('select.app_select2').first())
-            : $(row).closest('.modal');
-        var rowSelect2Config = { width: "100%", minimumResultsForSearch: 0 };
-        if ($modalParent && $modalParent.length) {
-            rowSelect2Config.dropdownParent = $modalParent;
-        }
         $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"]').each(function () {
-            var $el = $(this);
-            if ($el.data('select2')) {
-                $el.select2('destroy');
+            if (typeof initAppSelect2Element === 'function') {
+                initAppSelect2Element(this);
+            } else {
+                var $el = $(this);
+                if ($el.data('select2')) {
+                    $el.select2('destroy');
+                }
+                var $modalParent = typeof getModalSelect2Parent === 'function'
+                    ? getModalSelect2Parent($el)
+                    : $(document.body);
+                var rowSelect2Config = { width: "100%", minimumResultsForSearch: 0 };
+                if ($modalParent && $modalParent.length) {
+                    rowSelect2Config.dropdownParent = $modalParent;
+                }
+                $el.select2(rowSelect2Config);
             }
-            $el.select2(rowSelect2Config);
         });
     }
 

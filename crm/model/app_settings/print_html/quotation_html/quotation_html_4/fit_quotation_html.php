@@ -99,6 +99,17 @@ if (!function_exists('o4_guest_label')) {
     return $parts ? implode(', ', $parts) : o4nv($ov['guest_count'], '-');
   }
 }
+if (!function_exists('o4_list_item_text')) {
+  function o4_list_item_text($html)
+  {
+    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = str_replace("\xC2\xA0", ' ', $text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim($text);
+  }
+}
 if (!function_exists('o4_split_lines')) {
   function o4_split_lines($html, $fallback = array())
   {

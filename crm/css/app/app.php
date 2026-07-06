@@ -642,6 +642,12 @@ box-shadow: 0 3px 10px 0 rgba(34, 41, 47, 0.1);
 background-color: #fff;
 border-color: #7367f0;
 }
+.modal-open .select2-container--open {
+z-index: 10060 !important;
+}
+.modal-open .select2-dropdown {
+z-index: 10060 !important;
+}
 .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
 
 background-color: #f5f5f5;

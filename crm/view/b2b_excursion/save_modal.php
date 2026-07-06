@@ -285,7 +285,7 @@ include "../../model/model.php";
                                                                                 <option value=''>Select Type</option>
                                                                                 <option value='Offer'>Offer</option>
                                                                                 <option value='Coupon'>Coupon</option>
-                                                                        </td>
+                                                                            </select></td>
                                                                         <td><input type="text" id="from_date"
                                                                                 class="form-control" name="from_date"
                                                                                 placeholder="Valid From"
