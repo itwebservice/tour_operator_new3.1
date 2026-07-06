@@ -43,11 +43,11 @@ if ($package_id != '') {
 if ($quotation_id != '') {
 	$query .= " and quotation_id='$quotation_id'";
 }
-if ($quotation_source_type === 'ai') {
-	$query .= " and quotation_refer_id > 0";
-} else {
-	$query .= " and package_id > 0";
-}
+// if ($quotation_source_type === 'ai') {
+// 	$query .= " and quotation_refer_id > 0";
+// } else {
+// 	$query .= " and package_id > 0";
+// }
 if ($branch_id != "") {
 	$query .= " and branch_admin_id = '$branch_id'";
 }
