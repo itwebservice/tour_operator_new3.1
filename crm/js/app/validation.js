@@ -643,6 +643,8 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "to_sector-" + prefix + foo.counter
     );
+    $(row.cells[4]).addClass("planeairport-select").attr("style", "min-width:300px;");
+    $(row.cells[5]).addClass("planeairport-select").attr("style", "min-width:300px;");
     row.cells[6].childNodes[0].setAttribute(
       "id",
       "txt_plane_company-" + prefix + foo.counter
@@ -4893,6 +4895,22 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             newcell.classList.add("sector-select");
             if (oldCell.getAttribute("style")) {
                 newcell.setAttribute("style", oldCell.getAttribute("style"));
+            }
+        }
+        if (oldCell.classList.contains("planeairport-select")) {
+            newcell.classList.add("planeairport-select");
+            if (oldCell.getAttribute("style")) {
+                newcell.setAttribute("style", oldCell.getAttribute("style"));
+            }
+        }
+        if (
+            (tableID === "tbl_plane_travel_details_dynamic_row" ||
+             tableID === "tbl_plane_travel_details_dynamic_row_update") &&
+            (i === 4 || i === 5)
+        ) {
+            newcell.classList.add("planeairport-select");
+            if (!newcell.getAttribute("style")) {
+                newcell.setAttribute("style", "min-width:300px;");
             }
         }
 
