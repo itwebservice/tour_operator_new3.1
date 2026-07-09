@@ -2101,6 +2101,10 @@ a {
     padding-inline: calc(var(--spacing) * 9);
   }
 
+  .px-20 {
+    padding-inline: calc(var(--spacing) * 25);
+  }
+
   .px-12 {
     padding-inline: calc(var(--spacing) * 12);
   }

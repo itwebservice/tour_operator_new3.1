@@ -2754,6 +2754,35 @@ $("#infant_activity_pp").val(
     }
 
 
+function isAiQuotationActive() {
+    return sessionStorage.getItem('is_ai_quotation') === '1'
+        || ($('#is_ai_quotation').length && $('#is_ai_quotation').val() === '1')
+        || $('#aiBuilder').is(':checked');
+}
+
+function resolveAiQuotationPackageIds() {
+    var referId = sessionStorage.getItem('quotation_refer_id') || $('#quotation_refer_id').val() || '';
+    if (referId && String(referId) !== '0') {
+        return [String(referId)];
+    }
+    try {
+        var itineraryData = JSON.parse(sessionStorage.getItem('itinerary_data') || '{}');
+        if (itineraryData.package_id_arr && itineraryData.package_id_arr.length) {
+            return itineraryData.package_id_arr.map(String);
+        }
+    } catch (e) {}
+    var savedPackages = sessionStorage.getItem('selected_packages_tab3');
+    if (savedPackages) {
+        try {
+            var packageIds = JSON.parse(savedPackages);
+            if (packageIds.length) {
+                return packageIds.map(String);
+            }
+        } catch (e2) {}
+    }
+    return [];
+}
+
 function addHotelInfo(tableID, quot_table = "", itinerary = "") {
     const base_url = $('#base_url').val();
     let incl_arr = [], excl_arr = [], package_id_arr = [];
@@ -2774,6 +2803,15 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
         incl_arr.push(inclusion);
         excl_arr.push(exclusion);
     });
+
+    if (package_id_arr.length === 0 && isAiQuotationActive()) {
+        package_id_arr = resolveAiQuotationPackageIds();
+    }
+
+    if (package_id_arr.length === 0 && isAiQuotationActive()) {
+        error_msg_alert('Please select destination for AI quotation.');
+        return false;
+    }
 
     if (package_id_arr.length === 0) {
         error_msg_alert('Please select at least one Package!');
@@ -2807,9 +2845,29 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
     // Collect data arrays for each row in selected packages
     let attraction_arr = [], program_arr = [], stay_arr = [], meal_plan_arr = [], package_p_id_arr = [], day_count_arr = [];
     let count = 0;
+    var usedAiItineraryData = false;
 
+    if (isAiQuotationActive() && !$('input[name="custom_package"]:checked').length) {
+        try {
+            var storedItinerary = JSON.parse(sessionStorage.getItem('itinerary_data') || '{}');
+            attraction_arr = storedItinerary.attraction_arr || [];
+            program_arr = storedItinerary.program_arr || [];
+            stay_arr = storedItinerary.stay_arr || [];
+            meal_plan_arr = storedItinerary.meal_plan_arr || [];
+            package_p_id_arr = storedItinerary.package_p_id_arr || [];
+            if (program_arr.length > 0) {
+                day_count_arr = [program_arr.length];
+                usedAiItineraryData = true;
+            }
+        } catch (e) {}
+    }
+
+    if (!usedAiItineraryData) {
     package_id_arr.forEach(package_id => {
         const table = document.getElementById(`dynamic_table_list_p_${package_id}`);
+        if (!table) {
+            return;
+        }
         const rowCount = table.rows.length;
 
         for (let i = 0; i < rowCount; i++) {
@@ -2846,19 +2904,56 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
         day_count_arr.push(count);
         count = 0;
     });
+    }
+
+    const hotelPackageIds = package_id_arr.filter(function(packageId) {
+        return packageId && String(packageId) !== '0';
+    });
 
     const total_adult = $('#total_adult').val();
     const total_children = $('#total_children').val();
     const to_date = $('#to_date').val();
     const total_days = $('#total_days').val();
     const packagesToLoad = isAddingNewPackageTier
-        ? package_id_arr
+        ? hotelPackageIds
         : (typeof quotationFilterNewPackageIds === 'function'
-            ? quotationFilterNewPackageIds(package_id_arr)
-            : package_id_arr);
+            ? quotationFilterNewPackageIds(hotelPackageIds)
+            : hotelPackageIds);
     const from_date = typeof quotationGetReferenceTravelStartDate === 'function'
         ? quotationGetReferenceTravelStartDate()
         : $('#from_date').val();
+
+    if (!packagesToLoad.length && isAiQuotationActive() && program_arr.length > 0) {
+        const table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        let lastRowNo = 0;
+        for (let r = 0; r < table.rows.length; r++) {
+            const rowNo = parseInt(table.rows[r].cells[1].childNodes[0].value, 10);
+            if (!isNaN(rowNo) && rowNo > lastRowNo) {
+                lastRowNo = rowNo;
+            }
+        }
+        window.quotationBatchPopulatingHotels = true;
+        for (let i = 0; i < program_arr.length; i++) {
+            addRow('tbl_package_tour_quotation_dynamic_hotel');
+            const row = table.rows[table.rows.length - 1];
+            if (row && row.cells[1] && row.cells[1].childNodes[0]) {
+                row.cells[1].childNodes[0].value = lastRowNo + i + 1;
+            }
+            if (selectedPackageTypeToAdd && row.cells[2] && row.cells[2].childNodes[0]) {
+                $(row.cells[2].childNodes[0]).val(selectedPackageTypeToAdd).trigger('change.select2');
+            }
+        }
+        window.quotationBatchPopulatingHotels = false;
+        if (selectedPackageTypeToAdd && typeof hideHotelPackage === 'function') {
+            hideHotelPackage(selectedPackageTypeToAdd);
+        }
+        if (typeof get_hotel_cost === 'function') {
+            get_hotel_cost();
+        }
+        sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
+        saveHotelTableState();
+        return false;
+    }
 
     // Ajax to save data and update the table
     $.ajax({

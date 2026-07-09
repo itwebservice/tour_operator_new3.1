@@ -189,21 +189,29 @@ background-color:<?= $theme_color ?>;
                 </div>
 
                 <script>
-                    const aiToggleBtn = document.getElementById("aiToggleBtn");
-                    const aiChatBox = document.getElementById("aiChatBox");
-                    const aiItineraryRow = document.getElementById("aiItineraryRow");
+                    (function () {
+                        const aiToggleBtn = document.getElementById("aiToggleBtn");
+                        const aiChatBox = document.getElementById("aiChatBox");
+                        const aiItineraryRow = document.getElementById("aiItineraryRow");
 
-                    aiToggleBtn.addEventListener("click", function () {
-                        aiChatBox.classList.toggle("show");
-                        const isVisible = aiChatBox.classList.contains("show");
-                        aiChatBox.setAttribute("aria-hidden", String(!isVisible));
-                        aiItineraryRow.classList.toggle("show", isVisible);
-                        aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
-                        document.querySelectorAll('#aiItineraryContainer .ai-itinerary-row').forEach(function(row) {
-                            row.classList.toggle("show", isVisible);
-                            row.setAttribute("aria-hidden", String(!isVisible));
+                        if (!aiToggleBtn || !aiChatBox) {
+                            return;
+                        }
+
+                        aiToggleBtn.addEventListener("click", function () {
+                            aiChatBox.classList.toggle("show");
+                            const isVisible = aiChatBox.classList.contains("show");
+                            aiChatBox.setAttribute("aria-hidden", String(!isVisible));
+                            if (aiItineraryRow) {
+                                aiItineraryRow.classList.toggle("show", isVisible);
+                                aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
+                            }
+                            document.querySelectorAll('#aiItineraryContainer .ai-itinerary-row').forEach(function(row) {
+                                row.classList.toggle("show", isVisible);
+                                row.setAttribute("aria-hidden", String(!isVisible));
+                            });
                         });
-                    });
+                    })();
                 </script>
 
 
@@ -757,8 +765,22 @@ $(document).on('click', '#tab2_head', function() {
         window.href = base_url + 'view/custom_packages/master/package/index.php';
     }
 
+    function isAiQuotationMode() {
+        return $('#aiBuilder').is(':checked')
+            || $('#is_ai_quotation').val() === '1'
+            || sessionStorage.getItem('is_ai_quotation') === '1';
+    }
+
+    function getQuotationDestinationId() {
+        return $('#dest_name').val()
+            || sessionStorage.getItem('selected_destination_id')
+            || sessionStorage.getItem('quotation_dest_id')
+            || $('#quotation_dest_id').val()
+            || '';
+    }
+
     function syncQuotationReferId() {
-        var dest_id = $('#dest_name').val() || sessionStorage.getItem('selected_destination_id') || '';
+        var dest_id = getQuotationDestinationId();
         var referMap = {};
         try {
             referMap = JSON.parse($('#quotation_refer_id_map').val() || '{}');
@@ -892,7 +914,7 @@ $(document).on('click', '#tab2_head', function() {
 
     function storeAiItinerarySession() {
         var data = collectAiItineraryArrays();
-        var dest_id = $('#dest_name').val() || sessionStorage.getItem('selected_destination_id') || '';
+        var dest_id = getQuotationDestinationId();
         var refer_id = syncQuotationReferId();
         var inclusions = getQuotationEditorContent('inclusions_ai');
         var exclusions = getQuotationEditorContent('exclusions_ai');
@@ -900,6 +922,8 @@ $(document).on('click', '#tab2_head', function() {
         sessionStorage.setItem('quotation_dest_id', dest_id);
         $('#is_ai_quotation').val('1');
         $('#quotation_dest_id').val(dest_id);
+        var packageIdsForTab3 = refer_id && String(refer_id) !== '0' ? [String(refer_id)] : ['0'];
+        sessionStorage.setItem('selected_packages_tab3', JSON.stringify(packageIdsForTab3));
         sessionStorage.setItem('itinerary_data', JSON.stringify({
             attraction_arr: data.attraction_arr,
             program_arr: data.program_arr,
@@ -1061,9 +1085,9 @@ $(document).on('click', '#tab2_head', function() {
                 }
 
             });
-            var isAiFlow = hasValidAiItinerary() || hasAiItineraryContent();
+            var isAiMode = isAiQuotationMode();
 
-            if (isAiFlow && package_id_arr.length == 0) {
+            if (isAiMode && package_id_arr.length == 0) {
                 var aiRowError = '';
                 $('#aiItineraryContainer .ai-itinerary-row').each(function(index) {
                     var attraction = ($(this).find('.ai-special').val() || '').trim();
@@ -1086,7 +1110,7 @@ $(document).on('click', '#tab2_head', function() {
                     error_msg_alert('Please enter at least one complete AI itinerary row.');
                     return false;
                 }
-                var dest_id = $('#dest_name').val();
+                var dest_id = getQuotationDestinationId();
                 if (!dest_id) {
                     error_msg_alert('Please select destination for AI quotation.');
                     return false;
@@ -1095,7 +1119,7 @@ $(document).on('click', '#tab2_head', function() {
                 return false;
             }
 
-            if (!isAiFlow) {
+            if (!isAiMode) {
                 sessionStorage.removeItem('is_ai_quotation');
                 sessionStorage.removeItem('quotation_dest_id');
                 sessionStorage.removeItem('quotation_refer_id');
@@ -1104,7 +1128,7 @@ $(document).on('click', '#tab2_head', function() {
                 $('#quotation_refer_id').val('0');
             }
 
-            if (package_id_arr.length == 0 && !isAiFlow) {
+            if (package_id_arr.length == 0 && !isAiMode) {
                 error_msg_alert('Please select at least one Package!');
                 return false;
             }
@@ -1674,13 +1698,26 @@ $(document).on('click', '#tab2_head', function() {
         var id = $('input[name="quotation_package"]:checked').attr('id');
         if (id == "standardPackage") {
             $('#package_div_content').show();
+            $('#nights_filter').closest('.col-md-3').show();
+            $('#package_name_div').show();
+            $('#package_div_content > .col-md-6.text-right').show();
             $('#ai_chat_container').hide();
             $('#is_ai_quotation').val('0');
+            sessionStorage.removeItem('is_ai_quotation');
         }
         if (id == "aiBuilder") {
-            $('#package_div_content').hide();
+            $('#package_div_content').show();
+            $('#nights_filter').closest('.col-md-3').hide();
+            $('#package_name_div').hide();
+            $('#package_div_content > .col-md-6.text-right').hide();
             $('#ai_chat_container').show();
+            $('#aiChatBox').addClass('show').attr('aria-hidden', 'false');
+            $('#aiItineraryContainer .ai-itinerary-row').addClass('show').attr('aria-hidden', 'false');
             $('#is_ai_quotation').val('1');
+            sessionStorage.setItem('is_ai_quotation', '1');
+            if (!$('#dest_name').val() && typeof syncDestinationFromTab1 === 'function') {
+                syncDestinationFromTab1(false);
+            }
         }
     }
     package_booking_reflect();
