@@ -69,7 +69,7 @@ textarea.form-control {
                     <td width="20px;"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled="" style="margin-top:35px;"></td>
                     <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" style="margin-top:35px;"></td>
                     <td class="col-md-5 no-pad" style="padding-left: 5px !important;max-width: 594px;overflow: hidden;position: relative;" ><textarea id="day_program" name="day_program" class="form-control day_program" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"   style="overflow:hidden;resize:none;height:900px;"  
-    rows="1"></textarea><span class="style_text" style="position: absolute !important; right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important; padding: 0px 14px !important; top: 0px !important;"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>
+    rows="1"></textarea></td>
                     <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay" name="overnight_stay" style="margin-top:35px;"  onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay"></td>
                     <td class="col-md-2 no-pad" style="padding-left:5px !important; ">
                       <div style="display: flex; align-items: center; gap: 10px;">
@@ -150,36 +150,6 @@ initializeModal();
 
 
 
-$(document).on("click", ".style_text_b, .style_text_u", function() {
-        var wrapper = $(this).data("wrapper");
-
-        var textarea = $(this).parents('.style_text').siblings('.day_program')[0];
-        console.log(textarea);
-        // Ensure textarea exists and selectionStart/selectionEnd are supported
-        var start = textarea.selectionStart;
-        var end = textarea.selectionEnd;
-
-        // Get the selected text
-        var selectedText = textarea.value.substring(start, end);
-
-        // Wrap the selected text with the wrapper (e.g., ** for bold, __ for underline)
-        var wrappedText = wrapper + selectedText + wrapper;
-
-        // Insert the wrapped text back into the textarea
-        textarea.value = textarea.value.substring(0, start) + wrappedText + textarea.value.substring(end);
-
-        // Adjust the cursor position after wrapping
-        textarea.selectionStart = start;
-        textarea.selectionEnd = end + wrapper.length * 2;
-        var text = textarea.value;
-        var content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-
-        // Replace markdown-style underline (__text__) with <u> tags
-        content = content.replace(/__(.*?)__/g, '<u>$1</u>');
-        textarea.value = content;
-        //console.log(content);    
-    });
-
 function display_format_modal(){
     var base_url = $('#base_url').val();
     window.location = base_url+"images/csv_format/itinerary.csv";
@@ -244,10 +214,16 @@ function itinerary_form_csv_save(){
               return false;
             }
             else{
+              for(var r = 1; r < itinerary_arr.length; r++){
+                  if(table.rows[r] === undefined){
+                      addRow('default_program_list','', 'itinerary');
+                  }
+              }
 
               for(var i=0; i<itinerary_arr.length; i++){
 
                   var row = table.rows[i];
+                  if(!row){ continue; }
                   itinerary_arr[i]['spa'] = itinerary_arr[i]['spa'].replace(/\\/g, '');
                   itinerary_arr[i]['dwp'] = itinerary_arr[i]['dwp'].replace(/\\/g, '');
                   itinerary_arr[i]['os'] = itinerary_arr[i]['os'].replace(/\\/g, '');
@@ -255,11 +231,6 @@ function itinerary_form_csv_save(){
                   var dwpTextarea = row.cells[3].querySelector('textarea');
                   if(dwpTextarea){ dwpTextarea.value = itinerary_arr[i]['dwp']; }
                   row.cells[4].childNodes[0].value = itinerary_arr[i]['os'];
-                  if(i!=itinerary_arr.length-1){
-                      if(table.rows[i+1]==undefined){
-                          addRow('default_program_list','', 'itinerary');
-                      }
-                  }
               }
               initializeItineraryTooltips();
             }

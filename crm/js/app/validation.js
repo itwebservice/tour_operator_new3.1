@@ -961,8 +961,10 @@ function foo(tableID, quot_table_id, rowCounts) {
     // row.cells[3].childNodes[1].setAttribute("class","style_text"+foo.counter);
     
     row.cells[3].setAttribute("style", "position: relative !important;");
-    row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
-   );
+    if (row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
+     );
+    }
     
     row.cells[3].setAttribute("required", "");
     row.cells[4].childNodes[0].setAttribute(
@@ -1122,16 +1124,15 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[3].childNodes[0].setAttribute("id", "day_program" + foo.counter);
 
      row.cells[3].setAttribute("style", "position: relative !important;");
-    row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
-   );
+    if (row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
+     );
+    }
    
     row.cells[4].childNodes[0].setAttribute(
       "id",
       "overnight_stay" + foo.counter
     );
-    if (row.cells[5]) {
-      $(row.cells[5]).addClass("hidden");
-    }
   }
 
   if (tableID == "tbl_dynamic_city_name") {
@@ -4876,6 +4877,21 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             continue;
         }
         
+        // Special handling for the day-program cell in itinerary master tables.
+        // Copy the full cell (textarea + B/U span) so foo() does not crash on childNodes[1].
+        if ((tableID === "package_program_list" || tableID === "default_program_list") && i === 3) {
+            newcell.className = oldCell.className;
+            if (oldCell.getAttribute("style")) {
+                newcell.setAttribute("style", oldCell.getAttribute("style"));
+            }
+            newcell.innerHTML = oldCell.innerHTML;
+            var newDayProgram = newcell.querySelector("textarea");
+            if (newDayProgram) {
+                newDayProgram.value = "";
+            }
+            continue;
+        }
+
         // Special handling for image upload cell (cell index 5 for itinerary table)
         if (tableID === "default_program_list" && i === 5) {
             console.log("DEBUG: Special handling for image cell during cloning");

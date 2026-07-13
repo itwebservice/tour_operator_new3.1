@@ -318,6 +318,41 @@ function clearQuotationPackageListUi() {
 	}
 }
 
+function resetPackageSelectorRadios() {
+	$('input[name="custom_package"]').each(function() {
+		this.checked = false;
+		$(this).prop('checked', false).removeAttr('checked');
+	});
+
+	$('#accordion .panel-collapse.in').removeClass('in').addClass('collapse').attr('aria-expanded', 'false').css('height', '');
+	$('#accordion [data-toggle="collapse"]').addClass('collapsed').attr('aria-expanded', 'false');
+
+	sessionStorage.removeItem('selected_packages_tab3');
+}
+
+function blockPackageSelectInAiMode(radioEl) {
+	if ($('#aiBuilder').is(':checked') || $('#is_ai_quotation').val() === '1' || sessionStorage.getItem('is_ai_quotation') === '1') {
+		if (radioEl) {
+			radioEl.checked = false;
+			$(radioEl).prop('checked', false).removeAttr('checked');
+		} else {
+			resetPackageSelectorRadios();
+		}
+		return false;
+	}
+	return true;
+}
+
+$(document).on('change', 'input[name="custom_package"]', function() {
+	blockPackageSelectInAiMode(this);
+});
+
+$(document).on('change', 'input[name="quotation_package"]', function() {
+	if (typeof package_booking_reflect === 'function') {
+		package_booking_reflect();
+	}
+});
+
 function quotationResetPackageLoadCache() {
 	if (typeof window.__quotationResetPackageCache === 'function') {
 		window.__quotationResetPackageCache();
@@ -944,6 +979,62 @@ function quotationGetDefaultPackageType() {
 	}
 	var val = $main.find('option:first').val();
 	return val || 'ECONOMY';
+}
+
+function quotationInitEditablePackageTypeSelect(row, selectedValue) {
+	if (!row || !row.cells || !row.cells[2] || !row.cells[2].childNodes[0]) {
+		return;
+	}
+	quotationCachePackageTypeOptions();
+	var pkgEl = row.cells[2].childNodes[0];
+	var $pkg = jQuery(pkgEl);
+	if ($pkg.data('select2')) {
+		$pkg.select2('destroy');
+	}
+	if (quotationPackageTypeOptionsHtml) {
+		$pkg.html(quotationPackageTypeOptionsHtml);
+	}
+	$pkg.prop('disabled', false).removeAttr('disabled');
+	$pkg.attr('data-editable-package-type', '1').data('editablePackageType', 1);
+	$pkg.addClass('app_select2 package_type_select');
+	if (selectedValue) {
+		if (!$pkg.find('option[value="' + selectedValue + '"]').length) {
+			$pkg.append(new Option(selectedValue, selectedValue, true, true));
+		}
+		$pkg.val(selectedValue);
+	}
+	$pkg.select2({ width: '160px', minimumResultsForSearch: -1 });
+}
+
+function quotationIsEditablePackageTypeSelect($pkg) {
+	return !!($pkg && ($pkg.attr('data-editable-package-type') === '1' || $pkg.data('editablePackageType') === 1));
+}
+
+function quotationEnsureEditablePackageTypeRows(table) {
+	table = table || document.getElementById('tbl_package_tour_quotation_dynamic_hotel')
+		|| document.getElementById('tbl_package_tour_quotation_dynamic_hotel_update');
+	if (!table || !table.rows.length) {
+		return;
+	}
+	for (var i = 0; i < table.rows.length; i++) {
+		var pkgEl = table.rows[i].cells[2] && table.rows[i].cells[2].childNodes[0];
+		if (!pkgEl) {
+			continue;
+		}
+		var $pkg = jQuery(pkgEl);
+		if (!quotationIsEditablePackageTypeSelect($pkg)) {
+			continue;
+		}
+		var selectedValue = $pkg.val();
+		$pkg.prop('disabled', false).removeAttr('disabled');
+		if ($pkg.data('select2')) {
+			$pkg.select2('destroy');
+		}
+		if (selectedValue && !$pkg.find('option[value="' + selectedValue + '"]').length) {
+			$pkg.append(new Option(selectedValue, selectedValue, true, true));
+		}
+		$pkg.select2({ width: '160px', minimumResultsForSearch: -1 });
+	}
 }
 
 function quotationResetHotelRowFields(row, options) {

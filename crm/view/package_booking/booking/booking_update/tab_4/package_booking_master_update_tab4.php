@@ -3,6 +3,8 @@
     <div class="app_panel">
 
         <?php
+        include_once __DIR__ . '/../../inc/booking_discount_helper.php';
+        $booking_discount_in = booking_normalize_discount_in($sq_booking_info['discount_in']);
         $basic_cost = $sq_booking_info['basic_amount'];
         $service_charge = $sq_booking_info['service_charge'];
         // echo($sq_booking_info['tcs_tax']);
@@ -92,11 +94,11 @@
                                         <small id="service_show" style="color:#000000">&nbsp;</small>
                                         <label for="service_charge">Discount In</label>
                                         <select title="Discount In" id="discount_in" name="discount_in" class="form-control" onchange="calculate_tour_cost(this.id);get_auto_values('booking_date','total_basic_amt','payment_mode','service_charge','markup','update','false','service_charge','discount_amt');" >
-                                            <option value="<?= $sq_booking_info['discount_in']?>"><?= $sq_booking_info['discount_in']?></option>
-                                            <?php if($sq_booking_info['discount_in'] != 'Percentage'){ ?>
+                                            <option value="<?= $booking_discount_in ?>"><?= $booking_discount_in ?></option>
+                                            <?php if($booking_discount_in != 'Percentage'){ ?>
                                                 <option value="Percentage">Percentage</option>
                                             <?php } ?>
-                                            <?php if($sq_booking_info['discount_in'] != 'Flat'){ ?>
+                                            <?php if($booking_discount_in != 'Flat'){ ?>
                                                 <option value="Flat">Flat</option>
                                             <?php } ?>
                                         </select>

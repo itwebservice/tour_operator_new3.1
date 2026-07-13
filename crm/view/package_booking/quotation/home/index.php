@@ -1,3 +1,15 @@
+<?php
+ 
+include "../../../../model/model.php";
+
+/*======******Header******=======*/
+
+require_once('../../../layouts/admin_header.php');
+
+include_once('../inc/quotation_hints_modal.php');
+
+?>  
+ 
 <style>
   .app_dual_button input[type="radio"]{
 display: none;
@@ -37,10 +49,10 @@ background-color:<?= $theme_color ?>;
 </style>
 
 <?php
-include "../../../../model/model.php";
-/*======******Header******=======*/
-require_once('../../../layouts/admin_header.php');
-include_once('../inc/quotation_hints_modal.php');
+// include "../../../../model/model.php";
+// /*======******Header******=======*/
+// require_once('../../../layouts/admin_header.php');
+// include_once('../inc/quotation_hints_modal.php');
 $emp_id = $_SESSION['emp_id'];
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];

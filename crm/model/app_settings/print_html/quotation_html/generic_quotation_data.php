@@ -176,6 +176,70 @@ if (!function_exists('gqd_clean_html_text')) {
   }
 }
 
+if (!function_exists('gqd_media_url')) {
+  /**
+   * Resolve itinerary / gallery image paths to a browser-ready absolute URL.
+   * Handles full external URLs, crm/uploads paths, and project-root uploads.
+   */
+  function gqd_media_url($url)
+  {
+    $url = trim((string) $url);
+    if ($url === '' || stripos($url, 'dummy') !== false) {
+      return '';
+    }
+
+    $url = str_replace('\\', '/', $url);
+    if (preg_match('#^https?://#i', $url)) {
+      return str_replace(' ', '%20', $url);
+    }
+
+    $url = preg_replace('#^(\.\./)+#', '', $url);
+    $url = ltrim($url, '/');
+
+    if (!defined('BASE_URL')) {
+      return $url;
+    }
+
+    $base = rtrim(BASE_URL, '/');
+    $project_base = rtrim(str_replace('/crm/', '/', BASE_URL), '/');
+
+    if (strpos($url, 'crm/') === 0) {
+      return $base . '/' . substr($url, 4);
+    }
+    if (strpos($url, 'uploads/quotation_images/') === 0) {
+      return $base . '/' . $url;
+    }
+    if (strpos($url, 'uploads/') === 0) {
+      return $project_base . '/' . $url;
+    }
+
+    return $base . '/' . $url;
+  }
+}
+
+if (!function_exists('gqd_itinerary_package_ids')) {
+  /** Package ids that may appear in daywise image map entries for a program row. */
+  function gqd_itinerary_package_ids($master, $program_row, $effective_package_id)
+  {
+    $ids = array();
+    $program_pkg_id = intval(isset($program_row['package_id']) ? $program_row['package_id'] : 0);
+    $effective_package_id = intval($effective_package_id);
+    $refer_id = intval(isset($master['quotation_refer_id']) ? $master['quotation_refer_id'] : 0);
+
+    if ($program_pkg_id > 0) {
+      $ids[] = $program_pkg_id;
+    }
+    if ($effective_package_id > 0) {
+      $ids[] = $effective_package_id;
+    }
+    if ($refer_id > 0) {
+      $ids[] = $refer_id;
+    }
+
+    return array_values(array_unique($ids));
+  }
+}
+
 if (!function_exists('get_generic_quotation_data')) {
   /**
    * Build the full structured data-set for a Package Tour quotation.
@@ -203,7 +267,11 @@ if (!function_exists('get_generic_quotation_data')) {
     }
 
 
-    $package_id      = gqd_esc($master['package_id']);
+    // AI-built quotations store package_id=0 and keep the real package in quotation_refer_id.
+    $effective_package_id = function_exists('get_quotation_package_lookup_id')
+      ? intval(get_quotation_package_lookup_id($master))
+      : intval(isset($master['package_id']) ? $master['package_id'] : 0);
+    $package_id      = gqd_esc($effective_package_id);
     $branch_admin_id = isset($master['branch_admin_id']) ? gqd_esc($master['branch_admin_id']) : '0';
     $currency_code   = isset($master['currency_code']) ? $master['currency_code'] : '0';
     $session_role    = isset($_SESSION['role']) ? $_SESSION['role'] : '';
@@ -288,9 +356,12 @@ if (!function_exists('get_generic_quotation_data')) {
     // =====================================================================
     // 1. HERO
     // =====================================================================
-    $company_name = !empty($branch_admin['company_name'])
-      ? $branch_admin['company_name']
-      : (isset($app['app_name']) ? $app['app_name'] : '');
+    // Company name always comes from App Settings (Basic Info → Company Name).
+    // Do not use branch_admin_master / branch_name here — that caused hero and
+    // thank_you sections to show different names in Option-1 PDF/HTML.
+    $company_name = isset($app['app_name']) && trim($app['app_name']) !== ''
+      ? trim($app['app_name'])
+      : (isset($app_name) && trim($app_name) !== '' ? trim($app_name) : '');
 
     //=============================== Dipti
     // Gallery images for first page - destination wise last 4 images
@@ -298,12 +369,15 @@ if (!function_exists('get_generic_quotation_data')) {
 
     $dest_id_for_gallery = 0;
 
-    // First try from package master
-    if (!empty($master['package_id'])) {
-      $pkg_id = gqd_esc($master['package_id']);
-      $pkg = gqd_row("SELECT dest_id FROM custom_package_master WHERE package_id='$pkg_id'");
-      if (!empty($pkg['dest_id'])) {
-        $dest_id_for_gallery = $pkg['dest_id'];
+    // First try from package master (uses quotation_refer_id for AI quotations)
+    if ($effective_package_id > 0) {
+      if (!empty($dest_id) && $dest_id != '0') {
+        $dest_id_for_gallery = $dest_id;
+      } else {
+        $pkg = gqd_row("SELECT dest_id FROM custom_package_master WHERE package_id='$package_id'");
+        if (!empty($pkg['dest_id'])) {
+          $dest_id_for_gallery = $pkg['dest_id'];
+        }
       }
     }
 
@@ -621,24 +695,51 @@ if (!function_exists('get_generic_quotation_data')) {
     // =====================================================================
     $itinerary  = array();
     $dates_arr  = (array) (function_exists('get_dates_for_package_itineary') ? get_dates_for_package_itineary($quotation_id) : array());
-    $base_for_img = str_replace('/crm', '', defined('BASE_URL') ? BASE_URL : '');
+    $dummy_day_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
+    $imgrow = gqd_row("select image_url from package_tour_quotation_images where quotation_id='$quotation_id'");
+    $daywise_image_chunks = array();
+    if (!empty($imgrow['image_url'])) {
+      $daywise_image_chunks = explode(',', $imgrow['image_url']);
+    }
     $i = 0;
     $day_no = 1;
     foreach (gqd_rows("select * from package_quotation_program where quotation_id='$quotation_id'") as $p) {
-      $day_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
+      $day_image = $dummy_day_image;
+      $resolved_day_image = '';
+
       if (!empty($p['day_image'])) {
-        $day_image = $base_for_img . $p['day_image'];
-      } else {
-        $imgrow = gqd_row("select image_url from package_tour_quotation_images where quotation_id='$quotation_id'");
-        if (!empty($imgrow['image_url'])) {
-          foreach (explode(',', $imgrow['image_url']) as $chunk) {
-            $parts = explode('=', $chunk);
-            if (isset($parts[1], $parts[0], $parts[2]) && $parts[1] == $p['day_count'] && $parts[0] == $p['package_id']) {
-              $day_image = $parts[2];
-            }
+        $resolved_day_image = gqd_media_url($p['day_image']);
+      }
+
+      if ($resolved_day_image === '' && !empty($daywise_image_chunks)) {
+        $lookup_pkg_ids = gqd_itinerary_package_ids($master, $p, $effective_package_id);
+        $day_count = intval(isset($p['day_count']) ? $p['day_count'] : $day_no);
+        foreach ($daywise_image_chunks as $chunk) {
+          if (trim($chunk) === '') {
+            continue;
+          }
+          $parts = explode('=', $chunk);
+          if (!isset($parts[1], $parts[2]) || trim($parts[2]) === '') {
+            continue;
+          }
+          if (intval($parts[1]) !== $day_count) {
+            continue;
+          }
+          $map_pkg_id = intval(isset($parts[0]) ? $parts[0] : 0);
+          if (!empty($lookup_pkg_ids) && !in_array($map_pkg_id, $lookup_pkg_ids, true) && $map_pkg_id !== 0) {
+            continue;
+          }
+          $resolved_day_image = gqd_media_url($parts[2]);
+          if ($resolved_day_image !== '') {
+            break;
           }
         }
       }
+
+      if ($resolved_day_image !== '') {
+        $day_image = $resolved_day_image;
+      }
+
       $itinerary[] = array(
         'day_number'        => $day_no,
         'day_count'         => isset($p['day_count']) ? $p['day_count'] : $day_no,
@@ -907,7 +1008,7 @@ if (!function_exists('get_generic_quotation_data')) {
     $use_branch = ($branch_status == 'yes' && $branch_admin_id != '0');
     $thank_you = array(
       'company_logo'   => $branch_logo_url,
-      'company_name'   => isset($app['app_name']) ? $app['app_name'] : $company_name,
+      'company_name'   => $company_name,
       'company_address' => ($use_branch && !empty($branch_details['address1']))
         ? trim($branch_details['address1'] . ',' . $branch_details['address2'] . ',' . $branch_details['city'], ',')
         : (isset($app['app_address']) ? $app['app_address'] : ''),

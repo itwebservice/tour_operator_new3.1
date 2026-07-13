@@ -1,5 +1,6 @@
 <?php
 include "../../../../model/model.php";
+include_once "booking_discount_helper.php";
 
 function booking_get_bsm_entry($bsm_values_raw) {
 	if ($bsm_values_raw === '' || $bsm_values_raw === null) {
@@ -99,8 +100,9 @@ if ($sq_costing) {
 	$quot_info_arr['service_charge'] = $sq_costing['service_charge'];
 	$quot_info_arr['tax_type'] =  '';
 	$quot_info_arr['tax_in_percentage'] = '';
-	$quot_info_arr['discount_in'] = $sq_costing['discount_in'];
-	$quot_info_arr['discount'] = $sq_costing['discount'];
+	$resolved_discount = booking_resolve_quotation_discount($quotation_id, $sq_costing, $sq_quotation);
+	$quot_info_arr['discount_in'] = $resolved_discount['discount_in'];
+	$quot_info_arr['discount'] = $resolved_discount['discount'];
 	$bsm_entry = booking_get_bsm_entry($sq_costing['bsmValues']);
 	if (!$bsm_entry) {
 		$bsm_entry = (object) array('tax_apply_on' => '', 'tax_value' => '', 'tcsper' => '', 'tcsvalue' => 0);

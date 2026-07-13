@@ -24,15 +24,10 @@
                                     aria-labelledby="heading4">
                                     <div class="panel-body">
                                         <div class="row">
-                                            <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()">
+                                            <div class="col-xs-6 mg_bt_20_sm_xs" style="display:flex;  align-items:center; gap:8px;">
+                                                <!-- <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()">
                                                     <i class="fa fa-plus"></i>
-                                                </button>
-                                            </div>
-
-                                            <div class="col-xs-6 mg_bt_20_sm_xs"
-                                                style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
-
+                                                </button> -->
                                                 <select id="package_type" name="package_type"
                                                     class="form-control"
                                                     style="width:160px; text-align-last:center; -moz-text-align-last:center; -ms-text-align-last:center;"
@@ -44,6 +39,18 @@
                                                     onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
+                                            </div>
+
+                                            <div class="col-xs-6 mg_bt_20_sm_xs"
+                                                style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+
+                                                <button type="button" id="addHotelInfoSingleRowbtnsubmit" class="btn btn-excel btn-sm"
+                                                    title="Add Single Hotel Row">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+
+                                            
+                                         
 
                                             </div>
                                         </div>
@@ -79,7 +86,7 @@
                                                             <td><select name="room_cat-1" id="room_cat-1"
                                                                     style="width:145px;" title="Room Category"
                                                                     class="form-control app_select2"
-                                                                    onchange="get_hotel_cost();" data-add-new-option="true">
+                                                                    onchange="get_hotel_cost();" data-add-new-option="true">    
                                                                     <option value="">Room Category</option>
                                                                 </select>
                                                             </td>
@@ -906,8 +913,18 @@
                         }
                         // Don't force checkboxes to be checked - let user control them
                         // $(row.cells[0].childNodes[0]).prop('checked', true) /* .trigger('change') */ ;
-                        $(row.cells[2].childNodes[0]).prop('disabled', true);
+                        var $pkgSelect = $(row.cells[2].childNodes[0]);
+                        if (typeof quotationIsEditablePackageTypeSelect === 'function') {
+                            if (!quotationIsEditablePackageTypeSelect($pkgSelect)) {
+                                $pkgSelect.prop('disabled', true);
+                            }
+                        } else if (!$pkgSelect.attr('data-editable-package-type')) {
+                            $pkgSelect.prop('disabled', true);
+                        }
                     }
+                }
+                if (typeof quotationEnsureEditablePackageTypeRows === 'function') {
+                    quotationEnsureEditablePackageTypeRows(table);
                 }
                 console.log("hotel_cost"+row.cells[13].childNodes[0].value);
                 //Tab-4 Per person costing
@@ -2673,85 +2690,103 @@ $("#infant_activity_pp").val(
         }
     }
 
-    // Simple function to add a hotel row and copy data from previous row
-    function addSimpleHotelRow() {
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-        var rowCount = table.rows.length;
+    // Add exactly one hotel row dynamically
+    function addHotelInfoSingleRow(tableID) {
+        tableID = tableID || 'tbl_package_tour_quotation_dynamic_hotel';
 
-        if (rowCount < 1) return; // No rows to copy from
-
-        // Add new row
-        addRow('tbl_package_tour_quotation_dynamic_hotel');
-
-        var newRowIndex = table.rows.length - 1;
-        var newRow = table.rows[newRowIndex];
-        var prevRow = table.rows[newRowIndex - 1];
-
-        // Copy city from previous row
-        var prevCitySelect = $(prevRow.cells[3].childNodes[0]);
-        var prevCityId = prevCitySelect.val();
-        var prevCityName = prevCitySelect.find('option:selected').text();
-
-        if (prevCityId && prevCityName) {
-            var $newCitySelect = $(newRow.cells[3].childNodes[0]);
-
-            // Initialize city dropdown
-            city_lzloading($newCitySelect);
-
-            // Set city value after a short delay
-            setTimeout(function() {
-                var cityOption = new Option(prevCityName, prevCityId, true, true);
-                $newCitySelect.append(cityOption);
-                $newCitySelect.val(prevCityId).trigger('change');
-
-                // Copy hotel from previous row after city is set
-                setTimeout(function() {
-                    var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
-                    var prevHotelId = prevHotelSelect.val();
-                    var prevHotelName = prevHotelSelect.find('option:selected').text();
-
-                    if (prevHotelId && prevHotelName) {
-                        // Load hotels for the city
-                        hotel_name_list_load($newCitySelect.attr('id'));
-
-                        // Set hotel after hotels are loaded
-                        setTimeout(function() {
-                            var $newHotelSelect = $(newRow.cells[4].childNodes[0]);
-
-                            // Check if hotel exists in loaded options
-                            if ($newHotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
-                                $newHotelSelect.val(prevHotelId).trigger('change');
-                            } else {
-                                // Add hotel option if it doesn't exist
-                                var hotelOption = new Option(prevHotelName, prevHotelId, true, true);
-                                $newHotelSelect.append(hotelOption);
-                                $newHotelSelect.val(prevHotelId).trigger('change');
-                            }
-
-                            // Load hotel type
-                            hotel_type_load($newHotelSelect.attr('id'));
-                        }, 500);
-                    }
-                }, 200);
-            }, 100);
+        if (window.quotationAddingSingleHotelRow) {
+            return false;
         }
 
-        // Copy other fields from previous row
-        $(newRow.cells[2].childNodes[0]).val($(prevRow.cells[2].childNodes[0]).val()).trigger('change'); // Package type
-        $(newRow.cells[5].childNodes[0]).val($(prevRow.cells[5].childNodes[0]).val()).trigger('change'); // Room category
-        $(newRow.cells[8].childNodes[0]).val($(prevRow.cells[8].childNodes[0]).val()); // Hotel type
-        $(newRow.cells[16].childNodes[0]).val($(prevRow.cells[16].childNodes[0]).val()).trigger('change'); // Meal plan
+        var selectedPackageType = $('#package_type').val();
+        if (!selectedPackageType || selectedPackageType === '*Package Type') {
+            error_msg_alert('Please select Package Type!');
+            return false;
+        }
 
-        // Set row number
-        $(newRow.cells[1].childNodes[0]).val(parseInt($(prevRow.cells[1].childNodes[0]).val()) + 1);
+        var table = document.getElementById(tableID);
+        if (!table) {
+            return false;
+        }
 
-        // Initialize select2
-        $(newRow).find('.app_select2').select2();
-        initPackageQuotationMealPlanSelect(newRow);
+        var rowCountBefore = table.rows.length;
+        var prevRow = rowCountBefore > 0 ? table.rows[rowCountBefore - 1] : null;
+        var $btn = $('#addHotelInfoSingleRowbtnsubmit');
 
-        // Calculate hotel cost
-        get_hotel_cost();
+        window.quotationAddingSingleHotelRow = true;
+        $btn.prop('disabled', true);
+
+        window.quotationFreshPackageLoad = true;
+        addRow(tableID);
+        window.quotationFreshPackageLoad = false;
+
+        if (table.rows.length > rowCountBefore + 1) {
+            while (table.rows.length > rowCountBefore + 1) {
+                table.deleteRow(table.rows.length - 1);
+            }
+        }
+
+        var newRow = table.rows[table.rows.length - 1];
+        if (!newRow || !newRow.cells || newRow.cells.length < 17) {
+            window.quotationAddingSingleHotelRow = false;
+            $btn.prop('disabled', false);
+            return false;
+        }
+
+        if (typeof quotationResetHotelRowFields === 'function') {
+            quotationResetHotelRowFields(newRow, { packageType: selectedPackageType });
+        }
+        if (typeof quotationInitEditablePackageTypeSelect === 'function') {
+            quotationInitEditablePackageTypeSelect(newRow, selectedPackageType);
+        } else {
+            var $pkgSelect = $(newRow.cells[2].childNodes[0]);
+            $pkgSelect.prop('disabled', false)
+                .attr('data-editable-package-type', '1')
+                .val(selectedPackageType)
+                .trigger('change.select2');
+        }
+
+        var newSrNo = 1;
+        if (prevRow && prevRow.cells[1] && prevRow.cells[1].childNodes[0]) {
+            newSrNo = (parseInt(prevRow.cells[1].childNodes[0].value, 10) || rowCountBefore) + 1;
+        }
+        if (newRow.cells[1] && newRow.cells[1].childNodes[0]) {
+            newRow.cells[1].childNodes[0].value = newSrNo;
+        }
+
+        if (prevRow && typeof quotationGetHotelRowReference === 'function') {
+            var ref = quotationGetHotelRowReference(prevRow);
+            if (ref && ref.check_out && newRow.cells[6] && newRow.cells[6].childNodes[0]) {
+                newRow.cells[6].childNodes[0].value = ref.check_out;
+            }
+        }
+
+        if (typeof initAllHotelSelectAddNew === 'function') {
+            initAllHotelSelectAddNew(newRow);
+        }
+        if (typeof initAllRoomCategorySelectAddNew === 'function') {
+            initAllRoomCategorySelectAddNew(newRow);
+        }
+        if (typeof initPackageQuotationMealPlanSelect === 'function') {
+            initPackageQuotationMealPlanSelect(newRow);
+        }
+
+        if (typeof saveHotelTableState === 'function') {
+            saveHotelTableState();
+        }
+
+        window.quotationAddingSingleHotelRow = false;
+        $btn.prop('disabled', false);
+        return false;
     }
+    window.addHotelInfoSingleRow = addHotelInfoSingleRow;
+
+    $(document).off('click', '#addHotelInfoSingleRowbtnsubmit').on('click', '#addHotelInfoSingleRowbtnsubmit', function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        addHotelInfoSingleRow('tbl_package_tour_quotation_dynamic_hotel');
+        return false;
+    });
 
 
 function isAiQuotationActive() {

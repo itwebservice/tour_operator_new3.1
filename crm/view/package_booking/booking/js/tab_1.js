@@ -378,7 +378,7 @@ $(function () {
 				row.cells[7].childNodes[0].value = pass_count;
 			}
 			due_date_reflect();
-			get_auto_values('txt_booking_date','total_basic_amt','payment_mode','service_charge','markup','save','true','service_charge','discount');
+			get_auto_values('txt_booking_date','total_basic_amt','payment_mode','service_charge','markup','save','true','service_charge','discount_amt');
 
 			$('#tab_1_head').addClass('done');
 			$('#tab_2_head').addClass('active');
@@ -654,6 +654,9 @@ function set_booking_hotel_room_category(roomCatEl, hotelId, roomCategory) {
 		if (roomCategory) {
 			$roomCat.val(roomCategory).trigger('change');
 		}
+		if (typeof get_booking_hotel_cost === 'function') {
+			get_booking_hotel_cost();
+		}
 	});
 }
 
@@ -701,6 +704,9 @@ function load_booking_hotel_table(hotel_info_arr) {
 					if (mpRow && mpData.meal_plan) {
 						set_booking_meal_plan_select(booking_table_cell_control(mpRow.cells[8]), mpData.meal_plan);
 					}
+				}
+				if (typeof get_booking_hotel_cost === 'function') {
+					get_booking_hotel_cost();
 				}
 			}, 120);
 		}
@@ -1175,7 +1181,7 @@ function quotation_info_load() {
 				$('#txt_child_without_bed').val(response.children_without_bed);
 				$('#tax_apply_on').val(response.tax_apply_on);
 				$('#tax_value').val(response.tax_value);
-				$('#discount_in').val(response.discount_in);
+				setBookingDiscountIn(response.discount_in);
 				$('#discount_amt').val(response.discount);
 				$('#txt_special_request').html(response.enquiry_spec);
 				//Passenger Rows
@@ -1467,6 +1473,19 @@ function quotation_info_load() {
 	});
 }
 
+function setBookingDiscountIn(discountIn) {
+	var normalized = String(discountIn || '').trim();
+	if (normalized === '1') {
+		normalized = 'Percentage';
+	} else if (normalized === '2') {
+		normalized = 'Flat';
+	} else if (normalized !== 'Percentage' && normalized !== 'Flat') {
+		normalized = 'Percentage';
+	}
+	$('#discount_in').html('<option value="Percentage">Percentage</option><option value="Flat">Flat</option>');
+	$('#discount_in').val(normalized);
+}
+
 function mapQuotationTcsForSale(tcsper) {
 	tcsper = String(tcsper || '').trim();
 	if (tcsper === '' || tcsper === '0' || tcsper === '1' || tcsper === 'NaN') {
@@ -1520,14 +1539,14 @@ function get_package_type_costing() {
 			$('#txt_hotel_expenses').val(response.tour_cost || 0);
 			$('#service_charge').val(response.service_charge);
 			$('#total_basic_amt').val(response.tour_cost);
-			$('#discount_in').val(response.discount_in);
+			setBookingDiscountIn(response.discount_in);
 			$('#discount_amt').val(response.discount);
 			$('#tax_apply_on').val(response.tax_apply_on);
 			$('#tax_value').val(response.tax_value);
 			if (response.tour_cost !== undefined && response.tour_cost !== null) {
 				response.tour_cost = parseFloat(response.tour_cost).toFixed(2);
 			}
-			get_auto_values('txt_booking_date','total_basic_amt','payment_mode','service_charge','markup','save','true','service_charge','discount');
+			get_auto_values('txt_booking_date','total_basic_amt','payment_mode','service_charge','markup','save','true','service_charge','discount_amt');
 			applyQuotationTcs(response.tcsper, response.tcsvalue);
 		}
 });
@@ -1539,7 +1558,10 @@ function get_package_program(package) {
 		$.ajax({
 			type: 'post',
 			url: '../inc/package_hotel_info_load.php',
-			data: { package_id: package_id },
+			data: {
+				package_id: package_id,
+				from_date: $('#txt_package_from_date').val()
+			},
 
 			success: function (result) {
 				var result1 = JSON.parse(result);

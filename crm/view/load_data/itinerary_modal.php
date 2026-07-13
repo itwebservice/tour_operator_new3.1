@@ -114,6 +114,10 @@ textarea.form-control {
                         <input type="hidden" id="itinerary_image_<?= $count?>" name="itinerary_image" value="<?= $row_itinerary['itinerary_image'] ?? '' ?>">
                     </td>
                     <td class="hidden"><input type="text" id="entry_id<?= $count?>" name="entry_id" class="form-control" value="<?=$row_itinerary['entry_id']?>"></td>
+                      <td>
+              <button class="btn btn-sm btn-success" id="btn_update" style="margin-top: 35px;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
+
+                    </td>
                     </tr>
                     <?php
                 } ?>
@@ -130,11 +134,11 @@ textarea.form-control {
           <div class="col-md-12 col-sm-6 col-xs-12 mg_tp_10"></div>
         <?php }?>
         </div>
-          <div class="row mg_tp_10">
+          <!-- <div class="row mg_tp_10">
             <div class="col-xs-12 text-center">
               <button class="btn btn-sm btn-success" id="btn_update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
             </div>
-          </div>
+          </div> -->
 
 
 

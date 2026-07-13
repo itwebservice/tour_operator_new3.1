@@ -24,6 +24,8 @@ while($row_hotel = mysqli_fetch_assoc($sq_hotel)){
     'hotel_id1' => $row_hotel['hotel_name'],
     'city_name' => $city_name1,
     'hotel_name' => $hotel_name1,
+    'room_category' => $row_hotel['hotel_type'],
+    'total_rooms' => '1',
     'check_in_date' => $check_in_date,
     'check_out_date' => $check_out_date
   );
