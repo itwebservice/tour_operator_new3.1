@@ -99,7 +99,7 @@ $enable = ($sq_rp['payment_mode']=="Cash" || $sq_rp['payment_mode']=="Credit Not
                       <ul id="files" ></ul>
                       <input type="hidden" value="<?=$sq_rp['url']?>" id="payment_evidence_url1" name="payment_evidence_url">
                   </div>&nbsp;&nbsp;
-                  <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Upload JPG, JPEG, PNG or PDF only."><i class="fa fa-question-circle"></i></button>
+                  <button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Upload JPG, JPEG, PNG or PDF only."><i class="fa fa-question-circle"></i></button>
                 </div>
             </div>
 

@@ -161,16 +161,16 @@ while ($row_estimate = mysqli_fetch_assoc($sq_estimate)) {
 	}
 	$temp_arr = array("data" => array(
 		$row_estimate['estimate_id'],
-		get_date_user($date),
+		get_date_user($date).'<br>('.$emp_name.')',
 		$row_estimate['estimate_type'],
 		$estimate_type_val,
-		$row_estimate['vendor_type'],
-		$vendor_type_val,
-		$row_estimate['remark'],
+		$row_estimate['vendor_type'].' '.'('.
+		$vendor_type_val.')',
+		// $row_estimate['remark'],
 		number_format($row_estimate['net_total'], 2),
 		($cancel_amount == "") ? 0 : $cancel_amount,
 		number_format($purchase_amount, 2) . $currency_amount,
-		$emp_name,
+		// $emp_name,
 		$update_btn . $evidence . $cancel_button
 			. $removeDeleteBtn
 	), "bg" => $bg);

@@ -102,7 +102,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6 col-sm-6 mg_bt_10">
+                    <div class="col-md-9 col-sm-6 mg_bt_10">
                         <textarea id="txt_tour_note"
                             name="txt_tour_note"
                             class="form-control"

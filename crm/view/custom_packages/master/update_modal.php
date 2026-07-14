@@ -127,14 +127,14 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                     <div class="col-md-3 col-sm-6 mg_bt_10_xs">
 
                                         <input type="text" id="package_name1" name="package_name" class="form-control" placeholder="Package Name" title="Package Name" oninput="updateSlug()" value="<?php echo $sq_pckg['package_name']; ?>" onchange="package_name_validation(this.id);" <?= $readable ?> />
-                                        <button type="button" class="btn btn-excel btn-sm" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                        <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
 
                                     </div>
 
                                     <div class="col-md-3 col-sm-6 mg_bt_10_xs">
 
                                         <input type="text" id="package_code1" name="package_code1" class="form-control" placeholder="Package Code" title="Package Code" value="<?php echo $sq_pckg['package_code']; ?>" onchange="package_code_check(this.id);" />
-                                        <button type="button" class="btn btn-excel btn-sm" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                        <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
 
                                     </div>
 

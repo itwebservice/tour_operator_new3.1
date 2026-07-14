@@ -122,6 +122,7 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                         <li><span onclick="show_report_reflect('Fixed Asset Register')">Fixed Asset Register</span></li>
                         <li><span onclick="show_report_reflect('Bank Book')">Bank Book</span></li>
                         <li><span onclick="show_report_reflect('Cash Book')">Cash Book</span></li>
+						<li><span onclick="show_report_reflect('Party Wise Profit & Loss Report')">Party Wise P&L</span></li>
                       </ul>
                     </li>
                     <!-- Single Menu end -->
@@ -136,7 +137,7 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                     </li>
                     <!-- Single Menu end -->
 
-					<li class="dropdown">
+					<li class="dropdown" style="display: none;">
                       <a href="#">Party Wise Profit & Loss Report <span class="caret"></span></a>
                       <ul class="dropdown_menu no-pad">
                         <li><span onclick="show_report_reflect('Party Wise Profit & Loss Report')">Party Wise Profit & Loss Report</span></li>

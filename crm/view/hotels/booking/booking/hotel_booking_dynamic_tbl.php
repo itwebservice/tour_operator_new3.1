@@ -36,7 +36,7 @@
                 placeholder="*No Of Rooms" title="No Of Rooms" data-toggle="tooltip"
                 onchange="get_hotel_cost();">
         </td>
-        <td><select data-toggle="tooltip" style="width:120px" name="room_type<?= $prefix ?>1" id="room_type<?= $prefix ?>1"
+        <td style="display:none;"><select data-toggle="tooltip" style="width:120px" name="room_type<?= $prefix ?>1" id="room_type<?= $prefix ?>1"
                 title="Room Type">
                 <option value="">Room Type</option>
                 <option value="AC">AC</option>

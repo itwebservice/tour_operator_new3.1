@@ -27,6 +27,7 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                   <a href="#">Sales Summary <span class="caret"></span></a>
                   <ul class="dropdown_menu no-pad">
                     <li><span onclick="show_report_reflect('Complete Tour Summary')">Complete Tour Summary</span></li>
+                     <li><span onclick="show_report_reflect('All Sales')">Consolidated Sales Report</span></li>
                   </ul>
                 </li>
                 <!-- Single Menu end -->
@@ -63,7 +64,7 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                 <!-- Single Menu end -->
 
                    <!-- Single Menu start -->
-                <li class="dropdown">
+                <li class="dropdown" style="display:none;">
                   <a href="#">Consolidated Sales Report <span class="caret"></span></a>
                   <ul class="dropdown_menu no-pad">
                     <li><span onclick="show_report_reflect('All Sales')">All Sales</span></li>

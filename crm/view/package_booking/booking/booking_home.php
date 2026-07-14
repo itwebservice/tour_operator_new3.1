@@ -110,7 +110,7 @@ $('#booking_id_filter,#customer_id_filter,#cust_type_filter').select2();
 dynamic_customer_load('', '');
 
 var columns = [{
-        title: "INVOICE_NO"
+        title: "NO"
     },
     {
         title: "Booking_ID"
@@ -118,9 +118,9 @@ var columns = [{
     {
         title: "Customer_Name"
     },
-    {
-        title: "Tour"
-    },
+    // {
+    //     title: "Tour"
+    // },
     {
         title: "Amount",
         className: "info"
@@ -136,9 +136,9 @@ var columns = [{
     {
         title: "Created_by "
     },
-    {
-        title: "Booking_Date"
-    },
+    // {
+    //     title: "Booking_Date"
+    // },
     {
         title: "Actions",
         className: "text-center action_width",

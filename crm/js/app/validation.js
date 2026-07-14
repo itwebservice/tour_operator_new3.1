@@ -4406,22 +4406,23 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[4].childNodes[0].setAttribute("id", "max_pax" + foo.counter);
     row.cells[5].childNodes[0].setAttribute("id", "from_date" + foo.counter);
     row.cells[6].childNodes[0].setAttribute("id", "to_date" + foo.counter);
-    row.cells[7].childNodes[0].setAttribute("id", "badult_cost" + foo.counter);
-    row.cells[8].childNodes[0].setAttribute("id", "bcwb_cost" + foo.counter);
-    row.cells[9].childNodes[0].setAttribute("id", "bcwob_cost" + foo.counter);
+    row.cells[7].childNodes[0].setAttribute("id", "cadult_cost" + foo.counter);
+    row.cells[8].childNodes[0].setAttribute("id", "ccwb_cost" + foo.counter);
+    row.cells[9].childNodes[0].setAttribute("id", "ccwob_cost" + foo.counter);
     row.cells[10].childNodes[0].setAttribute(
-      "id",
-      "binfant_cost" + foo.counter
-    );
-    row.cells[11].childNodes[0].setAttribute("id", "bextra_cost" + foo.counter);
-    row.cells[12].childNodes[0].setAttribute("id", "cadult_cost" + foo.counter);
-    row.cells[13].childNodes[0].setAttribute("id", "ccwb_cost" + foo.counter);
-    row.cells[14].childNodes[0].setAttribute("id", "ccwob_cost" + foo.counter);
-    row.cells[15].childNodes[0].setAttribute(
       "id",
       "cinfant_cost" + foo.counter
     );
-    row.cells[16].childNodes[0].setAttribute("id", "cextra_cost" + foo.counter);
+    row.cells[11].childNodes[0].setAttribute("id", "cextra_cost" + foo.counter);
+    row.cells[12].childNodes[0].setAttribute("id", "badult_cost" + foo.counter);
+    row.cells[13].childNodes[0].setAttribute("id", "bcwb_cost" + foo.counter);
+    row.cells[14].childNodes[0].setAttribute("id", "bcwob_cost" + foo.counter);
+    row.cells[15].childNodes[0].setAttribute(
+      "id",
+      "binfant_cost" + foo.counter
+    );
+    row.cells[16].childNodes[0].setAttribute("id", "bextra_cost" + foo.counter);
+   
     row.cells[17].childNodes[0].setAttribute("id", "entry_id" + foo.counter);
 
     row.cells[5].childNodes[0].value = get_date();

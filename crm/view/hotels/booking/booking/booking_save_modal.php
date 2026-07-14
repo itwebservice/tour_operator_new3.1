@@ -106,19 +106,19 @@ $tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
                                 <input type="text" id="pass_name" name="pass_name" placeholder="Guest Name"
                                     title="Guest Name">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10">
                                 <input type="number" id="adults" name="adults" placeholder="Adult(s)" title="Adult(s)"
                                     onchange="validate_balance(this.id);get_hotel_cost();get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','service_charge','discount',true);">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10">
                                 <input type="number" id="childrens" name="childrens" placeholder="Child Without Bed(s)"
                                     title="Child Without Bed(s)" onchange="validate_balance(this.id);get_hotel_cost();get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','service_charge','discount',true)">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10">
                                 <input type="number" id="children_with" name="children_with" placeholder="Child With Bed(s)"
                                     title="Child With Bed(s)" onchange="validate_balance(this.id);get_hotel_cost();get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','service_charge','discount',true)">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10">
                                 <input type="number" id="infants" name="infants" placeholder="Infant(s)" title="Infant(s)"
                                     onchange="validate_balance(this.id)">
                             </div>
@@ -134,7 +134,7 @@ $tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
                         <legend>Hotel Details</legend>
                         <div class="row mg_bt_10">
                             <div class="col-md-6 text-left">
-                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button> 
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button> 
                             </div>
                             <div class="col-md-6 text-right">
                                 <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_hotel_booking');init_hotel_booking_row_select2();"><i class="fa fa-plus"></i></button>
@@ -156,19 +156,19 @@ $tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
                     <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_30">
                         <legend>Costing Details</legend>
                         <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xs-12">
+                            <div class="col-md-2 col-sm-6 col-xs-12">
                                 <small id="basic_show" style="color:red">&nbsp;</small>
                                 <input type="text" id="sub_total" name="sub_total" placeholder="*Basic Amount"
                                     title="Basic Amount"
                                     onchange="get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','basic','discount');validate_balance(this.id)">
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12 ">
+                            <div class="col-md-2 col-sm-6 col-xs-12 ">
                                 <small id="service_show" style="color:red">&nbsp;</small>
                                 <input type="text" id="service_charge" name="service_charge"
                                     placeholder="Service Charge" title="Service Charge"
                                     onchange="total_fun();validate_balance(this.id);get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','service_charge','discount')">
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <select title="Tax Apply On" id="tax_apply_on" name="tax_apply_on" class="form-control" onchange="get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','basic','discount');">
                                     <option value="">*Tax Apply On</option>
@@ -177,123 +177,123 @@ $tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
                                     <option value="3">Total</option>
                                 </select>
                             </div> 
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <select title="Select Tax" id="tax_value" name="tax_value" class="form-control" onchange="get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','basic','discount');">
                                     <option value="">*Select Tax</option>
                                     <?php get_tax_dropdown('Income') ?>
                                 </select>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                        <!-- </div> -->
+                        <!-- <div class="row"> -->
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <input type="text" id="service_tax_subtotal" name="service_tax_subtotal"
                                     placeholder="Tax Amount" title="Tax Amount" readonly>
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small id="markup_show" style="color:red">&nbsp;</small>
                                 <input type="text" id="markup" name="markup" placeholder="Markup Amount"
                                     title="Markup Amount"
                                     onchange="total_fun();get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','markup','discount');validate_balance(this.id)">
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <select title="Select Markup Tax" id="markup_tax_value" name="markup_tax_value" class="form-control" onchange="get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','basic','discount');">
                                     <option value="">*Select Markup Tax</option>
                                     <?php get_tax_dropdown('Income') ?>
                                 </select>
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <input type="text" id="service_tax_markup" name="service_tax_markup"
                                     placeholder="Tax on Markup" title="Tax on Markup" readonly>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                        <!-- </div>
+                        <div class="row"> -->
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small id="discount_show" style="color:red">&nbsp;</small>
                                 <input type="text" id="discount" name="discount" placeholder="Discount "
                                     title="Discount" value='0'
                                     onchange="total_fun();get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','discount','discount');validate_balance(this.id)">
                             </div>
-                             <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                             <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
-                                <label for="tcs_tax">TCS</label>
+                                <!-- <label for="tcs_tax">TCS</label> -->
                                 <select title="Select Tax" id="tcs_tax" name="tcs_tax" class="form-control">
-                                    <option value="">*Select Tax</option>
+                                    <option value="">*Select TCS Tax</option>
 									<option value="2">2% TCS</option>
 									<option value="20">20% TCS</option>
                                 </select>
                             </div>
                             
-                             <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
-                                <label for="tds">TCS</label>
+                             <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
+                                <!-- <label for="tds">TCS</label> -->
                                 <input type="number" name="tcs1" id="tcs1" readonly class="text-right"
                                     placeholder="TCS" title="TCS" value="0.00">
                                     
                             </div>
                             
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
-                                <label for="tds">TDS</label>
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
+                                <!-- <label for="tds">TDS</label> -->
                                 <input type="number" name="tds" id="tds"  class="text-right"
                                     placeholder="TDS" title="TDS" value="0.00" onchange="total_fun();">
                                     
-                            </div>
-                                
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            </div></div>
+                        <div class="row"> 
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <input type="text" name="roundoff" id="roundoff" placeholder="Round Off"
                                     title="RoundOff" readonly>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                        <!-- </div>
+                        <div class="row"> -->
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <input type="text" name="total_fee" id="total_fee"
                                     class="amount_feild_highlight text-right" placeholder="Net Total" title="Net Total"
                                     readonly>
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <input type="text" name="due_date" id="due_date" placeholder="Due Date" title="Due Date"
                                     value="<?= date('d-m-Y') ?>">
                             </div>
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <input type="text" name="booking_date" id="booking_date" placeholder="Booking Date"
                                     value="<?= date('d-m-Y') ?>" title="Booking Date"
                                     onchange="check_valid_date(this.id);get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','service_charge','discount');">
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10 mg_tp_10" id="currency_div">
+                        <!-- </div>
+                        <div class="row"> -->
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10 mg_tp_10" id="currency_div">
                             </div>
                         </div>
                     </div>
                     <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_30">
                         <legend>Advance Details</legend>
                         <div class="row">
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <input type="text" id="payment_date" name="payment_date" class="form-control"
                                     placeholder="Date" title="Date" value="<?= date('d-m-Y') ?>"
                                     onchange="check_valid_date(this.id)">
                             </div>
 
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <select name="payment_mode" id="payment_mode" class="form-control" title="Mode"
                                     onchange="get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','service_charge','discount');payment_master_toggles(this.id, 'bank_name', 'transaction_id', 'bank_id');get_identifier_block('identifier','payment_mode','credit_card_details','credit_charges');get_credit_card_charges('identifier','payment_mode','payment_amount','credit_card_details','credit_charges')">
                                     <?php echo get_payment_mode_dropdown(); ?>
                                 </select>
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <input type="text" id="payment_amount" name="payment_amount" class="form-control"
                                     placeholder="*Amount" title="Amount"
                                     onchange="payment_amount_validate(this.id,'payment_mode','transaction_id','bank_name','bank_id');get_credit_card_charges('identifier','payment_mode','payment_amount','credit_card_details','credit_charges');validate_balance(this.id)">
                             </div>
-                        </div>
-                        <div class="row mg_bt_10">
-                            <div class="col-md-4 col-sm-6 col-xs-12">
+                        <!-- </div> -->
+                        <!-- <div class="row mg_bt_10"> -->
+                            <!-- <div class="col-md-4 col-sm-6 col-xs-12">
                                 <input class="hidden" type="text" id="credit_charges" name="credit_charges"
                                     title="Credit card charges" disabled>
                             </div>
@@ -307,30 +307,30 @@ $tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
                             <div class="col-md-4 col-sm-6 col-xs-12">
                                 <input class="hidden" type="text" id="credit_card_details" name="credit_card_details"
                                     title="Credit card details" disabled>
-                            </div>
-                        </div>
-                        <div class="row mg_bt_10">
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            </div> -->
+                        <!-- </div> -->
+                        <!-- <div class="row mg_bt_10"> -->
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <input type="text" id="bank_name" name="bank_name" class="form-control bank_suggest"
                                     placeholder="Bank Name" title="Bank Name" disabled>
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <input type="number" id="transaction_id" name="transaction_id"
                                     onchange="validate_specialChar(this.id)" class="form-control"
                                     placeholder="Cheque No/ID" title="Cheque No/ID" disabled>
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <select name="bank_id" id="bank_id" title="Select Bank" disabled>
                                     <?php get_bank_dropdown(); ?>
                                 </select>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-9 col-sm-9">
+                        <!-- </div> -->
+                        <!-- <div class="row">
+                            <div class="col-md-9 col-sm-9 hidden">
                                 <span style="color: red;line-height: 35px;" data-original-title="" title=""
                                     class="note"><?= $txn_feild_note ?></span>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="row text-center  mg_bt_20">
                         <div class="col-xs-12">

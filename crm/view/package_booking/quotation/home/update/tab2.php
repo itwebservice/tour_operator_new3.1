@@ -191,7 +191,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                         ?>
                     </select>
                 </div>
-                <div class="col-md-6 col-sm-4 col-xs-12 mg_bt_20 text-right">
+                <div class="col-md-6 col-sm-4 col-xs-12 mg_bt_20 text-right hidden">
                     <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : The Package is not available for this Destination.Please create here."><i class="fa fa-question-circle"></i></button>
 
                     <a href="../../../../custom_packages/master/index.php" target='_blank' class="btn btn-sm" style="

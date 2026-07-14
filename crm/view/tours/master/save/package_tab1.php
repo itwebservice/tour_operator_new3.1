@@ -47,7 +47,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                         <input type="text" id="seo_slug" name="seo_slug" class="form-control" placeholder="*SEO friendly slug" title="SEO friendly slug" readonly />
                     </div>
                     <?php } ?>
-                    <div class="col-md-3 col-sm-6 mg_bt_10">
+                    <div class="col-md-9 col-sm-9 mg_bt_10">
                         <textarea class="form-control"
                             id="tour_note"
                             name="tour_note"

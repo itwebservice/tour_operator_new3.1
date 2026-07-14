@@ -73,7 +73,133 @@ $exc_name = ($sq_exc['excursion_name']);
 														</select>
 													</div>
 												</div>
-												<div class="row mg_bt_20">
+
+												<div class="row mg_bt_10">
+													<div class="col-md-3 mg_bt_10">
+														<?php $sq_currency1 = mysqli_fetch_assoc(mysqlQuery("select * from currency_name_master where id='$sq_exc[currency_code]'")); ?>
+														<select name="currency_code1" id="currency_code1" title="Currency" style="width:100%" class="form-control app_select2">
+															<option value='<?= $sq_currency1['id'] ?>'><?= $sq_currency1['currency_code'] ?></option>
+															<?php
+															$sq_currency = mysqlQuery("select * from currency_name_master order by default_currency desc");
+															while ($row_currency = mysqli_fetch_assoc($sq_currency)) {
+															?>
+																<option value="<?= $row_currency['id'] ?>"><?= $row_currency['currency_code'] ?></option>
+															<?php } ?>
+														</select>
+													</div>
+												</div>
+												<div class="col-md-12">
+													<div class="row mg_bt_10">
+														<div class="row text-right mg_bt_10">
+															<button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('table_exc_tarrif_basic')"><i class="fa fa-plus"></i></button>
+														</div>
+														<div class="row">
+															<div class="col-md-12">
+																<div class="table-responsive">
+																	<table id="table_exc_tarrif_basic" name="table_exc_tarrif_basic" class="table table-bordered no-marg pd_bt_51" style="width:100%">
+																		<?php
+																		$sq_bcount = mysqli_num_rows(mysqlQuery("select * from excursion_master_tariff_basics where exc_id='$entry_id'"));
+																		if ($sq_bcount == 0) {
+																		?>
+																			<tr>
+																				<td><input class="css-checkbox" id="chk_basic" type="checkbox" checked><label class="css-label" for="chk_basic"> </label></td>
+																				<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
+																				<td><select name="transfer_option" id="transfer_option" data-toggle="tooltip" class="form-contrl app_select2" title="Transfer Option" style="width:150px">
+																						<option value="">*Transfer Option</option>
+																						<option value="Without Transfer">Without Transfer</option>
+																						<option value="Sharing Transfer">Sharing Transfer</option>
+																						<option value="Private Transfer">Private Transfer</option>
+																						<option value="SIC">SIC</option>
+																					</select></td>
+																				<td><input type="text" id="from_date_basic" class="form-control" name="from_date_basic" placeholder="Valid From" title="Valid From" value="<?= date('d-m-Y') ?>" style="width:120px" onchange="get_to_date(this.id,'to_date_basic')" /></td>
+																				<td><input type="text" id="to_date_basic" class="form-control" name="to_date_basic" placeholder="Valid To " title="Valid To" onchange="validate_validDate('from_date_basic','to_date_basic')" value="<?= date('d-m-Y') ?>" style="width:120px" /></td>
+																				<td><input type="text" id="adult_cost" name="adult_cost" placeholder="*Adult Ticket Cost" title="Adult Ticket Cost" onchange="validate_balance(this.id);" style="width:120px"></td>
+																				<td><input type="text" id="child_cost" name="child_cost" placeholder="*Child Ticket Cost" title="Child Ticket Cost" onchange="validate_balance(this.id);" style="width:120px"></td>
+																				<td><input type="text" id="infant_cost" name="infant_cost" placeholder="Infant Ticket Cost" title="Infant Ticket Cost" onchange="validate_balance(this.id);" style="width:120px"></td>
+																				<td><input type="number" id="transfer_cost" name="transfer_cost" placeholder="Transfer Cost" title="Transfer Cost" style="width:155px"></td>
+																				<td><select name="vehicle_id" id="vehicle_id" style="width: 155px" class="form-control app_select2" title="Select Vehicle">
+																						<option value=''>Select Vehicle</option>
+																						<?php
+																						$sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+																						while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+																						?>
+																							<option value="<?= $row_vehicle['entry_id'] ?>">
+																								<?= $row_vehicle['vehicle_name'] ?></option>
+																						<?php } ?>
+																					</select></td>
+																				<td><select name="markup_in" id="markup_in" style="width: 125px" class="form-control app_select2" title="Markup In">
+																						<option value=''>Amount In</option>
+																						<option value='Flat'>Flat</option>
+																						<option value='Percentage'>Percentage</option>
+																					</select></td>
+																				<td><input type='number' id="amount" name="amount" placeholder="Markup Amount" class="form-control" title="Markup Amount" style="width: 147px;" onchange="validate_balance(this.id);" /></td>
+																				<td><input type="hidden" id="entry_id" name="entry_id" /></td>
+																			</tr>
+																		<?php } else { ?>
+																			<?php $count = 1;
+																			$sq_basic = mysqlQuery("select * from excursion_master_tariff_basics where exc_id='$entry_id'");
+																			while ($row_basic = mysqli_fetch_assoc($sq_basic)) { ?>
+																				<tr>
+																					<td><input class="css-checkbox" id="chk_basic<?= $count ?>-u" type="checkbox" checked><label class="css-label" for="chk_basic<?= $count ?>-u"> </label></td>
+																					<td><input maxlength="15" value="<?= $count ?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
+																					<td><select name="transfer_option-u<?= $count ?>" id="transfer_option-u<?= $count ?>" class="form-control app_select2" data-toggle="tooltip" title="Transfer Option" style="width: 150px;">
+																							<option value="<?= $row_basic['transfer_option'] ?>"><?= $row_basic['transfer_option'] ?></option>
+																							<option value="">*Transfer Option</option>
+																							<option value="Without Transfer">Without Transfer</option>
+																							<option value="Sharing Transfer">Sharing Transfer</option>
+																							<option value="Private Transfer">Private Transfer</option>
+																							<option value="SIC">SIC</option>
+																						</select></td>
+																					<td><input type="text" id="from_date_basic-u<?= $count ?>" class="form-control" name="from_date_basic-u<?= $count ?>" placeholder="Valid From" title="Valid From" value="<?= get_date_user($row_basic['from_date']) ?>" style="width: 120px;" onchange="get_to_date(this.id,'to_date_basic-u<?= $count ?>')" /></td>
+																					<td><input type="text" id="to_date_basic-u<?= $count ?>" class="form-control" name="to_date_basic-u<?= $count ?>" placeholder="Valid To " title="Valid To" onchange="validate_validDate('from_date_basic-u<?= $count ?>','to_date_basic-u<?= $count ?>')" value="<?= get_date_user($row_basic['to_date']) ?>" style="width: 120px;" /></td>
+																					<td><input type="text" id="adult_cost-u" name="adult_cost-u" placeholder="*Adult Ticket Cost" title="Adult Ticket Cost" value='<?= $row_basic['adult_cost'] ?>' onchange="validate_balance(this.id);" style="width: 155px;"></td>
+																					<td><input type="text" id="child_cost-u" name="child_cost-u" placeholder="*Child Ticket Cost" title="Child Ticket Cost" value='<?= $row_basic['child_cost'] ?>' onchange="validate_balance(this.id);" style="width: 155px;"></td>
+																					<td><input type="text" id="infant_cost-u" name="infant_cost" placeholder="Infant Ticket Cost" title="Infant Ticket Cost" onchange="validate_balance(this.id);" value='<?= $row_basic['infant_cost'] ?>' style="width: 155px;"></td>
+																					<td><input type="number" id="transfer_cost" name="transfer_cost" placeholder="Transfer Cost" title="Transfer Cost" value='<?= $row_basic['transfer_cost'] ?>' style="width:155px"></td>
+																					<td><select name="vehicle_id-u<?= $count ?>" id="vehicle_id-u<?= $count ?>" style="width: 155px" class="form-control app_select2" title="Select Vehicle">
+																							<?php 
+																							if(!empty($row_basic['vehicle_id'])){
+																								$sq_sel_vehicle = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id='".$row_basic['vehicle_id']."'"));
+																								if($sq_sel_vehicle){ ?>
+																									<option value="<?= $sq_sel_vehicle['entry_id'] ?>"><?= $sq_sel_vehicle['vehicle_name'] ?></option>
+																							<?php }
+																							} ?>
+																							<option value=''>Select Vehicle</option>
+																							<?php
+																							$sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+																							while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+																							?>
+																								<option value="<?= $row_vehicle['entry_id'] ?>">
+																									<?= $row_vehicle['vehicle_name'] ?></option>
+																							<?php } ?>
+																						</select></td>
+																					<td><select name="markup_in" id="markup_in-u" style="width: 125px" class="form-control app_select2" title="Markup In">
+																							<?php if ($row_basic['markup_in'] != '') { ?> <option value="<?= $row_basic['markup_in'] ?>"><?= $row_basic['markup_in'] ?></option> <?php } ?>
+																							<option value=''>Amount In</option>
+																							<option value='Flat'>Flat</option>
+																							<option value='Percentage'>Percentage</option>
+																						</select></td>
+																					<td><input type='number' id="amount-u" name="amount" placeholder="Markup Amount" value='<?= $row_basic['markup_cost'] ?>' class="form-control" title="Markup Amount" style="width: 165px;" onchange="validate_balance(this.id);" /></td>
+																					<td><input type="hidden" id="entry_id" name="entry_id" value='<?= $row_basic['entry_id'] ?>' /></td>
+																				</tr>
+																				<script>
+																					$('#transfer_option-u<?= $count ?>,#vehicle_id-u<?= $count ?>').select2({
+																						dropdownParent: $("#update_modal")
+																					});
+																					$('#from_date_basic-u<?= $count ?>,#to_date_basic-u<?= $count ?>').datetimepicker({
+																						timepicker: false,
+																						format: 'd-m-Y'
+																					});
+																				</script>
+																		<?php $count++;
+																			}
+																		} ?>
+																	</table>
+																</div>
+															</div>
+														</div>
+													</div>
+												<div class="row mg_bt_20 hidden">
 													<div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
 														<h3 class="editor_title">Useful Information</h3>
 														<textarea class="feature_editor" id="upolicy" name="upolicy" placeholder="Booking Policy" title="Booking Policy" rows="3"><?= $sq_exc['useful_info'] ?></textarea>
@@ -91,7 +217,7 @@ $exc_name = ($sq_exc['excursion_name']);
 										</div>
 									</div>
 								</div>
-								<div class="accordion_content package_content mg_bt_10">
+								<div class="accordion_content package_content mg_bt_10 hidden">
 									<div class="panel panel-default main_block">
 										<div class="panel-heading main_block" role="tab" id="heading2">
 											<div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="collapsed1">
@@ -357,6 +483,20 @@ $exc_name = ($sq_exc['excursion_name']);
 																<textarea class="feature_editor" id="terms" name="terms" placeholder="Terms & Conditions" title="Terms & Conditions" rows="3"><?= $sq_exc['terms_condition'] ?></textarea>
 															</div>
 														</div>
+														<div class="row mg_bt_20">
+													<div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
+														<h3 class="editor_title">Useful Information</h3>
+														<textarea class="feature_editor" id="upolicy" name="upolicy" placeholder="Booking Policy" title="Booking Policy" rows="3"><?= $sq_exc['useful_info'] ?></textarea>
+													</div>
+													<div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
+														<h3 class="editor_title">Booking Policy</h3>
+														<textarea class="feature_editor" id="bpolicy" name="bpolicy" placeholder="Booking Policy" title="Booking Policy" rows="3"><?= $sq_exc['booking_policy'] ?></textarea>
+													</div>
+													<div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
+														<h3 class="editor_title">Cancellation Policy</h3>
+														<textarea class="feature_editor" id="cpolicy" name="cpolicy" placeholder="Cancellation Policy" title="Cancellation Policy" rows="3"><?= $sq_exc['canc_policy'] ?></textarea>
+													</div>
+												</div>
 													</div>
 												</div>
 											</div>
@@ -383,7 +523,7 @@ $exc_name = ($sq_exc['excursion_name']);
 								<ul id="files"></ul>
 								<input type="hidden" id="photo_upload_url_i1" name="photo_upload_url_i1" value="<?= $images_url ?>">
 							</div>(Upload Maximum 3 images)
-							<button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note: Image size should be less than 100KB,resolution : 900X450."><i class="fa fa-question-circle"></i></button>
+							<button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note: Image size should be less than 100KB,resolution : 900X450."><i class="fa fa-question-circle"></i></button>
 						</div>
 					</div>
 					<div class="row mg_tp_20 mg_bt_20" id="images_list"></div>

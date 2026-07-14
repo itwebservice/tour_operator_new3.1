@@ -24,7 +24,7 @@ $nofquotation = $_REQUEST['nofquotation'];
                         <div class="col-md-12 no-pad" id="div_list1">
                             <div class="row mg_bt_10">
                                 <div class="col-xs-6 text_center_xs">
-                                    <button type="button" class="btn btn-excel btn-sm" onclick="hotel_save_modal()"><i class="fa fa-plus" title="Add Hotel"></i></button>
+                                    <button type="button" class="btn btn-excel btn-sm hidden" onclick="hotel_save_modal()"><i class="fa fa-plus" title="Add Hotel"></i></button>
                                 </div>
                                 <div class="col-xs-6 text-right text_center_xs">
                                     <button type="button" class="btn btn-excel btn-sm" onClick="addRow('dynamic_table_list_h_<?= $i ?>','<?= $i ?>');city_lzloading('.city_master_dropdown');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#dynamic_table_list_h_<?= $i ?>');}if(typeof initAllRoomCategorySelectAddNew==='function'){initAllRoomCategorySelectAddNew('#dynamic_table_list_h_<?= $i ?>');}"><i class="fa fa-plus"></i></button>

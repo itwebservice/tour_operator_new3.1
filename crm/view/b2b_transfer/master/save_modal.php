@@ -35,7 +35,7 @@
                                 <ul id="files"></ul>
                                 <input type="hidden" id="image_upload_url" name="image_upload_url" required>
                             </div>
-		                    <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : Upload Image size below 100KB, resolution : 900X450."><i class="fa fa-question-circle"></i></button>
+		                    <button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note : Upload Image size below 100KB, resolution : 900X450."><i class="fa fa-question-circle"></i></button>
                         </div>
                     </div>
                     <div class="row mg_tp_20">

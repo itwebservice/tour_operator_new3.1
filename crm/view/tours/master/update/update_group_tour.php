@@ -21,7 +21,7 @@ $readable = ($b2c_flag == '1') ? 'readonly':'';
                 <span class="text">Travelling</span>
             </a>
         </li>
-        <li>
+        <li class="hidden">
             <a href="javascript:void(0)" id="tab3_head">
                 <span class="num" title="Daywise Images">3<i class="fa fa-check"></i></span><br>
                 <span class="text">Daywise Images</span>

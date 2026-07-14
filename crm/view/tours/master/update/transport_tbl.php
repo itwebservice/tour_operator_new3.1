@@ -1,6 +1,6 @@
 <div class="row mg_bt_10">
     <div class="col-md-6">
-        <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
+        <button type="button" class="btn btn-excel btn-sm hidden" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
         <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('vehicle_name1')"><i class="fa fa-plus"></i></button>
         <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
     </div>
