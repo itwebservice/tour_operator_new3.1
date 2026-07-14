@@ -98,20 +98,20 @@ else if($reflections[0]->tax_apply_on == '3') {
                                 <input type="text" id="pass_name1" name="pass_name1" placeholder="Guest Name"
                                     title="Guest Name" value="<?= $sq_booking['pass_name'] ?>">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10_sm_xs">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10_sm_xs">
                                 <input type="text" id="adults1" name="adults1" placeholder="Adult(s)" title="Adult(s)"
                                     value="<?= $sq_booking['adults'] ?>"
                                     onchange="get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','discount1',true);validate_balance(this.id)">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10_sm_xs">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10_sm_xs">
                                 <input type="text" id="childrens1" name="childrens1" placeholder="Child Without Bed(s)"
                                     title="Child Without Bed(s)" value="<?= $sq_booking['childrens'] ?>"
                                     onchange="get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','discount1',true);validate_balance(this.id)">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10">
                                 <input type="number" id="children_with1" name="children_with1" placeholder="Child With Bed(s)" title="Child With Bed(s)" onchange="validate_balance(this.id);get_auto_values('booking_date','sub_total','payment_mode','service_charge','markup','save','true','service_charge','discount',true)" value="<?= $sq_booking['child_with_bed'] ?>">
                             </div>
-                            <div class="col-sm-3 col-xs-12 mg_bt_10_sm_xs">
+                            <div class="col-sm-2 col-xs-12 mg_bt_10_sm_xs">
                                 <input type="text" id="infants1" name="infants1" placeholder="Infant(s)"
                                     title="Infant(s)" value="<?= $sq_booking['infants'] ?>"
                                     onchange="validate_balance(this.id)">
@@ -218,7 +218,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                                     name="rooms<?= $prefix . $count ?>_f" placeholder="*No Of Rooms"
                                                     title="No Of Rooms" onchange="validate_balance(this.id)"
                                                     value="<?= $row_entry['rooms'] ?>"></td>
-                                            <td><select name="room_type<?= $prefix . $count ?>_f" style="width:120px;"
+                                            <td style="display:none;"><select name="room_type<?= $prefix . $count ?>_f" style="width:120px;"
                                                     id="room_type<?= $prefix . $count ?>_f" title="Room Type">
                                                     <?php if ($row_entry['room_type'] != '') { ?>
                                                     <option value="<?= $row_entry['room_type'] ?>">
@@ -341,14 +341,14 @@ else if($reflections[0]->tax_apply_on == '3') {
                     <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_30">
                         <legend>Costing Details</legend>
                         <div class="row mg_tp_20">
-                            <div class="col-md-4 col-sm-6 col-xs-12">
+                            <div class="col-md-2 col-sm-6 col-xs-12">
                                 <small id="basic_show1"
                                     style="color:red"><?= ($inclusive_b == '') ? '&nbsp;' : 'Inclusive Amount : <span>' . $inclusive_b ?></span></small>
                                 <input type="text" id="sub_total1" name="sub_total1" placeholder="Basic Amount" title="Basic Amount"
                                     onchange="get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','service_charge','discount1');total_fun1();validate_balance(this.id)"
                                     value="<?= $sub_total ?>">
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12">
+                            <div class="col-md-2 col-sm-6 col-xs-12">
                                 <small id="service_show1"
                                     style="color:red"><?= ($inclusive_s == '') ? '&nbsp;' : 'Inclusive Amount : <span>' . $inclusive_s ?></span></small>
                                 <input type="text" id="service_charge1" name="service_charge1"
@@ -356,15 +356,15 @@ else if($reflections[0]->tax_apply_on == '3') {
                                     onchange="total_fun1();validate_balance(this.id);get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','service_charge','discount1');"
                                     value="<?= $service_charge ?>">
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12">
+                            <div class="col-md-2 col-sm-6 col-xs-12">
                                 <small>&nbsp;</small>
                                 <input type="text" id="service_tax_subtotal1" name="service_tax_subtotal1"
                                     placeholder="Tax Amount" title="Tax Amount" readonly
                                     value="<?= $sq_booking['service_tax_subtotal'] ?>">
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                        <!-- </div>
+                        <div class="row"> -->
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small id="markup_show1"
                                     style="color:red"><?= ($inclusive_m == '') ? '&nbsp;' : 'Inclusive Amount : <span>' . $inclusive_m ?></span></small>
                                 <input type="text" id="markup1" name="markup1" placeholder="Markup Amount"
@@ -372,13 +372,13 @@ else if($reflections[0]->tax_apply_on == '3') {
                                     onchange="total_fun1();get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','markup','discount1');validate_balance(this.id)"
                                     value="<?= $markup ?>">
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small>&nbsp;</small>
                                 <input type="text" id="service_tax_markup1" name="service_tax_markup1"
                                     placeholder="Tax on Markup" title="Tax on Markup"
                                     value="<?= $sq_booking['markup_tax'] ?>" readonly>
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <small id="discount_show1"
                                     style="color:red"><?= ($inclusive_d == '') ? '&nbsp;' : 'Inclusive Amount : <span>' . $inclusive_d ?></span></small>
                                 <input type="text" id="discount1" name="discount1" placeholder="Discount"
@@ -387,46 +387,47 @@ else if($reflections[0]->tax_apply_on == '3') {
                                     value="<?= $sq_booking['discount'] ?>">
                             </div>
                         </div>
-                        <div class="row">
-                        <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                        <div class="row mg_bt_10">
+                        <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                         <small>&nbsp;</small>
-                                        <label for="tcs_tax">Select TCS Tax</label>
+                                        <!-- <label for="tcs_tax">Select TCS Tax</label> -->
                                         <select title="Select Tax" id="tcs_tax" name="tcs_tax" class="form-control">
-                                            <option value="">Select Tax</option>
+                                            <option value="">Select TCS Tax</option>
 											<option value="2" <?php if($sq_booking['tcs_per']==2){ echo "selected"; } ?>>2% TCS</option>
 											<option value="20" <?php if($sq_booking['tcs_per']==20){ echo "selected"; } ?>>20% TCS</option>
                                         </select>
                                     </div>
                        
                         
-                             <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                             <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                  <input type="hidden" id="tcs_tax1" name="tcs_tax" value="<?=$sq_booking['tcs_per']?>">
-                                <label for="tcs1">TCS</label>
+                                <!-- <label for="tcs1">TCS</label> -->
                                 <input type="number" name="tcs1" id="tcs1" readonly class="text-right"  placeholder="TCS" title="TCS" value="<?=$sq_booking['tcs_tax']?>">
                                     
                             </div>
                             
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
-                                <label for="tds">TDS</label>
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
+                                <!-- <label for="tds">TDS</label> -->
                                 <input type="number" name="tds1" id="tds1"  class="text-right"  placeholder="TDS" title="TDS" value="<?= $sq_booking['tds'] ?>"  onchange="total_fun1();">
                             </div>
                             
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <input type="text" name="roundoff1" id="roundoff1" class="text-right"  placeholder="Round Off" title="RoundOff" value="<?= $sq_booking['roundoff'] ?> " readonly>
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <input type="text" name="total_fee1" id="total_fee1" class="amount_feild_highlight text-right" placeholder="Net Total" title="Net Total" value="<?= $sq_booking['total_fee'] ?>" readonly>
                                 <input type="hidden" id="old_total" value="<?= $sq_booking['total_fee'] ?>">
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
                                 <input type="text" name="due_date1" id="due_date1" placeholder="Due Date" title="Due Date" value="<?= get_date_user($sq_booking['due_date']) ?>">
                             </div>
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10_xs">
+                        </div>
+                            <div class="row mg_bt_10">
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10_xs">
                                 <input type="text" name="booking_date1" id="booking_date1" placeholder="Booking Date" value="<?= get_date_user($sq_booking['created_at']) ?>" title="Booking Date" onchange="check_valid_date(this.id);get_auto_values('booking_date1','sub_total1','payment_mode','service_charge1','markup1','update','true','service_charge','discount1');">
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 col-sm-6 col-xs-12 mg_bt_10_xs">
+
+                            <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10_xs">
                                 <select name="currency_code" id="acurrency_code1" title="Currency" style="width:100%"  data-toggle="tooltip" required>
                                     <?php
                                     $sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . $sq_booking['currency_code']));
@@ -444,6 +445,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                 </select>
                             </div>
                         </div>
+                       
                     </div>
                     <div class="row text-center mg_tp_20 mg_bt_20">
                         <div class="col-xs-12">

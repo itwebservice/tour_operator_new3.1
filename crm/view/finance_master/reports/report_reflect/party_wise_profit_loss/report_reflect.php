@@ -12,6 +12,8 @@ $array_s = array();
 $temp_arr = array();
 $count = 0;
 
+$till_date = date('Y-m-d');
+
 // Totals
 $total_sale_without_tax = 0;
 $total_purchase_without_tax = 0;
@@ -67,6 +69,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and booking_date between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and booking_date < '$till_date'";
 }
 $sq_package = mysqlQuery($query);
 while ($row_package = mysqli_fetch_assoc($sq_package)) {
@@ -120,6 +124,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and form_date between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and form_date < '$till_date'";
 }
 $sq_group = mysqlQuery($query);
 while ($row_group = mysqli_fetch_assoc($sq_group)) {
@@ -171,6 +177,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $hotel_result = mysqlQuery($query);
 while ($row_hotel = mysqli_fetch_assoc($hotel_result)) {
@@ -222,6 +230,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $sq_car = mysqlQuery($query);
 while ($row_car = mysqli_fetch_assoc($sq_car)) {
@@ -273,6 +283,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $sq_flight = mysqlQuery($query);
 while ($row_flight = mysqli_fetch_assoc($sq_flight)) {
@@ -324,6 +336,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $sq_activity = mysqlQuery($query);
 while ($row_activity = mysqli_fetch_assoc($sq_activity)) {
@@ -375,6 +389,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $sq_visa = mysqlQuery($query);
 while ($row_visa = mysqli_fetch_assoc($sq_visa)) {
@@ -426,6 +442,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $sq_train = mysqlQuery($query);
 while ($row_train = mysqli_fetch_assoc($sq_train)) {
@@ -477,6 +495,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $sq_bus = mysqlQuery($query);
 while ($row_bus = mysqli_fetch_assoc($sq_bus)) {
@@ -528,6 +548,8 @@ if ($from_date != "" && $to_date != "") {
 	$from_date_db = date('Y-m-d', strtotime($from_date));
 	$to_date_db = date('Y-m-d', strtotime($to_date));
 	$query .= " and created_at between '$from_date_db' and '$to_date_db'";
+}else{
+	$query .= " and created_at < '$till_date'";
 }
 $sq_misc = mysqlQuery($query);
 while ($row_misc = mysqli_fetch_assoc($sq_misc)) {

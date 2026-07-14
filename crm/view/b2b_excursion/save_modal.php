@@ -26,7 +26,7 @@ include "../../model/model.php";
                                                 </div>
                                             </div>
                                         </div>
-                                        <div id="collapse1" class="panel-collapse collapse main_block" role="tabpanel"
+                                        <div id="collapse1" class="panel-collapse in main_block" role="tabpanel"
                                             aria-labelledby="heading1">
                                             <div class="panel-body">
                                                 <div class="row mg_bt_10">
@@ -66,7 +66,7 @@ include "../../model/model.php";
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="row mg_bt_10">
+                                                <div class="row mg_bt_10 hidden">
                                                     <div class="col-md-12 ">
                                                         <button type="button" class="btn btn-sm btnType st-custBtn"
                                                             onclick="display_format_modal1();" data-toggle="tooltip"
@@ -88,31 +88,146 @@ include "../../model/model.php";
                                                     <input type="hidden" id="timing_slots" />
                                                 </div>
                                             </div>
-                                            <div class="row mg_bt_20">
-                                                <div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
-                                                    <h3 class="editor_title">Useful Information</h3>
-                                                    <textarea class="feature_editor" id="upolicy" name="upolicy"
-                                                        placeholder="Booking Policy" title="Booking Policy"
-                                                        rows="3"></textarea>
-                                                </div>
-                                                <div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
-                                                    <h3 class="editor_title">Booking Policy</h3>
-                                                    <textarea class="feature_editor" id="bpolicy" name="bpolicy"
-                                                        placeholder="Booking Policy" title="Booking Policy"
-                                                        rows="3"></textarea>
-                                                </div>
-                                                <div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
-                                                    <h3 class="editor_title">Cancellation Policy</h3>
-                                                    <textarea class="feature_editor" id="cpolicy" name="cpolicy"
-                                                        placeholder="Cancellation Policy" title="Cancellation Policy"
-                                                        rows="3"></textarea>
-                                                </div>
+                                            <!-- <div class="panel-body"> -->
+                                            <div class="row mg_bt_10">
+                                               
                                             </div>
+                                            <div class="col-md-12">
+                                                <div class="row mg_bt_10">
+                                                     <div class="col-md-3 mg_bt_10">
+                                                    <select name="currency_code" id="currency_code" title="Currency"
+                                                        style="width:100%" class="form-control app_select2">
+                                                        <?php
+                                                        global $currency;
+                                                        $sq_dcurrency = mysqli_fetch_assoc(mysqlQuery("select * from currency_name_master where id='$currency'"));
+                                                        ?>
+                                                        <option value="<?= $sq_dcurrency['id'] ?>">
+                                                            <?= $sq_dcurrency['currency_code'] ?></option>
+                                                        <?php
+                                                        $sq_currency = mysqlQuery("select * from currency_name_master where id!='$currency' order by default_currency desc");
+                                                        while ($row_currency = mysqli_fetch_assoc($sq_currency)) {
+                                                        ?>
+                                                            <option value="<?= $row_currency['id'] ?>">
+                                                                <?= $row_currency['currency_code'] ?></option>
+                                                        <?php } ?>
+                                                    </select>
+                                                </div>
+                                                    <div class="row text-right mg_bt_10">
+                                                        <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('table_exc_tarrif_basic')"><i class="fa fa-plus"></i></button>
+                                                        <button type="button" class="btn btn-pdf btn-sm" title="Delete Row" onclick="deleteRow('table_exc_tarrif_basic')"><i class="fa fa-trash"></i></button>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="table-responsive">
+                                                                <table id="table_exc_tarrif_basic"
+                                                                    name="table_exc_tarrif_basic"
+                                                                    class="table table-bordered no-marg pd_bt_51"
+                                                                    style="width:100%">
+                                                                    <tr>
+                                                                        <td><input class="css-checkbox" id="chk_basic"
+                                                                                type="checkbox" checked><label
+                                                                                class="css-label" for="chk_basic">
+                                                                            </label></td>
+                                                                        <td><input maxlength="15" value="1" type="text"
+                                                                                name="username" placeholder="Sr. No."
+                                                                                class="form-control" disabled /></td>
+                                                                        <td><select name="transfer_option"
+                                                                                id="transfer_option"
+                                                                                data-toggle="tooltip"
+                                                                                class="form-contrl app_select2"
+                                                                                title="Transfer Option"
+                                                                                style="width:150px">
+                                                                                <option value="">*Transfer Option
+                                                                                </option>
+                                                                                <option value="Without Transfer">Without
+                                                                                    Transfer</option>
+                                                                                <option value="Sharing Transfer">Sharing
+                                                                                    Transfer</option>
+                                                                                <option value="Private Transfer">Private
+                                                                                    Transfer</option>
+                                                                                <option value="SIC">SIC</option>
+                                                                            </select></td>
+                                                                        <td><input type="text" id="from_date_basic"
+                                                                                class="form-control"
+                                                                                name="from_date_basic"
+                                                                                placeholder="Valid From"
+                                                                                title="Valid From"
+                                                                                value="<?= date('d-m-Y') ?>"
+                                                                                style="width:120px"
+                                                                                onchange="get_to_date(this.id,'to_date_basic')" />
+                                                                        </td>
+                                                                        <td><input type="text" id="to_date_basic"
+                                                                                class="form-control"
+                                                                                name="to_date_basic"
+                                                                                placeholder="Valid To " title="Valid To"
+                                                                                onchange="validate_validDate('from_date_basic','to_date_basic')"
+                                                                                value="<?= date('d-m-Y') ?>"
+                                                                                style="width:120px" /></td>
+                                                                        <td><input type="text" id="adult_cost"
+                                                                                name="adult_cost"
+                                                                                placeholder="*Adult Ticket Cost"
+                                                                                title="Adult Ticket Cost"
+                                                                                onchange="validate_balance(this.id);"
+                                                                                style="width:155px"></td>
+                                                                        <td><input type="text" id="child_cost"
+                                                                                name="child_cost"
+                                                                                placeholder="*Child Ticket Cost"
+                                                                                title="Child Ticket Cost"
+                                                                                onchange="validate_balance(this.id);"
+                                                                                style="width:155px"></td>
+                                                                        <td><input type="text" id="infant_cost"
+                                                                                name="infant_cost"
+                                                                                placeholder="Infant Ticket Cost"
+                                                                                title="Infant Ticket Cost"
+                                                                                onchange="validate_balance(this.id);"
+                                                                                style="width:155px"></td>
+                                                                        <td><input type="number" id="transfer_cost"
+                                                                                name="transfer_cost"
+                                                                                placeholder="Transfer Cost"
+                                                                                title="Transfer Cost" style="width:155px"></td>
+                                                                        <td><select name="vehicle_id" id="vehicle_id"
+                                                                                style="width: 155px"
+                                                                                class="form-control app_select2"
+                                                                                title="Select Vehicle">
+                                                                                <option value=''>Select Vehicle</option>
+                                                                                <?php
+                                                                                $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
+                                                                                while ($row_vehicle = mysqli_fetch_assoc($sq_vehicle)) {
+                                                                                ?>
+                                                                                    <option value="<?= $row_vehicle['entry_id'] ?>">
+                                                                                        <?= $row_vehicle['vehicle_name'] ?></option>
+                                                                                <?php } ?>
+                                                                            </select></td>
+                                                                        <td><select name="markup_in" id="markup_in"
+                                                                                style="width: 125px"
+                                                                                class="form-control app_select2"
+                                                                                title="Markup In">
+                                                                                <option value=''>Amount In</option>
+                                                                                <option value='Flat'>Flat</option>
+                                                                                <option value='Percentage'>Percentage
+                                                                                </option>
+                                                                            </select></td>
+                                                                        <td><input type='number' id="amount"
+                                                                                name="amount"
+                                                                                placeholder="Markup Amount"
+                                                                                class="form-control"
+                                                                                title="Markup Amount"
+                                                                                style="width: 165px;"
+                                                                                onchange="validate_balance(this.id);" />
+                                                                        </td>
+                                                                        <td><input type="hidden" id="entry_id" name="entry_id" /></td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            
                                         </div>
                                     </div>
-                                </div>
+                                <!-- </div> -->
                             </div>
-                            <div class="accordion_content package_content mg_bt_10">
+                            <div class="accordion_content package_content mg_bt_10 hidden">
                                 <div class="panel panel-default main_block">
                                     <div class="panel-heading main_block" role="tab" id="heading2">
                                         <div class="Normal collapsed main_block" role="button" data-toggle="collapse"
@@ -386,6 +501,26 @@ include "../../model/model.php";
                                                                 rows="3"></textarea>
                                                         </div>
                                                     </div>
+                                                    <div class="row mg_bt_20">
+                                                <div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
+                                                    <h3 class="editor_title">Useful Information</h3>
+                                                    <textarea class="feature_editor" id="upolicy" name="upolicy"
+                                                        placeholder="Booking Policy" title="Booking Policy"
+                                                        rows="3"></textarea>
+                                                </div>
+                                                <div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
+                                                    <h3 class="editor_title">Booking Policy</h3>
+                                                    <textarea class="feature_editor" id="bpolicy" name="bpolicy"
+                                                        placeholder="Booking Policy" title="Booking Policy"
+                                                        rows="3"></textarea>
+                                                </div>
+                                                <div class="col-md-4 col-sm-4 mg_bt_10_sm_xs">
+                                                    <h3 class="editor_title">Cancellation Policy</h3>
+                                                    <textarea class="feature_editor" id="cpolicy" name="cpolicy"
+                                                        placeholder="Cancellation Policy" title="Cancellation Policy"
+                                                        rows="3"></textarea>
+                                                </div>
+                                            </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -402,7 +537,7 @@ include "../../model/model.php";
                                 <ul id="files"></ul>
                                 <input type="hidden" id="photo_upload_url_i" name="photo_upload_url_i">
                             </div>(Upload Maximum 3 images)
-                            <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note: Image size should be less than 100KB,resolution : 900X450."><i class="fa fa-question-circle"></i></button>
+                            <button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note: Image size should be less than 100KB,resolution : 900X450."><i class="fa fa-question-circle"></i></button>
                         </div>
                     </div>
                     <input type="hidden" name="hotel_image_path" id="hotel_image_path">

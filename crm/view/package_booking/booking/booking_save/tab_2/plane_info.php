@@ -1,7 +1,7 @@
 <div class="row mg_tp_10 mg_bt_10">
     <div class="col-md-4 col-sm-6">
         <input type="checkbox" id="chk_plane_select_all" onchange="select_all('tbl_plane_travel_details_dynamic_row',this.id);calculate_plane_expense('tbl_plane_travel_details_dynamic_row',true)">&nbsp;&nbsp;<label for="chk_plane_select_all">Select All</label>&nbsp;&nbsp;&nbsp;
-        <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+        <button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
     </div>
     <div class="col-md-8 col-sm-6 text-right">
         <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_plane_travel_details_dynamic_row');event_airport('tbl_plane_travel_details_dynamic_row',4,5)" title="Add Row"><i class="fa fa-plus"></i></button>

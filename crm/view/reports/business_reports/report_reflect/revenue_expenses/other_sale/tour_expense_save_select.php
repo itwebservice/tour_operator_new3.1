@@ -15,7 +15,7 @@ $branch_admin_id = $_SESSION['branch_admin_id'];
 		<div class="col-md-3 col-sm-6">
 			<select style="width:100%" id="sale_type" name="sale_type" class="form-control" title="Select Sale" onchange="tour_expense_save_reflect();fetch_booking_ids();get_widget();"> 
 				<option value="Select Sale">Select Sale</option>
-				<option value="Package Tour">Package Tour</option>
+				<option value="Package Tour" selected>Package Tour</option>
 				<option value="Group Tour">Group Tour</option>
 				<option value="Hotel">Hotel</option>    
 		    	<option value="Flight Ticket">Flight</option> 
@@ -168,17 +168,17 @@ $('#sale_type').select2();
 		+tour_id+'&group_id='+group_id;
 	}
 	var column = [
-	{ title : "S_No."},
+	// { title : "S_No."},
 	{ title : "Booking_ID"},
 	{ title : "Booking_date"},
 	{ title : "Customer_Name"},
-	{ title : "Sale_amount"},
+	{ title : "Sale_purchase_amount"},
 	// { title : "Supplier_type"},
 	// { title : "Supplier_name"},
 	{ title : "Purchases"},
-	{ title : "Purchase_amount"},
-	{title:"Other_Expenses"},
-	{ title : "Profit/Loss(%)"},
+	// { title : "Purchase_amount"},
+	// {title:"Other_Expenses"},
+	// { title : "Profit/Loss(%)"},
 	{ title : "User_Name"}
 ];
 

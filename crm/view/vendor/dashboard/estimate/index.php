@@ -92,12 +92,12 @@ var column = [
 	{ title:"Purchase_Type"},
 	{ title : "Purchase_ID"},
 	{ title : "Supplier_Type"},
-	{ title : "Supplier_Name"},
-	{ title : "Remark"},
+	// { title : "Supplier_Name"},
+	// { title : "Remark"},
 	{ title : "Amount", className:"Info"},
 	{ title : "cncl_Amount", className:"action_width danger"},
 	{ title : "Total_Amount", className:"action_width Info"},
-	{ title : "Created_by"},
+	// { title : "Created_by"},
 	{ title : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", className : "text-center"}
 ];
 

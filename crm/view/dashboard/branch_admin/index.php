@@ -5,7 +5,6 @@ $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
 $financial_year_id = $_SESSION['financial_year_id'];
-
 $q = "select branch_status from branch_assign where link='package_booking/booking/index.php'";
 $sq_count = mysqli_num_rows(mysqlQuery($q));
 $sq = mysqli_fetch_assoc(mysqlQuery($q));
@@ -23,12 +22,12 @@ $branch_status1 = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['b
 //**Enquiries
 $q1 = "select enquiry_id from enquiry_master where financial_year_id='$financial_year_id' and status!='Disabled'";
 if ($branch_status1 == 'yes') {
-  if ($role == 'Branch Admin' || $role == 'Accountant' || $role == 'Hr' || $role == 'Hr' || $role_id > '7') {
+  if ($role == 'Branch Admin' || $role == 'Accountant' || $role == 'Hr' || $role == 'Sales Head' || $role_id > '7') {
     $q1 .= " and branch_admin_id = '$branch_admin_id'";
-  } elseif ($role != 'Admin' && $role != 'Branch Admin' && $role != 'Hr' && $role != 'Hr' && $role_id != '7' && $role_id < '7') {
+  } elseif ($role != 'Admin' && $role != 'Branch Admin' && $role != 'Hr' && $role != 'Sales Head' && $role_id != '7' && $role_id < '7') {
     $q1 .= " and assigned_emp_id='$emp_id' and branch_admin_id = '$branch_admin_id'";
   }
-} elseif ($role != 'Admin' && $role != 'Branch Admin' && $role != 'Hr' && $role != 'Hr' && $role_id != '7' && $role_id < '7') {
+} elseif ($role != 'Admin' && $role != 'Branch Admin' && $role != 'Hr' && $role != 'Sales Head' && $role_id != '7' && $role_id < '7') {
   $q1 .= " and assigned_emp_id='$emp_id'";
 }
 $assigned_enq_count = mysqli_num_rows(mysqlQuery($q1));
@@ -182,7 +181,7 @@ while ($row = mysqli_fetch_assoc($sq_enquiry)) {
           <ul class="nav nav-tabs responsive" role="tablist">
             <li role="presentation" class="active"><a href="#enquiry_tab" aria-controls="enquiry_tab" role="tab" data-toggle="tab">Followups</a></li>
             <li role="presentation"><a href="#oncoming_tab" aria-controls="oncoming_tab" role="tab" data-toggle="tab">Tour Summary</a></li>
-            <li role="presentation" ><a href="#itinerary_tab" aria-controls="itinerary_tab" role="tab" data-toggle="tab">Tour Itinerary</a></li>
+            <li role="presentation" ><a href="#itinerary_tab" aria-controls="itinerary_tab" role="tab" data-toggle="tab">Guest Program</a></li>
 						<li role="presentation"><a href="#reminder_tab" aria-controls="reminder_tab" role="tab" data-toggle="tab">Reminders</a></li>
           </ul>
 

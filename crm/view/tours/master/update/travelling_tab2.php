@@ -5,25 +5,7 @@
                 <div class="col-md-12 app_accordion">
                     <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
 
-                        <!-- Train Information -->
-                        <div class="accordion_content main_block mg_bt_10">
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse"
-                                        data-parent="#accordion" href="#collapse1" aria-expanded="true"
-                                        aria-controls="collapse1" id="collapsed1">
-                                        <div class="col-md-12"><span>Train Information</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapse1" class="panel-collapse collapse in main_block" role="tabpanel"
-                                    aria-labelledby="heading1">
-                                    <div class="panel-body" style="overflow:hidden;">
-                                        <?php include_once('train_tbl.php'); ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Hotel Information -->
+                     <!-- Hotel Information -->
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
                                 <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
@@ -41,25 +23,8 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Transport Information -->
-                        <div class="accordion_content main_block mg_bt_10">
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse"
-                                        data-parent="#accordion" href="#collapse2_5" aria-expanded="true"
-                                        aria-controls="collapse2_5" id="collapsed2_5">
-                                        <div class="col-md-12"><span>Transport Information</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapse2_5" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading2_5">
-                                    <div class="panel-body">
-                                        <?php include_once('transport_tbl.php'); ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Flight Information -->
+
+                         <!-- Flight Information -->
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
                                 <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
@@ -78,6 +43,46 @@
                             </div>
                         </div>
 
+                        <!-- Transport Information -->
+                        <div class="accordion_content main_block mg_bt_10">
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal main_block" role="button" data-toggle="collapse"
+                                        data-parent="#accordion" href="#collapse2_5" aria-expanded="true"
+                                        aria-controls="collapse2_5" id="collapsed2_5">
+                                        <div class="col-md-12"><span>Transport Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse2_5" class="panel-collapse collapse main_block" role="tabpanel"
+                                    aria-labelledby="heading2_5">
+                                    <div class="panel-body">
+                                        <?php include_once('transport_tbl.php'); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Train Information -->
+                        <div class="accordion_content main_block mg_bt_10">
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal main_block" role="button" data-toggle="collapse"
+                                        data-parent="#accordion" href="#collapse1" aria-expanded="true"
+                                        aria-controls="collapse1" id="collapsed1">
+                                        <div class="col-md-12"><span>Train Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse1" class="panel-collapse collapse in main_block" role="tabpanel"
+                                    aria-labelledby="heading1">
+                                    <div class="panel-body" style="overflow:hidden;">
+                                        <?php include_once('train_tbl.php'); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       
+                        
+                       
                         <!-- Cruise Information -->
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
@@ -356,9 +361,9 @@ $('#frm_tab2').validate({
         $('.collapse').removeClass("in");
         $('#collapse1').addClass("in");
         $('#tab2_head').addClass('done');
-        $('#tab3_head').addClass('active');
+        $('#tab4_head').addClass('active');
         $('.bk_tab').removeClass('active');
-        $('#tab3').addClass('active');
+        $('#tab4').addClass('active');
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);

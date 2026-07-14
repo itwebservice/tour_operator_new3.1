@@ -50,11 +50,11 @@ $vehcile_id_str = "vehicle_name1";
                         <div class="col-xs-12 no-pad mg_bt_20">
                             <div class="col-md-3 col-sm-3 mg_bt_10_xs">
                                 <input type="text" id="package_name" name="package_name" onchange="package_name_validation(this.id);package_name_check(this.id);"  oninput="updateSlug();" class="form-control" placeholder="*Package Name" title="Package Name" />
-                                <button type="button" class="btn btn-excel btn-sm" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
                             </div>
                             <div class="col-md-3 col-sm-3 mg_bt_10_xs">
                                 <input type="text" id="package_code" name="package_code" class="form-control" placeholder="Package Code" title="Package Code" onchange="package_code_check(this.id);" />
-                                <button type="button" class="btn btn-excel btn-sm" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
                             </div>
                             <div class="col-md-3 col-sm-3 mg_bt_10_xs">
                                 <input type="number" id="total_nights" onchange="validate_balance(this.id); calculate_days()" name="total_nights" placeholder="*Nights" title="Total Nights">
@@ -79,7 +79,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                         <div class="col-xs-12 no-pad mg_bt_20">
                             <div class="col-md-3 col-sm-4 mg_bt_10_xs">
                                 <input type="text" id="seo_slug" name="seo_slug" class="form-control" placeholder="*SEO friendly slug" title="SEO friendly slug" readonly />
-                                <button type="button" class="btn btn-excel btn-sm" title="Note : SEO friendly slug auto generated from package name : eg. amazing-bangkok-tour-2025"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Note : SEO friendly slug auto generated from package name : eg. amazing-bangkok-tour-2025"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
                             </div>
                             <div class="col-md-3 col-sm-3">
                                 <select id="tour_theme" name="tour_theme" title="Select Tour Theme" class="form-control" style="width:100%">
@@ -153,7 +153,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                     <legend>Hotel Information</legend>
                     <div class="row mg_bt_20">
                         <div class="col-md-6 mg_tp_10"> <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added city wise hotel & tariff using Supplier Master"><i class="fa fa-question-circle"></i></button>
-                            <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
                         </div>
                         <div class="col-xs-6 col-md-6 text-right mg_tp_10">
                             <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name1]');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_master');}"><i class="fa fa-plus"></i></button>
@@ -194,7 +194,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                     <div class="row mg_bt_20">
                         <div class="col-md-6 mg_tp_10">
                             <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
-                            <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('<?php echo $vehcile_id_str; ?>')"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-excel hidden" title="Add Vehicle" onclick="vehicle_save_modal('<?php echo $vehcile_id_str; ?>')"><i class="fa fa-plus"></i></button>
                             <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
                         </div>
                         <div class="col-xs-6 text-right mg_tp_10">

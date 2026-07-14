@@ -300,8 +300,8 @@
                     value="<?php echo $emp_info['salary'] ?>">
 
             </div>
-        </div>
-        <div class="row">
+        <!-- </div>
+        <div class="row"> -->
             <div class="col-md-3 col-sm-6 col-xs-7 mg_bt_10">
 
                 <div class="div-upload">

@@ -24,8 +24,8 @@
                                     aria-labelledby="heading4">
                                     <div class="panel-body">
                                         <div class="row">
-                                            <div class="col-xs-6 mg_bt_20_sm_xs" style="display:flex;  align-items:center; gap:8px;">
-                                                <!-- <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()">
+                                            <div class="col-xs-6 mg_bt_20_sm_xs">
+                                                <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()">
                                                     <i class="fa fa-plus"></i>
                                                 </button> -->
                                                 <select id="package_type" name="package_type"
@@ -159,12 +159,12 @@
                                         <div class="col-md-12"><span>Transport Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse5" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading5">
+                                <div id="collapse5" class="panel-collapse in main_block" role="tabpanel"
+                                    aria-labelledby="heading5" aria-expanded="true">
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('transport_vehicle-')"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-excel hidden" title="Add Vehicle" onclick="vehicle_save_modal('transport_vehicle-')"><i class="fa fa-plus"></i></button>
                                                 <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
                                             </div>
                                             <div class="col-xs-6 text-right mg_bt_20_sm_xs">
@@ -269,12 +269,12 @@
                                         <div class="col-md-12"><span>Flight Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading2">
+                                <div id="collapse2" class="panel-collapse in main_block" role="tabpanel"
+                                    aria-labelledby="heading2" aria-expanded="true">
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
                                             </div>
                                             <div class="col-xs-6 text-right mg_bt_20_sm_xs">
                                                 <button type="button" class="btn btn-excel btn-sm"
@@ -361,8 +361,8 @@
                                         <div class="col-md-12"><span>Activity Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse6" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading6">
+                                <div id="collapse6" class="panel-collapse in main_block" role="tabpanel"
+                                    aria-labelledby="heading6" aria-expanded="true">
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">

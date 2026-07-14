@@ -1,7 +1,7 @@
 
 <div class="row" style="margin-top: 5px">
     <div class="col-xs-6 mg_bt_20_sm_xs">
-        <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
+        <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
     </div>
     <div class="col-xs-6 text-right mg_bt_20_sm_xs">
         <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_hotel_infomration');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_infomration');}if(typeof initAllRoomCategorySelectAddNew==='function'){initAllRoomCategorySelectAddNew('#tbl_package_hotel_infomration');}"><i class="fa fa-plus"></i></button>

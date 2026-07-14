@@ -13,7 +13,7 @@
     <div class="col-sm-2 col-xs-12 col-sm-pull-10 mg_bt_10_sm_xs">
         <input type="checkbox" class="css-checkbox" id="chk_plane_select_all" onchange="select_all('tbl_plane_travel_details_dynamic_row',this.id); calculate_plane_expense('tbl_plane_travel_details_dynamic_row')" checked>&nbsp;&nbsp;
         <label for="chk_plane_select_all" class="">Select All</label>&nbsp;&nbsp;&nbsp;
-        <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button> 
+        <button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button> 
     </div>
 </div>
 

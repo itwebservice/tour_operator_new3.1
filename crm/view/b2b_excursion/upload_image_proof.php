@@ -52,7 +52,7 @@ $current_dir = check_dir($current_dir , $timestamp);
 
 $file = $current_dir.basename($_FILES['uploadfile']['name']); 
 
-if($_FILES['uploadfile']['size']<=100000){
+if($_FILES['uploadfile']['size']<=500000){
 	if (move_uploaded_file($_FILES['uploadfile']['tmp_name'], $file)) { 
 	echo $file; 
 	} else{

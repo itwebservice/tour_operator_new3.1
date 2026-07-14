@@ -62,7 +62,7 @@ include "../../model/model.php";
 						<ul id="files" ></ul>
 						<input type="Hidden" id="upload_url" name="upload_url">
 					</div> 
-					<button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note: Only Word,Excel or PDF files are allowed"><i class="fa fa-question-circle"></i></button>
+					<button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note: Only Word,Excel or PDF files are allowed"><i class="fa fa-question-circle"></i></button>
                 </div>   
 			</div>
 			<div class="row mg_tp_20 text-center">

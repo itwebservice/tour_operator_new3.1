@@ -9,7 +9,7 @@ $emp_id = $_SESSION['emp_id'];
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from group_tour_quotation_master where quotation_id='$quotation_id'"));
 ?>
 <div class="modal fade" id="quotation_update_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
-	<div class="modal-dialog modal-lg" style="width:96%" role="document">
+	<div class="modal-dialog modal-lg" style="width:95% !important;" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>

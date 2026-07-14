@@ -25,7 +25,7 @@ if ($role == "Backoffice") {
 if ($role == "B2b") {
 	include_once('sales/index.php');
 }
-if ($role == "Branch Admin" || $role == "Accountant" || $role == "Hr") {
+if ($role == "Branch Admin" || $role == "Accountant" || $role == "Hr" ||  $role == "Sales Head" || $role == "Operations Head") {
 	include_once('branch_admin/index.php');
 }
 if ($role_id > '7') {
