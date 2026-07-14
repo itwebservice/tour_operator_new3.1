@@ -27,7 +27,7 @@
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
                                                 <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()">
                                                     <i class="fa fa-plus"></i>
-                                                </button> -->
+                                                </button> 
                                                 <select id="package_type" name="package_type"
                                                     class="form-control"
                                                     style="width:160px; text-align-last:center; -moz-text-align-last:center; -ms-text-align-last:center;"
