@@ -71,7 +71,7 @@ $branch_admin_id = $_SESSION['branch_admin_id'];
                         </div>
                         <div class="row ">
                             <div class="col-md-2 col-sm-4 col-xs-12 mg_bt_10">
-                                <select name="country_code" id="country_code" class="app_select2" style="width:100%">>
+                                <select name="country_code" id="country_code" class="" style="width:100%">>
                                     <?= get_country_code() ?>
                                 </select>
                             </div>

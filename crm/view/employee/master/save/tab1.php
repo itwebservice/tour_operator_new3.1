@@ -271,7 +271,7 @@
                 </div>
             </div>
 
-        <!-- </div> -->
+        </div>
 
     </div>
     <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_30">

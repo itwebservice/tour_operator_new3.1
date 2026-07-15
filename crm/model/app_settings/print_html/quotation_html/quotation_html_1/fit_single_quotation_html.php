@@ -291,6 +291,417 @@ $o1_continuous_view = true;
     body.single-quotation-flow .itinerary-card {
       height: 350px;
     }
+
+    /* ------------------------------------------------------------------
+       Mobile / tablet responsiveness (screen only — print stays A4)
+       ------------------------------------------------------------------ */
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body.single-quotation-flow {
+      overflow-x: hidden;
+    }
+
+    body.single-quotation-flow img,
+    body.single-quotation-flow video {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ---- Tablet (≤ 1024px) ---- */
+    @media screen and (max-width: 1024px) {
+      body.single-quotation-flow .page {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      body.single-quotation-flow .px-20 {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+      }
+
+      body.single-quotation-flow .px-12 {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+      }
+
+      body.single-quotation-flow .page-hero h1[style*="font-size:84px"],
+      body.single-quotation-flow .page-hero h1[style*="font-size: 84px"] {
+        font-size: clamp(2.75rem, 8vw, 4.5rem) !important;
+      }
+
+      body.single-quotation-flow .text-7xl {
+        font-size: 3.5rem !important;
+        line-height: 1.05 !important;
+      }
+
+      body.single-quotation-flow .page-hero .grid.grid-cols-6 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+
+      body.single-quotation-flow .page-hero .grid.grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        height: auto !important;
+      }
+
+      body.single-quotation-flow .page .grid.grid-cols-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      body.single-quotation-flow .page .grid.grid-cols-5 {
+        grid-template-columns: 1fr 1fr !important;
+      }
+
+      body.single-quotation-flow .page .grid.grid-cols-5 > .col-span-2,
+      body.single-quotation-flow .page .grid.grid-cols-5 > .col-span-3,
+      body.single-quotation-flow .page .grid.grid-cols-5 > .col-span-4 {
+        grid-column: span 2 / span 2 !important;
+      }
+    }
+
+    /* ---- Mobile (≤ 768px) ---- */
+    @media screen and (max-width: 768px) {
+      body.single-quotation-flow {
+        overflow-x: hidden;
+      }
+
+      body.single-quotation-flow .page {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+      }
+
+      body.single-quotation-flow .page-hero {
+        min-height: auto !important;
+        padding-bottom: 1.5rem !important;
+      }
+
+      /* Reduce fixed side paddings across sections */
+      body.single-quotation-flow .px-20,
+      body.single-quotation-flow .page > .relative.px-20,
+      body.single-quotation-flow .relative.px-20 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+
+      body.single-quotation-flow .px-12,
+      body.single-quotation-flow .px-10 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+
+      body.single-quotation-flow .px-6 {
+        padding-left: 0.875rem !important;
+        padding-right: 0.875rem !important;
+      }
+
+      /* Hero header / title stack */
+      body.single-quotation-flow .page-hero > .relative.z-10.px-20.pt-8.flex {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      body.single-quotation-flow .page-hero h1[style*="font-size:84px"],
+      body.single-quotation-flow .page-hero h1[style*="font-size: 84px"] {
+        font-size: clamp(2.25rem, 11vw, 3.25rem) !important;
+        line-height: 1.05 !important;
+        word-break: break-word;
+      }
+
+      body.single-quotation-flow .page-hero .text-3xl {
+        font-size: 1.35rem !important;
+      }
+
+      body.single-quotation-flow .page-hero .text-2xl {
+        font-size: 1.1rem !important;
+      }
+
+      body.single-quotation-flow .page-hero .mt-12 {
+        margin-top: 1.5rem !important;
+      }
+
+      /* Feature icons: 3 cols on phones */
+      body.single-quotation-flow .page-hero .grid.grid-cols-6 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0.5rem !important;
+      }
+
+      /* Gallery strip */
+      body.single-quotation-flow .page-hero .grid.grid-cols-4,
+      body.single-quotation-flow .page-hero .grid.grid-cols-4.h-32 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        height: auto !important;
+        margin-top: 1.25rem !important;
+        gap: 0.5rem !important;
+      }
+
+      body.single-quotation-flow .page-hero .grid.grid-cols-4 > * {
+        min-height: 5.5rem;
+      }
+
+      /* Hero footer: client info */
+      body.single-quotation-flow .page-hero .absolute.bottom-0 {
+        position: relative !important;
+        padding-top: 2rem !important;
+        padding-bottom: 1.25rem !important;
+        margin-top: 1rem;
+      }
+
+      body.single-quotation-flow .page-hero .absolute.bottom-0 .flex.items-end.justify-between {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+      }
+
+      body.single-quotation-flow .page-hero .absolute.bottom-0 .text-right {
+        text-align: left !important;
+      }
+
+      body.single-quotation-flow .page-hero .font-display.text-4xl {
+        font-size: 1.75rem !important;
+      }
+
+      /* Section headings */
+      body.single-quotation-flow .font-display.text-4xl {
+        font-size: 1.75rem !important;
+        line-height: 1.2 !important;
+      }
+
+      body.single-quotation-flow .font-display.text-3xl {
+        font-size: 1.4rem !important;
+      }
+
+      body.single-quotation-flow .text-7xl {
+        font-size: 2.75rem !important;
+        line-height: 1.05 !important;
+      }
+
+      body.single-quotation-flow .font-display.text-2xl {
+        font-size: 1.25rem !important;
+      }
+
+      /* Stack common header rows */
+      body.single-quotation-flow .flex.items-center.justify-between,
+      body.single-quotation-flow .flex.items-end.justify-between,
+      body.single-quotation-flow .flex.items-start.justify-between {
+        flex-wrap: wrap !important;
+        gap: 0.75rem !important;
+      }
+
+      /* Tour overview cards */
+      body.single-quotation-flow .page .grid.grid-cols-3 {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Package + guest info (5-col) → stack */
+      body.single-quotation-flow .page .grid.grid-cols-5 {
+        grid-template-columns: 1fr !important;
+      }
+
+      body.single-quotation-flow .page .grid.grid-cols-5 > .col-span-1,
+      body.single-quotation-flow .page .grid.grid-cols-5 > .col-span-2,
+      body.single-quotation-flow .page .grid.grid-cols-5 > .col-span-3,
+      body.single-quotation-flow .page .grid.grid-cols-5 > .col-span-4 {
+        grid-column: 1 / -1 !important;
+      }
+
+      /* Hotel / activity / vehicle cards: image above content */
+      body.single-quotation-flow .page .rounded-xl.grid.grid-cols-5,
+      body.single-quotation-flow .page .grid.grid-cols-5.mt-3 {
+        grid-template-columns: 1fr !important;
+      }
+
+      body.single-quotation-flow .page .grid.grid-cols-5 .col-span-1,
+      body.single-quotation-flow .page .grid.grid-cols-5 .col-span-2,
+      body.single-quotation-flow .page .grid.grid-cols-5 .col-span-3,
+      body.single-quotation-flow .page .grid.grid-cols-5 .col-span-4 {
+        grid-column: 1 / -1 !important;
+      }
+
+      body.single-quotation-flow .page .grid.grid-cols-5 .h-56 {
+        height: 12rem !important;
+        object-fit: cover !important;
+      }
+
+      /* Flights / trains 2-col → 1-col */
+      body.single-quotation-flow .page .grid.grid-cols-2 {
+        grid-template-columns: 1fr !important;
+      }
+
+      body.single-quotation-flow .page .grid.grid-cols-2 > .col-span-2 {
+        grid-column: 1 / -1 !important;
+      }
+
+      /* Itinerary day cards */
+      body.single-quotation-flow .itinerary-card,
+      body.single-quotation-flow .grid.grid-cols-12 {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+        min-height: 0 !important;
+      }
+
+      body.single-quotation-flow .itinerary-card > .col-span-4,
+      body.single-quotation-flow .itinerary-card > .col-span-8,
+      body.single-quotation-flow .grid.grid-cols-12 > .col-span-4,
+      body.single-quotation-flow .grid.grid-cols-12 > .col-span-8 {
+        grid-column: 1 / -1 !important;
+      }
+
+      body.single-quotation-flow .itinerary-card > .col-span-4 {
+        min-height: 180px !important;
+        position: relative !important;
+      }
+
+      body.single-quotation-flow .itinerary-card > .col-span-4 img {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+      }
+
+      body.single-quotation-flow .itinerary-card > .col-span-8 {
+        padding: 1rem !important;
+      }
+
+      /* Costing package grid → stacked cards */
+      body.single-quotation-flow .mt-4.rounded-xl.overflow-hidden.border > .grid.grid-cols-6 {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem 0.75rem !important;
+        padding: 0.875rem !important;
+      }
+
+      body.single-quotation-flow .mt-4.rounded-xl.overflow-hidden.border > .grid.grid-cols-6 > div {
+        text-align: left !important;
+      }
+
+      body.single-quotation-flow .mt-4.rounded-xl.overflow-hidden.border > .grid.grid-cols-6 > .col-span-1 {
+        grid-column: 1 / -1 !important;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+      }
+
+      /* Wide per-person costing table: swipe horizontally */
+      body.single-quotation-flow .mt-4.rounded-xl.overflow-hidden.border {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      body.single-quotation-flow table {
+        width: max-content !important;
+        min-width: 100%;
+        border-collapse: separate;
+      }
+
+      body.single-quotation-flow table th,
+      body.single-quotation-flow table td {
+        padding: 10px 8px !important;
+        font-size: 11px !important;
+        white-space: nowrap;
+      }
+
+      /* Testimonials: avatar above quote */
+      body.single-quotation-flow .rounded-2xl.grid.grid-cols-6,
+      body.single-quotation-flow .rounded-2xl.bg-white.grid.grid-cols-6 {
+        grid-template-columns: 1fr !important;
+        text-align: center;
+      }
+
+      body.single-quotation-flow .rounded-2xl.grid.grid-cols-6 > .col-span-1,
+      body.single-quotation-flow .rounded-2xl.grid.grid-cols-6 > .col-span-5 {
+        grid-column: 1 / -1 !important;
+      }
+
+      body.single-quotation-flow .rounded-2xl.grid.grid-cols-6 > .col-span-5 {
+        text-align: left;
+      }
+
+      body.single-quotation-flow .rounded-2xl.grid.grid-cols-6 > .col-span-5 .pl-6 {
+        padding-left: 0.5rem !important;
+      }
+
+      /* Payment policy / bank QR */
+      body.single-quotation-flow .payment-policy-row {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Thank-you / contact blocks */
+      body.single-quotation-flow .thankyou-page .grid.grid-cols-3 {
+        grid-template-columns: 1fr !important;
+      }
+
+      body.single-quotation-flow .thankyou-page .grid.grid-cols-2 {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Soften card padding on narrow screens */
+      body.single-quotation-flow .rounded-xl.p-5,
+      body.single-quotation-flow .rounded-2xl.p-5,
+      body.single-quotation-flow .rounded-2xl.p-6,
+      body.single-quotation-flow .rounded-xl.p-4 {
+        padding: 1rem !important;
+      }
+
+      /* Prevent absolute decorative circles from causing overflow */
+      body.single-quotation-flow .absolute.-right-6,
+      body.single-quotation-flow .absolute.-right-10 {
+        display: none !important;
+      }
+
+      /* Flight segment airport code widths */
+      body.single-quotation-flow [style*="max-width:110px"],
+      body.single-quotation-flow [style*="max-width:130px"] {
+        max-width: 42% !important;
+      }
+
+      /* Word wrapping for long destination / hotel names */
+      body.single-quotation-flow .font-display,
+      body.single-quotation-flow h1,
+      body.single-quotation-flow h2,
+      body.single-quotation-flow h3 {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+    }
+
+    /* ---- Small phones (≤ 480px) ---- */
+    @media screen and (max-width: 480px) {
+      body.single-quotation-flow .px-20,
+      body.single-quotation-flow .relative.px-20,
+      body.single-quotation-flow .px-12,
+      body.single-quotation-flow .px-10 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+      }
+
+      body.single-quotation-flow .page-hero h1[style*="font-size:84px"],
+      body.single-quotation-flow .page-hero h1[style*="font-size: 84px"] {
+        font-size: 2rem !important;
+      }
+
+      body.single-quotation-flow .page-hero .grid.grid-cols-6 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      body.single-quotation-flow .font-display.text-4xl {
+        font-size: 1.5rem !important;
+      }
+
+      body.single-quotation-flow .text-7xl {
+        font-size: 2.25rem !important;
+      }
+
+      body.single-quotation-flow .px-10.py-4 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        flex-wrap: wrap;
+      }
+    }
   </style>
   <?php endif; ?>
 </head>
