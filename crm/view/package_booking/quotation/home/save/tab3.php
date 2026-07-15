@@ -25,7 +25,8 @@
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()">
+                                                <div style="display:flex; align-items:center; gap:8px;">
+                                                    <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()">
                                                     <i class="fa fa-plus"></i>
                                                 </button> 
                                                 <select id="package_type" name="package_type"
@@ -39,6 +40,7 @@
                                                     onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
+                                                </div>
                                             </div>
 
                                             <div class="col-xs-6 mg_bt_20_sm_xs"

@@ -42,7 +42,7 @@ $email_id2 = $encrypt_decrypt->fnDecrypt($sq_hotel['alternative_email_2'], $secr
             <input type="hidden" id="vendor_login_id" name="vendor_login_id" value="<?= $sq_vendor_login['login_id'] ?>">
             <div class="row">
               <div class="col-md-2 col-sm-6 mg_bt_10">
-                <select id="cmb_city_id" name="cmb_city_id" style="width:100%" title="City Name" required data-add-new-option="true">
+                <select id="cmb_city_id" name="cmb_city_id" style="width:100%" title="City Name" required data-add-new-option="true" data-lazy-city="true">
                   <?php $sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='$sq_hotel[city_id]'")); ?>
                   <option value="<?php echo $sq_hotel['city_id'] ?>" selected="selected"><?php echo $sq_city['city_name'] ?></option>
                 </select>
@@ -524,19 +524,16 @@ $email_id2 = $encrypt_decrypt->fnDecrypt($sq_hotel['alternative_email_2'], $secr
 </div>
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
 <script>
-  $('#update_modal').modal('show');
   $('#as_of_date1').datetimepicker({
     timepicker: false,
     format: 'd-m-Y'
   });
 
-  $(document).ready(function() {
-    $("#cust_state1,#hotel_type1,#rating_star,#side").select2({
-      dropdownParent: $("#update_modal")
-    });
-    city_lzloading('#cmb_city_id');
+  $("#cust_state1,#hotel_type1,#rating_star,#side").select2({
+    dropdownParent: $("#update_modal")
   });
-
+  city_lzloading('#cmb_city_id');
+  $('#update_modal').modal('show');
   function load_images(hotel_id) {
     var base_url = $("#base_url").val();
     $.ajax({

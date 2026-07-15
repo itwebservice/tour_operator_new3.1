@@ -2701,6 +2701,20 @@ function initAppSelect2Element(element, extraConfig) {
 	}
 	extraConfig = extraConfig || {};
 
+	// Lazy AJAX dropdowns (city / airport / airline) manage their own Select2.
+	// Do not destroy them on modal shown or search will show "No results found".
+	if (
+		$select.attr('data-add-new-option') === 'true' ||
+		$select.attr('data-lazy-select') === 'true' ||
+		$select.attr('data-lazy-city') === 'true'
+	) {
+		return $select;
+	}
+	var existing = $select.data('select2');
+	if (existing && existing.options && typeof existing.options.get === 'function' && existing.options.get('ajax')) {
+		return $select;
+	}
+
 	if ($select.data('select2')) {
 		$select.select2('destroy');
 	}
@@ -2743,54 +2757,59 @@ $(document).on('scroll.appSelect2', '.modal, .modal .table-responsive', function
 });
 
 function city_lzloading(element, placeholder = "City Name", valueasText = false) {
-	var base_url = $("#base_url").val();
-	url = base_url + '/view/load_data/generic_city_loading.php';
-	$(element).append($("<option></option>").attr("value", "").text(placeholder));
-	var dropdownParent  = $(element).closest('.modal').attr('id');
-	if(dropdownParent!=null){
-	$(element).select2({
-		placeholder: placeholder,
-		dropdownParent: $("#" + dropdownParent),
-		ajax: {
-			url: url,
-			dataType: 'json',
-			type: 'GET',
-			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
-			processResults: function (data) {
-				let more = data.pagination;
-				return {
-					results: data.results,
-					pagination: {
-						more: more.more,
-					}
-				};
-			}
-		}
-	});
-}else{
-	$(element).select2({
-		placeholder: placeholder,
-		ajax: {
-			url: url,
-			dataType: 'json',
-			type: 'GET',
-			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
-			processResults: function (data) {
-				let more = data.pagination;
-				return {
-					results: data.results,
-					pagination: {
-						more: more.more,
-					}
-				};
-			}
-		}
-	});
-}
+	var base_url = ($("#base_url").val() || '').replace(/\/?$/, '/');
+	var url = base_url + 'view/load_data/generic_city_loading.php';
 
 	$(element).each(function () {
-		if ($(this).attr('data-add-new-option') === 'true') {
-			initCityAddNewInline(this);
+		var $el = $(this);
+		$el.attr('data-lazy-city', 'true');
+		$el.attr('data-lazy-select', 'true');
+
+		if ($el.data('select2')) {
+			$el.select2('destroy');
+		}
+		if (!$el.find('option[value=""]').length) {
+			$el.prepend($("<option></option>").attr("value", "").text(placeholder));
+		}
+
+		var $modal = $el.closest('.modal');
+		var config = {
+			placeholder: placeholder,
+			allowClear: true,
+			minimumInputLength: 0,
+			width: '100%',
+			ajax: {
+				url: url,
+				dataType: 'json',
+				delay: 250,
+				type: 'GET',
+				data: function (params) {
+					return {
+						term: params.term || '',
+						page: params.page || 0,
+						valueasText: valueasText
+					};
+				},
+				processResults: function (data) {
+					data = data || {};
+					var pagination = data.pagination || { more: false };
+					return {
+						results: data.results || [],
+						pagination: {
+							more: !!pagination.more
+						}
+					};
+				},
+				cache: true
+			}
+		};
+		if ($modal.length) {
+			config.dropdownParent = $modal;
+		}
+		$el.select2(config);
+
+		if ($el.attr('data-add-new-option') === 'true') {
+			initCityAddNewInline($el);
 		}
 	});
 }
@@ -4325,15 +4344,20 @@ function resolveItineraryDestId(preferredFieldId) {
 	if (preferredFieldId === 0 || preferredFieldId === '0') {
 		return '0';
 	}
+	// Prefer explicit package/booking destination field only.
+	// Do NOT fall back to list filter #dest_name (that mixes wrong destinations).
 	var dest_id = preferredFieldId ? $('#' + preferredFieldId).val() : '';
+	if (!dest_id || dest_id === '0') {
+		dest_id = $('#dest_name_s').val();
+	}
+	if (!dest_id || dest_id === '0') {
+		dest_id = $('#dest_name_u').val();
+	}
 	if (!dest_id || dest_id === '0') {
 		dest_id = $('#dest_name2').val();
 	}
 	if (!dest_id || dest_id === '0') {
 		dest_id = $('#booking_itinerary_dest_id').val();
-	}
-	if (!dest_id || dest_id === '0') {
-		dest_id = $('#dest_name').val();
 	}
 	return dest_id;
 }

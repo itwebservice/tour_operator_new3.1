@@ -17,7 +17,7 @@ include "../../model/model.php";
         <legend>Other Supplier Information</legend>
         <div class="row">
           <div class="col-md-3 col-sm-6 mg_bt_10">
-            <select id="cmb_city_id" name="cmb_city_id" class="city_master_dropdown" style="width:100%" title="Select City Name" data-add-new-option="true">
+            <select id="cmb_city_id" name="cmb_city_id" class="form-control" style="width:100%" title="Select City Name" data-add-new-option="true" data-lazy-city="true">
             </select>
           </div> 
           <div class="col-md-3 col-sm-6 mg_bt_10">
@@ -122,11 +122,11 @@ include "../../model/model.php";
 </form>
 
 <script>
-$('#save_modal').modal('show');
 $('#state').select2({
   dropdownParent: $("#save_modal")});
-city_lzloading('#cmb_city_id');
 $('#as_of_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
+city_lzloading('#cmb_city_id');
+$('#save_modal').modal('show');
 $(function(){
   $('#frm_save').validate({
     rules:{

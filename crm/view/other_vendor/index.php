@@ -36,8 +36,6 @@ require_once('../layouts/admin_header.php');
 <div id="div_modal_view"></div>
 <script src="<?php echo BASE_URL ?>js/app/field_validation.js"></script>
 <script>
-city_lzloading('#city_id_filter');
-
 function save_modal() {
     $('#btn_save_modal').button('loading');
     $.post('save_modal.php', {}, function(data) {
@@ -88,3 +86,6 @@ list_reflect();
 /*======******Footer******=======*/
 require_once('../layouts/admin_footer.php');
 ?>
+<script>
+city_lzloading('#city_id_filter');
+</script>

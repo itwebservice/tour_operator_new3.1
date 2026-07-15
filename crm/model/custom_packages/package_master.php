@@ -1,6 +1,20 @@
 <?php
 $flag = true;
 class custom_package{
+
+   /** Cached check — day_no exists only after migration on some servers */
+   private function program_has_day_no() {
+      static $has_day_no = null;
+      if ($has_day_no === null) {
+         $has_day_no = false;
+         $col_check = @mysqlQuery("SHOW COLUMNS FROM custom_package_program LIKE 'day_no'");
+         if ($col_check && mysqli_num_rows($col_check) > 0) {
+            $has_day_no = true;
+         }
+      }
+      return $has_day_no;
+   }
+
    //save
    function package_master_save($tour_type,$dest_id,$package_code,$package_name,$total_days,$total_nights,$inclusions,$exclusions, $status ,$city_name_arr, $hotel_name_arr, $hotel_type_arr,$total_days_arr,$vehicle_name_arr,$drop_arr,$pickup_arr,$day_program_arr,$special_attaraction_arr,$overnight_stay_arr,$meal_plan_arr,$day_image_arr,$adult_cost,$child_cost,$infant_cost,$child_with,$child_without,$extra_bed,$currency_id,$note,$dest_image,$seo_slug, $tour_theme){
 
@@ -21,9 +35,28 @@ class custom_package{
 
       $sq = mysqlQuery("select max(package_id) as max from custom_package_master");
       $value = mysqli_fetch_assoc($sq);
-      $max_tour_id = $value['max'] + 1;
+      $max_tour_id = intval($value['max']) + 1;
+
+      // Avoid reusing a package_id that still has orphan child rows from deleted/failed packages
+      $sq_child_max = mysqli_fetch_assoc(mysqlQuery("SELECT GREATEST(
+            IFNULL((SELECT MAX(package_id) FROM custom_package_program), 0),
+            IFNULL((SELECT MAX(package_id) FROM custom_package_hotels), 0),
+            IFNULL((SELECT MAX(package_id) FROM custom_package_transport), 0),
+            IFNULL((SELECT MAX(package_id) FROM custom_package_images), 0)
+         ) AS max_child"));
+      $max_child_id = intval($sq_child_max['max_child'] ?? 0);
+      if ($max_child_id >= $max_tour_id) {
+         $max_tour_id = $max_child_id + 1;
+      }
+
       begin_t();
       $GLOBALS['flag'] = true;
+
+      // Wipe any leftover children before attaching this new package_id
+      mysqlQuery("DELETE FROM custom_package_program WHERE package_id='$max_tour_id'");
+      mysqlQuery("DELETE FROM custom_package_hotels WHERE package_id='$max_tour_id'");
+      mysqlQuery("DELETE FROM custom_package_transport WHERE package_id='$max_tour_id'");
+      mysqlQuery("DELETE FROM custom_package_images WHERE package_id='$max_tour_id'");
 
       $inclusions = addslashes($inclusions);
       $exclusions = addslashes($exclusions);
@@ -37,8 +70,26 @@ class custom_package{
          error_log("Package model debug - day_program_arr size: " . sizeof($day_program_arr));
          error_log("Package model debug - going into program loop");
 
-         for($i=0; $i<sizeof($day_program_arr); $i++){
+         $expected_days = intval($total_days);
+         $program_count = sizeof($day_program_arr);
+         // Never silently trim — trimming kept wrong dest rows (e.g. Dubai) and dropped real ones.
+         if ($expected_days > 0 && $program_count !== $expected_days) {
+            $GLOBALS['flag'] = false;
+            rollback_t();
+            echo "error--Itinerary day count ($program_count) must match Total Days ($expected_days). Clear leftover rows and try again.";
+            exit;
+         }
+
+         for($i=0; $i<$program_count; $i++){
             
+            // Incomplete row is an error (do not skip — that would under-count days)
+            if (trim((string)$special_attaraction_arr[$i]) === '' || trim((string)$day_program_arr[$i]) === '') {
+               $GLOBALS['flag'] = false;
+               rollback_t();
+               echo "error--Itinerary day ".($i+1)." is incomplete. Fill attraction and day program for every day.";
+               exit;
+            }
+
             error_log("Package model debug - processing program entry $i");
             error_log("Package model debug - day_program: " . $day_program_arr[$i]);
             error_log("Package model debug - attraction: " . $special_attaraction_arr[$i]);
@@ -46,15 +97,20 @@ class custom_package{
             $sq = mysqlQuery("select max(entry_id) as max from custom_package_program");
             $value = mysqli_fetch_assoc($sq);
             $max_group_id = $value['max'] + 1;
+            $day_no = $i + 1;
 
-            $meal_plan_arr[$i] = mysqlREString($meal_plan_arr[$i]);
-            $special_attaraction1 = addslashes($special_attaraction_arr[$i]);
-            $day_program_arr1 = addslashes($day_program_arr[$i]);
-            $overnight_stay1 = addslashes($overnight_stay_arr[$i]);
+            $meal_plan_arr[$i] = mysqlREString($meal_plan_arr[$i] ?? '');
+            $special_attaraction1 = addslashes($special_attaraction_arr[$i] ?? '');
+            $day_program_arr1 = addslashes($day_program_arr[$i] ?? '');
+            $overnight_stay1 = addslashes($overnight_stay_arr[$i] ?? '');
             $day_image1 = isset($day_image_arr[$i]) ? addslashes($day_image_arr[$i]) : '';
             
             error_log("Package model debug - about to insert program entry with ID: " . $max_group_id . ", day_image: " . $day_image1);
-            $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image)values('$max_group_id','$max_tour_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
+            if ($this->program_has_day_no()) {
+               $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, day_no, attraction, day_wise_program, stay, meal_plan, day_image)values('$max_group_id','$max_tour_id','$day_no','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
+            } else {
+               $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image)values('$max_group_id','$max_tour_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
+            }
 
             if(!$sq1){
             $GLOBALS['flag'] = false;
@@ -68,14 +124,18 @@ class custom_package{
          //Hotel Details
          for($i=0; $i<sizeof($city_name_arr); $i++){
 
+            if (trim((string)($city_name_arr[$i] ?? '')) === '' || trim((string)($hotel_name_arr[$i] ?? '')) === '') {
+               continue;
+            }
+
             $sq = mysqlQuery("select max(entry_id) as max from custom_package_hotels");
             $value = mysqli_fetch_assoc($sq);
             $max_hotel_id = $value['max'] + 1;
 
             $city_name_arr[$i] = mysqlREString($city_name_arr[$i]);
             $hotel_name_arr[$i] = mysqlREString($hotel_name_arr[$i]);
-            $hotel_type_arr[$i] = mysqlREString($hotel_type_arr[$i]);
-            $total_days_arr[$i] = mysqlREString($total_days_arr[$i]);
+            $hotel_type_arr[$i] = mysqlREString($hotel_type_arr[$i] ?? '');
+            $total_days_arr[$i] = mysqlREString($total_days_arr[$i] ?? '');
 
             $sq2 = mysqlQuery("insert into custom_package_hotels(entry_id, package_id, city_name, hotel_name, hotel_type,total_days,image_url)values('$max_hotel_id','$max_tour_id','$city_name_arr[$i]', '$hotel_name_arr[$i]', '$hotel_type_arr[$i]','$total_days_arr[$i]','')");
 
@@ -88,14 +148,20 @@ class custom_package{
       //Transport Details
       for($i=0; $i<sizeof($vehicle_name_arr); $i++){
 
+         if (trim((string)($vehicle_name_arr[$i] ?? '')) === '' || trim((string)($pickup_arr[$i] ?? '')) === '' || trim((string)($drop_arr[$i] ?? '')) === '') {
+            continue;
+         }
+
          $sq = mysqlQuery("select max(entry_id) as max from custom_package_transport");
          $value = mysqli_fetch_assoc($sq);
          $max_tr_id = $value['max'] + 1;
 
-         $pickup_type = explode("-",$pickup_arr[$i])[0];
-         $drop_type = explode("-",$drop_arr[$i])[0];
-         $pickup = explode("-",$pickup_arr[$i])[1];
-         $drop = explode("-",$drop_arr[$i])[1];
+         $pickup_parts = explode("-", $pickup_arr[$i], 2);
+         $drop_parts = explode("-", $drop_arr[$i], 2);
+         $pickup_type = $pickup_parts[0] ?? '';
+         $drop_type = $drop_parts[0] ?? '';
+         $pickup = $pickup_parts[1] ?? '';
+         $drop = $drop_parts[1] ?? '';
          
          $sq2 = mysqlQuery("INSERT INTO `custom_package_transport`(`entry_id`, `package_id`, `vehicle_name`, `pickup`, `drop`, `pickup_type`, `drop_type`) values('$max_tr_id','$max_tour_id','$vehicle_name_arr[$i]', '$pickup', '$drop', '$pickup_type', '$drop_type')");
 
@@ -226,6 +292,23 @@ function package_master_update($package_id1,$package_code,$package_name,$total_d
       error_log("Package update model debug - checked_programe_arr size: " . sizeof($checked_programe_arr));
       error_log("Package update model debug - going into program update loop");
 
+      $expected_days = intval($total_days);
+      $kept_program_count = 0;
+      for ($ci = 0; $ci < sizeof($checked_programe_arr); $ci++) {
+         if (($checked_programe_arr[$ci] ?? '') == 'true') {
+            $kept_program_count++;
+         }
+      }
+      if ($expected_days > 0 && $kept_program_count !== $expected_days) {
+         $GLOBALS['flag'] = false;
+         rollback_t();
+         echo "error--Itinerary day count ($kept_program_count) must match Total Days ($expected_days). Uncheck leftover days or re-enter nights.";
+         exit;
+      }
+
+      $kept_entry_ids = array();
+      $day_no_counter = 0;
+
       for($i=0; $i<sizeof($day_program_arr); $i++){
 
          error_log("Package update model debug - processing program entry $i");
@@ -242,32 +325,54 @@ function package_master_update($package_id1,$package_code,$package_name,$total_d
          $day_image1 = isset($day_image_arr[$i]) ? addslashes($day_image_arr[$i]) : '';
 
          if($checked_programe_arr[$i]=='true'){
+         $day_no_counter++;
+         $day_no = $day_no_counter;
          if($entry_id_arr[$i] == ''){
             $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(entry_id) as max from custom_package_program"));
             $id = $sq_max['max']+1;
 
-            $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image)values('$id','$package_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
+            if ($this->program_has_day_no()) {
+               $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, day_no, attraction, day_wise_program, stay, meal_plan, day_image)values('$id','$package_id','$day_no','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
+            } else {
+               $sq1 = mysqlQuery("insert into custom_package_program( entry_id, package_id, attraction, day_wise_program, stay, meal_plan, day_image)values('$id','$package_id','$special_attaraction1', '$day_program_arr1', '$overnight_stay1','$meal_plan_arr[$i]','$day_image1')");
+            }
             if(!$sq1){
                echo "error--Tour Itinerary not saved!";
                exit;
                }
+            $kept_entry_ids[] = (string)$id;
          }
          else{
-            $query_pckg = "update custom_package_program set day_wise_program = '$day_program_arr1', attraction = '$special_attaraction1', stay = '$overnight_stay1',meal_plan='$meal_plan_arr[$i]',day_image='$day_image1' where entry_id='$entry_id_arr[$i]'";   
+            if ($this->program_has_day_no()) {
+               $query_pckg = "update custom_package_program set day_no='$day_no', day_wise_program = '$day_program_arr1', attraction = '$special_attaraction1', stay = '$overnight_stay1',meal_plan='$meal_plan_arr[$i]',day_image='$day_image1' where entry_id='$entry_id_arr[$i]' AND package_id='$package_id'";
+            } else {
+               $query_pckg = "update custom_package_program set day_wise_program = '$day_program_arr1', attraction = '$special_attaraction1', stay = '$overnight_stay1',meal_plan='$meal_plan_arr[$i]',day_image='$day_image1' where entry_id='$entry_id_arr[$i]' AND package_id='$package_id'";
+            }
          
             $sq1 = mysqlQuery($query_pckg);
             if(!$sq1){
                $GLOBALS['flag'] = false;
                echo "error--Error in package program!";
             }
+            $kept_entry_ids[] = (string)$entry_id_arr[$i];
          }
       }else{
-         $sq_iti = mysqlQuery("Delete from custom_package_program where entry_id='$entry_id_arr[$i]'");
-         if(!$sq_iti){
-            echo "error--Itinarary not deleted!";
-            exit;
+         if ($entry_id_arr[$i] != '') {
+            $sq_iti = mysqlQuery("Delete from custom_package_program where entry_id='$entry_id_arr[$i]' AND package_id='$package_id'");
+            if(!$sq_iti){
+               echo "error--Itinarary not deleted!";
+               exit;
             }
+         }
       }
+      }
+
+      // Safety: remove any orphan program rows not present in this save payload
+      if (!empty($kept_entry_ids)) {
+         $kept_list = implode(',', array_map('intval', $kept_entry_ids));
+         mysqlQuery("DELETE FROM custom_package_program WHERE package_id='$package_id' AND entry_id NOT IN ($kept_list)");
+      } else {
+         mysqlQuery("DELETE FROM custom_package_program WHERE package_id='$package_id'");
       }
       //Hotel
       for($i=0; $i<sizeof($city_name_arr); $i++){

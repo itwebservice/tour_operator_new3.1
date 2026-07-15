@@ -1,11 +1,16 @@
 <?php
 include "../../model/model.php";
 $dest_id = isset($_POST['dest_id']) ? $_POST['dest_id'] : 0;
-$spa = $_POST['spa'];
-$dwp = $_POST['dwp'];
-$ovs = $_POST['ovs'];
-$dayp = $_POST['dayp'];
+$spa = isset($_POST['spa']) ? $_POST['spa'] : '';
+$dwp = isset($_POST['dwp']) ? $_POST['dwp'] : '';
+$ovs = isset($_POST['ovs']) ? $_POST['ovs'] : '';
+$dayp = isset($_POST['dayp']) ? $_POST['dayp'] : '';
+$dest_id = mysqlREString($dest_id);
 $sq_itinerary_c = mysqli_num_rows(mysqlQuery("select * from itinerary_master where dest_id='$dest_id'"));
+$row_dest = null;
+if ($dest_id !== '' && $dest_id !== '0') {
+    $row_dest = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id = '$dest_id'"));
+}
 ?>
      <style>
 textarea.form-control {
@@ -34,31 +39,28 @@ textarea.form-control {
 
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
-        <h4 class="modal-title" id="myModalLabel">Add Itinerary for <?= $dayp ?></h4>
+        <h4 class="modal-title" id="myModalLabel">Add Itinerary for <?= htmlspecialchars($dayp, ENT_QUOTES) ?></h4>
 
       </div>
 
       <div class="modal-body">
-      <input type="hidden" id="spa" value='<?=$spa ?>'/>
-      <input type="hidden" id="dwp" value='<?=$dwp ?>'/>
-      <input type="hidden" id="ovs" value='<?=$ovs ?>'/>
+      <input type="hidden" id="spa" value='<?= htmlspecialchars($spa, ENT_QUOTES) ?>'/>
+      <input type="hidden" id="dwp" value='<?= htmlspecialchars($dwp, ENT_QUOTES) ?>'/>
+      <input type="hidden" id="ovs" value='<?= htmlspecialchars($ovs, ENT_QUOTES) ?>'/>
       <input type="hidden" id="base_url" value="<?= BASE_URL ?>"/>
+      <input type="hidden" id="itin_locked_dest_id" value="<?= htmlspecialchars((string)$dest_id, ENT_QUOTES) ?>"/>
         <div class="row">
           <div class="text-left col-md-3 col-sm-6">
-            <select id="dest_ids1"  name="dest_names1" title="Select Destination" class="form-control" style="width:100%" onchange="get_dest_itinerary(this.id)" required> 
-              <?php
-              if($dest_id !='' && $dest_id !='0'){
-              $row_dest = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id = '$dest_id'"));
-              ?>
-              <option value="<?php echo $row_dest['dest_id']; ?>"><?php echo $row_dest['dest_name']; ?></option>
-              <?php } ?>
-              <option value="">*Destination</option>
-              <?php 
-              $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'"); 
-              while($row_dest = mysqli_fetch_assoc($sq_query)){ ?>
-                  <option value="<?php echo $row_dest['dest_id']; ?>"><?php echo $row_dest['dest_name']; ?></option>
-                  <?php } ?>
+            <?php if ($row_dest) { ?>
+            <select id="dest_ids1" name="dest_names1" title="Destination" class="form-control" style="width:100%" disabled>
+              <option value="<?php echo (int)$row_dest['dest_id']; ?>" selected><?php echo htmlspecialchars($row_dest['dest_name'], ENT_QUOTES); ?></option>
             </select>
+            <small class="text-muted">Itineraries are locked to the package destination.</small>
+            <?php } else { ?>
+            <select id="dest_ids1" name="dest_names1" title="Select Destination" class="form-control" style="width:100%" required>
+              <option value="">*Destination</option>
+            </select>
+            <?php } ?>
           </div>
         </div>
           <h5></h5>
@@ -78,26 +80,23 @@ textarea.form-control {
                     <tr>
                     <td width="27px;" style="padding-right: 10px !important;"><input class="css-checkbox labelauty" id="chk_programd<?=$count?>" type="checkbox" style="display: none;"><label for="chk_programd<?= $count?>"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>
                     <td width="20px;"><input maxlength="15" value="<?= $count?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled=""></td>
-                    <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction<?= $count?>" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?= $row_itinerary['special_attraction']?>"></td>
-                    <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="day_program<?= $count?>" name="day_program" class="form-control" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?=$row_itinerary['daywise_program']?></textarea></td>
-                    <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay<?= $count?>" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?=$row_itinerary['overnight_stay']?>"></td>
+                    <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_special_attaraction<?= $count?>" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="itin_modal_special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?= htmlspecialchars($row_itinerary['special_attraction'], ENT_QUOTES) ?>"></td>
+                    <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="itin_modal_day_program<?= $count?>" name="itin_modal_day_program" class="form-control" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?= htmlspecialchars($row_itinerary['daywise_program'], ENT_QUOTES) ?></textarea></td>
+                    <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_overnight_stay<?= $count?>" name="itin_modal_overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?= htmlspecialchars($row_itinerary['overnight_stay'], ENT_QUOTES) ?>"></td>
                     <td class="col-md-1 no-pad" style="padding-left: 5px !important; width: 120px;">
-                        <!-- Display existing image if available -->
                         <?php if (!empty($row_itinerary['itinerary_image']) && trim($row_itinerary['itinerary_image']) !== '' && trim($row_itinerary['itinerary_image']) !== 'NULL') { ?>
                             <div style="margin-top: 5px;">
                                 <div style="height:80px; max-height: 80px; overflow:hidden; position: relative; width: 80px; border: 2px solid #28a745; border-radius: 8px; background-color: #f8f9fa;">
                                     <img src="<?php 
                                         $image_path = trim($row_itinerary['itinerary_image']);
-                                        // Check if path already starts with http
                                         if (strpos($image_path, 'http') === 0) {
-                                            echo $image_path;
+                                            echo htmlspecialchars($image_path, ENT_QUOTES);
                                         } else {
-                                            // For itinerary images, use project root URL
                                             $project_base_url = str_replace('/crm/', '/', BASE_URL);
                                             $project_base_url = rtrim($project_base_url, '/');
                                             $image_path = ltrim($image_path, '/');
                                             $final_url = $project_base_url . '/' . $image_path;
-                                            echo $final_url;
+                                            echo htmlspecialchars($final_url, ENT_QUOTES);
                                         }
                                     ?>" alt="Itinerary Image" 
                                          style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
@@ -111,11 +110,11 @@ textarea.form-control {
                                 <small>No Image</small>
                             </div>
                         <?php } ?>
-                        <input type="hidden" id="itinerary_image_<?= $count?>" name="itinerary_image" value="<?= $row_itinerary['itinerary_image'] ?? '' ?>">
+                        <input type="hidden" id="itinerary_image_<?= $count?>" name="itinerary_image" value="<?= htmlspecialchars($row_itinerary['itinerary_image'] ?? '', ENT_QUOTES) ?>">
                     </td>
-                    <td class="hidden"><input type="text" id="entry_id<?= $count?>" name="entry_id" class="form-control" value="<?=$row_itinerary['entry_id']?>"></td>
+                    <td class="hidden"><input type="text" id="itin_modal_entry_id<?= $count?>" name="itin_modal_entry_id" class="form-control" value="<?= htmlspecialchars($row_itinerary['entry_id'], ENT_QUOTES) ?>"></td>
                       <td>
-              <button class="btn btn-sm btn-success" id="btn_update" style="margin-top: 35px;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
+              <button type="button" class="btn btn-sm btn-success itin-modal-add-btn" id="btn_itin_add_<?= $count ?>" style="margin-top: 35px;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
 
                     </td>
                     </tr>
@@ -134,13 +133,6 @@ textarea.form-control {
           <div class="col-md-12 col-sm-6 col-xs-12 mg_tp_10"></div>
         <?php }?>
         </div>
-          <!-- <div class="row mg_tp_10">
-            <div class="col-xs-12 text-center">
-              <button class="btn btn-sm btn-success" id="btn_update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
-            </div>
-          </div> -->
-
-
 
       </div>      
 
@@ -153,120 +145,120 @@ textarea.form-control {
 </form>
 
 <script>
-$('#itinerary_detail_modal').modal('show');
-$('#dest_ids1').select2();
-if ($('#dest_ids1').val() && $('#dest_ids1').val() !== '0' && <?= (int)$sq_itinerary_c ?> === 0 && typeof get_dest_itinerary === 'function') {
-    get_dest_itinerary('dest_ids1');
-}
-$('#itinerary_detail_frm').validate({
-    rules:{
-      dest_names1 : {required:true}
-    },
-    submitHandler:function(form){
-      
-        var sq_itinerary_c = <?= $sq_itinerary_c ?>;
-        console.log('ITINERARY MODAL: sq_itinerary_c =', sq_itinerary_c);
-        if(sq_itinerary_c != 0){
-          var dest_id = $('#dest_ids1').val();
-          var spa = $('#spa').val();
-          var dwp = $('#dwp').val();
-          var ovs = $('#ovs').val();
+(function () {
+    $('#itinerary_detail_modal').modal('show');
+    if ($('#dest_ids1').length && !$('#dest_ids1').prop('disabled')) {
+        $('#dest_ids1').select2();
+    } else if ($('#dest_ids1').length) {
+        $('#dest_ids1').select2({ disabled: true });
+    }
 
-          console.log('ITINERARY MODAL: dest_id =', dest_id, 'spa =', spa, 'dwp =', dwp, 'ovs =', ovs);
+    function applySelectedItineraryRow() {
+        var sq_itinerary_c = <?= (int)$sq_itinerary_c ?>;
+        if (sq_itinerary_c == 0) {
+            var dynamicCount = $('#sq_itinerary_c1').val();
+            if (dynamicCount !== undefined && dynamicCount !== null && dynamicCount !== '') {
+                sq_itinerary_c = parseInt(dynamicCount, 10) || 0;
+            }
+        }
+        if (sq_itinerary_c == 0) {
+            error_msg_alert("You need to add itinerary for this destination first!");
+            return false;
+        }
 
-          if(dest_id == '' || dest_id == 0){
+        var dest_id = $('#itin_locked_dest_id').val() || $('#dest_ids1').val();
+        var spa = $('#spa').val();
+        var dwp = $('#dwp').val();
+        var ovs = $('#ovs').val();
+
+        if (dest_id == '' || dest_id == 0) {
             error_msg_alert("Please select destination!");
             return false;
-          }
-          var table = document.getElementById("default_program_list");
-          var rowCount = table.rows.length;
-          console.log('ITINERARY MODAL: Table found, rowCount =', rowCount);
-          var count = 0;
-          for(var i=0; i<rowCount; i++){
-              var row = table.rows[i];
-              var checkbox = row.cells[0].childNodes[0];
-              console.log('ITINERARY MODAL: Row', i, 'checkbox checked =', checkbox.checked);
-              if(checkbox.checked){
-                  count++;
-              }
-          }
-          console.log('ITINERARY MODAL: Total checked items =', count);
-          if(parseInt(count) != 1){
-              error_msg_alert("Please select one day program!");
-              return false;
-          }
-          for(var i=0; i<rowCount; i++){
-              var row = table.rows[i];
-              if(row.cells[0].childNodes[0].checked){
-                  console.log('ITINERARY MODAL: Processing selected row', i);
+        }
 
-                  var sp = row.cells[2].childNodes[0].value;
-                  var dwp1 = row.cells[3].childNodes[0].value;
-                  var os1 = row.cells[4].childNodes[0].value;
-                  
-                  console.log('ITINERARY MODAL: Values - sp:', sp, 'dwp1:', dwp1, 'os1:', os1);
-                  
-                  // Get image path from hidden input
-                  var imgInput = row.querySelector('input[id^="itinerary_image_"]');
-                  var img = imgInput ? imgInput.value : '';
-                  console.log('ITINERARY MODAL: Image input found:', imgInput, 'value:', img);
-                  console.log('ITINERARY MODAL: Row cells count:', row.cells.length);
-                  console.log('ITINERARY MODAL: All inputs in row:', row.querySelectorAll('input'));
-                  
-                  $('#'+spa).val(sp);
-                  $('#'+dwp).val(dwp1);
-                  $('#'+ovs).val(os1);
-                  
-                  console.log('ITINERARY MODAL: Set form values - spa:', spa, 'dwp:', dwp, 'ovs:', ovs);
-                  
-                  // Also copy the image to the package form
-                  // Extract day number from spa parameter - handle different formats
-                  var dayId = '';
-                  if (spa.includes('special_attaraction')) {
-                      dayId = spa.split('special_attaraction')[1];
-                      // Remove any suffix like '-u' for update modal
-                      dayId = dayId.replace(/-u$/, '');
-                  } else if (spa.includes('special_attraction')) {
-                      dayId = spa.split('special_attraction')[1];
-                      dayId = dayId.replace(/-u$/, '');
-                  } else {
-                      // Fallback: try to extract number from the end
-                      var match = spa.match(/(\d+)(?:-u)?$/);
-                      dayId = match ? match[1] : '';
-                  }
-                  console.log('ITINERARY MODAL: dayId extracted:', dayId, 'from spa:', spa);
-                  console.log('ITINERARY MODAL: img value:', img);
-                  console.log('ITINERARY MODAL: All available preview_img elements:', $('[id^="preview_img_"]').map(function() { return this.id; }).get());
-                  console.log('ITINERARY MODAL: All available day_image_preview elements:', $('[id^="day_image_preview_"]').map(function() { return this.id; }).get());
-                  
-                  if (dayId && img) {
-                      var imageKey = typeof resolveItineraryImageKeyFromSpa === 'function'
-                          ? resolveItineraryImageKeyFromSpa(spa)
-                          : dayId;
-                      window.selectedItineraryImage = {
-                          dayId: dayId,
-                          imageKey: imageKey,
-                          spa: spa,
-                          img: img
-                      };
-                      console.log('ITINERARY MODAL: Stored image data for later processing:', window.selectedItineraryImage);
-                  } else {
-                      console.log('ITINERARY MODAL: Missing dayId or img - dayId:', dayId, 'img:', img);
-                  }
-              }
-          }
-          console.log('ITINERARY MODAL: Closing modal');
-          if (typeof applySelectedItineraryImagePreview === 'function') {
-              applySelectedItineraryImagePreview();
-          }
-          $('#itinerary_detail_modal').modal('hide');
+        var table = document.getElementById("default_program_list");
+        if (!table) {
+            error_msg_alert("You need to add itinerary for this destination first!");
+            return false;
         }
-        else{
-          error_msg_alert("You need to add itinerary for this destination first!");
-          return false;
+        var rowCount = table.rows.length;
+        var count = 0;
+        for (var i = 0; i < rowCount; i++) {
+            var checkbox = table.rows[i].querySelector('input[type="checkbox"]');
+            if (checkbox && checkbox.checked) {
+                count++;
+            }
         }
-        
+        if (parseInt(count, 10) != 1) {
+            error_msg_alert("Please select one day program!");
+            return false;
+        }
+
+        for (var i = 0; i < rowCount; i++) {
+            var row = table.rows[i];
+            var checkbox = row.querySelector('input[type="checkbox"]');
+            if (!checkbox || !checkbox.checked) {
+                continue;
+            }
+
+            var spInput = row.querySelector('input[name="itin_modal_special_attaraction"], input[id^="itin_modal_special_attaraction"]');
+            var dwpInput = row.querySelector('textarea[name="itin_modal_day_program"], textarea[id^="itin_modal_day_program"]');
+            var osInput = row.querySelector('input[name="itin_modal_overnight_stay"], input[id^="itin_modal_overnight_stay"]');
+            var imgInput = row.querySelector('input[id^="itinerary_image_"]');
+
+            var sp = spInput ? spInput.value : '';
+            var dwp1 = dwpInput ? dwpInput.value : '';
+            var os1 = osInput ? osInput.value : '';
+            var img = imgInput ? imgInput.value : '';
+
+            // Write only into package day fields (never into other pages)
+            if (spa) { $('#' + spa).val(sp); }
+            if (dwp) { $('#' + dwp).val(dwp1); }
+            if (ovs) { $('#' + ovs).val(os1); }
+
+            var dayId = '';
+            if (spa.indexOf('special_attaraction') !== -1) {
+                dayId = spa.split('special_attaraction')[1];
+                dayId = dayId.replace(/-u$/, '');
+            } else if (spa.indexOf('special_attraction') !== -1) {
+                dayId = spa.split('special_attraction')[1];
+                dayId = dayId.replace(/-u$/, '');
+            } else {
+                var match = spa.match(/(\d+)(?:-u)?$/);
+                dayId = match ? match[1] : '';
+            }
+
+            if (dayId && img) {
+                var imageKey = typeof resolveItineraryImageKeyFromSpa === 'function'
+                    ? resolveItineraryImageKeyFromSpa(spa)
+                    : dayId;
+                window.selectedItineraryImage = {
+                    dayId: dayId,
+                    imageKey: imageKey,
+                    spa: spa,
+                    img: img
+                };
+            }
+        }
+
+        if (typeof applySelectedItineraryImagePreview === 'function') {
+            applySelectedItineraryImagePreview();
+        }
+        $('#itinerary_detail_modal').modal('hide');
+        setTimeout(function () {
+            $('#div_itinerary_modal').empty();
+        }, 300);
+        return false;
     }
-});
+
+    $('#itinerary_detail_frm').off('submit.itineraryModal').on('submit.itineraryModal', function (e) {
+        e.preventDefault();
+        return applySelectedItineraryRow();
+    });
+
+    $(document).off('click.itineraryModalAdd', '#itinerary_detail_modal .itin-modal-add-btn').on('click.itineraryModalAdd', '#itinerary_detail_modal .itin-modal-add-btn', function (e) {
+        e.preventDefault();
+        applySelectedItineraryRow();
+    });
+})();
 </script>
-<script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>

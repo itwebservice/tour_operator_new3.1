@@ -14,7 +14,7 @@ include "../../../../model/model.php";
                         <legend>Basic Information</legend>
                         <div class="row">
                             <div class="col-md-3 col-sm-6 mg_bt_10">
-                                <select class="form-control app_select2" id="city_filter_hotel" name="city_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                <select class="form-control" id="city_filter_hotel" name="city_filter_hotel" style="width:100%" title="Select City Name" data-add-new-option="true" data-lazy-city="true">
                                 </select>
                             </div>
                             <div class="col-md-3 col-sm-6 mg_bt_10">

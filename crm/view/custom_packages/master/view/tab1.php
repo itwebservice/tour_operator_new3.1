@@ -81,7 +81,14 @@
 
 						<?php
 						$count = 0;
-						$query = "select * from custom_package_program where package_id = '$package_id'";
+						$has_day_no = false;
+						$col_check = mysqlQuery("SHOW COLUMNS FROM custom_package_program LIKE 'day_no'");
+						if ($col_check && mysqli_num_rows($col_check) > 0) {
+							$has_day_no = true;
+						}
+						$query = $has_day_no
+							? "select * from custom_package_program where package_id = '$package_id' order by day_no, entry_id"
+							: "select * from custom_package_program where package_id = '$package_id' order by entry_id";
 						$sq_pckg_a = mysqlQuery($query);
 						while($sq_pckg1 = mysqli_fetch_assoc($sq_pckg_a)){
 

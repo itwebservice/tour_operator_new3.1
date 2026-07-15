@@ -202,3 +202,60 @@
 [23-May-2018 03:59:10 Etc/GMT] PHP Warning:  mysqlQuery(): Access denied for user 'root'@'localhost' (using password: NO) in /home/itourscloud/public_html/v5/view/package_booking/quotation/home/excursion_name_load.php on line 8
 [23-May-2018 03:59:10 Etc/GMT] PHP Warning:  mysqlQuery(): A link to the server could not be established in /home/itourscloud/public_html/v5/view/package_booking/quotation/home/excursion_name_load.php on line 8
 [23-May-2018 03:59:10 Etc/GMT] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be resource, boolean given in /home/itourscloud/public_html/v5/view/package_booking/quotation/home/excursion_name_load.php on line 12
+[15-Jul-2026 13:04:05 Asia/Kolkata] Quotation ID: 47
+[15-Jul-2026 13:04:05 Asia/Kolkata] Email Option: Email Body
+[15-Jul-2026 13:04:05 Asia/Kolkata] Selected Options: Array
+(
+    [0] => price_structure
+    [1] => inclusion_exclusion
+    [2] => terms_conditions
+    [3] => itinerary
+)
+
+[15-Jul-2026 13:04:05 Asia/Kolkata] Price Structure selected: YES
+[15-Jul-2026 13:04:05 Asia/Kolkata] Inclusions/Exclusions selected: YES
+[15-Jul-2026 13:04:05 Asia/Kolkata] Terms & Conditions selected: YES
+[15-Jul-2026 13:04:05 Asia/Kolkata] Itinerary selected: YES
+[15-Jul-2026 13:04:05 Asia/Kolkata] Hotel count: 
+[15-Jul-2026 13:04:05 Asia/Kolkata] Transport count: 
+[15-Jul-2026 13:04:05 Asia/Kolkata] Itinerary count: 
+[15-Jul-2026 13:04:05 Asia/Kolkata] Hotel count: 3
+[15-Jul-2026 13:04:05 Asia/Kolkata] Itinerary count: 6
+[15-Jul-2026 13:04:15 Asia/Kolkata] Quotation ID: 47
+[15-Jul-2026 13:04:15 Asia/Kolkata] Email Option: WhatsApp
+[15-Jul-2026 13:04:15 Asia/Kolkata] Selected Options: Array
+(
+    [0] => price_structure
+    [1] => inclusion_exclusion
+    [2] => terms_conditions
+    [3] => itinerary
+)
+
+[15-Jul-2026 13:04:15 Asia/Kolkata] Price Structure selected: YES
+[15-Jul-2026 13:04:15 Asia/Kolkata] Inclusions/Exclusions selected: YES
+[15-Jul-2026 13:04:15 Asia/Kolkata] Terms & Conditions selected: YES
+[15-Jul-2026 13:04:15 Asia/Kolkata] Itinerary selected: YES
+[15-Jul-2026 13:04:15 Asia/Kolkata] Hotel count: 
+[15-Jul-2026 13:04:15 Asia/Kolkata] Transport count: 
+[15-Jul-2026 13:04:15 Asia/Kolkata] Itinerary count: 
+[15-Jul-2026 13:04:15 Asia/Kolkata] Hotel count: 3
+[15-Jul-2026 13:04:15 Asia/Kolkata] Itinerary count: 6
+[15-Jul-2026 13:05:15 Asia/Kolkata] Quotation ID: 47
+[15-Jul-2026 13:05:15 Asia/Kolkata] Email Option: Email Body
+[15-Jul-2026 13:05:15 Asia/Kolkata] Selected Options: Array
+(
+    [0] => price_structure
+    [1] => inclusion_exclusion
+    [2] => terms_conditions
+    [3] => itinerary
+)
+
+[15-Jul-2026 13:05:15 Asia/Kolkata] Price Structure selected: YES
+[15-Jul-2026 13:05:15 Asia/Kolkata] Inclusions/Exclusions selected: YES
+[15-Jul-2026 13:05:15 Asia/Kolkata] Terms & Conditions selected: YES
+[15-Jul-2026 13:05:15 Asia/Kolkata] Itinerary selected: YES
+[15-Jul-2026 13:05:15 Asia/Kolkata] Hotel count: 
+[15-Jul-2026 13:05:15 Asia/Kolkata] Transport count: 
+[15-Jul-2026 13:05:15 Asia/Kolkata] Itinerary count: 
+[15-Jul-2026 13:05:15 Asia/Kolkata] Hotel count: 3
+[15-Jul-2026 13:05:15 Asia/Kolkata] Itinerary count: 6

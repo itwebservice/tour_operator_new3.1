@@ -98,28 +98,28 @@ while ($sq_accomodation = mysqli_fetch_assoc($sq_accomodation1_hotel)) {
                             <ul class="main_block noType">
                                 <li class="col-md-3 mg_tp_10 mg_bt_10">
                                     <div class="print_quo_detail_block">
-                                        <i class="fa fa-hourglass-half" aria-hidden="true"></i><br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="12" width="9" viewBox="0 0 384 512"><path fill="hsl(0, 0%, 0%)" d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64l0 11c0 42.4 16.9 83.1 46.9 113.1l67.9 67.9-67.9 67.9C48.9 353.9 32 394.6 32 437l0 11c-17.7 0-32 14.3-32 32s14.3 32 32 32l320 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-11c0-42.4-16.9-83.1-46.9-113.1l-67.9-67.9 67.9-67.9c30-30 46.9-70.7 46.9-113.1l0-11c17.7 0 32-14.3 32-32S369.7 0 352 0L32 0zM96 75l0-11 192 0 0 11c0 19-5.6 37.4-16 53L112 128c-10.3-15.6-16-34-16-53zm16 309c3.5-5.3 7.6-10.3 12.1-14.9l67.9-67.9 67.9 67.9c4.6 4.6 8.6 9.6 12.2 14.9L112 384z"/></svg><br>
                                         <span>DURATION</span><br>
                                         <?= ($total_days) . 'N' ?><br>
                                     </div>
                                 </li>
                                 <li class="col-md-3 mg_tp_10 mg_bt_10">
                                     <div class="print_quo_detail_block">
-                                        <i class="fa fa-users" aria-hidden="true"></i><br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="12" width="15" viewBox="0 0 640 512"><path fill="hsl(0, 0%, 0%)" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"/></svg><br>
                                         <span>TOTAL GUEST(s)</span><br>
                                         <?= $adults ?> Adult(s), <?= $children ?> Child(ren), <?= $infants ?> Infant(s)<br>
                                     </div>
                                 </li>
                                 <li class="col-md-3 mg_tp_10 mg_bt_10">
                                     <div class="print_quo_detail_block">
-                                        <i class="fa fa-home" aria-hidden="true"></i><br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 512 512"><path fill="hsl(0, 0%, 0%)" d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272l16 0 0 176c0 35.3 28.7 64 64 64l288 0c35.3 0 64-28.7 64-64l0-176 16 0c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1l-224-208zM240 320l32 0c26.5 0 48 21.5 48 48l0 96-128 0 0-96c0-26.5 21.5-48 48-48z"/></svg><br>
                                         <span>TOTAL ROOM(s)</span><br>
                                         <?= $sq_accomodation['rooms'] ?><br>
                                     </div>
                                 </li>
                                 <li class="col-md-3 mg_tp_10 mg_bt_10">
                                     <div class="print_quo_detail_block">
-                                        <i class="fa fa-university" aria-hidden="true"></i><br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 512 512"><path fill="hsl(0, 0%, 0%)" d="M271.9 20.2c-9.8-5.6-21.9-5.6-31.8 0l-224 128c-12.6 7.2-18.8 22-15.1 36S17.5 208 32 208l32 0 0 208 0 0-51.2 38.4C4.7 460.4 0 469.9 0 480 0 497.7 14.3 512 32 512l448 0c17.7 0 32-14.3 32-32 0-10.1-4.7-19.6-12.8-25.6l-51.2-38.4 0-208 32 0c14.5 0 27.2-9.8 30.9-23.8s-2.5-28.8-15.1-36l-224-128zM400 208l0 208-64 0 0-208 64 0zm-112 0l0 208-64 0 0-208 64 0zm-112 0l0 208-64 0 0-208 64 0zM256 96a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg><br>
                                         <span>ROOM CATEGORY</span><br>
                                         <?= $sq_accomodation['catagory'] ?><br>
                                     </div>
@@ -480,21 +480,21 @@ if($q_transport_count > 0){
                         <ul class="main_block noType">
                             <li class="col-md-3 mg_tp_10 mg_bt_10">
                                 <div class="print_quo_detail_block">
-                                    <i class="fa fa-hourglass-half" aria-hidden="true"></i><br>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="12" width="9" viewBox="0 0 384 512"><path fill="hsl(0, 0%, 0%)" d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64l0 11c0 42.4 16.9 83.1 46.9 113.1l67.9 67.9-67.9 67.9C48.9 353.9 32 394.6 32 437l0 11c-17.7 0-32 14.3-32 32s14.3 32 32 32l320 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-11c0-42.4-16.9-83.1-46.9-113.1l-67.9-67.9 67.9-67.9c30-30 46.9-70.7 46.9-113.1l0-11c17.7 0 32-14.3 32-32S369.7 0 352 0L32 0zM96 75l0-11 192 0 0 11c0 19-5.6 37.4-16 53L112 128c-10.3-15.6-16-34-16-53zm16 309c3.5-5.3 7.6-10.3 12.1-14.9l67.9-67.9 67.9 67.9c4.6 4.6 8.6 9.6 12.2 14.9L112 384z"/></svg><br>
                                     <span>DURATION</span><br>
                                     <?php echo ($total_days + 1) . ' Days'; ?><br>
                                 </div>
                             </li>
                             <li class="col-md-4 mg_tp_10 mg_bt_10">
                                 <div class="print_quo_detail_block">
-                                    <i class="fa fa-users" aria-hidden="true"></i><br>
-                                    <span>TOTAL GUEST(s)</span><br>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="12" width="15" viewBox="0 0 640 512"><path fill="hsl(0, 0%, 0%)" d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"/></svg><br>
+                                <span>TOTAL GUEST(s)</span><br
                                     <?= $adults ?> Adult(s), <?= $children ?> Child(ren), <?= $infants ?> Infant(s)<br>
                                 </div>
                             </li>
                             <li class="col-md-3 mg_tp_10 mg_bt_10">
                                 <div class="print_quo_detail_block">
-                                    <i class="fa fa-user" aria-hidden="true"></i><br>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="14" width="12.25" viewBox="0 0 448 512"><path fill="hsl(0, 0%, 0%)" d="M224 248a120 120 0 1 0 0-240 120 120 0 1 0 0 240zm-29.7 56C95.8 304 16 383.8 16 482.3 16 498.7 29.3 512 45.7 512l356.6 0c16.4 0 29.7-13.3 29.7-29.7 0-98.5-79.8-178.3-178.3-178.3l-59.4 0z"/></svg><br>
                                     <span>GUEST NAME</span><br>
                                     <?= $name ?><br>
                                 </div>
@@ -778,7 +778,7 @@ if($q_transport_count > 0){
                                     </div>
                                     <div class="print_itinenary_desciption print_info_block">
                                         <div class="print_itinenary_attraction">
-                                            <span class="print_itinenary_attraction_icon"><i class="fa fa-map-marker"></i></span>
+                                            <span class="print_itinenary_attraction_icon"><svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 384 512"><path fill="hsl(0, 0%, 0%)" d="M0 188.6C0 84.4 86 0 192 0S384 84.4 384 188.6c0 119.3-120.2 262.3-170.4 316.8-11.8 12.8-31.5 12.8-43.3 0-50.2-54.5-170.4-197.5-170.4-316.8zM192 256a64 64 0 1 0 0-128 64 64 0 1 0 0 128z"/></svg></span>
                                             <samp class="print_itinenary_attraction_location"><?= $row_itinarary['attraction'] ?></samp>
                                         </div>
                                         <p><?= $row_itinarary['day_wise_program'] ?></p>
@@ -786,9 +786,9 @@ if($q_transport_count > 0){
                                     <div class="print_itinenary_details">
                                         <div class="print_info_block">
                                             <ul class="main_block no-pad noType">
-                                                <li class="col-md-12 mg_tp_10 mg_bt_10"><span><i class="fa fa-bed"></i> :
+                                                <li class="col-md-12 mg_tp_10 mg_bt_10"><span><svg xmlns="http://www.w3.org/2000/svg" height="12" width="13.5" viewBox="0 0 576 512"><path fill="hsl(0, 0%, 0%)" d="M32 32c17.7 0 32 14.3 32 32l0 224 224 0 0-128c0-17.7 14.3-32 32-32l160 0c53 0 96 43 96 96l0 224c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64-448 0 0 64c0 17.7-14.3 32-32 32S0 465.7 0 448L0 64C0 46.3 14.3 32 32 32zm80 160a64 64 0 1 1 128 0 64 64 0 1 1 -128 0z"/></svg> :
                                                     </span><?= $row_itinarary['stay'] ?></li>
-                                                <li class="col-md-12 mg_tp_10 mg_bt_10"><span><i class="fa fa-cutlery"></i> :
+                                                <li class="col-md-12 mg_tp_10 mg_bt_10"><span><svg xmlns="http://www.w3.org/2000/svg" height="12" width="13.5" viewBox="0 0 576 512"><path fill="hsl(0, 0%, 0%)" d="M32 32c17.7 0 32 14.3 32 32l0 224 224 0 0-128c0-17.7 14.3-32 32-32l160 0c53 0 96 43 96 96l0 224c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64-448 0 0 64c0 17.7-14.3 32-32 32S0 465.7 0 448L0 64C0 46.3 14.3 32 32 32zm80 160a64 64 0 1 1 128 0 64 64 0 1 1 -128 0z"/></svg> :
                                                     </span><?= $row_itinarary['meal_plan'] ?></li>
                                             </ul>
                                         </div>

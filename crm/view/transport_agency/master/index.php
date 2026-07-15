@@ -47,7 +47,6 @@ require_once('../../layouts/admin_header.php');
 <script src="<?php echo BASE_URL ?>js/app/field_validation.js"></script>                    
 
 <script>
-city_lzloading('#city_id_filter');
 function list_reflect()
 {
 	var active_flag = $('#active_flag_filter').val();
@@ -158,3 +157,6 @@ function display_format_modal()
 /*======******Footer******=======*/
 require_once('../../layouts/admin_footer.php'); 
 ?>
+<script>
+city_lzloading('#city_id_filter');
+</script>

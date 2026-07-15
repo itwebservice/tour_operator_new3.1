@@ -52,7 +52,6 @@ require_once('../layouts/admin_header.php');
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script>
-city_lzloading('#city_id_filter');
 vendor_csv_upload();
 function vendor_csv_upload()
 {   
@@ -188,3 +187,6 @@ function dmc_view_modal(dmc_id){
 /*======******Footer******=======*/
 require_once('../layouts/admin_footer.php'); 
 ?>
+<script>
+city_lzloading('#city_id_filter');
+</script>
