@@ -2,7 +2,38 @@
 
 class app_settings_master{
 
+private static function normalize_testimonial_photo($photo)
+{
+  $photo = trim((string) $photo);
+  if ($photo === '') {
+    return '';
+  }
 
+  $photo = str_replace('\\', '/', $photo);
+
+  if (strpos($photo, 'http://') === 0 || strpos($photo, 'https://') === 0) {
+    $base_path = parse_url(BASE_URL, PHP_URL_PATH);
+    $pos = strpos($photo, $base_path);
+    if ($pos !== false) {
+      $photo = ltrim(substr($photo, $pos + strlen($base_path)), '/');
+    } elseif (preg_match('#/crm/(.+)$#', $photo, $matches)) {
+      $photo = $matches[1];
+    }
+  }
+
+  $photo = preg_replace('#^(\.\./)+#', '', $photo);
+  $photo = ltrim($photo, '/');
+
+  if (strpos($photo, 'uploads/testimonials/') !== false) {
+    $filename = basename($photo);
+    $photo = 'images/quotational_customer_testimonials/' . $filename;
+  } elseif (strpos($photo, 'images/testimonial/') !== false) {
+    $filename = basename($photo);
+    $photo = 'images/quotational_customer_testimonials/' . $filename;
+  }
+
+  return $photo;
+}
 
 public function app_basic_info_save()
 
@@ -229,22 +260,26 @@ function app_format_save(){
 
     $config = gqb_get_config();
     // $config['testimonials'] = is_array($testimonials) ? $testimonials : array();
-    $testimonials = isset($_POST['testimonials']) ? json_decode($_POST['testimonials'], true) : array();
+    $testimonials = isset($_POST['testimonials']) ? json_decode(stripslashes($_POST['testimonials']), true) : array();
+    if (!is_array($testimonials)) {
+      $testimonials = array();
+    }
 
-    mysqlQuery("TRUNCATE TABLE quotation_testimonial");
+    // mysqlQuery("TRUNCATE TABLE quotation_testimonial");
 
-    if (is_array($testimonials)) {
-      foreach ($testimonials as $t) {
-        $name = mysqlREString($t['name'] ?? '');
-        $designation = mysqlREString($t['designation'] ?? '');
-        $review = mysqlREString($t['review'] ?? '');
-        $photo = mysqlREString($t['photo'] ?? '');
+    foreach ($testimonials as $t) {
+      if (!is_array($t)) {
+        continue;
+      }
+      $name = mysqlREString(trim($t['name'] ?? ''));
+      $designation = mysqlREString(trim($t['designation'] ?? ''));
+      $review = mysqlREString(trim($t['review'] ?? ''));
+      $photo = mysqlREString(self::normalize_testimonial_photo(trim($t['photo'] ?? '')));
 
-        mysqlQuery("INSERT INTO quotation_testimonial 
+      mysqlQuery("INSERT INTO quotation_testimonial 
       (name, designation, review, photo, active_flag) 
       VALUES 
       ('$name', '$designation', '$review', '$photo', 'Active')");
-      }
     }
     //==============================
     $social_links = isset($_POST['social_links']) ? json_decode($_POST['social_links'], true) : array();

@@ -642,6 +642,12 @@ box-shadow: 0 3px 10px 0 rgba(34, 41, 47, 0.1);
 background-color: #fff;
 border-color: #7367f0;
 }
+.modal-open .select2-container--open {
+z-index: 10060 !important;
+}
+.modal-open .select2-dropdown {
+z-index: 10060 !important;
+}
 .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
 
 background-color: #f5f5f5;
@@ -2590,16 +2596,63 @@ textarea.ai-chat-textarea.form-control:focus,
 
 
 .ai-check-wrap {
+	position: relative;
 	width: 24px;
-	display: flex;
+	height: 24px;
+	display: inline-flex;
+	align-items: center;
 	justify-content: center;
+	flex-shrink: 0;
 }
 
-.ai-check-wrap input {
-	width: 16px;
-	height: 16px;
-	accent-color: <?= $theme_color ?>;
+.ai-check-wrap .ai-program-check.css-checkbox {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	opacity: 0;
+	z-index: 2;
 	cursor: pointer;
+}
+
+.ai-check-wrap .ai-program-check.css-checkbox + label:not(.css-label) {
+	display: none !important;
+}
+
+.ai-check-wrap label.css-label {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	border: 2px solid <?= $theme_color ?>;
+	border-radius: 3px;
+	background: #fff;
+	cursor: pointer;
+	position: relative;
+	vertical-align: middle;
+}
+
+.ai-check-wrap .ai-program-check.css-checkbox:checked ~ label.css-label {
+	background: <?= $theme_color ?>;
+	border-color: <?= $theme_color ?>;
+}
+
+.ai-check-wrap .ai-program-check.css-checkbox:checked ~ label.css-label::after {
+	content: '';
+	position: absolute;
+	left: 5px;
+	top: 1px;
+	width: 5px;
+	height: 9px;
+	border: solid #fff;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+.ai-check-wrap .ai-program-check.css-checkbox:focus ~ label.css-label {
+	box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
 }
 
 .ai-field {
@@ -2727,6 +2780,8 @@ textarea.ai-chat-textarea.form-control:focus,
 #tbl_package_tour_member .select2-container .select2-selection--single{
     width:70px !important;
 }
+
+.planeairport-select .select2-container,
 .sector-select .select2-container{
 	width: 300px !important;
 }

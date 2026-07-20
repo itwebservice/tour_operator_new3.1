@@ -1,5 +1,6 @@
 <?php
 include "../../../../model/model.php";
+include_once "../inc/booking_discount_helper.php";
 
 $booking_id = $_POST['booking_id'];
 
@@ -7,7 +8,7 @@ $sq_package_info = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_boo
 $date = $sq_package_info['booking_date'];
 $yr = explode("-", $date);
 $year =$yr[0];
-$discount_in = ($sq_package_info['discount_in'] == 'Percentage') ? '%' : '';
+$discount_in = booking_discount_display_suffix($sq_package_info['discount_in']);
 ?>
 <div class="modal fade profile_box_modal" id="package_display_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
 	<div class="modal-dialog modal-lg" role="document">

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Renders package-quotation email HTML matching the active PDF template look (Option 1).
+ * Renders package-quotation email HTML using Option-1 design always
+ * (independent of Company Profile quotation format).
  * Section toggles: header, price_structure, itinerary, inclusion_exclusion, terms_conditions, footer.
  */
 if (!function_exists('render_quotation_email_pdf_style')) {
@@ -287,13 +288,8 @@ if (!function_exists('render_quotation_email_pdf_style')) {
 
 	function render_quotation_email_pdf_style($quotation_id, $options = array(), $sectioned = true, $quotation_link = '')
 	{
-		global $app_quot_format;
-
-		$format = (int) (!empty($app_quot_format) ? $app_quot_format : 1);
-		if ($format !== 1) {
-			return '';
-		}
-
+		// Package quotation emails always use Option-1 design,
+		// regardless of Company Profile quotation format setting.
 		$data_path = dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/generic_quotation_data.php';
 		if (!file_exists($data_path)) {
 			return '';

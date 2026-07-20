@@ -12,7 +12,7 @@ $blog = (sizeof($b2c_blogs)!=0) ? $b2c_blogs : [];
                 for($blog_count=0;$blog_count<sizeof($blog);$blog_count++){
                     //Image
                     $url = $blog[$blog_count]['image'];
-                    $pos = strstr($url,'uploads');
+                    $pos = strstr($url,'uploads') || strstr($url,'images/call_to_action');
                     if ($pos != false)   {
                         $newUrl = preg_replace('/(\/+)/','/',$url); 
                         $newUrl1 = BASE_URL.str_replace('../', '', $newUrl);

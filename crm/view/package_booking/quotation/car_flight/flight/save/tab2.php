@@ -18,7 +18,7 @@
                             <div class="panel-body">
                                 <div class="row mg_tp_10 mg_bt_10">
                                     <div class="col-xs-6 mg_bt_20_sm_xs">
-                                        <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                                        <button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
                                     </div>
                                     <div class="col-xs-6 text-right mg_bt_20_sm_xs">
                                         <button type="button" class="btn btn-excel btn-sm"

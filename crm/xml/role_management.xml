@@ -397,6 +397,15 @@
 	</menu_desc>
 
 	<menu_desc>
+		<name>Online Leads</name>
+		<link>online_leads/index.php</link>
+		<rank>5</rank>
+		<priority>1</priority>
+		<description>Social Media Leads Retrieval</description>
+		<menu_icon>fa fa-phone-square</menu_icon>
+	</menu_desc> 
+
+	<menu_desc>
 		<name>Sales</name>
 		<link>#</link>
 		<rank>6</rank>
@@ -495,6 +504,35 @@
 		<description>Miscellaneous bookings</description>
 		<menu_icon>fa fa-bed</menu_icon>
 	</menu_desc>
+
+	
+
+	<menu_desc>
+		<name>Purchase</name>
+		<link></link>
+		<rank>8</rank>
+		<priority>1</priority>
+		<description></description>
+		<menu_icon>fa fa-handshake-o</menu_icon>
+	</menu_desc>
+
+	<menu_desc>
+		<name> Purchase</name>
+		<link>vendor/dashboard/index.php</link>
+		<rank>8</rank>
+		<priority>2</priority>
+		<description>This vendor payment module dashboard.</description>
+		<menu_icon>fa fa-shopping-cart</menu_icon>
+	</menu_desc>
+
+	<menu_desc>
+		<name> Purchase Cancel </name>
+		<link>vendor/refund/index.php</link>
+		<rank>8</rank>
+		<priority>2</priority>
+		<description>This vendor refund module dashboard.</description>
+		<menu_icon>fa fa-undo</menu_icon>
+	</menu_desc>	
 
 	<menu_desc>
 		<name>Cancel / Refund</name>
@@ -603,33 +641,6 @@
 		<description>Miscellaneous cancel and refund</description>
 		<menu_icon>fa fa-angle-right</menu_icon>
 	</menu_desc>
-
-	<menu_desc>
-		<name>Purchase</name>
-		<link></link>
-		<rank>8</rank>
-		<priority>1</priority>
-		<description></description>
-		<menu_icon>fa fa-handshake-o</menu_icon>
-	</menu_desc>
-
-	<menu_desc>
-		<name> Purchase</name>
-		<link>vendor/dashboard/index.php</link>
-		<rank>8</rank>
-		<priority>2</priority>
-		<description>This vendor payment module dashboard.</description>
-		<menu_icon>fa fa-shopping-cart</menu_icon>
-	</menu_desc>
-
-	<menu_desc>
-		<name> Purchase Cancel </name>
-		<link>vendor/refund/index.php</link>
-		<rank>8</rank>
-		<priority>2</priority>
-		<description>This vendor refund module dashboard.</description>
-		<menu_icon>fa fa-undo</menu_icon>
-	</menu_desc>	
 	
 	<menu_desc>
 		<name>HR</name>
@@ -1009,14 +1020,14 @@
 		<menu_icon>fa fa-refresh</menu_icon>
 	</menu_desc> -->
 	
-	<menu_desc>
+	<!-- <menu_desc>
 		<name>Online Leads</name>
 		<link>online_leads/index.php</link>
 		<rank>15</rank>
 		<priority>1</priority>
 		<description>Social Media Leads Retrieval</description>
 		<menu_icon>fa fa-phone-square</menu_icon>
-	</menu_desc>
+	</menu_desc> -->
 
 	<menu_desc>
 		<name>Support</name>

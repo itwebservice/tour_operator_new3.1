@@ -2664,55 +2664,152 @@ function city_master_dropdown_reload() {
 // }
 
 
-function city_lzloading(element, placeholder = "City Name", valueasText = false) {
-	var base_url = $("#base_url").val();
-	url = base_url + '/view/load_data/generic_city_loading.php';
-	$(element).append($("<option></option>").attr("value", "").text(placeholder));
-	var dropdownParent  = $(element).closest('.modal').attr('id');
-	if(dropdownParent!=null){
-	$(element).select2({
-		placeholder: placeholder,
-		dropdownParent: $("#" + dropdownParent),
-		ajax: {
-			url: url,
-			dataType: 'json',
-			type: 'GET',
-			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
-			processResults: function (data) {
-				let more = data.pagination;
-				return {
-					results: data.results,
-					pagination: {
-						more: more.more,
-					}
-				};
-			}
-		}
-	});
-}else{
-	$(element).select2({
-		placeholder: placeholder,
-		ajax: {
-			url: url,
-			dataType: 'json',
-			type: 'GET',
-			data: function (params) { return { term: params.term, page: params.page || 0, valueasText: valueasText } },
-			processResults: function (data) {
-				let more = data.pagination;
-				return {
-					results: data.results,
-					pagination: {
-						more: more.more,
-					}
-				};
-			}
-		}
+function getModalSelect2Parent($element) {
+	// Append dropdown to body so position stays correct inside scrollable modals/tables.
+	return $(document.body);
+}
+
+function resolveAppSelect2Width($el) {
+	var $select = $($el);
+	var styleAttr = $select.attr('style') || '';
+	var widthMatch = styleAttr.match(/(?:^|;)\s*width\s*:\s*([^;]+)/i);
+	if (widthMatch && widthMatch[1]) {
+		return $.trim(widthMatch[1]);
+	}
+	var outerWidth = $select.outerWidth();
+	return outerWidth > 0 ? outerWidth : '100%';
+}
+
+function cleanClonedSelectElement(selectEl) {
+	if (!selectEl || selectEl.tagName !== 'SELECT') {
+		return selectEl;
+	}
+	selectEl.classList.remove('select2-hidden-accessible');
+	selectEl.removeAttribute('tabindex');
+	selectEl.removeAttribute('aria-hidden');
+	selectEl.removeAttribute('data-select2-id');
+	if (selectEl.style.display === 'none') {
+		selectEl.style.display = '';
+	}
+	return selectEl;
+}
+
+function initAppSelect2Element(element, extraConfig) {
+	var $select = $(element);
+	if (!$select.length || !$select.is('select')) {
+		return $select;
+	}
+	extraConfig = extraConfig || {};
+
+	// Lazy AJAX dropdowns (city / airport / airline) manage their own Select2.
+	// Do not destroy them on modal shown or search will show "No results found".
+	if (
+		$select.attr('data-add-new-option') === 'true' ||
+		$select.attr('data-lazy-select') === 'true' ||
+		$select.attr('data-lazy-city') === 'true'
+	) {
+		return $select;
+	}
+	var existing = $select.data('select2');
+	if (existing && existing.options && typeof existing.options.get === 'function' && existing.options.get('ajax')) {
+		return $select;
+	}
+
+	if ($select.data('select2')) {
+		$select.select2('destroy');
+	}
+
+	var config = $.extend({
+		width: resolveAppSelect2Width($select),
+		minimumResultsForSearch: 0,
+		dropdownParent: getModalSelect2Parent($select)
+	}, extraConfig);
+
+	$select.select2(config);
+	return $select;
+}
+
+function initModalAppSelect2(scope, extraConfig) {
+	var $scope = scope ? $(scope) : $(document);
+	extraConfig = extraConfig || {};
+	$scope.find('select.app_select2, select.form-contrl.app_select2').each(function () {
+		initAppSelect2Element(this, extraConfig);
 	});
 }
 
+window.getModalSelect2Parent = getModalSelect2Parent;
+window.resolveAppSelect2Width = resolveAppSelect2Width;
+window.cleanClonedSelectElement = cleanClonedSelectElement;
+window.initAppSelect2Element = initAppSelect2Element;
+window.initModalAppSelect2 = initModalAppSelect2;
+
+$(document).on('shown.bs.modal', '.modal', function () {
+	initModalAppSelect2(this);
+});
+
+$(document).on('scroll.appSelect2', '.modal, .modal .table-responsive', function () {
+	$('select.app_select2, select.form-contrl.app_select2').each(function () {
+		var s2 = $(this).data('select2');
+		if (s2 && s2.isOpen()) {
+			$(this).select2('close');
+		}
+	});
+});
+
+function city_lzloading(element, placeholder = "City Name", valueasText = false) {
+	var base_url = ($("#base_url").val() || '').replace(/\/?$/, '/');
+	var url = base_url + 'view/load_data/generic_city_loading.php';
+
 	$(element).each(function () {
-		if ($(this).attr('data-add-new-option') === 'true') {
-			initCityAddNewInline(this);
+		var $el = $(this);
+		$el.attr('data-lazy-city', 'true');
+		$el.attr('data-lazy-select', 'true');
+
+		if ($el.data('select2')) {
+			$el.select2('destroy');
+		}
+		if (!$el.find('option[value=""]').length) {
+			$el.prepend($("<option></option>").attr("value", "").text(placeholder));
+		}
+
+		var $modal = $el.closest('.modal');
+		var config = {
+			placeholder: placeholder,
+			allowClear: true,
+			minimumInputLength: 0,
+			width: '100%',
+			ajax: {
+				url: url,
+				dataType: 'json',
+				delay: 250,
+				type: 'GET',
+				data: function (params) {
+					return {
+						term: params.term || '',
+						page: params.page || 0,
+						valueasText: valueasText
+					};
+				},
+				processResults: function (data) {
+					data = data || {};
+					var pagination = data.pagination || { more: false };
+					return {
+						results: data.results || [],
+						pagination: {
+							more: !!pagination.more
+						}
+					};
+				},
+				cache: true
+			}
+		};
+		if ($modal.length) {
+			config.dropdownParent = $modal;
+		}
+		$el.select2(config);
+
+		if ($el.attr('data-add-new-option') === 'true') {
+			initCityAddNewInline($el);
 		}
 	});
 }
@@ -2730,6 +2827,7 @@ function destinationLoading(element, placeholder = "Destination", valueasText = 
 		var currentText = $el.find('option:selected').text();
 		var currentOptgroup = $el.find('option:selected').parent().attr('value');
 
+		
 		if ($el.hasClass("select2-hidden-accessible")) {
 			$el.select2('destroy');
 		}
@@ -2846,6 +2944,10 @@ function payment_amount_validate(payment_amount_id, payment_mode_id, transaction
 	}
 	else {
 		$('#' + payment_mode_id).prop({ disabled: '' });
+		var offset = payment_mode_id.replace('cmb_payment_mode', '');
+		if (typeof payment_installment_enable_disable_fields === 'function') {
+			payment_installment_enable_disable_fields(offset);
+		}
 	}
 }
 
@@ -4239,30 +4341,198 @@ window.buildItineraryImagePreviewUrl = buildItineraryImagePreviewUrl;
 window.applySelectedItineraryImagePreview = applySelectedItineraryImagePreview;
 
 function resolveItineraryDestId(preferredFieldId) {
+	if (preferredFieldId === 0 || preferredFieldId === '0') {
+		return '0';
+	}
+	// Prefer explicit package/booking destination field only.
+	// Do NOT fall back to list filter #dest_name (that mixes wrong destinations).
 	var dest_id = preferredFieldId ? $('#' + preferredFieldId).val() : '';
+	if (!dest_id || dest_id === '0') {
+		dest_id = $('#dest_name_s').val();
+	}
+	if (!dest_id || dest_id === '0') {
+		dest_id = $('#dest_name_u').val();
+	}
 	if (!dest_id || dest_id === '0') {
 		dest_id = $('#dest_name2').val();
 	}
 	if (!dest_id || dest_id === '0') {
 		dest_id = $('#booking_itinerary_dest_id').val();
 	}
-	if (!dest_id || dest_id === '0') {
-		dest_id = $('#dest_name').val();
-	}
 	return dest_id;
 }
+
+function sync_car_itinerary_count() {
+	var count = $('#itinerary_data .sq_itinerary_count').first().val();
+	if (count !== undefined && count !== '') {
+		$('#sq_itinerary_c1').val(count);
+	}
+}
+
+function get_dest_itinerary_car_rental(dest_id1) {
+	var base_url = $('#base_url').val();
+	var dest_id = $('#' + dest_id1).val();
+	if (dest_id == '' || dest_id == 0) {
+		$('#itinerary_data').html('');
+		$('#sq_itinerary_c1').val(0);
+		return false;
+	}
+	$.post(base_url + 'view/car_rental/booking/get_itinerary_data.php', { dest_id: dest_id }, function (data) {
+		$('#itinerary_data').html(data);
+		sync_car_itinerary_count();
+		if (typeof initItineraryImagePreview === 'function') {
+			initItineraryImagePreview($('#itinerary_data'));
+		}
+		$("input[type='checkbox']", '#itinerary_detail_modal').labelauty({ label: false, maximum_width: '20px' });
+	});
+}
+
+window.sync_car_itinerary_count = sync_car_itinerary_count;
+window.get_dest_itinerary_car_rental = get_dest_itinerary_car_rental;
+window.get_dest_itinerary_car_quotation = get_dest_itinerary_car_rental;
+window.get_dest_itinerary_booking = get_dest_itinerary_car_rental;
+
+function init_car_rental_itinerary_modal() {
+	if (!$('#itinerary_detail_frm').length || !$('#itinerary_detail_modal').length) {
+		return;
+	}
+
+	$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
+	$('#itinerary_detail_frm').appendTo('body');
+
+	if ($('#dest_ids1').length) {
+		if (typeof initModalAppSelect2 === 'function') {
+			initModalAppSelect2('#itinerary_detail_modal');
+		} else {
+			if ($('#dest_ids1').hasClass('select2-hidden-accessible')) {
+				$('#dest_ids1').select2('destroy');
+			}
+			$('#dest_ids1').select2({
+				dropdownParent: $('body'),
+				width: '100%',
+				minimumResultsForSearch: 0,
+				placeholder: '*Destination',
+				allowClear: true
+			});
+		}
+	}
+
+	if (typeof sync_car_itinerary_count === 'function') {
+		sync_car_itinerary_count();
+	} else {
+		var loadedCount = $('#itinerary_data .sq_itinerary_count').first().val();
+		if (loadedCount !== undefined && loadedCount !== '') {
+			$('#sq_itinerary_c1').val(loadedCount);
+		}
+	}
+
+	if ($('#default_program_list tbody tr').length && (!$('#sq_itinerary_c1').val() || $('#sq_itinerary_c1').val() === '0')) {
+		$('#sq_itinerary_c1').val($('#default_program_list tbody tr').length);
+	}
+
+	$("input[type='checkbox']", '#itinerary_detail_modal').labelauty({ label: false, maximum_width: '20px' });
+
+	var $form = $('#itinerary_detail_frm');
+	if ($form.data('validator')) {
+		$form.validate().destroy();
+	}
+
+	var initialCount = $form.data('sq-itinerary-c') || $('#sq_itinerary_c1').val() || 0;
+
+	$form.validate({
+		rules: {
+			dest_names1: { required: true }
+		},
+		submitHandler: function () {
+			var sq_itinerary_c = $('#sq_itinerary_c1').val() || initialCount;
+			if (sq_itinerary_c != 0) {
+				var dest_id = $('#dest_ids1').val();
+				var spa = $('#spa').val();
+				var dwp = $('#dwp').val();
+				var ovs = $('#ovs').val();
+				var meal = $('#meal').val();
+
+				if (dest_id == '' || dest_id == 0) {
+					error_msg_alert('Please select destination!');
+					return false;
+				}
+				var table = document.getElementById('default_program_list');
+				if (!table) {
+					error_msg_alert('Please select destination and load itinerary!');
+					return false;
+				}
+				var rowCount = table.rows.length;
+				var count = 0;
+				var selectedRow = null;
+				for (var i = 0; i < rowCount; i++) {
+					var row = table.rows[i];
+					var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+					if (checkbox && checkbox.checked) {
+						count++;
+						selectedRow = row;
+					}
+				}
+				if (parseInt(count, 10) !== 1) {
+					error_msg_alert('Please select one day program!');
+					return false;
+				}
+				if (selectedRow) {
+					var sp = selectedRow.cells[2].querySelector('input,textarea').value;
+					var dwp1 = selectedRow.cells[3].querySelector('textarea,input').value;
+					var os1 = selectedRow.cells[4].querySelector('input').value;
+					var meal1 = selectedRow.cells[5].querySelector('select').value;
+					$('#' + spa).val(sp);
+					$('#' + dwp).val(dwp1);
+					$('#' + ovs).val(os1);
+					$('#' + meal).val(meal1);
+				}
+				$('#itinerary_detail_modal').modal('hide');
+				if (typeof restore_car_quotation_parent_modal_scroll === 'function') {
+					restore_car_quotation_parent_modal_scroll();
+				} else if (typeof restore_car_rental_parent_modal_scroll === 'function') {
+					restore_car_rental_parent_modal_scroll();
+				}
+			} else {
+				error_msg_alert('You need to add itinerary for this destination first!');
+				return false;
+			}
+		}
+	});
+
+	$('#btn_update').off('click.itinerarySubmit').on('click.itinerarySubmit', function (e) {
+		e.preventDefault();
+		$form.submit();
+	});
+
+	$('#itinerary_detail_modal').off('hidden.bs.modal.carRentalItinerary').on('hidden.bs.modal.carRentalItinerary', function () {
+		if (typeof restore_car_quotation_parent_modal_scroll === 'function') {
+			restore_car_quotation_parent_modal_scroll();
+		} else if (typeof restore_car_rental_parent_modal_scroll === 'function') {
+			restore_car_rental_parent_modal_scroll();
+		}
+	});
+
+	$('#itinerary_detail_modal').modal('show');
+}
+
+window.init_car_rental_itinerary_modal = init_car_rental_itinerary_modal;
 
 function add_itinerary(dest_id1, spa, dwp, ovs, dayp) {
 
 	var day_id = dayp.split('-');
+	var allowNoDest = (dest_id1 === 0 || dest_id1 === '0');
 
 	$('#itinerary'+day_id[1]).prop('disabled',true);
 	var base_url = $('#base_url').val();
 	var dest_id = resolveItineraryDestId(dest_id1);
-	if (!dest_id || dest_id === '' || dest_id === '0') {
+	if ((!dest_id || dest_id === '' || dest_id === '0') && !allowNoDest) {
 		error_msg_alert('Please select destination!');
 		$('#itinerary'+day_id[1]).prop('disabled',false);
 		return false;
+	}
+	if (!dest_id || dest_id === '') {
+		dest_id = 0;
 	}
 	$('#itinerary'+day_id[1]).button('loading');
 	$.post(base_url + 'view/load_data/itinerary_modal.php', { dest_id: dest_id, spa: spa, dwp: dwp, ovs: ovs, dayp: dayp }, function (data) {

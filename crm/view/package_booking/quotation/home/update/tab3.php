@@ -92,7 +92,7 @@ if (!function_exists('quotation_excursion_options_html')) {
                                         <div class="col-md-12"><span>Transport Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse5" class="panel-collapse collapse main_block" role="tabpanel"
+                                <div id="collapse5" class="panel-collapse collapse in main_block" role="tabpanel"
                                     aria-labelledby="heading5">
                                     <div class="panel-body">
                                         <div class="row">
@@ -377,7 +377,7 @@ if (!function_exists('quotation_excursion_options_html')) {
                                         <div class="col-md-12"><span>Flight Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel"
+                                <div id="collapse2" class="panel-collapse collapse in main_block" role="tabpanel"
                                     aria-labelledby="heading2">
                                     <div class="panel-body">
                                         <?php include_once('plane_tbl.php'); ?>
@@ -396,7 +396,7 @@ if (!function_exists('quotation_excursion_options_html')) {
                                         <div class="col-md-12"><span>Activity Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse6" class="panel-collapse collapse main_block" role="tabpanel"
+                                <div id="collapse6" class="panel-collapse collapse in  main_block" role="tabpanel"
                                     aria-labelledby="heading1">
                                     <div class="panel-body">
                                         <div class="row">

@@ -1,5 +1,7 @@
 <?php
 
+include_once __DIR__ . '/booking_discount_helper.php';
+
 $flag = true;
 
 class booking_save
@@ -233,7 +235,7 @@ class booking_save
     $net_total = $_POST['net_total'];
 
     $actual_tour_cost = $_POST['actual_tour_cost'];
-    $discount_in = $_POST['discount_in'];
+    $discount_in = booking_normalize_discount_in($_POST['discount_in']);
     $discount_amt = $_POST['discount_amt'];
 
     //**Payment details

@@ -32,8 +32,8 @@ class exc_master
 	$total_infant_arr = $_POST['total_infant_arr'];
 	$infant_cost_arr = $_POST['infant_cost_arr'];
 	$vehicle_name_arr = isset($_POST['vehicle_name_arr']) ? $_POST['vehicle_name_arr'] : array();
-	$total_vehicle_arr = $_POST['total_vehicle_arr'];
-	$transfer_cost_arr = $_POST['transfer_cost_arr'];
+	$total_vehicle_arr = isset($_POST['total_vehicle_arr']) ? $_POST['total_vehicle_arr'] : array();
+	$transfer_cost_arr = isset($_POST['transfer_cost_arr']) ? $_POST['transfer_cost_arr'] : array();
 
 	$roundoff = $_POST['roundoff'];
 		$total_amt_arr = $_POST['total_amt_arr'];
@@ -41,8 +41,8 @@ class exc_master
 		$credit_card_details = $_POST['credit_card_details'];
 		$currency_code = $_POST['currency_code'];
 		$markup = $_POST['markup'];
-		$guest_name = $_POST['guest_name'];
-		$pick_point = $_POST['pick_point'];
+		$guest_name = isset($_POST['guest_name']) ? mysqlREString($_POST['guest_name']) : '';
+		$pick_point = isset($_POST['pick_point']) ? mysqlREString($_POST['pick_point']) : '';
 
 		$service_tax_markup = $_POST['service_tax_markup'];
 		$reflections = json_decode(json_encode($_POST['reflections']));
@@ -700,15 +700,15 @@ class exc_master
 	$total_infant_arr = $_POST['total_infant_arr'];
 	$infant_cost_arr = $_POST['infant_cost_arr'];
 	$vehicle_name_arr = isset($_POST['vehicle_name_arr']) ? $_POST['vehicle_name_arr'] : array();
-	$total_vehicle_arr = $_POST['total_vehicle_arr'];
-	$transfer_cost_arr = $_POST['transfer_cost_arr'];
+	$total_vehicle_arr = isset($_POST['total_vehicle_arr']) ? $_POST['total_vehicle_arr'] : array();
+	$transfer_cost_arr = isset($_POST['transfer_cost_arr']) ? $_POST['transfer_cost_arr'] : array();
 	$markup = $_POST['markup'];
 		$service_tax_markup = $_POST['service_tax_markup'];
 		$roundoff = $_POST['roundoff'];
 		$currency_code = $_POST['currency_code'];
 		$old_total = $_POST['old_total'];
-		$guest_name = $_POST['guest_name'];
-		$pick_point = $_POST['pick_point'];
+		$guest_name = isset($_POST['guest_name']) ? mysqlREString($_POST['guest_name']) : '';
+		$pick_point = isset($_POST['pick_point']) ? mysqlREString($_POST['pick_point']) : '';
 
 		$total_adults = 0;
 		$total_childs = 0;

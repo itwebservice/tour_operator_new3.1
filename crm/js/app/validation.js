@@ -643,6 +643,8 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "to_sector-" + prefix + foo.counter
     );
+    $(row.cells[4]).addClass("planeairport-select").attr("style", "min-width:300px;");
+    $(row.cells[5]).addClass("planeairport-select").attr("style", "min-width:300px;");
     row.cells[6].childNodes[0].setAttribute(
       "id",
       "txt_plane_company-" + prefix + foo.counter
@@ -959,8 +961,10 @@ function foo(tableID, quot_table_id, rowCounts) {
     // row.cells[3].childNodes[1].setAttribute("class","style_text"+foo.counter);
     
     row.cells[3].setAttribute("style", "position: relative !important;");
-    row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
-   );
+    if (row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
+     );
+    }
     
     row.cells[3].setAttribute("required", "");
     row.cells[4].childNodes[0].setAttribute(
@@ -979,18 +983,12 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "itinerary" + (rowCounts + 1)
     );
-    row.cells[6].childNodes[0].setAttribute(
-      "onclick",
-      'add_itinerary("dest_name2","special_attaraction' +
-        foo.counter +
-        '","day_program' +
-        foo.counter +
-        '","overnight_stay' +
-        foo.counter +
-        '","Day-' +
-        (rowCounts + 1) +
-        '")'
-    );
+    var isCarRentalQuotation = $('#quotation_save_modal, #quotation_update_modal').length > 0;
+    var fieldSuffix = $('#quotation_update_modal').length ? '-u' : '';
+    var itineraryOnclick = isCarRentalQuotation
+      ? 'add_itinerary_car_quotation(0,"special_attaraction' + foo.counter + fieldSuffix + '","day_program' + foo.counter + fieldSuffix + '","overnight_stay' + foo.counter + fieldSuffix + '","meal_plan' + foo.counter + '","Day-' + (rowCounts + 1) + '")'
+      : 'add_itinerary("dest_name2","special_attaraction' + foo.counter + '","day_program' + foo.counter + '","overnight_stay' + foo.counter + '","Day-' + (rowCounts + 1) + '")';
+    row.cells[6].childNodes[0].setAttribute("onclick", itineraryOnclick);
     if (row.cells[7]) {
       $(row.cells[7]).addClass("hidden");
       row.cells[7].childNodes[0].setAttribute("value", "");
@@ -1126,16 +1124,15 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[3].childNodes[0].setAttribute("id", "day_program" + foo.counter);
 
      row.cells[3].setAttribute("style", "position: relative !important;");
-    row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
-   );
+    if (row.cells[3].childNodes[1]) {
+      row.cells[3].childNodes[1].setAttribute("style", "position: absolute !important;right: 15px !important; display: flex !important; gap: 15px; background: #f5f5f5 !important;padding: 0px 14px !important; top: 0px !important;"
+     );
+    }
    
     row.cells[4].childNodes[0].setAttribute(
       "id",
       "overnight_stay" + foo.counter
     );
-    if (row.cells[5]) {
-      $(row.cells[5]).addClass("hidden");
-    }
   }
 
   if (tableID == "tbl_dynamic_city_name") {
@@ -4254,6 +4251,12 @@ function foo(tableID, quot_table_id, rowCounts) {
     );
 
     $(row.cells[12]).addClass("hidden");
+
+    $(row).find('select.app_select2').each(function () {
+      if (typeof initAppSelect2Element === 'function') {
+        initAppSelect2Element(this);
+      }
+    });
   }
   if (tableID == "table_exc_tarrif_offer") {
     row.cells[0].childNodes[0].setAttribute("id", "chk_offer" + foo.counter);
@@ -4269,7 +4272,11 @@ function foo(tableID, quot_table_id, rowCounts) {
     dynamic_date(row.cells[3].childNodes[0].id);
     row.cells[4].childNodes[0].value = get_date();
     dynamic_date(row.cells[4].childNodes[0].id);
-    $("#" + row.cells[8].childNodes[0].id).select2();
+    $(row).find('select.app_select2').each(function () {
+      if (typeof initAppSelect2Element === 'function') {
+        initAppSelect2Element(this);
+      }
+    });
     row.cells[3].childNodes[0].setAttribute(
       "onchange",
       'get_to_date(id,"' + row.cells[4].childNodes[0].id + '")'
@@ -4400,22 +4407,23 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[4].childNodes[0].setAttribute("id", "max_pax" + foo.counter);
     row.cells[5].childNodes[0].setAttribute("id", "from_date" + foo.counter);
     row.cells[6].childNodes[0].setAttribute("id", "to_date" + foo.counter);
-    row.cells[7].childNodes[0].setAttribute("id", "badult_cost" + foo.counter);
-    row.cells[8].childNodes[0].setAttribute("id", "bcwb_cost" + foo.counter);
-    row.cells[9].childNodes[0].setAttribute("id", "bcwob_cost" + foo.counter);
+    row.cells[7].childNodes[0].setAttribute("id", "cadult_cost" + foo.counter);
+    row.cells[8].childNodes[0].setAttribute("id", "ccwb_cost" + foo.counter);
+    row.cells[9].childNodes[0].setAttribute("id", "ccwob_cost" + foo.counter);
     row.cells[10].childNodes[0].setAttribute(
-      "id",
-      "binfant_cost" + foo.counter
-    );
-    row.cells[11].childNodes[0].setAttribute("id", "bextra_cost" + foo.counter);
-    row.cells[12].childNodes[0].setAttribute("id", "cadult_cost" + foo.counter);
-    row.cells[13].childNodes[0].setAttribute("id", "ccwb_cost" + foo.counter);
-    row.cells[14].childNodes[0].setAttribute("id", "ccwob_cost" + foo.counter);
-    row.cells[15].childNodes[0].setAttribute(
       "id",
       "cinfant_cost" + foo.counter
     );
-    row.cells[16].childNodes[0].setAttribute("id", "cextra_cost" + foo.counter);
+    row.cells[11].childNodes[0].setAttribute("id", "cextra_cost" + foo.counter);
+    row.cells[12].childNodes[0].setAttribute("id", "badult_cost" + foo.counter);
+    row.cells[13].childNodes[0].setAttribute("id", "bcwb_cost" + foo.counter);
+    row.cells[14].childNodes[0].setAttribute("id", "bcwob_cost" + foo.counter);
+    row.cells[15].childNodes[0].setAttribute(
+      "id",
+      "binfant_cost" + foo.counter
+    );
+    row.cells[16].childNodes[0].setAttribute("id", "bextra_cost" + foo.counter);
+   
     row.cells[17].childNodes[0].setAttribute("id", "entry_id" + foo.counter);
 
     row.cells[5].childNodes[0].value = get_date();
@@ -4870,6 +4878,21 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             continue;
         }
         
+        // Special handling for the day-program cell in itinerary master tables.
+        // Copy the full cell (textarea + B/U span) so foo() does not crash on childNodes[1].
+        if ((tableID === "package_program_list" || tableID === "default_program_list") && i === 3) {
+            newcell.className = oldCell.className;
+            if (oldCell.getAttribute("style")) {
+                newcell.setAttribute("style", oldCell.getAttribute("style"));
+            }
+            newcell.innerHTML = oldCell.innerHTML;
+            var newDayProgram = newcell.querySelector("textarea");
+            if (newDayProgram) {
+                newDayProgram.value = "";
+            }
+            continue;
+        }
+
         // Special handling for image upload cell (cell index 5 for itinerary table)
         if (tableID === "default_program_list" && i === 5) {
             console.log("DEBUG: Special handling for image cell during cloning");
@@ -4891,14 +4914,52 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                 newcell.setAttribute("style", oldCell.getAttribute("style"));
             }
         }
+        if (oldCell.classList.contains("planeairport-select")) {
+            newcell.classList.add("planeairport-select");
+            if (oldCell.getAttribute("style")) {
+                newcell.setAttribute("style", oldCell.getAttribute("style"));
+            }
+        }
+        if (
+            (tableID === "tbl_plane_travel_details_dynamic_row" ||
+             tableID === "tbl_plane_travel_details_dynamic_row_update") &&
+            (i === 4 || i === 5)
+        ) {
+            newcell.classList.add("planeairport-select");
+            if (!newcell.getAttribute("style")) {
+                newcell.setAttribute("style", "min-width:300px;");
+            }
+        }
 
 
         if (!oldInput) {
-            newcell.innerHTML = oldCell.innerHTML;
+            var rawSelect = oldCell.querySelector('select');
+            if (rawSelect) {
+                var clonedSelect = rawSelect.cloneNode(true);
+                if (typeof cleanClonedSelectElement === 'function') {
+                    clonedSelect = cleanClonedSelectElement(clonedSelect);
+                }
+                if (clonedSelect.id) {
+                    var selectBaseId = clonedSelect.id.replace(/[0-9]+$/, "");
+                    clonedSelect.id = selectBaseId + rowCount;
+                }
+                if (clonedSelect.name) {
+                    var selectBaseName = clonedSelect.name.replace(/[0-9]+$/, "");
+                    clonedSelect.name = selectBaseName + rowCount;
+                }
+                clonedSelect.selectedIndex = 0;
+                clonedSelect.classList.add('app_select2');
+                newcell.appendChild(clonedSelect);
+            } else {
+                newcell.innerHTML = oldCell.innerHTML;
+            }
             continue;
         }
 
         var cloned = oldInput.cloneNode(true);
+        if (cloned.tagName === "SELECT" && typeof cleanClonedSelectElement === 'function') {
+            cloned = cleanClonedSelectElement(cloned);
+        }
 
         // 🔹 Generate unique ID/Name for new row
         if (cloned.id) {
@@ -4941,7 +5002,24 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // ✅ Initialize Select2 only for the new row selects
     if (tableID !== "tbl_package_tour_member") {
-        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"]').select2({ width: "100%" });
+        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"]').each(function () {
+            if (typeof initAppSelect2Element === 'function') {
+                initAppSelect2Element(this);
+            } else {
+                var $el = $(this);
+                if ($el.data('select2')) {
+                    $el.select2('destroy');
+                }
+                var $modalParent = typeof getModalSelect2Parent === 'function'
+                    ? getModalSelect2Parent($el)
+                    : $(document.body);
+                var rowSelect2Config = { width: "100%", minimumResultsForSearch: 0 };
+                if ($modalParent && $modalParent.length) {
+                    rowSelect2Config.dropdownParent = $modalParent;
+                }
+                $el.select2(rowSelect2Config);
+            }
+        });
     }
 
     // ✅ Initialize datepicker for new row

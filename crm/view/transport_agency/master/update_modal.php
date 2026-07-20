@@ -30,7 +30,7 @@ $email_id = $encrypt_decrypt->fnDecrypt($sq_transport_agency['email_id'], $secre
     <input type="hidden" id="vendor_login_id" name="vendor_login_id" value="<?= $sq_vendor_login['login_id'] ?>">
 		  <div class="row">
 		    <div class="col-md-3 col-sm-6 mg_bt_10">
-		      <select id="cmb_city_id" name="cmb_city_id" style="width:100%" class="form-control" title="City Name" data-add-new-option="true">
+		      <select id="cmb_city_id" name="cmb_city_id" style="width:100%" class="form-control" title="City Name" data-add-new-option="true" data-lazy-city="true">
 		          <?php $sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='$sq_transport_agency[city_id]'")); ?>
 		          <option value="<?php echo $sq_transport_agency['city_id'] ?>" selected="selected"><?php echo $sq_city['city_name'] ?></option>
 		      </select>
@@ -144,12 +144,11 @@ $email_id = $encrypt_decrypt->fnDecrypt($sq_transport_agency['email_id'], $secre
 
 <script>
    
-$('#update_modal').modal('show');
 $('#cust_state1').select2({
   dropdownParent: $("#update_modal")});
-  $('.app_select2').select2();
 $('#as_of_date1').datetimepicker({ timepicker:false, format:'d-m-Y' });
 city_lzloading('#cmb_city_id');
+$('#update_modal').modal('show');
 ///////////////////////***Transport Agency Master Update start*********//////////////
 $(function(){
   $('#frm_transport_agency_update').validate({

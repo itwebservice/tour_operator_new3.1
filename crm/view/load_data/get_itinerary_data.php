@@ -16,9 +16,9 @@ if($sq_itinerary_c >0){
             <tr>
             <td width="27px;" style="padding-right: 10px !important;"><input class="css-checkbox labelauty" id="chk_programd1<?=$count?>" type="checkbox" style="display: none;"><label for="chk_programd1<?=$count?>"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>
             <td width="20px;"><input maxlength="15" value="<?=$count?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled=""></td>
-            <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction<?=$count?>" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?=$row_itinerary['special_attraction']?>"></td>
-            <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="day_program<?=$count?>" name="day_program" class="form-control" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?=$row_itinerary['daywise_program']?></textarea></td>
-            <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay<?=$count?>" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?=$row_itinerary['overnight_stay']?>"></td>
+            <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_special_attaraction<?=$count?>" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="itin_modal_special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?= htmlspecialchars($row_itinerary['special_attraction'], ENT_QUOTES) ?>"></td>
+            <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="itin_modal_day_program<?=$count?>" name="itin_modal_day_program" class="form-control" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?= htmlspecialchars($row_itinerary['daywise_program'], ENT_QUOTES) ?></textarea></td>
+            <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_overnight_stay<?=$count?>" name="itin_modal_overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?= htmlspecialchars($row_itinerary['overnight_stay'], ENT_QUOTES) ?>"></td>
             <td class="col-md-1 no-pad" style="padding-left: 5px !important; width: 120px;">
                 <?php if (!empty($row_itinerary['itinerary_image']) && trim($row_itinerary['itinerary_image']) !== '' && trim($row_itinerary['itinerary_image']) !== 'NULL') { ?>
                     <div style="margin-top: 5px;">
@@ -26,11 +26,11 @@ if($sq_itinerary_c >0){
                             <img src="<?php
                                 $image_path = trim($row_itinerary['itinerary_image']);
                                 if (strpos($image_path, 'http') === 0) {
-                                    echo $image_path;
+                                    echo htmlspecialchars($image_path, ENT_QUOTES);
                                 } else {
                                     $project_base_url = str_replace('/crm/', '/', BASE_URL);
                                     $project_base_url = rtrim($project_base_url, '/');
-                                    echo $project_base_url . '/' . ltrim($image_path, '/');
+                                    echo htmlspecialchars($project_base_url . '/' . ltrim($image_path, '/'), ENT_QUOTES);
                                 }
                             ?>" alt="Itinerary Image"
                                  style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
@@ -44,9 +44,12 @@ if($sq_itinerary_c >0){
                         <small>No Image</small>
                     </div>
                 <?php } ?>
-                <input type="hidden" id="itinerary_image_<?= $count?>" name="itinerary_image" value="<?= $row_itinerary['itinerary_image'] ?? '' ?>">
+                <input type="hidden" id="itinerary_image_<?= $count?>" name="itinerary_image" value="<?= htmlspecialchars($row_itinerary['itinerary_image'] ?? '', ENT_QUOTES) ?>">
             </td>
-            <td class="hidden"><input type="text" id="entry_id<?= $count?>" name="entry_id" class="form-control" value="<?=$row_itinerary['entry_id']?>"></td>
+            <td class="hidden"><input type="text" id="itin_modal_entry_id<?= $count?>" name="itin_modal_entry_id" class="form-control" value="<?= htmlspecialchars($row_itinerary['entry_id'], ENT_QUOTES) ?>"></td>
+            <td>
+              <button type="button" class="btn btn-sm btn-success itin-modal-add-btn" id="btn_itin_add_<?= $count ?>" style="margin-top: 35px;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add</button>
+            </td>
             </tr>
             <?php
         } ?>
@@ -61,6 +64,9 @@ else{
 <?php } ?>
 <div class="col-md-12 col-sm-6 col-xs-12 mg_tp_10"></div>
 <?php }?>
-<input type="hidden" id="sq_itinerary_c1" value="<?=$sq_itinerary_c?>"/>
-
-<script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
+<input type="hidden" id="sq_itinerary_c1" value="<?= (int)$sq_itinerary_c ?>"/>
+<script>
+if (typeof $ !== 'undefined') {
+    $("input[type='checkbox']", '#itinerary_detail_modal').labelauty({ label: false, maximum_width: '20px' });
+}
+</script>

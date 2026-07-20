@@ -144,12 +144,11 @@ margin-bottom: 3px;
 position: relative;
 padding-left: 20px;
 }
-ul.print_info_list li:before {
-content: '\f0da';
+ul.print_info_list li svg {
 position: absolute;
-font-family: fontawesome;
 left: 0;
 color: <?= $theme_color ?>;
+top: 5px;
 }
 ul.print_info_list li span {
 display: inline-block;

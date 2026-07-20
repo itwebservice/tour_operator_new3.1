@@ -235,7 +235,7 @@ function customer_info_load(offset = '') {
 function booking_update_modal(booking_id) {
 
     $('#editc-'+booking_id).prop('disabled',true);
-    $('#edit-'+booking_id).button('loading');
+    $('#editc-'+booking_id).button('loading');
     var branch_status = $('#branch_status').val();
     $.post('booking_update_modal.php', {
         booking_id: booking_id,

@@ -86,7 +86,7 @@ if ($pass_entry_id != '') {
 							<?php $chk = ($type_of_tour == "Multi City") ? "checked" : "" ?>
 							<input type="radio" name="type_of_tour" id="type_of_tour-multi_city" value="Multi City" <?= $chk ?>>&nbsp;&nbsp;<label for="type_of_tour-multi_city">Multi City</label>
 							&nbsp;&nbsp;&nbsp;
-							<button button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+							<button button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
 						</div>
 						<?php
 						if ($status == '') { ?>

@@ -71,19 +71,6 @@ $role_id = $_SESSION['role_id'];
                                     <td><input type="text" id="to_date" class="form-control" placeholder="*To Date"
                                             title="Valid To Date" style="width:110px;" value="<?= date('d-m-Y') ?>"
                                             onchange="validate_validDate('from_date','to_date');" /></td>
-                                    <td><input type="number" id="badult_cost" class="form-control"
-                                            placeholder="Adult PP" title="Adult PP Cost"
-                                            style="width:120px;" /><span>B2B Cost</span></td>
-                                    <td><input type="number" id="bcwb_cost" class="form-control" placeholder="CWB PP"
-                                            title="CWB PP Cost" style="width:120px;" /><span>B2B Cost</span></td>
-                                    <td><input type="number" id="bcwob_cost" class="form-control" placeholder="CWOB PP"
-                                            title="CWOB PP Cost" style="width:120px;" /><span>B2B Cost</span></td>
-                                    <td><input type="number" id="binfant_cost" class="form-control"
-                                            placeholder="Infant PP" title="Infant PP Cost"
-                                            style="width:120px;" /><span>B2B Cost</span></td>
-                                    <td><input type="number" id="bextra_cost" class="form-control"
-                                            placeholder="ExtraBed PP" title="ExtraBed PP Cost"
-                                            style="width:120px;" /><span>B2B Cost</span></td>
                                     <td><input type="number" id="cadult_cost" class="form-control"
                                             placeholder="Adult PP" title="Adult PP Cost"
                                             style="width:120px;" /><span>B2C Cost</span></td>
@@ -97,6 +84,19 @@ $role_id = $_SESSION['role_id'];
                                     <td><input type="number" id="cextra_cost" class="form-control"
                                             placeholder="ExtraBed PP" title="ExtraBed PP Cost"
                                             style="width:120px;" /><span>B2C Cost</span></td>
+                                    <td><input type="number" id="badult_cost" class="form-control"
+                                            placeholder="Adult PP" title="Adult PP Cost"
+                                            style="width:120px;" /><span>B2B Cost</span></td>
+                                    <td><input type="number" id="bcwb_cost" class="form-control" placeholder="CWB PP"
+                                            title="CWB PP Cost" style="width:120px;" /><span>B2B Cost</span></td>
+                                    <td><input type="number" id="bcwob_cost" class="form-control" placeholder="CWOB PP"
+                                            title="CWOB PP Cost" style="width:120px;" /><span>B2B Cost</span></td>
+                                    <td><input type="number" id="binfant_cost" class="form-control"
+                                            placeholder="Infant PP" title="Infant PP Cost"
+                                            style="width:120px;" /><span>B2B Cost</span></td>
+                                    <td><input type="number" id="bextra_cost" class="form-control"
+                                            placeholder="ExtraBed PP" title="ExtraBed PP Cost"
+                                            style="width:120px;" /><span>B2B Cost</span></td>                                    
                                     <td><input type="hidden" id="entry_id" class="form-control" style="width:120px;" />
                                     </td>
                                 </tr>

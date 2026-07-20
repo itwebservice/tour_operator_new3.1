@@ -14,6 +14,19 @@
 	overflow-y: auto;
 	overflow-x: hidden;
 }
+#itinerary_detail_modal {
+	z-index: 1060 !important;
+}
+#itinerary_detail_modal .modal-body {
+	overflow: visible;
+}
+.select2-container--open {
+	z-index: 1071 !important;
+}
+#quotation_save_modal .modal-body,
+#quotation_update_modal .modal-body {
+	overflow: visible;
+}
 </style>
 <form id="frm_tab_itinerary_c">
 	<div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_20">
@@ -56,7 +69,7 @@
 												name="special_attaraction" style="margin-top: 35px;" class="form-control mg_bt_10"
 												placeholder="Special Attraction" title="Special Attraction"
 												value="<?= $row_tours['attraction'] ?>"></td>
-										<td class='col-md-5 no-pad' style="padding-left: 5px !important;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" style=" height:900px;" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"><?php echo $row_tours['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
+										<td class='col-md-5 no-pad' style="padding-left: 5px !important;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" style="height:90px;" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"><?php echo $row_tours['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
 										</td>
 										<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay<?= $count ?>-u" name="overnight_stay" style="margin-top: 35px;" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" placeholder="Overnight Stay" title="Overnight Stay" value="<?= $row_tours['stay'] ?>"></td>
 										<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan<?= $count ?>" title="" name="meal_plan" style="margin-top: 35px;"
@@ -67,7 +80,7 @@
 												<?php get_mealplan_dropdown(); ?>
 											</select>
 										</td>
-										<td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="margin-top: 35px; border:none;" onClick="add_itinerary(0,'special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?= $count ?>-u','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button></td>
+										<td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" id="itinerary<?= $count ?>" title="Add Itinerary" style="margin-top: 35px; border:none;" onClick="add_itinerary_car_quotation(0,'special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?= $count ?>-u','meal_plan<?= $count ?>','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button></td>
 										<td style="display:none"><input type="text" value="<?php echo $row_tours['id'] ?>"></td>
 									</tr>
 								<?php }
@@ -76,12 +89,12 @@
 								<td><input class="css-checkbox mg_bt_10 labelauty" id="chk_program1" type="checkbox" checked style="display: none;"><label for="chk_program1" style="margin-top: 55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>
 								<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No."  style="margin-top: 35px;" class="form-control" disabled=""></td>
 								<td style="padding-left: 5px !important;"><input type="text" id="special_attaraction1"  style="margin-top: 35px;" onchange="validate_spaces(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction"></td>
-								<td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="day_program1" name="day_program" style=" height:900px;" class="form-control mg_bt_10 day_program" title="Day-wise Program" rows="3" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);"></textarea></td>
+								<td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="day_program1" name="day_program" style="height:90px;" class="form-control mg_bt_10 day_program" title="Day-wise Program" rows="3" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);"></textarea></td>
 								<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay1" style="margin-top: 35px;" name="overnight_stay" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" placeholder="Overnight Stay" title="Overnight Stay"></td>
 								<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan1" title="meal plan" style="margin-top: 35px;" name="meal_plan" class="form-control mg_bt_10" data-original-title="Meal Plan">
 										<?php get_mealplan_dropdown(); ?>
 										</select></td>
-								<td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm itinerary-btn" style="margin-top: 35px; border:none;" data-row="1" id="itinerary1" title="Add Itinerary" onClick="add_itinerary(0,'special_attaraction1','day_program1','overnight_stay1','Day-1')"><i class="fa fa-plus"></i></button></td>
+								<td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm itinerary-btn" style="margin-top: 35px; border:none;" data-row="1" id="itinerary1" title="Add Itinerary" onClick="add_itinerary_car_quotation(0,'special_attaraction1','day_program1','overnight_stay1','meal_plan1','Day-1')"><i class="fa fa-plus"></i></button></td>
 								<td style="display:none"><input type="text" name="package_id_n" value="" autocomplete="off" class="form-control" data-original-title="" title=""></td>
 								</tr>
 								<?php } ?>
@@ -102,8 +115,6 @@
 		</div>
 	</div>
 </form>
-
-<div id="div_itinerary_modal"></div>
 
 <script>
 function switch_to_tab1_iti(){ $('a[href="#tab_1_c"]').tab('show'); }
@@ -144,23 +155,21 @@ function updateLatestRowIds() {
 	if(table) {
 		var rowCount = table.rows.length;
 		var lastRow = table.rows[rowCount - 1];
+		var fieldSuffix = $('#quotation_update_modal').length ? '-u' : '';
 		
-		// Update input IDs
-		if(lastRow.cells[2]) lastRow.cells[2].childNodes[0].id = 'special_attaraction' + rowCount;
-		if(lastRow.cells[3]) lastRow.cells[3].childNodes[0].id = 'day_program' + rowCount;
-		if(lastRow.cells[4]) lastRow.cells[4].childNodes[0].id = 'overnight_stay' + rowCount;
+		if(lastRow.cells[2]) lastRow.cells[2].childNodes[0].id = 'special_attaraction' + rowCount + fieldSuffix;
+		if(lastRow.cells[3]) lastRow.cells[3].childNodes[0].id = 'day_program' + rowCount + fieldSuffix;
+		if(lastRow.cells[4]) lastRow.cells[4].childNodes[0].id = 'overnight_stay' + rowCount + fieldSuffix;
 		if(lastRow.cells[5]) lastRow.cells[5].childNodes[0].id = 'meal_plan' + rowCount;
 		
-		// Update button onclick
 		if(lastRow.cells[6]) {
 			var btn = lastRow.cells[6].getElementsByTagName('button')[0];
 			if(btn) {
 				btn.id = 'itinerary' + rowCount;
-				btn.setAttribute('onclick', "add_itinerary(0,'special_attaraction" + rowCount + "','day_program" + rowCount + "','overnight_stay" + rowCount + "','Day-" + rowCount + "')");
+				btn.setAttribute('onclick', "add_itinerary_car_quotation(0,'special_attaraction" + rowCount + fieldSuffix + "','day_program" + rowCount + fieldSuffix + "','overnight_stay" + rowCount + fieldSuffix + "','meal_plan" + rowCount + "','Day-" + rowCount + "')");
 			}
 		}
 		
-		// Update serial number
 		if(lastRow.cells[1]) lastRow.cells[1].childNodes[0].value = rowCount;
 	}
 }

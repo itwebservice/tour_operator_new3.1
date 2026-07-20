@@ -7,30 +7,39 @@ $branch_admin_id = $_SESSION['branch_admin_id'];
 $branch_status = $_POST['branch_status'];
 $sq_enq_info = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_booking where booking_id='$booking_id' and delete_status='0'"));
 $reflections = json_decode($sq_enq_info['reflections']);
-if($reflections[0]->tax_apply_on == '1') { 
+$reflection = (is_array($reflections) && isset($reflections[0])) ? $reflections[0] : (object)[
+    'car_sc' => '',
+    'car_markup' => '',
+    'car_taxes' => '',
+    'car_markup_taxes' => '',
+    'tax_apply_on' => '',
+    'tax_value' => '',
+    'markup_tax_value' => ''
+];
+if($reflection->tax_apply_on == '1') { 
     $tax_apply_on = 'Basic Amount';
 }
-else if($reflections[0]->tax_apply_on == '2') { 
+else if($reflection->tax_apply_on == '2') { 
     $tax_apply_on = 'Service Charge';
 }
-else if($reflections[0]->tax_apply_on == '3') { 
+else if($reflection->tax_apply_on == '3') { 
     $tax_apply_on = 'Total';
 }else{
     $tax_apply_on = '';
 }
 ?>
 
-<form id="frm_booking_update">
+<form id="frm_booking_update" novalidate>
     <input type="hidden" id="booking_id" name="booking_id" value="<?= $booking_id ?>">
-    <input type="hidden" id="car_sc" name="car_sc" value="<?php echo $reflections[0]->car_sc ?>">
-    <input type="hidden" id="car_markup" name="car_markup" value="<?php echo $reflections[0]->car_markup ?>">
-    <input type="hidden" id="car_taxes" name="car_taxes" value="<?php echo $reflections[0]->car_taxes ?>">
+    <input type="hidden" id="car_sc" name="car_sc" value="<?php echo $reflection->car_sc ?>">
+    <input type="hidden" id="car_markup" name="car_markup" value="<?php echo $reflection->car_markup ?>">
+    <input type="hidden" id="car_taxes" name="car_taxes" value="<?php echo $reflection->car_taxes ?>">
     <input type="hidden" id="car_markup_taxes" name="car_markup_taxes"
-        value="<?php echo $reflections[0]->car_markup_taxes ?>">
+        value="<?php echo $reflection->car_markup_taxes ?>">
     <input type="hidden" id="tax_apply_on" name="tax_apply_on" value="<?php echo $tax_apply_on ?>">
-    <input type="hidden" id="atax_apply_on" name="atax_apply_on" value="<?php echo $reflections[0]->tax_apply_on ?>">
-    <input type="hidden" id="tax_value1" name="tax_value1" value="<?php echo $reflections[0]->tax_value ?>">
-    <input type="hidden" id="markup_tax_value1" name="markup_tax_value1" value="<?php echo $reflections[0]->markup_tax_value ?>">
+    <input type="hidden" id="atax_apply_on" name="atax_apply_on" value="<?php echo $reflection->tax_apply_on ?>">
+    <input type="hidden" id="tax_value1" name="tax_value1" value="<?php echo $reflection->tax_value ?>">
+    <input type="hidden" id="markup_tax_value1" name="markup_tax_value1" value="<?php echo $reflection->markup_tax_value ?>">
 
     <div class="modal fade" id="booking_update_modal" role="dialog" aria-labelledby="myModalLabel"
         data-backdrop="static" data-keyboard="false">
@@ -250,7 +259,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                                                 <?php
                                                 // Fetch existing itinerary for this booking
                                                 $sq_program = mysqlQuery("SELECT * FROM car_rental_booking_program WHERE booking_id='$booking_id' ORDER BY entry_id ASC");
-                                                $program_count = mysqli_num_rows($sq_program);
+                                                $program_count = ($sq_program) ? mysqli_num_rows($sq_program) : 0;
                                                 
                                                 if($program_count > 0){
                                                     $count = 0;
@@ -412,6 +421,11 @@ else if($reflections[0]->tax_apply_on == '3') {
                         $markupservice_tax_amount = $markupservice_tax_amount + $service_tax[2];
                     }
                 }
+                $inclusive_b = '';
+                $inclusive_s = '';
+                $inclusive_m = '';
+                $basic_cost = $basic_cost1;
+                if (is_array($bsmValues) && isset($bsmValues[0])) {
                 foreach ($bsmValues[0] as $key => $value) {
                     switch ($key) {
                         case 'basic':
@@ -427,6 +441,7 @@ else if($reflections[0]->tax_apply_on == '3') {
                         $inclusive_m = $value;
                         break;
                     }
+                }
                 }
                 ?>
                                 <div class="row">
@@ -496,21 +511,26 @@ else if($reflections[0]->tax_apply_on == '3') {
                                     </div>
 
                                      <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
-                                <select name="currency_code" id="acurrency_code1" title="Currency" style="width:100%"  data-toggle="tooltip" required>
+                                <select name="currency_code" id="acurrency_code1" title="Currency" style="width:100%"  data-toggle="tooltip">
                                     <?php
                                     
                                 
-                                    if($sq_enq_info['currency_code'] ==''){
+                                    if($sq_enq_info['currency_code'] =='' || $sq_enq_info['currency_code'] == '0'){
                                       $currency_code1 = $currency_code;
                                     }
                                     else{
                                       $currency_code1= $sq_enq_info['currency_code'];
                                     }
                         
-                                    $sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . $currency_code1));
+                                    $sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . (int)$currency_code1));
+                                    if (!$sq_currencyd) {
+                                        $sq_currencyd = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . (int)$currency_code));
+                                    }
                                     ?>
+                                    <?php if ($sq_currencyd) { ?>
                                     <option value="<?=$sq_currencyd['id']?>"><?=$sq_currencyd['currency_code']?>
                                     </option>
+                                    <?php } ?>
                                     <?php
                                     $sq_currency = mysqlQuery("select * from currency_name_master order by currency_code");
                                     while ($row_currency = mysqli_fetch_assoc($sq_currency)) 
@@ -531,7 +551,7 @@ else if($reflections[0]->tax_apply_on == '3') {
 
                     <div class="row text-center">
                         <div class="col-xs-12">
-                            <button class="btn btn-sm btn-success" id="car_update"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                            <button type="submit" class="btn btn-sm btn-success" id="car_update"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
                         </div>
                     </div>
 
@@ -554,17 +574,51 @@ else if($reflections[0]->tax_apply_on == '3') {
     top: 0px;
 }
 
+#booking_update_modal {
+    overflow-y: auto !important;
+}
+
+#booking_update_modal .modal-dialog {
+    margin: 30px auto;
+}
+
 #booking_update_modal .modal-body {
-    max-height: 120vh;
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+#itinerary_detail_modal {
+    z-index: 1060 !important;
+}
+
+#booking_update_modal .day_program {
+    height: 90px !important;
+    max-height: 120px;
+    resize: vertical;
 }
 </style>
 
 <script>
     $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 
-$('#vendor_id1, #customer_id1,#acurrency_code1').select2();
+    function restore_car_rental_parent_modal_scroll() {
+        if ($('#booking_save_modal').is(':visible') || $('#booking_update_modal').is(':visible')) {
+            $('body').addClass('modal-open');
+            var $backdrops = $('.modal-backdrop');
+            if ($backdrops.length > 1) {
+                $backdrops.last().remove();
+            }
+        }
+    }
+
+    $(document).on('hidden.bs.modal', '#itinerary_detail_modal', function () {
+        restore_car_rental_parent_modal_scroll();
+    });
+
+$('#customer_id1,#acurrency_code1').select2({
+    dropdownParent: $("#booking_update_modal")
+});
 $('#from_date1,#to_date1').datetimepicker({
     timepicker: false,
     format: 'd-m-Y'
@@ -594,16 +648,21 @@ function reflect_feilds() {
     }
 }
 reflect_feilds();
-$(function() {
-    $('#frm_booking_update').validate({
+var $frm_booking_update = $('#frm_booking_update');
+if ($frm_booking_update.data('validator')) {
+    $frm_booking_update.validate().destroy();
+}
+$frm_booking_update.validate({
         rules: {
             booking_date1: {
+                required: true
+            },
+            currency_code: {
                 required: true
             },
         },
         submitHandler: function(form) {
 
-            $('#car_update').prop('disabled',true);
             var booking_id = $('#booking_id').val();
             var travel_type = $('#travel_type1').val();
             var capacity = $('#capacity1').val();
@@ -668,20 +727,21 @@ $(function() {
                 "markup": $('#markup_show1').find('span').text()
             });
 
-            // Collect itinerary data from all rows
-            var table = document.getElementById("package_program_list");
+            // Collect itinerary data from all rows in update modal only
+            var table = document.querySelector('#booking_update_modal #package_program_list');
+            var special_attraction_arr = [];
+            var day_program_arr = [];
+            var stay_arr = [];
+            var meal_plan_arr = [];
+            var checked_programe_arr = [];
             if(table) {
                 var rowCount = table.rows.length;
-                var special_attraction_arr = [];
-                var day_program_arr = [];
-                var stay_arr = [];
-                var meal_plan_arr = [];
-                var checked_programe_arr = [];
 
                 for (var i = 0; i < rowCount; i++) {
                     var row = table.rows[i];
-                    
-                    console.log('Row '+i+' cells:', row.cells.length);
+                    if (!row.cells || row.cells.length < 6) {
+                        continue;
+                    }
                     
                     // Get checkbox value
                     var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
@@ -708,48 +768,27 @@ $(function() {
                                     row.cells[5].querySelector('select');
                     var mealPlan = mealSelect ? mealSelect.value : '';
                     
-                    console.log('Row '+i+' data:', {
-                        checked: isChecked,
-                        attraction: attraction,
-                        dayProgram: dayProgram,
-                        stay: stay,
-                        mealPlan: mealPlan
-                    });
-                    
                     special_attraction_arr.push(attraction);
                     day_program_arr.push(dayProgram);
                     stay_arr.push(stay);
                     meal_plan_arr.push(mealPlan);
                 }
-                
-                console.log('Update - Collecting itinerary data:', {
-                    rowCount: rowCount,
-                    special_attraction_arr: special_attraction_arr,
-                    day_program_arr: day_program_arr,
-                    stay_arr: stay_arr,
-                    meal_plan_arr: meal_plan_arr,
-                    checked_programe_arr: checked_programe_arr
-                });
-            } else {
-                var special_attraction_arr = [];
-                var day_program_arr = [];
-                var stay_arr = [];
-                var meal_plan_arr = [];
-                var checked_programe_arr = [];
             }
 
             //Validation for booking and payment date in login financial year
             var check_date1 = $('#booking_date1').val();
+            $('#car_update').prop('disabled', true);
             $.post(base_url + 'view/load_data/finance_date_validation.php', {
                 check_date: check_date1
             }, function(data) {
                 if (data !== 'valid') {
                     error_msg_alert("The Booking date does not match between selected Financial year.");
-                    $('#car_update').prop('disabled',false);
+                    $('#car_update').prop('disabled', false);
+                    $('#car_update').button('reset');
                     return false;
                 } else {
                     $('#car_update').button('loading');
-                    $('#car_update').prop('disabled',true);
+                    $('#car_update').prop('disabled', true);
 
                     $.ajax({
                         type: 'post',
@@ -801,10 +840,13 @@ $(function() {
                         },
                         success: function(result) {
                             msg_popup_reload(result);
-                            $('#car_update').prop('disabled',true);
+                            $('#car_update').button('reset');
+                            $('#car_update').prop('disabled', false);
                         },
                         error: function(result) {
                             console.log(result.responseText);
+                            $('#car_update').button('reset');
+                            $('#car_update').prop('disabled', false);
                         }
                     });
                 }
@@ -813,7 +855,6 @@ $(function() {
 
         }
     });
-});
 
 // Itinerary management functions for update modal
 var count_itinerary_update = <?= ($program_count > 0) ? $program_count : 1 ?>;
@@ -821,12 +862,15 @@ var count_itinerary_update = <?= ($program_count > 0) ? $program_count : 1 ?>;
 // Function to add new row at the end of table (from top Add button)
 function addRowUpdate(table_id) {
     count_itinerary_update++;
-    var table = document.getElementById(table_id);
+    var table = document.querySelector('#booking_update_modal #' + table_id);
+    if (!table) {
+        return;
+    }
     var rowCount = table.rows.length;
     var row = table.insertRow(rowCount);
     
-    // Clone the meal plan options from the first row
-    var mealPlanOptions = $('#meal_plan1').html();
+    // Clone the meal plan options from the first row in update modal
+    var mealPlanOptions = $('#booking_update_modal #meal_plan1').html();
     
     row.innerHTML = '<td style="padding-right: 10px !important;"><input class="css-checkbox mg_bt_10 labelauty" id="chk_program'+count_itinerary_update+'" type="checkbox" checked style="display: none;"><label for="chk_program'+count_itinerary_update+'" style="margin-top: 55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>'+
         '<td><input maxlength="15" value="'+(rowCount + 1)+'" type="text" name="username" placeholder="Sr. No." style="margin-top: 35px;" class="form-control" disabled=""></td>'+
@@ -845,7 +889,10 @@ function addRowUpdate(table_id) {
 
 // Function to renumber all itinerary rows
 function renumber_itinerary_rows_update(){
-    var table = document.getElementById('package_program_list');
+    var table = document.querySelector('#booking_update_modal #package_program_list');
+    if (!table) {
+        return;
+    }
     for(var i = 0; i < table.rows.length; i++){
         table.rows[i].cells[1].childNodes[0].value = i + 1;
     }
@@ -890,20 +937,30 @@ function add_itinerary_booking_update(dest_id1, spa, dwp, ovs, meal, dayp) {
         $('#itinerary'+day_id[1]).button('reset');
         $('#itinerary'+day_id[1]).prop('disabled',false);
         $('#div_itinerary_modal').html(data);
+        if (typeof init_car_rental_itinerary_modal === 'function') {
+            init_car_rental_itinerary_modal();
+        }
     });
 }
 
 // Function to get itinerary data for booking update (also used by modal)
 function get_dest_itinerary_booking(dest_id1) {
+    if (typeof get_dest_itinerary_car_rental === 'function') {
+        return get_dest_itinerary_car_rental(dest_id1);
+    }
     var base_url = $('#base_url').val();
     var dest_id = $('#' + dest_id1).val();
     if (dest_id == '' || dest_id == 0) {
-        error_msg_alert('Please select destination!');
         $('#itinerary_data').html('');
+        $('#sq_itinerary_c1').val(0);
         return false;
     }
     $.post(base_url + 'view/car_rental/booking/get_itinerary_data.php', { dest_id: dest_id }, function (data) {
         $('#itinerary_data').html(data);
+        if (typeof sync_car_itinerary_count === 'function') {
+            sync_car_itinerary_count();
+        }
+        $("input[type='checkbox']", '#itinerary_detail_modal').labelauty({ label: false, maximum_width: '20px' });
     });
 }
 

@@ -118,12 +118,18 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
                 $sq_testm = mysqlQuery("SELECT * FROM quotation_testimonial WHERE active_flag='Active' ORDER BY testimonial_id ASC");
 
                 while ($row_testm = mysqli_fetch_assoc($sq_testm)) {
+                  $photo = str_replace('\\', '/', trim($row_testm['photo'] ?? ''));
+                  if (strpos($photo, 'http://') === 0 || strpos($photo, 'https://') === 0) {
+                    if (preg_match('#/crm/(.+)$#', $photo, $photo_match)) {
+                      $photo = $photo_match[1];
+                    }
+                  }
                   $testimonials[] = array(
                     'testimonial_id' => $row_testm['testimonial_id'],
                     'name' => $row_testm['name'],
                     'designation' => $row_testm['designation'],
                     'review' => $row_testm['review'],
-                    'photo' => $row_testm['photo']
+                    'photo' => $photo
                   );
                 }
                 // include_once(__DIR__ . '/../../../model/app_settings/print_html/quotation_html/generic_builder_config.php');
@@ -369,7 +375,7 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
       var btnUpload = $(this);
       var row = btnUpload.closest('.testimonial_row');
 
-      new AjaxUpload(btnUpload, {
+      var testimonialUpload = new AjaxUpload(btnUpload, {
         action: 'app_format/upload_testimonial_img.php',
         name: 'uploadfile',
 
@@ -378,10 +384,14 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
             error_msg_alert('Only JPG,JPEG,PNG files are allowed');
             return false;
           }
+          testimonialUpload.setData({
+            testimonial_id: row.find('.testimonial_id').val() || ''
+          });
           btnUpload.find('span').text('Uploading...');
         },
 
         onComplete: function(file, response) {
+          response = $('<div>').html($.trim(response)).text();
           var response1 = response.split('--');
 
           if (response1[0] == "error") {
@@ -392,7 +402,7 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
             var base_url = $('#base_url').val();
             var oldPhoto = row.find('.testimonial_photo').val();
 
-            if (oldPhoto != '' && oldPhoto.indexOf('uploads/testimonials/') != -1) {
+            if (oldPhoto != '' && (oldPhoto.indexOf('uploads/testimonials/') != -1 || oldPhoto.indexOf('images/testimonial/') != -1 || oldPhoto.indexOf('images/quotational_customer_testimonials/') != -1)) {
               $.post(base_url + 'view/app_settings/app_format/delete_testimonial_img.php', {
                 image: oldPhoto
               });
@@ -448,7 +458,7 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
             name: $(this).find('.testimonial_name').val(),
             designation: $(this).find('.testimonial_designation').val(),
             review: $(this).find('.testimonial_review').val(),
-            photo: $(this).find('.testimonial_photo').val()
+            photo: $.trim($(this).find('.testimonial_photo').val() || '')
           });
         });
 

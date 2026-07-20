@@ -25,7 +25,7 @@ if ($role == "Backoffice") {
 if ($role == "B2b") {
 	include_once('sales/index.php');
 }
-if ($role == "Branch Admin" || $role == "Accountant" || $role == "Hr") {
+if ($role == "Branch Admin" || $role == "Accountant" || $role == "Hr" ||  $role == "Sales Head" || $role == "Operations Head") {
 	include_once('branch_admin/index.php');
 }
 if ($role_id > '7') {
@@ -53,6 +53,10 @@ if ($role_id > '7') {
 		}
 	})();
 </script>
+<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+<elevenlabs-convai agent-id="agent_1901krgdr6jyedwt06z6grvqgzx0">
+</elevenlabs-convai>
+
 <?php
 /*======******Footer******=======*/
 require_once('../layouts/admin_footer.php');

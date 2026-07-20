@@ -25,14 +25,10 @@
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()">
+                                                <div style="display:flex; align-items:center; gap:8px;">
+                                                    <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()">
                                                     <i class="fa fa-plus"></i>
-                                                </button>
-                                            </div>
-
-                                            <div class="col-xs-6 mg_bt_20_sm_xs"
-                                                style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
-
+                                                </button> 
                                                 <select id="package_type" name="package_type"
                                                     class="form-control"
                                                     style="width:160px; text-align-last:center; -moz-text-align-last:center; -ms-text-align-last:center;"
@@ -44,6 +40,19 @@
                                                     onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6 mg_bt_20_sm_xs"
+                                                style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+
+                                                <button type="button" id="addHotelInfoSingleRowbtnsubmit" class="btn btn-excel btn-sm"
+                                                    title="Add Single Hotel Row">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+
+                                            
+                                         
 
                                             </div>
                                         </div>
@@ -79,7 +88,7 @@
                                                             <td><select name="room_cat-1" id="room_cat-1"
                                                                     style="width:145px;" title="Room Category"
                                                                     class="form-control app_select2"
-                                                                    onchange="get_hotel_cost();" data-add-new-option="true">
+                                                                    onchange="get_hotel_cost();" data-add-new-option="true">    
                                                                     <option value="">Room Category</option>
                                                                 </select>
                                                             </td>
@@ -152,12 +161,12 @@
                                         <div class="col-md-12"><span>Transport Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse5" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading5">
+                                <div id="collapse5" class="panel-collapse in main_block" role="tabpanel"
+                                    aria-labelledby="heading5" aria-expanded="true">
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('transport_vehicle-')"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-excel hidden" title="Add Vehicle" onclick="vehicle_save_modal('transport_vehicle-')"><i class="fa fa-plus"></i></button>
                                                 <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
                                             </div>
                                             <div class="col-xs-6 text-right mg_bt_20_sm_xs">
@@ -262,12 +271,12 @@
                                         <div class="col-md-12"><span>Flight Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading2">
+                                <div id="collapse2" class="panel-collapse in main_block" role="tabpanel"
+                                    aria-labelledby="heading2" aria-expanded="true">
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
                                             </div>
                                             <div class="col-xs-6 text-right mg_bt_20_sm_xs">
                                                 <button type="button" class="btn btn-excel btn-sm"
@@ -354,8 +363,8 @@
                                         <div class="col-md-12"><span>Activity Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse6" class="panel-collapse collapse main_block" role="tabpanel"
-                                    aria-labelledby="heading6">
+                                <div id="collapse6" class="panel-collapse in main_block" role="tabpanel"
+                                    aria-labelledby="heading6" aria-expanded="true">
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-xs-6 mg_bt_20_sm_xs">
@@ -906,8 +915,18 @@
                         }
                         // Don't force checkboxes to be checked - let user control them
                         // $(row.cells[0].childNodes[0]).prop('checked', true) /* .trigger('change') */ ;
-                        $(row.cells[2].childNodes[0]).prop('disabled', true);
+                        var $pkgSelect = $(row.cells[2].childNodes[0]);
+                        if (typeof quotationIsEditablePackageTypeSelect === 'function') {
+                            if (!quotationIsEditablePackageTypeSelect($pkgSelect)) {
+                                $pkgSelect.prop('disabled', true);
+                            }
+                        } else if (!$pkgSelect.attr('data-editable-package-type')) {
+                            $pkgSelect.prop('disabled', true);
+                        }
                     }
+                }
+                if (typeof quotationEnsureEditablePackageTypeRows === 'function') {
+                    quotationEnsureEditablePackageTypeRows(table);
                 }
                 console.log("hotel_cost"+row.cells[13].childNodes[0].value);
                 //Tab-4 Per person costing
@@ -2673,86 +2692,133 @@ $("#infant_activity_pp").val(
         }
     }
 
-    // Simple function to add a hotel row and copy data from previous row
-    function addSimpleHotelRow() {
-        var table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
-        var rowCount = table.rows.length;
+    // Add exactly one hotel row dynamically
+    function addHotelInfoSingleRow(tableID) {
+        tableID = tableID || 'tbl_package_tour_quotation_dynamic_hotel';
 
-        if (rowCount < 1) return; // No rows to copy from
-
-        // Add new row
-        addRow('tbl_package_tour_quotation_dynamic_hotel');
-
-        var newRowIndex = table.rows.length - 1;
-        var newRow = table.rows[newRowIndex];
-        var prevRow = table.rows[newRowIndex - 1];
-
-        // Copy city from previous row
-        var prevCitySelect = $(prevRow.cells[3].childNodes[0]);
-        var prevCityId = prevCitySelect.val();
-        var prevCityName = prevCitySelect.find('option:selected').text();
-
-        if (prevCityId && prevCityName) {
-            var $newCitySelect = $(newRow.cells[3].childNodes[0]);
-
-            // Initialize city dropdown
-            city_lzloading($newCitySelect);
-
-            // Set city value after a short delay
-            setTimeout(function() {
-                var cityOption = new Option(prevCityName, prevCityId, true, true);
-                $newCitySelect.append(cityOption);
-                $newCitySelect.val(prevCityId).trigger('change');
-
-                // Copy hotel from previous row after city is set
-                setTimeout(function() {
-                    var prevHotelSelect = $(prevRow.cells[4].childNodes[0]);
-                    var prevHotelId = prevHotelSelect.val();
-                    var prevHotelName = prevHotelSelect.find('option:selected').text();
-
-                    if (prevHotelId && prevHotelName) {
-                        // Load hotels for the city
-                        hotel_name_list_load($newCitySelect.attr('id'));
-
-                        // Set hotel after hotels are loaded
-                        setTimeout(function() {
-                            var $newHotelSelect = $(newRow.cells[4].childNodes[0]);
-
-                            // Check if hotel exists in loaded options
-                            if ($newHotelSelect.find('option[value="' + prevHotelId + '"]').length > 0) {
-                                $newHotelSelect.val(prevHotelId).trigger('change');
-                            } else {
-                                // Add hotel option if it doesn't exist
-                                var hotelOption = new Option(prevHotelName, prevHotelId, true, true);
-                                $newHotelSelect.append(hotelOption);
-                                $newHotelSelect.val(prevHotelId).trigger('change');
-                            }
-
-                            // Load hotel type
-                            hotel_type_load($newHotelSelect.attr('id'));
-                        }, 500);
-                    }
-                }, 200);
-            }, 100);
+        if (window.quotationAddingSingleHotelRow) {
+            return false;
         }
 
-        // Copy other fields from previous row
-        $(newRow.cells[2].childNodes[0]).val($(prevRow.cells[2].childNodes[0]).val()).trigger('change'); // Package type
-        $(newRow.cells[5].childNodes[0]).val($(prevRow.cells[5].childNodes[0]).val()).trigger('change'); // Room category
-        $(newRow.cells[8].childNodes[0]).val($(prevRow.cells[8].childNodes[0]).val()); // Hotel type
-        $(newRow.cells[16].childNodes[0]).val($(prevRow.cells[16].childNodes[0]).val()).trigger('change'); // Meal plan
+        var selectedPackageType = $('#package_type').val();
+        if (!selectedPackageType || selectedPackageType === '*Package Type') {
+            error_msg_alert('Please select Package Type!');
+            return false;
+        }
 
-        // Set row number
-        $(newRow.cells[1].childNodes[0]).val(parseInt($(prevRow.cells[1].childNodes[0]).val()) + 1);
+        var table = document.getElementById(tableID);
+        if (!table) {
+            return false;
+        }
 
-        // Initialize select2
-        $(newRow).find('.app_select2').select2();
-        initPackageQuotationMealPlanSelect(newRow);
+        var rowCountBefore = table.rows.length;
+        var prevRow = rowCountBefore > 0 ? table.rows[rowCountBefore - 1] : null;
+        var $btn = $('#addHotelInfoSingleRowbtnsubmit');
 
-        // Calculate hotel cost
-        get_hotel_cost();
+        window.quotationAddingSingleHotelRow = true;
+        $btn.prop('disabled', true);
+
+        window.quotationFreshPackageLoad = true;
+        addRow(tableID);
+        window.quotationFreshPackageLoad = false;
+
+        if (table.rows.length > rowCountBefore + 1) {
+            while (table.rows.length > rowCountBefore + 1) {
+                table.deleteRow(table.rows.length - 1);
+            }
+        }
+
+        var newRow = table.rows[table.rows.length - 1];
+        if (!newRow || !newRow.cells || newRow.cells.length < 17) {
+            window.quotationAddingSingleHotelRow = false;
+            $btn.prop('disabled', false);
+            return false;
+        }
+
+        if (typeof quotationResetHotelRowFields === 'function') {
+            quotationResetHotelRowFields(newRow, { packageType: selectedPackageType });
+        }
+        if (typeof quotationInitEditablePackageTypeSelect === 'function') {
+            quotationInitEditablePackageTypeSelect(newRow, selectedPackageType);
+        } else {
+            var $pkgSelect = $(newRow.cells[2].childNodes[0]);
+            $pkgSelect.prop('disabled', false)
+                .attr('data-editable-package-type', '1')
+                .val(selectedPackageType)
+                .trigger('change.select2');
+        }
+
+        var newSrNo = 1;
+        if (prevRow && prevRow.cells[1] && prevRow.cells[1].childNodes[0]) {
+            newSrNo = (parseInt(prevRow.cells[1].childNodes[0].value, 10) || rowCountBefore) + 1;
+        }
+        if (newRow.cells[1] && newRow.cells[1].childNodes[0]) {
+            newRow.cells[1].childNodes[0].value = newSrNo;
+        }
+
+        if (prevRow && typeof quotationGetHotelRowReference === 'function') {
+            var ref = quotationGetHotelRowReference(prevRow);
+            if (ref && ref.check_out && newRow.cells[6] && newRow.cells[6].childNodes[0]) {
+                newRow.cells[6].childNodes[0].value = ref.check_out;
+            }
+        }
+
+        if (typeof initAllHotelSelectAddNew === 'function') {
+            initAllHotelSelectAddNew(newRow);
+        }
+        if (typeof initAllRoomCategorySelectAddNew === 'function') {
+            initAllRoomCategorySelectAddNew(newRow);
+        }
+        if (typeof initPackageQuotationMealPlanSelect === 'function') {
+            initPackageQuotationMealPlanSelect(newRow);
+        }
+
+        if (typeof saveHotelTableState === 'function') {
+            saveHotelTableState();
+        }
+
+        window.quotationAddingSingleHotelRow = false;
+        $btn.prop('disabled', false);
+        return false;
     }
+    window.addHotelInfoSingleRow = addHotelInfoSingleRow;
 
+    $(document).off('click', '#addHotelInfoSingleRowbtnsubmit').on('click', '#addHotelInfoSingleRowbtnsubmit', function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        addHotelInfoSingleRow('tbl_package_tour_quotation_dynamic_hotel');
+        return false;
+    });
+
+
+function isAiQuotationActive() {
+    return sessionStorage.getItem('is_ai_quotation') === '1'
+        || ($('#is_ai_quotation').length && $('#is_ai_quotation').val() === '1')
+        || $('#aiBuilder').is(':checked');
+}
+
+function resolveAiQuotationPackageIds() {
+    var referId = sessionStorage.getItem('quotation_refer_id') || $('#quotation_refer_id').val() || '';
+    if (referId && String(referId) !== '0') {
+        return [String(referId)];
+    }
+    try {
+        var itineraryData = JSON.parse(sessionStorage.getItem('itinerary_data') || '{}');
+        if (itineraryData.package_id_arr && itineraryData.package_id_arr.length) {
+            return itineraryData.package_id_arr.map(String);
+        }
+    } catch (e) {}
+    var savedPackages = sessionStorage.getItem('selected_packages_tab3');
+    if (savedPackages) {
+        try {
+            var packageIds = JSON.parse(savedPackages);
+            if (packageIds.length) {
+                return packageIds.map(String);
+            }
+        } catch (e2) {}
+    }
+    return [];
+}
 
 function addHotelInfo(tableID, quot_table = "", itinerary = "") {
     const base_url = $('#base_url').val();
@@ -2774,6 +2840,15 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
         incl_arr.push(inclusion);
         excl_arr.push(exclusion);
     });
+
+    if (package_id_arr.length === 0 && isAiQuotationActive()) {
+        package_id_arr = resolveAiQuotationPackageIds();
+    }
+
+    if (package_id_arr.length === 0 && isAiQuotationActive()) {
+        error_msg_alert('Please select destination for AI quotation.');
+        return false;
+    }
 
     if (package_id_arr.length === 0) {
         error_msg_alert('Please select at least one Package!');
@@ -2807,9 +2882,29 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
     // Collect data arrays for each row in selected packages
     let attraction_arr = [], program_arr = [], stay_arr = [], meal_plan_arr = [], package_p_id_arr = [], day_count_arr = [];
     let count = 0;
+    var usedAiItineraryData = false;
 
+    if (isAiQuotationActive() && !$('input[name="custom_package"]:checked').length) {
+        try {
+            var storedItinerary = JSON.parse(sessionStorage.getItem('itinerary_data') || '{}');
+            attraction_arr = storedItinerary.attraction_arr || [];
+            program_arr = storedItinerary.program_arr || [];
+            stay_arr = storedItinerary.stay_arr || [];
+            meal_plan_arr = storedItinerary.meal_plan_arr || [];
+            package_p_id_arr = storedItinerary.package_p_id_arr || [];
+            if (program_arr.length > 0) {
+                day_count_arr = [program_arr.length];
+                usedAiItineraryData = true;
+            }
+        } catch (e) {}
+    }
+
+    if (!usedAiItineraryData) {
     package_id_arr.forEach(package_id => {
         const table = document.getElementById(`dynamic_table_list_p_${package_id}`);
+        if (!table) {
+            return;
+        }
         const rowCount = table.rows.length;
 
         for (let i = 0; i < rowCount; i++) {
@@ -2846,19 +2941,56 @@ function addHotelInfo(tableID, quot_table = "", itinerary = "") {
         day_count_arr.push(count);
         count = 0;
     });
+    }
+
+    const hotelPackageIds = package_id_arr.filter(function(packageId) {
+        return packageId && String(packageId) !== '0';
+    });
 
     const total_adult = $('#total_adult').val();
     const total_children = $('#total_children').val();
     const to_date = $('#to_date').val();
     const total_days = $('#total_days').val();
     const packagesToLoad = isAddingNewPackageTier
-        ? package_id_arr
+        ? hotelPackageIds
         : (typeof quotationFilterNewPackageIds === 'function'
-            ? quotationFilterNewPackageIds(package_id_arr)
-            : package_id_arr);
+            ? quotationFilterNewPackageIds(hotelPackageIds)
+            : hotelPackageIds);
     const from_date = typeof quotationGetReferenceTravelStartDate === 'function'
         ? quotationGetReferenceTravelStartDate()
         : $('#from_date').val();
+
+    if (!packagesToLoad.length && isAiQuotationActive() && program_arr.length > 0) {
+        const table = document.getElementById("tbl_package_tour_quotation_dynamic_hotel");
+        let lastRowNo = 0;
+        for (let r = 0; r < table.rows.length; r++) {
+            const rowNo = parseInt(table.rows[r].cells[1].childNodes[0].value, 10);
+            if (!isNaN(rowNo) && rowNo > lastRowNo) {
+                lastRowNo = rowNo;
+            }
+        }
+        window.quotationBatchPopulatingHotels = true;
+        for (let i = 0; i < program_arr.length; i++) {
+            addRow('tbl_package_tour_quotation_dynamic_hotel');
+            const row = table.rows[table.rows.length - 1];
+            if (row && row.cells[1] && row.cells[1].childNodes[0]) {
+                row.cells[1].childNodes[0].value = lastRowNo + i + 1;
+            }
+            if (selectedPackageTypeToAdd && row.cells[2] && row.cells[2].childNodes[0]) {
+                $(row.cells[2].childNodes[0]).val(selectedPackageTypeToAdd).trigger('change.select2');
+            }
+        }
+        window.quotationBatchPopulatingHotels = false;
+        if (selectedPackageTypeToAdd && typeof hideHotelPackage === 'function') {
+            hideHotelPackage(selectedPackageTypeToAdd);
+        }
+        if (typeof get_hotel_cost === 'function') {
+            get_hotel_cost();
+        }
+        sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
+        saveHotelTableState();
+        return false;
+    }
 
     // Ajax to save data and update the table
     $.ajax({

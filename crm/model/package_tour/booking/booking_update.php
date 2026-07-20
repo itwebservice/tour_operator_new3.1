@@ -1,4 +1,6 @@
 <?php
+include_once __DIR__ . '/booking_discount_helper.php';
+
 $flag = true;
 class booking_update
 {
@@ -152,7 +154,7 @@ class booking_update
     $tour_service_tax_subtotal = $_POST['tour_service_tax_subtotal'];
     $tcs_tax = $_POST['tcs_tax'];
     $tcs = $_POST['tcs'];
-    $discount_in = $_POST['discount_in'];
+    $discount_in = booking_normalize_discount_in($_POST['discount_in']);
     $discount_amt = $_POST['discount_amt'];
 
     $rue_cost = $_POST['rue_cost'];

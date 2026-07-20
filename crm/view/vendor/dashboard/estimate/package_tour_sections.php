@@ -47,17 +47,14 @@ if($offset!=1){
         <div id="div_vendor_type_content_s-<?= $offset ?>"></div>
 
 
-        <?php
-		if ($offset != 1) {
-		?>
-        <div class="col-sm-2 col-xs-12 pull-right text-right mg_tp_10">
-
-            <button type="button" class="btn btn-danger btn-sm"
-                onclick="close_estimate('div_estimate_<?= $offset ?>')"><i class="fa fa-times"></i></button>
-        </div>
-        <?php
-		}
-		?>
+    <?php if ($offset != 1) { ?>
+    <div class="col-sm-2 col-xs-12 pull-right text-right mg_tp_10">
+        <button type="button" class="btn btn-danger btn-sm" title="Remove"
+            onclick="close_estimate('div_estimate_<?= $offset ?>')">
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+    <?php } ?>
     </div>
 
     <hr class="mg_tp_10 mg_bt_10">
@@ -222,18 +219,12 @@ if($offset!=1){
     </script>
     <div id="div_vendor_type_content_s-<?= $offset ?>"></div>
 
-
-    <?php
-    if ($offset != 1) {
-    ?>
     <div class="col-sm-2 col-xs-12 pull-right text-right mg_tp_10">
-
-        <button type="button" class="btn btn-danger btn-sm"
-            onclick="close_estimate('div_estimate_<?= $offset ?>')"><i class="fa fa-times"></i></button>
+        <button type="button" class="btn btn-danger btn-sm" title="Remove"
+            onclick="close_estimate('div_estimate_<?= $offset ?>')">
+            <i class="fa fa-times"></i>
+        </button>
     </div>
-    <?php
-    }
-    ?>
 </div>
 
 <hr class="mg_tp_10 mg_bt_10">

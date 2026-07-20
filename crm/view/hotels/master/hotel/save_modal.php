@@ -16,7 +16,7 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
                         <legend>Basic Information</legend>
                         <div class="row">
                             <div class="col-md-2 col-sm-6 mg_bt_10">
-                                <select id="cmb_city_id" name="cmb_city_id" class="form-control app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                <select id="cmb_city_id" name="cmb_city_id" class="form-control" style="width:100%" title="Select City Name" data-add-new-option="true" data-lazy-city="true">
                                     
                                     <?php //get_cities_dropdown(); 
                                     ?>
@@ -440,7 +440,6 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
 <script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script>
-    $('#save_modal').modal('show');
     $('#as_of_date').datetimepicker({
         timepicker: false,
         format: 'd-m-Y'
@@ -449,6 +448,7 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
         dropdownParent: $("#save_modal")
     });
     city_lzloading('#cmb_city_id');
+    $('#save_modal').modal('show');
     ///////////////////////***Hotel Master Save start*********//////////////
     upload_hotel_pic_attch();
 

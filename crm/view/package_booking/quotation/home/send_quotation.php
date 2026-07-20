@@ -27,6 +27,12 @@
         transition: all 0.2s ease;
         color: #ffffff !important;
     }
+
+    .action-icon-btn.pdf-loading {
+        pointer-events: none;
+        opacity: 0.75;
+        cursor: wait;
+    }
     
     /* Background becomes icon color, icon becomes white on hover */
     /* Background becomes icon color, icon becomes white on hover */
@@ -608,7 +614,7 @@ $quotation_count = mysqli_num_rows($sq_query);
 <td>
     <div class="download-actions-container" style="display: inline-flex; gap: 6px; align-items: center;">
         <!-- PDF Button -->
-        <button type="button" class="btn btn-sm action-icon-btn"  onclick="loadOtherPage('<?php echo $url1; ?>')"
+        <button type="button" class="btn btn-sm action-icon-btn" onclick="loadQuotationPDF('<?php echo $url1; ?>', this)"
                 data-icon-type="pdf" 
                 data-toggle="tooltip" data-placement="top" title="Download as PDF">
             <i class="fa fa-file-pdf-o pdf-icon"></i>
@@ -835,6 +841,48 @@ $quotation_count = mysqli_num_rows($sq_query);
 </div> 
 
 <script>
+function loadQuotationPDF(url, btn) {
+    var $btn = $(btn);
+    if ($btn.hasClass('pdf-loading')) {
+        return false;
+    }
+
+    var originalHtml = $btn.html();
+    $btn.addClass('pdf-loading').prop('disabled', true);
+    $btn.html('<i class="fa fa-spinner fa-spin pdf-icon"></i><span class="action-label">Loading...</span>');
+
+    var loaderHidden = false;
+    var safetyTimer;
+
+    function hidePdfLoader() {
+        if (loaderHidden) {
+            return;
+        }
+        loaderHidden = true;
+        clearTimeout(safetyTimer);
+        $btn.removeClass('pdf-loading').prop('disabled', false).html(originalHtml);
+    }
+
+    var $iframe = $('<iframe>').hide().attr('src', url).appendTo('body');
+
+    safetyTimer = setTimeout(hidePdfLoader, 6000);
+
+    $iframe.on('load', function() {
+        try {
+            var iframeWin = this.contentWindow;
+            if (iframeWin) {
+                iframeWin.addEventListener('beforeprint', function() {
+                    setTimeout(hidePdfLoader, 300);
+                });
+            }
+        } catch (e) {}
+
+        setTimeout(hidePdfLoader, 4500);
+    });
+
+    $iframe.on('error', hidePdfLoader);
+}
+
 $(document).off('click', '.actions-btn-group .dropdown-toggle'); // prevent duplicate binding
 $(document).on('click', '.actions-btn-group .dropdown-toggle', function (e) {
     e.preventDefault();

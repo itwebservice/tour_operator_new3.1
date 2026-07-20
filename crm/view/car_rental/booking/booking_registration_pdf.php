@@ -248,10 +248,6 @@ $count = 0;
 
 $count++;
 
-$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_vendor_vehicle_entries where vehicle_id='$row_vehicle[vehicle_id]'"));
-
-// $pdf->Row(array($count, $sq_booking['vehicle_name'], $sq_vehicle['vehicle_no'], $sq_vehicle['vehicle_driver_name'], $sq_vehicle['vehicle_mobile_no'], $sq_vehicle['vehicle_type']));
-
 $sq_entry_n =mysqli_fetch_assoc( mysqlQuery("select * from car_rental_transport_voucher_entries where booking_id='$booking_id'"));
 
 $pdf->Row(array($count, $sq_booking['vehicle_name'], $sq_entry_n['vehicle_no'],$sq_entry_n['driver_name'],$sq_entry_n['mobile_no'],$sq_entry_n['type_array']));

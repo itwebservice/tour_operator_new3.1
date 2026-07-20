@@ -29,7 +29,7 @@ $email_id = $encrypt_decrypt->fnDecrypt($sq_vendor['email_id'], $secret_key);
         <legend>Other Supplier Information</legend>
         <div class="row">
           <div class="col-md-3 col-sm-6 mg_bt_10">
-            <select id="cmb_city_id1" name="cmb_city_id1" style="width:100%" title="City Name" data-add-new-option="true">
+            <select id="cmb_city_id1" name="cmb_city_id1" style="width:100%" class="form-control" title="City Name" data-add-new-option="true" data-lazy-city="true">
                   <?php $sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name,city_id from city_master where city_id='$sq_vendor[city_id]'")); ?>
                   <option value="<?php echo $sq_city['city_id'] ?>" selected="selected"><?php echo $sq_city['city_name'] ?></option>
             </select>
@@ -147,11 +147,11 @@ $email_id = $encrypt_decrypt->fnDecrypt($sq_vendor['email_id'], $secret_key);
 </form>
 
 <script>
-$('#update_modal').modal('show');
 $('#cust_state1').select2({
   dropdownParent: $("#update_modal")});
 $('#as_of_date1').datetimepicker({ timepicker:false, format:'d-m-Y' });
 city_lzloading('#cmb_city_id1');
+$('#update_modal').modal('show');
 $(function(){
   $('#frm_update').validate({
     rules:{

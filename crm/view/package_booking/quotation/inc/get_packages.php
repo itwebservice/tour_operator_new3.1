@@ -587,7 +587,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                             </div>
                             <div class="table-responsive">
                                 <table style="width:100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
-                                    <legend>Tour Itinerary</legend>
+                                    <legend>Tour </legend>
                                     <?php
                                     $offset1 = 0;
                                     if ($program_count == 0) {
@@ -651,6 +651,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             <div class="package_selector">
                 <input type="radio" value="<?php echo $row_tours['package_id']; ?>"
                     id="<?php echo $row_tours['package_id']; ?>" name="custom_package"
+                    onchange="if(typeof blockPackageSelectInAiMode==='function'){blockPackageSelectInAiMode(this);}"
                     <?php echo ($current_package_id && $row_tours['package_id'] == $current_package_id) ? 'checked' : ''; ?> />
                 <!-- Debug: Package ID = <?php echo $row_tours['package_id']; ?>, Current = <?php echo $current_package_id; ?>, Checked = <?php echo ($current_package_id && $row_tours['package_id'] == $current_package_id) ? 'YES' : 'NO'; ?> -->
             </div>
@@ -2369,7 +2370,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             // Force show the upload button container with maximum CSS override
             if (uploadContainer.length > 0) {
                 uploadContainer.show();
-                uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
+                uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important; margin-top: 35px;');
                 uploadContainer.css({
                     'display': 'flex !important',
                     'visibility': 'visible !important',
@@ -2417,8 +2418,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 console.log("QUOTATION: Upload button not visible after cleanup, trying to show using new system...");
                 if (uploadContainer.length > 0) {
                     uploadContainer.show();
-                    uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
-                    uploadContainer.css('display', 'flex !important');
+                    uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;    margin-top: 35px;');
+                    uploadContainer.css('display', 'flex !important');  
                     console.log("QUOTATION: Force showed upload container");
                 } else {
                     uploadLabel.show();

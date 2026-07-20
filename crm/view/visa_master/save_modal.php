@@ -181,7 +181,7 @@ include "../../model/model.php";
                                 <input type="hidden" id="photo_upload_url5" name="photo_upload_url5">
 
                             </div>
-					        <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note: Upload only PDF or Text files."><i class="fa fa-question-circle"></i></button>
+					        <button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note: Upload only PDF or Text files."><i class="fa fa-question-circle"></i></button>
 
                         </div>
 

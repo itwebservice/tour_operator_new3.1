@@ -1,5 +1,6 @@
 <?php
 include "../../../../model/model.php";
+include_once "booking_discount_helper.php";
 $quotation_id = $_POST['quotation_id'];
 
 $quot_info_arr = array();
@@ -76,8 +77,9 @@ $quot_info_arr['tax_type'] =  '';
 $quot_info_arr['tax_in_percentage'] = '';
 
 $quot_info_arr['service_tax_subtotal'] = $sq_costing['service_tax_subtotal'];
-$quot_info_arr['discount_in'] = $sq_costing['discount_in'];
-$quot_info_arr['discount'] = $sq_costing['discount'];
+$resolved_discount = booking_resolve_quotation_discount($quotation_id, $sq_costing, $sq_quotation);
+$quot_info_arr['discount_in'] = $resolved_discount['discount_in'];
+$quot_info_arr['discount'] = $resolved_discount['discount'];
 $quot_info_arr['total_tour_cost'] = $sq_costing['total_tour_cost'] + $sq_quotation['guide_cost']+ $sq_quotation['misc_cost'];
 
 //Transport

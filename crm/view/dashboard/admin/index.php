@@ -313,7 +313,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 					<ul class="nav nav-tabs responsive" role="tablist">
 						<li role="presentation" class="active"><a href="#enquiry_tab" aria-controls="enquiry_tab" role="tab" data-toggle="tab">Followups</a></li>
 						<li role="presentation"><a href="#oncoming_tab" aria-controls="oncoming_tab" role="tab" data-toggle="tab">Tour Summary</a></li>
-						<li role="presentation"><a href="#itinerary_tab" aria-controls="itinerary_tab" role="tab" data-toggle="tab">Tour Itinerary</a></li>
+						<li role="presentation"><a href="#itinerary_tab" aria-controls="itinerary_tab" role="tab" data-toggle="tab">Guest Program</a></li>
 						<li role="presentation"><a href="#reminder_tab" aria-controls="reminder_tab" role="tab" data-toggle="tab">Reminders</a></li>
 					</ul>
 

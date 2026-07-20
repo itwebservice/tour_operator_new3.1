@@ -6,6 +6,167 @@
                 <div class="col-md-12 app_accordion">
                     <div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
 
+                    <!-- Hotel Information -->
+                        <div class="accordion_content main_block mg_bt_10">
+                            <div class="panel panel-default main_block">
+                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="collapsed2">
+                                        <div class="col-md-12"><span>Hotel Information</span></div>
+                                    </div>
+                                </div>
+                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2">
+                                    <div class="panel-body">
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-6">
+                                                <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-md-6 text-right text_center_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name]');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_master');}" title="Add Row"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_hotel_master')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table table-bordered no-marg pd_bt_51">
+                                                        <tr>
+                                                            <td><input id="chk_dest" type="checkbox" checked></td>
+                                                            <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:250px;" title="Select City Name" data-add-new-option="true">
+                                                                </select></td>
+                                                            <td class="col-md-4"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" class="app_select2 form-control" style="width:100% !important" title="Select Hotel Name" data-add-new-option="true">
+                                                                    <option value="">*Hotel Name</option>
+                                                                </select></td>
+                                                            <td class="col-md-4"><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
+                                                            <td class="col-md-2"><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" placeholder="*Total Night" title="Total Night"></td>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flight Information -->
+        <div class="accordion_content main_block mg_bt_10">
+            <div class="panel panel-default main_block">
+                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false" aria-controls="collapse3" id="collapsed3">
+                        <div class="col-md-12"><span>Flight Information</span></div>
+                    </div>
+                </div>
+                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading3">
+                                    <div class="panel-body">
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-6">
+                                                <button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                            <div class="col-md-6 text-right text_center_xs">
+                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_group_tour_quotation_dynamic_plane');" title="Add Row"><i class="fa fa-plus"></i></button>
+                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_group_tour_quotation_dynamic_plane')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="row mg_bt_10">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="tbl_group_tour_quotation_dynamic_plane" name="tbl_group_tour_quotation_dynamic_plane" class="table table-bordered no-marg pd_bt_51">
+                                                        <tr>
+                                                            <td><input class="css-checkbox" id="chk_plan-" type="checkbox"><label class="css-label" for="chk_plan-"> <label></td>
+                                                            <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
+                                                           
+                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="from" title="From Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*From Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                                    class="form-control app_select2 plane-airport-select"
+                                                                    data-sector-type="to" title="To Sector"
+                                                                     data-add-new-option="true">
+                                                                    <option value="">*To Sector</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="col-md-2 no-pad"><select id="airline_name-1" class="app_select2 form-control" title="Airline Name" name="airline_name-1" style="width:100%;" data-add-new-option="true">
+                                                                    <option value="">*Airline Name</option>
+                                                                    <?php get_airline_name_dropdown(); ?>
+                                                                </select>
+                                                            </td>
+                                                            <td class="col-md-2 no-pad"><select name="plane_class-1" id="plane_class-1" title="Class" style="width:100%;">
+                                                                    <?php get_flight_class_dropdown(); ?>
+                                                                </select></td>
+                                                            <td class="hidden"><input type="hidden" id="from_city-1"></td>
+                                                            <td class="hidden"><input type="hidden" id="to_city-1"></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                         <!-- Transport Information -->
+        <div class="accordion_content main_block mg_bt_10">
+            <div class="panel panel-default main_block">
+                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
+                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2_5" aria-expanded="false" aria-controls="collapse2_5" id="collapsed2_5">
+                        <div class="col-md-12"><span>Transport Information</span></div>
+                    </div>
+                </div>
+                <div id="collapse2_5" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2_5">
+                    <div class="panel-body">
+                        <div class="row mg_bt_10">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
+                                <button type="button" class="btn btn-excel hidden" title="Add Vehicle" onclick="vehicle_save_modal('vehicle_name1')"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+                            </div>
+                            <div class="col-md-6 text-right text_center_xs">
+                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_tour_transport');destinationLoading('select[name^=pickup_from]', 'Pickup Location');destinationLoading('select[name^=drop_to]', 'Drop-off Location');" title="Add Row"><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_tour_transport')" title="Delete Row"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="row mg_bt_10">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table id="tbl_package_tour_transport" name="tbl_package_tour_transport" class="table table-bordered no-marg pd_bt_51">
+                                        <tbody>
+                                            <tr>
+                                                <td class="col-md-1"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
+                                                <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
+                                                <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
+                                                        <option value="">Select Vehicle</option>
+                                                        <?php
+                                                        $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
+                                                        while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>
+                                                            <option value="<?php echo $row_dest['entry_id']; ?>">
+                                                                <?php echo $row_dest['vehicle_name']; ?></option>
+                                                        <?php } ?>
+                                                    </select></td>
+                                                <td class="col-md-3"><select name="pickup_from1" id="pickup_from1" style="width:100%;" title="Pickup Location" class="form-control app_minselect2">
+                                                    </select></td>
+                                                <td class="col-md-3"><select name="drop_to1" id="drop_to1" style="width:100%;" title="Drop-off Location" class="form-control app_minselect2">
+                                                    </select></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+
                         <!-- Train Information -->
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
@@ -57,164 +218,9 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Hotel Information -->
-                        <div class="accordion_content main_block mg_bt_10">
-                            <div class="panel panel-default main_block">
-                                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="collapsed2">
-                                        <div class="col-md-12"><span>Hotel Information</span></div>
-                                    </div>
-                                </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2">
-                                    <div class="panel-body">
-                                        <div class="row mg_bt_10">
-                                            <div class="col-md-6">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                            <div class="col-md-6 text-right text_center_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name]');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_master');}" title="Add Row"><i class="fa fa-plus"></i></button>
-                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_hotel_master')" title="Delete Row"><i class="fa fa-trash"></i></button>
-                                            </div>
-                                        </div>
-                                        <div class="row mg_bt_10">
-                                            <div class="col-md-12">
-                                                <div class="table-responsive">
-                                                    <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table table-bordered no-marg pd_bt_51">
-                                                        <tr>
-                                                            <td><input id="chk_dest" type="checkbox" checked></td>
-                                                            <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                            <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:250px;" title="Select City Name" data-add-new-option="true">
-                                                                </select></td>
-                                                            <td class="col-md-4"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" class="app_select2 form-control" style="width:100% !important" title="Select Hotel Name" data-add-new-option="true">
-                                                                    <option value="">*Hotel Name</option>
-                                                                </select></td>
-                                                            <td class="col-md-4"><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
-                                                            <td class="col-md-2"><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" placeholder="*Total Night" title="Total Night"></td>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        
 
-        <!-- Transport Information -->
-        <div class="accordion_content main_block mg_bt_10">
-            <div class="panel panel-default main_block">
-                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2_5" aria-expanded="false" aria-controls="collapse2_5" id="collapsed2_5">
-                        <div class="col-md-12"><span>Transport Information</span></div>
-                    </div>
-                </div>
-                <div id="collapse2_5" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2_5">
-                    <div class="panel-body">
-                        <div class="row mg_bt_10">
-                            <div class="col-md-6">
-                                <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
-                                <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('vehicle_name1')"><i class="fa fa-plus"></i></button>
-                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
-                            </div>
-                            <div class="col-md-6 text-right text_center_xs">
-                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_tour_transport');destinationLoading('select[name^=pickup_from]', 'Pickup Location');destinationLoading('select[name^=drop_to]', 'Drop-off Location');" title="Add Row"><i class="fa fa-plus"></i></button>
-                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_tour_transport')" title="Delete Row"><i class="fa fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <div class="row mg_bt_10">
-                            <div class="col-md-12">
-                                <div class="table-responsive">
-                                    <table id="tbl_package_tour_transport" name="tbl_package_tour_transport" class="table table-bordered no-marg pd_bt_51">
-                                        <tbody>
-                                            <tr>
-                                                <td class="col-md-1"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
-                                                <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
-                                                <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
-                                                        <option value="">Select Vehicle</option>
-                                                        <?php
-                                                        $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
-                                                        while ($row_dest = mysqli_fetch_assoc($sq_query)) { ?>
-                                                            <option value="<?php echo $row_dest['entry_id']; ?>">
-                                                                <?php echo $row_dest['vehicle_name']; ?></option>
-                                                        <?php } ?>
-                                                    </select></td>
-                                                <td class="col-md-3"><select name="pickup_from1" id="pickup_from1" style="width:100%;" title="Pickup Location" class="form-control app_minselect2">
-                                                    </select></td>
-                                                <td class="col-md-3"><select name="drop_to1" id="drop_to1" style="width:100%;" title="Drop-off Location" class="form-control app_minselect2">
-                                                    </select></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Flight Information -->
-        <div class="accordion_content main_block mg_bt_10">
-            <div class="panel panel-default main_block">
-                <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false" aria-controls="collapse3" id="collapsed3">
-                        <div class="col-md-12"><span>Flight Information</span></div>
-                    </div>
-                </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading3">
-                                    <div class="panel-body">
-                                        <div class="row mg_bt_10">
-                                            <div class="col-md-6">
-                                                <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                            <div class="col-md-6 text-right text_center_xs">
-                                                <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_group_tour_quotation_dynamic_plane');" title="Add Row"><i class="fa fa-plus"></i></button>
-                                                <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_group_tour_quotation_dynamic_plane')" title="Delete Row"><i class="fa fa-trash"></i></button>
-                                            </div>
-                                        </div>
-                                        <div class="row mg_bt_10">
-                                            <div class="col-md-12">
-                                                <div class="table-responsive">
-                                                    <table id="tbl_group_tour_quotation_dynamic_plane" name="tbl_group_tour_quotation_dynamic_plane" class="table table-bordered no-marg pd_bt_51">
-                                                        <tr>
-                                                            <td><input class="css-checkbox" id="chk_plan-" type="checkbox"><label class="css-label" for="chk_plan-"> <label></td>
-                                                            <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-                                                           
-                                                            <td><select name="from_sector-1" id="from_sector-1"
-                                                                    class="form-control app_select2 plane-airport-select"
-                                                                    data-sector-type="from" title="From Sector"
-                                                                     data-add-new-option="true">
-                                                                    <option value="">*From Sector</option>
-                                                                </select>
-                                                            </td>
-                                                            <td><select name="to_sector-1" id="to_sector-1"
-                                                                    class="form-control app_select2 plane-airport-select"
-                                                                    data-sector-type="to" title="To Sector"
-                                                                     data-add-new-option="true">
-                                                                    <option value="">*To Sector</option>
-                                                                </select>
-                                                            </td>
-                                                            <td class="col-md-2 no-pad"><select id="airline_name-1" class="app_select2 form-control" title="Airline Name" name="airline_name-1" style="width:100%;" data-add-new-option="true">
-                                                                    <option value="">*Airline Name</option>
-                                                                    <?php get_airline_name_dropdown(); ?>
-                                                                </select>
-                                                            </td>
-                                                            <td class="col-md-2 no-pad"><select name="plane_class-1" id="plane_class-1" title="Class" style="width:100%;">
-                                                                    <?php get_flight_class_dropdown(); ?>
-                                                                </select></td>
-                                                            <td class="hidden"><input type="hidden" id="from_city-1"></td>
-                                                            <td class="hidden"><input type="hidden" id="to_city-1"></td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+       
                         <!-- Cruise Information -->
                         <div class="accordion_content main_block">
                             <div class="panel panel-default main_block">
@@ -644,9 +650,9 @@
                 }
                 $('.accordion_content').removeClass("indicator");
                 $('#tab2_head').addClass('done');
-                $('#tab3_head').addClass('active');
+                $('#tab4_head').addClass('active');
                 $('.bk_tab').removeClass('active');
-                $('#tab3').addClass('active');
+                $('#tab4').addClass('active');
                 $('html, body').animate({
                     scrollTop: $('.bk_tab_head').offset().top
                 }, 200);

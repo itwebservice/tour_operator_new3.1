@@ -89,7 +89,7 @@ background-color:<?= $theme_color ?>;
                         ?>
                     </select>
                 </div>
-                <div class="col-md-6 col-sm-4 col-xs-12 mg_bt_20 text-right">
+                <div class="col-md-6 col-sm-4 col-xs-12 mg_bt_20 text-right hidden">
                     <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note : The Package is not available for this Destination.Please create here."><i class="fa fa-question-circle"></i></button>
 
                     <a href="../../../../custom_packages/master/index.php" target='_blank' class="btn btn-sm" style="
@@ -128,33 +128,7 @@ background-color:<?= $theme_color ?>;
                 </div>
                 <div id="aiApiInfo"></div>
 
-                <div id="aiItineraryContainer">
-                <div class="ai-itinerary-row" id="aiItineraryRow" aria-hidden="true">
-                    <label class="ai-check-wrap" for="chk-program">
-                        <input id="chk-program" type="checkbox" checked>
-                    </label>
-                    <input type="text" class="ai-field ai-special" placeholder="*Special Attraction" value="">
-                    <textarea class="ai-field ai-day-program" placeholder="*Day-wise Program"></textarea>
-                    <input type="text" class="ai-field ai-stay" placeholder="*Overnight Stay" value="">
-                    <select class="ai-field ai-meal">
-                        <option selected>Meal Plan</option>
-                        <option>Breakfast</option>
-                        <option>Lunch</option>
-                        <option>Dinner</option>
-                        <option>B+L</option>
-                        <option>B+D</option>
-                        <option>L+D</option>
-                        <option>B+L+D</option>
-                        <option>Room Only</option>
-                        <option>No Meals</option>
-                        <option>All Inclusive</option>
-                    </select>
-                    <button type="button" class="ai-plus-btn" id="aiPlusBtn" aria-label="Add itinerary">+</button>
-                </div>
-
-
-
-                </div>
+                <div id="aiItineraryContainer"></div>
 
                 <div class="ai-inclusions-exclusions-row">
                 <div class="row mg_tp_20 ">
@@ -189,21 +163,24 @@ background-color:<?= $theme_color ?>;
                 </div>
 
                 <script>
-                    const aiToggleBtn = document.getElementById("aiToggleBtn");
-                    const aiChatBox = document.getElementById("aiChatBox");
-                    const aiItineraryRow = document.getElementById("aiItineraryRow");
+                    (function () {
+                        const aiToggleBtn = document.getElementById("aiToggleBtn");
+                        const aiChatBox = document.getElementById("aiChatBox");
 
-                    aiToggleBtn.addEventListener("click", function () {
-                        aiChatBox.classList.toggle("show");
-                        const isVisible = aiChatBox.classList.contains("show");
-                        aiChatBox.setAttribute("aria-hidden", String(!isVisible));
-                        aiItineraryRow.classList.toggle("show", isVisible);
-                        aiItineraryRow.setAttribute("aria-hidden", String(!isVisible));
-                        document.querySelectorAll('#aiItineraryContainer .ai-itinerary-row').forEach(function(row) {
-                            row.classList.toggle("show", isVisible);
-                            row.setAttribute("aria-hidden", String(!isVisible));
+                        if (!aiToggleBtn || !aiChatBox) {
+                            return;
+                        }
+
+                        aiToggleBtn.addEventListener("click", function () {
+                            aiChatBox.classList.toggle("show");
+                            const isVisible = aiChatBox.classList.contains("show");
+                            aiChatBox.setAttribute("aria-hidden", String(!isVisible));
+                            document.querySelectorAll('#aiItineraryContainer .ai-itinerary-row').forEach(function(row) {
+                                row.classList.toggle("show", isVisible);
+                                row.setAttribute("aria-hidden", String(!isVisible));
+                            });
                         });
-                    });
+                    })();
                 </script>
 
 
@@ -757,8 +734,22 @@ $(document).on('click', '#tab2_head', function() {
         window.href = base_url + 'view/custom_packages/master/package/index.php';
     }
 
+    function isAiQuotationMode() {
+        return $('#aiBuilder').is(':checked')
+            || $('#is_ai_quotation').val() === '1'
+            || sessionStorage.getItem('is_ai_quotation') === '1';
+    }
+
+    function getQuotationDestinationId() {
+        return $('#dest_name').val()
+            || sessionStorage.getItem('selected_destination_id')
+            || sessionStorage.getItem('quotation_dest_id')
+            || $('#quotation_dest_id').val()
+            || '';
+    }
+
     function syncQuotationReferId() {
-        var dest_id = $('#dest_name').val() || sessionStorage.getItem('selected_destination_id') || '';
+        var dest_id = getQuotationDestinationId();
         var referMap = {};
         try {
             referMap = JSON.parse($('#quotation_refer_id_map').val() || '{}');
@@ -846,6 +837,9 @@ $(document).on('click', '#tab2_head', function() {
         var attraction_arr = [], program_arr = [], stay_arr = [], meal_plan_arr = [];
         $('#aiItineraryContainer .ai-itinerary-row').each(function() {
             var $row = $(this);
+            if (!$row.find('.ai-program-check').is(':checked')) {
+                return;
+            }
             var attraction = ($row.find('.ai-special').val() || '').trim();
             var program = ($row.find('.ai-day-program').val() || '').trim();
             var stay = ($row.find('.ai-stay').val() || '').trim();
@@ -874,6 +868,9 @@ $(document).on('click', '#tab2_head', function() {
     function hasAiItineraryContent() {
         var hasContent = false;
         $('#aiItineraryContainer .ai-itinerary-row').each(function() {
+            if (!$(this).find('.ai-program-check').is(':checked')) {
+                return;
+            }
             var attraction = ($(this).find('.ai-special').val() || '').trim();
             var program = ($(this).find('.ai-day-program').val() || '').trim();
             var stay = ($(this).find('.ai-stay').val() || '').trim();
@@ -892,7 +889,7 @@ $(document).on('click', '#tab2_head', function() {
 
     function storeAiItinerarySession() {
         var data = collectAiItineraryArrays();
-        var dest_id = $('#dest_name').val() || sessionStorage.getItem('selected_destination_id') || '';
+        var dest_id = getQuotationDestinationId();
         var refer_id = syncQuotationReferId();
         var inclusions = getQuotationEditorContent('inclusions_ai');
         var exclusions = getQuotationEditorContent('exclusions_ai');
@@ -900,6 +897,8 @@ $(document).on('click', '#tab2_head', function() {
         sessionStorage.setItem('quotation_dest_id', dest_id);
         $('#is_ai_quotation').val('1');
         $('#quotation_dest_id').val(dest_id);
+        var packageIdsForTab3 = refer_id && String(refer_id) !== '0' ? [String(refer_id)] : ['0'];
+        sessionStorage.setItem('selected_packages_tab3', JSON.stringify(packageIdsForTab3));
         sessionStorage.setItem('itinerary_data', JSON.stringify({
             attraction_arr: data.attraction_arr,
             program_arr: data.program_arr,
@@ -929,53 +928,108 @@ $(document).on('click', '#tab2_head', function() {
         }, 200);
     }
 
-    function cloneAiItineraryRow() {
-        var $template = $('#aiItineraryRow');
-        var $clone = $template.clone().removeAttr('id');
-        $clone.find('input, textarea').val('');
-        $clone.find('select.ai-meal').prop('selectedIndex', 0);
-        $clone.find('input[type="checkbox"]').prop('checked', true);
-        if ($('#aiChatBox').hasClass('show')) {
-            $clone.addClass('show');
-            $clone.attr('aria-hidden', 'false');
+    var aiItineraryMealOptions = [
+        { value: '', text: 'Meal Plan' },
+        { value: 'Breakfast', text: 'Breakfast' },
+        { value: 'Lunch', text: 'Lunch' },
+        { value: 'Dinner', text: 'Dinner' },
+        { value: 'B+L', text: 'B+L' },
+        { value: 'B+D', text: 'B+D' },
+        { value: 'L+D', text: 'L+D' },
+        { value: 'B+L+D', text: 'B+L+D' },
+        { value: 'Room Only', text: 'Room Only' },
+        { value: 'No Meals', text: 'No Meals' },
+        { value: 'All Inclusive', text: 'All Inclusive' }
+    ];
+
+    function buildAiMealSelect(selectedMeal) {
+        var $meal = $('<select class="ai-field ai-meal"></select>');
+        aiItineraryMealOptions.forEach(function(opt) {
+            $meal.append($('<option></option>').val(opt.value).text(opt.text));
+        });
+        if (selectedMeal) {
+            if ($meal.find('option').filter(function() { return $(this).val() === selectedMeal; }).length) {
+                $meal.val(selectedMeal);
+            } else {
+                $meal.append($('<option></option>').val(selectedMeal).text(selectedMeal).prop('selected', true));
+            }
         }
-        $('#aiItineraryContainer').append($clone);
+        return $meal;
+    }
+
+    function addAiItineraryRow(data) {
+        data = data || {};
+        if (typeof window.aiItineraryRowCounter === 'undefined') {
+            window.aiItineraryRowCounter = 0;
+        }
+        window.aiItineraryRowCounter++;
+        var rowIndex = window.aiItineraryRowCounter;
+        var checkboxId = 'chk_ai_program_' + rowIndex;
+        var isVisible = $('#aiBuilder').is(':checked') || $('#aiChatBox').hasClass('show');
+
+        var $row = $('<div class="ai-itinerary-row"></div>')
+            .attr('data-ai-row', rowIndex)
+            .attr('aria-hidden', isVisible ? 'false' : 'true');
+        if (isVisible) {
+            $row.addClass('show');
+        }
+
+        var $checkbox = $('<input type="checkbox" class="css-checkbox ai-program-check">')
+            .attr('id', checkboxId)
+            .prop('checked', data.checked !== false);
+        var $checkboxLabel = $('<label class="css-label"></label>').attr('for', checkboxId);
+        var $checkWrap = $('<span class="ai-check-wrap"></span>').append($checkbox).append($checkboxLabel);
+
+        var $special = $('<input type="text" class="ai-field ai-special" placeholder="*Special Attraction">')
+            .val(data.attraction || '');
+        var $program = $('<textarea class="ai-field ai-day-program" placeholder="*Day-wise Program"></textarea>')
+            .val(data.program || '');
+        var $stay = $('<input type="text" class="ai-field ai-stay" placeholder="*Overnight Stay">')
+            .val(data.stay || '');
+        var $meal = buildAiMealSelect(data.meal || '');
+        var $plusBtn = $('<button type="button" class="ai-plus-btn" aria-label="Add itinerary">+</button>');
+
+        $row.append($checkWrap, $special, $program, $stay, $meal, $plusBtn);
+        $('#aiItineraryContainer').append($row);
+        return $row;
+    }
+
+    function initAiItineraryContainer() {
+        if ($('#aiItineraryContainer .ai-itinerary-row').length === 0) {
+            window.aiItineraryRowCounter = 0;
+            addAiItineraryRow({ checked: true });
+        }
+    }
+
+    function cloneAiItineraryRow() {
+        addAiItineraryRow({ checked: true });
     }
 
     function fillAiItineraryRows(programs) {
         if (!Array.isArray(programs) || !programs.length) {
             return;
         }
-        while ($('#aiItineraryContainer .ai-itinerary-row').length < programs.length) {
-            cloneAiItineraryRow();
-        }
-        $('#aiItineraryContainer .ai-itinerary-row').each(function(index) {
-            var item = programs[index];
-            if (!item) {
-                return;
-            }
-            $(this).find('.ai-special').val(item.special_attraction || item.attraction || '');
-            $(this).find('.ai-day-program').val(item.day_wise_program || item.program || '');
-            $(this).find('.ai-stay').val(item.overnight_stay || item.stay || '');
-            var meal = item.meal_plan || '';
-            if (meal) {
-                var $meal = $(this).find('.ai-meal');
-                if ($meal.find('option[value="' + meal + '"]').length) {
-                    $meal.val(meal);
-                } else {
-                    $meal.append('<option value="' + meal + '" selected>' + meal + '</option>');
-                }
-            }
-            $(this).find('input[type="checkbox"]').prop('checked', true);
+        $('#aiItineraryContainer').empty();
+        window.aiItineraryRowCounter = 0;
+        programs.forEach(function(item) {
+            addAiItineraryRow({
+                attraction: item.special_attraction || item.attraction || '',
+                program: item.day_wise_program || item.program || '',
+                stay: item.overnight_stay || item.stay || '',
+                meal: item.meal_plan || '',
+                checked: true
+            });
         });
         $('#aiChatBox').addClass('show').attr('aria-hidden', 'false');
         $('#aiItineraryContainer .ai-itinerary-row').addClass('show').attr('aria-hidden', 'false');
     }
 
-    $(document).on('click', '#aiPlusBtn, .ai-plus-btn', function(e) {
+    $(document).on('click', '.ai-plus-btn', function(e) {
         e.preventDefault();
         cloneAiItineraryRow();
     });
+
+    initAiItineraryContainer();
 
     $('#btnAnalyseMessage').on('click', function() {
         var message = ($('#aiMessageInput').val() || '').trim();
@@ -1061,11 +1115,14 @@ $(document).on('click', '#tab2_head', function() {
                 }
 
             });
-            var isAiFlow = hasValidAiItinerary() || hasAiItineraryContent();
+            var isAiMode = isAiQuotationMode();
 
-            if (isAiFlow && package_id_arr.length == 0) {
+            if (isAiMode && package_id_arr.length == 0) {
                 var aiRowError = '';
                 $('#aiItineraryContainer .ai-itinerary-row').each(function(index) {
+                    if (!$(this).find('.ai-program-check').is(':checked')) {
+                        return;
+                    }
                     var attraction = ($(this).find('.ai-special').val() || '').trim();
                     var program = ($(this).find('.ai-day-program').val() || '').trim();
                     var stay = ($(this).find('.ai-stay').val() || '').trim();
@@ -1086,7 +1143,7 @@ $(document).on('click', '#tab2_head', function() {
                     error_msg_alert('Please enter at least one complete AI itinerary row.');
                     return false;
                 }
-                var dest_id = $('#dest_name').val();
+                var dest_id = getQuotationDestinationId();
                 if (!dest_id) {
                     error_msg_alert('Please select destination for AI quotation.');
                     return false;
@@ -1095,7 +1152,7 @@ $(document).on('click', '#tab2_head', function() {
                 return false;
             }
 
-            if (!isAiFlow) {
+            if (!isAiMode) {
                 sessionStorage.removeItem('is_ai_quotation');
                 sessionStorage.removeItem('quotation_dest_id');
                 sessionStorage.removeItem('quotation_refer_id');
@@ -1104,7 +1161,7 @@ $(document).on('click', '#tab2_head', function() {
                 $('#quotation_refer_id').val('0');
             }
 
-            if (package_id_arr.length == 0 && !isAiFlow) {
+            if (package_id_arr.length == 0 && !isAiMode) {
                 error_msg_alert('Please select at least one Package!');
                 return false;
             }
@@ -1672,15 +1729,44 @@ $(document).on('click', '#tab2_head', function() {
         $('input[name="quotation_package"]:checked').closest('label').addClass('active');
 
         var id = $('input[name="quotation_package"]:checked').attr('id');
+        var wasAiMode = $('#is_ai_quotation').val() === '1' || sessionStorage.getItem('is_ai_quotation') === '1';
+
         if (id == "standardPackage") {
             $('#package_div_content').show();
+            $('#nights_filter').closest('.col-md-3').show();
+            $('#package_name_div').show();
+            $('#package_div_content > .col-md-6.text-right').show();
             $('#ai_chat_container').hide();
             $('#is_ai_quotation').val('0');
+            sessionStorage.removeItem('is_ai_quotation');
+
+            if (wasAiMode && $('#dest_name').val() && typeof load_packages_with_filter === 'function') {
+                load_packages_with_filter(true);
+            }
         }
         if (id == "aiBuilder") {
-            $('#package_div_content').hide();
+            if (typeof resetPackageSelectorRadios === 'function') {
+                resetPackageSelectorRadios();
+            }
+            if (typeof clearQuotationPackageListUi === 'function') {
+                clearQuotationPackageListUi();
+            }
+            if (typeof quotationResetPackageLoadCache === 'function') {
+                quotationResetPackageLoadCache();
+            }
+
+            $('#package_div_content').show();
+            $('#nights_filter').closest('.col-md-3').hide();
+            $('#package_name_div').hide();
+            $('#package_div_content > .col-md-6.text-right').hide();
             $('#ai_chat_container').show();
+            $('#aiChatBox').addClass('show').attr('aria-hidden', 'false');
+            $('#aiItineraryContainer .ai-itinerary-row').addClass('show').attr('aria-hidden', 'false');
             $('#is_ai_quotation').val('1');
+            sessionStorage.setItem('is_ai_quotation', '1');
+            if (!$('#dest_name').val() && typeof syncDestinationFromTab1 === 'function') {
+                syncDestinationFromTab1(false);
+            }
         }
     }
     package_booking_reflect();

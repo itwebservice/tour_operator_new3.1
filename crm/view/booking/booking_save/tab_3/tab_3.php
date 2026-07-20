@@ -348,7 +348,7 @@
                                     <div class="col-md-2 col-sm-4 col-xs-12 text_center_xs mg_bt_10_xs">
                                         <input type="text" id="txt_amount1" name="txt_amount1" title="Amount"
                                             placeholder="*Amount" class="text-right"
-                                            onchange="validate_balance(this.id);payment_amount_validate(this.id,'cmb_payment_mode1','txt_transaction_id1','txt_bank_name1');get_credit_card_charges('identifier','cmb_payment_mode1','txt_amount1','credit_card_details','credit_charges');" />
+                                            onchange="validate_balance(this.id);payment_amount_validate(this.id,'cmb_payment_mode1','txt_transaction_id1','txt_bank_name1','bank_id1');get_credit_card_charges('identifier','cmb_payment_mode1','txt_amount1','credit_card_details','credit_charges');" />
                                     </div>
                                     <div class="col-md-2 col-sm-4 col-xs-12 text_center_xs mg_bt_10_xs">
                                         <input type="text" class="bank_suggest" id="txt_bank_name1" title="Bank Name"
@@ -419,7 +419,7 @@
                                         <div class="col-md-2 col-sm-4 col-xs-12 text_center_xs mg_bt_10_xs">
                                             <input type="text" id="txt_amount2" name="txt_amount2" title="Amount"
                                                 placeholder="Amount" class="text-right"
-                                                onchange="validate_balance(this.id);payment_amount_validate(this.id,'cmb_payment_mode2','txt_transaction_id2','txt_bank_name2')" />
+                                                onchange="validate_balance(this.id);payment_amount_validate(this.id,'cmb_payment_mode2','txt_transaction_id2','txt_bank_name2','bank_id2')" />
                                         </div>
                                         <div class="col-md-2 col-sm-4 col-xs-12 text_center_xs mg_bt_10_xs">
                                             <input type="text" class="bank_suggest" id="txt_bank_name2"

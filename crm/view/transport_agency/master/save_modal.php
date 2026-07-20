@@ -17,7 +17,7 @@ include "../../../model/model.php";
         <legend>Transporter Information</legend>
 			  <div class="row">
 			    <div class="col-md-3 col-sm-6 mg_bt_10">
-			      <select id="cmb_city_id" name="cmb_city_id" style="width:100%" class="form-control city_master_dropdown app_select2" title="Select City Name" data-add-new-option="true">
+			      <select id="cmb_city_id" name="cmb_city_id" style="width:100%" class="form-control" title="Select City Name" data-add-new-option="true" data-lazy-city="true">
 			      </select>
 			    </div>
 			    <div class="col-md-3 col-sm-6 mg_bt_10">
@@ -122,12 +122,11 @@ include "../../../model/model.php";
 
 <script>
   
-$('#save_modal').modal('show');
 $('#state').select2({
   dropdownParent: $("#save_modal")});
-  $('.app_select2').select2();
 $('#as_of_date').datetimepicker({ timepicker:false, format:'d-m-Y' });
 city_lzloading('#cmb_city_id');
+$('#save_modal').modal('show');
 
 ///////////////////////***Transport Agency Master save start*********//////////////
 $(function(){

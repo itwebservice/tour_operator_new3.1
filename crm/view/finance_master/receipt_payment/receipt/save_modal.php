@@ -79,7 +79,7 @@ $branch_status = $_POST['branch_status'];
                       <ul id="files" ></ul>
                       <input type="hidden" id="payment_evidence_url" name="payment_evidence_url">
                   </div>&nbsp;&nbsp;
-                  <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Upload JPG, JPEG, PNG or PDF only."><i class="fa fa-question-circle"></i></button>
+                  <button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Upload JPG, JPEG, PNG or PDF only."><i class="fa fa-question-circle"></i></button>
                 </div>
                 <div class="col-xs-4"> 
                 </div>

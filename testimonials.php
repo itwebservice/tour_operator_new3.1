@@ -89,7 +89,7 @@ $testimonials = $themeData->getCustomerTestimonials('');
                 foreach ($testimonials as $testimonial) {
 
                     $url = $testimonial['image']; //Image
-                    $pos = strstr($url,'uploads');
+                    $pos = strstr($url,'uploads') || strstr($url,'images/testimonial');
 
                     if ($pos != false)   {
 

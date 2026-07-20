@@ -13,7 +13,7 @@
     <div class="col-sm-2 col-xs-12 col-sm-pull-10 mg_bt_10_sm_xs">
         <input type="checkbox" class="css-checkbox" id="chk_plane_select_all" onchange="select_all('tbl_plane_travel_details_dynamic_row',this.id); calculate_plane_expense('tbl_plane_travel_details_dynamic_row')" checked>&nbsp;&nbsp;
         <label for="chk_plane_select_all" class="">Select All</label>&nbsp;&nbsp;&nbsp;
-        <button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button> 
+        <button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button> 
     </div>
 </div>
 
@@ -29,17 +29,17 @@
 			<td><input type="text" name="to_sector-1" id="to_sector-1" style="width:300px" placeholder="To Sector" title="To Sector">
 			</td>  -->
 
-            <td style="min-width:300px;"><select name="from_sector-1" id="from_sector-1"
+            <td style="min-width:300px;" class="planeairport-select"><select name="from_sector-1" id="from_sector-1"
                                                                     class="form-control app_select2 plane-airport-select"
                                                                     data-sector-type="from" title="From Sector"
-                                                                     data-add-new-option="true" style="width:100%">
+                                                                     data-add-new-option="true" >
                                                                     <option value="">*From Sector</option>
                                                                 </select>
                                                             </td>
-                                                            <td style="min-width:300px;"><select name="to_sector-1" id="to_sector-1"
+                                                            <td style="min-width:300px;" class="planeairport-select"><select name="to_sector-1" id="to_sector-1"
                                                                     class="form-control app_select2 plane-airport-select"
                                                                     data-sector-type="to" title="To Sector"
-                                                                     data-add-new-option="true" style="width:100%">
+                                                                     data-add-new-option="true" >
                                                                     <option value="">*To Sector</option>
                                                                 </select>
                                                             </td>

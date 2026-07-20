@@ -166,6 +166,7 @@ function quotation_whatsapp(quotation_id){
 	});
 }
 </script>
+<script src="<?php echo BASE_URL ?>view/package_booking/quotation/car_flight/js/quotation.js"></script>
 <script src="<?php echo BASE_URL ?>view/package_booking/quotation/car_flight/js/car_calculation.js"></script>
 <?php
 /*======******Footer******=======*/

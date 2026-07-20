@@ -27,8 +27,7 @@ class ModuleData
         }
 
         $blogUrl = $row['image'];
-        $position = strstr($blogUrl, 'uploads');
-
+        $position = strstr($blogUrl, 'uploads') || strstr($blogUrl, 'images/call_to_action');
 
         if ($position !== false) {
 

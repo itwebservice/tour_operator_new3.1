@@ -161,7 +161,7 @@ while ($row_booking = mysqli_fetch_assoc($sq_booking)) {
 
 		$bg = "";
 		$update_btn = '
-		<form style="display:inline-block" data-toggle="tooltip" action="booking_update/package_booking_master_update.php" id="frm_booking_' . $count . '" method="POST">
+		<form style="display:inline-block; margin-bottom:0;" data-toggle="tooltip" action="booking_update/package_booking_master_update.php" id="frm_booking_' . $count . '" method="POST">
 			<input type="hidden" id="booking_id" name="booking_id" value="' . $row_booking['booking_id'] . '">
 			<input type="hidden" id="branch_status" name="branch_status" value="' . $branch_status . '">
 			<button class="btn btn-info btn-sm" data-toggle="tooltip" title="Update Details"><i class="fa fa-pencil-square-o"></i></button>
@@ -245,17 +245,17 @@ while ($row_booking = mysqli_fetch_assoc($sq_booking)) {
 
 	$temp_arr = array("data" => array(
 		$row_booking['invoice_pr_id'],
-		get_package_booking_id($row_booking['booking_id'], $year),
-		$customer_name . $cust_user_name,
-		$row_booking['tour_name'],
+		get_package_booking_id($row_booking['booking_id'], $year).'<br>'.get_date_user($row_booking['booking_date']),
+		$customer_name . $cust_user_name.'<p>'.
+		'('.$row_booking['tour_name'].')'.'</p>',
 		number_format($row_booking['net_total'] + $credit_card_charges, 2),
 		number_format($cancel_amount, 2),
 		number_format($balance_amount, 2) . '<br/>' . $currency_amount,
 		$emp_name,
-		get_date_user($row_booking['booking_date']),
-		'<div class="table-icon-btns">' . $conf_form . $service_voucher . $update_btn .
-			'<a data-toggle="tooltip" onclick="loadOtherPage(\'' . $url1 . '\')" class="btn btn-info btn-sm" title="Download Invoice"><i class="fa fa-print"></i></a>
-			<button class="btn btn-info btn-sm" onclick="package_view_modal(' . $row_booking['booking_id'] . ');btnDisableEnable(this.id)" id="package_view_modal_btn-' . $row_booking['booking_id'] . '" title="View Details" data-toggle="tooltip"><i class="fa fa-eye" aria-hidden="true"></i></button>
+		// get_date_user($row_booking['booking_date']),
+		'<div class="table-icon-btns">' . $conf_form . $service_voucher.
+			'<a data-toggle="tooltip" onclick="loadOtherPage(\'' . $url1 . '\')" class="btn btn-info btn-sm" title="Download Invoice"><i class="fa fa-print"></i></a>'. $update_btn .
+			'<button class="btn btn-info btn-sm" onclick="package_view_modal(' . $row_booking['booking_id'] . ');btnDisableEnable(this.id)" id="package_view_modal_btn-' . $row_booking['booking_id'] . '" title="View Details" data-toggle="tooltip"><i class="fa fa-eye" aria-hidden="true"></i></button>
 		' . $delete_btn . '</div>',
 
 	), "bg" => $bg);

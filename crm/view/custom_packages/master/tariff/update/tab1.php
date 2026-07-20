@@ -61,6 +61,21 @@
                                             placeholder="*To Date" title="Valid To Date" style="width:100px;"
                                             onchange="validate_validDate('from_date-u<?= $count ?>','to_date-u<?= $count ?>');"
                                             value="<?= get_date_user($row_tours['to_date']) ?>" /></td>
+                                     <td><input type="number" id="cadult_cost-u<?= $count ?>" class="form-control"
+                                            placeholder="Adult PP" title="Adult PP Cost" style="width:120px;"
+                                            value="<?= $row_tours['cadult'] ?>" /><span>B2C Cost</span></td>
+                                    <td><input type="number" id="ccwb_cost-u<?= $count ?>" class="form-control"
+                                            placeholder="CWB PP" title="CWB PP Cost" style="width:120px;"
+                                            value="<?= $row_tours['ccwb'] ?>" /><span>B2C Cost</span></td>
+                                    <td><input type="number" id="ccwob_cost-u<?= $count ?>" class="form-control"
+                                            placeholder="CWOB PP" title="CWOB PP Cost" style="width:120px;"
+                                            value="<?= $row_tours['ccwob'] ?>" /><span>B2C Cost</span></td>
+                                    <td><input type="number" id="cinfant_cost-u<?= $count ?>" class="form-control"
+                                            placeholder="Infant PP" title="Infant PP Cost" style="width:120px;"
+                                            value="<?= $row_tours['cinfant'] ?>" /><span>B2C Cost</span></td>
+                                    <td><input type="number" id="bextra_cost-u<?= $count ?>" class="form-control"
+                                            placeholder="ExtraBed PP" title="ExtraBed PP Cost" style="width:120px;"
+                                            value="<?= $row_tours['cextra'] ?>" /><span>B2C Cost</span></td>
                                     <td><input type="number" id="badult_cost-u<?= $count ?>" class="form-control"
                                             placeholder="Adult PP" title="Adult PP Cost" style="width:120px;"
                                             value="<?= $row_tours['badult'] ?>" /><span>B2B Cost</span></td>
@@ -76,21 +91,7 @@
                                     <td><input type="number" id="bextra_cost-u<?= $count ?>" class="form-control"
                                             placeholder="ExtraBed PP" title="ExtraBed PP Cost" style="width:120px;"
                                             value="<?= $row_tours['bextra'] ?>" /><span>B2B Cost</span></td>
-                                    <td><input type="number" id="cadult_cost-u<?= $count ?>" class="form-control"
-                                            placeholder="Adult PP" title="Adult PP Cost" style="width:120px;"
-                                            value="<?= $row_tours['cadult'] ?>" /><span>B2C Cost</span></td>
-                                    <td><input type="number" id="ccwb_cost-u<?= $count ?>" class="form-control"
-                                            placeholder="CWB PP" title="CWB PP Cost" style="width:120px;"
-                                            value="<?= $row_tours['ccwb'] ?>" /><span>B2C Cost</span></td>
-                                    <td><input type="number" id="ccwob_cost-u<?= $count ?>" class="form-control"
-                                            placeholder="CWOB PP" title="CWOB PP Cost" style="width:120px;"
-                                            value="<?= $row_tours['ccwob'] ?>" /><span>B2C Cost</span></td>
-                                    <td><input type="number" id="cinfant_cost-u<?= $count ?>" class="form-control"
-                                            placeholder="Infant PP" title="Infant PP Cost" style="width:120px;"
-                                            value="<?= $row_tours['cinfant'] ?>" /><span>B2C Cost</span></td>
-                                    <td><input type="number" id="bextra_cost-u<?= $count ?>" class="form-control"
-                                            placeholder="ExtraBed PP" title="ExtraBed PP Cost" style="width:120px;"
-                                            value="<?= $row_tours['cextra'] ?>" /><span>B2C Cost</span></td>
+                                   
                                     <td><input type="hidden" id="entry_id-u<?= $count ?>" class="form-control"
                                             value="<?= $row_tours['entry_id'] ?>" /></td>
                                 </tr>

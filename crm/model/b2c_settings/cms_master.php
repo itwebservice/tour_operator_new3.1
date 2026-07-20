@@ -4,7 +4,11 @@ class cms_master{
 	public function save(){
 
 		$section = $_POST['section'];
-		$data = json_encode($_POST['data']);
+		if ($section == '1') {
+			$data = mysqlREString(json_encode($_POST['data'], JSON_UNESCAPED_SLASHES));
+		} else {
+			$data = json_encode($_POST['data']);
+		}
 		$sq_settings = mysqli_num_rows(mysqlQuery("select * from b2c_settings"));
 		if($sq_settings == '0'){
 

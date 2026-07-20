@@ -73,7 +73,7 @@ $sq_ser = mysqli_fetch_assoc(mysqlQuery("select * from supplier_packages where p
 						<ul id="files" ></ul>
 						<input type="hidden" id="upload_url1" name="upload_url1" value="<?php echo $sq_ser['image_upload_url']; ?>">
 					</div>
-					<button type="button" data-toggle="tooltip" class="btn btn-excel" title="Note: Only Word,Excel or PDF files are allowed"><i class="fa fa-question-circle"></i></button>
+					<button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note: Only Word,Excel or PDF files are allowed"><i class="fa fa-question-circle"></i></button>
                 </div> 
 			</div>
 			<div class="row mg_bt_20 text-center">

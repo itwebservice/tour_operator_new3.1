@@ -4,7 +4,7 @@ $dest_id = $_POST['dest_id'];
 $sq_itinerary_c = mysqli_num_rows(mysqlQuery("select * from itinerary_master where dest_id='$dest_id'"));
 if($sq_itinerary_c >0){
 ?>
-    <input type="hidden" id="sq_itinerary_c1" value="<?=$sq_itinerary_c?>"/>
+    <input type="hidden" class="sq_itinerary_count" value="<?=$sq_itinerary_c?>"/>
     <div class="col-md-12 col-sm-6 col-xs-12 mg_bt_10">
     <table style="width:100%" id="default_program_list" name="default_program_list" class="table mg_bt_0 table-bordered">
         <tbody>
@@ -35,7 +35,7 @@ if($sq_itinerary_c >0){
 <?php }
 else{
   if($dest_id != '' || $dest_id != 0){ ?>
-  <input type="hidden" id="sq_itinerary_c1" value="0"/>
+  <input type="hidden" class="sq_itinerary_count" value="0"/>
     <div class="col-md-12 col-sm-6 col-xs-12 mg_tp_10">
     <?php echo '<h4 class="no-pad">Itinerary not added for this destination! <a href="'.BASE_URL.'view/other_masters/index.php" target="_blank" title="Add Itinerary"><i class="fa fa-plus"></i>&nbsp;&nbsp;Itinerary</a></h4> '; ?>
     </div>

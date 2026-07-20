@@ -504,14 +504,48 @@ $branch_status = $_POST['branch_status'];
     top: 0px;
 }
 
+#booking_save_modal {
+    overflow-y: auto !important;
+}
+
+#booking_save_modal .modal-dialog {
+    margin: 30px auto;
+}
+
 #booking_save_modal .modal-body {
-    max-height: 120vh;
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+#itinerary_detail_modal {
+    z-index: 1060 !important;
+}
+
+#booking_save_modal .day_program {
+    height: 90px !important;
+    max-height: 120px;
+    resize: vertical;
 }
 </style>
 
 <script>
+$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
+function restore_car_rental_parent_modal_scroll() {
+    if ($('#booking_save_modal').is(':visible') || $('#booking_update_modal').is(':visible')) {
+        $('body').addClass('modal-open');
+        var $backdrops = $('.modal-backdrop');
+        if ($backdrops.length > 1) {
+            $backdrops.last().remove();
+        }
+    }
+}
+
+$(document).on('hidden.bs.modal', '#itinerary_detail_modal', function () {
+    restore_car_rental_parent_modal_scroll();
+});
+
 $('#booking_save_modal').modal('show');
 $('#quotation_id,#customer_id,#currency_code1').select2( {
     dropdownParent: $("#booking_save_modal")
@@ -1052,20 +1086,30 @@ function add_itinerary_booking(dest_id1, spa, dwp, ovs, meal, dayp) {
         $('#itinerary'+day_id[1]).button('reset');
         $('#itinerary'+day_id[1]).prop('disabled',false);
         $('#div_itinerary_modal').html(data);
+        if (typeof init_car_rental_itinerary_modal === 'function') {
+            init_car_rental_itinerary_modal();
+        }
     });
 }
 
 // Function to get itinerary data for booking
 function get_dest_itinerary_booking(dest_id1) {
+    if (typeof get_dest_itinerary_car_rental === 'function') {
+        return get_dest_itinerary_car_rental(dest_id1);
+    }
     var base_url = $('#base_url').val();
     var dest_id = $('#' + dest_id1).val();
     if (dest_id == '' || dest_id == 0) {
-        error_msg_alert('Please select destination!');
         $('#itinerary_data').html('');
+        $('#sq_itinerary_c1').val(0);
         return false;
     }
     $.post(base_url + 'view/car_rental/booking/get_itinerary_data.php', { dest_id: dest_id }, function (data) {
         $('#itinerary_data').html(data);
+        if (typeof sync_car_itinerary_count === 'function') {
+            sync_car_itinerary_count();
+        }
+        $("input[type='checkbox']", '#itinerary_detail_modal').labelauty({ label: false, maximum_width: '20px' });
     });
 }
 

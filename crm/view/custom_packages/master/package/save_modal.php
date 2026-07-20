@@ -50,11 +50,11 @@ $vehcile_id_str = "vehicle_name1";
                         <div class="col-xs-12 no-pad mg_bt_20">
                             <div class="col-md-3 col-sm-3 mg_bt_10_xs">
                                 <input type="text" id="package_name" name="package_name" onchange="package_name_validation(this.id);package_name_check(this.id);"  oninput="updateSlug();" class="form-control" placeholder="*Package Name" title="Package Name" />
-                                <button type="button" class="btn btn-excel btn-sm" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
                             </div>
                             <div class="col-md-3 col-sm-3 mg_bt_10_xs">
                                 <input type="text" id="package_code" name="package_code" class="form-control" placeholder="Package Code" title="Package Code" onchange="package_code_check(this.id);" />
-                                <button type="button" class="btn btn-excel btn-sm" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
                             </div>
                             <div class="col-md-3 col-sm-3 mg_bt_10_xs">
                                 <input type="number" id="total_nights" onchange="validate_balance(this.id); calculate_days()" name="total_nights" placeholder="*Nights" title="Total Nights">
@@ -79,7 +79,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                         <div class="col-xs-12 no-pad mg_bt_20">
                             <div class="col-md-3 col-sm-4 mg_bt_10_xs">
                                 <input type="text" id="seo_slug" name="seo_slug" class="form-control" placeholder="*SEO friendly slug" title="SEO friendly slug" readonly />
-                                <button type="button" class="btn btn-excel btn-sm" title="Note : SEO friendly slug auto generated from package name : eg. amazing-bangkok-tour-2025"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                <button type="button" class="btn btn-excel btn-sm hidden" title="Note : SEO friendly slug auto generated from package name : eg. amazing-bangkok-tour-2025"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
                             </div>
                             <div class="col-md-3 col-sm-3">
                                 <select id="tour_theme" name="tour_theme" title="Select Tour Theme" class="form-control" style="width:100%">
@@ -153,7 +153,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                     <legend>Hotel Information</legend>
                     <div class="row mg_bt_20">
                         <div class="col-md-6 mg_tp_10"> <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added city wise hotel & tariff using Supplier Master"><i class="fa fa-question-circle"></i></button>
-                            <button type="button" class="btn btn-excel btn-sm" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-excel btn-sm hidden" title="Add Hotel" onclick="hotel_save_modal()"><i class="fa fa-plus"></i></button>
                         </div>
                         <div class="col-xs-6 col-md-6 text-right mg_tp_10">
                             <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name1]');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#tbl_package_hotel_master');}"><i class="fa fa-plus"></i></button>
@@ -165,22 +165,15 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                                     <tr>
                                         <td><input id="chk_dest1" type="checkbox" checked></td>
                                         <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
-                                        <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
+                                        <td style="min-width:160px;"><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
                                             </select>
                                         </td>
-                                        <td><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true">
+                                        <td  style="min-width:180px;"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true">
                                                 <option value="">*Hotel Name</option>
-                                                <?php 
-                                                    $query = "select hotel_id, hotel_name from hotel_master where 1";
-                                                    $sq_hotel = mysqlQuery($query);
-                                                    while($row_hotel = mysqli_fetch_assoc($sq_hotel)){ ?>
-                                                    <option value="<?php echo $row_hotel['hotel_id'] ?>"><?php echo $row_hotel['hotel_name'] ?></option>
-                                                    <?php } ?>
                                             </select>
                                         </td>
-                                        <td><input type="text" id="hotel_type" name="hotel_type1" placeholder="*Hotel Category" title="Hotel Category" readonly></td>
-                                        <td><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" placeholder="*Total Night" title="Total Night"></td>
-                                        </td>
+                                        <td class="col-md-3" style="min-width:140px;"><input type="text" id="hotel_type" name="hotel_type1" class="form-control" placeholder="*Hotel Category" title="Hotel Category" readonly style="width:100%;"></td>
+                                        <td class="col-md-2" style="min-width:110px;max-width:130px;"><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" class="form-control" placeholder="*Total Night" title="Total Night" style="width:100%;"></td>
                                     </tr>
                                 </table>
                             </div>
@@ -194,7 +187,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                     <div class="row mg_bt_20">
                         <div class="col-md-6 mg_tp_10">
                             <button type="button" class="btn btn-excel btn-sm" title="Note - Please ensure you added transfer tariff"><i class="fa fa-question-circle"></i></button>
-                            <button type="button" class="btn btn-excel" title="Add Vehicle" onclick="vehicle_save_modal('<?php echo $vehcile_id_str; ?>')"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-excel hidden" title="Add Vehicle" onclick="vehicle_save_modal('<?php echo $vehcile_id_str; ?>')"><i class="fa fa-plus"></i></button>
                             <button type="button" class="btn btn-excel btn-sm" title="Add Airport" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
                         </div>
                         <div class="col-xs-6 text-right mg_tp_10">
@@ -249,14 +242,14 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
             </div>
         </div>
     </div>
-    <div id="div_modal_content"></div>
-    
-    <!-- Itinerary Modal Container -->
-    <div id="div_itinerary_modal"></div>
     
     <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 
 </form>
+
+<!-- Itinerary Modal Container (outside form to avoid nested forms / duplicate field IDs) -->
+<div id="div_itinerary_modal"></div>
+<div id="div_modal_content"></div>
 
 
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
@@ -302,18 +295,119 @@ $(function () {
     // });
     // --------------------------------------  jQuery end here
 
+    window.packageFormGeneration = window.packageFormGeneration || 0;
+    window.packageSkipDestReset = false;
 
-    $('#dest_name_s').on('change', function () {
-    var dest_id = $(this).val();
-    var base_url = $('#base_url').val(); // assuming you have base_url set
+    function destroySelect2In($scope) {
+        $scope.find('select').each(function () {
+            var $el = $(this);
+            if ($el.data('select2')) {
+                try { $el.select2('destroy'); } catch (e) {}
+            }
+        });
+    }
 
-    if(dest_id === '') return;
+    function resetHotelTableToSingleRow() {
+        var $table = $('#tbl_package_hotel_master');
+        if (!$table.length) {
+            return;
+        }
+        destroySelect2In($table);
+        $table.html(
+            '<tr>' +
+                '<td><input id="chk_dest1" type="checkbox" checked></td>' +
+                '<td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>' +
+                '<td style="min-width:160px;"><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true"></select></td>' +
+                '<td class="col-md-4" style="min-width:180px;"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true"><option value="">*Hotel Name</option></select></td>' +
+                '<td class="col-md-3" style="min-width:140px;"><input type="text" id="hotel_type" name="hotel_type1" class="form-control" placeholder="*Hotel Category" title="Hotel Category" readonly style="width:100%;"></td>' +
+                '<td class="col-md-2" style="min-width:110px;max-width:130px;"><input type="text" id="hotel_tota_days1" onchange="validate_balance(this.id)" name="hotel_tota_days1" class="form-control" placeholder="*Total Night" title="Total Night" style="width:100%;"></td>' +
+            '</tr>'
+        );
+        city_lzloading('select[name^="city_name1"]');
+        $('#hotel_name').select2({
+            width: '100%',
+            minimumResultsForSearch: 0,
+            dropdownParent: $('body')
+        });
+        if (typeof captureHotelSelect2Config === 'function') {
+            captureHotelSelect2Config($('#hotel_name'));
+        }
+        if (typeof initHotelSelectAddNew === 'function') {
+            initHotelSelectAddNew('#hotel_name');
+        }
+        if (typeof initAllHotelSelectAddNew === 'function') {
+            initAllHotelSelectAddNew('#tbl_package_hotel_master');
+        }
+    }
 
-    $.post( "get_package_code.php", { dest_id: dest_id }, function (data) {
-        $('#package_code').val(data.trim());
-         package_code_check('package_code');
+    function resetTransportTableToSingleRow() {
+        var $table = $('#tbl_package_tour_transport');
+        if (!$table.length) {
+            return;
+        }
+        var savedVehicleHtml = '<option value="">Select Vehicle</option>';
+        var $existingVehicle = $table.find('select[name^="vehicle_name"]').first();
+        if ($existingVehicle.length) {
+            // clone options without current selection
+            savedVehicleHtml = $existingVehicle.html();
+        }
+        destroySelect2In($table);
+        $table.html(
+            '<tbody><tr>' +
+                '<td class="col-md-1"><input id="chk_transport1" type="checkbox" checked></td>' +
+                '<td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled></td>' +
+                '<td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">' + savedVehicleHtml + '</select></td>' +
+                '<td class="col-md-3"><select name="pickup_from" id="pickup_from" data-toggle="tooltip" style="width:100%;" title="Pickup Location" class="form-control app_minselect2"></select></td>' +
+                '<td class="col-md-3"><select name="drop_to" id="drop_to" style="width:100%;" data-toggle="tooltip" title="Drop-off Location" class="form-control app_minselect2"></select></td>' +
+            '</tr></tbody>'
+        );
+        $('#vehicle_name1').val('').trigger('change');
+        if (!$('#vehicle_name1').data('select2')) {
+            $('#vehicle_name1').select2({ width: '100%' });
+        }
+        if (typeof initAllVehicleSelectAddNew === 'function') {
+            initAllVehicleSelectAddNew('#tbl_package_tour_transport');
+        }
+        destinationLoading('select[name^="pickup_from"]', 'Pickup Location');
+        destinationLoading('select[name^="drop_to"]', 'Drop-off Location');
+    }
+
+    function resetPackageDependentSections(reason) {
+        if (window.packageSkipDestReset) {
+            return;
+        }
+        window.packageFormGeneration = (window.packageFormGeneration || 0) + 1;
+        window.packageCreateImages = {};
+        window.selectedItineraryImage = null;
+        $('#div_itinerary_modal').empty();
+        $('#aiApiInfo').text('');
+
+        var totalNights = $('#total_nights').val();
+        if (totalNights !== '' && !isNaN(parseInt(totalNights, 10)) && parseInt(totalNights, 10) >= 0) {
+            calculate_days();
+        } else {
+            $('#div_list1').html('');
+            $('#total_days').val('');
+        }
+
+        resetHotelTableToSingleRow();
+        resetTransportTableToSingleRow();
+        console.log('PACKAGE CREATE: Reset dependent sections after', reason || 'destination change', 'generation=', window.packageFormGeneration);
+    }
+
+    $('#dest_name_s').off('change.packageDestReset').on('change.packageDestReset', function () {
+        var dest_id = $(this).val();
+        if (dest_id === '') {
+            return;
+        }
+        if (!window.packageSkipDestReset) {
+            resetPackageDependentSections('destination-change');
+        }
+        $.post('get_package_code.php', { dest_id: dest_id }, function (data) {
+            $('#package_code').val(data.trim());
+            package_code_check('package_code');
+        });
     });
-});
 
 
     function generateSlug(packageName) {
@@ -667,6 +761,9 @@ $(function () {
                     return false;
                 }
                 
+                // Clear itinerary picker DOM so its rows never leak into package save
+                $('#div_itinerary_modal').empty();
+                
                 var base_url = $('#base_url').val();
 
                 var dest_id = $("#dest_name_s").val();
@@ -713,12 +810,17 @@ $(function () {
                 var meal_plan_arr = new Array();
                 var day_image_arr = new Array();
 
-                var table = document.getElementById("dynamic_table_list");
+                var table = document.querySelector('#div_list1 #dynamic_table_list') || document.getElementById("dynamic_table_list");
                 if (!table || !table.rows.length) {
                     error_msg_alert('Please enter total nights to generate itinerary rows.');
                     return false;
                 }
+                var expectedDays = parseInt(total_days1, 10) || 0;
                 var rowCount = table.rows.length;
+                if (expectedDays > 0 && rowCount !== expectedDays) {
+                    error_msg_alert('Itinerary rows (' + rowCount + ') must match Total Days (' + expectedDays + '). Please re-enter nights.');
+                    return false;
+                }
                 console.log("PACKAGE SAVE: Table found with", rowCount, "rows");
                 for (var i = 0; i < rowCount; i++) {
                     var row = table.rows[i];
@@ -820,8 +922,8 @@ $(function () {
                 for (var i = 0; i < rowCount; i++) {
 
                     var row = table.rows[i];
-
-                    if (row.cells[0].childNodes[0].checked) {
+                    var hotelChecked = row.querySelector('input[type="checkbox"]');
+                    if (hotelChecked && hotelChecked.checked) {
                         count++;
                         var hotelData = getPackageHotelRowData(row);
                         var city_name = hotelData.city_name;
@@ -875,35 +977,28 @@ $(function () {
                 var rowCount = table.rows.length;
                 for (var i = 0; i < rowCount; i++) {
                     var row = table.rows[i];
-                    if (row.cells[0].childNodes[0].checked) {
+                    var transportChecked = row.querySelector('input[type="checkbox"]');
+                    if (transportChecked && transportChecked.checked) {
 
 
-                        $('#' + row.cells[3].childNodes[0].id).find("option:selected").each(function() {
-                            pickup = row.cells[3].childNodes[0].value;
-                            pickup_type = $("option:selected", $("#" + row.cells[3].childNodes[
-                                0].id)).parent().attr('value');
+                        var pickupSelect = row.querySelector('select[name^="pickup_from"]');
+                        var dropSelect = row.querySelector('select[name^="drop_to"]');
+                        var vehicleSelect = row.querySelector('select[name^="vehicle_name"]');
+                        pickup = pickupSelect ? (pickupSelect.value || '') : '';
+                        drop = dropSelect ? (dropSelect.value || '') : '';
+                        pickup_type = pickupSelect && pickup ? ($("option:selected", pickupSelect).parent().attr('value') || '') : '';
+                        drop_type = dropSelect && drop ? ($("option:selected", dropSelect).parent().attr('value') || '') : '';
 
-                            // var pickup = row.cells[4].childNodes[0].value;
-                            // var drop = row.cells[5].childNodes[0].value;
-                            // var pickup_type = $("option:selected", $("#"+row.cells[4].childNodes[0].id)).parent().attr('value');
-                            // var drop_type = $("option:selected", $("#"+row.cells[5].childNodes[0].id)).parent().attr('value');
-                        });
-                        $('#' + row.cells[4].childNodes[0].id).find("option:selected").each(function() {
-                            drop = row.cells[4].childNodes[0].value;
-                            drop_type = $("option:selected", $("#" + row.cells[4].childNodes[0]
-                                .id)).parent().attr('value');
-                        });
-
-                        var vehicle_name = row.cells[2].childNodes[0].value;
+                        var vehicle_name = vehicleSelect ? (vehicleSelect.value || '') : '';
                         if (vehicle_name == "") {
                             error_msg_alert('Transport Vehicle is mandatory in row' + (i + 1));
                             return false;
                         }
-                        if (pickup_type == "") {
+                        if (pickup == "") {
                             error_msg_alert('Transport pickup location is mandatory in row' + (i + 1));
                             return false;
                         }
-                        if (drop_type == "") {
+                        if (drop == "") {
                             error_msg_alert('Transport drop location is mandatory in row' + (i + 1));
                             return false;
                         }
@@ -1080,9 +1175,8 @@ $(function () {
             return list.length > 0;
         }
 
-        function showAiJsonResponse(response) {
-            var raw = (response && response.reply) ? response.reply : '';
-            $('#aiApiInfo').text(raw || '');
+        function showAiStatus(message) {
+            $('#aiApiInfo').text(message || '');
         }
 
         function getHotelRowElements(row) {
@@ -1406,7 +1500,10 @@ $(function () {
                 }
             });
             if (bestVal && bestScore >= 50) {
+                // Dest change would wipe AI-filled sections; skip reset and set code only.
+                window.packageSkipDestReset = true;
                 $('#dest_name_s').val(bestVal).trigger('change');
+                window.packageSkipDestReset = false;
             }
         }
 
@@ -1568,6 +1665,9 @@ $(function () {
                 return $.Deferred().resolve().promise();
             }
 
+            // Always start from one clean row so AI cannot append onto leftover hotels.
+            resetHotelTableToSingleRow();
+
             return ensureTableRows('tbl_package_hotel_master', hotels.length, function (row, rowIndex) {
                 if (rowIndex <= 1) {
                     return;
@@ -1648,6 +1748,8 @@ $(function () {
                 return $.Deferred().resolve().promise();
             }
 
+            // Always start from one clean row so AI cannot append onto leftover transport.
+            resetTransportTableToSingleRow();
             var table = document.getElementById('tbl_package_tour_transport');
 
             return ensureTableRows('tbl_package_tour_transport', vehicles.length, function (row, rowIndex) {
@@ -1670,6 +1772,12 @@ $(function () {
             var programs = itinerary.detailed_program || [];
             var destinations = normalizeAiList(itinerary.destination);
             var dayCount = programs.length || parseInt(itinerary.total_days, 10) || 0;
+            var generationAtStart = (window.packageFormGeneration || 0) + 1;
+            window.packageFormGeneration = generationAtStart;
+
+            // Wipe any previous destinations hotels / transport before AI fill.
+            resetHotelTableToSingleRow();
+            resetTransportTableToSingleRow();
 
             if (destinations.length) {
                 matchDestinationSelect(destinations[0]);
@@ -1684,7 +1792,13 @@ $(function () {
 
             if (dayCount > 0) {
                 chain = chain.then(function () {
+                    if (window.packageFormGeneration !== generationAtStart) {
+                        return $.Deferred().reject('stale-ai-generation').promise();
+                    }
                     return ensureItineraryTable(dayCount).then(function (html) {
+                        if (window.packageFormGeneration !== generationAtStart) {
+                            return;
+                        }
                         $('#div_list1').html(html);
                         fillItineraryRows(programs);
                     });
@@ -1693,10 +1807,21 @@ $(function () {
 
             return chain
                 .then(function () {
+                    if (window.packageFormGeneration !== generationAtStart) {
+                        return $.Deferred().reject('stale-ai-generation').promise();
+                    }
                     return fillHotelsFromParsed(parsed.hotels || [], parsed);
                 })
                 .then(function () {
+                    if (window.packageFormGeneration !== generationAtStart) {
+                        return $.Deferred().reject('stale-ai-generation').promise();
+                    }
                     return fillTransportFromParsed(parsed.vehicle || []);
+                })
+                .fail(function (reason) {
+                    if (reason === 'stale-ai-generation') {
+                        console.log('PACKAGE CREATE: Discarded stale AI fill after destination change');
+                    }
                 });
         }
 
@@ -1719,19 +1844,15 @@ $(function () {
                 data: { text: message },
                 success: function (response) {
                     if (response && response.error) {
-                        $('#aiApiInfo').text(response.error);
+                        showAiStatus(response.error);
                         return;
                     }
-                    
 
                     if (!(response && response.status)) {
                         var errorMsg = (response && (response.error || response.Error))
                             ? (response.error || response.Error)
                             : 'Failed to analyse message.';
-                        $('#aiApiInfo').text(errorMsg);
-                        if (response && response.reply) {
-                            showAiJsonResponse(response);
-                        }
+                        showAiStatus(errorMsg);
                         return;
                     }
 
@@ -1745,13 +1866,24 @@ $(function () {
                         parsed = response.raw;
                     }
                     if (!parsed || parsed.Error) {
-                        $('#aiApiInfo').text((parsed && parsed.Error) ? parsed.Error : 'Invalid AI response.');
-                        showAiJsonResponse(response);
+                        showAiStatus((parsed && parsed.Error) ? parsed.Error : 'Invalid AI response.');
                         return;
                     }
 
-                    showAiJsonResponse(response);
-                    applyParsedData(parsed);
+                    showAiStatus('Filling package details...');
+                    applyParsedData(parsed).done(function () {
+                        var programs = (parsed.itinerary && parsed.itinerary.detailed_program) ? parsed.itinerary.detailed_program : [];
+                        var hotelCount = (parsed.hotels || []).filter(function (hotel) {
+                            return hotel && (hotel.city_name || hotel.hotel_name);
+                        }).length;
+                        var statusMsg = programs.length
+                            ? 'Package details filled successfully.'
+                            : 'AI analysis completed.';
+                        if (hotelCount) {
+                            statusMsg += ' Hotels populated.';
+                        }
+                        showAiStatus(statusMsg);
+                    });
                 },
                 error: function (xhr) {
                     var errorMsg = 'Request failed.';

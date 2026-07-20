@@ -30,7 +30,7 @@ $images = ($query['banner_images'] != '' && $query['banner_images'] != 'null') ?
         <?php
             for ($i = 0; $i < sizeof($images); $i++) {
                 $url = $images[$i]->image_url;
-                $pos = strstr($url, 'uploads');
+                $pos = strstr($url, 'uploads') || strstr($url, 'images/banner');
                 if ($pos != false) {
                     $newUrl1 = preg_replace('/(\/+)/', '/', $images[$i]->image_url);
                     $download_url = BASE_URL . str_replace('../', '', $newUrl1);

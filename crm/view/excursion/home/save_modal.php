@@ -509,7 +509,6 @@ $('#frm_exc_save').validate({
 										
 										if(msg[0]=='error'){
 											$('#btn_exc_master_save').prop('disabled',false);
-											btn_exc_master_save
 											msg_alert(result);
 											return false;
 										}

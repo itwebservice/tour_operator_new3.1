@@ -72,6 +72,8 @@ if (!function_exists('o1nv')) {
   }
 }
 
+$o1_company = o1nv($hero['company_name'], o1nv($ty['company_name'], ''));
+
 if (!function_exists('o1_list_item_text')) {
   function o1_list_item_text($html)
   {
@@ -255,7 +257,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             </svg>
           </div>
           <div class="leading-tight text-cream">
-            <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+            <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
             <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
           </div>
         </div>
@@ -436,7 +438,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -475,7 +477,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
           <h2 class="font-display text-4xl text-[color:var(--navy)] mt-3"><?php $o1cn = o1nv($ov['client_name'], $hero['client_name']);
                                                                           $o1fn = trim(strtok((string)$o1cn, ' '));
                                                                           echo o1e('Dear ' . ($o1fn !== '' ? $o1fn : $o1cn) . ','); ?></h2>
-          <p class="mt-3 text-[15.5px] leading-relaxed text-[color:var(--ink)]/85 font-serif-soft text-lg">Thank you for choosing <?= o1e(o1nv($hero['company_name'], 'us')) ?> for your upcoming journey to <?= o1e(o1nv($ov['destination'], 'your destination')) ?>. We are delighted to present this carefully crafted travel proposal &mdash; thoughtfully designed to deliver memorable experiences, seamless arrangements and exceptional hospitality at every step.</p>
+          <p class="mt-3 text-[15.5px] leading-relaxed text-[color:var(--ink)]/85 font-serif-soft text-lg">Thank you for choosing <?= o1e(o1nv($o1_company, 'us')) ?> for your upcoming journey to <?= o1e(o1nv($ov['destination'], 'your destination')) ?>. We are delighted to present this carefully crafted travel proposal &mdash; thoughtfully designed to deliver memorable experiences, seamless arrangements and exceptional hospitality at every step.</p>
         </div>
         <div class="mt-8">
           <div class="flex items-center justify-between">
@@ -693,7 +695,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
+        <span><?= o1e($o1_company) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>02<!-- --> / 09</span>
       </div>
@@ -714,7 +716,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -845,7 +847,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
+        <span><?= o1e($o1_company) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>03<!-- --> / 09</span>
       </div>
@@ -865,7 +867,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -1307,7 +1309,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             </div>
             <div class="leading-tight text-cream">
               <div class="font-display text-lg font-bold tracking-wide">
-                <?= o1e(o1nv($hero['company_name'], 'ITOURS LLP PVT LTDS')) ?>
+                <?= o1e($o1_company) ?>
               </div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
@@ -1577,7 +1579,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
       </div>
       </div>
       <div class="page-foot  absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+        <span><?= o1e($o1_company) ?> · Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>04<!-- --> / 09</span>
       </div>
@@ -1597,7 +1599,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -1860,7 +1862,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
           </div>
           <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
           <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-            <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> · Luxury Voyages</span>
+            <span><?= o1e($o1_company) ?> · Luxury Voyages</span>
             <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
             <span>05<!-- --> / 09</span>
           </div>
@@ -1880,7 +1882,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -2335,7 +2337,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
         </div>
       </div>
       <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
+        <span><?= o1e($o1_company) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>06<!-- --> / 09</span>
       </div>
@@ -2355,7 +2357,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -2447,7 +2449,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             </div>
             <div class="col-span-5 relative">
               <div class="font-display text-6xl text-[color:var(--gold)]/40 absolute -top-4 -left-1 leading-none">&quot;</div>
-              <p class="font-serif-soft italic text-[15px] text-[color:var(--ink)]/85 pl-6">FreezeMyTrip turned our anniversary into a dream. Every transfer, every meal, every sunset â€” perfectly arranged.</p>
+              <p class="font-serif-soft italic text-[15px] text-[color:var(--ink)]/85 pl-6"><?= o1e($o1_company) ?> turned our anniversary into a dream. Every transfer, every meal, every sunset â€” perfectly arranged.</p>
               <div class="flex gap-0.5 mt-2 pl-6 text-[color:var(--gold)]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-4 h-4 fill-current" aria-hidden="true">
                   <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
@@ -2575,7 +2577,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
+        <span><?= o1e($o1_company) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>07<!-- --> / 09</span>
       </div>
@@ -2595,7 +2597,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -2865,11 +2867,11 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
           <circle cx="4" cy="20" r="2">
           </circle>
         </svg>
-        <p class="mt-2 font-serif-soft italic text-[13px] text-cream/90 max-w-3xl">By confirming this booking, the guest acknowledges that they have read, understood and accepted the terms and conditions above. FreezeMyTrip reserves the right to amend these terms with prior notice.</p>
+        <p class="mt-2 font-serif-soft italic text-[13px] text-cream/90 max-w-3xl">By confirming this booking, the guest acknowledges that they have read, understood and accepted the terms and conditions above. <?= o1e($o1_company) ?> reserves the right to amend these terms with prior notice.</p>
       </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?>Luxury Voyages</span>
+        <span><?= o1e($o1_company) ?>Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>08<!-- --> / 09</span>
       </div>
@@ -2889,7 +2891,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-cream">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -2915,7 +2917,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-[color:var(--navy)]">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
@@ -2943,7 +2945,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
         <div class="grid grid-cols-2 gap-4 mt-7">
           <div class="rounded-xl bg-white p-5 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Office Address</div>
-            <h3 class="font-display text-xl text-[color:var(--navy)] mt-1"><?= o1e(o1nv($ty['company_name'], $hero['company_name'])) ?></h3>
+            <h3 class="font-display text-xl text-[color:var(--navy)] mt-1"><?= o1e($o1_company) ?></h3>
             <p class="text-[12px] text-[color:var(--ink)]/80 mt-2 leading-relaxed"><?= nl2br(o1e(o1nv($ty['company_address'], ''))) ?></p>
             <div class="mt-3 space-y-1.5 text-[12px] text-[color:var(--ink)]/85">
               <div class="flex items-center gap-2">
@@ -3076,11 +3078,11 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
         </div>
         <div class="mt-10 text-center">
           <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div>
-          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1">FreezeMyTrip Â· Luxury Voyages Â· Est. 2014</div>
+          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1"><?= o1e($o1_company) ?> Â· Luxury Voyages Â· Est. 2014</div>
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
-        <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?> Â· Luxury Voyages</span>
+        <span><?= o1e($o1_company) ?> Â· Luxury Voyages</span>
         <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
         <span>09<!-- --> / 09</span>
       </div>

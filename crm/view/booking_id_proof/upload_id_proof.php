@@ -13,13 +13,17 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
 <input type="hidden" id="branch_status" name="branch_status" value="<?= $branch_status ?>" >
 <div class="row text-center mg_bt_20 text_left_sm_xs">
     <div class="col-md-12">
-        <label for="rd_group_tour" class="app_dual_button active mg_bt_10">
+        <!-- <label for="rd_group_tour" class="app_dual_button active mg_bt_10">
             <input type="radio" id="rd_group_tour" name="app_id_proof" checked onchange="id_proof_upload_content_show()" >
             &nbsp;&nbsp;Group Tour
-        </label>
-        <label for="rd_package_tour" class="app_dual_button mg_bt_10">
-            <input type="radio" id="rd_package_tour" name="app_id_proof" onchange="id_proof_upload_content_show()">
+        </label> -->
+        <label for="rd_package_tour" class="app_dual_button active mg_bt_10">
+            <input type="radio" id="rd_package_tour" name="app_id_proof" checked onchange="id_proof_upload_content_show()">
             &nbsp;&nbsp;Package Tour
+        </label>
+        <label for="rd_group_tour" class="app_dual_button  mg_bt_10">
+            <input type="radio" id="rd_group_tour" name="app_id_proof"  onchange="id_proof_upload_content_show()" >
+            &nbsp;&nbsp;Group Tour
         </label>
         <label for="rd_air_ticket" class="app_dual_button">
             <input type="radio" id="rd_air_ticket" name="app_id_proof" onchange="id_proof_upload_content_show()">

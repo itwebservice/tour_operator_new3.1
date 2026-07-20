@@ -127,14 +127,14 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                     <div class="col-md-3 col-sm-6 mg_bt_10_xs">
 
                                         <input type="text" id="package_name1" name="package_name" class="form-control" placeholder="Package Name" title="Package Name" oninput="updateSlug()" value="<?php echo $sq_pckg['package_name']; ?>" onchange="package_name_validation(this.id);" <?= $readable ?> />
-                                        <button type="button" class="btn btn-excel btn-sm" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                        <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Name : eg. Kerala amazing"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
 
                                     </div>
 
                                     <div class="col-md-3 col-sm-6 mg_bt_10_xs">
 
                                         <input type="text" id="package_code1" name="package_code1" class="form-control" placeholder="Package Code" title="Package Code" value="<?php echo $sq_pckg['package_code']; ?>" onchange="package_code_check(this.id);" />
-                                        <button type="button" class="btn btn-excel btn-sm" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
+                                        <button type="button" class="btn btn-excel btn-sm hidden" title="Note : Package Code : eg. Ker001"><i class="fa fa-question-circle" style="margin-top:5px;"></i></button>
 
                                     </div>
 
@@ -214,19 +214,27 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                 <table style="width: 100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
                                     <?php
                                     $count = 1;
-                                    $query = "select * from custom_package_program where package_id = '$package_id'";
+                                    // day_no may not exist on older DBs — fall back to entry_id
+                                    $has_day_no = false;
+                                    $col_check = mysqlQuery("SHOW COLUMNS FROM custom_package_program LIKE 'day_no'");
+                                    if ($col_check && mysqli_num_rows($col_check) > 0) {
+                                        $has_day_no = true;
+                                    }
+                                    $query = $has_day_no
+                                        ? "select * from custom_package_program where package_id = '$package_id' order by day_no, entry_id"
+                                        : "select * from custom_package_program where package_id = '$package_id' order by entry_id";
                                     $sq_pckg_a = mysqlQuery($query);
                                     while ($sq_pckg1 = mysqli_fetch_assoc($sq_pckg_a)) { ?>
                                         <tr>
                                             <td width="27px;"><input class="css-checkbox mg_bt_10 labelauty" id="chk_program<?php echo $count; ?>" type="checkbox" checked autocomplete="off" data-original-title="" title="" aria-hidden="true" style="display: none;"><label for="chk_program<?php echo $count; ?>" style="margin-top:55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label><label class="css-label" for="chk_program1"> </label></td>
                                             <td class='hidden col-md-1 pad_8'><input maxlength="15" value="<?php echo $count; ?>" type="text" name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled="" autocomplete="off" data-original-title="" title="" style='width:10px;margin-top:35px;'>
                                             </td>
-                                            <td style='width:140px'><input type="text" id="special_attaraction<?php echo $count; ?>-u" name="special_attaraction" class="form-control mg_bt_10" placeholder="*Special Attraction" title="Special Attraction" onchange="validate_spaces(this.id);validate_spattration(this.id);" style='width:150px;margin-top:35px;' value="<?php echo $sq_pckg1['attraction']; ?>"></td>
+                                            <td style='width:140px'><input type="text" id="special_attaraction<?php echo $count; ?>-u" name="special_attaraction" class="form-control mg_bt_10" placeholder="*Special Attraction" title="Special Attraction" onchange="validate_spaces(this.id);validate_spattration(this.id);" style='width:150px;margin-top:35px;' value="<?php echo htmlspecialchars($sq_pckg1['attraction'], ENT_QUOTES); ?>"></td>
 
-                                            <td class='col-md-7 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $sq_pckg1['day_wise_program']; ?>" style='width:100%;height:900px;' ><?php echo $sq_pckg1['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
+                                            <td class='col-md-7 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style='width:100%;height:900px;'><?php echo htmlspecialchars($sq_pckg1['day_wise_program'], ENT_QUOTES); ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                                             </td>
 
-                                            <td class='col-md-1/2 pad_8' style='width:100px'><input type="text" id="overnight_stay<?php echo $count; ?>-u" name="overnight_stay" class="form-control mg_bt_10" onchange="validate_spaces(this.id);validate_onstay(this.id);" placeholder="*Overnight Stay" title="Overnight Stay" style='width:150px;margin-top:35px;' value="<?php echo $sq_pckg1['stay']; ?>"></td>
+                                            <td class='col-md-1/2 pad_8' style='width:100px'><input type="text" id="overnight_stay<?php echo $count; ?>-u" name="overnight_stay" class="form-control mg_bt_10" onchange="validate_spaces(this.id);validate_onstay(this.id);" placeholder="*Overnight Stay" title="Overnight Stay" style='width:150px;margin-top:35px;' value="<?php echo htmlspecialchars($sq_pckg1['stay'], ENT_QUOTES); ?>"></td>
 
                                             <td class='col-md-1/2 pad_8'><select id="meal_plan<?php echo $count; ?>" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style='width:125px;margin-top:35px;'>
                                                     <?php if ($sq_pckg1['meal_plan'] != '') { ?>
@@ -469,7 +477,6 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                     <?php } ?>
                                                 </select></td>
                                             <td class="col-md-3"><select name="pickup_from" id="pickup_from" data-toggle="tooltip" style="width:250px;" title="Pickup Location" class="form-control app_minselect2 pickup_from_u">
-                                                    </optgroup>
                                                 </select></td>
                                             <td class="col-md-3"><select name="drop_to" id="drop_to" style="width:250px;" data-toggle="tooltip" title="Drop-off Location" class="form-control app_minselect2 drop_to_u">
                                                 </select></td>
@@ -515,7 +522,6 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                         }
                                                         echo $html;
                                                         ?>
-                                                        </optgroup>
                                                     </select></td>
                                                 <td class="col-md-3"><select name="drop_to<?php echo $count_hotel; ?>-u" id="drop_to<?php echo $count_hotel; ?>-u" style="width:250px;" data-toggle="tooltip" title="Drop-off Location" class="form-control app_minselect2 drop_to_u">
                                                         <?php
@@ -535,8 +541,8 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                         }
                                                         echo $html;
                                                         ?>
-                                                <td class="hidden"><input type="text" value="<?php echo $row_tr['entry_id']; ?>">
-                                                </td>
+                                                    </select></td>
+                                                <td class="hidden"><input type="text" value="<?php echo $row_tr['entry_id']; ?>"></td>
                                             </tr>
                                             <script type="text/javascript">
                                                 $('#vehicle_name1<?php echo $count_hotel; ?>-u').select2();
@@ -1241,16 +1247,22 @@ $('#seo_slug').val(generateSlug(packageName));
                 for (var i = 0; i < rowCount; i++) {
 
                     var row = table.rows[i];
-                    var check_id = row.cells[0].childNodes[0].checked;
-                    var city_name = row.cells[2].childNodes[0].value;
-                    var hotel_name = row.cells[3].childNodes[0].value;
-                    var hotel_type = row.cells[4].childNodes[0].value;
-                    var total_days1 = row.cells[5].childNodes[0].value;
-                    if (row.cells[6]) {
-                        var hotel_entry_id = row.cells[6].childNodes[0].value;
-                    } else {
-                        var hotel_entry_id = '';
-                    }
+                    var hotelCheckbox = row.querySelector('input[type="checkbox"]');
+                    var check_id = !!(hotelCheckbox && hotelCheckbox.checked);
+                    var hotelData = (typeof getPackageHotelRowData === 'function')
+                        ? getPackageHotelRowData(row)
+                        : {
+                            city_name: ($(row).find('select[name^="city_name"]').val() || ''),
+                            hotel_name: ($(row).find('select[name^="hotel_name"]').val() || ''),
+                            hotel_type: ($(row).find('input[name^="hotel_type"]').val() || ''),
+                            total_days: ($(row).find('input[name^="hotel_tota_days"]').val() || ''),
+                            hotel_entry_id: ($(row).find('td.hidden input').val() || '')
+                        };
+                    var city_name = hotelData.city_name || '';
+                    var hotel_name = hotelData.hotel_name || '';
+                    var hotel_type = hotelData.hotel_type || '';
+                    var total_days1 = hotelData.total_days || '';
+                    var hotel_entry_id = hotelData.hotel_entry_id || ($(row).find('td.hidden input').first().val() || '');
                     if (check_id === true) {
                         count++;
                         if (city_name == '') {
@@ -1265,7 +1277,7 @@ $('#seo_slug').val(generateSlug(packageName));
                             error_msg_alert("Hotel Type is required");
                             return false;
                         }
-                        if (total_days == '') {
+                        if (total_days1 == '') {
                             error_msg_alert("Total nights is required");
                             return false;
                         }
@@ -1303,28 +1315,29 @@ $('#seo_slug').val(generateSlug(packageName));
 
                     var row = table.rows[i];
 
-                    var check_id = row.cells[0].childNodes[0].checked;
-                    var vehicle_name = row.cells[2].childNodes[0].value;
-                    $('#' + row.cells[3].childNodes[0].id).find("option:selected").each(function() {
-                        pickup = row.cells[3].childNodes[0].value;
-                        pickup_type = $("option:selected", $("#" + row.cells[3].childNodes[0]
-                            .id)).parent().attr('value');
-                    });
-                    $('#' + row.cells[4].childNodes[0].id).find("option:selected").each(function() {
-                        drop = row.cells[4].childNodes[0].value;
-                        drop_type = $("option:selected", $("#" + row.cells[4].childNodes[0].id))
-                            .parent().attr('value');
-                    });
-
-                    if (row.cells[5]) {
-                        var entry_id = row.cells[5].childNodes[0].value;
-                    } else {
-                        var entry_id = '';
-                    }
+                    var transportCheckbox = row.querySelector('input[type="checkbox"]');
+                    var check_id = !!(transportCheckbox && transportCheckbox.checked);
+                    var vehicleSelect = row.querySelector('select[name^="vehicle_name"]');
+                    var pickupSelect = row.querySelector('select[name^="pickup_from"]');
+                    var dropSelect = row.querySelector('select[name^="drop_to"]');
+                    var vehicle_name = vehicleSelect ? (vehicleSelect.value || '') : '';
+                    pickup = pickupSelect ? (pickupSelect.value || '') : '';
+                    drop = dropSelect ? (dropSelect.value || '') : '';
+                    pickup_type = pickupSelect && pickup ? ($("option:selected", pickupSelect).parent().attr('value') || '') : '';
+                    drop_type = dropSelect && drop ? ($("option:selected", dropSelect).parent().attr('value') || '') : '';
+                    var entry_id = $(row).find('td.hidden input').first().val() || '';
 
                     if (check_id == true) {
                         if (vehicle_name == "") {
                             error_msg_alert('Transport Vehicle is mandatory in row' + (i + 1));
+                            return false;
+                        }
+                        if (pickup == "") {
+                            error_msg_alert('Transport pickup location is mandatory in row' + (i + 1));
+                            return false;
+                        }
+                        if (drop == "") {
+                            error_msg_alert('Transport drop location is mandatory in row' + (i + 1));
                             return false;
                         }
                     }

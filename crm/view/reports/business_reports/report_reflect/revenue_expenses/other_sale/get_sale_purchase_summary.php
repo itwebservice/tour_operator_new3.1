@@ -1073,17 +1073,15 @@ if ($sale_type == 'Package Tour') {
 		$btn = ($bg == '') ? '<button class="btn btn-info btn-sm" id="suppliere_btn-' . $row_visa['booking_id'] . '" onclick="package_other_expnse_modal(' . $row_visa['booking_id'] . ')" title="Add Other expense amount"><i class="fa fa-plus"></i></button>' : 'NA';
 
 		$temp_arr = array("data" => array(
-			(int)($count++),
+			// (int)($count++),
 			get_package_booking_id($row_visa['booking_id'], $year),
 			get_date_user($row_visa['booking_date']),
 			$customer_name,
-			number_format($total_sale, 2),
+			'<b>' . number_format($total_sale, 2). '</b>'.'-' .number_format($total_purchase, 2) . ' (' . $profit_loss_per . '% ' . $var . ')',
+			
 			// ($vendor_type !='')?$vendor_type:'NA',
 			// ($vendor_name !='') ? $vendor_name : 'NA',
-			'<button data-toggle="tooltip" class="btn btn-info btn-sm" onclick="purchases_display_modal_pkg(\'' . 'Package Tour' . '\',' . $row_visa['booking_id'] . ')" title="" data-original-title="View Details" id="supplierv_btn-' . $row_visa['booking_id'] . '"><i class="fa fa-eye"></i></button>',
-			number_format($total_purchase, 2),
-			$btn,
-			'<b>' . number_format($profit_amount, 2) . '</b>' . ' (' . $profit_loss_per . '% ' . $var . ')',
+			'<button data-toggle="tooltip" class="btn btn-info btn-sm" onclick="purchases_display_modal_pkg(\'' . 'Package Tour' . '\',' . $row_visa['booking_id'] . ')" title="" data-original-title="View Details" id="supplierv_btn-' . $row_visa['booking_id'] . '"><i class="fa fa-eye"></i></button>'.$btn,						
 			$emp
 		), "bg" => $bg);
 		array_push($array_s, $temp_arr);

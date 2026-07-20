@@ -38,7 +38,8 @@ $(document).ready(function() {
                     $(btnUpload).find('span').text('Uploading...');
                 },
                 onComplete: function(file, response) {
-                    var response1 = response.split('--')
+                    response = $.trim(response);
+                    var response1 = response.split('--');
                     if (response1[0] == "error") {
                         error_msg_alert(response1[1]);
                         $(btnUpload).find('span').text('Banner ' + (i + 1));

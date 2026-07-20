@@ -33,16 +33,20 @@ $localIP = getHostByName(getHostName());
 $servername = "localhost";
 $username = "root";
 $password = "";
-// $db_name = "tour_operator";
-
-// $db_name = "tour_operator_theme";
-
 $db_name = "itours_latest";
 
-global $conn;
-$conn = new mysqli($servername, $username, $password, $db_name);
+// $db_name = "tour_operator_theme";
+global $connection;
+$connection = new mysqli($servername, $username, $password, $db_name);
+$conn = $connection;
 
-define('BASE_URL', 'http://localhost/tour_operator_new3.1/crm/');
+// Check connection
+if (!$connection) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+
+define('BASE_URL', 'http://localhost/testdemo1/crm/');
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");
 $b2b_index_url = BASE_URL . 'Tours_B2B/view/index.php';

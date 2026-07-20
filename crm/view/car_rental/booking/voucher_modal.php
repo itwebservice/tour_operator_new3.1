@@ -25,7 +25,7 @@ $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_booking wh
 			?>
 		<div class="row">
 			<div class="col-md-4 col-sm-6 mg_bt_10">
-				<input type="hidden" id="vehicle_name" value='<?= $q_transport['entry_id']  ?>'>
+				<input type="hidden" id="vehicle_name" value='<?= isset($sq_transport['entry_id']) ? $sq_transport['entry_id'] : '' ?>'>
 				<input type="text" id="vehicle_names" title="Vehicle Name" name="vehicle_name" value="<?=$sq_booking['vehicle_name']?>" disabled>
 			</div>
 		</div>

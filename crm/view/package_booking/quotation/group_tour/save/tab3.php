@@ -105,7 +105,7 @@
 							<div class="panel-body">
 								<div class="row mg_tp_10 mg_bt_10">
 									<div class="col-xs-6 mg_bt_20_sm_xs">
-										<button type="button" class="btn btn-excel btn-sm" title="Add Vehicle" onclick="vehicle_save_modal('vehicle_name1')"><i class="fa fa-plus"></i></button>
+										<button type="button" class="btn btn-excel btn-sm hidden" title="Add Vehicle" onclick="vehicle_save_modal('vehicle_name1')"><i class="fa fa-plus"></i></button>
 									</div>
 									<div class="col-xs-6 text-right mg_bt_20_sm_xs">
 										<button type="button" class="btn btn-excel btn-sm" onClick="addTransportRowSave();" title="Add Row"><i class="fa fa-plus"></i></button>
@@ -162,7 +162,7 @@
 				        <div class="panel-body">
 				        	<div class="row mg_tp_10 mg_bt_10">
 								<div class="col-xs-6 mg_bt_20_sm_xs">
-									<button type="button" class="btn btn-excel btn-sm" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
+									<button type="button" class="btn btn-excel btn-sm hidden" title="Add Airport/Airline" onclick="airport_airline_save_modal()"><i class="fa fa-plus"></i></button>
 								</div>
 								<div class="col-xs-6 text-right mg_bt_20_sm_xs">
 									<button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_tour_quotation_dynamic_plane');event_airport('tbl_package_tour_quotation_dynamic_plane')" title="Add Row"><i class="fa fa-plus"></i></button>
