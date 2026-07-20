@@ -24,7 +24,8 @@
 }
 body {
   /* font-family: 'Inter', sans-serif; */
-  font-family: 'Prata', serif;
+  /* font-family: 'Prata', serif; */
+  font-family: Calibri, Arial, sans-serif;
   background: #dde2e8;
   color: var(--text);
   font-size: 13px;
@@ -376,7 +377,7 @@ body {
   margin-bottom: 8px;
 }
 .salutation-card p {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text-mid);
   line-height: 1.7;
 }
@@ -1037,7 +1038,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
-    grid-template-columns: 370px;
+  grid-template-columns: 370px;
 
   justify-content: center;
 }
@@ -1465,7 +1466,7 @@ body {
   line-height: 1;
 }
 .ty-sub {
-  font-size: 16px;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.7;
   margin-bottom: 36px;
