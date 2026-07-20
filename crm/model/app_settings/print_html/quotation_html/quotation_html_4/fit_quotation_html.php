@@ -109,6 +109,17 @@ if (!function_exists('o4_split_lines')) {
       return $fallback;
     }
 
+    if (!function_exists('o4_list_item_text')) {
+      function o4_list_item_text($html)
+      {
+        $html = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
+        $html = preg_replace('/<br\s*\/?>/i', "\n", $html);
+        $html = strip_tags($html);
+        $html = preg_replace('/\s+/', ' ', $html);
+        return trim($html);
+      }
+    }
+
     if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
       foreach ($matches[1] as $chunk) {
         $text = o4_list_item_text($chunk);

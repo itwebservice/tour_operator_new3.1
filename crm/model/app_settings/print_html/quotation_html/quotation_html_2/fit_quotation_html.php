@@ -376,7 +376,7 @@ $o2_round = o2img(
           <div class="k">A Personalized Travel Experience</div>
           <h2 style="font-size: 20px;">Exclusively designed for <em><?= o2e($o2_client) ?></em> — an unforgettable journey through <?= o2e($o2_dest) ?>.</h2>
         </div>
-        <p class="greet" style="margin:7mm 0 0; font-size: 13px;">
+        <p class="greet" style="margin:7mm 0 0; font-size: 15px;">
           Dear <b><?= o2e($o2_client_first !== '' ? $o2_client_first : $o2_client) ?></b>,<br>
           Thank you for choosing <?= o2e($o2_company) ?> for your upcoming journey. We are delighted to present this carefully
           crafted travel proposal, designed to deliver memorable experiences, seamless arrangements and exceptional
@@ -640,10 +640,10 @@ $o2_round = o2img(
                       <div class="l">Arrival</div>
                       <div class="v"><?= o2e(o2nv($f['arrival_datetime'], 'NA')) ?></div>
                     </div>
-                    <div class="x">
+                    <!-- <div class="x">
                       <div class="l">Flight</div>
-                      <div class="v"><?= o2e(o2nv($f['airline_code'], '—')) ?></div>
-                    </div>
+                      <div class="v"><//?= o2e(o2nv($f['airline_code'], '—')) ?></div>
+                    </div> -->
                   </div>
                 </div>
                 <div class="boarding__stub">

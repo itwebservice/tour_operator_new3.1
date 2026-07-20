@@ -41,7 +41,8 @@ body {
   padding: 0;
 }
 body {
-  font-family: var(--sans);
+  /* font-family: var(--sans); */
+  font-family: Calibri, Arial, sans-serif;
   color: var(--ink);
   background: radial-gradient(1200px 700px at 50% -10%, #1d3556 0%, transparent 60%), #0a1426;
   -webkit-font-smoothing: antialiased;
@@ -264,19 +265,19 @@ body.header-b .strip__content {
   gap: 12px;
   margin: 0;
 }
-.kicker-heading{
-margin-top: 30px !important;
+.kicker-heading {
+  margin-top: 30px !important;
 }
-.gold-rule{
-background:var(--gradient-gold);
-border:0;
-width:64px;
-height:2px;
+.gold-rule {
+  background: var(--gradient-gold);
+  border: 0;
+  width: 64px;
+  height: 2px;
 }
-.mt-2{
-  margin-top:calc(var(--spacing) * 2);
+.mt-2 {
+  margin-top: calc(var(--spacing) * 2);
 }
-hr{
+hr {
   color: inherit;
 }
 .kicker::before {
@@ -527,7 +528,7 @@ body.cover-b .cv-b {
   height: 20px;
 }
 .incitem span {
-  font-size: 8.5px;
+  font-size: 10px;
   line-height: 1.32;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1020,10 +1021,11 @@ body.cover-b .cv-b {
   line-height: 0.9;
 }
 .sector .pt .city {
-  font-size: 8px;
+  font-size: 9.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  font-weight: 450;
+  color: var(--navy);
   margin-top: 2px;
 }
 .sector .mid {
@@ -1051,7 +1053,7 @@ body.cover-b .cv-b {
 }
 .boarding__times {
   display: flex;
-  gap: 10px;
+  gap: 300px;
   margin-top: 10px;
   padding-top: 9px;
   border-top: 1px dashed var(--line);
@@ -1063,7 +1065,9 @@ body.cover-b .cv-b {
   font-size: 7.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted);
+  /* color: var(--muted); */
+    color: var(--navy);
+
 }
 .boarding__times .v {
   font-family: var(--serif);
@@ -1428,17 +1432,15 @@ body.cover-b .cv-b {
   color: #b24a45;
 } */
 
-.ie--in h3 .b{
-    background: linear-gradient(135deg, lab(83.9185% 9.76154 50.5538), lab(67.1959% 24.4167 67.5432));
-    color:var(--navy) !important;
+.ie--in h3 .b {
+  background: linear-gradient(135deg, lab(83.9185% 9.76154 50.5538), lab(67.1959% 24.4167 67.5432));
+  color: var(--navy) !important;
 }
 
-
-.ie--ex h3 .b{
-    background:var(--navy) !important;
-    color:var(--gold) !important;
+.ie--ex h3 .b {
+  background: var(--navy) !important;
+  color: var(--gold) !important;
 }
-
 
 .option1-ie-grid {
   display: grid !important;
@@ -1468,8 +1470,8 @@ body.cover-b .cv-b {
 .option1-ie-grid .ie h3 .b {
   width: 36px !important;
   height: 36px !important;
-border-radius: 0.75rem !important;  
-display: inline-flex !important;
+  border-radius: 0.75rem !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex: 0 0 36px !important;
@@ -1513,8 +1515,6 @@ display: inline-flex !important;
   color: color-mix(in oklab, var(--navy) 70%, transparent) !important;
   stroke: color-mix(in oklab, var(--navy) 70%, transparent) !important;
 }
-
-
 
 .cost {
   width: 100%;
@@ -2175,14 +2175,14 @@ img {
 
 .itinerary-page .strip,
 .inclusion-page .strip,
-.payment-page .strip{
+.payment-page .strip {
   break-after: avoid !important;
   page-break-after: avoid !important;
 }
 
 .itinerary-page .page__body,
 .inclusion-page .page__body,
-.payment-page .page__body{
+.payment-page .page__body {
   break-before: avoid !important;
   page-break-before: avoid !important;
 }
@@ -2257,23 +2257,23 @@ img {
     page-break-inside: avoid !important;
     margin-bottom: 12px !important;
   }
-.itinerary-page{
-  break-before: page !important;
-  page-break-before: always !important;
-}
-.testimonial-page{
-  break-before: page !important;
-  page-break-before: always !important;
-}
-.inclusion-page {
+  .itinerary-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .testimonial-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .inclusion-page {
     page-break-before: always !important;
     break-before: page !important;
   }
-.payment-page {
+  .payment-page {
     page-break-before: always !important;
     break-before: page !important;
   }
-.terms-page {
+  .terms-page {
     page-break-before: always !important;
     break-before: page !important;
   }
@@ -2382,10 +2382,9 @@ img {
     break-inside: avoid;
     page-break-inside: avoid;
   }
-   .option1-ie-grid,
+  .option1-ie-grid,
   .ie {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
-
 }
