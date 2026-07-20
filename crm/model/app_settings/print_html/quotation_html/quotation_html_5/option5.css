@@ -925,7 +925,7 @@ body {
 }
 .itin-attract-title {
   font-family: 'Playfair Display', serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--navy);
 }
@@ -943,7 +943,7 @@ body {
   flex-shrink: 0;
 }
 .itin-prog-lbl {
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -951,7 +951,7 @@ body {
   margin-bottom: 5px;
 }
 .itin-prog-text {
-  font-size: 12.5px;
+  font-size: 14px !important;
   color: var(--slate);
   line-height: 1.65;
   margin-bottom: 14px;
@@ -1935,22 +1935,21 @@ body {
   }
 
   .reviews-grid {
-  display: block !important;
-  width: 100% !important;
-  font-size: 0 !important;
+    display: block !important;
+    width: 100% !important;
 }
 
 .review-card {
-  display: inline-block !important;
-  vertical-align: top !important;
-  width: 48.5% !important;
-  margin: 0 1% 14px 0 !important;
-  box-sizing: border-box !important;
-  font-size: 12.5px !important;
+    display: block !important;
+    width: 100% !important;
+    margin: 0 0 14px 0 !important;
+    box-sizing: border-box !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 .review-card:nth-child(2n) {
-  margin-right: 0 !important;
+    margin-right: 0 !important;
 }
 }
 @page {

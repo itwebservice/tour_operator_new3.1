@@ -634,7 +634,6 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
       o5_render_page_header_strip($hero, $o5_show_flights ? 'Flight Details' : 'Transportation');
     }
     ?>
-
     <!-- FLIGHTS & TRANSPORT -->
     <?php if ($o5_show_flights || $o5_show_vehs) : ?>
       <div class="page-section">
@@ -813,37 +812,40 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
                 </div>
               </div>
             </div>
-
           <?php endforeach; ?>
         <?php endif; ?>
+      </div>
+    <?php endif; ?>
+    <hr class="page-divider" />
 
-        <?php if ($o5_show_vehs) : ?>
-          <div class="sec-head" style="margin-top:8px;">
-            <h2>Transportation</h2>
-          </div>
-          <div class="transport-grid">
-            <?php foreach ($vehs as $v) :
-              $v_start = o5nv($v['date'], '');
-              $v_end = o5_vehicle_end_date($v);
-              $v_dur = trim($v_start . ($v_end !== '' ? ' – ' . $v_end : ''));
-              $svc = o5nv($v['service_duration'], o5nv($v['description'], 'Private Transfer'));
-            ?>
-              <div class="transport-card">
-                <div class="transport-card-head">
-                  <div class="transport-icon">🚗</div>
-                  <div>
-                    <div class="transport-name"><?= o5e(o5nv($v['vehicle_name'], 'Vehicle')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o5e($v['vehicle_count']) ?>)<?php endif; ?></div>
-                    <div class="transport-type"><?= o5e(o5nv($v['vehicle_type'], 'Private Transfer')) ?></div>
-                  </div>
-                </div>
-                <div class="transport-row"><span class="tr-lbl">Pickup</span><span class="tr-val"><?= o5e(o5nv($v['pickup'], 'NA')) ?></span></div>
-                <div class="transport-row"><span class="tr-lbl">Drop</span><span class="tr-val"><?= o5e(o5nv($v['drop'], 'NA')) ?></span></div>
-                <div class="transport-row"><span class="tr-lbl">Duration</span><span class="tr-val"><?= o5e($v_dur !== '' ? $v_dur : 'As per itinerary') ?></span></div>
-                <div class="transport-row"><span class="tr-lbl">Service</span><span class="tr-val"><span class="tr-badge2"><?= o5e($svc) ?></span></span></div>
+    <?php if ($o5_show_vehs) : ?>
+      <?php o5_render_page_header_strip($hero, 'Transportation'); ?>
+
+      <div class="page-section  print-section">
+        <div class=" sec-head" style="margin-top:8px;">
+        <h2>Transportation</h2>
+      </div>
+      <div class="transport-grid">
+        <?php foreach ($vehs as $v) :
+          $v_start = o5nv($v['date'], '');
+          $v_end = o5_vehicle_end_date($v);
+          $v_dur = trim($v_start . ($v_end !== '' ? ' – ' . $v_end : ''));
+          $svc = o5nv($v['service_duration'], o5nv($v['description'], 'Private Transfer'));
+        ?>
+          <div class="transport-card">
+            <div class="transport-card-head">
+              <div class="transport-icon">🚗</div>
+              <div>
+                <div class="transport-name"><?= o5e(o5nv($v['vehicle_name'], 'Vehicle')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o5e($v['vehicle_count']) ?>)<?php endif; ?></div>
+                <div class="transport-type"><?= o5e(o5nv($v['vehicle_type'], 'Private Transfer')) ?></div>
               </div>
-            <?php endforeach; ?>
+            </div>
+            <div class="transport-row"><span class="tr-lbl">Pickup</span><span class="tr-val"><?= o5e(o5nv($v['pickup'], 'NA')) ?></span></div>
+            <div class="transport-row"><span class="tr-lbl">Drop</span><span class="tr-val"><?= o5e(o5nv($v['drop'], 'NA')) ?></span></div>
+            <div class="transport-row"><span class="tr-lbl">Duration</span><span class="tr-val"><?= o5e($v_dur !== '' ? $v_dur : 'As per itinerary') ?></span></div>
+            <div class="transport-row"><span class="tr-lbl">Service</span><span class="tr-val"><span class="tr-badge2"><?= o5e($svc) ?></span></span></div>
           </div>
-        <?php endif; ?>
+        <?php endforeach; ?>
       </div>
     <?php endif; ?>
 
