@@ -8,21 +8,30 @@ $_SESSION['generated_by'] = $app_name;
 global $currency;
 
 
-// $email_icon=BASE_URL . 'images/';
-// $phone_icon
+// FPDF needs local filesystem paths (HTTP URLs fail when allow_url_fopen is off / SSL blocked)
+$phone_icon_path = __DIR__ . '/../../../images/call.png';
+$email_icon_path = __DIR__ . '/../../../images/email.png';
 $role = $_SESSION['role'];
 $sq = mysqli_fetch_assoc(mysqlQuery("select branch_status from branch_assign where link='car_rental/booking/index.php'"));
-$branch_status = $sq['branch_status'];
+$branch_status = isset($sq['branch_status']) ? $sq['branch_status'] : 'no';
 
 $booking_id = $_GET['booking_id'];
 $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_booking where booking_id='$booking_id' and delete_status='0'"));
+if(!$sq_booking){
+  echo 'Booking not found.';
+  exit;
+}
 $branch_admin_id = ($_SESSION['branch_admin_id'] != '') ? $_SESSION['branch_admin_id'] : $sq_booking['branch_admin_id'];
 $branch_details = mysqli_fetch_assoc(mysqlQuery("select * from branches where branch_id='$branch_admin_id'"));
+if(!$branch_details){
+  $branch_details = array('address1'=>'','address2'=>'','city'=>'','contact_no'=>'','email_id'=>'');
+}
 
 // Get branch-wise logo file path for FPDF
 $admin_logo_path = get_branch_logo_path($branch_admin_id);
 
-$no_of_car = ceil(intval($sq_booking['total_pax']) / intval($sq_booking['capacity']));
+$capacity = intval($sq_booking['capacity']);
+$no_of_car = ($capacity > 0) ? ceil(intval($sq_booking['total_pax']) / $capacity) : 1;
 $booking_date = $sq_booking['created_at'];
 $yr = explode("-", $booking_date);
 $year = $yr[0];
@@ -68,7 +77,10 @@ if ($sq_booking['service_tax_subtotal'] !== 0.00 && ($sq_booking['service_tax_su
   }
 }
 $bsmValues = json_decode($sq_booking['bsm_values']);
-if ($bsmValues[0]->service != '') { //inclusive service charge
+$bsmService = (is_array($bsmValues) && isset($bsmValues[0]->service)) ? $bsmValues[0]->service : '';
+$bsmMarkup = (is_array($bsmValues) && isset($bsmValues[0]->markup)) ? $bsmValues[0]->markup : '';
+$bsmBasic = (is_array($bsmValues) && isset($bsmValues[0]->basic)) ? $bsmValues[0]->basic : '';
+if ($bsmService != '') { //inclusive service charge
   $newSC = $service_tax_amount + $service_charge;
   $newBasic = $newSC + $basic_cost1;
 } else {
@@ -85,7 +97,7 @@ if ($sq_booking['markup_cost_subtotal'] !== 0.00 && $sq_booking['markup_cost_sub
     $markupservice_tax_amount += $service_tax[2];
   }
 }
-if ($bsmValues[0]->markup != '') { //inclusive markup
+if ($bsmMarkup != '') { //inclusive markup
   $newBasic = $basic_cost1 + $sq_booking['markup_cost'] + $markupservice_tax_amount;
   $tax_show = '';
 } else {
@@ -95,7 +107,7 @@ if ($bsmValues[0]->markup != '') { //inclusive markup
   $tax_show = ' ( ' . $name . ' ) ' . $percent . ' ' . ($markupservice_tax_amount + $service_tax_amount);
 }
 ////////////Basic Amount Rules
-if ($bsmValues[0]->basic != '') { //inclusive markup
+if ($bsmBasic != '') { //inclusive markup
   $newBasic = $basic_cost1 + $service_tax_amount + $sq_booking['markup_cost'] + $markupservice_tax_amount;
 }
 $newBasic = $newBasic + $sq_booking['roundoff'] + $service_tax_amount + $markupservice_tax_amount;
@@ -140,11 +152,11 @@ $y_pos = $pdf->getY();
 // Slightly lower the Y-position to reduce the top space for the icon
 $pdf->SetXY(10, $y_pos); // Try -1 for smaller adjustment
 
-// Insert a smaller phone icon (adjust the width to 4)
-$pdf->Image($phone_icon, $pdf->GetX(), $pdf->GetY(), 3);
-
-// Adjust the X-position for the text, leaving a gap of 6 units
-$pdf->SetXY($pdf->GetX() + 4, $pdf->GetY());
+// Insert a smaller phone icon (local path required for FPDF)
+if (file_exists($phone_icon_path)) {
+  $pdf->Image($phone_icon_path, $pdf->GetX(), $pdf->GetY(), 3);
+  $pdf->SetXY($pdf->GetX() + 4, $pdf->GetY());
+}
 
 // Insert the phone number text on the same line as the icon
 $pdf->MultiCell(45, 4, "Phone: " . (($branch_status == 'yes') ? $branch_details['contact_no'] : $app_contact_no));
@@ -157,12 +169,13 @@ $pdf->SetXY(10, $y_pos + 4);
 $y_pos = $pdf->getY();
 $pdf->SetXY(10, $y_pos);
 
-$pdf->Image($email_icon, $pdf->GetX(), $pdf->GetY(), 3);
+if (file_exists($email_icon_path)) {
+  $pdf->Image($email_icon_path, $pdf->GetX(), $pdf->GetY(), 3);
+  $pdf->SetXY($pdf->GetX() + 4, $pdf->GetY());
+}
 
-// Adjust the X-position for the text, leaving a gap of 6 units
-$pdf->SetXY($pdf->GetX() + 4, $pdf->GetY());
-
-$pdf->MultiCell(45, 4, "Email: " . ($branch_status=='yes' && $branch_details['email_id'] != '') ? $branch_details['email_id'] : $app_email_id);
+$email_display = ($branch_status=='yes' && $branch_details['email_id'] != '') ? $branch_details['email_id'] : $app_email_id;
+$pdf->MultiCell(45, 4, "Email: " . $email_display);
 
 $pdf->SetFont('Arial', '', 12);
 $y_pos = $pdf->getY() + 10;
@@ -249,6 +262,9 @@ $count = 0;
 $count++;
 
 $sq_entry_n =mysqli_fetch_assoc( mysqlQuery("select * from car_rental_transport_voucher_entries where booking_id='$booking_id'"));
+if(!$sq_entry_n){
+  $sq_entry_n = array('vehicle_no'=>'','driver_name'=>'','mobile_no'=>'','type_array'=>'');
+}
 
 $pdf->Row(array($count, $sq_booking['vehicle_name'], $sq_entry_n['vehicle_no'],$sq_entry_n['driver_name'],$sq_entry_n['mobile_no'],$sq_entry_n['type_array']));
 

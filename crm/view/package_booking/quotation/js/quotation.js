@@ -615,26 +615,32 @@ function get_enquiry_details(offset = '') {
 function get_auto_to_date(from_date) {
 
 	var from_date1 = $('#' + from_date).val();
-	var offset = from_date.split('-');
+	var suffix = String(from_date || '').replace(/^check_in-/, '');
+	var checkOutId = 'check_out-' + suffix;
 	if (from_date1 != '') {
-		var edate = from_date1.split('-');
-		e_date = new Date(edate[2], edate[1] - 1, edate[0]).getTime();
-		var currentDate = new Date(new Date(e_date).getTime() + 24 * 60 * 60 * 1000);
-		var day = currentDate.getDate();
-		var month = currentDate.getMonth() + 1;
-		var year = currentDate.getFullYear();
-		if (day < 10) {
-			day = '0' + day;
+		var nights = 1;
+		var stayEl = document.getElementById('hotel_stay_days-' + suffix);
+		if (stayEl && parseInt(stayEl.value, 10) > 0) {
+			nights = parseInt(stayEl.value, 10);
 		}
-		if (month < 10) {
-			month = '0' + month;
+		if (typeof quotationAddDays === 'function') {
+			$('#' + checkOutId).val(quotationAddDays(from_date1, nights));
+		} else {
+			var edate = from_date1.split('-');
+			var currentDate = new Date(edate[2], edate[1] - 1, edate[0]);
+			currentDate.setDate(currentDate.getDate() + nights);
+			var day = currentDate.getDate();
+			var month = currentDate.getMonth() + 1;
+			var year = currentDate.getFullYear();
+			if (day < 10) day = '0' + day;
+			if (month < 10) month = '0' + month;
+			$('#' + checkOutId).val(day + '-' + month + '-' + year);
 		}
-		$('#check_out-' + offset[1]).val(day + '-' + month + '-' + year);
 	}
 	else {
-		$('#check_out-' + offset[1]).val('');
+		$('#' + checkOutId).val('');
 	}
-	calculate_total_nights('check_out-' + offset[1]);
+	calculate_total_nights(checkOutId);
 }
 
 function calculate_total_nights(to_date1) {
@@ -769,11 +775,28 @@ function quotationAddDays(dateStr, days) {
 }
 
 function quotationGetTravelDates() {
-	var isUpdate = $('#from_date12').length > 0;
+	var isPackageUpdate = $('#from_date12').length > 0;
+	if (isPackageUpdate) {
+		return {
+			isUpdate: true,
+			from_date: $('#from_date12').val() || '',
+			to_date: $('#to_date12').val() || ''
+		};
+	}
+	// Group Quotation Update uses from_date1 / to_date1 (only while update modal is open)
+	var groupUpdateOpen = $('#quotation_update_modal').hasClass('in') ||
+		($('#quotation_update_modal').length > 0 && $('#quotation_update_modal').is(':visible'));
+	if (groupUpdateOpen && $('#from_date1').length > 0) {
+		return {
+			isUpdate: true,
+			from_date: $('#from_date1').val() || '',
+			to_date: $('#to_date1').val() || ''
+		};
+	}
 	return {
-		isUpdate: isUpdate,
-		from_date: isUpdate ? $('#from_date12').val() : $('#from_date').val(),
-		to_date: isUpdate ? $('#to_date12').val() : $('#to_date').val()
+		isUpdate: false,
+		from_date: $('#from_date').val() || '',
+		to_date: $('#to_date').val() || ''
 	};
 }
 
@@ -783,7 +806,8 @@ function quotationIsRowActive(row) {
 	return input.type !== 'checkbox' || input.checked;
 }
 
-function quotationShiftTableDateCells(tableId, cellIndexes, delta) {
+function quotationShiftTableDateCells(tableId, cellIndexes, delta, options) {
+	options = options || {};
 	var table = document.getElementById(tableId);
 	if (!table || !delta) return;
 	for (var i = 0; i < table.rows.length; i++) {
@@ -793,7 +817,8 @@ function quotationShiftTableDateCells(tableId, cellIndexes, delta) {
 			var input = quotationGetTableDateInput(row, cellIndexes[j]);
 			if (input && input.value) {
 				input.value = quotationShiftDMY(input.value, delta);
-				if (window.jQuery) {
+				// Do not trigger change by default — hotel check-in onchange would force checkout to +1 night
+				if (options.triggerChange && window.jQuery) {
 					jQuery(input).trigger('change');
 				}
 			}
@@ -895,6 +920,17 @@ function quotationSyncHotelDatesFromTravelStart(from_date, options) {
 		var table = document.getElementById(tableId);
 		if (!table || !table.rows.length) return;
 
+		// Capture nights first so we can safely rewrite check-in/out without losing stay length
+		var nightsByRow = [];
+		for (var r = 0; r < table.rows.length; r++) {
+			var captureRow = table.rows[r];
+			if (!quotationIsRowActive(captureRow)) {
+				nightsByRow[r] = 0;
+				continue;
+			}
+			nightsByRow[r] = quotationGetRowNights(captureRow);
+		}
+
 		var chainDate = travelStart;
 		for (var i = 0; i < table.rows.length; i++) {
 			var row = table.rows[i];
@@ -908,12 +944,12 @@ function quotationSyncHotelDatesFromTravelStart(from_date, options) {
 				chainDate = checkOutInput.value.split(' ')[0];
 				var stayDaysInput = quotationGetTableDateInput(row, 9);
 				if (stayDaysInput && !stayDaysInput.value) {
-					stayDaysInput.value = quotationGetRowNights(row);
+					stayDaysInput.value = nightsByRow[i] || quotationGetRowNights(row);
 				}
 				continue;
 			}
 
-			var nights = quotationGetRowNights(row);
+			var nights = nightsByRow[i] || 1;
 			var checkOutDate = quotationAddDays(chainDate, nights);
 
 			quotationSetInputDateValue(checkInInput, chainDate);
@@ -1551,8 +1587,10 @@ function quotationShiftDatetimeFieldsByDelta(delta) {
 	if (!delta) return;
 
 	quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_plane', [6, 7], delta);
+	quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_plane_update', [6, 7], delta);
 	quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_train', [5, 6], delta);
 	quotationShiftTableDateCells('tbl_dynamic_cruise_quotation', [2, 3], delta);
+	quotationShiftTableDateCells('tbl_dynamic_cruise_quotation_update', [2, 3], delta);
 	quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_excursion', [2], delta);
 
 	[
@@ -1574,13 +1612,15 @@ function quotationShiftDatetimeFieldsByDelta(delta) {
 }
 
 function quotationSetDefaultSectionDates(from_date) {
-	jQuery('#txt_dapart1, #txt_arrval1, #train_departure_date, #train_arrival_date, #cruise_departure_date, #cruise_arrival_date, #exc_date-1').each(function () {
+	if (!from_date) return;
+	var datePart = from_date.split(' ')[0];
+	jQuery('input[id^="txt_dapart"], input[id^="txt_arrval"], input[id^="train_departure_date"], input[id^="train_arrival_date"], input[id^="cruise_departure_date"], input[id^="cruise_arrival_date"], #exc_date-1').each(function () {
 		var current = jQuery(this).val();
 		var timePart = ' 00:00';
 		if (current && current.indexOf(' ') > -1) {
 			timePart = current.substring(current.indexOf(' '));
 		}
-		jQuery(this).val(from_date.split(' ')[0] + timePart).trigger('change');
+		jQuery(this).val(datePart + timePart);
 	});
 }
 function quotationGetTravelStayBaselineDate() {
@@ -1650,13 +1690,27 @@ function syncQuotationTravelStayDates(options) {
 	var hasHotelRows = !!document.getElementById('tbl_package_tour_quotation_dynamic_hotel') ||
 		!!document.getElementById('tbl_package_tour_quotation_dynamic_hotel_update');
 	var preserveHotelDates = !!options.preserveHotelDates;
+	var isGroupQuotationUpdate = $('#quotation_update_modal').hasClass('in') ||
+		($('#quotation_update_modal').length > 0 && $('#quotation_update_modal').is(':visible'));
+
+	// Group Quotation Update has no FIT hotel check-in rows; train/flight/cruise must follow travel from-date
+	if (isGroupQuotationUpdate) {
+		quotationSetDefaultSectionDates(from_date);
+		quotationSyncTransportDates(from_date, to_date);
+		quotationSyncGroupTransportDates(from_date, to_date);
+		quotationRecalculateTravelStayCosts(dates.isUpdate);
+		return;
+	}
 
 	if (delta !== 0) {
-		quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_hotel', [6, 7], delta);
-		quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_hotel_update', [6, 7], delta);
-		quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_transport', [3, 4], delta);
-		quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_transport_u', [3, 4], delta);
-		quotationShiftDatetimeFieldsByDelta(delta);
+		// Re-chain hotels from new travel start (preserves nights). Do NOT delta-shift hotel
+		// check-in fields — that triggered get_auto_to_date and collapsed every stay to 1 night.
+		quotationSyncHotelDatesFromTravelStart(from_date);
+		quotationSyncTransportDatesFromHotels();
+		quotationSyncFlightAndExcursionDatesFromHotels();
+		quotationShiftTableDateCells('tbl_package_tour_quotation_dynamic_train', [5, 6], delta);
+		quotationShiftTableDateCells('tbl_dynamic_cruise_quotation', [2, 3], delta);
+		quotationShiftTableDateCells('tbl_dynamic_cruise_quotation_update', [2, 3], delta);
 	} else if (hasHotelRows) {
 		if (!preserveHotelDates && quotationHotelsNeedDateFill()) {
 			quotationSyncHotelDatesFromTravelStart(from_date, { onlyMissing: true });
@@ -1671,6 +1725,27 @@ function syncQuotationTravelStayDates(options) {
 	}
 
 	quotationRecalculateTravelStayCosts(dates.isUpdate);
+}
+
+function quotationSyncGroupTransportDates(from_date, to_date) {
+	var travelStart = from_date ? from_date.split(' ')[0] : '';
+	var travelEnd = to_date ? to_date.split(' ')[0] : travelStart;
+	['tbl_group_tour_quotation_transport', 'tbl_group_tour_quotation_transport_u'].forEach(function (tableId) {
+		var table = document.getElementById(tableId);
+		if (!table) return;
+		for (var i = 0; i < table.rows.length; i++) {
+			var row = table.rows[i];
+			if (!quotationIsRowActive(row)) continue;
+			var startInput = quotationGetTableDateInput(row, 3);
+			var endInput = quotationGetTableDateInput(row, 4);
+			if (startInput && travelStart) {
+				quotationSetInputDateValue(startInput, travelStart);
+			}
+			if (endInput && travelEnd) {
+				quotationSetInputDateValue(endInput, travelEnd);
+			}
+		}
+	});
 }
 
 function quotationSyncTravelStaySectionsFromHotels() {
@@ -1688,19 +1763,32 @@ function quotationSyncTravelStaySectionsFromHotels() {
 
 function quotationWatchTab3Activation() {
 	var tab3 = document.getElementById('tab3');
-	if (!tab3 || !window.MutationObserver) return;
+	if (tab3 && window.MutationObserver) {
+		var observer = new MutationObserver(function () {
+			if (jQuery('#tab3').hasClass('active')) {
+				setTimeout(function () {
+					if (typeof syncQuotationTravelStayDates === 'function') {
+						syncQuotationTravelStayDates();
+					}
+				}, 150);
+			}
+		});
+		observer.observe(tab3, { attributes: true, attributeFilter: ['class'] });
+	}
 
-	var observer = new MutationObserver(function () {
-		if (jQuery('#tab3').hasClass('active')) {
-			setTimeout(function () {
-				if (typeof syncQuotationTravelStayDates === 'function') {
-					syncQuotationTravelStayDates();
-				}
-			}, 150);
-		}
-	});
-
-	observer.observe(tab3, { attributes: true, attributeFilter: ['class'] });
+	var tab3u = document.getElementById('tab3_u');
+	if (tab3u && window.MutationObserver) {
+		var observerU = new MutationObserver(function () {
+			if (jQuery('#tab3_u').hasClass('active')) {
+				setTimeout(function () {
+					if (typeof syncQuotationTravelStayDates === 'function') {
+						syncQuotationTravelStayDates();
+					}
+				}, 150);
+			}
+		});
+		observerU.observe(tab3u, { attributes: true, attributeFilter: ['class'] });
+	}
 }
 
 jQuery(document).ready(function () {
@@ -1709,12 +1797,25 @@ jQuery(document).ready(function () {
 });
 
 jQuery(document).on('click', '#tab3_head', function () {
+	if (jQuery('#tab4').hasClass('active') && typeof quotationSaveTab4CostingState === 'function') {
+		quotationSaveTab4CostingState();
+	}
 	setTimeout(function () {
 		if (typeof syncQuotationTravelStayDates === 'function') {
 			syncQuotationTravelStayDates();
 		}
 	}, 200);
 });
+
+jQuery(document).on(
+	'change',
+	'#tbl_package_tour_quotation_dynamic_costing input, #tbl_package_tour_quotation_dynamic_costing select, #flight_cost, #train_cost, #cruise_cost, #visa_cost, #guide_cost, #misc_cost, #currency_code',
+	function () {
+		if (typeof quotationSaveTab4CostingState === 'function') {
+			quotationSaveTab4CostingState();
+		}
+	}
+);
 
 function quotationIsValidImageFile(file) {
 	if (!file || !file.name) return false;
@@ -1996,6 +2097,138 @@ function quotationApplyGroupCostingTransportTotals(unique_package_id_arr, packag
 			$('#basic_amount' + suffix).val(parseFloat(transport_cost) + hotel_cost);
 		}
 	});
+	return true;
+}
+
+/** Persist Tab4 costing so Previous → Next does not wipe manual edits. */
+function quotationSaveTab4CostingState() {
+	try {
+		var entries = typeof quotationCollectGroupCostingEntries === 'function'
+			? quotationCollectGroupCostingEntries()
+			: null;
+		if (entries && entries.length) {
+			sessionStorage.setItem('quotation_tab4_costing_state', JSON.stringify(entries));
+		}
+		sessionStorage.setItem('quotation_tab4_travel_cost_state', JSON.stringify({
+			flight_cost: $('#flight_cost').val() || '',
+			train_cost: $('#train_cost').val() || '',
+			cruise_cost: $('#cruise_cost').val() || '',
+			visa_cost: $('#visa_cost').val() || '',
+			guide_cost: $('#guide_cost').val() || '',
+			misc_cost: $('#misc_cost').val() || '',
+			misc_desc: $('#misc_desc').val() || $('#miscellaneous_desc').val() || '',
+			currency_code: $('#currency_code').val() || ''
+		}));
+		sessionStorage.setItem('quotation_tab4_costing_visited', '1');
+	} catch (e) {
+		console.log('Unable to save tab4 costing state', e);
+	}
+}
+
+/**
+ * After Tab4 costing is rebuilt from Tab3, restore manual fields.
+ * options.refreshHotelCost / refreshActivityCost / refreshTransportCost:
+ *   true  = keep values just calculated from Tab3
+ *   false = restore previous Tab4 manual values (default for transport/service/tax)
+ */
+function quotationRestoreTab4CostingState(options) {
+	options = options || {};
+	var refreshHotelCost = options.refreshHotelCost !== false;
+	var refreshActivityCost = options.refreshActivityCost !== false;
+	var refreshTransportCost = !!options.refreshTransportCost;
+
+	var raw = sessionStorage.getItem('quotation_tab4_costing_state');
+	if (!raw) {
+		return false;
+	}
+
+	var entries;
+	try {
+		entries = JSON.parse(raw);
+	} catch (e) {
+		return false;
+	}
+	if (!entries || !entries.length) {
+		return false;
+	}
+
+	var byType = {};
+	for (var i = 0; i < entries.length; i++) {
+		byType[String(entries[i].package_type_c || '')] = entries[i];
+	}
+
+	var $costInputs = $('#tbl_package_tour_quotation_dynamic_costing').find('[id^="tour_cost-"]');
+	$costInputs.each(function () {
+		var suffix = this.id.replace('tour_cost', '');
+		if (!suffix) {
+			return;
+		}
+		var pkgType = String($('#package_type' + suffix).val() || '');
+		var saved = byType[pkgType];
+		if (!saved && entries.length === 1 && $costInputs.length === 1) {
+			saved = entries[0];
+		}
+		if (!saved) {
+			return;
+		}
+
+		if (!refreshHotelCost && saved.tour_cost !== undefined && saved.tour_cost !== '') {
+			$('#tour_cost' + suffix).val(saved.tour_cost);
+		}
+		if (!refreshTransportCost && saved.transport_cost !== undefined && saved.transport_cost !== '') {
+			$('#transport_cost1' + suffix).val(saved.transport_cost);
+		}
+		if (!refreshActivityCost && saved.excursion_cost !== undefined && saved.excursion_cost !== '') {
+			$('#excursion_cost' + suffix).val(saved.excursion_cost);
+		}
+		if (saved.service_tax !== undefined && saved.service_tax !== '') {
+			$('#service_charge' + suffix).val(saved.service_tax);
+		}
+		if (saved.discount_in) {
+			$('#discount_in' + suffix).val(saved.discount_in);
+		}
+		if (saved.discount !== undefined && saved.discount !== '') {
+			$('#discount_amt' + suffix).val(saved.discount);
+		}
+		if (saved.tax_apply_on) {
+			$('#tax_apply_on' + suffix).val(saved.tax_apply_on);
+		}
+		if (saved.tax_value) {
+			$('#tax_value' + suffix).val(saved.tax_value);
+		}
+		if (saved.service_tax_subtotal !== undefined) {
+			$('#service_tax_subtotal' + suffix).val(saved.service_tax_subtotal);
+		}
+		if (saved.tcs !== undefined) {
+			$('#tcs_tax' + suffix).val(saved.tcs);
+		}
+		if (saved.tcsvalue !== undefined) {
+			$('#tcs1' + suffix).val(saved.tcsvalue);
+		}
+		if (typeof quotation_cost_calculate === 'function') {
+			quotation_cost_calculate('tour_cost' + suffix);
+		}
+	});
+
+	var travelRaw = sessionStorage.getItem('quotation_tab4_travel_cost_state');
+	if (travelRaw) {
+		try {
+			var travel = JSON.parse(travelRaw);
+			if (travel.flight_cost !== undefined) $('#flight_cost').val(travel.flight_cost);
+			if (travel.train_cost !== undefined) $('#train_cost').val(travel.train_cost);
+			if (travel.cruise_cost !== undefined) $('#cruise_cost').val(travel.cruise_cost);
+			if (travel.visa_cost !== undefined) $('#visa_cost').val(travel.visa_cost);
+			if (travel.guide_cost !== undefined) $('#guide_cost').val(travel.guide_cost);
+			if (travel.misc_cost !== undefined) $('#misc_cost').val(travel.misc_cost);
+			if (travel.misc_desc !== undefined) {
+				if ($('#misc_desc').length) $('#misc_desc').val(travel.misc_desc);
+				if ($('#miscellaneous_desc').length) $('#miscellaneous_desc').val(travel.misc_desc);
+			}
+			if (travel.currency_code && $('#currency_code').length) {
+				$('#currency_code').val(travel.currency_code).trigger('change');
+			}
+		} catch (e2) {}
+	}
 	return true;
 }
 

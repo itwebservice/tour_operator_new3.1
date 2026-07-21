@@ -805,9 +805,9 @@ function is_ai_package_quotation($quotation_row)
   if (!is_array($quotation_row)) {
     return false;
   }
-  $refer_id = isset($quotation_row['quotation_refer_id']) ? intval($quotation_row['quotation_refer_id']) : 0;
   $package_id = isset($quotation_row['package_id']) ? intval($quotation_row['package_id']) : 0;
-  return $refer_id > 0 && $package_id == 0;
+  // AI quotations are always saved with package_id = 0
+  return $package_id == 0;
 }
 
 function get_quotation_package_lookup_id($quotation_row)

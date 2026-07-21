@@ -205,25 +205,20 @@ while($row_ticket = mysqli_fetch_assoc($sq_ticket)){
 				
 	
 
-	// currency conversion
-
-
-	if($row_ticket['currency_code']==''){
-		$currency_c= $currency;
+	// currency conversion — only show converted amount when ticket currency differs from app currency
+	if($row_ticket['currency_code']=='' || $row_ticket['currency_code']=='0' || $row_ticket['currency_code']==null){
+		$currency_c = $currency;
 	}else{
-		$currency_c= $row_ticket['currency_code'];
+		$currency_c = $row_ticket['currency_code'];
 	}
-	
 
-
-		$currency_amount1 = currency_conversion($currency,$currency_c,$total_amt);
-if($row_ticket['currency_code'] !='0' && $currency != $row_ticket['currency_code']){
-	$currency_amount = ' ('.$currency_amount1.')';
-}else{
 	$currency_amount = '';
-}
+	if((string)$currency_c !== '' && (string)$currency_c !== '0' && (string)$currency !== (string)$currency_c){
+		$currency_amount1 = currency_conversion($currency, $currency_c, $total_amt);
+		$currency_amount = ' ('.$currency_amount1.')';
+	}
 
-
+	$total_amount_display = $currency_amount !== '' ? ($total_amount1.'<br/>'.$currency_amount) : $total_amount1;
 
 	$temp_arr = array( "data" => array(
 		$row_ticket['invoice_pr_id'],
@@ -232,7 +227,7 @@ if($row_ticket['currency_code'] !='0' && $currency != $row_ticket['currency_code
 		$contact_no,
 		$bal_amount,
 		$cancel_amt,
-		$total_amount1.'<br/>'.$currency_amount,
+		$total_amount_display,
 		$emp_name,
 		$invoice_date,
 		$btn_eticket.

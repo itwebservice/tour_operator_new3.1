@@ -208,6 +208,9 @@ $('#frm_tab1_u').validate({
 		country_code1 : { required : true },
 	},
 	submitHandler:function(form){
+		if (typeof syncQuotationTravelStayDates === 'function') {
+			syncQuotationTravelStayDates();
+		}
 		$('a[href="#tab3_u"]').tab('show');
 	}
 });

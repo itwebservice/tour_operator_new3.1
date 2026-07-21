@@ -2,9 +2,12 @@
 include "../../../model/model.php";
 $booking_id = $_POST['booking_id'];
 $sq_transport = mysqli_fetch_assoc( mysqlQuery("select * from car_rental_transport_voucher_entries where booking_id='$booking_id'") );
-
+if(!$sq_transport){
+	$sq_transport = array('entry_id'=>'','vehicle_no'=>'','driver_name'=>'','mobile_no'=>'','type_array'=>'');
+}
 
 $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_booking where booking_id='$booking_id' and delete_status='0'"));
+$vehicle_name = isset($sq_booking['vehicle_name']) ? $sq_booking['vehicle_name'] : '';
 ?>
 <form id="frm_service_voucher">
 <div class="modal fade" id="voucher_modal1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
@@ -19,28 +22,26 @@ $sq_booking = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_booking wh
 		<input type="hidden" id="cmb_booking_id" value='<?= $booking_id  ?>'>
 		
 		<?php
-		
-            $sq_entry_n1 = mysqli_fetch_assoc(mysqlQuery("select * from car_rental_transport_voucher_entries where booking_id='$booking_id'"));
-        //    echo($sq_entry_n1 ['vehicle_no']);
+            $sq_entry_n1 = $sq_transport;
 			?>
 		<div class="row">
 			<div class="col-md-4 col-sm-6 mg_bt_10">
-				<input type="hidden" id="vehicle_name" value='<?= isset($sq_transport['entry_id']) ? $sq_transport['entry_id'] : '' ?>'>
-				<input type="text" id="vehicle_names" title="Vehicle Name" name="vehicle_name" value="<?=$sq_booking['vehicle_name']?>" disabled>
+				<input type="hidden" id="vehicle_name" value='<?= htmlspecialchars($sq_transport['entry_id']) ?>'>
+				<input type="text" id="vehicle_names" title="Vehicle Name" name="vehicle_name" value="<?= htmlspecialchars($vehicle_name) ?>" disabled>
 			</div>
 		</div>
 		<div class="row">
             <div class="col-md-4 col-sm-6 mg_bt_10">
-				<input type="text" id="vehicle_no" name="vehicle_no" placeholder=" Vehicle No"   title=" Vehicle No" value="<?= $sq_entry_n1['vehicle_no'] ?>">
+				<input type="text" id="vehicle_no" name="vehicle_no" placeholder=" Vehicle No"   title=" Vehicle No" value="<?= htmlspecialchars($sq_entry_n1['vehicle_no']) ?>">
 			</div>
 			<div class="col-md-4 col-sm-6 mg_bt_10">
-				<input type="text" id="driver_name" name="driver_name" placeholder="Driver Name"   title="Driver Name" value="<?= $sq_entry_n1['driver_name'] ?>">
+				<input type="text" id="driver_name" name="driver_name" placeholder="Driver Name"   title="Driver Name" value="<?= htmlspecialchars($sq_entry_n1['driver_name']) ?>">
 			</div>
 			<div class="col-md-4 col-sm-6 mg_bt_10">
-				<input type="number" id="mobile_no" name="mobile_no" placeholder="Mobile No"    title="Mobile No" value="<?= $sq_entry_n1['mobile_no'] ?>">
+				<input type="number" id="mobile_no" name="mobile_no" placeholder="Mobile No"    title="Mobile No" value="<?= htmlspecialchars($sq_entry_n1['mobile_no']) ?>">
 			</div>
 			<div class="col-md-4 col-sm-6 mg_bt_10">
-				<input type="text" id="type_array" name="type_array"  placeholder="Type" title="Type" value="<?= $sq_entry_n1['type_array'] ?>" />
+				<input type="text" id="type_array" name="type_array"  placeholder="Type" title="Type" value="<?= htmlspecialchars($sq_entry_n1['type_array']) ?>" />
 			</div>
 		</div>
 		

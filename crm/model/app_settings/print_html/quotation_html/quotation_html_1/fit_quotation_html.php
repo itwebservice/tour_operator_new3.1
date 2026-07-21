@@ -616,7 +616,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </rect>
             </svg>
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)] mt-2">Package Type</div>
-            <div class="font-display text-3xl mt-1"><span>Tailored Package</span></div>
+            <div class="font-display text-3xl mt-1"><span><?= o1e(o1nv($o1_row['package_type'], 'Package')) ?></span></div>
             <div class="text-cream/70 text-xs mt-1.5 font-serif-soft italic">Hand-picked value with luxury touchpoints.</div>
             <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full" style="background:oklch(0.78 0.13 78 / 0.2)">
             </div>

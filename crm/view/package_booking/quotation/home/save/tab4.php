@@ -977,6 +977,9 @@ if (input) {
     }
 
     function switch_to_tab3() {
+        if (typeof quotationSaveTab4CostingState === 'function') {
+            quotationSaveTab4CostingState();
+        }
         $('#tab4_head').removeClass('active');
         $('#tab3_head').addClass('active');
         $('.bk_tab').removeClass('active');

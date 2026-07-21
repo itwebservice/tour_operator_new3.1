@@ -135,9 +135,11 @@ public function quotation_master_save()
 	$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
 	$quotation_refer_id = 0;
 
-	if ($is_ai_quotation == '1' && $dest_id > 0) {
-		$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
+	if ($is_ai_quotation == '1') {
 		$package_id_arr = array('0');
+		if ($dest_id > 0) {
+			$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
+		}
 	}
 	$discount = $_POST['discount'];
 	$flight_acost = $_POST['flight_acost'];

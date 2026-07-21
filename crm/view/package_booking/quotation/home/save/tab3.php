@@ -1952,8 +1952,11 @@ $("#infant_activity_pp").val(
     });
 
     function switch_to_tab2() {
-        // Discard saved Tab 3 state so Tab 2 Next reloads fresh package data.
+        // Discard saved Tab 3/4 state so Tab 2 Next reloads fresh package data.
         sessionStorage.removeItem('hotel_table_state_tab3');
+        sessionStorage.removeItem('quotation_tab4_costing_state');
+        sessionStorage.removeItem('quotation_tab4_travel_cost_state');
+        sessionStorage.removeItem('quotation_tab4_costing_visited');
         if (typeof quotationRestorePackageTypeDropdown === 'function') {
             quotationRestorePackageTypeDropdown();
         }
@@ -2197,6 +2200,13 @@ $("#infant_activity_pp").val(
             };
             populateGroupCostingFromHotels(aggregated_hotel_arr, aggregated_hotel_arr, costingOptions);
             console.log("Tab4 costing populated with", aggregated_hotel_arr.length, "package types");
+            if (typeof quotationRestoreTab4CostingState === 'function') {
+                quotationRestoreTab4CostingState({
+                    refreshHotelCost: true,
+                    refreshActivityCost: true,
+                    refreshTransportCost: false
+                });
+            }
             return;
         }
 
@@ -2273,6 +2283,13 @@ $("#infant_activity_pp").val(
         }
 
         console.log("Tab4 costing table populated with", unique_package_type_arr.length, "package types");
+        if (typeof quotationRestoreTab4CostingState === 'function') {
+            quotationRestoreTab4CostingState({
+                refreshHotelCost: true,
+                refreshActivityCost: true,
+                refreshTransportCost: false
+            });
+        }
     }
 
 

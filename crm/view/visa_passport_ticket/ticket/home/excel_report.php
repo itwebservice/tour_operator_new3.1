@@ -251,22 +251,18 @@ while($row_ticket = mysqli_fetch_assoc($sq_ticket)){
 
 
     
-	if($row_ticket['currency_code']==''){
-		$currency_c= $currency;
+	// currency conversion — only show converted amount when ticket currency differs from app currency
+	if($row_ticket['currency_code']=='' || $row_ticket['currency_code']=='0' || $row_ticket['currency_code']==null){
+		$currency_c = $currency;
 	}else{
-		$currency_c= $row_ticket['currency_code'];
+		$currency_c = $row_ticket['currency_code'];
 	}
-	
 
-
-		$currency_amount1 = currency_conversion($currency,$currency_c,$total_amt);
-if($row_ticket['currency_code'] !='0' && $currency != $row_ticket['currency_code']){
-	$currency_amount = ' ('.$currency_amount1.')';
-}else{
 	$currency_amount = '';
-}
-
-
+	if((string)$currency_c !== '' && (string)$currency_c !== '0' && (string)$currency !== (string)$currency_c){
+		$currency_amount1 = currency_conversion($currency, $currency_c, $total_amt);
+		$currency_amount = ' ('.$currency_amount1.')';
+	}
 
 	$objPHPExcel->setActiveSheetIndex(0)
         ->setCellValue('B'.$row_count, $row_ticket['invoice_pr_id'])

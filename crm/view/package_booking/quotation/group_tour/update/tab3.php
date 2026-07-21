@@ -208,6 +208,26 @@ $(function(){
 			  }
  
 
+			  function getGroupPlaneCellValue(row, cellIndex) {
+				if (!row || !row.cells || !row.cells[cellIndex]) {
+					return '';
+				}
+				var input = (typeof getCellFormControl === 'function')
+					? getCellFormControl(row.cells[cellIndex])
+					: row.cells[cellIndex].querySelector('input, select, textarea');
+				if (!input) {
+					return '';
+				}
+				return ($(input).val() != null) ? $(input).val() : (input.value || '');
+			  }
+			  function isGroupPlaneRowChecked(row) {
+				if (!row || !row.cells || !row.cells[0]) {
+					return false;
+				}
+				var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+				return !!(checkbox && checkbox.checked);
+			  }
+
 			  var table = document.getElementById("tbl_package_tour_quotation_dynamic_plane_update");
 			  var rowCount = table.rows.length;
 			  
@@ -215,23 +235,17 @@ $(function(){
 			  {
 			    var row = table.rows[i];
 			     
-			    if(row.cells[0].childNodes[0].checked)
+			    if(isGroupPlaneRowChecked(row))
 			    {
-					var plane_from_location1 = row.cells[2].childNodes[0].value;          
-		       var plane_to_location1 = row.cells[3].childNodes[0].value;
-		       var airline_name = row.cells[4].childNodes[0].value;  
-		       var plane_class = row.cells[5].childNodes[0].value;  
-		       var dapart1 = row.cells[6].childNodes[0].value;       
-		       var arraval1 = row.cells[7].childNodes[0].value;
-			   var from_city_id1 = row.cells[8].childNodes[0].value;
-		       var to_city_id1 = row.cells[9].childNodes[0].value;
-
-			       if(row.cells[10] && row.cells[10].childNodes[0]){
-			       	var plane_id = row.cells[10].childNodes[0].value;
-			       }
-			       else{
-			       	var plane_id = "";
-			       }     
+					var plane_from_location1 = getGroupPlaneCellValue(row, 2);
+		       var plane_to_location1 = getGroupPlaneCellValue(row, 3);
+		       var airline_name = getGroupPlaneCellValue(row, 4);
+		       var plane_class = getGroupPlaneCellValue(row, 5);
+		       var dapart1 = getGroupPlaneCellValue(row, 6);
+		       var arraval1 = getGroupPlaneCellValue(row, 7);
+			   var from_city_id1 = getGroupPlaneCellValue(row, 8);
+		       var to_city_id1 = getGroupPlaneCellValue(row, 9);
+			       var plane_id = getGroupPlaneCellValue(row, 10);
 			    
 				if(plane_from_location1=="")
 

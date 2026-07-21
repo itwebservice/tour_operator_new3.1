@@ -507,7 +507,7 @@ $o2_round = o2img(
               </span>
               <div>
                 <div class="t" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)">Package Type</div>
-                <div class="nm" style="font-size:16px;margin-top:2px">Tailored Package</div>
+                <div class="nm" style="font-size:16px;margin-top:2px"><?= o1e(o1nv($o1_row['package_type'], 'Package')) ?></div>
                 <div class="meta" style="margin-top:3px"><span style="color:var(--gold-deep);font-weight:500; font-size:14px;">Recommended for your group</span></div>
               </div>
             </div>

@@ -3534,19 +3534,31 @@ function airport_load_main(ids) {
 			},
 			minLength: 3,
 			change: function (event, ui) {
-				var substr_id = object_id.substr(6);
+				// Use suffix after first "-" so ids like from_sector-1_d map to from_city-1_d
+				var substr_id = object_id.split('-').slice(1).join('-');
+				var currentVal = $.trim($(this).val() || '');
+				// Keep prefilled/saved airport values on blur when user did not pick from the list again
 				if (!ui.item) {
+					if (currentVal !== '') {
+						return;
+					}
 					$(this).val('');
-					$('#from_city-' + substr_id).val("");
-					$('#to_city-' + substr_id).val("");
+					if (Object.keys(id)[0] == 'dep') {
+						$('#from_city-' + substr_id).val("");
+					} else {
+						$('#to_city-' + substr_id).val("");
+					}
 					error_msg_alert('Please select Airport from the list!!');
 					$(this).css('border', '1px solid red;');
 					return;
 				}
 				if (($('#' + ids[0].dep).val() == $("#" + ids[1].arr).val()) && $('#' + ids[0].dep).val() != '' && $('#' + ids[1].arr).val() != '') {
 					$(this).val('');
-					$('#from_city-' + substr_id).val("");
-					$('#to_city-' + substr_id).val("");
+					if (Object.keys(id)[0] == 'dep') {
+						$('#from_city-' + substr_id).val("");
+					} else {
+						$('#to_city-' + substr_id).val("");
+					}
 					$(this).css('border', '1px solid red;');
 					error_msg_alert('Same Arrival and Boarding Airport Not Allowed!!');
 				}

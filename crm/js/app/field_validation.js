@@ -1617,6 +1617,15 @@ function get_to_datetime(from_date, to_date) {
 
 //Validation for special attration
 function validate_spattration(id) {
+	// AI Builder quotations can have longer special attraction text — skip char limit
+	if ((typeof jQuery !== 'undefined' && $('#is_ai_quotation').length && $('#is_ai_quotation').val() === '1')
+		|| (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('is_ai_quotation') === '1')) {
+		if (id && typeof jQuery !== 'undefined') {
+			$('#' + id).css({ border: '1px solid #ddd' });
+		}
+		return true;
+	}
+
 	var element = document.getElementById(id);
 	if (!element) {
 		console.log('validate_spattration: Element not found for id:', id);
