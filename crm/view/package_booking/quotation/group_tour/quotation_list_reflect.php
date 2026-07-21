@@ -93,24 +93,25 @@ $query .=" order by quotation_id desc ";
 		$p_url = BASE_URL."model/app_settings/print_html/invoice_html/body/proforma_invoice_html.php?invoice_no=$invoice_no&invoice_date=$invoice_date&customer_id=$customer_id&customer_email=$customer_email&service_name=$service_name&basic_cost=$basic_cost&service_tax=$service_tax&net_amount=$net_amount&travel_cost=$travel_cost&for=$for&currency=$row_quotation[currency_code]";
 							
 		$quotation_id = $row_quotation['quotation_id'];
-		if($app_quot_format == 2){
-			$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_2/git_quotation_html.php?quotation_id=$quotation_id";
-		}
-		else if($app_quot_format == 3){
-			$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_3/git_quotation_html.php?quotation_id=$quotation_id";
-		}
-		else if($app_quot_format == 4){
-			$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_4/git_quotation_html.php?quotation_id=$quotation_id";
-		}
-		else if($app_quot_format == 5){
-			$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_5/git_quotation_html.php?quotation_id=$quotation_id";
-		}
-		else if($app_quot_format == 6){
-			$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_6/git_quotation_html.php?quotation_id=$quotation_id";
-		}
-		else{
-			$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_1/git_quotation_html.php?quotation_id=$quotation_id";
-		} 
+  $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_1/fit_quotation_html.php?quotation_id=$quotation_id";
+		// if($app_quot_format == 2){
+		// 	$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_2/git_quotation_html.php?quotation_id=$quotation_id";
+		// }
+		// else if($app_quot_format == 3){
+		// 	$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_3/git_quotation_html.php?quotation_id=$quotation_id";
+		// }
+		// else if($app_quot_format == 4){
+		// 	$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_4/git_quotation_html.php?quotation_id=$quotation_id";
+		// }
+		// else if($app_quot_format == 5){
+		// 	$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_5/git_quotation_html.php?quotation_id=$quotation_id";
+		// }
+		// else if($app_quot_format == 6){
+		// 	$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_6/git_quotation_html.php?quotation_id=$quotation_id";
+		// }
+		// else{
+		// 	$url1 = BASE_URL."model/app_settings/print_html/quotation_html/quotation_html_1/git_quotation_html.php?quotation_id=$quotation_id";
+		// } 
 		$whatsapp_tooltip_change = ($whatsapp_switch == "on") ? 'Email and What\'sApp Quotation to Customer' : "Email Quotation to Customer";
 		
 		$copy_btn = ($row_quotation['status'] == '1') ? '<button class="btn btn-warning btn-sm" data-toggle="tooltip" onclick="quotation_clone('.$row_quotation['quotation_id'].')" title="Create copy of this quotation"><i class="fa fa-files-o"></i></button>': '';

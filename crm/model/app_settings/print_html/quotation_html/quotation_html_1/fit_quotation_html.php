@@ -3077,8 +3077,8 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
           </div>
         </div>
         <div class="mt-10 text-center">
-          <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div>
-          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1"><?= o1e($o1_company) ?> Â· Luxury Voyages Â· Est. 2014</div>
+          <!-- <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div> -->
+          <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1"><?= o1e($o1_company) ?> Â· Luxury Voyages · Est. 2014</div>
         </div>
       </div>
       <div class="absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
