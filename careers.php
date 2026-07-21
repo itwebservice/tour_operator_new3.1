@@ -7,6 +7,7 @@ $service = $_GET['service'];
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'career';
 
 $career = mysqli_fetch_all(mysqlQuery("SELECT * FROM `b2c_career` WHERE active_flag='0'"), MYSQLI_ASSOC);
 

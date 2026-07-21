@@ -1,5 +1,76 @@
 <?php
 include '../../config.php';
+
+/**
+ * CMS "List of documents" uses jQuery wysiwyg (no bullet toolbar) — content is often
+ * <p>...</p>, <table> rows, or plain text. Convert to real <ul><li> so bullets show on B2C.
+ */
+if (!function_exists('visa_format_documents_html')) {
+    function visa_format_documents_html($html)
+    {
+        $html = trim((string) $html);
+        if ($html === '') {
+            return '';
+        }
+        // Already a list
+        if (preg_match('/<\s*(ul|ol)\b/i', $html)) {
+            return $html;
+        }
+        // Editor table: one document per cell or row
+        if (preg_match('/<\s*table\b/i', $html)) {
+            $lis = [];
+            if (preg_match_all('/<\s*t[dh]\b[^>]*>(.*?)<\s*\/\s*t[dh]\s*>/is', $html, $cells)) {
+                foreach ($cells[1] as $cell) {
+                    $cell = trim($cell);
+                    if ($cell !== '' && $cell !== '&nbsp;' && strip_tags($cell) !== '') {
+                        $lis[] = '<li>' . $cell . '</li>';
+                    }
+                }
+            }
+            if (!empty($lis)) {
+                return '<ul class="visa-documents-auto-list">' . implode('', $lis) . '</ul>';
+            }
+        }
+        // Typical wysiwyg: paragraphs
+        if (preg_match('/<\s*p\b/i', $html) && preg_match_all('/<\s*p[^>]*>(.*?)<\s*\/\s*p\s*>/is', $html, $m)) {
+            $lis = [];
+            foreach ($m[1] as $inner) {
+                $inner = trim($inner);
+                if ($inner === '' || $inner === '&nbsp;') {
+                    continue;
+                }
+                if (preg_match('/^<\s*br\s*\/?\s*>$/i', $inner)) {
+                    continue;
+                }
+                $lis[] = '<li>' . $inner . '</li>';
+            }
+            if (!empty($lis)) {
+                return '<ul class="visa-documents-auto-list">' . implode('', $lis) . '</ul>';
+            }
+        }
+        // Line breaks only (no block tags)
+        if (strpos($html, '<') === false) {
+            $lines = preg_split('/\r\n|\r|\n/', $html);
+            $lis = [];
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line !== '') {
+                    $lis[] = '<li>' . htmlspecialchars($line, ENT_QUOTES, 'UTF-8') . '</li>';
+                }
+            }
+            if (!empty($lis)) {
+                return '<ul class="visa-documents-auto-list">' . implode('', $lis) . '</ul>';
+            }
+        }
+        // Fallback: single item wrapper if there is visible text but odd markup
+        $plain = trim(strip_tags($html, '<a><strong><b><em><i><u><br>'));
+        if ($plain !== '') {
+            return '<ul class="visa-documents-auto-list"><li>' . $html . '</li></ul>';
+        }
+        return $html;
+    }
+}
+
 $visa_results_array = ($_POST['data'] != '') ? $_POST['data'] : [];
 $h_currency_id = $_SESSION['session_currency_id'];
 global $currency;
@@ -145,7 +216,7 @@ if (sizeof($visa_results_array) > 0) {
                             <?php
                             if (sizeof($visa_types) > 0) {
                                 for ($v = 0; $v < sizeof($visa_types); $v++) { ?>
-                                    <div class="tab-pane fade" id="type<?= $visa_results_array[$visa_i]['country_id'] . $v ?>"
+                                    <div class="tab-pane fade visa-type-detail-pane" id="type<?= $visa_results_array[$visa_i]['country_id'] . $v ?>"
                                         role="tabpanel"
                                         aria-labelledby="type-tab<?= $visa_results_array[$visa_i]['country_id'] . $v ?>">
                                         <!-- **** types **** -->
@@ -158,8 +229,8 @@ if (sizeof($visa_results_array) > 0) {
                                         <h3 class="c-heading">
                                             List Of Documents
                                         </h3>
-                                        <div class="custom_texteditor">
-                                            <?php echo $visa_types[$v]['documents'] ?>
+                                        <div class="custom_texteditor visa-documents-content">
+                                            <?php echo visa_format_documents_html($visa_types[$v]['documents']); ?>
                                         </div>
                                         <?php
                                         if ($visa_types[$v]['upload_url1'] != '') {
@@ -180,6 +251,39 @@ if (sizeof($visa_results_array) > 0) {
                                             <h3 class="c-heading">
                                                 Form-2
                                                 <a href="<?php echo $newUrl; ?>" download title="Download Form-2"><i
+                                                        class="fa fa-file-text"></i></a>
+                                            </h3>
+                                        <?php } ?>
+                                        <?php
+                                        if ($visa_types[$v]['upload_url3'] != '') {
+                                            $url = preg_replace('/(\/+)/', '/', $visa_types[$v]['upload_url3']);
+                                            $newUrl1 = explode('uploads', $url);
+                                            $newUrl = BASE_URL . 'uploads' . $newUrl1[1];  ?>
+                                            <h3 class="c-heading">
+                                                Form-3
+                                                <a href="<?php echo $newUrl; ?>" download title="Download Form-3"><i
+                                                        class="fa fa-file-text"></i></a>
+                                            </h3>
+                                        <?php } ?>
+                                        <?php
+                                        if ($visa_types[$v]['upload_url4'] != '') {
+                                            $url = preg_replace('/(\/+)/', '/', $visa_types[$v]['upload_url4']);
+                                            $newUrl1 = explode('uploads', $url);
+                                            $newUrl = BASE_URL . 'uploads' . $newUrl1[1];  ?>
+                                            <h3 class="c-heading">
+                                                Form-4
+                                                <a href="<?php echo $newUrl; ?>" download title="Download Form-4"><i
+                                                        class="fa fa-file-text"></i></a>
+                                            </h3>
+                                        <?php } ?>
+                                        <?php
+                                        if ($visa_types[$v]['upload_url5'] != '') {
+                                            $url = preg_replace('/(\/+)/', '/', $visa_types[$v]['upload_url5']);
+                                            $newUrl1 = explode('uploads', $url);
+                                            $newUrl = BASE_URL . 'uploads' . $newUrl1[1];  ?>
+                                            <h3 class="c-heading">
+                                                Form-5
+                                                <a href="<?php echo $newUrl; ?>" download title="Download Form-5"><i
                                                         class="fa fa-file-text"></i></a>
                                             </h3>
                                         <?php } ?>

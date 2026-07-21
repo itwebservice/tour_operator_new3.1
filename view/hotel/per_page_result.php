@@ -42,7 +42,8 @@ if (sizeof($hotel_results_array) > 0) {
                     <div class="c-discount c-hide" id='discount<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>'>
                         <div class="discount-text">
                             <span class="currency-icon"></span>
-                            <span class='offer-currency-price' id="offer-currency-price<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>"></span>&nbsp;&nbsp;<span class="ml-5px" id='discount_text<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>'></span>
+                            <span class='offer-currency-price' id="offer-currency-price<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>"></span>
+                            <span id='discount_text<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>'></span>
                             <span class='c-hide offer-currency-id' id="offer-currency-id<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>"></span>
                             <span class='c-hide offer-currency-flag' id="offer-currency-flag<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>"></span>
                         </div>
@@ -225,18 +226,19 @@ if (sizeof($hotel_results_array) > 0) {
                                         $c_amount = ($to_currency_rate != '') ? 1 / $from_currency_rate * $room_cost : 0;
 
                                         array_push($original_costs_array, $c_amount);
-                                        if ($hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_type'] != '') {
-
-                                            $offer_amount = $hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_amount'];
-                                            $coupon_offer = 0;
-                                            if ($hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_type'] == 'Offer') {
-
-                                                if ($hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_in'] == 'Percentage') {
-                                                    $text = '%';
+                                        $offer_text = '';
+                                        $offer_price_display = '';
+                                        $offer_price_flag = '';
+                                        $offer_currency_id_val = $currency;
+                                        $coupon_offer = 0;
+                                        $offer_in_value = strtolower(trim($hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_in'] ?? ''));
+                                        $offer_type_value = strtolower(trim($hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_type'] ?? ''));
+                                        if ($offer_type_value != '') {
+                                            $offer_amount = (float)$hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_amount'];
+                                            if ($offer_type_value == 'offer') {
+                                                if ($offer_in_value === 'percentage') {
                                                     $coupon_offer = ($c_amount * ($offer_amount / 100));
-                                                    $c_amount = $c_amount - $coupon_offer;
                                                 } else {
-                                                    $text = '';
                                                     if ($currency != $b2b_currency) {
                                                         $sq_to = mysqli_fetch_assoc(mysqlQuery("select * from roe_master where currency_id='$h_currency_id'"));
                                                         $to_currency_rate = $sq_to['currency_rate'];
@@ -247,18 +249,25 @@ if (sizeof($hotel_results_array) > 0) {
                                                         $coupon_offer = ($to_currency_rate != '') ? 1 / $from_currency_rate * $offer_amount : 0;
                                                     }
                                                 }
-                                            } else if ($hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_type'] == 'Coupon') {
-                                                if ($hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_in'] == 'Percentage') {
-                                                    $text = '%';
-                                                } else {
-                                                    $text = '';
-                                                }
+                                            } else if ($offer_type_value == 'coupon') {
+                                                $coupon_offer = 0;
                                             }
-                                            $offer_text = $text . ' ' . $hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_type'];
-                                        } else {
-                                            $offer_text = '';
+
+                                            if ($offer_in_value === 'percentage') {
+                                                $offer_price_display = rtrim(rtrim(number_format($offer_amount, 2, '.', ''), '0'), '.') . '%';
+                                                $offer_price_flag = 'percentage';
+                                                $offer_currency_id_val = 'PERCENT';
+                                                $offer_text = rtrim(rtrim(number_format($offer_amount, 2, '.', ''), '0'), '.') . '% ' . $hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_type'];
+                                            } else {
+                                                $offer_text = ' ' . $hotel_results_array[$hotel_i]['final_room_type_array'][$i]['offer_type'];
+                                                $offer_price_display = sprintf("%.2f", $coupon_offer);
+                                                $offer_price_flag = 'no';
+                                                $offer_currency_id_val = $currency;
+                                            }
                                         }
-                                        $c_amount = $c_amount - $coupon_offer;
+                                        if ($offer_type_value == 'offer') {
+                                            $c_amount = $c_amount - $coupon_offer;
+                                        }
                                         $c_amount = ceil($c_amount);
                                         array_push($all_costs_array, $c_amount);
                                 ?>
@@ -324,17 +333,44 @@ if (sizeof($hotel_results_array) > 0) {
 
                                         //Offer red strip display
                                         if ('<?= $offer_text ?>' != '') {
-                                            document.getElementById("discount<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").classList.remove("c-hide");
-                                            document.getElementById("discount<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").classList.add("c-show");
-                                            // if ('<?= $text != '%' ?>' && (<?= $currency ?> != <?= $b2b_currency ?>)) {
-                                            //     document.getElementById("offer-currency-price<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = '<?= $coupon_offer ?>';
-                                            //     document.getElementById("offer-currency-id<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = '<?= $currency ?>';
-                                            // } else {
-                                            document.getElementById("offer-currency-price<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = '<?= $coupon_offer ?>';
-                                            document.getElementById("offer-currency-id<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = '<?= $currency ?>';
-                                            document.getElementById("offer-currency-flag<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = 'no';
-                                            // }
-                                            document.getElementById("discount_text<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = '<?= $offer_text ?>';
+                                            var discountEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?> = document.getElementById("discount<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>");
+                                            var discountTextEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?> = discountEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.querySelector('.discount-text');
+                                            discountEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.classList.remove("c-hide");
+                                            discountEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.classList.add("c-show");
+                                            document.getElementById("offer-currency-id<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = '<?= $offer_currency_id_val ?>';
+                                            document.getElementById("offer-currency-flag<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").innerHTML = '<?= $offer_price_flag ?>';
+                                            var offerPriceEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?> = document.getElementById("offer-currency-price<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>");
+                                            var offerIcon<?= $hotel_results_array[$hotel_i]['hotel_id'] ?> = discountTextEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.querySelector('.currency-icon');
+                                            var discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?> = document.getElementById("discount_text<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>");
+
+                                            if ('<?= $offer_price_flag ?>' === 'percentage') {
+                                                if (offerPriceEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>) {
+                                                    offerPriceEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.display = 'none';
+                                                }
+                                                if (offerIcon<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>) {
+                                                    offerIcon<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.display = 'none';
+                                                }
+                                                if (discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>) {
+                                                    // discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.className = '';
+                                                    // discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.marginLeft = '0';
+                                                    // discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.display = 'inline-block';
+                                                    discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.innerHTML = '<?= $offer_text ?>';
+                                                }
+                                            } else {
+                                                if (offerPriceEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>) {
+                                                    offerPriceEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.innerHTML = '<?= $offer_price_display ?>';
+                                                    offerPriceEl<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.display = 'inline-block';
+                                                }
+                                                if (offerIcon<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>) {
+                                                    offerIcon<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.display = 'inline-block';
+                                                }
+                                                if (discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>) {
+                                                    // discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.className = 'ml-5px';
+                                                    discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.display = 'inline-block';
+                                                    // discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.style.marginLeft = '3px';
+                                                    discountTextSpan<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>.innerHTML = '<?= $offer_text ?>';
+                                                }
+                                            }
                                         } else {
                                             document.getElementById("discount<?= $hotel_results_array[$hotel_i]['hotel_id'] ?>").classList.add("c-hide");
                                         }

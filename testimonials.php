@@ -5,6 +5,7 @@ include 'config.php';
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'testimonials';
 
 $testimonials = $themeData->getCustomerTestimonials('');
 
@@ -83,24 +84,21 @@ $testimonials = $themeData->getCustomerTestimonials('');
         <h2 class="ts-section-title">HAPPY CUSTOMERS</h2>
 
         <div class="row">
-        <?php
+            <?php
 
             if ($testimonials && count($testimonials) > 0):
                 foreach ($testimonials as $testimonial) {
 
                     $url = $testimonial['image']; //Image
-                    $pos = strstr($url,'uploads') || strstr($url,'images/testimonial');
+                    $pos = strstr($url, 'uploads');
 
-                    if ($pos != false)   {
+                    if ($pos != false) {
 
-                        $newUrl = preg_replace('/(\/+)/','/',$url); 
-                        $newUrl1 = BASE_URL.str_replace('../', '', $newUrl);
-                    }
+                        $newUrl = preg_replace('/(\/+)/', '/', $url);
+                        $newUrl1 = BASE_URL . str_replace('../', '', $newUrl);
+                    } else {
 
-                    else{
-
-                        $newUrl1 =  $url; 
-
+                        $newUrl1 =  $url;
                     } ?>
 
                     <div class="col col-12 col-md-6 col-lg-12">
@@ -111,18 +109,18 @@ $testimonials = $themeData->getCustomerTestimonials('');
 
                                 <img src="<?= $newUrl1 ?>" alt="Customer Image" class="img-fluid">
 
-                                <h3 class="ts-customer-testimonial-name"><?= $testimonial['name'].' ('.$testimonial['designation'].')' ?></h3>
+                                <h3 class="ts-customer-testimonial-name"><?= $testimonial['name'] . ' (' . $testimonial['designation'] . ')' ?></h3>
 
                             </div>
 
-                            <p class="ts-customer-testimonial-description"><?= $testimonial['testm'] ?></p>
+                            <p class="ts-customer-testimonial-description" style="font-size: 15px;"><?= $testimonial['testm'] ?></p>
 
                         </div>
 
                     </div>
 
-                <?php
-                } 
+            <?php
+                }
             endif; ?>
 
         </div>
@@ -137,48 +135,48 @@ $testimonials = $themeData->getCustomerTestimonials('');
 
 
 
-<?php include 'layouts/footer2.php';?>
+<?php include 'layouts/footer2.php'; ?>
 
 <script type="text/javascript" src="js2/scripts.js"></script>
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
 
 
 
-    var service = '<?php echo $service; ?>';
+        var service = '<?php echo $service; ?>';
 
-    if (service && (service !== '' || service !== undefined)) {
+        if (service && (service !== '' || service !== undefined)) {
 
-        var checkLink = $('.c-searchContainer .c-search-tabs li');
+            var checkLink = $('.c-searchContainer .c-search-tabs li');
 
-        var checkTab = $('.c-searchContainer .search-tab-content .tab-pane');
+            var checkTab = $('.c-searchContainer .search-tab-content .tab-pane');
 
-        checkLink.each(function() {
+            checkLink.each(function() {
 
-            var child = $(this).children('.nav-link');
+                var child = $(this).children('.nav-link');
 
-            if (child.data('service') === service) {
+                if (child.data('service') === service) {
 
-                $(this).siblings().children('.nav-link').removeClass('active');
+                    $(this).siblings().children('.nav-link').removeClass('active');
 
-                child.addClass('active');
+                    child.addClass('active');
 
-            }
+                }
 
-        });
+            });
 
-        checkTab.each(function() {
+            checkTab.each(function() {
 
-            if ($(this).data('service') === service) {
+                if ($(this).data('service') === service) {
 
-                $(this).addClass('active show').siblings().removeClass('active show');
+                    $(this).addClass('active show').siblings().removeClass('active show');
 
-            }
+                }
 
-        })
+            })
 
-    }
+        }
 
-});
+    });
 </script>

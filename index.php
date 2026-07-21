@@ -3,25 +3,19 @@ include "config.php";
 global $app_contact_no;
 $b = 'base6' . '4_decode';
 $service = $_GET['service'];
+$_SESSION['page_type'] = 'index';
 include 'layouts/header.php'; //Include header
 ?>
-
 <!-- *** Banner slider *** -->
 <section class="c-bannerAndFilter with-slider">
-  <div class="c-banner type-01">
-    <?php $banners = $themeData->getBanners(); ?>
-    <!-- *** Slider *** -->
-    <div class="owl-carousel pageSlider">
-      <?php foreach ($banners as $banner): ?>
-        <div class="item sliderItem">
-          <img src="<?php echo $banner; ?>" alt="travel" />
-          <!-- *** Info Section *** -->
-          <div class="info-section banner_one_text text-center">
-            <h1>Explore the world together</h1>
-          </div>
-          <!-- *** Info Section End *** -->
-        </div>
-      <?php endforeach; ?>
+  <div class="c-banner type-01"><!-- YouTube Video Background -->
+    <div class="video-wrapper position-absolute top-0 start-0 w-100 h-100">
+      <iframe class="yt-video"
+        src="https://www.youtube.com/embed/Wcd6r97fOgo?autoplay=1&mute=1&controls=0&showinfo=0&loop=1&playlist=Wcd6r97fOgo&rel=0&modestbranding=1"
+        frameborder="0"
+        allow="autoplay; fullscreen"
+        allowfullscreen
+        title="Holiday Tour Video"></iframe>
     </div>
     <!-- *** Slider End *** -->
   </div>
@@ -36,7 +30,7 @@ include 'layouts/header.php'; //Include header
         <div class="filterWrapper">
           <!-- ***** Filter Tabs ***** -->
           <div class="c-filterTabs">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <ul class="nav nav-tabs parentNav" id="myTab" role="tablist">
 
               <li class="nav-item" role="presentation">
                 <button
@@ -48,10 +42,11 @@ include 'layouts/header.php'; //Include header
                   role="tab"
                   aria-controls="holiday-tab-pane"
                   aria-selected="false">
-                  <i class="fa-solid fa-umbrella-beach me-2"></i>
+                  <i class="fa-solid fa-umbrella-beach me-2 me-2 fs-8"></i>
                   <span class="fw-medium">Holiday</span>
                 </button>
               </li>
+
               <li class="nav-item" role="presentation">
                 <button
                   class="nav-link filterButton fs-7"
@@ -62,9 +57,10 @@ include 'layouts/header.php'; //Include header
                   role="tab"
                   aria-controls="groupTour-tab-pane"
                   aria-selected="false">
-                  <i class="fa-solid fa-users me-2"></i>
+                  <i class="fa-solid fa-users me-2 me-2 fs-8"></i>
                   <span class="fw-medium">Group Tour</span>
                 </button>
+              </li>
               <li class="nav-item" role="presentation">
                 <button
                   class="nav-link filterButton fs-7"
@@ -75,12 +71,11 @@ include 'layouts/header.php'; //Include header
                   role="tab"
                   aria-controls="hotel-tab-pane"
                   aria-selected="true">
-                  <i class="fa-solid fa-hotel me-2"></i>
+                  <i class="fa-solid fa-hotel me-2 fs-8"></i>
                   <span class="fw-medium">Hotel</span>
                 </button>
               </li>
-              </li>
-              <li class="nav-item" role="presentation">
+              <!-- <li class="nav-item" role="presentation">
                 <button
                   class="nav-link filterButton fs-7"
                   id="flight-tab"
@@ -90,10 +85,11 @@ include 'layouts/header.php'; //Include header
                   role="tab"
                   aria-controls="flight-tab-pane"
                   aria-selected="false">
-                  <i class="fa-sharp fa-solid fa-plane-departure me-2"></i>
+                  <i class="fa-solid fa-plane-departure me-2 fs-8"></i>
                   <span class="fw-medium">Flight</span>
                 </button>
-              </li>
+              </li> -->
+
               <li class="nav-item" role="presentation">
                 <button
                   class="nav-link filterButton fs-7"
@@ -104,7 +100,7 @@ include 'layouts/header.php'; //Include header
                   role="tab"
                   aria-controls="activity-tab-pane"
                   aria-selected="false">
-                  <i class="fa-solid fa-sailboat me-2"></i>
+                  <i class="fa-solid fa-sailboat me-2 me-2 fs-8"></i>
                   <span class="fw-medium">Activity</span>
                 </button>
               </li>
@@ -118,24 +114,35 @@ include 'layouts/header.php'; //Include header
                   role="tab"
                   aria-controls="transfer-tab-pane"
                   aria-selected="false">
-                  <i class="fa-solid fa-car me-2"></i>
+                  <i class="fa-solid fa-car me-2 me-2 fs-8"></i>
                   <span class="fw-medium">Transfer</span>
                 </button>
               </li>
             </ul>
             <div class="tab-content" id="myTabContent">
-
-              <!-- ***** Holiday Tour ***** -->
-              <div
-                class="tab-pane fade show active"
-                id="holiday-tab-pane"
+              <!-- ***** Flight ***** -->
+              <!-- <div
+                class="tab-pane fade"
+                id="flight-tab-pane"
                 role="tabpanel"
-                aria-labelledby="holiday-tab"
+                aria-labelledby="flight-tab"
                 tabindex="0">
-                <?php include 'view/tours/tours-search.php'; ?>
+                <?php //include 'view/flight/flight-search.php'; 
+                ?>
+              </div> -->
+              <!-- ***** Flight End ***** -->
 
+              <!-- ***** Hotel ***** -->
+              <div
+                class="tab-pane fade"
+                id="hotel-tab-pane"
+                role="tabpanel"
+                aria-labelledby="hotel-tab"
+                tabindex="0">
+                <?php include 'view/hotel/hotel-search.php'; ?>
               </div>
-              <!-- ***** Holiday Tour End ***** -->
+              <!-- ***** Hotel End ***** -->
+
               <!-- ***** Group Tour ***** -->
               <div
                 class="tab-pane fade"
@@ -147,26 +154,17 @@ include 'layouts/header.php'; //Include header
               </div>
               <!-- ***** Group Tour End ***** -->
 
-              <!-- ***** Hotel ***** -->
+              <!-- ***** Holiday Tour ***** -->
               <div
-                class="tab-pane fade"
-                id="hotel-tab-pane"
+                class="tab-pane fade show active"
+                id="holiday-tab-pane"
                 role="tabpanel"
+                aria-labelledby="holiday-tab"
                 tabindex="0">
-                <?php include 'view/hotel/hotel-search.php'; ?>
+                <?php include 'view/tours/tours-search.php'; ?>
               </div>
-              <!-- ***** Hotel End ***** -->
+              <!-- ***** Holiday Tour ***** -->
 
-              <!-- ***** Flight ***** -->
-              <div
-                class="tab-pane fade"
-                id="flight-tab-pane"
-                role="tabpanel"
-                aria-labelledby="flight-tab"
-                tabindex="0">
-                <?php include 'view/flight/flight-search.php'; ?>
-              </div>
-              <!-- ***** Flight End ***** -->
               <!-- ***** Activity Tour ***** -->
               <div
                 class="tab-pane fade"
@@ -175,7 +173,6 @@ include 'layouts/header.php'; //Include header
                 aria-labelledby="activity-tab"
                 tabindex="0">
                 <?php include 'view/activities/activities-search.php'; ?>
-
               </div>
               <!-- ***** Activity Tour End ***** -->
 
@@ -188,7 +185,7 @@ include 'layouts/header.php'; //Include header
                 tabindex="0">
                 <?php include 'view/transfer/transfer-search.php'; ?>
               </div>
-              <!-- ***** Transfer Tour End ***** -->
+              <!-- ***** Activity Tour End ***** -->
             </div>
           </div>
           <!-- ***** Filter Tabs End ***** -->
@@ -197,541 +194,763 @@ include 'layouts/header.php'; //Include header
     </div>
   </div>
 </section>
-<!-- ***** Filter Section End ***** -->
-
-<!-- ***** Popular Packages Section ***** -->
+<!-- ***** Trending Tours Slider Section ***** -->
 <?php
 $popularPackages = $themeData->getPopularPackages();
 if ($popularPackages && count($popularPackages) > 0) {
 ?>
-  <section class="c-section type-2">
-    <div class="container-lg">
+  <section class="c-section type-1">
+    <div class="container-lg" id="season-spcl">
       <div class="row align-items-center">
         <div class="col-12">
-          <h3 class="heading">Explore Popular Packages</h3>
-          <!-- Set up your HTML -->
-          <div class="owl-carousel cardSlider c-slider">
+          <div class="heading">
+            <h2 class="span">Trending Tours</h2>
+            <div class="image"></div>
+          </div>
+
+          <!-- *** Card Slider *** -->
+          <div class="owl-carousel c-slider oddEven js-trendingTours">
             <?php foreach ($popularPackages as $package) :
+              // echo '<pre.'; var_dump($package);
               $pricing = ($package['tariff']['cadult'])
                 ?  $themeData->convertCurrency($package['tariff']['cadult'], $currency)  : '0.00';
             ?>
               <!-- Card -->
               <div class="card c-card" title="<?php echo $package['package_name'];  ?>">
                 <div class="card-image">
-                  <img
-                    src="<?php echo $package['main_img_url']; ?>"
-                    class="card-img-top"
-                    alt="<?php echo $package['package_name']; ?>" />
-                  <span class="title fw-medium"> <?php echo $package['tour_type']; ?> </span>
-                  <div class="discount">
-                    <i class="fa-solid fa-tags fs-5 text-success"></i>
-                  </div>
+                  <img src="<?php echo $package['main_img_url']; ?>" alt="..." />
+                  <span class="title"><?php echo $package['tour_type']; ?></span>
                 </div>
                 <div class="card-body">
-                  <h6 class="fw-medium mb-2 color-primary fs-6 height-38">
+                  <h5
+                    class="card-title mb-2 fs-6 text-center color-primary font-family-secondary-semibold">
                     <?php
                     if ((strlen($package['package_name']) > 30))
                       echo substr($package['package_name'], 0, length: 30) . "...";
                     else
                       echo $package['package_name'];
-                    // echo (strlen($package['package_name']) > 30) ? substr($package['package_name'], 0, length: 30) . "..." : $package['package_name'];
                     ?>
-                  </h6>
-                  <div class="d-flex flex-row mb-3 gap-2">
-                    <div class="flex-grow-1">
-                      <span class="fs-6 fw-bold text-secondary">
-                        <i class="fa-solid fa-location-dot me-1"></i> <?php echo $package['destination']['dest_name']; ?> </span>
-                    </div>
-                    <div class="flex-grow-1 text-end">
-                      <span class="fs-6 fw-medium text-secondary">
-                        <i class="fa-regular fa-clock me-1"></i> <?php echo $package['total_nights']; ?> N / <?php echo $package['total_days']; ?> D
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="d-block mb-2">
-                    <span class="fs-6 text-secondary d-block">
+                  </h5>
+                  <span
+                    class="d-block card-title mb-3 fs-7 text-center text-secondary">
+                    <?php echo $package['total_nights']; ?> nights & <?php echo $package['total_days']; ?> days
+                  </span>
+                  <span
+                    class="d-block card-title mb-3 fs-7 text-center text-secondary">
+                    <i class="fa-solid fa-location-dot me-1"></i> <?php echo $package['destination']['dest_name']; ?>
+                  </span>
+                  <div
+                    class="d-flex justify-content-center align-items-center gap-2 mb-3">
+                    <span class="fs-8 text-secondary d-block">
                       Price Per Person
                     </span>
-                    <span class="card-title d-inline fs-4 fw-bold">
+                    <span class="fs-5 font-family-secondary-bold color-primary">
                       <?php echo $pricing; ?>
-                      <sup class="fs-6 text-secondary">*</sup>
                     </span>
                   </div>
-                  <a class="c-button btn small sm fw-medium fs-8" href="<?php echo BASE_URL_B2C; ?><?php echo $package['seo_slug']; ?>">
-                    View More
-                  </a>
+                  <div class="text-center">
+                    <!-- <button class="c-button btn rounded">View Details</button> -->
+                    <a class="c-button btn rounded" href="<?php echo BASE_URL_B2C; ?><?php echo $package['seo_slug']; ?>">
+                      View Details
+                    </a>
+                  </div>
                 </div>
               </div>
+              <!-- Card End -->
             <?php endforeach; ?>
-            <!-- Card End -->
           </div>
+          <!-- *** Card Slider End *** -->
         </div>
       </div>
     </div>
   </section>
 <?php } ?>
-<!-- ***** Popular Packages Section End ***** -->
+<!-- ***** Trending Tours Slider Section End ***** -->
+>
 
-<!-- ***** Recommended HotelsSection ***** -->
+<!-- ***** Popular Activities Slider Section ***** -->
+<?php
+$popularActivities = $themeData->getPopularActivities();
+if ($popularActivities && count($popularActivities) > 0) {
+?>
+  <section class="c-section type-1 popularActivities">
+    <div class="container-lg">
+      <div class="row align-items-center">
+        <div class="col-12">
+          <div class="heading">
+            <h2 class="span">Popular Activities</h2>
+            <div class="image"></div>
+          </div>
+
+          <!-- *** Card Slider *** -->
+          <div class="owl-carousel c-slider oddEven js-activities">
+            <?php foreach ($popularActivities as $activity) :
+              $pricing = ($activity['basics']->adult_cost && $activity['basics']->adult_cost !== 'On Req')
+                ? $themeData->convertCurrency($activity['basics']->adult_cost, $currency)
+                : $activity['basics']->adult_cost;
+              $activityImg = ($activity['main_img_url']) ? htmlspecialchars($activity['main_img_url']) : BASE_URL_B2C . '/images/activity_default.png';
+            ?>
+              <!-- Card -->
+              <div class="card c-card" title="<?php echo htmlspecialchars($activity['excursion_name']); ?>">
+                <div class="card-image">
+                  <img src="<?php echo $activityImg; ?>" alt="<?php echo htmlspecialchars($activity['excursion_name']); ?>" />
+                  <span class="title"><?php echo $activity['duration'] ? $activity['duration'] : 'NA'; ?></span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title mb-2 fs-6 text-center color-primary font-family-secondary-semibold">
+                    <?php
+                    echo (strlen($activity['excursion_name']) > 30)
+                      ? substr($activity['excursion_name'], 0, 30) . "..."
+                      : $activity['excursion_name'];
+                    ?>
+                  </h5>
+                  <span class="d-block card-title mb-3 fs-7 text-center text-secondary">
+                    <i class="fa-solid fa-location-dot me-1"></i>
+                    <?php
+                    echo (strlen($activity['city_details']['city_name']) > 30)
+                      ? substr($activity['city_details']['city_name'], 0, 30) . "..."
+                      : $activity['city_details']['city_name'];
+                    ?>
+                  </span>
+                  <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+                    <span class="fs-8 text-secondary d-block">Per Person</span>
+                    <span class="fs-5 font-family-secondary-bold color-primary">
+                      <?php echo $pricing ? $pricing : 'On Request'; ?>
+                    </span>
+                  </div>
+                  <div class="text-center">
+                    <a class="c-button btn rounded" onclick="get_act_listing_page('<?php echo $activity['entry_id']; ?>')">
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <!-- Card End -->
+            <?php endforeach; ?>
+          </div>
+          <!-- *** Card Slider End *** -->
+        </div>
+      </div>
+    </div>
+  </section>
+<?php } ?>
+<!-- ***** Popular Activities Slider Section End ***** -->
+<!-- ***** Top Hotels Slider Section ***** -->
 <?php
 $recommendedHotels = $themeData->getPopularHotels();
 if ($recommendedHotels && count($recommendedHotels) > 0) {
 ?>
-  <section class="c-section type-1">
+  <section class="c-section topHotels">
     <div class="container-lg">
       <div class="row align-items-center">
         <div class="col-12">
-          <h3 class="heading">Recommended Hotels</h3>
-          <!-- Set up your HTML -->
-          <div class="owl-carousel cardSlider c-slider">
-            <!-- Card -->
-            <?php foreach ($recommendedHotels as $hotel) :
+          <div class="heading">
+            <h2 class="span">Top Hotels</h2>
+            <div class="image"></div>
+          </div>
+          <!-- *** Hotel Slider single  *** -->
+          <div class="container-lg">
+            <div class="owl-carousel c-slider js-ctaSlider">
+              <!-- Card -->
+              <?php foreach ($recommendedHotels as $hotel) :
+                $ratingStars = '';
+                $starValue = 0;
+                if (preg_match("#Star#", $hotel['rating_star'])) {
+                  list($starValue, $stringVal) = explode("Star", $hotel['rating_star']);
+                  $starValue = trim($starValue);
+                }
+                for ($i = 0; $i < $starValue; $i++) {
+                  $ratingStars .= '<i class="fa-solid fa-star fs-10 text-warning" style=" text-shadow: 0 0 3px #000;"></i>';
+                }
+                $pricing =  $hotel['double_bed'] ? $themeData->convertCurrency($hotel['double_bed'], $currency) : '0.00';
+              ?>
+                <div class="row align-items-center">
+                  <div class="col-md-6 col-sm-12 order-2 order-md-1">
+                    <h5
+                      class="card-title mb-2 fs-3 color-primary font-family-secondary-bold">
+                      <?php echo $hotel['hotel_name']; ?>
+                    </h5>
 
-              $ratingStars = '';
-              $starValue = 0;
-              if (preg_match("#Star#", $hotel['rating_star'])) {
-                list($starValue, $stringVal) = explode("Star", $hotel['rating_star']);
-                $starValue = trim($starValue);
-              }
-              for ($i = 0; $i < $starValue; $i++) {
-                $ratingStars .= '<i class="fa-solid fa-star fs-10 text-warning" style=" text-shadow: 0 0 3px #000;"></i>';
-              }
+                    <div class="with-divider d-flex flex-row mb-4">
+                      <span
+                        class="color-primary fs-7">
+                        <i class="fa-solid fa-location-dot me-1"></i> <?php echo $hotel['hotel_address']; ?>
+                      </span>
+                    </div>
+                    <div class="d-flex flex-row gap-3 mb-4">
+                      <?php
+                      if (!empty($hotel['amenities'])) {
+                        $items = explode(",", $hotel['amenities']);
+                        if ($items[0] != '') { ?>
+                          <script>
+                            setTimeout(function() {
+                              var ameities = getObjectsData(amenities, 'name', '<?php echo $items[0]; ?>');
+                              document.getElementById("amenity1<?= $hotel['hotel_id']; ?>").src = 'crm/Tours_B2B/images/amenities/' + ameities[0]['image'];
+                            }, 5000);
+                          </script>
+                          <div class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                            <div class="icon mb-2 bg-color-secondary">
+                              <img id='amenity1<?= $hotel['hotel_id']; ?>' alt="" width='32' height='32' />
+                            </div>
+                            <span class="fs-7 fw-medium"> <?php echo $items[0]; ?></span>
+                          </div>
+                        <?php }
+                        if ($items[1] != '') { ?>
+                          <script>
+                            setTimeout(function() {
+                              var ameities = getObjectsData(amenities, 'name', '<?php echo $items[1]; ?>');
+                              document.getElementById("amenity2<?= $hotel['hotel_id']; ?>").src = 'crm/Tours_B2B/images/amenities/' + ameities[0]['image'];
+                            }, 5000);
+                          </script>
+                          <div class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                            <div class="icon mb-2 bg-color-secondary">
+                              <img id='amenity2<?= $hotel['hotel_id']; ?>' alt="" width='32' height='32' />
+                            </div>
+                            <span class="fs-7 fw-medium"> <?php echo $items[1]; ?></span>
+                          </div>
+                        <?php }
+                        if ($items[2] != '') { ?>
+                          <script>
+                            setTimeout(function() {
+                              var ameities = getObjectsData(amenities, 'name', '<?php echo $items[2]; ?>');
+                              document.getElementById("amenity3<?= $hotel['hotel_id']; ?>").src = 'crm/Tours_B2B/images/amenities/' + ameities[0]['image'];
+                            }, 5000);
+                          </script>
+                          <div class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                            <div class="icon mb-2 bg-color-secondary">
+                              <img id='amenity3<?= $hotel['hotel_id']; ?>' alt="" width='32' height='32' />
+                            </div>
+                            <span class="fs-7 fw-medium"> <?php echo $items[2]; ?></span>
+                          </div>
+                        <?php }
+                      } else { ?>
+                        <div class="d-flex flex-row gap-3 mb-4">
+                          <div
+                            class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                            <div class="icon mb-2 bg-color-secondary">
+                              <i class="fa-solid fa-wifi"></i>
+                            </div>
+                            <span class="fs-7 fw-medium">Free Wifi</span>
+                          </div>
+                          <div
+                            class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                            <div class="icon mb-2 bg-color-secondary">
+                              <i class="fa-solid fa-water-ladder"></i>
+                            </div>
+                            <span class="fs-7 fw-medium">Swimming Pool</span>
+                          </div>
+                          <div
+                            class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                            <div class="icon mb-2 bg-color-secondary">
+                              <i class="fa-solid fa-utensils"></i>
+                            </div>
+                            <span class="fs-7 fw-medium">Breakfast</span>
+                          </div>
+                        </div>
+                      <?php } ?>
+                    </div>
 
-              // $pricing = $hotel['double_bed'] ? $hotel['double_bed'] : '0.00';
-              $pricing =  $hotel['double_bed'] ? $themeData->convertCurrency($hotel['double_bed'], $currency) : '0.00';
-            ?>
-              <div class="card c-card">
-                <div class="card-image">
-                  <img
-                    src="<?= $hotel['main_img']; ?>"
-                    class="card-img-top"
-                    alt="<?php echo $hotel['hotel_type']; ?>" />
-                  <div class="overlayRating">
-                    <div class="flex-grow-1 text-end"><?php echo $ratingStars; ?></div>
-                  </div>
-                  <span class="title fs-8 fw-medium"> <?php echo $hotel['hotel_type']; ?> </span>
-                  <div class="discount">
-                    <i class="fa-solid fa-tags fs-5 text-success"></i>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <h6 class="fw-medium mb-2 color-primary fs-6 height-38"><?php echo $hotel['hotel_name']; ?>
-                  </h6>
-                  <span class="fs-8 fw-medium text-secondary mb-3 d-block height-38">
-                    <i class="fa-solid fa-location-dot me-1"></i>
-                    <?php echo $hotel['hotel_address']; ?>
-                  </span>
-
-                  <div class="d-block mb-2">
-                    <span class="fs-8 text-secondary d-block">
+                    <span
+                      class="fs-6 text-secondary font-family-secondary-medium">
                       Room Cost
                     </span>
-                    <span class="card-title d-inline fs-4 fw-bold hotel-mrp-homepage">
-                      <?php echo $pricing; ?>
-                      <sup class="fs-6 text-secondary">*</sup>
-                    </span>
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                      <span
+                        class="fs-4 font-family-secondary-bold color-primary">
+                        <?php echo $pricing; ?>
+                        <sup class="fs-6 text-secondary">*</sup>
+                      </span>
+                    </div>
+                    <button class="c-button btn rounded align-items-center d-flex" onclick="get_hotel_listing_page('<?= $hotel['hotel_id']; ?>')">View Details<i class="fa-solid fa-circle-arrow-right ms-2 fs-5"></i>
+                    </button>
                   </div>
-                  <a class="c-button btn small sm fw-medium fs-8" target="_blank" onclick="get_hotel_listing_page('<?= $hotel['hotel_id']; ?>')">
-                    View More
-                  </a>
+                  <div
+                    class="col-md-6 col-sm-12 order-1 order-md-2 mb-3 mb-md-3">
+                    <div class="card-image position-relative">
+                      <img
+                        src="<?= $hotel['main_img']; ?>"
+                        alt="<?php echo $hotel['hotel_type']; ?>"
+                        class="c-image sh-oval bordered" />
+                      <div class="rating d-flex flex-row align-items-center justify-content-center">
+                        <span class="badge text-white position-absolute m-2 shadow-sm hoteltype-badge">
+                          <?php echo $hotel['hotel_type']; ?>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            <?php endforeach; ?>
-            <!-- Card End -->
+                <!-- Card End -->
+              <?php endforeach; ?>
+            </div>
           </div>
+          <!-- *** Hotel Slider single End  *** -->
         </div>
       </div>
     </div>
   </section>
 <?php } ?>
-<!-- ***** Recommended Hotels Section End ***** -->
+<!-- ***** Top Hotels Slider Section End ***** -->
 
-<!-- ***** CTA Section ***** -->
-<?php
-$testimonials = $themeData->getCustomerTestimonials(5);
-?>
-<section class="c-section">
+<!-- ***** Our Story Section ***** -->
+<section class=" c-section ourStory">
   <div class="container-lg">
-    <div class="row align-items-center">
-      <div class="col-12">
-        <div class="c-cta">
-          <img src="./images/CTA.png" alt="cta" />
-          <div class="infoSection">
-            <div class="row">
-              <div class="col-md-6 col-sm-12">
-                <div class="info p-5 align-middle">
-                  <span
-                    class="fs-4 fw-medium d-block text-white font-family-secondary">
-                    At <?php echo $app_name; ?>, we take pride in crafting unforgettable travel experiences. Our customer's testimonials reflect the seamless journeys, personalized service, and incredible destinations we offer.
-                  </span>
-                  <span class="fs-7 d-block text-white mb-1">
-
-                  </span>
-                  <span class="fs-3 d-block text-white">
-                    <i class="fa-solid fa-phone me-2 fs-5"></i><?= $app_contact_no; ?></span>
-                </div>
-              </div>
-              <div class="col-md-6 col-sm-12 text-center">
-                <div class="ctaSlider">
-                  <span
-                    class="fs-6 d-block text-secondary text-center mb-1 font-family-secondary fw-bolder">
-                    Our Testimonials
-                  </span>
-                  <span
-                    class="fs-4 d-block fw-medium text-center mb-1 font-family-secondary">
-                    What our clients say about us
-                  </span>
-
-                  <div class="owl-carousel cta-slider c-slider mt-4">
-                    <?php if ($testimonials && count($testimonials) > 0):
-                      foreach ($testimonials as $testimonial) { ?>
-                        <div class="item">
-                          <span
-                            class="fs-5 fw-medium d-block color-primary text-center mb-3">
-                            Awesome Service
-                          </span>
-                          <span
-                            class="fs-6 d-block text-center mb-3 text-secondary mh-100">
-                            <?= $testimonial['testm']; ?>
-                          </span>
-                          <span class="fs-6 fw-medium d-block text-center">
-                            <?= $testimonial['name']; ?>
-                          </span>
-                          <span
-                            class="fs-7 fw-medium d-block color-primary text-center mb-1">
-                            <?= $testimonial['designation']; ?>
-                          </span>
-                        </div>
-                    <?php }
-                    endif; ?>
-                  </div>
-                </div>
-              </div>
+    <div class="row gx-md-5">
+      <div class="col-md-6 col-sm-12">
+        <div class="cta mb-3 mb-md-0">
+          <div class="cta-info">
+            <span
+              class="fs-3 color-primary font-family-secondary-bold d-block mb-3">Our Story</span>
+            <span class="fs-7 mb-3 d-block color-primary">At <?php echo $app_name; ?>, we take pride in crafting unforgettable travel experiences. Our customer's testimonials reflect the seamless journeys, personalized service, and incredible destinations we offer.With a strong focus on customer satisfaction, real-time support, and carefully selected destinations, we continue to raise the bar in the travel industry.</span>
+            <button
+              class="c-button btn rounded align-items-center d-flex primary" onclick="window.location.href='<?= BASE_URL_B2C ?>about.php'">
+              View Details <i class="fa-solid fa-circle-arrow-right ms-2 fs-5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12">
+        <h3
+          class="fs-2 font-family-secondary-bold d-block mb-3 color-primary mb-3">
+          Why choose us
+        </h3>
+        <div class="d-flex flex-row align-items-center mb-4 gap-3">
+          <div class="itenary">
+            <div class="icon bg-color-secondary">
+              <i class="fa-solid fa-plane"></i>
             </div>
+          </div>
+          <div class="flex-grow-1">
+            <span class="fs-5 font-family-secondary-bold d-block">550+ Destinations</span>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-center mb-4 gap-3">
+          <div class="itenary">
+            <div class="icon">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1">
+            <span class="fs-5 font-family-secondary-bold d-block">Best price guaranteed</span>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-center mb-4 gap-3">
+          <div class="itenary">
+            <div class="icon bg-color-secondary">
+              <i class="fa-solid fa-compass"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1">
+            <span class="fs-5 font-family-secondary-bold d-block">Top quality experience</span>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-center mb-4 gap-3">
+          <div class="itenary">
+            <div class="icon">
+              <i class="fa-solid fa-headset"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1">
+            <span class="fs-5 font-family-secondary-bold d-block">Customer Support</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- ***** CTA Section End ***** -->
+<!-- ***** Our Story Section ***** -->
+<?php
+$testimonials = $themeData->getCustomerTestimonials(10);
+?>
+<!-- ***** Happy Customers Slider Section ***** -->
+<section class="c-section">
+  <div class="container-lg">
+    <div class="row align-items-center">
+      <div class="col-12">
+        <div class="heading">
+          <h2 class="span">Happy Customers</h2>
+          <div class="image"></div>
+        </div>
+        <!-- *** Card Slider *** -->
+        <div
+          class="owl-carousel c-slider js-testimonials customerCard-oddEven">
+          <!-- Card -->
+          <?php if ($testimonials && count($testimonials) > 0):
+            foreach ($testimonials as $testimonial) { ?>
+              <div class="c-customerCard">
+                <div class="card-image">
+                  <?php $cleanPath = str_replace('../../../', '/', $testimonial['image']); ?>
+                  <img
+                    src="<?= 'crm/' . $cleanPath; ?>"
+                    alt="photo"
+                    height="150"
+                    width="150" />
+                </div>
+                <div class="card-body">
+                  <h2 class="fs-5 d-block mb-2 font-family-secondary-bold">
+                    <?= $testimonial['name']; ?>
+                  </h2>
+                  <h3 class="fs-7 d-block mb-3 color-secondary">
+                    <?= $testimonial['designation']; ?>
+                  </h3>
+                  <p class="fs-7 d-block lh-lg mb-0">
+                    <a class="text-black text-decoration-none" href="<?= BASE_URL_B2C ?>testimonials.php"><?= substr($testimonial['testm'], 0, length: 100) . "..."; ?></a>
+                  </p>
+                </div>
+              </div>
+              <!-- Card End -->
+          <?php }
+          endif; ?>
+        </div>
+        <!-- *** Card Slider End *** -->
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ***** Happy Customers Slider Section End ***** -->
 
 <?php
 $excitingGroupTours = $themeData->getPopularGroupTours();
 if ($excitingGroupTours && count($excitingGroupTours) > 0) {
 ?>
-  <!-- ***** Exciting Group Tours Section ***** -->
-  <section class="c-section type-2">
+  <!-- ***** Seasons special Slider Section ***** -->
+  <section class="c-section type-1 overlayRight">
     <div class="container-lg">
       <div class="row align-items-center">
         <div class="col-12">
-          <h3 class="heading">Exciting Group Tours</h3>
-          <!-- Set up your HTML -->
-          <div class="owl-carousel cardSlider c-slider">
-            <?php foreach ($excitingGroupTours as $tour) {
-              $pricing =  $tour['adult_cost'] ? $themeData->convertCurrency($tour['adult_cost'], $currency) : '0.00';
-            ?>
+          <div class="heading">
+            <h2 class="span">Group Tours Special</h2>
+            <div class="image"></div>
+          </div>
+          <!-- *** Hotel Slider single  *** -->
+          <div class="container-lg">
+            <div class="owl-carousel c-slider js-ctaSlider">
               <!-- Card -->
-              <div class="card c-card" title="<?php echo $tour['tour_name']; ?>">
-                <div class="card-image">
-                  <img
-                    src="<?= $tour['image_url']; ?>"
-                    class="card-img-top"
-                    alt="<?= $tour['tour_name']; ?>" />
-                  <span class="title fs-8 fw-bold"> <?= $tour['tour_type']; ?> </span>
-                  <div class="discount">
-                    <i class="fa-solid fa-tags fs-5 text-success"></i>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <h6
-                    class="card-title fw-5 fw-medium mb-2 color-primary height-38">
-                    <?php
-                    echo (strlen($tour['tour_name']) > 30)
-                      ? substr($tour['tour_name'], 0, 30) . "..."
-                      : $tour['tour_name'];
-                    ?>
-                  </h6>
-
-                  <div class="d-flex flex-row mb-3 gap-2">
-                    <div class="flex-grow-1">
-                      <span class="fs-8 fw-medium text-secondary d-block group-tour-date-homepage">
-                        <?= $tour['tour_dates']; ?>
-                      </span>
+              <?php foreach ($excitingGroupTours as $tour) {
+                // echo '<pre>'; print_r($tour);
+                $pricing =  $tour['adult_cost'] ? $themeData->convertCurrency($tour['adult_cost'], $currency) : '0.00';
+              ?>
+                <div class="row align-items-center">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="image oval mb-3 mb-md-0">
+                      <img src="<?= $tour['image_url']; ?>" alt="<?= $tour['tour_name']; ?>" />
                     </div>
                   </div>
-                  <div class="d-block mb-2">
-                    <span class="fs-8 fw-bold text-secondary d-block">
-                      Price Per Person
-                    </span>
-                    <span class="card-title d-inline fs-5 fw-bold">
-                      <?= $pricing; ?>
-                      <sup class="fs-6 text-secondary">*</sup>
-                    </span>
+                  <div class="col-md-6 col-sm-12 ps-md-4">
+                    <h5
+                      class="card-title mb-3 fs-4 fs-md-3 color-primary font-family-secondary-bold">
+                      <?php
+                      echo (strlen($tour['tour_name']) > 30)
+                        ? substr($tour['tour_name'], 0, 30) . "..."
+                        : $tour['tour_name'];
+                      ?>
+                    </h5>
+
+                    <div class="with-divider d-flex flex-row mb-4">
+                      <?php if (strpos($tour['total_nights'], '|') !== false) {
+                        $totalNight = explode('|', $tour['total_nights']);
+                        $cityName = explode('|', $tour['city_name']);
+                        $hotelName = explode('|', $tour['hotel_name']);
+                        foreach ($totalNight as $key => $nt) { ?>
+                          <span class="color-primary fs-7"><?= $nt ?> N <?= $cityName[$key]; ?> </span>
+                          <?= (++$index < $total) ? ' &bull; ' : '' ?>
+                        <?php }
+                      } elseif (!empty($tour['total_nights'])) { ?>
+                        <span class="color-primary fs-7"><?= $tour['total_nights'] ?> N <?= $tour['city_name'] ?></span>
+                      <?php } else {
+                      } ?>
+                    </div>
+
+                    <span class="fs-7 mb-4 text-ellipsis-3"><?= $tour['tour_note']; ?></span>
+
+                    <div class="d-flex flex-row gap-4 mb-4">
+                      <div
+                        class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                        <div class="icon mb-2 bg-color-secondary">
+                          <i class="fa-solid fa-hotel"></i>
+                        </div>
+                        <span class="fs-7 fw-medium">Hotel</span>
+                      </div>
+
+                      <div
+                        class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                        <div class="icon mb-2 bg-color-secondary">
+                          <i class="fa-solid fa-car"></i>
+                        </div>
+                        <span class="fs-7 fw-medium">Transfer</span>
+                      </div>
+                      <div
+                        class="itenary text-center align-items-center justify-content-center d-flex flex-column gap-2">
+                        <div class="icon mb-2 bg-color-secondary">
+                          <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <span class="fs-7 fw-medium">Meals</span>
+                      </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                      <span
+                        class="fs-4 color-primary font-family-secondary-bold">
+                        <?= $pricing; ?>
+                      </span>
+
+                      <span
+                        class="fs-6 color-primary font-family-secondary-medium">
+                        Per Person
+                      </span>
+                    </div>
+
+                    <button class="c-button btn rounded align-items-center d-flex" onclick="window.location.href='<?php echo BASE_URL_B2C; ?><?php echo 'group-tour/' . $tour['seo_slug']; ?>'">
+                      View Details
+                      <i class="fa-solid fa-circle-arrow-right ms-2 fs-4"></i>
+                    </button>
                   </div>
-                  <a class="c-button btn small sm fw-medium fs-8" onclick='<?php echo BASE_URL_B2C; ?><?php echo $tour['seo_slug']; ?>'>
-                    View More
-                  </a>
                 </div>
-              </div>
+              <?php } ?>
               <!-- Card End -->
-            <?php } ?>
+            </div>
           </div>
+          <!-- *** Hotel Slider single End  *** -->
         </div>
       </div>
     </div>
   </section>
+  <!-- ***** Seasons special Slider Section End ***** -->
 <?php } ?>
-<!-- ***** Exciting Group Tours Section End ***** -->
-
-<!-- ***** Popular Destinations Section ***** -->
-<section class="c-section type-1">
+<!-- ***** Gallery ***** -->
+<section class="c-section top-destinations">
   <div class="container-lg">
     <div class="row align-items-center">
       <div class="col-12">
-        <h3 class="heading">Popular Destinations</h3>
+        <div class="heading">
+          <h2 class="span font-family-secondary type-2">
+            Top Destinations
+          </h2>
+          <div class="image"></div>
+        </div>
       </div>
     </div>
-    <div class="row alterNateCards">
-      <!-- Alternate image card -->
-      <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="imageCard mb-3 mb-md-0">
-          <img src="./images/destination-card-2.png" alt="'offer" />
-          <div class="rating">
-            <span class="fs-7 text-secondary fw-semibold">Rating</span>
-            <i
-              class="fa-sharp fa-solid fa-star color-primary fs-7 me-1"></i>
-            <span class="fs-7 text-secondary fw-semibold">4.8</span>
+    <div class="row">
+      <div class="col-12">
+        <div class="imageGrid">
+          <div class="imageGrid-item">
+            <img src="./images/Singapore.webp" alt="Image 1" />
+            <div class="imageGrid-item-info">
+              <div class="text-center">
+                <span
+                  class="d-block mb-3 font-family-secondary-bold fs-5 text-white">Destination</span>
+                <span
+                  class="d-block mb-1 font-family-secondary fs-3 text-white">
+                  Singapore
+                </span>
+                <span class="d-block font-family-secondary fs-5 text-white">
+                  Merlion statue and cityscape
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="info">
-            <h3
-              class="fs-4 fs-md-3 mb-3 text-white fw-semibold font-family-secondary">
-              Dubai
-            </h3>
-            <span class="fs-7 fs-md-6 text-white">
-              Experience luxury, adventure, and culture in vibrant, iconic
-              Dubai
-            </span>
+          <div class="imageGrid-item">
+            <img src="./images/Thailand.webp" alt="Image 2" />
+            <div class="imageGrid-item-info">
+              <div class="text-center">
+                <span
+                  class="d-block mb-3 font-family-secondary-bold fs-5 text-white">Destination</span>
+                <span
+                  class="d-block mb-1 font-family-secondary fs-3 text-white">
+                  Thailand
+                </span>
+                <span class="d-block font-family-secondary fs-5 text-white">
+                  Bangkok Temple
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="imageGrid-item">
+            <img src="./images/Turkey.webp" alt="Image 3" />
+            <div class="imageGrid-item-info">
+              <div class="text-center">
+                <span
+                  class="d-block mb-3 font-family-secondary-bold fs-5 text-white">Destination</span>
+                <span
+                  class="d-block mb-1 font-family-secondary fs-3 text-white">
+                  Turkey
+                </span>
+                <span class="d-block font-family-secondary fs-5 text-white">
+                  Cappadocia
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="imageGrid-item">
+            <img src="./images/Paris.webp" alt="Image 4" />
+            <div class="imageGrid-item-info">
+              <div class="text-center">
+                <span
+                  class="d-block mb-3 font-family-secondary-bold fs-5 text-white">Destination</span>
+                <span
+                  class="d-block mb-1 font-family-secondary fs-3 text-white">
+                  Paris
+                </span>
+                <span class="d-block font-family-secondary fs-5 text-white">
+                  Eiffel Tower
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="imageGrid-item">
+            <img src="./images/Japanese.webp" alt="Image 4" />
+            <div class="imageGrid-item-info">
+              <div class="text-center">
+                <span
+                  class="d-block mb-3 font-family-secondary-bold fs-5 text-white">Destination</span>
+                <span
+                  class="d-block mb-1 font-family-secondary fs-3 text-white">
+                  Japan
+                </span>
+                <span class="d-block font-family-secondary fs-5 text-white">
+                  Sannen Zaka street
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="imageGrid-item">
+            <img src="./images/India.webp" alt="Image 5" />
+            <div class="imageGrid-item-info">
+              <div class="text-center">
+                <span
+                  class="d-block mb-3 font-family-secondary-bold fs-5 text-white">Destination</span>
+                <span
+                  class="d-block mb-1 font-family-secondary fs-3 text-white">
+                  India
+                </span>
+                <span class="d-block font-family-secondary fs-5 text-white">
+                  Taj Mahal
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="imageGrid-item">
+            <img src="./images/Indonesia.webp" alt="Image 3" />
+            <div class="imageGrid-item-info">
+              <div class="text-center">
+                <span
+                  class="d-block mb-3 font-family-secondary-bold fs-5 text-white">Destination</span>
+                <span
+                  class="d-block mb-1 font-family-secondary fs-3 text-white">
+                  Indonesia
+                </span>
+                <span class="d-block font-family-secondary fs-5 text-white">
+                  Bali pagoda
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <!-- Alternate image card End -->
-
-      <!-- Alternate image card -->
-      <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="imageCard mt-0 mt-md-5 mb-3 mb-md-0">
-          <img src="./images/destination-card-1.png" alt="'offer" />
-          <div class="rating">
-            <span class="fs-7 text-secondary fw-semibold">Rating</span>
-            <i
-              class="fa-sharp fa-solid fa-star color-primary fs-7 me-1"></i>
-            <span class="fs-7 text-secondary fw-semibold">4.8</span>
-          </div>
-          <div class="info">
-            <h3
-              class="fs-4 fs-md-3 mb-3 text-white fw-semibold font-family-secondary">
-              Singapore
-            </h3>
-            <span class="fs-7 fs-md-6 text-white">
-              Explore Singapore's vibrant culture, stunning landmarks, and
-              world-class attractions.
-            </span>
-          </div>
-        </div>
-      </div>
-      <!-- Alternate image card End -->
-
-      <!-- Alternate image card -->
-      <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="imageCard mb-3 mb-md-0">
-          <img src="./images/destination-card-2.png" alt="'offer" />
-          <div class="rating">
-            <span class="fs-7 text-secondary fw-semibold">Rating</span>
-            <i
-              class="fa-sharp fa-solid fa-star color-primary fs-7 me-1"></i>
-            <span class="fs-7 text-secondary fw-semibold">4.8</span>
-          </div>
-          <div class="info">
-            <h3
-              class="fs-4 fs-md-3 mb-3 text-white fw-semibold font-family-secondary">
-              Europe
-            </h3>
-            <span class="fs-7 fs-md-6 text-white">
-              Experience Europe's rich history, diverse cultures, stunning
-              landmarks, and landscapes.
-            </span>
-          </div>
-        </div>
-      </div>
-      <!-- Alternate image card End -->
-
-      <!-- Alternate image card -->
-      <div class="col-md-3 col-sm-6 col-xs-12">
-        <div class="imageCard mt-0 mt-md-5 mb-3 mb-md-0">
-          <img src="./images/destination-card-1.png" alt="'offer" />
-          <div class="rating">
-            <span class="fs-7 text-secondary fw-semibold">Rating</span>
-            <i
-              class="fa-sharp fa-solid fa-star color-primary fs-7 me-1"></i>
-            <span class="fs-7 text-secondary fw-semibold">4.8</span>
-          </div>
-          <div class="info">
-            <h3
-              class="fs-4 fs-md-3 mb-3 text-white fw-semibold font-family-secondary">
-              Thailand
-            </h3>
-            <span class="fs-7 fs-md-6 text-white">
-              Discover Thailand's rich culture, beautiful beaches, and
-              vibrant city life.
-            </span>
-          </div>
-        </div>
-      </div>
-      <!-- Alternate image card End -->
     </div>
   </div>
 </section>
-<!-- ***** Popular Destinations Section End ***** -->
+<!-- ***** Gallery End ***** -->
 
-<!-- ***** Memorable  Activities  Section ***** -->
-<?php
-$activities = $themeData->getPopularActivities();
-if ($activities && count($activities) > 0) {
-?>
-  <section class="c-section type-2">
-    <div class="container-lg">
-      <div class="row align-items-center">
-        <div class="col-12">
-          <h3 class="heading">Memorable Activities</h3>
-          <!-- Set up your HTML -->
-          <div class="owl-carousel cardSlider c-slider">
-            <!-- Card -->
-            <?php foreach ($activities as $activity) {
-            ?>
-              <div class="card c-card" title="<?php echo $activity['excursion_name'];  ?>">
-                <div class="card-image">
-                  <img
-                    src="<?= $activity['main_img_url']; ?>"
-                    class="card-img-top"
-                    alt="<?= $activity['excursion_name']; ?>" />
-                  <span class="title fs-8 fw-medium"> <?php echo $activity['city_details']['city_name'] ?? "Unknown"; ?> </span>
-                </div>
-                <div class="card-body">
-                  <h6
-                    class="card-title fw-5 fw-medium mb-1 color-primary height-38">
-                    <?= $activity['excursion_name']; ?>
-                  </h6>
-                  <span class="fs-8 fw-medium text-secondary d-block mb-3 height-38">
-                    <!-- <i class="icon itours-align-left" aria-hidden="true"></i> -->
-                    <i class="fa-solid fa-circle-info"></i>
-                    <?php echo substr($activity['description'], 0, 100) . '...'; ?>
-                  </span>
-
-                  <div class="d-block mb-2">
-                    <span class="fs-8 text-secondary d-block">
-                      Price Per Person
-                    </span>
-                    <span class="card-title d-inline fs-4 fw-bold">
-                      <?php
-                      echo $activity['basics']->adult_cost ? $themeData->convertCurrency($activity['basics']->adult_cost, $currency) : "";
-                      ?>
-                      <sup class="fs-6 text-secondary">*</sup>
-                    </span>
-                  </div>
-                  <a class="c-button btn small sm fw-medium fs-8" target="!#" onclick="get_act_listing_page('<?= $activity['entry_id'] ?>')">
-                    View More
-                  </a>
-                </div>
-              </div>
-            <?php } ?>
-            <!-- Card End -->
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-<?php } ?>
-<!-- ***** Memorable  Activities  Section End ***** -->
-
-<!-- ***** Latest News and Blogs Section ***** -->
+<!-- ***** Our Articles Slider Section ***** -->
 <?php
 $blogs = $themeData->getBlogsData(3);
 ?>
-<section class="c-section">
+<section class="c-section type-2 blogArticle">
   <div class="container-lg">
     <div class="row align-items-center">
       <div class="col-12">
-        <h3 class="heading">Latest News and Blogs</h3>
-      </div>
-    </div>
-    <div class="row align-items-center">
-      <!-- Card -->
-      <?php foreach ($blogs as $blog) { ?>
-        <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="card c-card mb-3 mb-md-0 blog-home-page-list">
-            <div class="card-image">
-              <img src="<?php echo BASE_URL . $blog['image_path']; ?>" class="card-img-top" alt="..." />
-            </div>
-            <div class="card-body">
-              <div class="mb-3 d-flex">
-                <h6
-                  class="card-title fw-5 fw-medium mb-1 color-primary height-38">
-                  <?php
-                  echo substr($blog['title'], 0, 20) . "....";
-                  ?>
-                  </span>
-                </h6>
-                <span
-                  class="d-inline fs-8 text-body-tertiary fw-medium text-end flex-grow-1">
-                  <!-- 26 October, 2024 -->
-                </span>
-              </div>
-              <span class="fs-8 fw-medium text-secondary d-block mb-3 height-38">
-                <i class="icon itours-align-left" aria-hidden="true"></i>
-                <?php echo substr($blog['description'], 0, 100) . "..."; ?>
-              </span>
-              <!-- <h5 class="card-title mb-3">
-                <?php echo substr($blog['description'], 0, 100) . "..."; ?>
-              </h5> -->
+        <div class="heading">
+          <h2 class="span">
+            Travel
+            <span class="fs-4 font-family-secondary-bold"> Blog </span>
+          </h2>
+          <div class="image"></div>
+        </div>
+        <!-- *** Blog Slider  *** -->
+        <div class="justify-content-center row">
+          <div class="col-md-8 col-sm-12">
+            <div class="owl-carousel c-slider js-blogSlider">
+              <!-- Card -->
+              <?php foreach ($blogs as $blog) { ?>
+                <div class="card c-card">
+                  <div class="card-image md">
+                    <img src="<?php echo BASE_URL . $blog['image_path']; ?>" alt="..." />
+                  </div>
+                  <div class="card-body p-4">
+                    <h5
+                      class="card-title mb-2 fs-6 font-family-secondary-bold color-primary" title="<?= $blog['title'] ?>">
+                      <?php
+                      echo (strlen($blog['title']) > 45)
+                        ? substr($blog['title'], 0, 45) . "..."
+                        : $blog['title'];
+                      ?>
+                    </h5>
+                    <div class="with-divider d-flex flex-row mb-3">
 
-              <a href="<?= BASE_URL_B2C ?>single-blog.php?blog_id=<?= $blog['id'] ?>" class="c-button btn small sm fw-medium fs-8">
-                Read More
-              </a>
+                    </div>
+                    <span
+                      class="mb-1 fs-7 text-secondary text-ellipsis-3 lh-md">
+                      <?php
+                      $desc = strip_tags($blog['description']);
+                      echo (strlen($desc) > 200)
+                        ? substr($desc, 0, 200) . "..."
+                        : $desc;
+                      ?>
+                    </span>
+
+                    <a href="<?= BASE_URL_B2C ?>single-blog.php?blog_id=<?= $blog['id'] ?>" class="c-button btn is-link text-uppercase fw-bolder">
+                      Read More
+                    </a>
+                  </div>
+                </div>
+                <!-- Card End -->
+              <?php } ?>
+              <!-- Card End -->
             </div>
           </div>
         </div>
-      <?php } ?>
-      <!-- Card End -->
+        <!-- *** Blog Slider End  *** -->
+      </div>
     </div>
   </div>
 </section>
-<!-- ***** Latest News and Blogs Section End ***** -->
+<!-- ***** Our Articles Slider Section End ***** -->
 
-<!-- ***** Partner Slider Section ***** -->
+<!-- ***** Our Partners Section ***** -->
 <?php
 $partners = $themeData->getPartners();
 if (count($partners) > 0) {
 ?>
-  <section class="c-section type-1">
+  <section class="c-section">
     <div class="container-lg">
       <div class="row align-items-center">
         <div class="col-12">
-          <h3 class="heading">Our Partners</h3>
+          <div class="heading">
+            <h2 class="span">Our Partners</h2>
+            <div class="image"></div>
+          </div>
         </div>
       </div>
       <div class="row align-items-center">
         <div class="col-12">
-          <div class="owl-carousel partnerSlider">
+          <div
+            class="owl-carousel c-slider js-gallerySlider partnerCardSlider">
+            <!-- Card -->
             <?php
             foreach ($partners as $partner) {
             ?>
-              <div class="partner">
-                <img src="<?php echo $partner; ?>" alt="'partner" />
+              <div class="c-partnerCard">
+                <div class="card-image">
+                  <img
+                    src="<?php echo $partner; ?>"
+                    alt="photo"
+                    width="60" />
+                </div>
               </div>
             <?php }
             ?>
+            <!-- Card End -->
           </div>
         </div>
       </div>
@@ -740,7 +959,294 @@ if (count($partners) > 0) {
 <?php
 }
 ?>
-<!-- ***** Partner Slider Section ***** -->
+<!-- ***** Our Partners Section End ***** -->
+
+<!-- ***** Our Team Section ***** -->
+<?php $team_array = $themeData->getTeams(5);
+if (count($team_array) > 0) {
+?>
+  <section class="c-section type-2 ourTeam">
+    <div class="container-lg">
+      <div class="row align-items-center">
+        <div class="col-12">
+          <div class="heading">
+            <h2 class="span">Our Team</h2>
+            <div class="image"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="owl-carousel c-slider js-trendingTours">
+        <!-- Card -->
+        <?php
+        foreach ($team_array as $team) {
+          if ($team['image']) {
+            $cleanPath = str_replace('../../../', '/', $team['image']);
+            $cleanPath = "crm/" . $cleanPath;
+          } else {
+            $cleanPath = './images/profile.png';
+          } ?>
+          <div class="c-customerCard type-1">
+            <div class="card-image">
+              <img
+                src="<?php echo $cleanPath; ?>"
+                alt="photo"
+                height="130"
+                width="130" class="profile-pic" />
+            </div>
+            <div class="card-body">
+              <h2 class="fs-5 font-family-secondary-bold d-block mb-2">
+                <?php echo $team['tname']; ?>
+              </h2>
+              <span
+                class="fs-7 d-block color-secondary font-family-secondary-bold">
+                <?= $team['designation']; ?>
+              </span>
+            </div>
+          </div>
+          <!-- Card End -->
+        <?php } ?>
+      </div>
+    </div>
+  </section>
+  <!-- ***** Our Services Section End ***** -->
+<?php } ?>
+<!-- ***** Our Gallery Slider Section ***** -->
+<?php $gallary_array = $moduleData->getGalleryImages(); ?>
+<section class="c-section">
+  <div class="container-lg">
+    <div class="row align-items-center">
+      <div class="col-12">
+        <div class="heading">
+          <h2 class="span">Our Gallery</h2>
+          <div class="image"></div>
+        </div>
+      </div>
+    </div>
+    <div class="owl-carousel c-slider js-gallerySlider">
+      <?php
+      foreach ($gallary_array as $item) {
+      ?>
+        <div class="card-image">
+          <a class="light-gallery-item">
+            <img src="<?= $item['image_url'] ?>" alt="photo" class="img-fluid" style="height:242px;border-radius: 30px;max-width:264px;" title="<?= $item['dest_name']; ?>" />
+          </a>
+        </div>
+      <?php } ?>
+    </div>
+  </div>
+</section>
+<!-- ***** Our Gallery Slider Section End ***** -->
+
+<!-- ***** Our Services Section ***** -->
+<?php
+$servicesData = mysqli_fetch_all(mysqlQuery("SELECT services FROM `b2c_settings` "), MYSQLI_ASSOC);
+$services = isset($servicesData[0]['services']) ? json_decode($servicesData[0]['services'], true) : [];
+?>
+<section class="c-section">
+  <div class="container-lg">
+    <div class="row">
+      <div class="col-12">
+        <div class="c-ourServices">
+          <div class="ourServices">
+            <h2
+              class="fs-2 font-family-secondary-bold d-block text-center text-white mb-4">
+              Our Services
+            </h2>
+            <div class="row">
+
+              <!-- Service card -->
+              <?php
+              if (!empty($services)) :
+                $limitedServices = array_slice($services, 0, 4);
+                foreach ($limitedServices as $service) :
+                  if ($service['service_name'] == 'Airport Transfers')
+                    $icon = '<i class="fa fa-plane"></i>';
+                  else if ($service['service_name'] == 'Adventure Activities')
+                    $icon = '<i class="fa fa-hiking"></i>';
+                  else if ($service['service_name'] == 'Luxury Cruise Tours')
+                    $icon = '<i class="fa fa-anchor"></i>';
+                  else if ($service['service_name'] == 'City Sightseeing Tours')
+                    $icon = '<i class="fa fa-city"></i>';
+                  else if ($service['service_name'] == 'Corporate Travel Services')
+                    $icon = '<i class="fa fa-briefcase"></i>';
+                  else if ($service['service_name'] == 'Hotel Bookings')
+                    $icon = '<i class="fa fa-hotel"></i>';
+                  else if ($service['service_name'] == 'Flight Reservations')
+                    $icon = '<i class="fa fa-plane"></i>';
+                  else if ($service['service_name'] == 'Visa Assistance')
+                    $icon = '<i class="fa fa-passport"></i>';
+                  else if ($service['service_name'] == 'Cruise Holidays')
+                    $icon = '<i class="fa fa-ship"></i>';
+                  else if ($service['service_name'] == 'Travel Insurance')
+                    $icon = '<i class="fa fa-shield"></i>';
+                  else if ($service['service_name'] == 'Adventure Activities')
+                    $icon = '<i class="fa fa-mountain"></i>';
+                  else
+                    $icon = '<i class="fa fa-headphones"></i>';
+              ?>
+                  <div class="col-md-3 col-sm-6 col-xs-12 text-center">
+                    <div class="serviceCircle mb-3">
+                      <?php echo $icon; ?>
+                    </div>
+                    <span
+                      class="fs-6 font-family-secondary-bold d-block text-white mb-3">
+                      <?= htmlspecialchars($service['service_name']) ?>
+                    </span>
+                    <span class="fs-7 d-block text-white mb-3">
+                      <?= htmlspecialchars($service['description']) ?>
+                    </span>
+                  </div>
+                <?php
+                endforeach;
+              else :
+                ?>
+                <p class="text-center font-weight-bold text-danger">No services available</p>
+              <?php
+              endif;
+              ?>
+              <!-- Service card End -->
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ***** Our Services Section End ***** -->
+
+<!-- ***** Our Expertise Section ***** -->
+<section class="c-section">
+  <div class="container-lg">
+    <div class="row align-items-center">
+      <div class="col-12">
+        <div class="heading">
+          <h2 class="span">Our Expertise</h2>
+          <div class="image"></div>
+        </div>
+      </div>
+      <!-- Card -->
+      <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="counter text-center mb-3 mb-md-0">
+          <div>
+            <h5 class="d-block fs-3 font-family-secondary-bold mb-3">
+              2000+
+            </h5>
+            <span class="d-block fs-5 font-family-secondary-bold">Awesome hikers</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card End -->
+
+      <!-- Card -->
+      <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="counter text-center mb-3 mb-md-0">
+          <div>
+            <h5 class="d-block fs-3 font-family-secondary-bold mb-3">
+              80+
+            </h5>
+            <span class="d-block fs-5 font-family-secondary-bold">Stunning destinations</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card End -->
+
+      <!-- Card -->
+      <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="counter text-center mb-3 mb-md-0">
+          <div>
+            <h5 class="d-block fs-3 font-family-secondary-bold mb-3">
+              1200+
+            </h5>
+            <span class="d-block fs-5 font-family-secondary-bold">Miles to hike</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card End -->
+
+      <!-- Card -->
+      <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="counter text-center mb-3 mb-md-0">
+          <div>
+            <h5 class="d-block fs-3 font-family-secondary-bold mb-3">
+              15+
+            </h5>
+            <span class="d-block fs-5 font-family-secondary-bold">Years in service</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card End -->
+    </div>
+  </div>
+</section>
+<!-- ***** Our Expertise Section End ***** -->
+
+<!-- ***** Write to us Section ***** -->
+<section class="c-section type-1 overlayRight sm">
+  <div class="container-lg">
+    <div class="row align-items-center">
+      <div class="col-12">
+        <div class="heading">
+          <h2 class="span">Write to us</h2>
+          <div class="image"></div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5 col-sm-12 order-md-1 order-2">
+        <form id="contactForm">
+          <span class="fw-6 d-block mb-3">Feel free to reach out to us and if you have a query drop us a
+            message. Our team will get back to you at the earliest.</span>
+          <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Name *" name="name" required />
+          </div>
+          <div class="mb-3">
+            <input type="email" class="form-control" placeholder="Email *" name="email" required />
+          </div>
+          <div class="mb-3">
+            <input
+              type="number"
+              class="form-control"
+              name="phone"
+              placeholder="Phone Number *" required />
+          </div>
+          <div class="mb-3">
+            <textarea
+              class="form-control"
+              placeholder="Message *"
+              name="message"
+              rows="3" required></textarea>
+          </div>
+          <button
+            class="c-button btn rounded primary align-items-center d-flex">
+            Submit
+            <i class="fa-solid fa-circle-arrow-right ms-2 fs-5"></i>
+          </button>
+          <div id="response" class="mt-3"></div>
+        </form>
+      </div>
+      <div class="col-md-7 col-sm-12 order-md-2 order-1 mb-4 mb-md-0">
+        <?php $googleMapScript = $moduleData->getB2cSettings('google_map_script'); ?>
+        <div class="gMap">
+          <?php if ($googleMapScript != '') { ?>
+            <iframe
+              src="<?= $googleMapScript ?>"
+              style="border: 0"
+              class="map"
+              allowfullscreen=""
+              referrerpolicy="no-referrer-when-downgrade"
+              loading="lazy">
+            </iframe>
+          <?php } ?>
+        </div>
+      </div>
+      </form>
+    </div>
+  </div>
+</section>
+<!-- ***** Write to us Section End ***** -->
 
 <!-- ***** Flight :: Traveller information Modal ***** -->
 <div
@@ -749,7 +1255,7 @@ if (count($partners) > 0) {
   tabindex="-1"
   aria-labelledby="attendantModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-fullscreen-sm-down">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Travellers Information</h5>
@@ -822,6 +1328,8 @@ if (count($partners) > 0) {
               Premium Economy
             </label>
           </div>
+        </div>
+        <div class="d-flex flex-row mb-3">
 
           <div class="form-check flex-fill">
             <input
@@ -861,10 +1369,13 @@ if (count($partners) > 0) {
 <!-- ***** Flight :: Traveller information Modal End ***** -->
 </div>
 
+
 <?php
 include 'layouts/footer.php'; // Include footer
 ?>
-<script type="text/javascript" src="./js/header-api-async.js"></script>
+<?php
+include 'buy_now.php';
+?>
 <script type="text/javascript" src="js/scripts.js"></script>
 <script type="text/javascript" src="view/transfer/js/index.js"></script>
 <script type="text/javascript" src="view/activities/js/index.js"></script>
@@ -872,6 +1383,11 @@ include 'layouts/footer.php'; // Include footer
 <script type="text/javascript" src="view/group_tours/js/index.js"></script>
 <script type="text/javascript" src="view/hotel/js/index.js"></script>
 <script type="text/javascript" src="view/flight/js/index.js"></script>
+<script type="text/javascript" src="view/hotel/js/amenities.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL_B2C ?>js2/lightgallery.min.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL_B2C ?>js2/lg-thumbnail.min.js"></script>
+<script type="text/javascript" src="<?php echo BASE_URL_B2C ?>js2/lg-zoom.min.js"></script>
+
 <script>
   var service = '<?php echo $service; ?>';
 
@@ -983,4 +1499,83 @@ include 'layouts/footer.php'; // Include footer
       header.classList.remove('sticky');
     }
   });
+
+  $(document).ready(function() {
+    lightGallery(document.getElementById('lightGalleryImage'), {
+      plugins: [lgZoom, lgThumbnail],
+      speed: 500,
+      download: true,
+    });
+
+    setTimeout(function() {
+      var width = $(".light-gallery-item img").width();
+      console.log(width);
+      $(".light-gallery-item img").height(width);
+    }, 1000);
+  });
+
+  jQuery.validator.addMethod("lettersOnly", function(value, element) {
+    return this.optional(element) || /^[a-zA-Z\s]+$/.test(value); // only letters and space
+  }, "Please enter letters only.");
+
+  jQuery.validator.addMethod("validMobile", function(value, element) {
+    return this.optional(element) || /^[6-9]\d{9}$/.test(value);
+  }, "Please enter a valid 10-digit mobile number.");
+
+  $("#contactForm").validate({
+    rules: {
+      name: {
+        required: true,
+        lettersOnly: true
+      },
+      email: {
+        required: true,
+        email: true
+      },
+      phone: {
+        required: true,
+        validMobile: true
+      }
+    },
+    submitHandler: function(form) {
+      // This will only run if the form is valid
+      $.ajax({
+        url: 'layouts/send_mail.php',
+        type: 'POST',
+        data: $(form).serialize(), // ← this must be used, not JSON
+        success: function(response) {
+          $('#response').html('<b>Response:</b><br>' + response);
+        },
+        error: function() {
+          $('#response').html('<b style="color:red;">AJAX request failed</b>');
+        }
+      });
+    }
+  });
+
+  $('#contactForm').on('submit', function(e) {
+    if (!$(this).valid()) {
+      e.preventDefault(); // Stop form submission if invalid
+    }
+  });
+
+  //Get Amenities by mathcing name
+  function getObjectsData(obj, key, val) {
+    var objects = [];
+    for (var i in obj) {
+      if (!obj.hasOwnProperty(i)) continue;
+      if (typeof obj[i] == 'object') {
+        objects = objects.concat(getObjectsData(obj[i], key, val));
+      } else if ((i == key && obj[i] == val) || (i == key && val == '')) {
+        //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
+        objects.push(obj);
+      } else if (obj[i] == val && key == '') {
+        //only add if the object is not already in the array
+        if (objects.lastIndexOf(obj) == -1) {
+          objects.push(obj);
+        }
+      }
+    }
+    return objects;
+  }
 </script>

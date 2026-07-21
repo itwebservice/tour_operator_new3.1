@@ -1,17 +1,5 @@
 <?php
 include '../../../config.php';
-
-//  $_POST['bookingId'] = $_SESSION['current_booking_id'];
-// // Validate session booking ID
-// if (!isset($_SESSION['current_booking_id']) || 
-//     $_SESSION['current_booking_id'] !== $_POST['bookingId']) {
-    
-//     echo json_encode([
-//         'status' => 'error',
-//         'message' => 'Invalid booking session. Please start over.'
-//     ]);
-//     exit;
-// }
 // api/air_book.php
 require('razorpay-php-2.9.0/Razorpay.php'); // Include the Razorpay SDK
 
@@ -103,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $airBookresult = callAPI('POST', 'https://apitest.tripjack.com/oms/v1/air/book', json_encode($airBookData));
   
-file_put_contents('airBookresult.txt', print_r($airBookresult, true));
     $airBookresult=json_decode($airBookresult,true);
     if (isset($airBookresult['status']['success']) && 
         $airBookresult['status']['httpStatus'] == 200 && 
@@ -178,6 +165,7 @@ file_put_contents('airBookresult.txt', print_r($airBookresult, true));
 
 
     } else {
+        
         // Check if 'errors' key exists and is an array
         if (isset($airBookresult['errors']) && is_array($airBookresult['errors']) && isset($airBookresult['errors'][0]['message'])) {
             // Respond with an error message in JSON format

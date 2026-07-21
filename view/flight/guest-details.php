@@ -1,13 +1,10 @@
 <?php
-ob_start();
 require_once('../../config.php');
-if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
-    $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
-    header('Location:login.php');
-    exit();
-    // header('Location: ../../index.php');
-}
-$_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
+
+// if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
+//     $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
+//   header('Location: ../../index.php');
+// }
 
 // List of country calling codes
 $mobileCodes = [
@@ -49,37 +46,6 @@ $mobileCodes = [
     "+263" => "Zimbabwe"
     // Add more codes as needed
 ];
-
-
-// Added session validation
-// if (!isset($_SESSION['search_data'])) {
-//     header('Location: /flightapi');
-//     exit;
-// }
-
-// // Validate flight IDs
-// $flight_id = isset($_GET['flightid']) ? $_GET['flightid'] : header("Location: /flightapi");
-// $flight_ids = explode(",", $flight_id);
-
-// // Call Review API
-// $datareview = ['priceIds' => $flight_ids];
-// $resultreview = callAPI('POST', 'https://apitest.tripjack.com/fms/v1/review', json_encode($datareview));
-// $resultreviewArr = json_decode($resultreview, true);
-
-// // Validate Review API response
-// if (!isset($resultreviewArr['status']['success']) || 
-//     $resultreviewArr['status']['httpStatus'] != 200 || 
-//     !$resultreviewArr['status']['success']) {
-    
-//     // Handle invalid flight selection
-//     header('Location: ' . getCleanSearchURL());
-//     exit;
-// }
-
-// // Store booking ID in session
-// $_SESSION['current_booking_id'] = $resultreviewArr['bookingId'];
-// $_SESSION['flight_review_data'] = $resultreview;
-
 
 ?>
 <?php
@@ -164,9 +130,7 @@ include '../../layouts/header2.php';
         .selector.st-clean span.c-custom-select{
             display:none;
         }
-        .ts-contact-form.ts-enquiry-form .form-control, .select2-container--default .select2-selection--single, .ts-contact-form .form-control{
-            height:40px !important;
-        }
+        
         
     </style>
 <!-- ***** Banner Section ***** -->
@@ -286,7 +250,7 @@ include '../../layouts/header2.php';
                           <label>Adult <?=$a?>: </label>
                         </div>
                         <div class="col-md-2 col-sm-6">
-                          <div class=" st-clean">
+                          <div class="selector st-clean">
                            <select class="full-width js-advanceSelect" name="ti[]" required>
                               <option value="">Select</option>
                               <option value="Mr">Mr</option>
@@ -294,7 +258,6 @@ include '../../layouts/header2.php';
                               <option value="Ms">Ms</option>
                             </select>
                           </div>
-                          
                         </div>
                         <input type="hidden" name="pt[]" value="ADULT" class="infoRow_txtbox" required />  
                         <div class="col-md-3 col-sm-6">
@@ -319,13 +282,12 @@ include '../../layouts/header2.php';
                           <label>Child <?=$c?>: </label>
                         </div>
                         <div class="col-md-2 col-sm-6">
-                          <div class=" st-clean">
+                          <div class="selector st-clean">
                             <select class="full-width js-advanceSelect" name="ti[]" required>
                               <option value="">Select</option>
                               <option value="Ms">Ms</option>
                               <option value="Master">Master</option>
                             </select>
-                            
                           </div>
                         </div>
                         <input type="hidden" name="pt[]" value="CHILD" class="infoRow_txtbox" required />  
@@ -351,7 +313,7 @@ include '../../layouts/header2.php';
                           <label>Infant <?=$i?>: </label>
                         </div>
                         <div class="col-md-2 col-sm-6">
-                          <div class=" st-clean">
+                          <div class="selector st-clean">
                             <select class="full-width js-advanceSelect" name="ti[]" required>
                               <option value="">Select</option>
                               <option value="Ms">Ms</option>
@@ -381,7 +343,7 @@ include '../../layouts/header2.php';
                         <div class="title">Contact Person</div>
                         <div class="row c-infoRow">
                           <div class="col-md-2 col-sm-6">
-                            <div class=" st-clean">
+                            <div class="selector st-clean">
                               <select class="full-width js-advanceSelect" name="contact_country_code">
                                 <option value="">Country Code</option>
                                 <?php
@@ -423,66 +385,66 @@ include '../../layouts/header2.php';
               <div class="c-cartContainer cartPricing">
                 <div class="sTitle">Final Pricing</div>
                 <?php
-                    $totalPayAmount = 0;
-                    $fareSummary = []; // To collect merged data per passenger type
+                $totalPayAmount=0;
+                foreach ($resultreviewArr['tripInfos'] as $tripInfo) {
+                
+                // Loop through the 'totalPriceList' for each 'tripInfo'
+                foreach ($tripInfo['totalPriceList'] as $tripInfostotalPriceList) {
+                
+                    $fairDetails=$tripInfostotalPriceList['fd'];
+                   // print_r($fairDetails);
                     
-                    // Loop through each segment
-                    foreach ($resultreviewArr['tripInfos'] as $tripInfo) {
-                        foreach ($tripInfo['totalPriceList'] as $tripInfostotalPriceList) {
-                            $fairDetails = $tripInfostotalPriceList['fd'];
-                    
-                            foreach ($fairDetails as $fdindex => $fd) {
-                                // Determine passenger count
-                                if ($fdindex == "CHILD") {
-                                    $prcount = $child;
-                                } elseif ($fdindex == "INFANT") {
-                                    $prcount = $infant;
-                                } else {
-                                    $prcount = $adult;
-                                }
-                    
-                                // Initialize if not set
-                                if (!isset($fareSummary[$fdindex])) {
-                                    $fareSummary[$fdindex] = [
-                                        'count' => $prcount,
-                                        'BF' => 0,
-                                        'TAF' => 0,
-                                        'TF' => 0,
-                                    ];
-                                }
-                    
-                                // Accumulate values
-                                $fareSummary[$fdindex]['BF'] += ($fd['fC']['BF'] ?? 0) * $prcount;
-                                $fareSummary[$fdindex]['TAF'] += ($fd['fC']['TAF'] ?? 0) * $prcount;
-                                $fareSummary[$fdindex]['TF'] += ($fd['fC']['TF'] ?? 0) * $prcount;
-                    
-                                // Add to total payable
-                                $totalPayAmount += ($fd['fC']['TF'] ?? 0) * $prcount;
-                            }
+                    foreach($fairDetails as $fdindex => $fd)
+                    {
+                        
+                        if($fdindex=="CHILD")
+                        {
+                            $prcount=$child;
                         }
-                    }
-                    ?>
-                    
-                    <!-- Render final pricing blocks -->
-                    <?php foreach ($fareSummary as $type => $fare): ?>
+                        elseif($fdindex=="INFANT")
+                        {
+                            $prcount=$infant;
+                        }
+                        else
+                        {
+                            $prcount=$adult;
+                        }
+                        $totalPayAmount+=$fd['fC']['TF']*$prcount;
+                        ?>
+                        <!-- **** Pricing Block **** -->
                         <div class="sBlock">
-                            <span class="sBlock_title"><?= $fare['count'] ?> <?= $type ?></span>
-                            <div class="row sBlock_price">
-                                <div class="col-4"><span class="pLabel">Price: </span></div>
-                                <div class="col-8"><span class="pLabel cost"><span class="p_currency">₹</span> <?= $fare['BF'] ?></span></div>
+                          <span class="sBlock_title"><?=$prcount?> <?=$fdindex?></span>
+                          <div class="row sBlock_price">
+                            <div class="col-4">
+                              <span class="pLabel">Price: </span>
                             </div>
-                            <div class="row sBlock_price">
-                                <div class="col-4"><span class="pLabel">Tax: </span></div>
-                                <div class="col-8"><span class="pLabel cost"><span class="p_currency">₹</span> <?= $fare['TAF'] ?></span></div>
+                            <div class="col-8">
+                              <span class="pLabel cost"><span class="p_currency">₹</span> <?=$fd['fC']['BF']*$prcount ?? 0;?></span>
                             </div>
-                            <div class="row sBlock_price cDivider">
-                                <div class="col-4"><span class="pLabel">Total: </span></div>
-                                <div class="col-8"><span class="pLabel cost colWhite"><span class="p_currency">₹</span> <?= $fare['TF'] ?></span></div>
+                          </div>
+                          <div class="row sBlock_price">
+                            <div class="col-4">
+                              <span class="pLabel">Tax: </span>
                             </div>
+                            <div class="col-8">
+                              <span class="pLabel cost"><span class="p_currency">₹</span> <?=$fd['fC']['TAF']*$prcount?? 0;?></span>
+                            </div>
+                          </div>
+                          <div class="row sBlock_price cDivider">
+                            <div class="col-4">
+                              <span class="pLabel">Total: </span>
+                            </div>
+                            <div class="col-8">
+                              <span class="pLabel cost colWhite"><span class="p_currency">₹</span> <?=$fd['fC']['TF'] ?? 0;?></span>
+                            </div>
+                          </div>
                         </div>
-                    <?php endforeach; ?>
-
-
+                        <!-- **** Pricing Block End **** -->
+                        <?php
+                    }
+                }
+                }
+                ?>
                 <!-- **** Pricing Block **** -->
                 <div class="sBlock gTotal">
                   <div class="row sBlock_price">
@@ -881,70 +843,21 @@ include '../../layouts/header2.php';
         return isValid;
     }
 
-    // // Helper function to display error messages
-    // function showError(element, message) {
-    //     const errorMessage = $('<span class="error-message" style="color:red; font-size:12px;">' + message + '</span>');
-    //     element.after(errorMessage);
-    // }
-
-    // // Remove error message dynamically on input
-    // $(document).on('input change', 'input, select', function () {
-    //     const element = $(this);
-    //     if (element.next('.error-message').length) {
-    //         element.next('.error-message').remove();
-    //     }
-    // });
-    
-    // $(".js-advanceSelect").select2();
-    $('.js-advanceSelect').select2();
-
     // Helper function to display error messages
     function showError(element, message) {
-        // Remove any existing error message to prevent duplicates
-        const existingError = element.hasClass('js-advanceSelect')
-            ? element.siblings('.select2').next('.error-message')
-            : element.next('.error-message');
-        if (existingError.length) {
-            existingError.remove();
-        }
-
-        // Create the error message
-        const errorMessage = $('<span class="error-message" style="color:red; font-size:12px; display:block; margin-top:5px;">' + message + '</span>');
-
-        // If the element is a Select2 dropdown, append after the .select2-container
-        if (element.hasClass('js-advanceSelect')) {
-            element.siblings('.select2').after(errorMessage);
-        } else {
-            // For regular inputs, append after the element
-            element.after(errorMessage);
-        }
+        const errorMessage = $('<span class="error-message" style="color:red; font-size:12px;">' + message + '</span>');
+        element.after(errorMessage);
     }
 
-    // Remove error message dynamically on input or change
+    // Remove error message dynamically on input
     $(document).on('input change', 'input, select', function () {
         const element = $(this);
-        // For Select2, check the .select2-container sibling
-        if (element.hasClass('js-advanceSelect')) {
-            const error = element.siblings('.select2').next('.error-message');
-            if (error.length) {
-                error.remove();
-            }
-        } else {
-            const error = element.next('.error-message');
-            if (error.length) {
-                error.remove();
-            }
+        if (element.next('.error-message').length) {
+            element.next('.error-message').remove();
         }
     });
-
-    // Handle Select2 change event explicitly
-    $(document).on('select2:select', '.js-advanceSelect', function () {
-        const element = $(this);
-        const error = element.siblings('.select2').next('.error-message');
-        if (error.length) {
-            error.remove();
-        }
-    });
+    
+    $(".js-advanceSelect").select2();
 });
 
 // Set the max attribute of the date input to the current date

@@ -101,8 +101,8 @@ if (sizeof($activity_result_array) > 0) {
                   </span>
                   <small>(Excl of all taxes)</small>
                 </div>
-                <button class="expandSect" role="button" data-toggle="collapse" href="#collapseExample<?= $activity_result_array[$i]['exc_id'] ?>"
-                  aria-expanded="false" aria-controls="collapseExample">View Details</button>
+                <button class="expandSect" type="button" data-toggle="collapse" data-target="#collapseExample<?= $activity_result_array[$i]['exc_id'] ?>"
+                  aria-expanded="false" aria-controls="collapseExample<?= $activity_result_array[$i]['exc_id'] ?>" onclick="event.stopPropagation(); event.stopImmediatePropagation(); $('#collapseExample<?= $activity_result_array[$i]['exc_id'] ?>').collapse('toggle'); return false;">View Details</button>
 
               </div>
             </div>

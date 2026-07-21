@@ -19,15 +19,11 @@ function callAPI($method, $url, $data){
     // Set cURL options
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-        'apikey: 112342b116e718-0106-4e59-89fd-5cc5c9674300',
+        'apikey:1123423b81fdfd-4eb9-40a2-9c97-3a736e306b7e',
         'Content-Type: application/json'
-    ));
+    )); 
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($curl, CURLOPT_TIMEOUT, 30); // ⏱ total timeout
-    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10); // ⏱ connection timeout
-
-
     // Execute cURL request and get the response
     $result = curl_exec($curl);
 
@@ -102,7 +98,7 @@ if ($from && $to && $departureDate) {
     {
         if ($returnDate) {
             // Create a DateTime object from the input date
-            $date = DateTime::createFromFormat('m/d/Y', $returnDate);
+            $date = DateTime::createFromFormat('d/m/Y', $returnDate);
         
             // If the date is valid, format it to 'Y-m-d' (e.g., 2024-01-01)
             if ($date) {
@@ -134,7 +130,7 @@ if ($from && $to && $departureDate) {
         {
             if ($departureDate) {
                 // Create a DateTime object from the input date
-                $date = DateTime::createFromFormat('m/d/Y', $departureDate);
+                $date = DateTime::createFromFormat('d/m/Y', $departureDate);
             
                 // If the date is valid, format it to 'Y-m-d' (e.g., 2024-01-01)
                 if ($date) {
@@ -301,13 +297,11 @@ cleanExpiredCache('cache', $cacheTime);
         $resultArr = json_decode(file_get_contents($cacheFile), true);
 
     } else {
-        // print_r($data);
-        // die;
         // Make the API call and store the result in cache
         $result = callAPI('POST', 'https://apitest.tripjack.com/fms/v1/air-search-all', json_encode($data));
         $resultArr = json_decode($result, true);
-        // print_r($result);
-        // die;
+        //print_r($result);
+        
         // Save to cache
         if (!is_dir('cache')) {
             mkdir('cache', 0777, true); // Create the cache directory if it doesn't exist
@@ -322,7 +316,7 @@ cleanExpiredCache('cache', $cacheTime);
 // print_r($result);
 // die;
 // }
-//$result = callAPI('POST','https://apitest.tripjack.com/fms/v1/air-search-all',json_encode($data));
+//$result = callAPI('POST','https://api.tripjack.com/fms/v1/air-search-all',json_encode($data));
 
 $filtered = [];
 $filters = getReq('additionalFilters');
@@ -489,7 +483,7 @@ if( isset($resultArr['searchResult']['tripInfos'] ) )
                             'baggage_cabin' => $value['bI']['cB'] ?? 0,
                             'refundable' => $value['rT'] ?? false,
                             'free_meal' => $value['mI'] ?? false,
-                            'class' => $value['cc'] ?? false
+                            'class' => $value['cc']
                         ];
                         
                         if($variant=="CHILD")
@@ -690,7 +684,7 @@ if( isset($resultArr['searchResult']['tripInfos'] ) )
                             'baggage_cabin' => $value['bI']['cB'] ?? 0,
                             'refundable' => $value['rT'] ?? false,
                             'free_meal' => $value['mI'] ?? false,
-                            'class' => $value['cc'] ?? false
+                            'class' => $value['cc']
                         ];
                         if($variant=="CHILD")
                         {
@@ -893,7 +887,7 @@ if( isset($resultArr['searchResult']['tripInfos'] ) )
                                         'baggage_cabin' => $value['bI']['cB'] ?? 0,
                                         'refundable' => $value['rT'] ?? false,
                                         'free_meal' => $value['mI'] ?? false,
-                                        'class' => $value['cc'] ?? false,
+                                        'class' => $value['cc'] ?? '',
                                     ];
                                     if($variant=="CHILD")
                                     {

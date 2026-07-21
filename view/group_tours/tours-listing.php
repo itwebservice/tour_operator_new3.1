@@ -6,7 +6,7 @@ include_once "./inc/tour_booked_seats.php";
 $bk_seats1 = new total_booked_seats1();
 global $currency;
 
-// $currency = $_SESSION['session_currency_id'];
+$_SESSION['page_type'] = 'group';
 
 $sq_to = mysqli_fetch_assoc(mysqlQuery("select * from roe_master where currency_id='$currency'"));
 $to_currency_rate = $sq_to['currency_rate'];
@@ -660,9 +660,9 @@ $total_pax = intval($adults_count) + intval($child_wocount) + intval($cwb_count)
       $all_costs_array = array();
       $total_nights_array = array();
       if (!$tour_id) {
-        $query = "SELECT * FROM tour_master WHERE dest_id = '$dest_id'";
+        $query = "SELECT * FROM tour_master WHERE dest_id = '$dest_id' and active_flag = 'Active'";
       } else {
-        $query = "SELECT * FROM tour_master WHERE tour_id = '$tour_id'";
+        $query = "SELECT * FROM tour_master WHERE tour_id = '$tour_id' and active_flag = 'Active'";
       }
       $sq_query = mysqlQuery($query);
       while (($row_query  = mysqli_fetch_assoc($sq_query))) {
@@ -868,7 +868,7 @@ $total_pax = intval($adults_count) + intval($child_wocount) + intval($cwb_count)
           $infant_cost_total = 0;
           $sp_cost_total = 0;
           if ($total_pax == 1) {
-            $sp_cost_total = $single_person_cost;
+            $sp_cost_total = (float)($adult_cost);
           } else {
             $adult_cost_total = intval($adults_count) * (float)($adult_cost);
             $child_without_cost_total = intval($child_wocount) * (float)($child_without_cost);
@@ -1045,6 +1045,26 @@ $total_pax = intval($adults_count) + intval($child_wocount) + intval($cwb_count)
 
   .cardInfoLine::before {
     color: red !important;
+  }
+
+  /* Fix for View Details button clickability on mobile only */
+  @media (max-width: 768px) {
+    .priceTag .expandSect {
+      position: relative !important;
+      z-index: 999 !important;
+      pointer-events: auto !important;
+      display: inline-block !important;
+      min-height: 44px !important;
+      min-width: 44px !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+      margin-top: 15px !important;
+    }
+    
+    .divider.s2 {
+      position: relative;
+      z-index: 1;
+    }
   }
 </style>
 <script>

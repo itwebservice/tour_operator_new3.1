@@ -2,11 +2,12 @@
 
 include 'config.php';
 
-include BASE_URL.'model/model.php';
+include BASE_URL . 'model/model.php';
 
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'blog-inner';
 
 $blog_id = $_GET['blog_id'];
 
@@ -108,7 +109,7 @@ $blogData = $moduleData->getBlogData($blog_id);
                     <div class="ts-blog-card">
 
                         <div class="ts-blog-card-img">
-                            <?php if( $blogData && $blogData['url']) : ?>    
+                            <?php if ($blogData && $blogData['url']) : ?>
                                 <img src="<?php echo $blogData['url']; ?>" alt="Blog Image" class="img-fluid">
                             <?php endif; ?>
 
@@ -144,10 +145,14 @@ $blogData = $moduleData->getBlogData($blog_id);
 
                             </div> -->
 
-                            <h3 class="ts-blog-card-title"><?php if( $blogData && $blogData['title']) { echo $blogData['title']; }  ?></h3>
+                            <h3 class="ts-blog-card-title"><?php if ($blogData && $blogData['title']) {
+                                                                echo $blogData['title'];
+                                                            }  ?></h3>
 
                             <p class="ts-blog-card-description">
-                            <div class="custom_texteditor"><?php if( $blogData && $blogData['description']) { echo $blogData['description']; }  ?></div>
+                            <div class="custom_texteditor"><?php if ($blogData && $blogData['description']) {
+                                                                echo $blogData['description'];
+                                                            }  ?></div>
                             </p>
 
                         </div>
@@ -166,7 +171,7 @@ $blogData = $moduleData->getBlogData($blog_id);
 
 <!-- Contact Section End -->
 
-<?php include 'layouts/footer2.php';?>
+<?php include 'layouts/footer2.php'; ?>
 
 
 

@@ -8,10 +8,8 @@ try {
     $total_nights = isset($_POST['total_nights']) ? $_POST['total_nights'] : '';
     $current_package_id = isset($_POST['current_package_id']) ? $_POST['current_package_id'] : '';
     $quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] : '';
-    $is_ai_quotation_post = isset($_POST['is_ai_quotation']) ? $_POST['is_ai_quotation'] : '0';
-    $quotation_refer_id_post = isset($_POST['quotation_refer_id']) ? intval($_POST['quotation_refer_id']) : 0;
 
-    error_log("get_packages.php called - dest_id: " . $dest_id . ", total_nights: " . $total_nights . ", current_package_id: " . $current_package_id . ", quotation_id: " . $quotation_id . ", is_ai_quotation: " . $is_ai_quotation_post);
+    error_log("get_packages.php called - dest_id: " . $dest_id . ", total_nights: " . $total_nights . ", current_package_id: " . $current_package_id . ", quotation_id: " . $quotation_id);
     error_log("is_new_quotation: " . (empty($quotation_id) ? 'YES' : 'NO'));
 } catch (Exception $e) {
     error_log("Error in get_packages.php: " . $e->getMessage());
@@ -198,24 +196,13 @@ if (!empty($quotation_id)) {
         $quotation_tour_name = $sq_quotation_row['tour_name'];
         $quotation_refer_id_val = intval($sq_quotation_row['quotation_refer_id']);
         $quotation_package_id = intval($sq_quotation_row['package_id']);
-        // Prefer DB helper; also honor client flag (edit Tab2 always sends is_ai_quotation)
-        $is_ai_edit = is_ai_package_quotation($sq_quotation_row)
-            || ($is_ai_quotation_post === '1')
-            || ($quotation_package_id == 0);
-
-        if ($quotation_refer_id_val <= 0 && $quotation_refer_id_post > 0) {
-            $quotation_refer_id_val = $quotation_refer_id_post;
-        }
+        // quotation_refer_id > 0 = AI quotation, quotation_refer_id = 0 = package tour quotation
+        $is_ai_edit = ($quotation_refer_id_val > 0);
 
         // Package-tour edit: use saved package_id from quotation master
         if (!$is_ai_edit && empty($current_package_id) && $quotation_package_id > 0) {
             $current_package_id = $quotation_package_id;
         }
-    }
-} elseif ($is_ai_quotation_post === '1') {
-    $is_ai_edit = true;
-    if ($quotation_refer_id_post > 0) {
-        $quotation_refer_id_val = $quotation_refer_id_post;
     }
 }
 

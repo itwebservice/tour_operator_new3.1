@@ -41,13 +41,14 @@ if (mysqli_num_rows($sq_tariff) > 0) {
         $extra_bed_per_person = ($to_currency_rate != '') ? $to_currency_rate * $extra_bed_per_person : 0;
 
         // Add Per Adult cost
-        $adult_cost = $adult_count * $adult_cost_per_person;
-        array_push($all_costs_array, array(
-            'type' => 'Adult(PP)',
-            // 'cost' => $adult_cost,
-            'per_person' => $curr_symbol . ' ' . number_format($adult_cost_per_person, 2)
-        ));
-
+        if ($adult_count > 0) {
+            $adult_cost = $adult_count * $adult_cost_per_person;
+            array_push($all_costs_array, array(
+                'type' => 'Adult(PP)',
+                // 'cost' => $adult_cost,
+                'per_person' => $curr_symbol . ' ' . number_format($adult_cost_per_person, 2)
+            ));
+        }
         // Add other costs
         if ($child_wobed > 0) {
             array_push($all_costs_array, array(

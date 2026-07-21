@@ -23,30 +23,10 @@ if (isset($_POST['selectedValues'])) {
         $datareview['priceIds'][]=$value;
     }
     
-    if ($searchType === 'multicity') {
-         $segmentCount = count(explode(',', $_GET['from']));
-        if (count($datareview['priceIds']) !== 3) {
-            
-             echo json_encode([
-            "status" => [
-                "success" => false,
-                "httpStatus" => 400
-            ],
-            "errors" => [
-                [
-                    "errCode" => "1000",
-                    "message" => "Please select one flight for each leg (total $segmentCount selections required).",
-                    "details" => "Multi-city booking requires 1 PriceId per segment."
-                ]
-            ]
-        ]);
-            exit;
-        }
-    }
     $resultreview = callAPI('POST', 'https://apitest.tripjack.com/fms/v1/review', json_encode($datareview));
     $resultreviewArr = json_decode($resultreview, true);
-   
-    file_put_contents('resultreview.txt', print_r($resultreview, true));
+    
+    
     if( isset($resultreviewArr['status']['success'] ) && $resultreviewArr['status']['httpStatus']=200 && $resultreviewArr['status']['success']==true) 
     {
         $allFlighData=array();

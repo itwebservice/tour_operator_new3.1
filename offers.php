@@ -6,9 +6,12 @@ include 'config.php';
 
 include 'layouts/header2.php';
 
+$_SESSION['page_type'] = 'Offers';
 $coupon_codes = $moduleData->getB2cSettings('coupon_codes');
 
 $coupon_codes = ($coupon_codes != '' && $coupon_codes != 'null') ? json_decode($coupon_codes) : [];
+// Ensure $coupon_codes is always an array, not null
+$coupon_codes = is_array($coupon_codes) ? $coupon_codes : [];
 
 ?>
 
@@ -17,7 +20,6 @@ $coupon_codes = ($coupon_codes != '' && $coupon_codes != 'null') ? json_decode($
 <div class="c-pageTitleSect ts-pageTitleSect">
 
     <div class="container">
-
         <div class="row">
 
             <div class="col-md-7 col-12">
@@ -50,7 +52,7 @@ $coupon_codes = ($coupon_codes != '' && $coupon_codes != 'null') ? json_decode($
 
                     <li class="st-active">
 
-                        <a href="javascript:void(0)">Offers</a>
+                        <a href="<?= BASE_URL_B2C ?>offers.php">Offers</a>
 
                     </li>
 
@@ -68,40 +70,28 @@ $coupon_codes = ($coupon_codes != '' && $coupon_codes != 'null') ? json_decode($
 
 <!-- ********** Component :: Page Title End ********** -->
 
-<!-- Landing Section Start -->
-
-<!-- <section class="ts-inner-landing-section ts-font-poppins">
-
-    <img src="images/banner-2.jpg" alt="" class="img-fluid">
-
-    <div class="ts-inner-landing-content">
-
-        <div class="container">
-
-            <h1 class="ts-section-title">Offers</h1>
-
-        </div>
-
-    </div>
-
-</section> -->
-
-<!-- Landing Section End -->
-
-
-
-
-
 <!-- Testimonial Section Start -->
 
 <section class="ts-customer-testimonial-section ts-destinations-section">
 
     <div class="container">
 
+        <div class="ts-section-subtitle-content">
+
+            <h2 class="ts-section-subtitle">Offers </h2>
+
+            <span class="ts-section-subtitle-icon"><img src="images/traveler.png" alt="traveler" classimg-fluid></span>
+
+        </div>
+
+        <h2 class="ts-section-title">Hot Deals Inside</h2>
+        </h2>
         <div class="row">
 
             <?php
+            $offersFound = false;
 
+            if (!empty($coupon_codes) && is_array($coupon_codes)) {
             for ($i = 0; $i < sizeof($coupon_codes); $i++) {
 
 
@@ -112,6 +102,7 @@ $coupon_codes = ($coupon_codes != '' && $coupon_codes != 'null') ? json_decode($
 
                 if ($date < strtotime($valid_date)) {
 
+                    $offersFound = true;
                     $offer = '';
 
                     if ($coupon_codes[$i]->amount_in == 'Percentage') {
@@ -153,7 +144,19 @@ $coupon_codes = ($coupon_codes != '' && $coupon_codes != 'null') ? json_decode($
                     </div>
 
             <?php }
-            } ?>
+            }
+            }
+            
+            if (!$offersFound) {
+            ?>
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fa fa-gift fa-3x text-muted mb-3" aria-hidden="true"></i>
+                        <h4 class="text-muted">No Offers Available</h4>
+                        <p class="text-muted">Check back soon for exciting deals and offers!</p>
+                    </div>
+                </div>
+            <?php } ?>
 
         </div>
 

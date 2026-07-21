@@ -2095,8 +2095,8 @@ position: relative;
 }
 
 .ts-customer-testimonial-img img {
-width: 70px;
-height: 70px;
+width: 80px;
+height: 90px;
 border-radius: 50%;
 -o-object-fit: cover;
 object-fit: cover;
@@ -2777,8 +2777,8 @@ align-items: baseline;
 }
 
 .top-header .main-menu > ul > li > a {
-font-size: 14px;
-color: #555555;
+<!-- font-size: 14px; -->
+color: #000;
 font-weight: 500;
 }
 
@@ -3489,6 +3489,7 @@ margin-bottom: 0;
 margin: 0;
 padding: 0;
 cursor: pointer;
+gap: 15px;
 }
 
 /* Submenu styles */
@@ -3598,7 +3599,7 @@ padding: 0 5px 15px 5px;
 /* All styles for screen size over 992px
 ================================================== */
 @media only screen and (min-width: 992px) {
-    .w-33 {
+.w-33 {
 width: 33% !important;
 }
 

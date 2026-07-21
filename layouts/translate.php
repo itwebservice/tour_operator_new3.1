@@ -32,7 +32,7 @@ $sidebar_color = '#212529'; // Almost black (for clean UI)
 
 <!-- Google Translate Element (hidden) -->
 <div id="google_translate_element" style="display:none;"></div>
-<select id="lang-select" name="state" class="js-advanceSelect notranslate" translate="no">
+<select id="lang-select" name="state" class="js-advanceSelect notranslate link" translate="no">
     <!-- Top common ones -->
     <option value="en">English</option>
     <option value="es">Spanish</option>
@@ -130,8 +130,14 @@ $sidebar_color = '#212529'; // Almost black (for clean UI)
 
 <script>
     $(document).ready(function() {
-        $('#lang-select2').html($('#lang-select').html());
-        $('#lang-select, #lang-select2').select2();
+        // Populate mobile dropdown if it exists (but don't initialize select2 yet)
+        if ($('#lang-select2').length && $('#lang-select').length) {
+            $('#lang-select2').html($('#lang-select').html());
+        }
+        
+        // Initialize select2 only for desktop dropdown
+        // Mobile dropdown will be initialized in scripts.js when offcanvas opens
+        $('#lang-select').select2();
 
         $('.select2-container').attr('translate', 'no').addClass('notranslate');
 
@@ -186,5 +192,31 @@ $sidebar_color = '#212529'; // Almost black (for clean UI)
             const langCode = currentLang.split('/')[2];
             $('#lang-select, #lang-select2').val(langCode).trigger('change.select2');
         }
+
+        // Mobile language dropdown initialization is handled in scripts.js
+        // Just sync the value when offcanvas opens
+        $('#mobileSidebar').on('shown.bs.offcanvas', function () {
+            if ($('#lang-select2').length && $('#lang-select').length) {
+                var currentLang = getCookie('googtrans');
+                var $langSelect2 = $('#lang-select2');
+                if (currentLang) {
+                    const langCode = currentLang.split('/')[2];
+                    if ($langSelect2.val() !== langCode) {
+                        $langSelect2.val(langCode);
+                        if ($langSelect2.hasClass('select2-hidden-accessible')) {
+                            $langSelect2.trigger('change.select2');
+                        }
+                    }
+                } else {
+                    var desktopLang = $('#lang-select').val();
+                    if ($langSelect2.val() !== desktopLang) {
+                        $langSelect2.val(desktopLang);
+                        if ($langSelect2.hasClass('select2-hidden-accessible')) {
+                            $langSelect2.trigger('change.select2');
+                        }
+                    }
+                }
+            }
+        });
     });
 </script>

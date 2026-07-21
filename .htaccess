@@ -1,12 +1,8 @@
-<IfModule mod_headers.c>
-  <FilesMatch "\.(php|less|ttf|ttc|otf|eot|woff|woff2|font.css|css|js)$$">
-    Header always set Access-Control-Allow-Origin "*"
-    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
-  </FilesMatch>
+
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php81” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php81___lsphp .php .php8 .phtml
 </IfModule>
- 
-# Optional: preflight support
-RewriteEngine On
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ $1 [R=200,L]
+# php -- END cPanel-generated handler, do not edit

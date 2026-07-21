@@ -7,6 +7,7 @@ include 'config.php';
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'about';
 
 
 $result = mysqli_fetch_all(mysqlQuery("SELECT about_us FROM `b2c_settings`"), MYSQLI_ASSOC);
@@ -227,8 +228,8 @@ $aboutusData = !empty($result) ? json_decode($result[0]['about_us'], true) : [];
                         </ul>
 
                     </div>
-                    <div class="d-flex ml-5px pb-3">
-                        <a href="contact.php" class="about-contact-btn rounded-3 ml-5px">Contact Us</a>
+                    <div class="d-flex ml-5px pb-3" style="padding-top: 1rem !important;">
+                        <a href="contact.php" class="btn btn-primary">Contact Us</a>
                     </div>
 
                 </div>

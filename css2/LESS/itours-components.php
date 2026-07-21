@@ -1319,9 +1319,9 @@ writing-mode: lr-tb;
 width: 117px;
 height: 30px;
 line-height: 25px;
-top: -3px;
+top: -23px;
 position: relative;
-left: -16px;
+left: -12px;
 text-align: center;
 font-size: 9px;
 }

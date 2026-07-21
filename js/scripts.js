@@ -1,35 +1,108 @@
 $(function() {
-
-  
-
   $('form').attr('autocomplete', 'off');
-
   $('input').attr('autocomplete', 'off');
-
-
-
-  //Lazy Load the cities
-
-  // city_lzloading('#hotel_city_filter,#activities_city_filter,#city,#ffrom_city_filter,#fto_city_filter');
-
 });
+
+ function scrollToSection() {
+	const element = document.getElementById("season-spcl");
+	element.scrollIntoView({ behavior: "smooth" });
+}
+
 $(document).ready(function () {
-    // Partner Slider
-    $(".pageSlider").owlCarousel({
-      items: 1,
-      loop:true,
-      dots: true,
-      smartSpeed: 800, // Duration of the transition
-      easing: "easeInOutQuad", // Custom easing function for jQuery Easing
-      animateOut: "fadeOut", // Fade out animation
-      animateIn: "fadeIn",
-      autoplay: true,
-      autoplayTimeout: 3000,
-      autoplayHoverPause: true,
+    
+    // Auto-focus on search field when dropdown opens
+    $(document).on('select2:open', () => {
+        setTimeout(() => {
+            document.querySelector('.select2-container--open .select2-search__field')?.focus();
+        }, 0);
     });
-  
-    $(".cardSlider").owlCarousel({
+  // ! Trending Tours slider
+  if ($(".js-trendingTours").length) {
+    $(".js-trendingTours").owlCarousel({
       items: 4,
+      nav: true,
+      dots: true,
+      margin: 24,
+      autoplay: true,
+      loop: false,
+      autoplayTimeout: 5000,
+      autoplayHoverPause: true,
+      responsive: {
+        0: {
+          items: 1,
+        },
+        480: {
+          items: 1,
+        },
+        768: {
+          items: 3,
+        },
+        960: {
+          items: 4,
+        },
+      },
+    });
+  }
+
+  // ! Popular Activities slider
+  if ($(".js-activities").length) {
+    $(".js-activities").owlCarousel({
+      items: 4,
+      nav: true,
+      dots: true,
+      margin: 24,
+      autoplay: true,
+      loop: false,
+      autoplayTimeout: 5000,
+      autoplayHoverPause: true,
+      responsive: {
+        0: {
+          items: 1,
+        },
+        480: {
+          items: 1,
+        },
+        768: {
+          items: 3,
+        },
+        960: {
+          items: 4,
+        },
+      },
+    });
+  }
+
+  // ! Testimonial slider
+  if ($(".js-testimonials").length) {
+    $(".js-testimonials").owlCarousel({
+      items: 3,
+      nav: true,
+      dots: false,
+      margin: 42,
+      autoplay: true,
+      autoplayTimeout: 5000,
+      autoplayHoverPause: true,
+      responsive: {
+        0: {
+          items: 1,
+        },
+        480: {
+          items: 1,
+        },
+        768: {
+          items: 2,
+        },
+        920: {
+          items: 3,
+        },
+      },
+    });
+  }
+
+  // ! Gallery slider
+  if ($(".js-gallerySlider").length) {
+    $(".js-gallerySlider").owlCarousel({
+      items: 5,
       nav: true,
       dots: false,
       margin: 24,
@@ -41,15 +114,17 @@ $(document).ready(function () {
           items: 2,
         },
         768: {
-          items: 3,
+          items: 4,
         },
         960: {
-          items: 4,
+          items: 5,
         },
       },
     });
-  
-    // Partner Slider
+  }
+
+  // ! Partner Slider
+  if ($(".partnerSlider").length) {
     $(".partnerSlider").owlCarousel({
       items: 8,
       dots: false,
@@ -75,16 +150,120 @@ $(document).ready(function () {
         },
       },
     });
-  
-    // Partner Slider
-    $(".cta-slider").owlCarousel({
+  }
+
+  // ! Blog slider
+  if ($(".js-blogSlider").length) {
+    $(".js-blogSlider").owlCarousel({
+      items: 2,
+      nav: true,
+      dots: false,
+      margin: 48,
+      responsive: {
+        0: {
+          items: 1,
+        },
+        480: {
+          items: 1,
+        },
+        768: {
+          items: 2,
+        },
+      },
+    });
+  }
+
+  // Partner Slider
+  if ($(".js-ctaSlider").length) {
+    $(".js-ctaSlider").owlCarousel({
       items: 1,
       dots: true,
     });
-  
-    // Select 2
-    $(".js-advanceSelect").select2();
-  
+  }
+
+  // --- Slick slider call
+  // if ($(".banner-slider-02").length) {
+  //   $(".banner-slider-02").owlCarousel({
+  //     items: 1,
+  //     dots: true,
+  //     autoplay: true,
+  //     loop: true,
+  //     smartSpeed: 800, // Duration of the transition
+  //     easing: "easeInOutQuad", // Custom easing function for jQuery Easing
+  //     animateOut: "fadeOut", // Fade out animation
+  //     animateIn: "fadeIn",
+  //   });
+  // }
+
+  if ($(".subMenus").length) {
+    $(".subMenus").hover(function () {
+      $(".dropdown-toggle", this).trigger("click");
+    });
+  }
+
+  // ! Gallery image grid
+  if ($(".imageGrid").length) {
+    $(".imageGrid").masonry({
+      // Options
+      itemSelector: ".imageGrid-item",
+      columnWidth: ".imageGrid-item",
+      percentPosition: true,
+      gutter: 30,
+    });
+  }
+
+  // Select 2 - Initialize only desktop dropdowns (exclude mobile ones in offcanvas)
+  $(".js-advanceSelect").not('#lang-select2, #currency-mobile').select2();
+
+  // Initialize select2 for mobile dropdowns when offcanvas opens
+  $('#mobileSidebar').on('shown.bs.offcanvas', function () {
+    var $offcanvasBody = $(this).find('.offcanvas-body');
+    
+    // Initialize currency dropdown
+    var $currencyMobile = $('#currency-mobile');
+    if ($currencyMobile.length) {
+      // Destroy if already initialized to avoid conflicts
+      if ($currencyMobile.hasClass('select2-hidden-accessible')) {
+        $currencyMobile.select2('destroy');
+      }
+      $currencyMobile.select2({
+        dropdownParent: $offcanvasBody
+      });
+    }
+    
+    // Initialize language dropdown
+    var $langSelect2 = $('#lang-select2');
+    if ($langSelect2.length) {
+      // Make sure it has options
+      if ($langSelect2.find('option').length === 0 && $('#lang-select').length) {
+        $langSelect2.html($('#lang-select').html());
+      }
+      // Destroy if already initialized to avoid conflicts
+      if ($langSelect2.hasClass('select2-hidden-accessible')) {
+        $langSelect2.select2('destroy');
+      }
+      $langSelect2.select2({
+        dropdownParent: $offcanvasBody
+      });
+    }
+    
+    // Sync currency values between desktop and mobile
+    if ($("#currency").length && $currencyMobile.length) {
+      var desktopCurrency = $("#currency").val();
+      if (desktopCurrency && $currencyMobile.val() !== desktopCurrency) {
+        $currencyMobile.val(desktopCurrency);
+        // Update select2 display without triggering change event
+        if ($currencyMobile.hasClass('select2-hidden-accessible')) {
+          var $container = $currencyMobile.next('.select2-container');
+          if ($container.length) {
+            var selectedText = $currencyMobile.find('option:selected').text();
+            $container.find('.select2-selection__rendered').text(selectedText);
+          }
+        }
+      }
+    }
+  });
+
     // Calendar
     jQuery(".js-calendar-date")
       .datetimepicker({
@@ -98,8 +277,8 @@ $(document).ready(function () {
         format: "m/d/Y H:i",
         minDate: new Date() // Disable past dates
       });
+});
 
-  });
   function multicityrenderInputs(multicityIndex) {
     // Select 2
     $(".js-advanceSelect").select2();
@@ -368,14 +547,13 @@ function error_msg_alert(message, base_url = '') {
       var base_url1 = base_url + 'notification_modal.php';
 
   }
-$('#site_alert').html('');
-$('#site_alert').removeClass();
-  $('#site_alert').addClass('error');
-  $('#site_alert').vialert({
-    type: 'danger',
-    title: 'Error',
-    message: message,
-    delay: 3000
+
+  var class_name = 'alert-danger';
+
+  $.post(base_url1, { message: message, class_name: class_name }, function(data) {
+
+      $('#site_alert').html(data);
+
   });
 
 }
@@ -394,14 +572,12 @@ function success_msg_alert(message, base_url = '') {
 
   }
 
-$('#site_alert').html('');
-$('#site_alert').removeClass();
-  $('#site_alert').addClass('success');
-  $('#site_alert').vialert({
-    type: 'danger',
-    title: 'Error',
-    message: message,
-    delay: 3000
+  var class_name = 'alert-success';
+
+  $.post(base_url1, { message: message, class_name: class_name }, function(data) {
+
+      $('#site_alert').html(data);
+
   });
 
 }
@@ -1089,7 +1265,8 @@ $("#single_tour_enq_form").validate({
   function get_selected_currency() {
     var base_url = $("#base_url").val();
   
-    var currency_id = $("#currency").val();
+    // Get currency from desktop or mobile dropdown
+    var currency_id = $("#currency").val() || $("#currency-mobile").val();
     
     //Set selected currency in php session also
   
@@ -1247,35 +1424,5 @@ function postRedirect(url, data) {
     postRedirect(base_url + 'action.php', actionData);
   }
   
-  function enq_to_action_page(type, item_id, enq_data) {
-    var base_url = $("#base_url").val();
+
   
-    if (type == "6") {
-      var visa_type_arr = [];
-  
-      var input_name = "result_day-" + item_id;
-  
-      $("input[name=" + input_name + "]:checked").each(function () {
-        visa_type_arr.push($(this).val());
-      });
-  
-      if (visa_type_arr.length == 0) {
-        error_msg_alert("Please select at least one visa type!", base_url);
-  
-        return false;
-      }
-  
-      enq_data.push(visa_type_arr[0]);
-    }
-  
-    enq_data = JSON.stringify(enq_data);
-  
-    window.location =
-      base_url +
-      "action.php?item_id=" +
-      item_id +
-      "&type=" +
-      type +
-      "&enq_data=" +
-      enq_data;
-  }

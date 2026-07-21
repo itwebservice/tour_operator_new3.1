@@ -5,6 +5,13 @@ $(document).ready(function () {
 		$('form').attr('autocomplete', 'off');
 		$('input').attr('autocomplete', 'off');
 	});
+	
+    // Auto-focus on search field when dropdown opens
+    $(document).on('select2:open', () => {
+        setTimeout(() => {
+            document.querySelector('.select2-container--open .select2-search__field')?.focus();
+        }, 0);
+    });
 
 	if ($('.dropdown.selectable').length > 0) {
 		$('.dropdown.selectable .dropdown-item').on('click', function(){

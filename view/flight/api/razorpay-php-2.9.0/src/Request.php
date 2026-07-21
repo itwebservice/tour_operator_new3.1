@@ -64,6 +64,10 @@ class Request
     public function setCurlSslOpts($curl)
     {
         curl_setopt($curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_1);
+        // Disable SSL certificate verification for development/testing only
+        // WARNING: Remove this in production! Fix SSL certificate instead.
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
     }
 
     /**

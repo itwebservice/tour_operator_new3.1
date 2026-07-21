@@ -31,9 +31,10 @@ $localIP = getHostByName(getHostName());
 
 // Create connection
 $servername = "localhost";
-$username = "root";
-$password = "";
-$db_name = "itours_latest";
+$username = "itourjh2_idemo4_u";
+$password = "f2*Ouj9DJo]k";
+$db_name = "itourjh2_demo4";
+
 
 // $db_name = "tour_operator_theme";
 global $connection;
@@ -46,7 +47,7 @@ if (!$connection) {
 }
 
 
-define('BASE_URL', 'http://localhost/testdemo1/crm/');
+define('BASE_URL', 'https://www.itoursdemo.co.in/demo-4/crm/');
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");
 $b2b_index_url = BASE_URL . 'Tours_B2B/view/index.php';
@@ -805,9 +806,9 @@ function is_ai_package_quotation($quotation_row)
   if (!is_array($quotation_row)) {
     return false;
   }
+  $refer_id = isset($quotation_row['quotation_refer_id']) ? intval($quotation_row['quotation_refer_id']) : 0;
   $package_id = isset($quotation_row['package_id']) ? intval($quotation_row['package_id']) : 0;
-  // AI quotations are always saved with package_id = 0
-  return $package_id == 0;
+  return $refer_id > 0 && $package_id == 0;
 }
 
 function get_quotation_package_lookup_id($quotation_row)

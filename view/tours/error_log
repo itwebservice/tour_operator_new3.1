@@ -1536,3 +1536,9 @@ Stack trace:
 #1 /home4/itourjh2/public_html/theme-1_2-php/view/tours/tours-listing.php(590): mysqlQuery(NULL)
 #2 {main}
   thrown in /home4/itourjh2/public_html/theme-1_2-php/config.php on line 137
+[15-Jul-2026 13:35:45 Asia/Kolkata] PHP Fatal error:  Uncaught ValueError: mysqli_query(): Argument #2 ($query) cannot be empty in /home/itourjh2/public_html/demo-1/config.php:134
+Stack trace:
+#0 /home/itourjh2/public_html/demo-1/config.php(134): mysqli_query(Object(mysqli), '')
+#1 /home/itourjh2/public_html/demo-1/view/tours/tours-listing.php(581): mysqlQuery(NULL)
+#2 {main}
+  thrown in /home/itourjh2/public_html/demo-1/config.php on line 134

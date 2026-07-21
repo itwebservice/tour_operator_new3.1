@@ -139,7 +139,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
     <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
     <input type="hidden" id="quotation_id" value="<?= $quotation_id ?>" />
     <?php
-    $is_ai_quotation = is_ai_package_quotation($sq_quotation) ? 1 : 0;
+    $is_ai_quotation = (intval($sq_quotation['quotation_refer_id']) > 0) ? 1 : 0;
     $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
     $sq_pacakge = array('dest_id' => '', 'package_name' => '');
     if ($package_lookup_id > 0) {
@@ -234,7 +234,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                         </div>
                                     </div>
                                     <div class="table-responsive">
-                                        <table style="width:100%" id="dynamic_table_list_update_hidden" name="dynamic_table_list_update_hidden" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
+                                        <table style="width:100%" id="dynamic_table_list_update" name="dynamic_table_list_update" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
                                             <h3 class="editor_title" style="width:100%;">Tour Itinerary</h3>
                                             <?php
                                             $offset = 0;
@@ -776,9 +776,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
     // Resolve the visible itinerary table for the selected package (AJAX-loaded content)
     function getUpdateItineraryTable() {
         if ($('#is_ai_quotation').val() === '1') {
-            // Prefer AJAX-loaded AI table inside package_name_div (avoid hidden duplicate)
-            var aiTable = document.querySelector('#package_name_div #dynamic_table_list_update')
-                || document.getElementById('dynamic_table_list_update');
+            var aiTable = document.getElementById('dynamic_table_list_update');
             if (aiTable) {
                 return { table: aiTable, package_id: '0' };
             }
@@ -792,8 +790,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
             }
         }
         return {
-            table: document.querySelector('#package_name_div #dynamic_table_list_update')
-                || document.getElementById('dynamic_table_list_update'),
+            table: document.getElementById('dynamic_table_list_update'),
             package_id: package_id || $('#img_package_id').val()
         };
     }
@@ -926,9 +923,9 @@ function findImageUrl($image_path, $is_new_quotation = false)
                     flag2 = true,
                     flag3 = true;
 
-                // Check special attraction validation (skip char limit for AI quotations)
+                // Check special attraction validation
                 var attractionInput = row.querySelector('input[id*="special_attaraction"]');
-                if (attractionInput && attractionInput.id && $('#is_ai_quotation').val() !== '1') {
+                if (attractionInput && attractionInput.id) {
                     try {
                         flag1 = validate_spattration(attractionInput.id);
                     } catch (e) {
@@ -1385,50 +1382,6 @@ function findImageUrl($image_path, $is_new_quotation = false)
         load_packages_with_filter();
     }
 
-    // Initialize WYSIWYG for AI inclusions/exclusions after AJAX load
-    function initAiInclusionExclusionEditors() {
-        var $incl = $('#package_name_div #inclusions_ai');
-        var $excl = $('#package_name_div #exclusions_ai');
-        if (!$incl.length && !$excl.length) {
-            return;
-        }
-
-        var inclusionsContent = $incl.val() || '';
-        var exclusionsContent = $excl.val() || '';
-
-        $incl.add($excl).removeClass('feature_editor');
-
-        setTimeout(function() {
-            $incl.add($excl).addClass('feature_editor');
-            if (typeof $().wysiwyg === 'function') {
-                try {
-                    if ($incl.length && !$incl.data('wysiwyg')) {
-                        $incl.wysiwyg({
-                            controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
-                            initialContent: ''
-                        });
-                        if (inclusionsContent) {
-                            $incl.wysiwyg('setContent', inclusionsContent);
-                        }
-                    }
-                    if ($excl.length && !$excl.data('wysiwyg')) {
-                        $excl.wysiwyg({
-                            controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
-                            initialContent: ''
-                        });
-                        if (exclusionsContent) {
-                            $excl.wysiwyg('setContent', exclusionsContent);
-                        }
-                    }
-                } catch (e) {
-                    console.log('AI WYSIWYG init error:', e);
-                    $incl.val(inclusionsContent);
-                    $excl.val(exclusionsContent);
-                }
-            }
-        }, 300);
-    }
-
     // Function to load packages with explicit nights parameter for update
     function package_dynamic_reflect_with_nights(dest_name, total_nights) {
         var dest_id = $('#' + dest_name).val();
@@ -1467,8 +1420,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 $('#package_name_div').html(result);
 
                 if ($('#is_ai_quotation').val() === '1') {
-                    console.log('AI quotation loaded - initializing inclusions/exclusions editors');
-                    initAiInclusionExclusionEditors();
+                    console.log('AI quotation loaded - skipping package preselection');
                     return;
                 }
 

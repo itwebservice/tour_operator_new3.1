@@ -5,6 +5,7 @@ include 'config.php';
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'terms';
 
 $terms_cond = $moduleData->getB2cSettings('terms_of_use');
 
@@ -22,7 +23,7 @@ $terms_cond = $moduleData->getB2cSettings('terms_of_use');
 
                 <div class="searchHeading">
 
-                <span class="pageTitle m0">Terms and Conditions</span>
+                    <span class="pageTitle m0">Terms and Conditions</span>
 
                 </div>
 
@@ -36,17 +37,17 @@ $terms_cond = $moduleData->getB2cSettings('terms_of_use');
 
                 <ul>
 
-                <li>
+                    <li>
 
-                    <a href="<?= BASE_URL_B2C ?>">Home</a>
+                        <a href="<?= BASE_URL_B2C ?>">Home</a>
 
-                </li>
+                    </li>
 
-                <li class="st-active">
+                    <li class="st-active">
 
-                    <a href="javascript:void(0)">Terms and Conditions</a>
+                        <a href="javascript:void(0)">Terms and Conditions</a>
 
-                </li>
+                    </li>
 
                 </ul>
 
@@ -68,7 +69,7 @@ $terms_cond = $moduleData->getB2cSettings('terms_of_use');
 
             <div class="col-12">
 
-            <div class="custom_texteditor"><?= $terms_cond ?></div>
+                <div class="custom_texteditor"><?= $terms_cond ?></div>
 
             </div>
 

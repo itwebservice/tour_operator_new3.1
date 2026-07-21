@@ -13,7 +13,7 @@ curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification (
 
 // Set the request headers
 curl_setopt($curl, CURLOPT_HTTPHEADER, [
-    'apikey: 112342b116e718-0106-4e59-89fd-5cc5c9674300',  // Your API key
+    'apikey: 1123423b81fdfd-4eb9-40a2-9c97-3a736e306b7e',  // Your API key
     'Content-Type: application/json'  // Specify that we are sending JSON
 ]);
 

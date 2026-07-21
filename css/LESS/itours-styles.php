@@ -2245,20 +2245,112 @@ width: 20%;
 
 
 @media (max-width: 768px) {
-  .c-discount .discount-text{
-display:inline-flex;
-height:0;
-line-height:0;
-width:unset;
-top:-3px;
-left:9px;
+.c-cardList .cardList-image,
+.c-card .card-image {
+overflow: visible !important;
+position: relative !important;
 }
-  .ml-5px{
-    margin-left:5px;
-  }
+
+.c-cardList .cardList-image .typeOverlay,
+.c-card .card-image .typeOverlay {
+overflow: visible !important;
+}
+
+.c-cardList .cardList-image .c-discount:not(.c-hide),
+.c-cardList .cardList-image .typeOverlay .c-discount:not(.c-hide),
+.c-card .card-image .c-discount:not(.c-hide),
+.c-card .card-image .typeOverlay .c-discount:not(.c-hide) {
+left: 0 !important;
+top: 0 !important;
+width: 80px !important;
+height: 82px !important;
+background-size: 80px 82px !important;
+background-repeat: no-repeat !important;
+z-index: 10 !important;
+position: absolute !important;
+}
+
+.c-cardList .cardList-image .c-discount.c-hide,
+.c-cardList .cardList-image .typeOverlay .c-discount.c-hide,
+.c-card .card-image .c-discount.c-hide,
+.c-card .card-image .typeOverlay .c-discount.c-hide {
+display: none !important;
+}
+
+.c-discount .discount-text{
+display: inline-block !important;
+height: 24px !important;
+line-height: 22px !important;
+width: 95px !important;
+top: 18px !important;
+left: -12px !important;
+font-size: 8px !important;
+transform: rotate(-45deg) !important;
+}
+
+.c-discount .discount-text > span:not(.c-hide) {
+font-size: 8px !important;
+white-space: nowrap !important;
+overflow: hidden !important;
+text-overflow: ellipsis !important;
+max-width: 90px !important;
+display: inline !important;
+}
+
+.c-discount .discount-text > span.c-hide {
+display: none !important;
+}
+
+@media (max-width: 480px) {
+.c-cardList .cardList-image .c-discount:not(.c-hide),
+.c-cardList .cardList-image .typeOverlay .c-discount:not(.c-hide),
+.c-card .card-image .c-discount:not(.c-hide),
+.c-card .card-image .typeOverlay .c-discount:not(.c-hide) {
+left: 0 !important;
+top: 0 !important;
+width: 70px !important;
+height: 72px !important;
+background-size: 70px 72px !important;
+z-index: 10 !important;
+position: absolute !important;
+}
+
+.c-cardList .cardList-image .c-discount.c-hide,
+.c-cardList .cardList-image .typeOverlay .c-discount.c-hide,
+.c-card .card-image .c-discount.c-hide,
+.c-card .card-image .typeOverlay .c-discount.c-hide {
+display: none !important;
+}
+
+.c-discount .discount-text {
+width: 85px !important;
+height: 20px !important;
+line-height: 18px !important;
+font-size: 7px !important;
+top: 15px !important;
+left: -10px !important;
+transform: rotate(-45deg) !important;
+white-space: nowrap !important;
+}
+
+.c-discount .discount-text > span:not(.c-hide) {
+font-size: 7px !important;
+display: inline !important;
+vertical-align: baseline !important;
+white-space: nowrap !important;
+}
+
+.c-discount .discount-text > span.c-hide {
+display: none !important;
+}
+}
+
+.ml-5px{
+margin-left:5px;
+}
 .width-100{
-		width: 100% !important;
-	}
+width: 100% !important;
+}
 .column-5-no-margin > * {
 
 width: 50%;
@@ -4207,9 +4299,9 @@ position: relative;
 
 .ts-customer-testimonial-img img {
 
-width: 70px;
+width: 80px;
 
-height: 70px;
+height: 90px;
 
 border-radius: 50%;
 
@@ -5581,7 +5673,7 @@ align-items: baseline;
 
 .top-header .main-menu > ul > li > a {
 
-font-size: 14px;
+font-size: 16px;
 
 color: #555555;
 
@@ -10616,7 +10708,7 @@ padding: 0;
 
 .main-menu ul ul li a {
 
-font-size: 12px;
+font-size: 14px;
 
 color: #555;
 
@@ -11421,6 +11513,54 @@ margin-bottom: 0 !important;
 
 }
 
+.custom_texteditor {
+
+height: auto !important;
+
+max-height: none !important;
+
+overflow: visible !important;
+
+word-wrap: break-word;
+
+display: block !important;
+
+}
+
+.custom_texteditor p,
+
+.custom_texteditor div,
+
+.custom_texteditor li {
+
+height: auto !important;
+
+max-height: none !important;
+
+overflow: visible !important;
+
+text-overflow: clip !important;
+
+display: block !important;
+
+white-space: normal !important;
+
+}
+
+.custom_texteditor span {
+
+display: inline !important;
+
+height: auto !important;
+
+max-height: none !important;
+
+overflow: visible !important;
+
+white-space: normal !important;
+
+}
+
 
 
 .c-alert {
@@ -11460,6 +11600,20 @@ outline: none !important;
 background-color: #f9f9f9;
 
 padding: 50px 0;
+
+height: auto !important;
+
+overflow: visible !important;
+
+}
+
+.c-containerDark .custom_texteditor {
+
+height: auto !important;
+
+max-height: none !important;
+
+overflow: visible !important;
 
 }
 

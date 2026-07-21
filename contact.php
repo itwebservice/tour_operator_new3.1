@@ -7,7 +7,7 @@ include 'config.php';
 include 'layouts/header2.php';
 
 $service = $_GET['service'];
-$headerStripeNote = $moduleData->getB2cSettings('header_strip_note');
+$_SESSION['page_type'] = 'contact';
 $googleMapScript = $moduleData->getB2cSettings('google_map_script');
 
 global $app_contact_no;
@@ -112,7 +112,7 @@ global $app_contact_no;
 
                         </span>
 
-                        <a href="<?= $app_contact_no ?>" class="ts-contact-info-link"><?= $app_contact_no ?></a>
+                        <a href="<?= 'tel:'.$app_contact_no ?>" class="ts-contact-info-link"><?= $app_contact_no ?></a>
 
                     </li>
 
@@ -126,18 +126,6 @@ global $app_contact_no;
 
                         <a href="mailto:<?= $app_email_id_send ?>"
                             class="ts-contact-info-link"><?= $app_email_id_send ?></a>
-
-                    </li>
-
-                    <li class="ts-contact-info-item">
-
-                        <span class="ts-contact-info-icon">
-
-                            <i class="fa fa-clock-o"></i>
-
-                        </span>
-
-                        <a class="ts-contact-info-link"><?= $headerStripeNote; ?></a>
 
                     </li>
 
@@ -371,18 +359,19 @@ global $app_contact_no;
 <a href="#" class="scrollup">Scroll</a>
 <style>
     .ts-map-section {
-    width: 100%;
-    height: 100vh; /* Full viewport height */
-    padding: 0;
-    margin-bottom:2rem;
-}
+        width: 100%;
+        height: 100vh;
+        /* Full viewport height */
+        padding: 0;
+        margin-bottom: 2rem;
+    }
 
-.ts-map-section .map-iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    display: block;
-}
+    .ts-map-section .map-iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+    }
 </style>
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields

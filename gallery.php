@@ -5,6 +5,7 @@ include 'config.php';
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'gallary_new';
 
 $gallary_array = $moduleData->getGalleryImages();
 

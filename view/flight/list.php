@@ -448,7 +448,7 @@ include '../../layouts/header2.php';
                                         <button class="tab-button" onclick="openTab(event, 'flightResults_RETURN')"><?=$toData['city']?> 
                                             <i class="fa-sharp fa-solid fa-plane me-2" aria-hidden="true"></i> 
                                             <?=$fromData['city']?>
-                                            <?php $returnDateFormate = DateTime::createFromFormat("m/d/Y", $returnDate); ?>
+                                            <?php $returnDateFormate = DateTime::createFromFormat("d/m/Y", $returnDate); ?>
                                             <p class="flightResultsDate"><?=$returnDateFormate->format("D, M jS Y");?></p>
                                         </button>
                                       </div>
@@ -558,7 +558,7 @@ include '../../layouts/header2.php';
                                                 <button class="tab-button <?php if($index==0){ echo "active";}?>" onclick="openTab(event, 'flightResults_<?=$index?><?=$row['from']?><?=$row['to']?>')"><?=$TabfromData['city']?> 
                                                     <i class="fa-sharp fa-solid fa-plane me-2" aria-hidden="true"></i> 
                                                     <?=$TabtoData['city']?>
-                                                    <?php $departureDateFormate = DateTime::createFromFormat("m/d/Y", $row['departureDate']); ?>
+                                                    <?php $departureDateFormate = DateTime::createFromFormat("d/m/Y", $row['departureDate']); ?>
                                                     <p class="flightResultsDate"><?=$departureDateFormate->format("D, M jS Y");?></p>
                                                 </button>
                                                 
@@ -985,7 +985,7 @@ include '../../layouts/header2.php';
         												aria-expanded="false"
         												aria-controls="collapseExample"
         											>
-        												<div class="flightSection" style="padding-bottom:50px; !important">
+        												<div class="flightSection">
         													<div class="fs_start">
         														<div class="airport_details">
         															<span class="flight_detail_lbl uppercase"
@@ -1250,7 +1250,7 @@ include '../../layouts/header2.php';
         																	<div class="flight_number">${flight_number}</div>
         																</div>
         																<div class="flight-timings">
-        																	<div class="flightSection" style="padding-bottom:50px; !important">
+        																	<div class="flightSection">
         																		<div class="fs_start">
         																			<div class="airport_details">
         																				<span class="flight_detail_lbl uppercase bold" >
@@ -1557,7 +1557,7 @@ include '../../layouts/header2.php';
                                 } else {
                                     // If the response is not successful, handle the error
                                     alert(response.errors[0].message); // Show error message in alert (you can customize the display)
-                                    // console.error(response.errors[0].message); // Log the error in the console for debugging
+                                    console.error(response.errors[0].message); // Log the error in the console for debugging
                                     $(".bottom-fixed").hide();
                                 }
                             },
@@ -1663,36 +1663,6 @@ include '../../layouts/header2.php';
                         });
 
 					    let type='';
-					    if(searchType=='multicity')
-					    {
-					        renderStopsFilter(response.stops);
-					        renderAirlineFilter(response.airline);
-					        renderarrivalTimeFilter(response.arrivalTime);
-					        renderdepartureTimeFilter(response.departureTime);
-					        
-                                    
-					        $.each(response, function (index, value) {
-                                if (index !== 'airline' && index !== 'arrivalTime' && index !== 'departureTime' && index !== 'stops') {
-                                    // Check if the index is in updatedclassArray
-                                    var arrayIndex = $.inArray(index, updatedclassArray);
-                                    if (arrayIndex !== -1) {
-                                        // Remove the matched index from updatedclassArray
-                                        updatedclassArray.splice(arrayIndex, 1);
-                                        // Call the render function
-                                        renderFlightCards(value, index);
-                                    }
-                                }
-                            });
-                            
-                            $.each(updatedclassArray, function (index, value) {
-                                // Call the render function
-                                enderFlightCardsNotfound(value);
-                            });
-                            
-
-					        
-					    }
-					   // comment by me 
 					    if(response.ONWARD)
 					    {
 					        type="ONWARD";
@@ -1732,8 +1702,35 @@ include '../../layouts/header2.php';
 					        type="RETURN";
 					        enderFlightCardsNotfound(type);
 					    }
-					   // alert("HI");
-					    // comment by taken 
+					    if(searchType=='multicity')
+					    {
+					        renderStopsFilter(response.stops);
+					        renderAirlineFilter(response.airline);
+					        renderarrivalTimeFilter(response.arrivalTime);
+					        renderdepartureTimeFilter(response.departureTime);
+					        
+                                    
+					        $.each(response, function (index, value) {
+                                if (index !== 'airline' && index !== 'arrivalTime' && index !== 'departureTime' && index !== 'stops') {
+                                    // Check if the index is in updatedclassArray
+                                    var arrayIndex = $.inArray(index, updatedclassArray);
+                                    if (arrayIndex !== -1) {
+                                        // Remove the matched index from updatedclassArray
+                                        updatedclassArray.splice(arrayIndex, 1);
+                                        // Call the render function
+                                        renderFlightCards(value, index);
+                                    }
+                                }
+                            });
+                            
+                            $.each(updatedclassArray, function (index, value) {
+                                // Call the render function
+                                enderFlightCardsNotfound(value);
+                            });
+                            
+
+					        
+					    }
 					    if(response.errors)
 					    {
 					        alert(response.errors[0].message);

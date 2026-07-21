@@ -3,6 +3,7 @@ include '../../config.php';
 include BASE_URL . 'model/model.php';
 include '../../layouts/header2.php';
 
+$_SESSION['page_type'] = 'package';
 $currency = $_SESSION['session_currency_id'];
 $b2b_agent_code = $_SESSION['b2b_agent_code'];
 
@@ -736,6 +737,24 @@ if ($tour_id != '') {
         $all_orgcosts_array = array();
         $total_cost1 = 0;
 
+        // Fetch offers from custom_package_offers table
+        $sq_offers_count = mysqli_num_rows(mysqlQuery("select * from custom_package_offers where (from_date <='$date1' and to_date>='$date1') and package_id='$row_query[package_id]'"));
+        if ($sq_offers_count > 0) {
+          $sq_offers = mysqlQuery("select * from custom_package_offers where (from_date <='$date1' and to_date>='$date1') and package_id='$row_query[package_id]'");
+          while ($row_offers = mysqli_fetch_assoc($sq_offers)) {
+            array_push($offer_options_array, array(
+              'offer_type' => $row_offers['type'],
+              'offer_in' => $row_offers['offer_in'],
+              'offer_amount' => (float)($row_offers['offer_amount']),
+              'coupon_code' => $row_offers['coupon_code'],
+              'agent_type' => $row_offers['agent_type'],
+              'from_date' => $row_offers['from_date'],
+              'to_date' => $row_offers['to_date'],
+              'currency_id' => $currency_id
+            ));
+          }
+        }
+
         $q = "select * from custom_package_tariff where (`from_date` <= '$date1' and `to_date` >= '$date1') and (`min_pax` <= '$costing_pax' and `max_pax` >= '$costing_pax') and `package_id`='$row_query[package_id]'";
         $sq_tariff = mysqlQuery($q);
         while ($row_tariff = mysqli_fetch_assoc($sq_tariff)) {
@@ -939,6 +958,26 @@ if ($tour_id != '') {
 
   .cardInfoLine::before {
     color: red !important;
+  }
+
+  /* Fix for View Details button clickability on mobile only */
+  @media (max-width: 768px) {
+    .priceTag .expandSect {
+      position: relative !important;
+      z-index: 999 !important;
+      pointer-events: auto !important;
+      display: inline-block !important;
+      min-height: 44px !important;
+      min-width: 44px !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+      margin-top: 15px !important;
+    }
+    
+    .divider.s2 {
+      position: relative;
+      z-index: 1;
+    }
   }
 </style>
 <!-- ********** Component :: Tours Listing End ********** -->

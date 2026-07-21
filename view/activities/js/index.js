@@ -28,14 +28,19 @@ $(function () {
 				return false;
             }
             
+            // Fix NaN issue by providing default values
+            var adultCount = parseInt(adult) || 0;
+            var childCount = parseInt(child) || 0;
+            var infantCount = parseInt(infant) || 0;
+            
 			var activity_array = [];
 			activity_array.push({
 				'activity_city_id':activity_city_id,
 				'activities_id':activities_id,
 				'checkDate':checkDate,
-				'adult':parseInt(adult),
-				'child':parseInt(child),
-				'infant':parseInt(infant)
+				'adult':adultCount,
+				'child':childCount,
+				'infant':infantCount
 			})
 			$.post(crm_base_url+'controller/b2b_excursion/b2b/search_session_save.php', { activity_array: activity_array }, function (data) {
 				window.location.href = base_url + 'view/activities/activities-listing.php';

@@ -8,5 +8,4 @@ $sq = mysqli_fetch_assoc(mysqlQuery("select id from state_master where id ='$sq_
 $sq_state = mysqli_fetch_assoc(mysqlQuery("select * from app_settings where setting_id ='1'"));
 $state_id = $sq_state['state_id'];
 
-echo $sq['id'].'-'.$state_id;
-?>
+echo $sq['id'] . '-' . $state_id;

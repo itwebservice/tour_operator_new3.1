@@ -3,11 +3,11 @@ include 'config.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-$service = $_GET['service'];
 
+$service = $_GET['service'];
 global $app_contact_no, $currency;
 
-
+$_SESSION['page_type'] = 'group';
 $slug = $_GET['slug'] ?? null;
 $tour_id = null;
 if ($slug) {

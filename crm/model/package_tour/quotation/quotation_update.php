@@ -19,11 +19,9 @@ public function quotation_master_update()
 	$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
 	$quotation_refer_id = 0;
 
-	if ($is_ai_quotation == '1') {
+	if ($is_ai_quotation == '1' && $dest_id > 0) {
+		$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
 		$package_id = 0;
-		if ($dest_id > 0) {
-			$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
-		}
 	}
 	$tour_name = $_POST['tour_name'];
     $from_date = $_POST['from_date'];
@@ -755,11 +753,9 @@ function quotation_daywiseimages_update(){
 			$is_ai_quotation = isset($_POST['is_ai_quotation']) ? $_POST['is_ai_quotation'] : '0';
 			$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
 			$quotation_refer_id = 0;
-			if ($is_ai_quotation == '1') {
+			if ($is_ai_quotation == '1' && $dest_id > 0) {
+				$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
 				$package_id = 0;
-				if ($dest_id > 0) {
-					$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
-				}
 				mysqlQuery("update package_tour_quotation_master set package_id='0', quotation_refer_id='$quotation_refer_id' where quotation_id='$quotation_id'");
 			}
 			

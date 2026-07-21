@@ -16,7 +16,8 @@ class result_master
             $total_cost = 0;
             $child_cost = 0;
             for ($j = $i + 1; $j <= $i + 1; $j++) {
-                if (isset($cost_arr[$j]['rooms']['category']) && $cost_arr[$i]['rooms']['category'] == $cost_arr[$j]['rooms']['category'] && $cost_arr[$i]['rooms']['room_count'] == $cost_arr[$j]['rooms']['room_count']) {
+                if (isset($cost_arr[$j]['rooms']['category']) && $cost_arr[$i]['rooms']['category'] == $cost_arr[$j]['rooms']['category'] && $cost_arr[$i]['rooms']['room_count'] == $cost_arr[$j]['rooms']['room_count'] && 
+                    isset($cost_arr[$i]['rooms']['meal_plan']) && isset($cost_arr[$j]['rooms']['meal_plan']) && $cost_arr[$i]['rooms']['meal_plan'] == $cost_arr[$j]['rooms']['meal_plan']) {
 
                     $total_cost = $cost_arr[$i]['rooms']['room_cost'];
 
@@ -30,6 +31,7 @@ class result_master
                             "room_count" =>      $cost_arr[$i]['rooms']['room_count'],
                             "check_date" =>      $cost_arr[$i]['rooms']['check_date'],
                             "category" =>        $cost_arr[$i]['rooms']['category'],
+                            "meal_plan" =>       $cost_arr[$i]['rooms']['meal_plan'],
                             "room_cost" =>       (float)($total_cost),
                             "child_cost" =>      $child_cost,
                             "extra_bed_cost" =>  (float)($extrabed_cost),
@@ -56,6 +58,7 @@ class result_master
                             "room_count" =>      $cost_arr[$i]['rooms']['room_count'],
                             "check_date" =>      $cost_arr[$i]['rooms']['check_date'],
                             "category" =>        $cost_arr[$i]['rooms']['category'],
+                            "meal_plan" =>       $cost_arr[$i]['rooms']['meal_plan'],
                             "room_cost" =>       (float)($total_cost),
                             "child_cost" =>      (float)($child_cost),
                             "extra_bed_cost" =>  (float)($cost_arr[$i]['rooms']['extra_bed_cost']),
@@ -78,7 +81,11 @@ class result_master
         $result_category_array = array();
         $room_array = array();
         for ($i = 0; $i < sizeof($final_result_array); $i++) {
-            array_push($result_category_array, $final_result_array[$i]['rooms']['category']);
+            $category_meal_plan = $final_result_array[$i]['rooms']['category'];
+            if (isset($final_result_array[$i]['rooms']['meal_plan']) && $final_result_array[$i]['rooms']['meal_plan'] != '') {
+                $category_meal_plan .= ' (' . $final_result_array[$i]['rooms']['meal_plan'] . ')';
+            }
+            array_push($result_category_array, $category_meal_plan);
             array_push($room_array, $final_result_array[$i]['rooms']['room_count']);
         }
         //Array for same room-count and same category but different dates
@@ -104,7 +111,11 @@ class result_master
                 $final_result_array1 = array();
                 for ($i = 0; $i < sizeof($category_array[$k]); $i++) {
 
-                    if ($category_array[$k][$i]['category'] == $result_category_array[$c]) {
+                    $category_meal_plan = $category_array[$k][$i]['category'];
+                    if (isset($category_array[$k][$i]['meal_plan']) && $category_array[$k][$i]['meal_plan'] != '') {
+                        $category_meal_plan .= ' (' . $category_array[$k][$i]['meal_plan'] . ')';
+                    }
+                    if ($category_meal_plan == $result_category_array[$c]) {
                         array_push($final_result_array1, $category_array[$k][$i]);
                     }
                 }
@@ -130,10 +141,15 @@ class result_master
                 array_push($markup_type_array, $category_array1[$i][$j]['markup_type']);
                 array_push($markup_amount_array, (float)($category_array1[$i][$j]['markup_amount']));
 
+                $category_meal_plan = $category_array1[$i][$j]['category'];
+                if (isset($category_array1[$i][$j]['meal_plan']) && $category_array1[$i][$j]['meal_plan'] != '') {
+                    $category_meal_plan .= ' (' . $category_array1[$i][$j]['meal_plan'] . ')';
+                }
                 $categorywise_array = array(
                     'room_count' =>      $category_array1[$i][$j]['room_count'],
-                    'category' =>        $category_array1[$i][$j]['category'],
+                    'category' =>        $category_meal_plan,
                     'check_date' =>      $category_array1[$i][$j]['check_date'],
+                    'meal_plan' =>       $category_array1[$i][$j]['meal_plan'],
                     'room_cost' => ($room_cost_array),
                     'child_cost' => ($child_cost_array),
                     'daywise_exbcost' => ($extra_bed_cost_array),

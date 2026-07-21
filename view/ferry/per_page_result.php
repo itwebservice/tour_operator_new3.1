@@ -94,7 +94,7 @@ if (sizeof($ferry_results_array) > 0) {
                                         <span class="c-hide ferry-currency-id"><?= $ferry_results_array[$ferry_i]['currency_id'] ?></span>
                                     </span> <small>(Excl of all taxes)</small>
                                 </div>
-                                <button class="expandSect" role="button" data-toggle="collapse" href="#collapseExample<?= $ferry_results_array[$ferry_i]['tariff_id'] ?>" aria-expanded="false" aria-controls="collapseExample">View Details</button>
+                                <button class="expandSect" type="button" data-toggle="collapse" data-target="#collapseExample<?= $ferry_results_array[$ferry_i]['tariff_id'] ?>" aria-expanded="false" aria-controls="collapseExample<?= $ferry_results_array[$ferry_i]['tariff_id'] ?>" onclick="event.stopPropagation(); event.stopImmediatePropagation(); $('#collapseExample<?= $ferry_results_array[$ferry_i]['tariff_id'] ?>').collapse('toggle'); return false;">View Details</button>
                             </div>
                         </div>
                     </div>

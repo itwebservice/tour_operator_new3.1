@@ -2,6 +2,7 @@
 include 'config.php';
 //Include header
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'refund-policy';
 $refund_policy = $moduleData->getB2cSettings('refund_policy');
 ?>
 <div class="c-pageTitleSect">
@@ -10,19 +11,19 @@ $refund_policy = $moduleData->getB2cSettings('refund_policy');
             <div class="col-md-7 col-12">
                 <!-- *** Search Head **** -->
                 <div class="searchHeading">
-                <span class="pageTitle m0">Refund Policy</span>
+                    <span class="pageTitle m0">Refund Policy</span>
                 </div>
                 <!-- *** Search Head End **** -->
             </div>
 
             <div class="col-md-5 col-12 c-breadcrumbs">
                 <ul>
-                <li>
-                    <a href="<?= BASE_URL_B2C ?>">Home</a>
-                </li>
-                <li class="st-active">
-                    <a href="javascript:void(0)">Refund Policy</a>
-                </li>
+                    <li>
+                        <a href="<?= BASE_URL_B2C ?>">Home</a>
+                    </li>
+                    <li class="st-active">
+                        <a href="javascript:void(0)">Refund Policy</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -33,7 +34,7 @@ $refund_policy = $moduleData->getB2cSettings('refund_policy');
     <div class="container">
         <div class="row">
             <div class="col-12">
-            <div class="custom_texteditor"><?= $refund_policy ?></div>
+                <div class="custom_texteditor"><?= $refund_policy ?></div>
             </div>
         </div>
     </div>

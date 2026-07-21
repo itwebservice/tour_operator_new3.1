@@ -6,10 +6,10 @@
 
       <div class="btn-group c-btnGroup" role="group" aria-label="Basic radio toggle button group">
         <input type="radio" class="btn-check" name="transfer_type" value="oneway" id="oneway" autocomplete="off" onclick="fields_enable_disable()" checked>
-        <label class="btn btn-outline-primary" for="oneway">One Way</label>
+        <label class="btn btn-outline-secondary" for="oneway">One Way</label>
 
         <input type="radio" class="btn-check" value="roundtrip" id="roundtrip" name="transfer_type" autocomplete="off" onclick="fields_enable_disable()">
-        <label class="btn btn-outline-primary" for="roundtrip">Round Trip</label>
+        <label class="btn btn-outline-secondary" for="roundtrip">Round Trip</label>
 
       </div>
 

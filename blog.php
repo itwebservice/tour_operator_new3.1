@@ -2,11 +2,12 @@
 
 include 'config.php';
 
-include BASE_URL.'model/model.php';
+include BASE_URL . 'model/model.php';
 
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'blog';
 
 $blog_id = $_GET['blog_id'];
 
@@ -20,53 +21,53 @@ $b2c_blogs = $moduleData->getBlogs();
 
 <div class="c-pageTitleSect ts-pageTitleSect">
 
-<div class="container">
+  <div class="container">
 
-  <div class="row">
+    <div class="row">
 
-    <div class="col-md-7 col-12">
+      <div class="col-md-7 col-12">
 
 
 
-      <!-- *** Search Head **** -->
+        <!-- *** Search Head **** -->
 
-      <div class="searchHeading">
+        <div class="searchHeading">
 
-        <span class="pageTitle mb-0">Blog</span>
+          <span class="pageTitle mb-0">Blog</span>
+
+        </div>
+
+        <!-- *** Search Head End **** -->
 
       </div>
 
-      <!-- *** Search Head End **** -->
+
+
+      <div class="col-md-5 col-12 c-breadcrumbs">
+
+        <ul>
+
+          <li>
+
+            <a href="<?= BASE_URL_B2C ?>">Home</a>
+
+          </li>
+
+          <li class="st-active">
+
+            <a href="javascript:void(0)">Blog</a>
+
+          </li>
+
+        </ul>
+
+      </div>
+
+
 
     </div>
-
-
-
-    <div class="col-md-5 col-12 c-breadcrumbs">
-
-      <ul>
-
-        <li>
-
-          <a href="<?= BASE_URL_B2C ?>">Home</a>
-
-        </li>
-
-        <li class="st-active">
-
-          <a href="javascript:void(0)">Blog</a>
-
-        </li>
-
-      </ul>
-
-    </div>
-
-
 
   </div>
-
-</div>
 
 </div>
 
@@ -92,7 +93,7 @@ $b2c_blogs = $moduleData->getBlogs();
 
 <!-- Landing Section End -->
 
-<input type='hidden' value='<?php echo json_encode($b2c_blogs,JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>' id='b2c_blogs' name='b2c_blogs'/>
+<input type='hidden' value='<?php echo json_encode($b2c_blogs, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>' id='b2c_blogs' name='b2c_blogs' />
 
 
 
@@ -106,15 +107,14 @@ $b2c_blogs = $moduleData->getBlogs();
 
 
 
-<?php include 'layouts/footer2.php';?>
+<?php include 'layouts/footer2.php'; ?>
 
 <script type="text/javascript" src="js2/scripts.js"></script>
 
 <script>
+  $(document).ready(function() {
 
-$(document).ready(function () {
 
-    
 
     var hotel_results = $('#b2c_blogs').val();
 
@@ -122,26 +122,27 @@ $(document).ready(function () {
 
     $('#pagination-container').pagination({
 
-        dataSource:(hotel_results) ,
+      dataSource: (hotel_results),
 
-        pageSize: 3,
+      pageSize: 3,
 
-        isForced:true,
+      isForced: true,
 
-        callback: function(data, pagination) {
+      callback: function(data, pagination) {
 
-                
 
-            $.post('blog_data_fetch.php', { data: data }, function (html) {
 
-                $('#data-container').html(html);
+        $.post('blog_data_fetch.php', {
+          data: data
+        }, function(html) {
 
-            });
+          $('#data-container').html(html);
 
-        }
+        });
+
+      }
 
     });
 
-});
-
+  });
 </script>

@@ -644,7 +644,70 @@ $room_cat = $_POST['room_cat'];
     $('#pickup_time').datetimepicker({
         format: 'd-m-Y H:i'
     });
-    $('#state').select2();
+    
+    // Initialize state dropdown with search enabled
+    function initStateDropdown() {
+        if ($('#state').length) {
+            // Destroy if already initialized
+            try {
+                if ($('#state').hasClass('select2-hidden-accessible')) {
+                    $('#state').select2('destroy');
+                }
+            } catch(e) {}
+            
+            // Initialize with search enabled and proper dropdown parent
+            $('#state').select2({
+                minimumResultsForSearch: 0, // Enable search box
+                dropdownParent: $('#book_modal') // Attach dropdown to modal to avoid z-index issues
+            });
+            
+            // Ensure search field is enabled and focusable when dropdown opens
+            $('#state').on('select2:open', function() {
+                setTimeout(function() {
+                    var $searchField = $('.select2-container--open .select2-search__field');
+                    if ($searchField.length) {
+                        // Remove any disabled/readonly attributes
+                        $searchField.prop('disabled', false);
+                        $searchField.prop('readonly', false);
+                        $searchField.removeAttr('disabled');
+                        $searchField.removeAttr('readonly');
+                        
+                        // Ensure it's clickable and typeable
+                        $searchField.css({
+                            'pointer-events': 'auto !important',
+                            'user-select': 'text !important',
+                            '-webkit-user-select': 'text !important',
+                            'cursor': 'text !important',
+                            'z-index': '99999 !important'
+                        });
+                        
+                        // Remove any event handlers that might block input
+                        $searchField.off('click.select2');
+                        $searchField.off('mousedown.select2');
+                        
+                        // Focus and select
+                        $searchField.focus();
+                        $searchField[0].focus();
+                    }
+                    
+                    // Also ensure the dropdown itself has proper z-index
+                    $('.select2-dropdown').css({
+                        'z-index': '99999 !important',
+                        'pointer-events': 'auto !important'
+                    });
+                }, 50);
+            });
+        }
+    }
+    
+    // Initialize after modal is shown
+    $('#book_modal').on('shown.bs.modal', function () {
+        setTimeout(initStateDropdown, 200);
+    });
+    
+    // Also try immediately
+    setTimeout(initStateDropdown, 600);
+    
     var exampleEl = document.getElementById('total_cost')
     var tooltip = new bootstrap.Tooltip(exampleEl)
 

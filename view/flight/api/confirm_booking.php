@@ -18,59 +18,13 @@ $bookingData = [
     ]
 ];
 //print_r($bookingData);
-// Make the API call
+
 $confirmbook = callAPI('POST', 'https://apitest.tripjack.com/oms/v1/air/confirm-book', json_encode($bookingData));
-
-// Log the booking data and raw response for debugging
-file_put_contents('bookingData.txt', print_r($bookingData, true));
-file_put_contents('raw_confirmbook.txt', $confirmbook);
-
-// Decode the API response
-$confirmbookresult = json_decode($confirmbook, true);
-
-// Log the decoded result for debugging
-file_put_contents('decoded_log_confirm.txt', print_r($confirmbookresult, true));
-
-// Check if the response is valid and successful
-if (
-    is_array($confirmbookresult) &&
-    isset($confirmbookresult['status']['success']) && 
-    $confirmbookresult['status']['httpStatus'] == '200' && 
-    $confirmbookresult['status']['success'] == '1'
-) {
-//     // Handle successful booking
-//     echo json_encode([
-//         'status' => 'success',
-//         'message' => 'Booking confirmed successfully.'
-//     ]);
-// } else {
-//     // Handle errors
-//     if (isset($confirmbookresult['errors']) && is_array($confirmbookresult['errors']) && isset($confirmbookresult['errors'][0]['message'])) {
-//         echo json_encode([
-//             'status' => 'error',
-//             'message' => $confirmbookresult['errors'][0]['message']
-//         ]);
-//     } else {
-//         echo json_encode([
-//             'status' => 'error',
-//             'message' => 'An unexpected error occurred. No error message provided.'
-//         ]);
-//     }
-// }
-
-// die;
-// $confirmbook = callAPI('POST', 'https://apitest.tripjack.com/oms/v1/air/confirm-book', json_encode($bookingData));
-// file_put_contents('bookingData.txt', print_r($bookingData, true));
-// file_put_contents('log_confirm.txt', print_r($confirmbook, true));
-// $confirmbookresult=json_decode($confirmbook,true);
-// file_put_contents('decoded_log_confirm.txt', print_r($confirmbookresult, true));
-
-
-
-// if (isset($confirmbookresult['status']['success']) && 
-// $confirmbookresult['status']['httpStatus'] == 200 && 
-// $confirmbookresult['status']['success'] == 1)
-// {
+$confirmbookresult=json_decode($confirmbook,true);
+if (isset($confirmbookresult['status']['success']) && 
+$confirmbookresult['status']['httpStatus'] == 200 && 
+$confirmbookresult['status']['success'] == true)
+{
 $flight_review_data=$_SESSION['flight_review_data'];
 $search_data=$_SESSION['search_data'];
 
@@ -86,7 +40,7 @@ if ($result && mysqli_num_rows($result) > 0) {
             $bookingdetails = callAPI('POST', 'https://apitest.tripjack.com/oms/v1/booking-details', json_encode($bookingData));
             
             $bookingDetailsResult = json_decode($bookingdetails, true);
-    file_put_contents('confirmbookingDetailsResult.txt', print_r($bookingDetailsResult, true));
+    
                 // Check order status
                 $orderStatus = $bookingDetailsResult['order']['status'] ?? 'UNKNOWN';
                 switch ($orderStatus) {
@@ -290,10 +244,6 @@ if ($result && mysqli_num_rows($result) > 0) {
  {
      $ticket_id = mysqli_insert_id($conn);
      $flightIndex=0;
-     $update_sql = "UPDATE ticket_master SET invoice_pr_id=$ticket_id WHERE ticket_id = $ticket_id";
-    if (mysqli_query($conn, $update_sql)) {
-    }
-
      foreach ($bookingDetailsResult['itemInfos']['AIR']['tripInfos'] as $tripInfoindex => $tripInfo) 
      {
         foreach ($tripInfo['sI'] as $flight) 
@@ -318,7 +268,7 @@ if ($result && mysqli_num_rows($result) > 0) {
                  $sub_category='NULL';
                  $no_of_pieces='NULL';
                  $aircraft_type='NULL';
-                 $operating_carrier=$flight['fD']['aI']['name'];
+                 $operating_carrier='NULL';
                  $frequent_flyer='NULL';
                  
                  $basic_fare=$baseFare;
@@ -577,8 +527,6 @@ if ($result && mysqli_num_rows($result) > 0) {
 }
 else
 {
-    
-    
     if (isset($farevalidateresult['errors']) && is_array($farevalidateresult['errors']) && isset($farevalidateresult['errors'][0]['message'])) {
         // Respond with an error message in JSON format
         echo json_encode([

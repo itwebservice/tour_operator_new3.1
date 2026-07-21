@@ -14,9 +14,9 @@ $cart_data_arr = array();
 $cart_checkout_data = array();
 $sq_reg = mysqli_fetch_assoc(mysqlQuery("select cart_data from b2b_registration where register_id='$register_id'"));
 $cart_checkout_data = json_decode($sq_reg['cart_data']);
-if($cart_checkout_data != null){
-  for($i=0;$i<sizeof($cart_checkout_data);$i++){
-    array_push($cart_data_arr,$cart_checkout_data[$i]);
+if ($cart_checkout_data != null) {
+  for ($i = 0; $i < sizeof($cart_checkout_data); $i++) {
+    array_push($cart_data_arr, $cart_checkout_data[$i]);
   }
 }
 
@@ -30,14 +30,13 @@ $hotel_info_arr['tax'] = $applied_taxes;
 
 //Hotel Image
 $sq_singleImage = mysqli_fetch_assoc(mysqlQuery("select hotel_pic_url from hotel_vendor_images_entries where hotel_id='$id'"));
-if($sq_singleImage['hotel_pic_url']!=''){
+if ($sq_singleImage['hotel_pic_url'] != '') {
   $image = $sq_singleImage['hotel_pic_url'];
-  $newUrl1 = preg_replace('/(\/+)/','/',$image);
+  $newUrl1 = preg_replace('/(\/+)/', '/', $image);
   $newUrl1 = explode('uploads', $newUrl1);
-  $newUrl = BASE_URL.'uploads'.$newUrl1[1];
-}
-else{
-  $newUrl = BASE_URL.'images/dummy-image.jpg';
+  $newUrl = BASE_URL . 'uploads' . $newUrl1[1];
+} else {
+  $newUrl = BASE_URL . 'images/dummy-image.jpg';
 }
 $hotel_info_arr['newUrl'] = $newUrl;
 $hotel_info_arr['date'] = $check_indate;
@@ -48,21 +47,21 @@ $currency = $sq_app_setting['currency'];
 
 $check_indate = date("Y-m-d", strtotime($check_indate));
 $sq_hotel_offer = mysqlQuery("select * from hotel_offers_tarrif where type='Coupon' and (from_date <='$check_indate' and to_date>='$check_indate') and hotel_id='$id'");
-while($row_hotel_offer = mysqli_fetch_assoc($sq_hotel_offer)){
+while ($row_hotel_offer = mysqli_fetch_assoc($sq_hotel_offer)) {
 
-    $arr = array(
+  $arr = array(
     'offer_in' => $row_hotel_offer['offer'],
     'offer_amount' => $row_hotel_offer['offer_amount'],
     'coupon_code' => $row_hotel_offer['coupon_code'],
     'agent_type' => $row_hotel_offer['agent_type'],
     'currency_id' => $currency
-    );
-    array_push($coupon_info_arr, $arr);
+  );
+  array_push($coupon_info_arr, $arr);
 }
 $hotel_info_arr['coupon_info_arr'] = $coupon_info_arr;
 
 $cart_arr1 = array(
-  'service'=> array(
+  'service' => array(
     'uuid'      => $huuid,
     'name'      => 'Hotel',
     'id'        => $id,
@@ -79,4 +78,3 @@ $cart_data_arr = json_encode($cart_data_arr);
 $sq_update = mysqlQuery("update b2b_registration set cart_data='$cart_data_arr' where register_id='$register_id'");
 
 echo json_encode($hotel_info_arr);
-?>

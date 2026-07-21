@@ -506,7 +506,6 @@ font-family: 'Lato', sans-serif;
 .c-starRating.cust.s7 .stars::before {
 	content: "\6e \6e \6e \6e \6e \6e \6e";
 }
-
 .c-amenitiesType2 {
 	margin: 0;
 	padding: 0;
@@ -1013,6 +1012,56 @@ section.dataContainer:after {
 /* ----------------------------------------------
     Component :: Header Refactor
 ------------------------------------------------- */
+
+.c-pageHeaderTop .sectionList {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+.c-pageHeaderTop .sectionList > li {
+	align-items: center;
+	color: #fff;
+	display: inline-flex;
+	flex-direction: row;
+	gap: 6px;
+	list-style-type: none;
+	position: relative;
+	margin-right: 25px;
+}
+.c-pageHeaderTop .sectionList > li .fab {
+	font-size: 0.9rem;
+	line-height: normal;
+}
+.c-pageHeaderTop .sectionList > li::before {
+	background-color: rgba(219, 219, 219, 0.4705882353);
+	content: "";
+	height: 12px;
+	position: absolute;
+	right: -15px;
+	top: 8px;
+	width: 1px;
+}
+.c-pageHeaderTop .sectionList > li .link {
+	background-color: transparent;
+	color: #fff;
+	font-size: 0.84rem;
+	padding: 6px 0;
+	line-height: normal;
+	text-decoration: none;
+}
+.c-pageHeaderTop .sectionList > li:last-child {
+	margin-right: 0;
+}
+.c-pageHeaderTop .sectionList > li:last-child::before {
+	display: none;
+}
+.c-pageHeaderTop .sectionList > li .c-advanceSelect .select2-selection {
+	border: none;
+	color: #fff;
+	font-size: 0.84rem;
+	padding: 0 4px !important;
+	position: relative;
+}
 .c-pageHeader {
 	position: relative;
 	display: block;
@@ -1685,9 +1734,9 @@ ul.c-search-tabs .nav-link.active {
 	width: 117px;
 	height: 30px;
 	line-height: 25px;
-	top: -3px;
+	top: -23px;
 	position: relative;
-	left: -16px;
+	left: -12px;
 	text-align: center;
 	font-size: 9px;
 }
@@ -6524,7 +6573,7 @@ body .ts-best-place-slider.owl-carousel button.owl-dot {
 	top: 1px;
 }
 .listingPageTitleSection {
-	height: 200px !important;
+	height: 300px !important;
 }
 .filterPriceSidebar .btn {
 	box-shadow: none;
@@ -6759,9 +6808,9 @@ h2.ts-video-title {
 	padding: 5rem 0 5rem 0;
 }
 @media (max-width: 991px) {
-	 .overflow-x-auto {
-    overflow-x: auto;
-  }
+	.overflow-x-auto {
+		overflow-x: auto;
+	}
 	.top-1 {
 		width: 310px;
 		left: 40px;

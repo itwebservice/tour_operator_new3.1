@@ -5,6 +5,7 @@ include 'config.php';
 //Include header
 
 include 'layouts/header2.php';
+$_SESSION['page_type'] = 'services';
 
 
 $servicesData = mysqli_fetch_all(mysqlQuery("SELECT services FROM `b2c_settings`"), MYSQLI_ASSOC);
@@ -99,10 +100,20 @@ $services = isset($servicesData[0]['services']) ? json_decode($servicesData[0]['
                         $icon = '<i class="fa fa-anchor"></i>';
                     else if ($service['service_name'] == 'City Sightseeing Tours')
                         $icon = '<i class="fa fa-city"></i>';
-                    else if ($service['service_name'] == 'Visa Assistance Services')
-                        $icon = '<i class="fa fa-passport"></i>';
                     else if ($service['service_name'] == 'Corporate Travel Services')
                         $icon = '<i class="fa fa-briefcase"></i>';
+                    else if ($service['service_name'] == 'Hotel Bookings')
+                        $icon = '<i class="fa fa-hotel"></i>';
+                    else if ($service['service_name'] == 'Flight Reservations')
+                        $icon = '<i class="fa fa-plane"></i>';
+                    else if ($service['service_name'] == 'Visa Assistance')
+                        $icon = '<i class="fa fa-passport"></i>';
+                    else if ($service['service_name'] == 'Cruise Holidays')
+                        $icon = '<i class="fa fa-ship"></i>';
+                    else if ($service['service_name'] == 'Travel Insurance')
+                        $icon = '<i class="fa fa-shield"></i>';
+                    else if ($service['service_name'] == 'Adventure Activities')
+                        $icon = '<i class="fa fa-mountain"></i>';
                     else
                         $icon = '<i class="fa fa-headphones"></i>';
             ?>

@@ -86,7 +86,7 @@ if (sizeof($tours_result_array) > 0) {
                   <small class="mb-2 mb-md-0">(Excl of all taxes)</small>
                   <input type="hidden" id="tours-cost-<?= $tours_result_array[$i]['tour_id'] ?>" value='<?php echo $tours_result_array[$i]['total_cost'] . '-' . $h_currency_id ?>'>
                 </div>
-                <a target="_blank" href="<?php echo $tours_result_array[$i]['seo_slug']; ?>" class="expandSect">View Details</a>
+                <a target="_blank" href="<?php echo $tours_result_array[$i]['seo_slug']; ?>" class="expandSect" onclick="event.stopPropagation();">View Details</a>
               </div>
             </div>
           </div>

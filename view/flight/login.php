@@ -1,9 +1,9 @@
 <?php
-ob_start();
-session_start();
 require_once('../../config.php');
-require_once('../../crm/model/database_setup/sub_quotation_setup.php');
 
+// include_once('encrypt_decrypt.php');
+
+session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
@@ -24,33 +24,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             $_SESSION['user_logged_in'] = true;
             $_SESSION['customer_id'] = $user['customer_id'];
-            $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
-            
-            // Auto-setup sub-quotation database structure on successful customer login
-            try {
-                $sub_quotation_setup = new sub_quotation_setup();
-                $setup_result = $sub_quotation_setup->ensure_sub_quotation_ready();
-                
-                if ($setup_result) {
-                    error_log("Sub-quotation database setup completed successfully for customer: " . $email);
-                } else {
-                    error_log("Warning: Sub-quotation database setup failed for customer: " . $email);
-                }
-            } catch (Exception $e) {
-                error_log("Error during sub-quotation setup for customer: " . $e->getMessage());
-                // Don't fail login if setup fails, just log the error
-            }
-            
+            $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];;
            // Redirect to the page user came from
     if (isset($_SESSION['redirect_after_login'])) {
         $redirectUrl = $_SESSION['redirect_after_login'];
-        // unset($_SESSION['redirect_after_login']);  // Clear the redirect URL after use
+        unset($_SESSION['redirect_after_login']);  // Clear the redirect URL after use
         header("Location: $redirectUrl");
         exit();
     } else {
         // If no redirect URL is set, redirect to a default page (e.g., homepage)
-        print_r($_SESSION);
-        die('Hi');
         header('Location: ../../index.php');
         exit();
     }
