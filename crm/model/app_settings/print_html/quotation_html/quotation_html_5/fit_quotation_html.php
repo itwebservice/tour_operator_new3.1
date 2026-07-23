@@ -540,7 +540,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
     <?php o5_render_page_header_strip($hero, $o5_pkg_badge !== '' ? $o5_pkg_badge : $o5_pkg_ov, true); ?>
 
     <!-- ACCOMMODATION -->
-    <div class="page-section">
+    <div class="page-section print-section">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
         <div class="sec-head" style="margin-bottom:0;">
           <h2>Accommodation Details</h2>
@@ -627,812 +627,819 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
 
     <hr class="page-divider" />
 
-    <?php
-    $o5_show_flights = !empty($present['flights']) && !empty($flights);
-    $o5_show_vehs = !empty($present['vehicles']) && !empty($vehs);
-    if ($o5_show_flights || $o5_show_vehs) {
-      o5_render_page_header_strip($hero, $o5_show_flights ? 'Flight Details' : 'Transportation');
-    }
-    ?>
-    <!-- FLIGHTS & TRANSPORT -->
-    <?php if ($o5_show_flights || $o5_show_vehs) : ?>
-      <div class="page-section">
-        <?php if ($o5_show_flights) : ?>
-          <div class="sec-head">
-            <h2>Flight Details</h2>
-          </div>
-          <?php foreach ($flights as $f) :
-            $air_name = o5nv($f['airline_name'], o5nv($f['airline_display'], 'Flight'));
-            $flight_lbl = o5nv($f['airline_code'], o5nv($f['airline_display'], ''));
-            list($dep_time, $dep_date) = o5_flight_parts(o5nv($f['departure_datetime'], ''));
-            list($arr_time, $arr_date) = o5_flight_parts(o5nv($f['arrival_datetime'], ''));
-            $from_code = o5_air_code(o5nv($f['from_city'], ''));
-            $to_code = o5_air_code(o5nv($f['to_city'], ''));
-          ?>
-            <div class="flight-card">
-              <div class="flight-header">
-                <div class="flight-header-left">
-                  <div class="flight-icon-box">✈</div>
-                  <div>
-                    <span class="flight-airline"><?= o5e($air_name) ?></span>
-                    <?php if ($flight_lbl !== '') : ?><span class="flight-num-text"><?= o5e($flight_lbl) ?></span><?php endif; ?>
-                  </div>
-                </div>
-                <div class="flight-class-badge"><?= o5e(o5nv($f['class'], 'Economy')) ?></div>
-              </div>
-              <div class="flight-body">
-                <div class="flight-route-row">
-                  <div>
-                    <div class="flight-time"><?= o5e($dep_time) ?></div>
-                    <div class="flight-date"><?= o5e($dep_date) ?></div>
-                    <div class="flight-city"><?= o5e(o5nv($f['from_city'], '')) ?> (<?= o5e($from_code) ?>)</div>
-                  </div>
-                  <div class="flight-middle">
-                    <div class="flight-dur"><?= o5e(o5nv($f['duration'], 'Direct')) ?></div>
-                    <div class="flight-line">
-                      <div class="fl"></div>
-                      <div class="fc">⏰</div>
-                      <div class="fl"></div>
-                    </div>
-                  </div>
-                  <div style="text-align:right;">
-                    <div class="flight-time"><?= o5e($arr_time) ?></div>
-                    <div class="flight-date"><?= o5e($arr_date) ?></div>
-                    <div class="flight-city"><?= o5e(o5nv($f['to_city'], '')) ?> (<?= o5e($to_code) ?>)</div>
-                  </div>
-                </div>
-                <div class="flight-footer">
-                  <span class="ff-icon">🧳</span>
-                  <span class="ff-text">Route:</span>
-                  <span class="ff-val"><?= o5e(o5nv($f['from_city'], '')) ?> → <?= o5e(o5nv($f['to_city'], '')) ?></span>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
-
-        <?php if (!empty($trains)) : ?>
-          <div class="sec-head" style="margin-top:24px;">
-            <h2>Train Details</h2>
-          </div>
-
-          <?php foreach ($trains as $tr) :
-            $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
-            $to_loc = isset($tr['to_location']) ? $tr['to_location'] : '';
-            $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
-            $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
-
-            $total_pax = 0;
-            if (isset($ov['pax']) && is_array($ov['pax'])) {
-              $total_pax =
-                (int)o5nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
-                (int)o5nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
-                (int)o5nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
-                (int)o5nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
-            }
-          ?>
-
-            <div class="flight-card">
-              <div class="flight-header">
-                <div class="flight-header-left">
-                  <div class="flight-icon-box">🚆</div>
-                  <div>
-                    <span class="flight-airline">Train Journey</span>
-                    <span class="flight-num-text"><?= o5e($train_class) ?></span>
-                  </div>
-                </div>
-                <div class="flight-class-badge"><?= o5e($train_class) ?></div>
-              </div>
-
-              <div class="flight-body">
-                <div class="flight-route-row">
-                  <div>
-                    <div class="flight-time"><?= o5e(o5_air_code($from_loc)) ?></div>
-                    <div class="flight-date"><?= o5e(o5nv($from_date, 'NA')) ?></div>
-                    <div class="flight-city"><?= o5e(o5nv($from_loc, 'NA')) ?></div>
-                  </div>
-
-                  <div class="flight-middle">
-                    <div class="flight-dur">Rail Journey</div>
-                    <div class="flight-line">
-                      <div class="fl"></div>
-                      <div class="fc">🚆</div>
-                      <div class="fl"></div>
-                    </div>
-                  </div>
-
-                  <div style="text-align:right;">
-                    <div class="flight-time"><?= o5e(o5_air_code($to_loc)) ?></div>
-                    <div class="flight-date"><?= o5e(o5nv($from_date, 'NA')) ?></div>
-                    <div class="flight-city"><?= o5e(o5nv($to_loc, 'NA')) ?></div>
-                  </div>
-                </div>
-
-                <div class="flight-footer">
-                  <span class="ff-icon">👥</span>
-                  <span class="ff-text">Total Pax:</span>
-                  <span class="ff-val"><?= o5e($total_pax) ?></span>
-                </div>
-              </div>
-            </div>
-
-          <?php endforeach; ?>
-        <?php endif; ?>
-
-
-        <?php if (!empty($acts)) : ?>
-          <div class="sec-head" style="margin-top:24px;">
-            <h2>Activity Details</h2>
-          </div>
-
-          <?php foreach ($acts as $a) :
-            $activity_img = BASE_URL . 'images/activity.jpg';
-            $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
-            $city_name = isset($a['city_name']) ? $a['city_name'] : '';
-            $activity_date = isset($a['date']) ? $a['date'] : '';
-            $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
-
-            $total_pax = 0;
-            if (isset($a['pax']) && is_array($a['pax'])) {
-              $total_pax =
-                (int)o5nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
-                (int)o5nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
-                (int)o5nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
-                (int)o5nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
-            }
-          ?>
-
-            <div class="hotel-card">
-              <div class="hotel-inner">
-                <div class="hotel-img">
-                  <img src="<?= o5e($activity_img) ?>" alt="<?= o5e(o5nv($activity_name, 'Activity')) ?>" />
-                </div>
-
-                <div class="hotel-body">
-                  <div class="hotel-loc">📍 <?= o5e(o5nv($city_name, 'NA')) ?></div>
-                  <div class="hotel-name"><?= o5e(o5nv($activity_name, 'Activity')) ?></div>
-
-                  <div class="hotel-dates">
-                    <div class="hotel-date-item">
-                      <div class="dlbl">Date</div>
-                      <div class="dval"><?= o5e(o5nv($activity_date, 'NA')) ?></div>
-                    </div>
-
-                    <div class="hotel-date-arrow">→</div>
-
-                    <div class="hotel-date-item">
-                      <div class="dlbl">Transfer Type</div>
-                      <div class="dval"><?= o5e(o5nv($transfer_type, 'NA')) ?></div>
-                    </div>
-                  </div>
-
-                  <div class="hotel-amenities">
-                    <div class="hotel-amenity"><span class="a-icon">👥</span> <?= o5e($total_pax) ?> Pax</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </div>
-    <?php endif; ?>
-    <hr class="page-divider" />
-
-    <?php if ($o5_show_vehs) : ?>
-      <?php o5_render_page_header_strip($hero, 'Transportation'); ?>
-
-      <div class="page-section  print-section">
-        <div class=" sec-head" style="margin-top:8px;">
-        <h2>Transportation</h2>
-      </div>
-      <div class="transport-grid">
-        <?php foreach ($vehs as $v) :
-          $v_start = o5nv($v['date'], '');
-          $v_end = o5_vehicle_end_date($v);
-          $v_dur = trim($v_start . ($v_end !== '' ? ' – ' . $v_end : ''));
-          $svc = o5nv($v['service_duration'], o5nv($v['description'], 'Private Transfer'));
-        ?>
-          <div class="transport-card">
-            <div class="transport-card-head">
-              <div class="transport-icon">🚗</div>
-              <div>
-                <div class="transport-name"><?= o5e(o5nv($v['vehicle_name'], 'Vehicle')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o5e($v['vehicle_count']) ?>)<?php endif; ?></div>
-                <div class="transport-type"><?= o5e(o5nv($v['vehicle_type'], 'Private Transfer')) ?></div>
-              </div>
-            </div>
-            <div class="transport-row"><span class="tr-lbl">Pickup</span><span class="tr-val"><?= o5e(o5nv($v['pickup'], 'NA')) ?></span></div>
-            <div class="transport-row"><span class="tr-lbl">Drop</span><span class="tr-val"><?= o5e(o5nv($v['drop'], 'NA')) ?></span></div>
-            <div class="transport-row"><span class="tr-lbl">Duration</span><span class="tr-val"><?= o5e($v_dur !== '' ? $v_dur : 'As per itinerary') ?></span></div>
-            <div class="transport-row"><span class="tr-lbl">Service</span><span class="tr-val"><span class="tr-badge2"><?= o5e($svc) ?></span></span></div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-
-    <hr class="page-divider" />
-
-    <?php o5_render_page_header_strip($hero, 'Day Wise Itinerary'); ?>
-
-    <!-- ITINERARY -->
-    <div class="page-section print-section">
-      <div class="sec-head">
-        <h2>Day Wise Itinerary</h2>
-      </div>
-      <div class="itin-timeline">
-        <?php if (!empty($itin)) :
-          foreach ($itin as $day) :
-            // $day_img = o5img(isset($day['image']) ? $day['image'] : '', $assets . 'day-' . ((($day['day_number'] - 1) % 6) + 1) . '.jpg');
-            $dummy_day_img = BASE_URL . 'images/itinerary.png';
-
-            $o5_day_photo = isset($day['image']) ? trim($day['image']) : '';
-
-            if ($o5_day_photo == '' || stripos($o5_day_photo, 'dummy') !== false) {
-              $day_img = $dummy_day_img;
-            } else {
-              $day_img = o5img($o5_day_photo, $dummy_day_img);
-            }
-            $day_date = o5nv($day['date'], '');
-            $day_title = o5nv($day['special_attraction'], o5nv($day['city'], 'Sightseeing'));
-        ?>
-            <div class="itin-item">
-              <div class="itin-dot"></div>
-              <div class="itin-card">
-                <div class="itin-img-top">
-                  <img src="<?= o5e($day_img) ?>" alt="<?= o5e($day_title) ?>" />
-                  <?php if ($day_date !== '') : ?>
-                    <div class="itin-date-badge"><?= o5e($day_date) ?></div>
-                  <?php endif; ?>
-                </div>
-                <div class="itin-body">
-                  <div class="itin-attract-row">
-                    <div class="itin-attract-left">
-                      <span style="font-size:16px;">🌐</span>
-                      <div class="itin-attract-title">Special Attraction · <?= o5e($day_title) ?></div>
-                    </div>
-                    <div class="itin-day-num-circle"><?= o5e(o5nv($day['day_number'], '')) ?></div>
-                  </div>
-                  <div class="itin-prog-lbl">Detailed Programme</div>
-                  <div class="itin-prog-text"><?= o5e(o5nv($day['detailed_programme'], '')) ?></div>
-                  <div class="itin-chips">
-                    <?php if (!empty($day['meal_plan'])) : ?>
-                      <div class="itin-chip meal">
-                        <div class="itin-chip-icon">🍽️</div>
-                        <div>
-                          <div class="itin-chip-lbl">Meal Plan</div>
-                          <div class="itin-chip-val"><?= o5e($day['meal_plan']) ?></div>
-                        </div>
-                      </div>
-                    <?php endif; ?>
-                    <?php if (!empty($day['overnight_stay'])) : ?>
-                      <div class="itin-chip stay">
-                        <div class="itin-chip-icon">🌙</div>
-                        <div>
-                          <div class="itin-chip-lbl">Overnight Stay</div>
-                          <div class="itin-chip-val"><?= o5e($day['overnight_stay']) ?></div>
-                        </div>
-                      </div>
-                    <?php endif; ?>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <?php
-          endforeach;
-        else :
-          ?>
-          <div class="itin-item">
-            <div class="itin-dot"></div>
-            <div class="itin-card">
-              <div class="itin-body">
-                <div class="itin-prog-text">Itinerary details will be shared upon confirmation.</div>
-              </div>
-            </div>
-          </div>
-        <?php endif; ?>
-      </div>
-    </div>
-
-    <hr class="page-divider" />
-
-    <?php o5_render_page_header_strip($hero, 'Inclusions & Costing'); ?>
-
-    <!-- INCLUSIONS + COSTING -->
-    <div class="page-section">
-      <div class="inc-exc-grid">
-        <div class="inc-card">
-          <div class="inc-header"><span style="font-size:18px;">✓</span><span class="ie-header-text">What's Included</span></div>
-          <div class="inc-body">
-            <?php foreach ($o5_included as $item) : ?>
-              <div class="ie-item">
-                <div class="ie-check">✓</div>
-                <div class="ie-text"><?= nl2br(o5e($item)) ?></div>
-              </div>
-            <?php endforeach; ?>
-          </div>
-        </div>
-        <div class="exc-card">
-          <div class="exc-header"><span style="font-size:18px;">✗</span><span class="ie-header-text">What's Excluded</span></div>
-          <div class="exc-body">
-            <?php foreach ($o5_excluded as $item) : ?>
-              <div class="ie-item">
-                <div class="ie-x">✗</div>
-                <div class="ie-text"><?= nl2br(o5e($item)) ?></div>
-              </div>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </div>
-
+    <div class="pdf-page">
       <?php
-      $o5_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
-      $o5_is_per_person = ($o5_costing_type == 'per person');
-      $o5_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+      $o5_show_flights = !empty($present['flights']) && !empty($flights);
+      $o5_show_vehs = !empty($present['vehicles']) && !empty($vehs);
+      if ($o5_show_flights || $o5_show_vehs) {
+        o5_render_page_header_strip($hero, $o5_show_flights ? 'Flight Details' : 'Transportation');
+      }
       ?>
+      <!-- FLIGHTS & TRANSPORT -->
+      <?php if ($o5_show_flights || $o5_show_vehs) : ?>
+        <div class="page-section">
+          <?php if ($o5_show_flights) : ?>
+            <div class="sec-head">
+              <h2>Flight Details</h2>
+            </div>
+            <?php foreach ($flights as $f) :
+              $air_name = o5nv($f['airline_name'], o5nv($f['airline_display'], 'Flight'));
+              $flight_lbl = o5nv($f['airline_code'], o5nv($f['airline_display'], ''));
+              list($dep_time, $dep_date) = o5_flight_parts(o5nv($f['departure_datetime'], ''));
+              list($arr_time, $arr_date) = o5_flight_parts(o5nv($f['arrival_datetime'], ''));
+              $from_code = o5_air_code(o5nv($f['from_city'], ''));
+              $to_code = o5_air_code(o5nv($f['to_city'], ''));
+            ?>
+              <div class="flight-card">
+                <div class="flight-header">
+                  <div class="flight-header-left">
+                    <div class="flight-icon-box">✈</div>
+                    <div>
+                      <span class="flight-airline"><?= o5e($air_name) ?></span>
+                      <?php if ($flight_lbl !== '') : ?><span class="flight-num-text"><?= o5e($flight_lbl) ?></span><?php endif; ?>
+                    </div>
+                  </div>
+                  <div class="flight-class-badge"><?= o5e(o5nv($f['class'], 'Economy')) ?></div>
+                </div>
+                <div class="flight-body">
+                  <div class="flight-route-row">
+                    <div>
+                      <div class="flight-time"><?= o5e($dep_time) ?></div>
+                      <div class="flight-date"><?= o5e($dep_date) ?></div>
+                      <div class="flight-city"><?= o5e(o5nv($f['from_city'], '')) ?> (<?= o5e($from_code) ?>)</div>
+                    </div>
+                    <div class="flight-middle">
+                      <div class="flight-dur"><?= o5e(o5nv($f['duration'], 'Direct')) ?></div>
+                      <div class="flight-line">
+                        <div class="fl"></div>
+                        <div class="fc">⏰</div>
+                        <div class="fl"></div>
+                      </div>
+                    </div>
+                    <div style="text-align:right;">
+                      <div class="flight-time"><?= o5e($arr_time) ?></div>
+                      <div class="flight-date"><?= o5e($arr_date) ?></div>
+                      <div class="flight-city"><?= o5e(o5nv($f['to_city'], '')) ?> (<?= o5e($to_code) ?>)</div>
+                    </div>
+                  </div>
+                  <div class="flight-footer">
+                    <span class="ff-icon">🧳</span>
+                    <span class="ff-text">Route:</span>
+                    <span class="ff-val"><?= o5e(o5nv($f['from_city'], '')) ?> → <?= o5e(o5nv($f['to_city'], '')) ?></span>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
 
-      <div class="sec-head">
-        <h2>Costing Details</h2>
-      </div>
+          <?php if (!empty($trains)) : ?>
+            <div class="sec-head" style="margin-top:24px;">
+              <h2>Train Details</h2>
+            </div>
 
-      <?php if (!$o5_is_per_person) { ?>
+            <?php foreach ($trains as $tr) :
+              $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
+              $to_loc = isset($tr['to_location']) ? $tr['to_location'] : '';
+              $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
+              $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
 
-        <table class="costing-table">
-          <thead>
-            <tr>
-              <th>Package Type</th>
-              <th>Tour Cost</th>
-              <th>Tax</th>
-              <th>TCS</th>
-              <th>Travel Cost</th>
-              <th>Grand Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($o5_cost_grp as $ci => $row) :
-              $is_rec = (stripos(o5nv($row['package_type'], ''), 'premium') !== false)
-                || (stripos(o5nv($row['package_type'], ''), 'recommended') !== false)
-                || ($ci === 1 && count($o5_cost_grp) > 1);
-
-              $tax_amount = '0.00';
-              if (!empty($row['tax_display'])) {
-                preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-                if (!empty($m[1])) {
-                  $tax_amount = $m[1];
-                }
+              $total_pax = 0;
+              if (isset($ov['pax']) && is_array($ov['pax'])) {
+                $total_pax =
+                  (int)o5nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
+                  (int)o5nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
+                  (int)o5nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
+                  (int)o5nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
               }
             ?>
-              <tr<?= $is_rec ? ' class="recommended"' : '' ?>>
-                <td>
-                  <strong><?= o5e(o5nv($row['package_type'], 'Package')) ?></strong>
-                  <?php if ($is_rec) : ?><span class="rec-inline-badge">RECOMMENDED</span><?php endif; ?>
-                </td>
-                <td><?= o5e(o5nv($row['tour_cost_display'], '0')) ?></td>
-                <td>INR <?= o5e($tax_amount) ?></td>
-                <td><?= o5e(o5nv($row['tcs_display'], '0')) ?></td>
-                <td><?= o5e(o5nv($row['travel_display'], '0')) ?></td>
-                <td><?= o5e(o5nv($row['total_display'], '0')) ?></td>
-                </tr>
-              <?php endforeach; ?>
-          </tbody>
-        </table>
 
-      <?php } else { ?>
+              <div class="flight-card">
+                <div class="flight-header">
+                  <div class="flight-header-left">
+                    <div class="flight-icon-box">🚆</div>
+                    <div>
+                      <span class="flight-airline">Train Journey</span>
+                      <span class="flight-num-text"><?= o5e($train_class) ?></span>
+                    </div>
+                  </div>
+                  <div class="flight-class-badge"><?= o5e($train_class) ?></div>
+                </div>
 
-        <?php if (!empty($o5_pp)) { ?>
-          <table class="costing-table">
-            <thead>
-              <tr>
-                <th>Package</th>
-                <th>Adult</th>
-                <th>CWB</th>
-                <th>CWOB</th>
-                <th>Infant</th>
-                <th>Tax</th>
-                <th>TCS</th>
-                <th>Visa</th>
-                <th>Guide</th>
-                <th>Misc</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($o5_pp as $pp) :
-                $tax_amount = '0.00';
-                if (!empty($pp['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                  if (!empty($m[1])) {
-                    $tax_amount = $m[1];
-                  }
-                }
-              ?>
-                <tr>
-                  <td><strong><?= o5e(o5nv($pp['package_type'], 'Package')) ?></strong></td>
-                  <td><?= o5e(o5nv($pp['pp_adult_display'], 'INR 0.00')) ?></td>
-                  <td><?= o5e(o5nv($pp['pp_cwb_display'], 'INR 0.00')) ?></td>
-                  <td><?= o5e(o5nv($pp['pp_cwnb_display'], 'INR 0.00')) ?></td>
-                  <td><?= o5e(o5nv($pp['pp_infant_display'], 'INR 0.00')) ?></td>
-                  <td>INR <?= o5e($tax_amount) ?></td>
-                  <td><?= o5e(o5nv($pp['tcs_display'], 'INR 0.00')) ?></td>
-                  <td><?= o5e(o5nv($pp['visa_display'], 'INR 0.00')) ?></td>
-                  <td><?= o5e(o5nv($pp['guide_display'], 'INR 0.00')) ?></td>
-                  <td><?= o5e(o5nv($pp['misc_display'], 'INR 0.00')) ?></td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-        <?php } ?>
+                <div class="flight-body">
+                  <div class="flight-route-row">
+                    <div>
+                      <div class="flight-time"><?= o5e(o5_air_code($from_loc)) ?></div>
+                      <div class="flight-date"><?= o5e(o5nv($from_date, 'NA')) ?></div>
+                      <div class="flight-city"><?= o5e(o5nv($from_loc, 'NA')) ?></div>
+                    </div>
 
-      <?php } ?>
+                    <div class="flight-middle">
+                      <div class="flight-dur">Rail Journey</div>
+                      <div class="flight-line">
+                        <div class="fl"></div>
+                        <div class="fc">🚆</div>
+                        <div class="fl"></div>
+                      </div>
+                    </div>
 
-      <div class="costing-note">
-        <strong>Note:</strong>
-        <?= o5e(o5nv(isset($incx['note']) ? $incx['note'] : '', 'Rates are subject to availability at the time of confirmation.')) ?>
-      </div>
+                    <div style="text-align:right;">
+                      <div class="flight-time"><?= o5e(o5_air_code($to_loc)) ?></div>
+                      <div class="flight-date"><?= o5e(o5nv($from_date, 'NA')) ?></div>
+                      <div class="flight-city"><?= o5e(o5nv($to_loc, 'NA')) ?></div>
+                    </div>
+                  </div>
+
+                  <div class="flight-footer">
+                    <span class="ff-icon">👥</span>
+                    <span class="ff-text">Total Pax:</span>
+                    <span class="ff-val"><?= o5e($total_pax) ?></span>
+                  </div>
+                </div>
+              </div>
+
+            <?php endforeach; ?>
+          <?php endif; ?>
+
+
+          <?php if (!empty($acts)) : ?>
+            <div class="sec-head" style="margin-top:24px;">
+              <h2>Activity Details</h2>
+            </div>
+
+            <?php foreach ($acts as $a) :
+              $activity_img = BASE_URL . 'images/activity.jpg';
+              $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
+              $city_name = isset($a['city_name']) ? $a['city_name'] : '';
+              $activity_date = isset($a['date']) ? $a['date'] : '';
+              $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
+
+              $total_pax = 0;
+              if (isset($a['pax']) && is_array($a['pax'])) {
+                $total_pax =
+                  (int)o5nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
+                  (int)o5nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
+                  (int)o5nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
+                  (int)o5nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
+              }
+            ?>
+
+              <div class="hotel-card">
+                <div class="hotel-inner">
+                  <div class="hotel-img">
+                    <img src="<?= o5e($activity_img) ?>" alt="<?= o5e(o5nv($activity_name, 'Activity')) ?>" />
+                  </div>
+
+                  <div class="hotel-body">
+                    <div class="hotel-loc">📍 <?= o5e(o5nv($city_name, 'NA')) ?></div>
+                    <div class="hotel-name"><?= o5e(o5nv($activity_name, 'Activity')) ?></div>
+
+                    <div class="hotel-dates">
+                      <div class="hotel-date-item">
+                        <div class="dlbl">Date</div>
+                        <div class="dval"><?= o5e(o5nv($activity_date, 'NA')) ?></div>
+                      </div>
+
+                      <div class="hotel-date-arrow">→</div>
+
+                      <div class="hotel-date-item">
+                        <div class="dlbl">Transfer Type</div>
+                        <div class="dval"><?= o5e(o5nv($transfer_type, 'NA')) ?></div>
+                      </div>
+                    </div>
+
+                    <div class="hotel-amenities">
+                      <div class="hotel-amenity"><span class="a-icon">👥</span> <?= o5e($total_pax) ?> Pax</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
     </div>
-
     <hr class="page-divider" />
 
-    <?php o5_render_page_header_strip($hero, 'Payment Information'); ?>
+    <div class="pdf-page">
+      <?php if ($o5_show_vehs) : ?>
+        <?php o5_render_page_header_strip($hero, 'Transportation'); ?>
 
-    <!-- PAYMENT -->
-    <div class="page-section">
-      <div class="sec-head">
-        <h2>Payment Information</h2>
-      </div>
-
-      <div class="pay-bank-card">
-        <div class="pay-bank-header">
-          <div class="pay-bank-icon">🏦</div>
-          <div>
-            <div class="pay-bank-title">Bank Details</div>
-            <div class="pay-bank-name"><?= o5e(o5nv($bank['bank_name'], 'NA')) ?></div>
+        <div class="page-section  print-section">
+          <div class=" sec-head" style="margin-top:8px;">
+            <h2>Transportation</h2>
           </div>
+          <div class="transport-grid">
+            <?php foreach ($vehs as $v) :
+              $v_start = o5nv($v['date'], '');
+              $v_end = o5_vehicle_end_date($v);
+              $v_dur = trim($v_start . ($v_end !== '' ? ' – ' . $v_end : ''));
+              $svc = o5nv($v['service_duration'], o5nv($v['description'], 'Private Transfer'));
+            ?>
+              <div class="transport-card">
+                <div class="transport-card-head">
+                  <div class="transport-icon">🚗</div>
+                  <div>
+                    <div class="transport-name"><?= o5e(o5nv($v['vehicle_name'], 'Vehicle')) ?><?php if (!empty($v['vehicle_count'])) : ?> (<?= o5e($v['vehicle_count']) ?>)<?php endif; ?></div>
+                    <div class="transport-type"><?= o5e(o5nv($v['vehicle_type'], 'Private Transfer')) ?></div>
+                  </div>
+                </div>
+                <div class="transport-row"><span class="tr-lbl">Pickup</span><span class="tr-val"><?= o5e(o5nv($v['pickup'], 'NA')) ?></span></div>
+                <div class="transport-row"><span class="tr-lbl">Drop</span><span class="tr-val"><?= o5e(o5nv($v['drop'], 'NA')) ?></span></div>
+                <div class="transport-row"><span class="tr-lbl">Duration</span><span class="tr-val"><?= o5e($v_dur !== '' ? $v_dur : 'As per itinerary') ?></span></div>
+                <div class="transport-row"><span class="tr-lbl">Service</span><span class="tr-val"><span class="tr-badge2"><?= o5e($svc) ?></span></span></div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
         </div>
-        <div class="pay-bank-body">
-          <div class="pay-bank-left">
-            <div class="pay-field">
-              <div class="pf-lbl">Account Name</div>
-              <div class="pf-val"><?= o5e(o5nv($bank['account_name'], 'NA')) ?></div>
+        <hr class="page-divider" />
+
+        <div class="pdf-page">
+          <?php o5_render_page_header_strip($hero, 'Day Wise Itinerary'); ?>
+
+          <!-- ITINERARY -->
+          <div class="page-section print-section">
+            <div class="sec-head">
+              <h2>Day Wise Itinerary</h2>
             </div>
-            <div class="pay-field">
-              <div class="pf-lbl">Account Number</div>
-              <div class="pf-val"><?= o5e(o5nv($bank['account_no'], 'NA')) ?></div>
-            </div>
-            <div class="pay-field">
-              <div class="pf-lbl">Branch</div>
-              <div class="pf-val"><?= o5e(o5nv($bank['branch_name'], 'NA')) ?></div>
-            </div>
-            <div class="pay-field">
-              <div class="pf-lbl">IFSC Code</div>
-              <div class="pf-val"><?= o5e(o5nv($bank['ifsc_code'], o5nv($bank['swift_code'], 'NA'))) ?></div>
-            </div>
-          </div>
-          <div class="pay-bank-right">
-            <div class="qr-box">
-              <?php if (!empty($bank['qr_html'])) : ?>
-                <?= $bank['qr_html'] ?>
-              <?php elseif (!empty($bank['qr_code']) || !empty($bank['branch_qr_url'])) : ?>
-                <img src="<?= o5e(o5nv($bank['branch_qr_url'], $bank['qr_code'])) ?>" alt="Payment QR" style="width:110px;height:110px;object-fit:contain;" />
-              <?php else : ?>
-                <span style="color:var(--muted);font-size:11px;">QR not configured</span>
+            <div class="itin-timeline">
+              <?php if (!empty($itin)) :
+                foreach ($itin as $day) :
+                  // $day_img = o5img(isset($day['image']) ? $day['image'] : '', $assets . 'day-' . ((($day['day_number'] - 1) % 6) + 1) . '.jpg');
+                  $dummy_day_img = BASE_URL . 'images/itinerary.png';
+
+                  $o5_day_photo = isset($day['image']) ? trim($day['image']) : '';
+
+                  if ($o5_day_photo == '' || stripos($o5_day_photo, 'dummy') !== false) {
+                    $day_img = $dummy_day_img;
+                  } else {
+                    $day_img = o5img($o5_day_photo, $dummy_day_img);
+                  }
+                  $day_date = o5nv($day['date'], '');
+                  $day_title = o5nv($day['special_attraction'], o5nv($day['city'], 'Sightseeing'));
+              ?>
+                  <div class="itin-item">
+                    <div class="itin-dot"></div>
+                    <div class="itin-card">
+                      <div class="itin-img-top">
+                        <img src="<?= o5e($day_img) ?>" alt="<?= o5e($day_title) ?>" />
+                        <?php if ($day_date !== '') : ?>
+                          <div class="itin-date-badge"><?= o5e($day_date) ?></div>
+                        <?php endif; ?>
+                      </div>
+                      <div class="itin-body">
+                        <div class="itin-attract-row">
+                          <div class="itin-attract-left">
+                            <span style="font-size:16px;">🌐</span>
+                            <div class="itin-attract-title">Special Attraction · <?= o5e($day_title) ?></div>
+                          </div>
+                          <div class="itin-day-num-circle"><?= o5e(o5nv($day['day_number'], '')) ?></div>
+                        </div>
+                        <div class="itin-prog-lbl">Detailed Programme</div>
+                        <div class="itin-prog-text"><?= o5e(o5nv($day['detailed_programme'], '')) ?></div>
+                        <div class="itin-chips">
+                          <?php if (!empty($day['meal_plan'])) : ?>
+                            <div class="itin-chip meal">
+                              <div class="itin-chip-icon">🍽️</div>
+                              <div>
+                                <div class="itin-chip-lbl">Meal Plan</div>
+                                <div class="itin-chip-val"><?= o5e($day['meal_plan']) ?></div>
+                              </div>
+                            </div>
+                          <?php endif; ?>
+                          <?php if (!empty($day['overnight_stay'])) : ?>
+                            <div class="itin-chip stay">
+                              <div class="itin-chip-icon">🌙</div>
+                              <div>
+                                <div class="itin-chip-lbl">Overnight Stay</div>
+                                <div class="itin-chip-val"><?= o5e($day['overnight_stay']) ?></div>
+                              </div>
+                            </div>
+                          <?php endif; ?>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <?php
+                endforeach;
+              else :
+                ?>
+                <div class="itin-item">
+                  <div class="itin-dot"></div>
+                  <div class="itin-card">
+                    <div class="itin-body">
+                      <div class="itin-prog-text">Itinerary details will be shared upon confirmation.</div>
+                    </div>
+                  </div>
+                </div>
               <?php endif; ?>
             </div>
-            <div class="qr-title">Scan to Pay</div>
-            <?php if (!empty($bank['upi_id'])) : ?>
-              <div class="qr-upi">UPI: <?= o5e($bank['upi_id']) ?></div>
-            <?php endif; ?>
           </div>
         </div>
-      </div>
 
-      <div class="pay-cards-grid">
-        <div class="pay-info-card">
-          <div class="pay-info-head"><span class="pay-info-icon">💳</span> Payment Instructions</div>
-          <ul class="pay-list">
-            <?php foreach ($o5_pay_notes as $note) : ?>
-              <li><span class="chk">✓</span> <?= o5e($note) ?></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-        <div class="pay-info-card">
-          <div class="pay-info-head"><span class="pay-info-icon">🛡️</span> Booking Policy</div>
-          <ul class="pay-list">
-            <?php foreach (array_slice($o5_book_policy, 0, 4) as $pol) : ?>
-              <li><span class="chk">✓</span> <?= o5e($pol) ?></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-      </div>
+        <hr class="page-divider" />
 
+        <div class="pdf-page">
+          <?php o5_render_page_header_strip($hero, 'Inclusions & Costing'); ?>
 
-    </div>
-
-    <hr class="page-divider" />
-
-    <?php o5_render_page_header_strip($hero, 'Traveller Reviews'); ?>
-
-    <!-- REVIEWS -->
-    <div class="page-section print-section">
-      <div class="sec-head">
-        <h2>What Our Travellers Say</h2>
-      </div>
-
-      <div class="reviews-grid">
-        <?php if (!empty($testimonials)) :
-          $o5_ti = 0;
-          foreach ($testimonials as $t) :
-            if ($o5_ti >= 3) {
-              break;
-            }
-            $o5_ti++;
-            $photo = o5_testi_photo(isset($t['photo']) ? $t['photo'] : '');
-        ?>
-            <div class="review-card">
-              <div class="review-quote-icon">❝</div>
-              <div class="review-text">"<?= o5e(o5nv($t['review'], '')) ?>"</div>
-              <div class="review-footer">
-                <?php if ($photo !== '') : ?>
-                  <img class="review-avatar" src="<?= o5e($photo) ?>" alt="<?= o5e(o5nv($t['name'], '')) ?>" />
-                <?php else : ?>
-                  <div class="review-avatar" style="background:var(--navy);color:var(--gold2);display:flex;align-items:center;justify-content:center;font-weight:700;"><?= o5e(strtoupper(substr(o5nv($t['name'], 'T'), 0, 1))) ?></div>
-                <?php endif; ?>
-                <div>
-                  <div class="review-name"><?= o5e(o5nv($t['name'], 'Traveller')) ?></div>
-                  <div class="review-loc"><?= o5e(o5nv($t['designation'], '')) ?></div>
-                  <div class="review-stars">★★★★★</div>
+          <!-- INCLUSIONS + COSTING -->
+          <div class="page-section">
+            <div class="inc-exc-grid">
+              <div class="inc-card">
+                <div class="inc-header"><span style="font-size:18px;">✓</span><span class="ie-header-text">What's Included</span></div>
+                <div class="inc-body">
+                  <?php foreach ($o5_included as $item) : ?>
+                    <div class="ie-item">
+                      <div class="ie-check">✓</div>
+                      <div class="ie-text"><?= nl2br(o5e($item)) ?></div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+              <div class="exc-card">
+                <div class="exc-header"><span style="font-size:18px;">✗</span><span class="ie-header-text">What's Excluded</span></div>
+                <div class="exc-body">
+                  <?php foreach ($o5_excluded as $item) : ?>
+                    <div class="ie-item">
+                      <div class="ie-x">✗</div>
+                      <div class="ie-text"><?= nl2br(o5e($item)) ?></div>
+                    </div>
+                  <?php endforeach; ?>
                 </div>
               </div>
             </div>
-          <?php
-          endforeach;
-        else :
-          ?>
-          <div class="review-card">
-            <div class="review-quote-icon">❝</div>
-            <div class="review-text">Customer testimonials can be managed from Quotation Builder settings.</div>
+
+            <?php
+            $o5_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
+            $o5_is_per_person = ($o5_costing_type == 'per person');
+            $o5_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+            ?>
+
+            <div class="sec-head">
+              <h2>Costing Details</h2>
+            </div>
+
+            <?php if (!$o5_is_per_person) { ?>
+
+              <table class="costing-table">
+                <thead>
+                  <tr>
+                    <th>Package Type</th>
+                    <th>Tour Cost</th>
+                    <th>Tax</th>
+                    <th>TCS</th>
+                    <th>Travel Cost</th>
+                    <th>Grand Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($o5_cost_grp as $ci => $row) :
+                    $is_rec = (stripos(o5nv($row['package_type'], ''), 'premium') !== false)
+                      || (stripos(o5nv($row['package_type'], ''), 'recommended') !== false)
+                      || ($ci === 1 && count($o5_cost_grp) > 1);
+
+                    $tax_amount = '0.00';
+                    if (!empty($row['tax_display'])) {
+                      preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
+                      if (!empty($m[1])) {
+                        $tax_amount = $m[1];
+                      }
+                    }
+                  ?>
+                    <tr<?= $is_rec ? ' class="recommended"' : '' ?>>
+                      <td>
+                        <strong><?= o5e(o5nv($row['package_type'], 'Package')) ?></strong>
+                        <?php if ($is_rec) : ?><span class="rec-inline-badge">RECOMMENDED</span><?php endif; ?>
+                      </td>
+                      <td><?= o5e(o5nv($row['tour_cost_display'], '0')) ?></td>
+                      <td>INR <?= o5e($tax_amount) ?></td>
+                      <td><?= o5e(o5nv($row['tcs_display'], '0')) ?></td>
+                      <td><?= o5e(o5nv($row['travel_display'], '0')) ?></td>
+                      <td><?= o5e(o5nv($row['total_display'], '0')) ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                </tbody>
+              </table>
+
+            <?php } else { ?>
+
+              <?php if (!empty($o5_pp)) { ?>
+                <table class="costing-table">
+                  <thead>
+                    <tr>
+                      <th>Package</th>
+                      <th>Adult</th>
+                      <th>CWB</th>
+                      <th>CWOB</th>
+                      <th>Infant</th>
+                      <th>Tax</th>
+                      <th>TCS</th>
+                      <th>Visa</th>
+                      <th>Guide</th>
+                      <th>Misc</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($o5_pp as $pp) :
+                      $tax_amount = '0.00';
+                      if (!empty($pp['tax_display'])) {
+                        preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
+                        if (!empty($m[1])) {
+                          $tax_amount = $m[1];
+                        }
+                      }
+                    ?>
+                      <tr>
+                        <td><strong><?= o5e(o5nv($pp['package_type'], 'Package')) ?></strong></td>
+                        <td><?= o5e(o5nv($pp['pp_adult_display'], 'INR 0.00')) ?></td>
+                        <td><?= o5e(o5nv($pp['pp_cwb_display'], 'INR 0.00')) ?></td>
+                        <td><?= o5e(o5nv($pp['pp_cwnb_display'], 'INR 0.00')) ?></td>
+                        <td><?= o5e(o5nv($pp['pp_infant_display'], 'INR 0.00')) ?></td>
+                        <td>INR <?= o5e($tax_amount) ?></td>
+                        <td><?= o5e(o5nv($pp['tcs_display'], 'INR 0.00')) ?></td>
+                        <td><?= o5e(o5nv($pp['visa_display'], 'INR 0.00')) ?></td>
+                        <td><?= o5e(o5nv($pp['guide_display'], 'INR 0.00')) ?></td>
+                        <td><?= o5e(o5nv($pp['misc_display'], 'INR 0.00')) ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              <?php } ?>
+
+            <?php } ?>
+
+            <div class="costing-note">
+              <strong>Note:</strong>
+              <?= o5e(o5nv(isset($incx['note']) ? $incx['note'] : '', 'Rates are subject to availability at the time of confirmation.')) ?>
+            </div>
           </div>
-        <?php endif; ?>
-      </div>
-
-      <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-num">⭐ <?= o5e($o5_google_rating) ?></div>
-          <div class="stat-lbl">Google Rating</div>
         </div>
-        <div class="stats-div"></div>
-        <div class="stat-item">
-          <div class="stat-num"><?= o5e($o5_review_count) ?></div>
-          <div class="stat-lbl">Happy Reviews</div>
-        </div>
-        <div class="stats-div"></div>
-        <div class="stat-item">
-          <div class="stat-num"><?= o5e($o5_traveller_cnt) ?></div>
-          <div class="stat-lbl">Happy Travellers</div>
-        </div>
-      </div>
 
-      <div class="trust-grid">
-        <div class="trust-card">
-          <div class="trust-icon">🛡️</div>
-          <div class="trust-label">Secure Booking</div>
-        </div>
-        <div class="trust-card">
-          <div class="trust-icon">🏅</div>
-          <div class="trust-label">Best Price Guarantee</div>
-        </div>
-        <div class="trust-card">
-          <div class="trust-icon">❤️</div>
-          <div class="trust-label">Personalized Service</div>
-        </div>
-        <div class="trust-card">
-          <div class="trust-icon">✨</div>
-          <div class="trust-label">Premium Experience</div>
-        </div>
-      </div>
+        <hr class="page-divider" />
 
-      <div class="cta-btn">📞 Ready to Book? Call us: <?= o5e(o5nv($ty['company_contact'], o5nv($hero['user_contact'], ''))) ?></div>
-    </div>
+        <div class="pdf-page">
+          <?php o5_render_page_header_strip($hero, 'Payment Information'); ?>
 
-    <hr class="page-divider" />
+          <!-- PAYMENT -->
+          <div class="page-section">
+            <div class="sec-head">
+              <h2>Payment Information</h2>
+            </div>
 
-    <?php o5_render_page_header_strip($hero, 'Terms & Conditions'); ?>
-
-    <!-- TERMS -->
-    <div class="page-section print-section">
-      <div class="sec-head">
-        <h2><?= o5e(o5nv($terms['title'], 'Terms & Conditions')) ?></h2>
-      </div>
-
-      <div class="tnc-grid">
-        <?php
-        $o5_terms_html = isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '';
-        $o5_terms_html = str_replace(array("\r", "\n"), '', $o5_terms_html);
-
-        $o5_term_cards = array();
-
-        preg_match_all('/<b[^>]*>(.*?)<\/b>\s*<br\s*\/?>(.*?)(?=<span[^>]*>\s*<br>\s*<b|<div><span[^>]*>\s*<b|<b[^>]*>|$)/is', $o5_terms_html, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $i => $m) {
-          $title = trim(strip_tags($m[1]));
-          $title = trim($title, " :\t\n\r\0\x0B");
-
-          $body = trim($m[2]);
-
-          if (preg_match('/<ul[^>]*>(.*?)<\/ul>/is', $body, $ul_match)) {
-            $body = '<ul class="tnc-list">' . $ul_match[1] . '</ul>';
-          } else {
-            $body = '<div class="tnc-list-text">' . strip_tags($body, '<br>') . '</div>';
-          }
-
-          if ($title != '') {
-            $o5_term_cards[] = array(
-              'num' => $i + 1,
-              'title' => $title,
-              'body' => $body
-            );
-          }
-        }
-        ?>
-        <?php if (!empty($o5_term_cards)) :
-          foreach ($o5_term_cards as $card) : ?>
-            <div class="tnc-card">
-              <div class="tnc-head">
-                <div class="tnc-num"><?= o5e($card['num']) ?></div>
-                <div class="tnc-title"><?= o5e($card['title']) ?></div>
+            <div class="pay-bank-card">
+              <div class="pay-bank-header">
+                <div class="pay-bank-icon">🏦</div>
+                <div>
+                  <div class="pay-bank-title">Bank Details</div>
+                  <div class="pay-bank-name"><?= o5e(o5nv($bank['bank_name'], 'NA')) ?></div>
+                </div>
               </div>
-              <?= $card['body'] ?>
+              <div class="pay-bank-body">
+                <div class="pay-bank-left">
+                  <div class="pay-field">
+                    <div class="pf-lbl">Account Name</div>
+                    <div class="pf-val"><?= o5e(o5nv($bank['account_name'], 'NA')) ?></div>
+                  </div>
+                  <div class="pay-field">
+                    <div class="pf-lbl">Account Number</div>
+                    <div class="pf-val"><?= o5e(o5nv($bank['account_no'], 'NA')) ?></div>
+                  </div>
+                  <div class="pay-field">
+                    <div class="pf-lbl">Branch</div>
+                    <div class="pf-val"><?= o5e(o5nv($bank['branch_name'], 'NA')) ?></div>
+                  </div>
+                  <div class="pay-field">
+                    <div class="pf-lbl">IFSC Code</div>
+                    <div class="pf-val"><?= o5e(o5nv($bank['ifsc_code'], o5nv($bank['swift_code'], 'NA'))) ?></div>
+                  </div>
+                </div>
+                <div class="pay-bank-right">
+                  <div class="qr-box">
+                    <?php if (!empty($bank['qr_html'])) : ?>
+                      <?= $bank['qr_html'] ?>
+                    <?php elseif (!empty($bank['qr_code']) || !empty($bank['branch_qr_url'])) : ?>
+                      <img src="<?= o5e(o5nv($bank['branch_qr_url'], $bank['qr_code'])) ?>" alt="Payment QR" style="width:110px;height:110px;object-fit:contain;" />
+                    <?php else : ?>
+                      <span style="color:var(--muted);font-size:11px;">QR not configured</span>
+                    <?php endif; ?>
+                  </div>
+                  <div class="qr-title">Scan to Pay</div>
+                  <?php if (!empty($bank['upi_id'])) : ?>
+                    <div class="qr-upi">UPI: <?= o5e($bank['upi_id']) ?></div>
+                  <?php endif; ?>
+                </div>
+              </div>
             </div>
-          <?php endforeach;
-        else : ?>
-          <div class="tnc-card">
-            <div class="tnc-head">
-              <div class="tnc-num">1</div>
-              <div class="tnc-title">Terms &amp; Conditions</div>
-            </div>
-            <ul class="tnc-list">
-              <li>Terms and conditions will be shared as per company policy.</li>
-            </ul>
-          </div>
-        <?php endif; ?>
-      </div>
 
-      <!-- <div class="tnc-footer-note">
-        📄 By confirming this booking, the client agrees to all the above terms and conditions and authorizes <strong><?= o5e($o5_company) ?></strong> to process payments and make necessary arrangements for the tour.
-      </div> -->
+            <div class="pay-cards-grid">
+              <div class="pay-info-card">
+                <div class="pay-info-head"><span class="pay-info-icon">💳</span> Payment Instructions</div>
+                <ul class="pay-list">
+                  <?php foreach ($o5_pay_notes as $note) : ?>
+                    <li><span class="chk">✓</span> <?= o5e($note) ?></li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+              <div class="pay-info-card">
+                <div class="pay-info-head"><span class="pay-info-icon">🛡️</span> Booking Policy</div>
+                <ul class="pay-list">
+                  <?php foreach (array_slice($o5_book_policy, 0, 4) as $pol) : ?>
+                    <li><span class="chk">✓</span> <?= o5e($pol) ?></li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="page-divider" />
+
+        <div class="pdf-page">
+          <?php o5_render_page_header_strip($hero, 'Traveller Reviews'); ?>
+
+          <!-- REVIEWS -->
+          <div class="page-section print-section">
+            <div class="sec-head">
+              <h2>What Our Travellers Say</h2>
+            </div>
+
+            <div class="reviews-grid">
+              <?php if (!empty($testimonials)) :
+                $o5_ti = 0;
+                foreach ($testimonials as $t) :
+                  if ($o5_ti >= 3) {
+                    break;
+                  }
+                  $o5_ti++;
+                  $photo = o5_testi_photo(isset($t['photo']) ? $t['photo'] : '');
+              ?>
+                  <div class="review-card">
+                    <div class="review-quote-icon">❝</div>
+                    <div class="review-text">"<?= o5e(o5nv($t['review'], '')) ?>"</div>
+                    <div class="review-footer">
+                      <?php if ($photo !== '') : ?>
+                        <img class="review-avatar" src="<?= o5e($photo) ?>" alt="<?= o5e(o5nv($t['name'], '')) ?>" />
+                      <?php else : ?>
+                        <div class="review-avatar" style="background:var(--navy);color:var(--gold2);display:flex;align-items:center;justify-content:center;font-weight:700;"><?= o5e(strtoupper(substr(o5nv($t['name'], 'T'), 0, 1))) ?></div>
+                      <?php endif; ?>
+                      <div>
+                        <div class="review-name"><?= o5e(o5nv($t['name'], 'Traveller')) ?></div>
+                        <div class="review-loc"><?= o5e(o5nv($t['designation'], '')) ?></div>
+                        <div class="review-stars">★★★★★</div>
+                      </div>
+                    </div>
+                  </div>
+                <?php
+                endforeach;
+              else :
+                ?>
+                <div class="review-card">
+                  <div class="review-quote-icon">❝</div>
+                  <div class="review-text">Customer testimonials can be managed from Quotation Builder settings.</div>
+                </div>
+              <?php endif; ?>
+            </div>
+
+            <div class="stats-bar">
+              <div class="stat-item">
+                <div class="stat-num">⭐ <?= o5e($o5_google_rating) ?></div>
+                <div class="stat-lbl">Google Rating</div>
+              </div>
+              <div class="stats-div"></div>
+              <div class="stat-item">
+                <div class="stat-num"><?= o5e($o5_review_count) ?></div>
+                <div class="stat-lbl">Happy Reviews</div>
+              </div>
+              <div class="stats-div"></div>
+              <div class="stat-item">
+                <div class="stat-num"><?= o5e($o5_traveller_cnt) ?></div>
+                <div class="stat-lbl">Happy Travellers</div>
+              </div>
+            </div>
+
+            <div class="trust-grid">
+              <div class="trust-card">
+                <div class="trust-icon">🛡️</div>
+                <div class="trust-label">Secure Booking</div>
+              </div>
+              <div class="trust-card">
+                <div class="trust-icon">🏅</div>
+                <div class="trust-label">Best Price Guarantee</div>
+              </div>
+              <div class="trust-card">
+                <div class="trust-icon">❤️</div>
+                <div class="trust-label">Personalized Service</div>
+              </div>
+              <div class="trust-card">
+                <div class="trust-icon">✨</div>
+                <div class="trust-label">Premium Experience</div>
+              </div>
+            </div>
+
+            <div class="cta-btn">📞 Ready to Book? Call us: <?= o5e(o5nv($ty['company_contact'], o5nv($hero['user_contact'], ''))) ?></div>
+          </div>
+        </div>
+
+        <hr class="page-divider" />
+
+        <div class="pdf-page">
+          <?php o5_render_page_header_strip($hero, 'Terms & Conditions'); ?>
+
+          <!-- TERMS -->
+          <div class="page-section print-section">
+            <div class="sec-head">
+              <h2><?= o5e(o5nv($terms['title'], 'Terms & Conditions')) ?></h2>
+            </div>
+
+            <div class="tnc-grid">
+              <?php
+              $o5_terms_html = isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '';
+              $o5_terms_html = str_replace(array("\r", "\n"), '', $o5_terms_html);
+
+              $o5_term_cards = array();
+
+              preg_match_all('/<b[^>]*>(.*?)<\/b>\s*<br\s*\/?>(.*?)(?=<span[^>]*>\s*<br>\s*<b|<div><span[^>]*>\s*<b|<b[^>]*>|$)/is', $o5_terms_html, $matches, PREG_SET_ORDER);
+
+              foreach ($matches as $i => $m) {
+                $title = trim(strip_tags($m[1]));
+                $title = trim($title, " :\t\n\r\0\x0B");
+
+                $body = trim($m[2]);
+
+                if (preg_match('/<ul[^>]*>(.*?)<\/ul>/is', $body, $ul_match)) {
+                  $body = '<ul class="tnc-list">' . $ul_match[1] . '</ul>';
+                } else {
+                  $body = '<div class="tnc-list-text">' . strip_tags($body, '<br>') . '</div>';
+                }
+
+                if ($title != '') {
+                  $o5_term_cards[] = array(
+                    'num' => $i + 1,
+                    'title' => $title,
+                    'body' => $body
+                  );
+                }
+              }
+              ?>
+              <?php if (!empty($o5_term_cards)) :
+                foreach ($o5_term_cards as $card) : ?>
+                  <div class="tnc-card">
+                    <div class="tnc-head">
+                      <div class="tnc-num"><?= o5e($card['num']) ?></div>
+                      <div class="tnc-title"><?= o5e($card['title']) ?></div>
+                    </div>
+                    <?= $card['body'] ?>
+                  </div>
+                <?php endforeach;
+              else : ?>
+                <div class="tnc-card">
+                  <div class="tnc-head">
+                    <div class="tnc-num">1</div>
+                    <div class="tnc-title">Terms &amp; Conditions</div>
+                  </div>
+                  <ul class="tnc-list">
+                    <li>Terms and conditions will be shared as per company policy.</li>
+                  </ul>
+                </div>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+
+        <!-- THANK YOU -->
+        <div class="ty-page" style="background:linear-gradient(rgba(15,32,68,.72),rgba(15,32,68,.82)),url('<?= o5e($o5_ty_bg) ?>') center/cover no-repeat;">
+          <div class="ty-top">
+            <div class="ty-logo">
+              <?php if ($o5_logo !== '') : ?>
+                <img src="<?= o5e($o5_logo) ?>" alt="<?= o5e($o5_company) ?>" class="company-logo-img" />
+              <?php else : ?>
+                <div class="ty-logo-icon">✈</div>
+              <?php endif; ?>
+              <!-- <div class="ty-logo-name"><? //= o5e($o5_company) 
+                                              ?></div> -->
+            </div>
+          </div>
+
+          <div class="ty-main">
+            <div class="ty-script">Thank You</div>
+            <div class="ty-sub">Dear <?= o5e($o5_client) ?>, we truly appreciate your trust in <?= o5e(o5nv($ty['company_name'], $o5_company)) ?>. Our team is committed to crafting an unforgettable travel experience for you.</div>
+            <div class="ty-stats-row">
+              <div class="ty-stat">
+                <div class="ty-stat-num">⭐ <?= o5e($o5_google_rating) ?></div>
+                <div class="ty-stat-lbl">Rating</div>
+              </div>
+              <div class="ty-stat">
+                <div class="ty-stat-num"><?= o5e($o5_review_count) ?></div>
+                <div class="ty-stat-lbl">Reviews</div>
+              </div>
+              <div class="ty-stat">
+                <div class="ty-stat-num"><?= o5e($o5_traveller_cnt) ?></div>
+                <div class="ty-stat-lbl">Travellers</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ty-contact-row">
+            <div class="ty-contact-item">
+              <div class="ty-contact-icon">🌐</div>
+              <div class="ty-contact-val">
+                <a href="<?= o5e(o5nv($ty['website'], '')) ?>">
+                  <?= o5e(o5nv($ty['website'], '')) ?>
+                </a>
+              </div>
+            </div>
+
+            <div class="ty-contact-item">
+              <div class="ty-contact-icon">📞</div>
+              <div class="ty-contact-val">
+                <a href="tel:<?= preg_replace('/\s+/', '', o5nv($ty['company_contact'], o5nv($ty['user_mobile'], ''))) ?>">
+                  <?= o5e(o5nv($ty['company_contact'], o5nv($ty['user_mobile'], ''))) ?>
+                </a>
+              </div>
+            </div>
+
+            <div class="ty-contact-item">
+              <div class="ty-contact-icon">✉️</div>
+              <div class="ty-contact-val">
+                <a href="mailto:<?= o5e(o5nv($ty['company_email'], '')) ?>">
+                  <?= o5e(o5nv($ty['company_email'], '')) ?>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="ty-divider"></div>
+          <div class="ty-bottom">
+            <div class="ty-address">
+              <div class="addr-title">Corporate Office</div>
+              <div class="addr-text"><?= o5e(o5nv($ty['company_address'], '')) ?></div>
+            </div>
+            <div class="ty-prepared">
+              <div class="prep-label">Prepared By</div>
+              <div class="prep-name"><?= o5e(o5nv($ty['prepared_by'], o5nv($hero['login_user'], 'Team'))) ?></div>
+              <div class="prep-role">Travel Consultant</div>
+            </div>
+          </div>
+        </div>
+
     </div>
 
-    <!-- THANK YOU -->
-    <div class="ty-page" style="background:linear-gradient(rgba(15,32,68,.72),rgba(15,32,68,.82)),url('<?= o5e($o5_ty_bg) ?>') center/cover no-repeat;">
-      <div class="ty-top">
-        <div class="ty-logo">
-          <?php if ($o5_logo !== '') : ?>
-            <img src="<?= o5e($o5_logo) ?>" alt="<?= o5e($o5_company) ?>" class="company-logo-img" />
-          <?php else : ?>
-            <div class="ty-logo-icon">✈</div>
-          <?php endif; ?>
-          <!-- <div class="ty-logo-name"><? //= o5e($o5_company) 
-                                          ?></div> -->
-        </div>
-      </div>
+    <script type="text/javascript">
+      (function() {
+        var printed = false;
 
-      <div class="ty-main">
-        <div class="ty-script">Thank You</div>
-        <div class="ty-sub">Dear <?= o5e($o5_client) ?>, we truly appreciate your trust in <?= o5e(o5nv($ty['company_name'], $o5_company)) ?>. Our team is committed to crafting an unforgettable travel experience for you.</div>
-        <div class="ty-stats-row">
-          <div class="ty-stat">
-            <div class="ty-stat-num">⭐ <?= o5e($o5_google_rating) ?></div>
-            <div class="ty-stat-lbl">Rating</div>
-          </div>
-          <div class="ty-stat">
-            <div class="ty-stat-num"><?= o5e($o5_review_count) ?></div>
-            <div class="ty-stat-lbl">Reviews</div>
-          </div>
-          <div class="ty-stat">
-            <div class="ty-stat-num"><?= o5e($o5_traveller_cnt) ?></div>
-            <div class="ty-stat-lbl">Travellers</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="ty-contact-row">
-        <div class="ty-contact-item">
-          <div class="ty-contact-icon">🌐</div>
-          <div class="ty-contact-val">
-            <a href="<?= o5e(o5nv($ty['website'], '')) ?>">
-              <?= o5e(o5nv($ty['website'], '')) ?>
-            </a>
-          </div>
-        </div>
-
-        <div class="ty-contact-item">
-          <div class="ty-contact-icon">📞</div>
-          <div class="ty-contact-val">
-            <a href="tel:<?= preg_replace('/\s+/', '', o5nv($ty['company_contact'], o5nv($ty['user_mobile'], ''))) ?>">
-              <?= o5e(o5nv($ty['company_contact'], o5nv($ty['user_mobile'], ''))) ?>
-            </a>
-          </div>
-        </div>
-
-        <div class="ty-contact-item">
-          <div class="ty-contact-icon">✉️</div>
-          <div class="ty-contact-val">
-            <a href="mailto:<?= o5e(o5nv($ty['company_email'], '')) ?>">
-              <?= o5e(o5nv($ty['company_email'], '')) ?>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="ty-divider"></div>
-      <div class="ty-bottom">
-        <div class="ty-address">
-          <div class="addr-title">Corporate Office</div>
-          <div class="addr-text"><?= o5e(o5nv($ty['company_address'], '')) ?></div>
-        </div>
-        <div class="ty-prepared">
-          <div class="prep-label">Prepared By</div>
-          <div class="prep-name"><?= o5e(o5nv($ty['prepared_by'], o5nv($hero['login_user'], 'Team'))) ?></div>
-          <div class="prep-role">Travel Consultant</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script type="text/javascript">
-    (function() {
-      var printed = false;
-
-      function doPrint() {
-        if (printed) return;
-        printed = true;
-        try {
-          window.focus();
-        } catch (e) {}
-        window.print();
-      }
-
-      function waitForImages() {
-        var imgs = Array.prototype.slice.call(document.images || []);
-        var pending = imgs.filter(function(img) {
-          return !img.complete;
-        });
-        if (pending.length === 0) return Promise.resolve();
-        return Promise.all(pending.map(function(img) {
-          return new Promise(function(resolve) {
-            img.addEventListener('load', resolve, {
-              once: true
-            });
-            img.addEventListener('error', resolve, {
-              once: true
-            });
-          });
-        }));
-      }
-
-      function waitForFonts() {
-        if (document.fonts && document.fonts.ready) {
-          return document.fonts.ready.catch(function() {});
+        function doPrint() {
+          if (printed) return;
+          printed = true;
+          try {
+            window.focus();
+          } catch (e) {}
+          window.print();
         }
-        return Promise.resolve();
-      }
 
-      function ready() {
-        var safety = new Promise(function(resolve) {
-          setTimeout(resolve, 4000);
-        });
-        Promise.race([
-          Promise.all([waitForImages(), waitForFonts()]),
-          safety
-        ]).then(function() {
-          setTimeout(doPrint, 150);
-        });
-      }
-      if (document.readyState === 'complete') {
-        ready();
-      } else {
-        window.addEventListener('load', ready);
-      }
-    })();
-  </script>
+        function waitForImages() {
+          var imgs = Array.prototype.slice.call(document.images || []);
+          var pending = imgs.filter(function(img) {
+            return !img.complete;
+          });
+          if (pending.length === 0) return Promise.resolve();
+          return Promise.all(pending.map(function(img) {
+            return new Promise(function(resolve) {
+              img.addEventListener('load', resolve, {
+                once: true
+              });
+              img.addEventListener('error', resolve, {
+                once: true
+              });
+            });
+          }));
+        }
+
+        function waitForFonts() {
+          if (document.fonts && document.fonts.ready) {
+            return document.fonts.ready.catch(function() {});
+          }
+          return Promise.resolve();
+        }
+
+        function ready() {
+          var safety = new Promise(function(resolve) {
+            setTimeout(resolve, 4000);
+          });
+          Promise.race([
+            Promise.all([waitForImages(), waitForFonts()]),
+            safety
+          ]).then(function() {
+            setTimeout(doPrint, 150);
+          });
+        }
+        if (document.readyState === 'complete') {
+          ready();
+        } else {
+          window.addEventListener('load', ready);
+        }
+      })();
+    </script>
 </body>
 
 </html>

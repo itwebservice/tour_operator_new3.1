@@ -301,7 +301,7 @@ body {
 .ph-logo .pl-tag {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 9px;
+  font-size: 13px;
   color: var(--gold);
 }
 .ph-right {
@@ -616,7 +616,7 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
   margin-bottom: 5px;
 }
@@ -816,7 +816,7 @@ body {
   margin-top: 4px;
 }
 .ff-item .ff-label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 .ff-item .ff-value {
@@ -990,7 +990,7 @@ body {
   border-left: 1px solid var(--border);
 }
 .day-attr-label {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--gold);
   font-weight: 700;
   letter-spacing: 2px;

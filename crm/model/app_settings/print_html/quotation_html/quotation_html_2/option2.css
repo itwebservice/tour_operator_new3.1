@@ -165,7 +165,8 @@ body {
 .strip__no {
   font-family: var(--serif);
   font-style: italic;
-  color: rgba(255, 255, 255, 0.62);
+  /* color: rgba(255, 255, 255, 0.62); */
+  color: rgb(221 229 232);
   font-size: 14px;
   white-space: nowrap;
   margin-bottom: 6px;
@@ -370,8 +371,8 @@ body.cover-b .cv-b {
   gap: 6px;
 }
 .logo__slot {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
 }
 .logo__name {
   font-family: var(--serif);
@@ -383,7 +384,7 @@ body.cover-b .cv-b {
   font-family: var(--sans);
   font-weight: 400;
   letter-spacing: 0.32em;
-  font-size: 7px;
+  font-size: 9px;
   text-transform: uppercase;
 }
 
@@ -752,7 +753,7 @@ body.cover-b .cv-b {
   align-items: center;
 }
 .ov .t {
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
@@ -766,7 +767,7 @@ body.cover-b .cv-b {
   line-height: 1.1;
 }
 .ov .v.sm {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .prep {
@@ -833,7 +834,7 @@ body.cover-b .cv-b {
   padding: 11px 13px 13px;
 }
 .hotel__city {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--gold-deep);
@@ -854,7 +855,7 @@ body.cover-b .cv-b {
   line-height: 1.12;
 }
 .hotel__cat {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
 }
 .hotel__stars {
@@ -876,7 +877,7 @@ body.cover-b .cv-b {
   padding: 6px 8px;
 }
 .hotel__dt .l {
-  font-size: 7px;
+  font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1021,7 +1022,7 @@ body.cover-b .cv-b {
   line-height: 0.9;
 }
 .sector .pt .city {
-  font-size: 9.5px;
+  font-size: 10.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 450;
@@ -1061,18 +1062,18 @@ body.cover-b .cv-b {
 .boarding__times .x {
   flex: 1;
 }
+
 .boarding__times .l {
-  font-size: 7.5px;
+  font-size: 9.8px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   /* color: var(--muted); */
-    color: var(--navy);
-
+  color: var(--navy);
 }
 .boarding__times .v {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--navy);
   margin-top: 2px;
 }
@@ -1512,8 +1513,10 @@ body.cover-b .cv-b {
 }
 
 .option1-ie-grid .ie--ex li svg {
-  color: color-mix(in oklab, var(--navy) 70%, transparent) !important;
-  stroke: color-mix(in oklab, var(--navy) 70%, transparent) !important;
+  /* color: color-mix(in oklab, var(--navy) 70%, transparent) !important;
+  stroke: color-mix(in oklab, var(--navy) 70%, transparent) !important; */
+      color:#dc2626;
+
 }
 
 .cost {
@@ -2090,7 +2093,7 @@ img {
   font-size: 15px;
 }
 .tnode .rt i {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--gold-deep);
 }
 .ie li i {
@@ -2144,8 +2147,8 @@ img {
 }
 /* ======================== Dipti  */
 .incitem .ico svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: block;
   margin: auto;
 }
@@ -2173,14 +2176,12 @@ img {
   width: 100% !important;
 }
 
-.itinerary-page .strip,
 .inclusion-page .strip,
 .payment-page .strip {
   break-after: avoid !important;
   page-break-after: avoid !important;
 }
 
-.itinerary-page .page__body,
 .inclusion-page .page__body,
 .payment-page .page__body {
   break-before: avoid !important;

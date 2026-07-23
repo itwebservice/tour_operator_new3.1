@@ -279,7 +279,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
       <div class="relative z-10 mt-12 px-12">
         <div class="grid grid-cols-6 gap-3">
           <div class="rounded-xl border border-[color:var(--gold)]/40 bg-white/8 backdrop-blur-md px-3 py-3 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hotel w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hotel w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
               <path d="M10 22v-6.57">
               </path>
               <path d="M12 11h.01">
@@ -304,14 +304,14 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             <div class="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-cream/85">Hotels</div>
           </div>
           <div class="rounded-xl border border-[color:var(--gold)]/40 bg-white/8 backdrop-blur-md px-3 py-3 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
               <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z">
               </path>
             </svg>
             <div class="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-cream/85">Flights</div>
           </div>
           <div class="rounded-xl border border-[color:var(--gold)]/40 bg-white/8 backdrop-blur-md px-3 py-3 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-camera w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
               <path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z">
               </path>
               <circle cx="12" cy="13" r="3">
@@ -320,7 +320,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             <div class="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-cream/85">Activities</div>
           </div>
           <div class="rounded-xl border border-[color:var(--gold)]/40 bg-white/8 backdrop-blur-md px-3 py-3 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
               <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2">
               </path>
               <circle cx="7" cy="17" r="2">
@@ -333,7 +333,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             <div class="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-cream/85">Transfers</div>
           </div>
           <div class="rounded-xl border border-[color:var(--gold)]/40 bg-white/8 backdrop-blur-md px-3 py-3 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
               <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
               </path>
               <circle cx="12" cy="10" r="3">
@@ -342,7 +342,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             <div class="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-cream/85">Sightseeing</div>
           </div>
           <div class="rounded-xl border border-[color:var(--gold)]/40 bg-white/8 backdrop-blur-md px-3 py-3 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils w-5 h-5 mx-auto text-[color:var(--gold)]" aria-hidden="true">
               <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2">
               </path>
               <path d="M7 2v20">
@@ -414,7 +414,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
           <div>
             <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--gold)] mb-1.5">Prepared Exclusively For</div>
             <div class="font-display text-4xl text-cream"><?= o1e(o1nv($ov['client_name'], $hero['client_name'])) ?></div>
-            <div class="text-cream/70 text-sm mt-1 font-serif-soft italic"><?php if (o1nv($ov['guest_count'], '') !== '') { ?><?= o1e($ov['guest_count']) ?> Travellers &middot; <?php } ?><?= o1e($ov['travel_from']) ?> &ndash; <?= o1e($ov['travel_to']) ?></div>
+            <div class="text-cream/80 text-sm mt-1 font-serif-soft italic"><?php if (o1nv($ov['guest_count'], '') !== '') { ?><?= o1e($ov['guest_count']) ?> Travellers &middot; <?php } ?><?= o1e($ov['travel_from']) ?> &ndash; <?= o1e($ov['travel_to']) ?></div>
           </div>
           <div class="text-right text-cream/80">
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]"><?= o1e(o1nv($hero['duration_label'], '')) ?></div>
@@ -439,7 +439,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             </div>
             <div class="leading-tight text-cream">
               <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
-              <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
+              <div class="text-[10px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
           </div>
           <div class="text-cream text-right">
@@ -738,7 +738,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
           </div>
           <div class="rounded-full px-4 py-1.5 text-cream text-xs uppercase tracking-[0.2em]" style="background:var(--gradient-navy)">
             <span class="text-[color:var(--gold)] mr-2">✦</span>
-            
+
             <?= o1e($o1_pkg_label) ?>
           </div>
         </div>
@@ -1860,7 +1860,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             <?php } ?>
             </div>
           </div>
-          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic">* Prices indicative and subject to availability at the time of booking confirmation.</div>
+          <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic italic-size">* Prices indicative and subject to availability at the time of booking confirmation.</div>
           <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
             <span><?= o1e($o1_company) ?> · Luxury Voyages</span>
             <span class="text-[color:var(--gold)]">✦ ✦ ✦</span>
@@ -2664,14 +2664,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
 
       </div>
       <!-- ======================================== -->
-      <!-- <div class="rounded-xl bg-white p-5 border border-[color:var(--gold)]/25 mt-6" style="box-shadow:var(--shadow-card)">
-          <div class="font-serif-soft text-[12px] text-[color:var(--ink)]/85 leading-relaxed">
-            <? //php
-            //$o1_terms_html = trim(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '');
-            //echo $o1_terms_html !== '' ? $o1_terms_html : 'Terms and conditions will be shared as per company policy.';
-            ?>
-          </div>
-        </div> -->
       <div class="grid grid-cols-2 gap-3 mt-6 hidden">
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2697,7 +2689,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">25% advance required to confirm the booking. The balance must be cleared 15 days prior to the travel date.</p> -->
         </div>
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2717,7 +2708,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">30+ days: 25% retention. 15â€“29 days: 50%. 7â€“14 days: 75%. Under 7 days: 100% retention.</p> -->
         </div>
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2737,7 +2727,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Refunds will be processed within 10â€“15 working days from the date of cancellation approval.</p> -->
         </div>
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2759,7 +2748,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Visa approval is at the sole discretion of the embassy. Fees once paid are non-refundable in any case.</p> -->
         </div>
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2795,7 +2783,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Standard check-in 14:00, check-out 12:00. Early check-in or late check-out is subject to availability.</p> -->
         </div>
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2813,7 +2800,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Flight schedules and fares are subject to change by the airline. Re-booking charges are payable as applicable.</p> -->
         </div>
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2833,7 +2819,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">We shall not be liable for changes or cancellations due to natural calamities, political unrest, or pandemics.</p> -->
         </div>
         <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
           <div class="flex items-center gap-2">
@@ -2853,7 +2838,6 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
             ?>
           </p>
           <!-- ==================== -->
-          <!-- <p class="mt-2 text-[11.5px] text-[color:var(--ink)]/80 leading-relaxed">Travel insurance is strongly recommended and not included in the package unless specified explicitly.</p> -->
         </div>
       </div>
       <div class="terms-spacing mt-2 rounded-xl p-5 text-cream relative overflow-hidden" style="background:var(--gradient-navy)">
@@ -2907,7 +2891,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
       </div>
       <div class="relative px-10 pt-10 pb-20">
         <div class="text-center">
-          <div class="flex items-center gap-2.5">
+          <!-- <div class="flex items-center gap-2.5">
             <div class="relative w-10 h-10 rounded-full grid place-items-center" style="background:var(--gradient-gold)">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-compass w-5 h-5 text-[color:var(--navy)]" aria-hidden="true">
                 <circle cx="12" cy="12" r="10">
@@ -2917,10 +2901,10 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
               </svg>
             </div>
             <div class="leading-tight text-[color:var(--navy)]">
-              <div class="font-display text-lg font-bold tracking-wide"><?= o1e($o1_company) ?></div>
+              <div class="font-display text-lg font-bold tracking-wide"><?//= o1e($o1_company) ?></div>
               <div class="text-[9px] uppercase tracking-[0.25em] opacity-80">Luxury Voyages</div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="text-center mt-10">
           <div class="text-[11px] uppercase tracking-[0.4em] text-[color:var(--gold)]">With Gratitude</div>
@@ -3077,7 +3061,7 @@ $o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
           </div>
         </div>
         <div class="mt-10 text-center">
-          <!-- <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div> -->
+          <span><?= o1e(o1nv($hero['company_name'], 'FreezeMyTrip')) ?></span>
           <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1"><?= o1e($o1_company) ?> Â· Luxury Voyages · Est. 2014</div>
         </div>
       </div>

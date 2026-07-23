@@ -302,7 +302,7 @@ body {
    SECTIONS (white bg pages)
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .page-section {
-  padding: 32px 28px;
+  padding: 22px 18px;
   background: var(--white);
 }
 .page-section + .page-section {
@@ -1388,7 +1388,7 @@ body {
   margin-bottom: 14px;
 }
 .review-text {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--slate);
   line-height: 1.65;
   margin-bottom: 16px;
@@ -1400,24 +1400,24 @@ body {
   gap: 10px;
 }
 .review-avatar {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
 }
 .review-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--navy);
 }
 .review-loc {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
 }
 .review-stars {
   color: var(--gold2);
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 1px;
   margin-top: 2px;
 }
@@ -1929,7 +1929,14 @@ body {
     display: block !important;
     margin-bottom: 14px !important;
   }
-
+/* .page-section{
+  page-break-before: always;
+    break-before: page;
+} */
+.pdf-page{
+  page-break-before: always;
+    break-before: page;
+}
   img {
     max-width: 100% !important;
   }

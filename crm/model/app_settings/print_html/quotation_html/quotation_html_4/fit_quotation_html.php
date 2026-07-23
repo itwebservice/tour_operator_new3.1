@@ -358,76 +358,78 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     </div>
 
     <!-- PAGE 2 – OVERVIEW -->
-    <?php o4_render_page_header($hero, $o4_pkg_ov); ?>
-    <div class="page-section">
-      <div class="personal-banner">
-        <div class="eyebrow">Personalized For You</div>
-        <h2>A Personalized Travel Experience<br />Exclusively Designed for <span><?= o4e($o4_client) ?></span></h2>
-      </div>
+    <div class="pdf-page">
+      <?php o4_render_page_header($hero, $o4_pkg_ov); ?>
+      <div class="page-section">
+        <div class="personal-banner">
+          <div class="eyebrow">Personalized For You</div>
+          <h2>A Personalized Travel Experience<br />Exclusively Designed for <span><?= o4e($o4_client) ?></span></h2>
+        </div>
 
-      <div class="salutation-card">
-        <div class="dear">Dear <?= o4e($o4_salutation) ?>,</div>
-        <p>Thank you for choosing <?= o4e($o4_company) ?> for your upcoming journey. We are delighted to present this carefully crafted travel proposal designed to provide memorable experiences, seamless arrangements, and exceptional hospitality throughout your trip. Every detail has been thoughtfully curated to ensure your <?= o4e($o4_dest) ?> escape is nothing short of extraordinary.</p>
-      </div>
+        <div class="salutation-card">
+          <div class="dear">Dear <?= o4e($o4_salutation) ?>,</div>
+          <p>Thank you for choosing <?= o4e($o4_company) ?> for your upcoming journey. We are delighted to present this carefully crafted travel proposal designed to provide memorable experiences, seamless arrangements, and exceptional hospitality throughout your trip. Every detail has been thoughtfully curated to ensure your <?= o4e($o4_dest) ?> escape is nothing short of extraordinary.</p>
+        </div>
 
-      <div class="sec-eyebrow">Your Journey at a Glance</div>
-      <div class="sec-heading">Tour Overview</div>
+        <div class="sec-eyebrow">Your Journey at a Glance</div>
+        <div class="sec-heading">Tour Overview</div>
 
-      <div class="ov-grid">
-        <div class="ov-card">
-          <div class="icon">#</div>
-          <div class="lbl">Quotation ID</div>
-          <div class="val"><?= o4e(o4nv($hero['quotation_code'], '')) ?></div>
-        </div>
-        <div class="ov-card">
-          <div class="icon">🏷️</div>
-          <div class="lbl">Tour ID</div>
-          <div class="val"><?= o4e($o4_tour_id) ?></div>
-        </div>
-        <div class="ov-card">
-          <div class="icon">📅</div>
-          <div class="lbl">Quotation Date</div>
-          <div class="val"><?= o4e(o4nv($ov['quotation_date'], '')) ?></div>
-        </div>
-      </div>
-      <div class="ov-grid" style="margin-bottom:20px;">
-        <div class="ov-card">
-          <div class="icon">✈️</div>
-          <div class="lbl">Travel Date</div>
-          <div class="val"><?= o4e($o4_travel_range !== '' ? $o4_travel_range : ($o4_travel_from . ($o4_travel_to !== '' ? ' – ' . $o4_travel_to : ''))) ?></div>
-        </div>
-        <div class="ov-card">
-          <div class="icon">⏱️</div>
-          <div class="lbl">Duration</div>
-          <div class="val"><?= o4e($o4_duration) ?></div>
-        </div>
-        <div class="ov-card">
-          <div class="icon">👥</div>
-          <div class="lbl">Guests</div>
-          <div class="val"><?= o4e(o4_guest_label($ov)) ?></div>
-        </div>
-      </div>
-
-      <div class="prep-bar">
-        <div class="prep-lbl">Prepared For</div>
-        <div class="prep-row">
-          <div class="prep-item"><span class="pi">👤</span> <?= o4e($o4_client) ?></div>
-          <div class="prep-item">
-            <span class="pi">✉️</span>
-            <a href="mailto:<?= o4e(o4nv($ov['customer_email'], o4nv($hero['user_email_id'], ''))) ?>">
-              <?= o4e(o4nv($ov['customer_email'], o4nv($hero['user_email_id'], ''))) ?>
-            </a>
+        <div class="ov-grid">
+          <div class="ov-card">
+            <div class="icon">#</div>
+            <div class="lbl">Quotation ID</div>
+            <div class="val"><?= o4e(o4nv($hero['quotation_code'], '')) ?></div>
           </div>
-          <div class="prep-item">
-            <span class="pi">📞</span>
-            <a href="tel:<?= o4e(preg_replace('/\D+/', '', o4nv($ov['customer_mobile'], o4nv($hero['user_contact'], '')))) ?>">
-              <?= o4e(o4nv($ov['customer_mobile'], o4nv($hero['user_contact'], ''))) ?>
-            </a>
+          <div class="ov-card">
+            <div class="icon">🏷️</div>
+            <div class="lbl">Tour ID</div>
+            <div class="val"><?= o4e($o4_tour_id) ?></div>
+          </div>
+          <div class="ov-card">
+            <div class="icon">📅</div>
+            <div class="lbl">Quotation Date</div>
+            <div class="val"><?= o4e(o4nv($ov['quotation_date'], '')) ?></div>
           </div>
         </div>
+        <div class="ov-grid" style="margin-bottom:20px;">
+          <div class="ov-card">
+            <div class="icon">✈️</div>
+            <div class="lbl">Travel Date</div>
+            <div class="val"><?= o4e($o4_travel_range !== '' ? $o4_travel_range : ($o4_travel_from . ($o4_travel_to !== '' ? ' – ' . $o4_travel_to : ''))) ?></div>
+          </div>
+          <div class="ov-card">
+            <div class="icon">⏱️</div>
+            <div class="lbl">Duration</div>
+            <div class="val"><?= o4e($o4_duration) ?></div>
+          </div>
+          <div class="ov-card">
+            <div class="icon">👥</div>
+            <div class="lbl">Guests</div>
+            <div class="val"><?= o4e(o4_guest_label($ov)) ?></div>
+          </div>
+        </div>
+
+        <div class="prep-bar">
+          <div class="prep-lbl">Prepared For</div>
+          <div class="prep-row">
+            <div class="prep-item"><span class="pi">👤</span> <?= o4e($o4_client) ?></div>
+            <div class="prep-item">
+              <span class="pi">✉️</span>
+              <a href="mailto:<?= o4e(o4nv($ov['customer_email'], o4nv($hero['user_email_id'], ''))) ?>">
+                <?= o4e(o4nv($ov['customer_email'], o4nv($hero['user_email_id'], ''))) ?>
+              </a>
+            </div>
+            <div class="prep-item">
+              <span class="pi">📞</span>
+              <a href="tel:<?= o4e(preg_replace('/\D+/', '', o4nv($ov['customer_mobile'], o4nv($hero['user_contact'], '')))) ?>">
+                <?= o4e(o4nv($ov['customer_mobile'], o4nv($hero['user_contact'], ''))) ?>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
+      <div class="page-num">PAGE 02 / 10</div>
     </div>
-    <div class="page-num">PAGE 02 / 09</div>
 
     <!-- PAGE 3 – ACCOMMODATION -->
     <div class="pdf-page">
@@ -509,363 +511,364 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
         <?php endif; ?>
         <div class="hotel-note">All hotels are subject to availability at the time of confirmation. Similar category alternatives may be offered.</div>
       </div>
-      <div class="page-num">PAGE 03 / 09</div>
+      <div class="page-num">PAGE 03 / 10</div>
     </div>
 
     <!-- PAGE 4 – FLIGHTS -->
-    <?php
-    $o4_show_flights = !empty($present['flights']) && !empty($flights);
-    $o4_show_vehs = !empty($present['vehicles']) && !empty($vehs);
-    if ($o4_show_flights || $o4_show_vehs) :
-      o4_render_page_header($hero, 'Flights');
-    ?>
+    <div class="pdf-page">
+      <?php
+      $o4_show_flights = !empty($present['flights']) && !empty($flights);
+      $o4_show_vehs = !empty($present['vehicles']) && !empty($vehs);
+      if ($o4_show_flights || $o4_show_vehs) :
+        o4_render_page_header($hero, 'Flights');
+      ?>
+        <div class="page-section">
+          <?php if ($o4_show_flights) : ?>
+            <div class="sec-eyebrow">Your Journey by Air</div>
+            <div class="sec-heading">Flight Details</div>
+
+            <?php foreach ($flights as $f) :
+              $air_name = o4nv($f['airline_name'], o4nv($f['airline_display'], 'Flight'));
+              $flight_lbl = o4nv($f['airline_code'], o4nv($f['airline_display'], ''));
+              $from_code = o4_air_code(o4nv($f['from_city'], ''));
+              $to_code = o4_air_code(o4nv($f['to_city'], ''));
+              $duration = o4nv($f['duration'], '');
+              $stop_type = o4nv($f['stop_type'], 'Non-Stop');
+              $baggage = o4nv($f['baggage'], 'As per airline policy');
+            ?>
+              <div class="flight-card">
+                <div class="flight-card-inner">
+                  <div class="flight-left">
+                    <div class="flight-boarding">✈ Boarding</div>
+                    <div>
+                      <div class="flight-num"><?= o4e($flight_lbl) ?></div>
+                      <div class="flight-class"><?= o4e(o4nv($f['class'], 'Economy')) ?></div>
+                    </div>
+                  </div>
+                  <div class="flight-right">
+                    <div class="flight-airline-row">
+                      <div class="flight-airline"><?= o4e($air_name) ?></div>
+                      <div class="flight-num-badge"><?= o4e($flight_lbl) ?></div>
+                    </div>
+                    <div class="flight-route">
+                      <div>
+                        <div class="flight-code"><?= o4e($from_code) ?></div>
+                        <div class="flight-city"><?= o4e(o4nv($f['from_city'], '')) ?></div>
+                      </div>
+                      <div class="flight-middle">
+                        <?php if ($duration !== '') : ?><div class="flight-duration"><?= o4e($duration) ?></div><?php endif; ?>
+                        <div class="flight-arrow-line">
+                          <div class="fal"></div>
+                          <div class="fa-arrow">→</div>
+                          <div class="fal"></div>
+                        </div>
+                        <div class="flight-nonstop"><?= o4e($stop_type) ?></div>
+                      </div>
+                      <div style="text-align:right;">
+                        <div class="flight-code"><?= o4e($to_code) ?></div>
+                        <div class="flight-city"><?= o4e(o4nv($f['to_city'], '')) ?></div>
+                      </div>
+                    </div>
+                    <div class="flight-footer">
+                      <div class="ff-item"><span class="ff-icon">⏰</span>
+                        <div>
+                          <div class="ff-lbl">Dep:</div>
+                          <div class="ff-val"><?= o4e(o4nv($f['departure_datetime'], 'NA')) ?></div>
+                        </div>
+                      </div>
+                      <div class="ff-div"></div>
+                      <div class="ff-item"><span class="ff-icon">⏰</span>
+                        <div>
+                          <div class="ff-lbl">Arr:</div>
+                          <div class="ff-val"><?= o4e(o4nv($f['arrival_datetime'], 'NA')) ?></div>
+                        </div>
+                      </div>
+                      <div class="ff-div"></div>
+                      <div class="ff-item"><span class="ff-icon">🧳</span>
+                        <div>
+                          <div class="ff-lbl">Baggage</div>
+                          <div class="ff-val"><?= o4e($baggage) ?></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+
+          <!-- ============ Train Details -->
+          <?php if (!empty($trains)) : ?>
+            <div class="sec-eyebrow" style="margin-top:24px;">Your Journey by Rail</div>
+            <div class="sec-heading">Train Details</div>
+
+            <?php foreach ($trains as $tr) :
+              $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
+              $to_loc = isset($tr['to_location']) ? $tr['to_location'] : '';
+              $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
+              $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
+
+              $total_pax = 0;
+              if (isset($ov['pax']) && is_array($ov['pax'])) {
+                $total_pax =
+                  (int)o4nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
+                  (int)o4nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
+                  (int)o4nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
+                  (int)o4nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
+              }
+            ?>
+              <div class="flight-card">
+                <div class="flight-card-inner">
+                  <div class="flight-left">
+                    <div class="flight-boarding">🚆 Boarding</div>
+                    <div>
+                      <div class="flight-num">TRAIN</div>
+                      <div class="flight-class"><?= o4e($train_class) ?></div>
+                    </div>
+                  </div>
+
+                  <div class="flight-right">
+                    <div class="flight-airline-row">
+                      <div class="flight-airline">Train Journey</div>
+                      <div class="flight-num-badge"><?= o4e($train_class) ?></div>
+                    </div>
+
+                    <div class="flight-route">
+                      <div>
+                        <div class="flight-code"><?= o4e(o4_air_code($from_loc)) ?></div>
+                        <div class="flight-city"><?= o4e(o4nv($from_loc, 'NA')) ?></div>
+                      </div>
+
+                      <div class="flight-middle">
+                        <div class="flight-arrow-line">
+                          <div class="fal"></div>
+                          <div class="fa-arrow">→</div>
+                          <div class="fal"></div>
+                        </div>
+                        <div class="flight-nonstop">Rail Journey</div>
+                      </div>
+
+                      <div style="text-align:right;">
+                        <div class="flight-code"><?= o4e(o4_air_code($to_loc)) ?></div>
+                        <div class="flight-city"><?= o4e(o4nv($to_loc, 'NA')) ?></div>
+                      </div>
+                    </div>
+
+                    <div class="flight-footer">
+                      <div class="ff-item">
+                        <span class="ff-icon">📅</span>
+                        <div>
+                          <div class="ff-lbl">Date & Time</div>
+                          <div class="ff-val"><?= o4e(o4nv($from_date, 'NA')) ?></div>
+                        </div>
+                      </div>
+
+                      <div class="ff-div"></div>
+
+                      <div class="ff-item">
+                        <span class="ff-icon">👥</span>
+                        <div>
+                          <div class="ff-lbl">Total Pax</div>
+                          <div class="ff-val"><?= o4e($total_pax) ?></div>
+                        </div>
+                      </div>
+
+                      <div class="ff-div"></div>
+
+                      <div class="ff-item">
+                        <span class="ff-icon">🎫</span>
+                        <div>
+                          <div class="ff-lbl">Class</div>
+                          <div class="ff-val"><?= o4e($train_class) ?></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+
+          <!-- ====== Activity Details -->
+          <?php if (!empty($acts)) : ?>
+            <div class="sec-eyebrow" style="margin-top:24px;">Experiences Included</div>
+            <div class="sec-heading">Activity Details</div>
+
+            <?php foreach ($acts as $a) :
+              $activity_img = BASE_URL . 'images/activity.jpg';
+
+              $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
+              $city_name = isset($a['city_name']) ? $a['city_name'] : '';
+              $activity_date = isset($a['date']) ? $a['date'] : '';
+              $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
+
+              $total_pax = 0;
+              if (isset($a['pax']) && is_array($a['pax'])) {
+                $total_pax =
+                  (int)o4nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
+                  (int)o4nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
+                  (int)o4nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
+                  (int)o4nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
+              }
+            ?>
+              <div class="transfer-card" style="margin-bottom:14px;">
+                <div class="transfer-inner">
+                  <div class="transfer-img">
+                    <img src="<?= o4e($activity_img) ?>" alt="<?= o4e(o4nv($activity_name, 'Activity')) ?>" />
+                  </div>
+
+                  <div class="transfer-body">
+                    <div class="transfer-head">
+                      <div class="transfer-name">📸 <?= o4e(o4nv($activity_name, 'Activity')) ?></div>
+                      <div class="transfer-type-badge"><?= o4e(o4nv($transfer_type, 'Activity')) ?></div>
+                    </div>
+
+                    <div class="transfer-grid">
+                      <div class="transfer-item">
+                        <div class="tlbl">📍 City</div>
+                        <div class="tval"><?= o4e(o4nv($city_name, 'NA')) ?></div>
+                      </div>
+
+                      <div class="transfer-item">
+                        <div class="tlbl">📅 Date</div>
+                        <div class="tval"><?= o4e(o4nv($activity_date, 'NA')) ?></div>
+                      </div>
+
+                      <div class="transfer-item">
+                        <div class="tlbl">🚐 Transfer Type</div>
+                        <div class="tval"><?= o4e(o4nv($transfer_type, 'NA')) ?></div>
+                      </div>
+
+                      <div class="transfer-item">
+                        <div class="tlbl">👥 Total Pax</div>
+                        <div class="tval"><?= o4e($total_pax) ?> Pax</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div class="page-num">PAGE 04 / 10</div>
+  <?php endif; ?>
+  </div>
+  <!-- ============= -->
+
+  <!-- PAGE 5 – TRANSFERS -->
+  <?php if ($o4_show_vehs) : ?>
+    <div class="pdf-page">
+      <?php o4_render_page_header($hero, 'Transfers'); ?>
       <div class="page-section">
-        <?php if ($o4_show_flights) : ?>
-          <div class="sec-eyebrow">Your Journey by Air</div>
-          <div class="sec-heading">Flight Details</div>
-
-          <?php foreach ($flights as $f) :
-            $air_name = o4nv($f['airline_name'], o4nv($f['airline_display'], 'Flight'));
-            $flight_lbl = o4nv($f['airline_code'], o4nv($f['airline_display'], ''));
-            $from_code = o4_air_code(o4nv($f['from_city'], ''));
-            $to_code = o4_air_code(o4nv($f['to_city'], ''));
-            $duration = o4nv($f['duration'], '');
-            $stop_type = o4nv($f['stop_type'], 'Non-Stop');
-            $baggage = o4nv($f['baggage'], 'As per airline policy');
-          ?>
-            <div class="flight-card">
-              <div class="flight-card-inner">
-                <div class="flight-left">
-                  <div class="flight-boarding">✈ Boarding</div>
-                  <div>
-                    <div class="flight-num"><?= o4e($flight_lbl) ?></div>
-                    <div class="flight-class"><?= o4e(o4nv($f['class'], 'Economy')) ?></div>
-                  </div>
-                </div>
-                <div class="flight-right">
-                  <div class="flight-airline-row">
-                    <div class="flight-airline"><?= o4e($air_name) ?></div>
-                    <div class="flight-num-badge"><?= o4e($flight_lbl) ?></div>
-                  </div>
-                  <div class="flight-route">
-                    <div>
-                      <div class="flight-code"><?= o4e($from_code) ?></div>
-                      <div class="flight-city"><?= o4e(o4nv($f['from_city'], '')) ?></div>
-                    </div>
-                    <div class="flight-middle">
-                      <?php if ($duration !== '') : ?><div class="flight-duration"><?= o4e($duration) ?></div><?php endif; ?>
-                      <div class="flight-arrow-line">
-                        <div class="fal"></div>
-                        <div class="fa-arrow">→</div>
-                        <div class="fal"></div>
-                      </div>
-                      <div class="flight-nonstop"><?= o4e($stop_type) ?></div>
-                    </div>
-                    <div style="text-align:right;">
-                      <div class="flight-code"><?= o4e($to_code) ?></div>
-                      <div class="flight-city"><?= o4e(o4nv($f['to_city'], '')) ?></div>
-                    </div>
-                  </div>
-                  <div class="flight-footer">
-                    <div class="ff-item"><span class="ff-icon">⏰</span>
-                      <div>
-                        <div class="ff-lbl">Dep:</div>
-                        <div class="ff-val"><?= o4e(o4nv($f['departure_datetime'], 'NA')) ?></div>
-                      </div>
-                    </div>
-                    <div class="ff-div"></div>
-                    <div class="ff-item"><span class="ff-icon">⏰</span>
-                      <div>
-                        <div class="ff-lbl">Arr:</div>
-                        <div class="ff-val"><?= o4e(o4nv($f['arrival_datetime'], 'NA')) ?></div>
-                      </div>
-                    </div>
-                    <div class="ff-div"></div>
-                    <div class="ff-item"><span class="ff-icon">🧳</span>
-                      <div>
-                        <div class="ff-lbl">Baggage</div>
-                        <div class="ff-val"><?= o4e($baggage) ?></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
-
-        <!-- ============ Train Details -->
-        <?php if (!empty($trains)) : ?>
-          <div class="sec-eyebrow" style="margin-top:24px;">Your Journey by Rail</div>
-          <div class="sec-heading">Train Details</div>
-
-          <?php foreach ($trains as $tr) :
-            $from_loc = isset($tr['from_location']) ? $tr['from_location'] : '';
-            $to_loc = isset($tr['to_location']) ? $tr['to_location'] : '';
-            $train_class = isset($tr['class']) ? $tr['class'] : 'NA';
-            $from_date = isset($tr['from_date']) ? $tr['from_date'] : '';
-
-            $total_pax = 0;
-            if (isset($ov['pax']) && is_array($ov['pax'])) {
-              $total_pax =
-                (int)o4nv(isset($ov['pax']['adult']) ? $ov['pax']['adult'] : 0, 0) +
-                (int)o4nv(isset($ov['pax']['children_with_bed']) ? $ov['pax']['children_with_bed'] : 0, 0) +
-                (int)o4nv(isset($ov['pax']['children_without_bed']) ? $ov['pax']['children_without_bed'] : 0, 0) +
-                (int)o4nv(isset($ov['pax']['infant']) ? $ov['pax']['infant'] : 0, 0);
-            }
-          ?>
-            <div class="flight-card">
-              <div class="flight-card-inner">
-                <div class="flight-left">
-                  <div class="flight-boarding">🚆 Boarding</div>
-                  <div>
-                    <div class="flight-num">TRAIN</div>
-                    <div class="flight-class"><?= o4e($train_class) ?></div>
-                  </div>
-                </div>
-
-                <div class="flight-right">
-                  <div class="flight-airline-row">
-                    <div class="flight-airline">Train Journey</div>
-                    <div class="flight-num-badge"><?= o4e($train_class) ?></div>
-                  </div>
-
-                  <div class="flight-route">
-                    <div>
-                      <div class="flight-code"><?= o4e(o4_air_code($from_loc)) ?></div>
-                      <div class="flight-city"><?= o4e(o4nv($from_loc, 'NA')) ?></div>
-                    </div>
-
-                    <div class="flight-middle">
-                      <div class="flight-arrow-line">
-                        <div class="fal"></div>
-                        <div class="fa-arrow">→</div>
-                        <div class="fal"></div>
-                      </div>
-                      <div class="flight-nonstop">Rail Journey</div>
-                    </div>
-
-                    <div style="text-align:right;">
-                      <div class="flight-code"><?= o4e(o4_air_code($to_loc)) ?></div>
-                      <div class="flight-city"><?= o4e(o4nv($to_loc, 'NA')) ?></div>
-                    </div>
-                  </div>
-
-                  <div class="flight-footer">
-                    <div class="ff-item">
-                      <span class="ff-icon">📅</span>
-                      <div>
-                        <div class="ff-lbl">Date & Time</div>
-                        <div class="ff-val"><?= o4e(o4nv($from_date, 'NA')) ?></div>
-                      </div>
-                    </div>
-
-                    <div class="ff-div"></div>
-
-                    <div class="ff-item">
-                      <span class="ff-icon">👥</span>
-                      <div>
-                        <div class="ff-lbl">Total Pax</div>
-                        <div class="ff-val"><?= o4e($total_pax) ?></div>
-                      </div>
-                    </div>
-
-                    <div class="ff-div"></div>
-
-                    <div class="ff-item">
-                      <span class="ff-icon">🎫</span>
-                      <div>
-                        <div class="ff-lbl">Class</div>
-                        <div class="ff-val"><?= o4e($train_class) ?></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
-
-        <!-- ====== Activity Details -->
-        <?php if (!empty($acts)) : ?>
-          <div class="sec-eyebrow" style="margin-top:24px;">Experiences Included</div>
-          <div class="sec-heading">Activity Details</div>
-
-          <?php foreach ($acts as $a) :
-            $activity_img = BASE_URL . 'images/activity.jpg';
-
-            $activity_name = isset($a['activity_name']) ? $a['activity_name'] : '';
-            $city_name = isset($a['city_name']) ? $a['city_name'] : '';
-            $activity_date = isset($a['date']) ? $a['date'] : '';
-            $transfer_type = isset($a['transfer_type']) ? $a['transfer_type'] : '';
-
-            $total_pax = 0;
-            if (isset($a['pax']) && is_array($a['pax'])) {
-              $total_pax =
-                (int)o4nv(isset($a['pax']['adult']) ? $a['pax']['adult'] : 0, 0) +
-                (int)o4nv(isset($a['pax']['chwb']) ? $a['pax']['chwb'] : 0, 0) +
-                (int)o4nv(isset($a['pax']['chwob']) ? $a['pax']['chwob'] : 0, 0) +
-                (int)o4nv(isset($a['pax']['infant']) ? $a['pax']['infant'] : 0, 0);
-            }
-          ?>
-            <div class="transfer-card" style="margin-bottom:14px;">
-              <div class="transfer-inner">
-                <div class="transfer-img">
-                  <img src="<?= o4e($activity_img) ?>" alt="<?= o4e(o4nv($activity_name, 'Activity')) ?>" />
-                </div>
-
-                <div class="transfer-body">
-                  <div class="transfer-head">
-                    <div class="transfer-name">📸 <?= o4e(o4nv($activity_name, 'Activity')) ?></div>
-                    <div class="transfer-type-badge"><?= o4e(o4nv($transfer_type, 'Activity')) ?></div>
-                  </div>
-
-                  <div class="transfer-grid">
-                    <div class="transfer-item">
-                      <div class="tlbl">📍 City</div>
-                      <div class="tval"><?= o4e(o4nv($city_name, 'NA')) ?></div>
-                    </div>
-
-                    <div class="transfer-item">
-                      <div class="tlbl">📅 Date</div>
-                      <div class="tval"><?= o4e(o4nv($activity_date, 'NA')) ?></div>
-                    </div>
-
-                    <div class="transfer-item">
-                      <div class="tlbl">🚐 Transfer Type</div>
-                      <div class="tval"><?= o4e(o4nv($transfer_type, 'NA')) ?></div>
-                    </div>
-
-                    <div class="transfer-item">
-                      <div class="tlbl">👥 Total Pax</div>
-                      <div class="tval"><?= o4e($total_pax) ?> Pax</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-      </div>
-    <?php endforeach; ?>
-
-  </div>
-  </div>
-  <div class="page-num">PAGE 04 / 09</div>
-<?php endif; ?>
-<!-- ============= -->
-
-<!-- PAGE 5 – TRANSFERS -->
-<?php if ($o4_show_vehs) : ?>
-  <div class="pdf-page">
-    <?php o4_render_page_header($hero, 'Transfers'); ?>
-    <div class="page-section">
-      <? //php if ($o4_show_vehs) : 
-      ?>
-      <div class="sec-eyebrow" style="margin-top:24px;">Ground Transportation</div>
-      <div class="sec-heading">Private Transfers</div>
-
-      <?php foreach ($vehs as $v) :
-          $vimg = BASE_URL . 'images/vehicle.png';
-          $vtype = o4nv($v['vehicle_type'], 'Private Transfer');
-          if (!empty($v['vehicle_count'])) {
-            $vtype .= ' (' . $v['vehicle_count'] . ' Unit' . ((int) $v['vehicle_count'] > 1 ? 's' : '') . ')';
-          }
-      ?>
-
-        <div class="transfer-card" style="margin-bottom:14px;">
-          <div class="transfer-inner">
-            <div class="transfer-img">
-              <img src="<?= o4e($vimg) ?>" alt="<?= o4e(o4nv($v['vehicle_name'], 'Vehicle')) ?>" />
-            </div>
-            <div class="transfer-body">
-              <div class="transfer-head">
-                <div class="transfer-name">🚐 <?= o4e(o4nv($v['vehicle_name'], 'Vehicle')) ?></div>
-                <div class="transfer-type-badge"><?= o4e($vtype) ?></div>
-              </div>
-              <div class="transfer-grid">
-                <div class="transfer-item">
-                  <div class="tlbl">📍 Pickup</div>
-                  <div class="tval"><?= o4e(o4nv($v['pickup'], 'NA')) ?></div>
-                </div>
-                <div class="transfer-item">
-                  <div class="tlbl">📍 Drop</div>
-                  <div class="tval"><?= o4e(o4nv($v['drop'], 'NA')) ?></div>
-                </div>
-                <div class="transfer-item">
-                  <div class="tlbl">📅 Start Date</div>
-                  <div class="tval"><?= o4e(o4nv($v['date'], '')) ?></div>
-                </div>
-                <div class="transfer-item">
-                  <div class="tlbl">📅 End Date</div>
-                  <div class="tval"><?= o4e(o4_vehicle_end_date($v)) ?></div>
-                </div>
-              </div>
-              <div class="transfer-duration"><span class="td-icon">⏱</span> Service Duration: <strong><?= o4e(o4nv($v['service_duration'], o4nv($v['description'], 'As per itinerary'))) ?></strong></div>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    <?php endif; ?>
-    </div>
-    <div class="page-num">PAGE 04 / 09</div>
-  </div>
-<?php endif; ?>
-
-<!-- PAGE 5 – ITINERARY -->
-<div class="pdf-page">
-  <div class="itinerary-start">
-    <?php o4_render_page_header($hero, 'Day-Wise Itinerary'); ?>
-
-    <div class="page-section">
-      <div class="sec-eyebrow">Your Day-by-Day Journey</div>
-      <div class="sec-heading">Itinerary</div>
-
-      <?php if (!empty($itin)) :
-        foreach ($itin as $day) :
-          $day_num = str_pad((string) o4nv($day['day_number'], ''), 2, '0', STR_PAD_LEFT);
-      ?>
-          <div class="itin-day">
-            <div class="itin-day-header">
-              <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n"><?= o4e($day_num) ?></span></div>
-              <div class="itin-day-date"><?= o4e(o4nv($day['date'], '')) ?></div>
-            </div>
-            <div class="itin-day-body">
-              <div class="itin-attraction">🌐 Special Attraction · <?= o4e(o4nv($day['special_attraction'], o4nv($day['city'], 'Sightseeing'))) ?></div>
-              <div class="itin-prog-lbl">Detailed Programme</div>
-              <div class="itin-prog"><?= o4e(o4nv($day['detailed_programme'], '')) ?></div>
-              <div class="itin-chips">
-                <?php if (!empty($day['meal_plan'])) : ?>
-                  <div class="itin-chip meal">
-                    <div class="itin-chip-icon">🍽️</div>
-                    <div>
-                      <div class="itin-chip-lbl">Meal Plan</div>
-                      <div class="itin-chip-val"><?= o4e($day['meal_plan']) ?></div>
-                    </div>
-                  </div>
-                <?php endif; ?>
-                <?php if (!empty($day['overnight_stay'])) : ?>
-                  <div class="itin-chip stay">
-                    <div class="itin-chip-icon">🌙</div>
-                    <div>
-                      <div class="itin-chip-lbl">Overnight Stay</div>
-                      <div class="itin-chip-val"><?= o4e($day['overnight_stay']) ?></div>
-                    </div>
-                  </div>
-                <?php endif; ?>
-              </div>
-            </div>
-          </div>
-        <?php
-        endforeach;
-      else :
+        <? //php if ($o4_show_vehs) : 
         ?>
-        <div class="itin-day">
-          <div class="itin-day-body">
-            <div class="itin-prog">Itinerary details will be shared upon confirmation.</div>
+        <div class="sec-eyebrow" style="margin-top:24px;">Ground Transportation</div>
+        <div class="sec-heading">Private Transfers</div>
+
+        <?php foreach ($vehs as $v) :
+            $vimg = BASE_URL . 'images/vehicle.png';
+            $vtype = o4nv($v['vehicle_type'], 'Private Transfer');
+            if (!empty($v['vehicle_count'])) {
+              $vtype .= ' (' . $v['vehicle_count'] . ' Unit' . ((int) $v['vehicle_count'] > 1 ? 's' : '') . ')';
+            }
+        ?>
+
+          <div class="transfer-card" style="margin-bottom:14px;">
+            <div class="transfer-inner">
+              <div class="transfer-img">
+                <img src="<?= o4e($vimg) ?>" alt="<?= o4e(o4nv($v['vehicle_name'], 'Vehicle')) ?>" />
+              </div>
+              <div class="transfer-body">
+                <div class="transfer-head">
+                  <div class="transfer-name">🚐 <?= o4e(o4nv($v['vehicle_name'], 'Vehicle')) ?></div>
+                  <div class="transfer-type-badge"><?= o4e($vtype) ?></div>
+                </div>
+                <div class="transfer-grid">
+                  <div class="transfer-item">
+                    <div class="tlbl">📍 Pickup</div>
+                    <div class="tval"><?= o4e(o4nv($v['pickup'], 'NA')) ?></div>
+                  </div>
+                  <div class="transfer-item">
+                    <div class="tlbl">📍 Drop</div>
+                    <div class="tval"><?= o4e(o4nv($v['drop'], 'NA')) ?></div>
+                  </div>
+                  <div class="transfer-item">
+                    <div class="tlbl">📅 Start Date</div>
+                    <div class="tval"><?= o4e(o4nv($v['date'], '')) ?></div>
+                  </div>
+                  <div class="transfer-item">
+                    <div class="tlbl">📅 End Date</div>
+                    <div class="tval"><?= o4e(o4_vehicle_end_date($v)) ?></div>
+                  </div>
+                </div>
+                <div class="transfer-duration"><span class="td-icon">⏱</span> Service Duration: <strong><?= o4e(o4nv($v['service_duration'], o4nv($v['description'], 'As per itinerary'))) ?></strong></div>
+              </div>
+            </div>
           </div>
-        </div>
+        <?php endforeach; ?>
       <?php endif; ?>
+      </div>
+      <div class="page-num">PAGE 05 / 10</div>
     </div>
-    <div class="page-num">PAGE 05 / 09</div>
+  <?php endif; ?>
+
+  <!-- PAGE 5 – ITINERARY -->
+  <div class="pdf-page">
+    <div class="itinerary-start">
+      <?php o4_render_page_header($hero, 'Day-Wise Itinerary'); ?>
+
+      <div class="page-section">
+        <div class="sec-eyebrow">Your Day-by-Day Journey</div>
+        <div class="sec-heading">Itinerary</div>
+
+        <?php if (!empty($itin)) :
+          foreach ($itin as $day) :
+            $day_num = str_pad((string) o4nv($day['day_number'], ''), 2, '0', STR_PAD_LEFT);
+        ?>
+            <div class="itin-day">
+              <div class="itin-day-header">
+                <div class="itin-day-num"><span class="day-label">Day</span><span class="day-n"><?= o4e($day_num) ?></span></div>
+                <div class="itin-day-date"><?= o4e(o4nv($day['date'], '')) ?></div>
+              </div>
+              <div class="itin-day-body">
+                <div class="itin-attraction">🌐 Special Attraction · <?= o4e(o4nv($day['special_attraction'], o4nv($day['city'], 'Sightseeing'))) ?></div>
+                <div class="itin-prog-lbl">Detailed Programme</div>
+                <div class="itin-prog"><?= o4e(o4nv($day['detailed_programme'], '')) ?></div>
+                <div class="itin-chips">
+                  <?php if (!empty($day['meal_plan'])) : ?>
+                    <div class="itin-chip meal">
+                      <div class="itin-chip-icon">🍽️</div>
+                      <div>
+                        <div class="itin-chip-lbl">Meal Plan</div>
+                        <div class="itin-chip-val"><?= o4e($day['meal_plan']) ?></div>
+                      </div>
+                    </div>
+                  <?php endif; ?>
+                  <?php if (!empty($day['overnight_stay'])) : ?>
+                    <div class="itin-chip stay">
+                      <div class="itin-chip-icon">🌙</div>
+                      <div>
+                        <div class="itin-chip-lbl">Overnight Stay</div>
+                        <div class="itin-chip-val"><?= o4e($day['overnight_stay']) ?></div>
+                      </div>
+                    </div>
+                  <?php endif; ?>
+                </div>
+              </div>
+            </div>
+          <?php
+          endforeach;
+        else :
+          ?>
+          <div class="itin-day">
+            <div class="itin-day-body">
+              <div class="itin-prog">Itinerary details will be shared upon confirmation.</div>
+            </div>
+          </div>
+        <?php endif; ?>
+      </div>
+      <div class="page-num">PAGE 06 / 10</div>
+    </div>
   </div>
 
   <!-- PAGE 6 – PRICING -->
@@ -1033,7 +1036,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
 
       <?php } ?>
     </div></br>
-    <div class="page-num">PAGE 06 / 09</div>
+    <div class="page-num">PAGE 07 / 10</div>
   </div>
 
   <!-- PAGE 7 – PAYMENT -->
@@ -1113,7 +1116,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
         </div>
       </div>
     </div>
-    <div class="page-num">PAGE 07 / 09</div>
+    <div class="page-num">PAGE 08 / 10</div>
   </div>
 
   <!-- PAGE 8 – REVIEWS -->
@@ -1162,7 +1165,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
         <span class="txt">rated by happy travellers across the globe</span>
       </div>
     </div>
-    <div class="page-num">PAGE 08 / 09</div>
+    <div class="page-num">PAGE 09 / 10</div>
   </div>
 
   <!-- PAGE 9 – T&C -->
@@ -1186,7 +1189,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
         ?>
       </div>
     </div>
-    <div class="page-num">PAGE 09 / 09</div>
+    <div class="page-num">PAGE 10 / 10</div>
   </div>
 
   <!-- THANK YOU PAGE -->
@@ -1255,64 +1258,64 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     </div>
   </div>
 
-</div>
+  </div>
 
-<script type="text/javascript">
-  (function() {
-    var printed = false;
+  <script type="text/javascript">
+    (function() {
+      var printed = false;
 
-    function doPrint() {
-      if (printed) return;
-      printed = true;
-      try {
-        window.focus();
-      } catch (e) {}
-      window.print();
-    }
-
-    function waitForImages() {
-      var imgs = Array.prototype.slice.call(document.images || []);
-      var pending = imgs.filter(function(img) {
-        return !img.complete;
-      });
-      if (pending.length === 0) return Promise.resolve();
-      return Promise.all(pending.map(function(img) {
-        return new Promise(function(resolve) {
-          img.addEventListener('load', resolve, {
-            once: true
-          });
-          img.addEventListener('error', resolve, {
-            once: true
-          });
-        });
-      }));
-    }
-
-    function waitForFonts() {
-      if (document.fonts && document.fonts.ready) {
-        return document.fonts.ready.catch(function() {});
+      function doPrint() {
+        if (printed) return;
+        printed = true;
+        try {
+          window.focus();
+        } catch (e) {}
+        window.print();
       }
-      return Promise.resolve();
-    }
 
-    function ready() {
-      var safety = new Promise(function(resolve) {
-        setTimeout(resolve, 4000);
-      });
-      Promise.race([
-        Promise.all([waitForImages(), waitForFonts()]),
-        safety
-      ]).then(function() {
-        setTimeout(doPrint, 150);
-      });
-    }
-    if (document.readyState === 'complete') {
-      ready();
-    } else {
-      window.addEventListener('load', ready);
-    }
-  })();
-</script>
+      function waitForImages() {
+        var imgs = Array.prototype.slice.call(document.images || []);
+        var pending = imgs.filter(function(img) {
+          return !img.complete;
+        });
+        if (pending.length === 0) return Promise.resolve();
+        return Promise.all(pending.map(function(img) {
+          return new Promise(function(resolve) {
+            img.addEventListener('load', resolve, {
+              once: true
+            });
+            img.addEventListener('error', resolve, {
+              once: true
+            });
+          });
+        }));
+      }
+
+      function waitForFonts() {
+        if (document.fonts && document.fonts.ready) {
+          return document.fonts.ready.catch(function() {});
+        }
+        return Promise.resolve();
+      }
+
+      function ready() {
+        var safety = new Promise(function(resolve) {
+          setTimeout(resolve, 4000);
+        });
+        Promise.race([
+          Promise.all([waitForImages(), waitForFonts()]),
+          safety
+        ]).then(function() {
+          setTimeout(doPrint, 150);
+        });
+      }
+      if (document.readyState === 'complete') {
+        ready();
+      } else {
+        window.addEventListener('load', ready);
+      }
+    })();
+  </script>
 </body>
 
 </html>
