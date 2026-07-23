@@ -229,4 +229,3 @@ class app_settings_master
       echo "error--Sorry, Company profile details are not saved!";
     }
   }}
-}
