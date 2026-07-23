@@ -68,25 +68,6 @@ if (!empty($destination)) {
 $queryImg = mysqlQuery($query);
 $count = 0;
 
-<<<<<<< HEAD
-    }
-    $queryImg = mysqlQuery($query);
-    $count = 0;
-    while($db = mysqli_fetch_array($queryImg))
-    {
-      $is_checked = (
-        (int)$db['is_selected'] === 1
-        || ($saved_format == $format && $saved_img_url !== '' && $saved_img_url === $db['img_url'])
-      );
-      ?>
-      <div class="gallary-image">
-    <div class="col-sm-3">
-      <div class="gallary-single-image mg_bt_30 mg_bt_10_sm_xs" style="width: 100%;">
-          <img src="<?php echo $db['img_url']; ?>" id="image<?php echo $count; ?>" alt="title" class="img-responsive">
-          <span class="img-check-btn">
-            <input type="radio" id="image_select<?php echo $count; ?>" name="image_check" value="<?php echo $db['img_url']; ?>" <?= $is_checked ? "checked" : "" ?>>
-          </span>
-=======
               // Find default image position from Destination 1
 
               // destination 1 এ কোন position selected সেটা বের করি
@@ -140,7 +121,6 @@ while ($db = mysqli_fetch_array($queryImg)) {
             name="image_check"
             value="<?php echo $db['img_url']; ?>"
             <?php echo $checked; ?>>
->>>>>>> origin/test
           <div class="table-image-btns">
             <ul style="margin-left: -40%;">
               <!-- <span style="color: #fff; "><//?php echo $sq_gal['description']; ?></span> -->

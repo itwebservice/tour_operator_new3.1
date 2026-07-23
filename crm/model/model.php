@@ -33,7 +33,7 @@ $localIP = getHostByName(getHostName());
 $servername = "localhost";
 $username = "root";
 $password = "";
-$db_name = "itourjh2_demo4";
+$db_name = "itours_latest";
 
 
 // $db_name = "tour_operator_theme";
