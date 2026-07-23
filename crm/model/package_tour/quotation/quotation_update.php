@@ -614,7 +614,7 @@ public function costing_entries_update($tour_cost_arr,$transport_cost_arr, $basi
 		}
 	}
 	for($i=0; $i<sizeof($adult_cost); $i++){
-		$sq_cost = mysqlQuery("update package_tour_quotation_costing_entries set adult_cost = '$adult_cost[$i]', infant_cost = '$infant_cost[$i]',child_with = '$child_with[$i]', child_without = '$child_without[$i]',discount_in = '$discount_in_arr[$i]' ,discount = '$discount_arr[$i]' where id='$entry_id_arr[$i]'");
+		$sq_cost = mysqlQuery("update package_tour_quotation_costing_entries set adult_cost = '$adult_cost[$i]', infant_cost = '$infant_cost[$i]',child_with = '$child_with[$i]', child_without = '$child_without[$i]' where id='$entry_id_arr[$i]'");
 		if(!$sq_cost){
 			echo "error--Costing information not updated!";
 			exit;

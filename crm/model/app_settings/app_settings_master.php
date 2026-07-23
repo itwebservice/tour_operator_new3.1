@@ -417,5 +417,5 @@ function app_format_save(){
     } else {
       echo "error--Sorry, Company profile details are not saved!";
     }
-  }
+  }}
 }

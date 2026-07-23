@@ -171,14 +171,15 @@ background-color:<?= $theme_color ?>;
                                                                                id="service_charge-<?= $count ?>" name="service_charge"
                                                                                onchange="get_business(this.id,'false');quotation_cost_calculate1(this.id); validate_balance(this.id)"  placeholder="Service charge" title="Service charge" value="<?= $row_q_costing['service_charge'] ?>"></div>
 
-                                                                       <div ><small>&nbsp;</small> <span>Discount In</span><select title="Discount In" id="discount_in-<?= $count ?>" name="discount_in-" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'true');" style="width: >
-                                                                           <option value="<?= $row_q_costing['discount_in']?>"><?= $row_q_costing['discount_in']?></option>
-                                                                           <?php if($row_q_costing['discount_in'] != 'Percentage'){ ?>
-                                                                               <option value="Percentage">Percentage</option>
-                                                                           <?php } ?>
-                                                                           <?php if($row_q_costing['discount_in'] != 'Flat'){ ?>
-                                                                               <option value="Flat">Flat</option>
-                                                                           <?php } ?>
+                                                                       <div ><small>&nbsp;</small> <span>Discount In</span><select title="Discount In" id="discount_in-<?= $count ?>" name="discount_in-" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'true');">
+                                                                           <?php
+                                                                           $discount_in_val = trim((string) ($row_q_costing['discount_in'] ?? ''));
+                                                                           if ($discount_in_val !== 'Percentage' && $discount_in_val !== 'Flat') {
+                                                                             $discount_in_val = 'Percentage';
+                                                                           }
+                                                                           ?>
+                                                                           <option value="Percentage" <?= $discount_in_val === 'Percentage' ? 'selected' : '' ?>>Percentage</option>
+                                                                           <option value="Flat" <?= $discount_in_val === 'Flat' ? 'selected' : '' ?>>Flat</option>
                                                                            </select></div>
 
                                                                        <div ><small>&nbsp;</small><span>Discount</span><input type="<?= $add_class1 ?>" id="discount_amt-<?= $count ?>" name="discount_amt-" onchange="quotation_cost_calculate1(this.id); get_business(this.id,'false');validate_balance(this.id)" placeholder="Discount" title="Discount" value="<?= $row_q_costing['discount'] ?>" ></div>
@@ -186,17 +187,25 @@ background-color:<?= $theme_color ?>;
 
                                                                       <div style="display: grid; grid-template-columns: repeat(7, 1fr);  gap: 15px ;margin-top: 15px;">
                                                                       <div ><small id="tax_apply_show-" style="color:#000000">&nbsp;</small><span>Tax Apply On</span><select title="Tax Apply On" id="atax_apply_on-<?= $count ?>" name="atax_apply_on-<?= $count ?>" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'false');" >
-                                                                       <option value="<?php echo $bsmValues[0]->tax_apply_on ?>"><?php echo $tax_apply_on ?></option>
+                                                                       <?php $tax_apply_on_val = isset($bsmValues[0]->tax_apply_on) ? (string) $bsmValues[0]->tax_apply_on : ''; ?>
                                                                                <option value="">*Tax Apply On</option>
-                                                                               <option value="1">Basic Amount</option>
-                                                                               <option value="2">Service Charge</option>
-                                                                               <option value="3">Total</option>
+                                                                               <option value="1" <?= $tax_apply_on_val === '1' ? 'selected' : '' ?>>Basic Amount</option>
+                                                                               <option value="2" <?= $tax_apply_on_val === '2' ? 'selected' : '' ?>>Service Charge</option>
+                                                                               <option value="3" <?= $tax_apply_on_val === '3' ? 'selected' : '' ?>>Total</option>
                                                                            </select></div>
                                                                        
                                                                        <div ><small id="tax_show-" style="color:#000000">&nbsp;</small><span>Select Tax</span><select title="Select Tax" id="tax_value1-<?= $count ?>" name="tax_value1-<?= $count ?>" class="form-control" onchange="quotation_cost_calculate1(this.id);get_business(this.id,'false');" >
-                                                                           <option value="<?php echo $bsmValues[0]->tax_value ?>"><?php echo $bsmValues[0]->tax_value ?></option>
+                                                                           <?php $tax_value_val = isset($bsmValues[0]->tax_value) ? (string) $bsmValues[0]->tax_value : ''; ?>
                                                                            <option value="">*Select Tax</option>
-                                                                           <?php get_tax_dropdown('Income') ?>
+                                                                           <?php
+                                                                           $sq_tax = mysqlQuery("SELECT * FROM `tax_master` where status='Active' and reflection='Income'");
+                                                                           while ($row_tax = mysqli_fetch_assoc($sq_tax)) {
+                                                                             $tax_string = $row_tax['name1'] . ':(' . $row_tax['amount1'] . '%):(' . $row_tax['ledger1'] . ')';
+                                                                             $tax_string .= ($row_tax['name2'] != '') ? '+' . $row_tax['name2'] . ':(' . $row_tax['amount2'] . '%):(' . $row_tax['ledger2'] . ')' : '';
+                                                                             $tax_selected = ($tax_value_val !== '' && $tax_value_val === $tax_string) ? 'selected' : '';
+                                                                           ?>
+                                                                             <option value="<?= htmlspecialchars($tax_string, ENT_QUOTES) ?>" <?= $tax_selected ?>><?= htmlspecialchars($tax_string) ?></option>
+                                                                           <?php } ?>
                                                                            </select></div>
 
                                                                        <div ><small>&nbsp;</small><span>Tax Amount</span><input type="text"

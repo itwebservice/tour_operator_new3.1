@@ -67,11 +67,6 @@ if (!empty($destination)) {
 }
 $queryImg = mysqlQuery($query);
 $count = 0;
-
-<<<<<<< HEAD
-    }
-    $queryImg = mysqlQuery($query);
-    $count = 0;
     while($db = mysqli_fetch_array($queryImg))
     {
       $is_checked = (
@@ -86,61 +81,6 @@ $count = 0;
           <span class="img-check-btn">
             <input type="radio" id="image_select<?php echo $count; ?>" name="image_check" value="<?php echo $db['img_url']; ?>" <?= $is_checked ? "checked" : "" ?>>
           </span>
-=======
-              // Find default image position from Destination 1
-
-              // destination 1 এ কোন position selected সেটা বের করি
-              $default_position = 1;
-              $pos = 0;
-
-              $res = mysqlQuery("
-SELECT id,is_selected
-FROM format_image_master
-WHERE type='$basic_format'
-AND dest_id='1'
-ORDER BY id
-");
-
-              while ($r = mysqli_fetch_assoc($res)) {
-                $pos++;
-                if ($r['is_selected'] == 1) {
-                  $default_position = $pos;
-                  break;
-                }
-              }
-
-
-$app_setting = mysqli_fetch_assoc(mysqlQuery("
-SELECT quot_format, quot_img_url
-FROM app_settings
-WHERE setting_id='1'
-"));
-
-$selected_img = $app_setting['quot_img_url'];
-$saved_format = $app_setting['quot_format'];
-$current_format_selected = ($saved_format == $format);
-$position = 0;
-
-while ($db = mysqli_fetch_array($queryImg)) {
-  $position++;
-  if ($current_format_selected) {
-    $checked = ($selected_img == $db['img_url']) ? "checked" : "";
-  } else {
-    $checked = ($position == $default_position) ? "checked" : "";
-  }
-?>
-  <div class="gallary-image">
-    <div class="col-sm-3">
-      <div class="gallary-single-image mg_bt_30 mg_bt_10_sm_xs" style="width: 100%;">
-        <img src="<?php echo $db['img_url']; ?>" id="image<?php echo $count; ?>" alt="title" class="img-responsive">
-        <span class="img-check-btn">
-          <input
-            type="radio"
-            id="image_select<?php echo $count; ?>"
-            name="image_check"
-            value="<?php echo $db['img_url']; ?>"
-            <?php echo $checked; ?>>
->>>>>>> origin/test
           <div class="table-image-btns">
             <ul style="margin-left: -40%;">
               <!-- <span style="color: #fff; "><//?php echo $sq_gal['description']; ?></span> -->

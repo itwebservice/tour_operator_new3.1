@@ -2908,7 +2908,7 @@ $o1_continuous_view = true;
           </div>
         </div>
         <div class="mt-10 text-center">
-          <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div>
+          <!-- <div class="font-display text-2xl gold-text inline-block">Bon Voyage</div> -->
           <div class="text-[10px] uppercase tracking-[0.35em] text-[color:var(--navy)]/60 mt-1"><?= o1e($o1_company) ?> Â· Luxury Voyages Â· Est. 2014</div>
         </div>
       </div>
