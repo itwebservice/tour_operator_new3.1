@@ -1321,10 +1321,6 @@ $o2_round = o2img(
       <div class="thanks__wrap">
         <div class="logo">
           <img class="logo__slot" src="<?= o2e($o2_logo) ?>" alt="Company logo">
-          <div>
-            <div class="logo__name"><?= o2e($o2_company) ?></div>
-            <div class="logo__tag"><?= o2e($o2_tagline) ?></div>
-          </div>
         </div>
         <div class="thanks__k">With Heartfelt Gratitude</div>
         <h2 class="thanks__big">Thank You</h2>
