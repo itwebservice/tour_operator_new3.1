@@ -16,7 +16,7 @@ include "../../model/model.php";
                         <div class="col-md-12 app_accordion">
                             <div class="panel-group main_block" id="accordion" role="tablist"
                                 aria-multiselectable="true">
-                                <div class="accordion_content package_content">
+                                <div class="accordion_content package_content" style="width: 100%;">
                                     <div class="panel panel-default main_block">
                                         <div class="panel-heading main_block" role="tab" id="heading1">
                                             <div class="Normal collapsed main_block" role="button"
@@ -112,7 +112,7 @@ include "../../model/model.php";
                                                         <?php } ?>
                                                     </select>
                                                 </div>
-                                                    <div class="row text-right mg_bt_10">
+                                                    <div class="row text-right mg_bt_10" style="padding-right: 20px;">
                                                         <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('table_exc_tarrif_basic')"><i class="fa fa-plus"></i></button>
                                                         <button type="button" class="btn btn-pdf btn-sm" title="Delete Row" onclick="deleteRow('table_exc_tarrif_basic')"><i class="fa fa-trash"></i></button>
                                                     </div>
@@ -227,7 +227,7 @@ include "../../model/model.php";
                                     </div>
                                 <!-- </div> -->
                             </div>
-                            <div class="accordion_content package_content mg_bt_10 hidden">
+                            <div class="accordion_content package_content mg_bt_10 hidden" style="width: 100%;">
                                 <div class="panel panel-default main_block">
                                     <div class="panel-heading main_block" role="tab" id="heading2">
                                         <div class="Normal collapsed main_block" role="button" data-toggle="collapse"
@@ -455,7 +455,7 @@ include "../../model/model.php";
                                     </div>
                                 </div>
                             </div>
-                            <div class="accordion_content package_content mg_bt_10">
+                            <div class="accordion_content package_content mg_bt_10" style="width: 100%;">
                                 <div class="panel panel-default main_block">
                                     <div class="panel-heading main_block" role="tab" id="heading3">
                                         <div class="Normal collapsed main_block" role="button" data-toggle="collapse"

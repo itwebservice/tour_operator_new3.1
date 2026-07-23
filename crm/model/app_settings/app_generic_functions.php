@@ -117,19 +117,34 @@ function begin_widget()
                                                                                       // }
 
  function currency_conversion($from_currency, $to_currency, $quotation_cost){
-    $from_currency_data = mysqli_fetch_assoc(mysqlQuery("SELECT `default_currency`, `currency_code` FROM `currency_name_master` WHERE id=" . $from_currency));
-    $from_currency_logo = $from_currency_data['currency_code'];
+    // Amounts may arrive formatted with commas (e.g. "1,400.00")
+    if (is_string($quotation_cost)) {
+        $quotation_cost = str_replace(',', '', $quotation_cost);
+    }
+    $quotation_cost = floatval($quotation_cost);
 
-    if (isset($to_currency) && $to_currency != '0' && $from_currency != $to_currency) {
+    $from_currency = trim((string)$from_currency);
+    $to_currency = trim((string)$to_currency);
 
-        $to_currency_data = mysqli_fetch_assoc(mysqlQuery("SELECT `default_currency`, `currency_code` FROM `currency_name_master` WHERE id=" . $to_currency));
-        $currency_logo = $to_currency_data['currency_code'];
+    // Invalid from-currency → return plain amount (avoid SQL like WHERE id=)
+    if ($from_currency === '' || $from_currency === '0' || !ctype_digit($from_currency)) {
+        return number_format($quotation_cost, 2);
+    }
 
-        $sq_from = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM roe_master WHERE currency_id='$from_currency'"));
-        $from_currency_rate = floatval($sq_from['currency_rate']);
+    $from_currency_data = mysqli_fetch_assoc(mysqlQuery("SELECT `default_currency`, `currency_code` FROM `currency_name_master` WHERE id=" . intval($from_currency)));
+    $from_currency_logo = isset($from_currency_data['currency_code']) ? $from_currency_data['currency_code'] : '';
 
-        $sq_to = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM roe_master WHERE currency_id='$to_currency'"));
-        $to_currency_rate = floatval($sq_to['currency_rate']);
+    // Empty / invalid to-currency → no conversion (this was causing FY receipt 404/SQL crash)
+    if ($to_currency !== '' && $to_currency !== '0' && ctype_digit($to_currency) && $from_currency != $to_currency) {
+
+        $to_currency_data = mysqli_fetch_assoc(mysqlQuery("SELECT `default_currency`, `currency_code` FROM `currency_name_master` WHERE id=" . intval($to_currency)));
+        $currency_logo = isset($to_currency_data['currency_code']) ? $to_currency_data['currency_code'] : '';
+
+        $sq_from = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM roe_master WHERE currency_id='" . intval($from_currency) . "'"));
+        $from_currency_rate = floatval(isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0);
+
+        $sq_to = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM roe_master WHERE currency_id='" . intval($to_currency) . "'"));
+        $to_currency_rate = floatval(isset($sq_to['currency_rate']) ? $sq_to['currency_rate'] : 0);
 
         // ✅ Corrected conversion logic
         if ($from_currency_rate == 1) { 
@@ -137,15 +152,15 @@ function begin_widget()
             $c_amount = ($quotation_cost != 0) ? ($quotation_cost * $to_currency_rate) : 0;
         } elseif ($to_currency_rate == 1) { 
             // If converting from INR (or any other currency) to USD (default currency), divide
-            $c_amount = ($quotation_cost != 0) ? ($quotation_cost / $from_currency_rate) : 0;
+            $c_amount = ($quotation_cost != 0 && $from_currency_rate != 0) ? ($quotation_cost / $from_currency_rate) : 0;
         } else { 
             // Other currency-to-currency conversions (standard division formula)
-            $c_amount = ($quotation_cost != 0) ? ($from_currency_rate / $to_currency_rate) * $quotation_cost : 0;
+            $c_amount = ($quotation_cost != 0 && $to_currency_rate != 0) ? ($from_currency_rate / $to_currency_rate) * $quotation_cost : 0;
         }
 
         $currency_amount = $currency_logo . ' ' . number_format($c_amount, 2);
     } else {
-        $currency_amount = $from_currency_logo . ' ' . number_format(floatval($quotation_cost), 2);
+        $currency_amount = $from_currency_logo . ' ' . number_format($quotation_cost, 2);
     }
 
     return $currency_amount;

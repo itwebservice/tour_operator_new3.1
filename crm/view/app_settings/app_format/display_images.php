@@ -13,11 +13,11 @@ else if($format == 3){ $count = 129; $dir = 'https://itourscloud.com/quotation_f
   $basic_format = "Landscape-Creative";
   
 }
-else if($format == 1){ $count = 10; $dir = 'https://itourscloud.com/quotation_format_images/Portrait-Standard/';
+else if($format == 1 || $format == 9){ $count = 10; $dir = 'https://itourscloud.com/quotation_format_images/Portrait-Standard/';
   $basic_format = "Portrait-Standard";
   
 }
-else if($format == 5){ $count = 52; $dir = 'https://itourscloud.com/quotation_format_images/Portrait-Advanced/';
+else if($format == 5 || $format == 10){ $count = 52; $dir = 'https://itourscloud.com/quotation_format_images/Portrait-Advanced/';
   $basic_format = "Portrait-Advanced";
   
 }
@@ -31,6 +31,10 @@ else{ //Format : 4
   $basic_format = "Portrait-Creative";
 
 }
+$sq_saved = mysqli_fetch_assoc(mysqlQuery("select quot_format, quot_img_url from app_settings where setting_id='1'"));
+$saved_img_url = isset($sq_saved['quot_img_url']) ? $sq_saved['quot_img_url'] : '';
+$saved_format = isset($sq_saved['quot_format']) ? $sq_saved['quot_format'] : '';
+
 // for($i = 1; $i<=$count; $i++){
 //   $image_path = $dir.$i.'.jpg';
 //   $sq_setting = mysqli_num_rows(mysqlQuery("select * from app_settings where quot_format='$format' and quot_img_url='$image_path'"));
@@ -74,14 +78,17 @@ else{ //Format : 4
     $count = 0;
     while($db = mysqli_fetch_array($queryImg))
     {
-      $sq_setting = mysqli_num_rows(mysqlQuery("select * from app_settings where quot_format='$format' and quot_img_url='$db[img_url]'"));
+      $is_checked = (
+        (int)$db['is_selected'] === 1
+        || ($saved_format == $format && $saved_img_url !== '' && $saved_img_url === $db['img_url'])
+      );
       ?>
       <div class="gallary-image">
     <div class="col-sm-3">
       <div class="gallary-single-image mg_bt_30 mg_bt_10_sm_xs" style="width: 100%;">
           <img src="<?php echo $db['img_url']; ?>" id="image<?php echo $count; ?>" alt="title" class="img-responsive">
           <span class="img-check-btn">
-            <input type="radio" id="image_select<?php echo $count; ?>" name="image_check" value="<?php echo $db['img_url']; ?>" <?= $db['is_selected'] == 1 ? "checked" : "" ?>>
+            <input type="radio" id="image_select<?php echo $count; ?>" name="image_check" value="<?php echo $db['img_url']; ?>" <?= $is_checked ? "checked" : "" ?>>
           </span>
           <div class="table-image-btns">
             <ul style="margin-left: -40%;">

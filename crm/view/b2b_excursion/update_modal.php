@@ -22,7 +22,7 @@ $exc_name = ($sq_exc['excursion_name']);
 					<div class="row">
 						<div class="col-md-12 app_accordion">
 							<div class="panel-group main_block" id="accordion" role="tablist" aria-multiselectable="true">
-								<div class="accordion_content package_content">
+								<div class="accordion_content package_content" style="width: 100%;">
 									<div class="panel panel-default main_block">
 										<div class="panel-heading main_block" role="tab" id="heading1">
 											<div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="false" aria-controls="collapse1" id="collapsed1">
@@ -217,7 +217,7 @@ $exc_name = ($sq_exc['excursion_name']);
 										</div>
 									</div>
 								</div>
-								<div class="accordion_content package_content mg_bt_10 hidden">
+								<div class="accordion_content package_content mg_bt_10 hidden" style="width: 100%;">
 									<div class="panel panel-default main_block">
 										<div class="panel-heading main_block" role="tab" id="heading2">
 											<div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="collapsed1">
@@ -446,7 +446,7 @@ $exc_name = ($sq_exc['excursion_name']);
 										</div>
 									</div>
 								</div>
-								<div class="accordion_content package_content mg_bt_10">
+								<div class="accordion_content package_content mg_bt_10" style="width: 100%;">
 									<div class="panel panel-default main_block">
 										<div class="panel-heading main_block" role="tab" id="heading3">
 											<div class="Normal collapsed main_block" role="button" data-toggle="collapse"

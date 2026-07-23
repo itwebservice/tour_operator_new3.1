@@ -501,14 +501,16 @@ function get_tax_rules_on_conditions(final_taxes_rules, basic_amount, payment_mo
 		var customer = $('#customer_id1').val();
 	}
 	var table = document.getElementById(hotel_table);
-	var rowCount = table.rows.length;
 	var hotel_ids = '';
-	for (var i = 0; i < rowCount; i++) {
-		var row = table.rows[i];
-		if (row.cells[0].childNodes[0].checked) {
-			if (row.cells[4].childNodes[0].value !== '') {
-				if (i === 0 && hotel_ids === '') hotel_ids = '"' + row.cells[4].childNodes[0].value + '"';
-				else hotel_ids += ',"' + row.cells[4].childNodes[0].value + '"';
+	if (table && table.rows) {
+		var rowCount = table.rows.length;
+		for (var i = 0; i < rowCount; i++) {
+			var row = table.rows[i];
+			if (row.cells[0] && row.cells[0].childNodes[0] && row.cells[0].childNodes[0].checked) {
+				if (row.cells[4] && row.cells[4].childNodes[0] && row.cells[4].childNodes[0].value !== '') {
+					if (i === 0 && hotel_ids === '') hotel_ids = '"' + row.cells[4].childNodes[0].value + '"';
+					else hotel_ids += ',"' + row.cells[4].childNodes[0].value + '"';
+				}
 			}
 		}
 	}
@@ -595,7 +597,7 @@ function get_tax_rules_on_conditions(final_taxes_rules, basic_amount, payment_mo
 											type: 'POST',
 											global: false,
 											dataType: 'html',
-											url: '../booking/booking/inc/get_customer.php',
+											url: $('#base_url').val() + 'view/hotels/booking/booking/inc/get_customer.php',
 											data: { customer: customer },
 											success: function (data) {
 												data = data.split('-');
@@ -647,7 +649,7 @@ function get_tax_rules_on_conditions(final_taxes_rules, basic_amount, payment_mo
 											type: 'POST',
 											global: false,
 											dataType: 'html',
-											url: '../booking/booking/inc/get_customer.php',
+											url: $('#base_url').val() + 'view/hotels/booking/booking/inc/get_customer.php',
 											data: { customer: customer },
 											success: function (data) {
 												data = data.split('-');
@@ -696,14 +698,16 @@ function get_charges_on_conditions(service_charge_result, basic_amount, payment_
 		var customer = $('#customer_id1').val();
 	}
 	var table = document.getElementById(hotel_table);
-	var rowCount = table.rows.length;
 	var hotel_ids = '';
-	for (var i = 0; i < rowCount; i++) {
-		var row = table.rows[i];
-		if (row.cells[0].childNodes[0].checked) {
-			if (row.cells[3].childNodes[0].value !== '') {
-				if (i === 0 && hotel_ids === '') hotel_ids = '"' + row.cells[3].childNodes[0].value + '"';
-				else hotel_ids += ',"' + row.cells[3].childNodes[0].value + '"';
+	if (table && table.rows) {
+		var rowCount = table.rows.length;
+		for (var i = 0; i < rowCount; i++) {
+			var row = table.rows[i];
+			if (row.cells[0] && row.cells[0].childNodes[0] && row.cells[0].childNodes[0].checked) {
+				if (row.cells[4] && row.cells[4].childNodes[0] && row.cells[4].childNodes[0].value !== '') {
+					if (i === 0 && hotel_ids === '') hotel_ids = '"' + row.cells[4].childNodes[0].value + '"';
+					else hotel_ids += ',"' + row.cells[4].childNodes[0].value + '"';
+				}
 			}
 		}
 	}
@@ -771,7 +775,7 @@ function get_charges_on_conditions(service_charge_result, basic_amount, payment_
 									type: 'POST',
 									global: false,
 									dataType: 'html',
-									url: '../booking/booking/inc/get_supplier.php',
+									url: $('#base_url').val() + 'view/hotels/booking/booking/inc/get_supplier.php',
 									data: { hotel_ids: hotel_ids },
 									success: (data) => {
 										data = data.split(',');
@@ -835,7 +839,8 @@ function get_charges_on_conditions(service_charge_result, basic_amount, payment_
 									type: 'POST',
 									global: false,
 									dataType: 'html',
-									url: '../booking/booking/inc/get_customer.php',
+									url: $('#base_url').val() + 'view/hotels/booking/booking/inc/get_customer.php',
+									
 									data: { customer: customer },
 									success: function (data) {
 										data = data.split('-');
@@ -865,7 +870,7 @@ function get_charges_on_conditions(service_charge_result, basic_amount, payment_
 									type: 'POST',
 									global: false,
 									dataType: 'html',
-									url: '../booking/booking/inc/get_customer.php',
+									url: $('#base_url').val() + 'view/hotels/booking/booking/inc/get_customer.php',
 									data: { customer: customer },
 									success: function (data) {
 										data = data.split('-');
@@ -959,10 +964,10 @@ function calculate_charges(rules_array, type, basic_amount, markup_amount1) {
 			if (child_wob == '') { child_wob = 0; }
 			if (child_wb == '') { child_wb = 0; }
 			var child = (parseInt(child_wb) || 0) + (parseInt(child_wob) || 0);
-			var hotel_table = 'tbl_package_tour_quotation_dynamic_costing';
+			var hotel_table = 'tbl_package_tour_quotation_dynamic_hotel';
 		}
 		else {
-			var hotel_table = 'tbl_package_tour_quotation_dynamic_costing';
+			var hotel_table = 'tbl_package_tour_quotation_dynamic_hotel_update';
 			var customer = $('#customer_id1').val();
 			var adults = $('#total_adult12').val();
 			var child_wob = $('#children_without_bed12').val();
@@ -973,22 +978,25 @@ function calculate_charges(rules_array, type, basic_amount, markup_amount1) {
 		}
 
 		var table = document.getElementById(hotel_table);
-		var rowCount = table.rows.length;
 		var hotel_count = 0;
 		var total_nights = 0;
 		var total_rooms = 0;
-		for (var i = 0; i < rowCount; i++) {
-			var row = table.rows[i];
-			if (row.cells[0].childNodes[0].checked) {
-				if (row.cells[3].childNodes[0].value !== '') hotel_count++;
-				var no_of_nights = row.cells[6].childNodes[0].value;
-				var rooms = row.cells[7].childNodes[0].value;
+		if (table && table.rows) {
+			var rowCount = table.rows.length;
+			for (var i = 0; i < rowCount; i++) {
+				var row = table.rows[i];
+				if (row.cells[0] && row.cells[0].childNodes[0] && row.cells[0].childNodes[0].checked) {
+					// cells: 4=hotel, 9=nights, 10=rooms
+					if (row.cells[4] && row.cells[4].childNodes[0] && row.cells[4].childNodes[0].value !== '') hotel_count++;
+					var no_of_nights = row.cells[9] && row.cells[9].childNodes[0] ? row.cells[9].childNodes[0].value : 0;
+					var rooms = row.cells[10] && row.cells[10].childNodes[0] ? row.cells[10].childNodes[0].value : 0;
 
-				if (no_of_nights === '') no_of_nights = parseInt(0);
-				if (rooms === '') rooms = parseInt(0);
+					if (no_of_nights === '') no_of_nights = parseInt(0);
+					if (rooms === '') rooms = parseInt(0);
 
-				total_nights = parseInt(total_nights) + parseInt(no_of_nights);
-				total_rooms = parseInt(total_rooms) + parseInt(rooms);
+					total_nights = parseInt(total_nights) + (parseInt(no_of_nights) || 0);
+					total_rooms = parseInt(total_rooms) + (parseInt(rooms) || 0);
+				}
 			}
 		}
 		

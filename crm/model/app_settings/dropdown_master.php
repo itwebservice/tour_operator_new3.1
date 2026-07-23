@@ -313,7 +313,7 @@ function get_locations_dropdown()
   }
 }
 //State name dropdown
-function get_states_dropdown()
+function get_states_dropdown($selected = '')
 
 {
 
@@ -326,10 +326,10 @@ function get_states_dropdown()
   $sq_state = mysqlQuery("select * from state_master where active_flag='Active'");
 
   while ($row_state = mysqli_fetch_assoc($sq_state)) {
-
+    $is_selected = ((string) $selected !== '' && (string) $selected === (string) $row_state['id']) ? 'selected' : '';
   ?>
 
-    <option value="<?php echo $row_state['id'] ?>"><?php echo $row_state['state_name'] ?></option>
+    <option value="<?php echo $row_state['id'] ?>" <?= $is_selected ?>><?php echo $row_state['state_name'] ?></option>
 
   <?php
 
@@ -340,7 +340,7 @@ function get_states_dropdown()
 
 //Bank name dropdown
 
-function get_bank_dropdown($label = 'Creditor Bank')
+function get_bank_dropdown($label = 'Creditor Bank', $selected = '')
 
 {
 
@@ -352,10 +352,10 @@ function get_bank_dropdown($label = 'Creditor Bank')
   $sq_bank = mysqlQuery("select * from bank_master where active_flag='Active' order by bank_name asc");
 
   while ($row_bank = mysqli_fetch_assoc($sq_bank)) {
-
+    $is_selected = ((string) $selected !== '' && (string) $selected === (string) $row_bank['bank_id']) ? 'selected' : '';
   ?>
 
-    <option value="<?= $row_bank['bank_id'] ?>"><?= $row_bank['bank_name'] . ' : ' . $row_bank['branch_name'] ?></option>
+    <option value="<?= $row_bank['bank_id'] ?>" <?= $is_selected ?>><?= $row_bank['bank_name'] . ' : ' . $row_bank['branch_name'] ?></option>
 
   <?php
 

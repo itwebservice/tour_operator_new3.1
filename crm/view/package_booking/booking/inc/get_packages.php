@@ -53,9 +53,11 @@ else{ ?>
               <td class="col-md-5 no-pad" style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program" name="day_program" style=" height:900px;" class="form-control mg_bt_10 day_program" placeholder="*Day<?php echo $i; ?> Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value=""></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
               </td>
               <td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay" name="overnight_stay" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" style="margin-top:35px;" placeholder="Overnight Stay" title="Overnight Stay"></td>
-              <td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan" title="meal plan" name="meal_plan" style="margin-top:35px;" class="form-control mg_bt_10" data-original-title="Meal Plan">
+                <td class="col-md-2 no-pad" style="padding-left: 5px !important;">
+              <select id="meal_plan" title="meal plan" name="meal_plan" class="form-control mg_bt_10" data-original-title="Meal Plan" style="margin-top:35px;">
                       <?php get_mealplan_dropdown(); ?>
-                      </select></td>
+                      </select>
+              </td>
               <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" id="itinerary<?php echo '1'; ?>" style="margin-top:35px;" title="Add Itinerary" onClick="add_itinerary('dest_name2','special_attaraction','day_program','overnight_stay','Day-1')"><i class="fa fa-plus"></i></button>
               </td>
               <td><input style="display:none" type="text" name="package_id_n" value="4" autocomplete="off" class="form-control" data-original-title="" title=""></td>

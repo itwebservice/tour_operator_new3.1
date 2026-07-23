@@ -3,6 +3,52 @@ $(function () {
 	$('input').attr('autocomplete', 'off');
 });
 
+/**
+ * Remove duplicate <option> values from selects.
+ * Legacy screens often prepend the saved value and then list all options again.
+ */
+function removeDuplicateSelectOptions(context) {
+	var $root = context ? $(context) : $(document.body);
+	if (!$root.length) {
+		return;
+	}
+	$root.find('select').each(function () {
+		var $select = $(this);
+		var seen = {};
+		$select.find('option').each(function () {
+			var val = this.getAttribute('value');
+			if (val === null) {
+				val = this.value;
+			}
+			// Keep empty placeholders as-is (may be used as titles)
+			if (val === '' || val === null) {
+				return;
+			}
+			var key = String(val);
+			if (Object.prototype.hasOwnProperty.call(seen, key)) {
+				if (this.selected && !seen[key].selected) {
+					$(seen[key]).remove();
+					seen[key] = this;
+				} else {
+					$(this).remove();
+				}
+			} else {
+				seen[key] = this;
+			}
+		});
+	});
+}
+
+$(function () {
+	removeDuplicateSelectOptions();
+});
+
+$(document).ajaxSuccess(function () {
+	setTimeout(function () {
+		removeDuplicateSelectOptions();
+	}, 0);
+});
+
 $(function () {
 	$('.feature_editor').wysiwyg({
 		controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',

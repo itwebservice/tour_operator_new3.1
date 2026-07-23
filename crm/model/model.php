@@ -31,8 +31,8 @@ $localIP = getHostByName(getHostName());
 
 // Create connection
 $servername = "localhost";
-$username = "itourjh2_idemo4_u";
-$password = "f2*Ouj9DJo]k";
+$username = "root";
+$password = "";
 $db_name = "itourjh2_demo4";
 
 
@@ -47,7 +47,7 @@ if (!$connection) {
 }
 
 
-define('BASE_URL', 'https://www.itoursdemo.co.in/demo-4/crm/');
+define('BASE_URL', 'http://localhost/demo-4/crm/');
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");
 $b2b_index_url = BASE_URL . 'Tours_B2B/view/index.php';

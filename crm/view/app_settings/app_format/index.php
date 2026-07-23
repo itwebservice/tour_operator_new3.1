@@ -9,9 +9,9 @@ $quot_format_labels = array(
   3  => 'Option-3',
   4  => 'Option-4',
   5  => 'Option-5',
-  6  => 'Option-6',
-  7  => 'Option-7',
-  8  => 'Option-8',
+  // 6  => 'Option-6',
+  // 7  => 'Option-7',
+  // 8  => 'Option-8',
   9  => 'Portrait Standard',
   10 => 'Portrait Advanced',
 );
@@ -35,14 +35,22 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
         <div class="col-sm-8 col-md-8 mg_bt_10">
 
           <select name="invoice_format_list" id="invoice_format_list" title="Invoice Format List">
-            <?php if ($sq_settings_g['invoice_format'] == '4') { ?>
-              <option value="4">Creative</option>
-            <?php } else { ?>
-              <option value="<?= $sq_settings_g['invoice_format'] ?>"><?= $sq_settings_g['invoice_format'] ?></option>
-            <?php } ?>
-            <option value="Standard">Standard</option>
-            <option value="Regular">Regular</option>
-            <option value="Advance">Advance</option>
+            <?php
+            $invoice_format = $sq_settings_g['invoice_format'];
+            $invoice_options = array(
+              'Standard' => 'Standard',
+              'Regular' => 'Regular',
+              'Advance' => 'Advance',
+              '4' => 'Creative',
+            );
+            if ($invoice_format !== '' && $invoice_format !== null && !isset($invoice_options[$invoice_format])) {
+              $invoice_options[$invoice_format] = $invoice_format;
+            }
+            foreach ($invoice_options as $inv_val => $inv_label) {
+              $selected = ((string) $invoice_format === (string) $inv_val) ? 'selected' : '';
+              echo '<option value="' . htmlspecialchars($inv_val, ENT_QUOTES) . '" ' . $selected . '>' . htmlspecialchars($inv_label) . '</option>';
+            }
+            ?>
           </select>
           <!-- <small>Note : Bydefault Standard Format is used.</small> -->
         </div>
@@ -60,19 +68,11 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
         <legend>Quotation Format & Image Setting</legend>
         <div class="col-sm-6 col-md-3 mg_bt_10">
           <select name="format_list" id="format_list" title="Quotation Format List" onchange="display_images(this.id);">
-            <?php if ($qf_val != 0) { ?>
-              <option value="<?= $qf_val ?>"><?= $quot_format ?></option>
+            <?php foreach ($quot_format_labels as $opt_val => $opt_label) {
+              $selected = ($qf_val === (int) $opt_val) ? 'selected' : '';
+            ?>
+              <option value="<?= (int) $opt_val ?>" <?= $selected ?>><?= htmlspecialchars($opt_label) ?></option>
             <?php } ?>
-            <option value="1">Option-1</option>
-            <option value="2">Option-2</option>
-            <option value="3">Option-3</option>
-            <option value="4">Option-4</option>
-            <option value="5">Option-5</option>
-            <option value="6">Option-6</option>
-            <option value="7">Option-7</option>
-            <option value="8">Option-8</option>
-            <option value="9">Portrait Standard</option>
-            <option value="10">Portrait Advanced</option>
           </select>
         </div>
         <div class="col-sm-6 col-md-3 mg_bt_10">
@@ -492,6 +492,7 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
                   // msg_popup_reload(result);
                   success_msg_alert(result);
                   $('#format_save').button('reset');
+                  display_images('format_list');
                 }
               });
             } else {

@@ -116,13 +116,12 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 			<div class="col-md-2 text-right"><label for="currency_code1">Default Currency</label></div>
 			<div class="col-md-4">
 				<select name="currency_code" id="currency_code1" title="Currency" style="width:100%">
-					<?php $sq_curr = mysqli_fetch_assoc(mysqlQuery("select * from currency_name_master where id='$sq_settings[currency]'")); ?>
-					<option value="<?= $sq_curr['id'] ?>"><?= $sq_curr['currency_code'] ?></option>
 					<?php
 					$sq_currency = mysqlQuery("select * from currency_name_master order by default_currency desc");
 					while ($row_currency = mysqli_fetch_assoc($sq_currency)) {
+						$selected = ((string) $sq_settings['currency'] === (string) $row_currency['id']) ? 'selected' : '';
 					?>
-						<option value="<?= $row_currency['id'] ?>"><?= $row_currency['currency_code'] ?></option>
+						<option value="<?= $row_currency['id'] ?>" <?= $selected ?>><?= $row_currency['currency_code'] ?></option>
 					<?php } ?>
 				</select>
 			</div>
@@ -132,17 +131,12 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 			<div class="col-md-2 text-right"><label for="state">Country</label></div>
 			<div class="col-md-4 ">
 				<select name="country" id="country" title="Select Country" class='form-control' style='width:100%'>
-					<?php
-					if ($sq_settings['country'] != "0") {
-						$sq_country = mysqli_fetch_assoc(mysqlQuery("select country_id,country_name from country_list_master where country_id='$sq_settings[country]'"));
-					?>
-						<option value="<?= $sq_country['country_id'] ?>"><?= $sq_country['country_name'] ?></option>
-					<?php } ?>
 					<option value="">Country Name</option>
 					<?php $sq_country1 = mysqlQuery("select country_id,country_name from country_list_master where 1");
 					while ($row_c = mysqli_fetch_assoc($sq_country1)) {
+						$selected = ((string) $sq_settings['country'] === (string) $row_c['country_id']) ? 'selected' : '';
 					?>
-						<option value="<?= $row_c['country_id'] ?>"><?= $row_c['country_name'] ?></option>
+						<option value="<?= $row_c['country_id'] ?>" <?= $selected ?>><?= $row_c['country_name'] ?></option>
 					<?php } ?>
 				</select>
 			</div>
@@ -150,12 +144,7 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 			<div class="col-md-2 text-right"><label for="state">State/Country</label></div>
 			<div class="col-md-4 ">
 				<select name="state" id="state" title="Select State/Country" class='form-control' style='width:100%'>
-					<?php
-					if ($sq_settings['state_id'] != "") {
-						$sq_state = mysqli_fetch_assoc(mysqlQuery("select * from state_master where id='$sq_settings[state_id]'")); ?>
-						<option value="<?= $sq_settings['state_id'] ?>"><?= $sq_state['state_name'] ?></option>
-					<?php } ?>
-					<?php get_states_dropdown() ?>
+					<?php get_states_dropdown($sq_settings['state_id']); ?>
 				</select>
 			</div>
 		</div>
@@ -168,13 +157,14 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 			<div class="col-md-2 text-right"><label for="tax_type1">Tax Pay Type</label></div>
 			<div class="col-md-4 ">
 				<select name="tax_type1" id="tax_type1" title="Select Tax Pay">
-					<?php if ($sq_settings['tax_type'] != "") { ?>
-						<option value="<?= $sq_settings['tax_type'] ?>"><?= $sq_settings['tax_type'] ?></option>
-					<?php } ?>
 					<option value="">Select Tax Type</option>
-					<option value="Monthly">Monthly</option>
-					<option value="Quarterly">Quarterly</option>
-					<option value="Yearly">Yearly</option>
+					<?php
+					$tax_types = array('Monthly', 'Quarterly', 'Yearly');
+					foreach ($tax_types as $tax_type) {
+						$selected = ($sq_settings['tax_type'] === $tax_type) ? 'selected' : '';
+					?>
+						<option value="<?= $tax_type ?>" <?= $selected ?>><?= $tax_type ?></option>
+					<?php } ?>
 				</select>
 			</div>
 

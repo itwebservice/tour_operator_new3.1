@@ -179,6 +179,9 @@ while($row_ticket_payment = mysqli_fetch_assoc($sq_ticket_payment)){
 				
 			$currency_code_2 = $row_ticket_payment['currency_code'];
 		  }
+		if($currency_code_2 === '' || $currency_code_2 === null){
+			$currency_code_2 = $currency;
+		}
 
 		
 		  $pay_id= $row_ticket_payment['payment_id'];
@@ -221,9 +224,13 @@ $total_payment_amount = number_format($row_ticket_payment['payment_amount']+$row
 		  else{
 			$currency_code_1= $row_ticket_payment['currency_code'];
 		  }
+		// Older FY receipts may have blank currency_code on payment + booking
+		if($currency_code_1 === '' || $currency_code_1 === null){
+			$currency_code_1 = $currency;
+		}
 		// currency conversion
 		$currency_amount1 = currency_conversion($currency,$currency_code_1,$total_payment_amount);
-		if($currency_code_1 !='0' && $currency != $currency_code_1){
+		if($currency_code_1 !='' && $currency_code_1 !='0' && $currency != $currency_code_1){
 			$currency_amount = ' ('.$currency_amount1.')';
 		}else{
 			$currency_amount = '';

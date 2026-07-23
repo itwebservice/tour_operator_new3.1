@@ -975,6 +975,18 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[4].setAttribute("required", "");
     row.cells[5].setAttribute("id", "meal_plan" + foo.counter);
     row.cells[5].setAttribute("style", "padding-left: 5px !important;");
+     var mealPlanSelect = row.cells[5].querySelector("select");
+    if (mealPlanSelect) {
+      mealPlanSelect.setAttribute("id", "meal_plan" + foo.counter);
+      mealPlanSelect.setAttribute("name", "meal_plan" + foo.counter);
+      var mealPlanWrap = mealPlanSelect.parentNode;
+      if (!mealPlanWrap || mealPlanWrap.tagName.toLowerCase() !== "div") {
+        mealPlanWrap = document.createElement("div");
+        row.cells[5].insertBefore(mealPlanWrap, mealPlanSelect);
+        mealPlanWrap.appendChild(mealPlanSelect);
+      }
+      mealPlanWrap.style.marginTop = "35px";
+    }
     for (var i = row.cells[6].childNodes[0].attributes.length; i-- > 0; )
       row.cells[6].childNodes[0].removeAttribute(
         row.cells[6].childNodes[0].attributes[i]
@@ -4889,6 +4901,37 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             var newDayProgram = newcell.querySelector("textarea");
             if (newDayProgram) {
                 newDayProgram.value = "";
+            }
+            continue;
+        }
+
+         if (tableID === "package_program_list" && i === 5) {
+            newcell.className = oldCell.className;
+            if (oldCell.getAttribute("style")) {
+                newcell.setAttribute("style", oldCell.getAttribute("style"));
+            }
+            newcell.innerHTML = "";
+            var sourceMealPlan = oldCell.querySelector("select");
+            if (sourceMealPlan) {
+                var newMealPlan = sourceMealPlan.cloneNode(true);
+                if (typeof cleanClonedSelectElement === "function") {
+                    newMealPlan = cleanClonedSelectElement(newMealPlan);
+                }
+                if (newMealPlan.id) {
+                    var mealBaseId = newMealPlan.id.replace(/[0-9]+$/, "");
+                    newMealPlan.id = mealBaseId + rowCount;
+                }
+                if (newMealPlan.name) {
+                    var mealBaseName = newMealPlan.name.replace(/[0-9]+$/, "");
+                    newMealPlan.name = mealBaseName + rowCount;
+                }
+                newMealPlan.selectedIndex = 0;
+                newMealPlan.classList.add("app_select2");
+
+                var mealPlanWrap = document.createElement("div");
+                mealPlanWrap.style.marginTop = "35px";
+                mealPlanWrap.appendChild(newMealPlan);
+                newcell.appendChild(mealPlanWrap);
             }
             continue;
         }

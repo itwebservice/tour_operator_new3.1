@@ -123,7 +123,7 @@ textarea.form-control {
                           <input type="hidden" id="itinerary_image_path_<?=$count?>" name="itinerary_image_path_<?=$count?>" value="<?= $row_itinerary['itinerary_image'] ?? '' ?>" />
                         </div>
                       </td>
-                      <td class="hidden"><input type="text" id="entry_id" name="entry_id" class="form-control" value="<?=$row_itinerary['entry_id']?>"></td>
+                      <!-- <td class="hidden"><input type="text" id="entry_id" name="entry_id" class="form-control" value="<?=$row_itinerary['entry_id']?>"></td> -->
                     </tr>
                     <?php 
                   } ?>

@@ -217,9 +217,34 @@ function app_format_save(){
 
 	$invoice_format_list = $_POST['invoice_format_list'];
 	$quot_format = $_POST['quot_format'];
-	$image = $_POST['image'];
-	$dest_id = $_POST['dest_id'];
+	$image = mysqlREString($_POST['image']);
+	$dest_id = !empty($_POST['dest_id']) ? $_POST['dest_id'] : '0';
 	$sq_invoice = mysqlQuery("update generic_count_master set invoice_format='$invoice_format_list' where id='1'");
+
+	// Map quotation format option to image type (must match display_images.php / get_quotation_image)
+	switch ((int) $quot_format) {
+		case 2:
+			$formatMain = 'Landscape-Standard';
+			break;
+		case 3:
+			$formatMain = 'Landscape-Creative';
+			break;
+		case 4:
+			$formatMain = 'Portrait-Creative';
+			break;
+		case 5:
+		case 10:
+			$formatMain = 'Portrait-Advanced';
+			break;
+		case 6:
+			$formatMain = 'Landscape-Advanced';
+			break;
+		case 1:
+		case 9:
+		default:
+			$formatMain = 'Portrait-Standard';
+			break;
+	}
 
 	$sq_app_setting_count = mysqli_num_rows(mysqlQuery("select setting_id from app_settings"));
 	if($sq_app_setting_count == '0'){
@@ -230,28 +255,16 @@ function app_format_save(){
 		$query = "insert into app_settings ( setting_id, quot_format, quot_img_url,format_dest_id) values ( '$setting_id', '$quot_format', '$image','$dest_id')";
 
 		$sq_setting = mysqlQuery($query);
+		$sq_invoice = $sq_setting;
 	}
-
-    // =========================== Dipti
     else {
-      if (empty($dest_id)) {
-        $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
-      } else {
-        $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='$dest_id' where setting_id='1'");
-        mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
-        mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
-      }
+      $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='$dest_id' where setting_id='1'");
     }
-    // ====================================
 
-    // else{
-    // 	if(empty($dest_id))
-    // 	{
-    // 		$sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
-    // 	}
-    // 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
-    // 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
-    // }
+	// Persist selection only for this destination + format type (do not clear other options)
+	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id' AND type='$formatMain'");
+	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' AND type='$formatMain' AND img_url='$image'");
+
 
 
     // ========================== Dipti

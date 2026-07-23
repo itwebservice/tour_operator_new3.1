@@ -3237,7 +3237,10 @@ function populateHotelRow(row, hotel, i, hotel_arr, options, onComplete) {
 
     // Set other fields (dates, package details, etc.)
     if (row.cells[1] && row.cells[1].childNodes[0]) {
-        row.cells[1].childNodes[0].value = i + 1;
+        const existingSrNo = parseInt(row.cells[1].childNodes[0].value, 10);
+        if (isNaN(existingSrNo) || existingSrNo <= 0) {
+            row.cells[1].childNodes[0].value = i + 1;
+        }
     }
     row.cells[6].childNodes[0].value = checkIn;
     row.cells[7].childNodes[0].value = checkOut;

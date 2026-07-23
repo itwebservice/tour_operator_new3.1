@@ -163,7 +163,7 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                             <div class="table-responsive">
                                 <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table mg_bt_0 table-bordered mg_bt_10 pd_bt_51">
                                     <tr>
-                                        <td><input id="chk_dest1" type="checkbox" checked></td>
+                                        <td><input id="chk_dest1" type="checkbox" checked class="custom_checkbox"></td>
                                         <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                                         <td style="min-width:160px;"><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
                                             </select>
@@ -315,7 +315,7 @@ $(function () {
         destroySelect2In($table);
         $table.html(
             '<tr>' +
-                '<td><input id="chk_dest1" type="checkbox" checked></td>' +
+                '<td><input id="chk_dest1" type="checkbox" checked class="custom_checkbox"></td>' +
                 '<td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>' +
                 '<td style="min-width:160px;"><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true"></select></td>' +
                 '<td class="col-md-4" style="min-width:180px;"><select id="hotel_name" name="hotel_name1" onchange="hotel_type_load(this.id);" style="width:100%" title="Select Hotel Name" class="app_select2 form-control" data-add-new-option="true"><option value="">*Hotel Name</option></select></td>' +
@@ -354,7 +354,7 @@ $(function () {
         destroySelect2In($table);
         $table.html(
             '<tbody><tr>' +
-                '<td class="col-md-1"><input id="chk_transport1" type="checkbox" checked></td>' +
+                '<td class="col-md-1"><input id="chk_transport1" type="checkbox" checked class="custom_checkbox"></td>' +
                 '<td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled></td>' +
                 '<td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">' + savedVehicleHtml + '</select></td>' +
                 '<td class="col-md-3"><select name="pickup_from" id="pickup_from" data-toggle="tooltip" style="width:100%;" title="Pickup Location" class="form-control app_minselect2"></select></td>' +

@@ -66,7 +66,7 @@ $currency_amount1 = currency_conversion($currency,$sq_quotation['currency_code']
           <span class="customerMail"><i class="fa fa-envelope"></i> : <?= $sq_quotation['email_id'] ?></span><br>
           <?php if($sq_quotation['mobile_number'] != ''){ ?>
             <span class="customerMobile"><i class="fa fa-phone"></i> : <?= $sq_quotation['mobile_number'] ?></span> <?php } ?>
-          <span class="generatorName">PREPARED BY <?= $emp_name?></span><br>
+           <span class="generatorName">PREPARED BY <?= $emp_name?></span><br>
         </div>
       </div>
       <div class="col-md-8 text-right">

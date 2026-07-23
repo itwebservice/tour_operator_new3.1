@@ -22,10 +22,9 @@ $membership_details_arr = json_decode($sq_credit['membership_details_arr']);
           </div>
           <div class="col-md-4 mg_bt_10">
             <select name="charges_in" id="charges_in" title="Credit Card Charges In" required>
-              <option value="<?= $sq_credit['charges_in'] ?>"><?= $sq_credit['charges_in'] ?></option>
               <option value="">Credit Card Charges In</option>
-              <option value="Percentage">Percentage</option>
-              <option value="Flat">Flat</option>
+              <option value="Percentage" <?= $sq_credit['charges_in'] === 'Percentage' ? 'selected' : '' ?>>Percentage</option>
+              <option value="Flat" <?= $sq_credit['charges_in'] === 'Flat' ? 'selected' : '' ?>>Flat</option>
             </select>
           </div>
           <div class="col-md-4 mg_bt_10">
@@ -36,10 +35,9 @@ $membership_details_arr = json_decode($sq_credit['membership_details_arr']);
     		<div class="row">
           <div class="col-md-4 mg_bt_10">
             <select name="tax_charges_in" id="tax_charges_in" title="Tax on Credit Card Charges In" required>
-              <option value="<?= $sq_credit['tax_charges_in'] ?>"><?= $sq_credit['tax_charges_in'] ?></option>
               <option value="">Tax On Credit Card Charges In</option>
-              <option value="Percentage">Percentage</option>
-              <option value="Flat">Flat</option>
+              <option value="Percentage" <?= $sq_credit['tax_charges_in'] === 'Percentage' ? 'selected' : '' ?>>Percentage</option>
+              <option value="Flat" <?= $sq_credit['tax_charges_in'] === 'Flat' ? 'selected' : '' ?>>Flat</option>
             </select>
           </div>
           <div class="col-md-4 mg_bt_10">
@@ -47,26 +45,15 @@ $membership_details_arr = json_decode($sq_credit['membership_details_arr']);
           </div>
           <div class="col-md-4 mg_bt_10">
             <select name="bank_id1" id="bank_id1" title="Select Bank" required>
-              <?php 
-              $sq_bank = mysqli_fetch_assoc(mysqlQuery("select * from bank_master where bank_id='$sq_credit[bank_id]'"));
-              if($sq_credit['bank_id'] != ''){
-              ?>
-              <option value="<?= $sq_credit['bank_id'] ?>"><?= $sq_bank['bank_name'] ?></option>
-              <?php } ?>
-              <?php get_bank_dropdown(); ?>
+              <?php get_bank_dropdown('Creditor Bank', $sq_credit['bank_id']); ?>
             </select>
           </div>
           </div>
           <div class="row">
           <div class="col-md-4 mg_bt_10">
             <select name="cstatus" id="cstatus" title="Status" required>
-              <option value="<?= $sq_credit['status'] ?>"><?= $sq_credit['status'] ?></option>
-              <?php if($sq_credit['status'] != 'Active'){ ?>
-              <option value="Active">Active</option>
-              <?php } ?>
-              <?php if($sq_credit['status'] != 'Inactive'){ ?>
-              <option value="Inactive">Inactive</option>
-              <?php } ?>
+              <option value="Active" <?= $sq_credit['status'] === 'Active' ? 'selected' : '' ?>>Active</option>
+              <option value="Inactive" <?= $sq_credit['status'] === 'Inactive' ? 'selected' : '' ?>>Inactive</option>
             </select>
           </div>
         </div>
@@ -90,13 +77,8 @@ $membership_details_arr = json_decode($sq_credit['membership_details_arr']);
           <div class="col-md-4 mg_bt_10">
             <label>Status</label>
             <select name="status" id="status<?= $i ?>" title="Status" required>
-              <option value="<?= $membership_details_arr[$i]->status ?>"><?= $membership_details_arr[$i]->status ?></option>
-              <?php if($membership_details_arr[$i]->status != 'Active'){ ?>
-              <option value="Active">Active</option>
-              <?php } ?>
-              <?php if($membership_details_arr[$i]->status != 'Inactive'){ ?>
-              <option value="Inactive">Inactive</option>
-              <?php } ?>
+              <option value="Active" <?= $membership_details_arr[$i]->status == 'Active' ? 'selected' : '' ?>>Active</option>
+              <option value="Inactive" <?= $membership_details_arr[$i]->status == 'Inactive' ? 'selected' : '' ?>>Inactive</option>
             </select>
           </div>
           </div>
