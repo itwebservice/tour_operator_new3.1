@@ -97,69 +97,13 @@ if (!function_exists('o6_guest_label')) {
     return $parts ? implode(', ', $parts) : o6nv($ov['guest_count'], '-');
   }
 }
-if (!function_exists('o6_list_item_text')) {
-  function o6_list_item_text($html)
-  {
-    $html = preg_replace('/<br\s*\/?>/i', ' ', (string) $html);
-    $text = strip_tags($html);
-    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $text = str_replace("\xC2\xA0", ' ', $text);
-    $text = preg_replace('/\s+/u', ' ', $text);
-    return trim($text);
-  }
-}
 if (!function_exists('o6_split_lines')) {
   function o6_split_lines($html, $fallback = array())
   {
-    $html = (string) $html;
-    $items = array();
-
-    if (trim($html) === '') {
-      return $fallback;
-    }
-
-    if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $html, $matches)) {
-      foreach ($matches[1] as $chunk) {
-        $text = o6_list_item_text($chunk);
-        if ($text !== '') {
-          $items[] = $text;
-        }
-      }
-    }
-
-    if (empty($items) && preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches)) {
-      foreach ($matches[1] as $chunk) {
-        $text = o6_list_item_text($chunk);
-        if ($text !== '') {
-          $items[] = $text;
-        }
-      }
-    }
-
-    if (empty($items)) {
-      $plain = o6_list_item_text($html);
-      $parts = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $plain);
-      foreach ((array) $parts as $part) {
-        $text = trim($part);
-        if ($text !== '') {
-          $items[] = $text;
-        }
-      }
-    }
-
+    $text = trim(strip_tags(str_replace(array('<br>', '<br/>', '<br />', '</p>', '</li>'), "\n", (string) $html)));
+    $items = preg_split('/\r\n|\r|\n|•|\x{2022}/u', $text);
+    $items = array_values(array_filter(array_map('trim', (array) $items)));
     return $items ? $items : $fallback;
-  }
-}
-if (!function_exists('o6_icon_list_inc')) {
-  function o6_icon_list_inc()
-  {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-12.5 12.5-32.8 12.5-45.3 0l-64-64c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3z"/></svg>';
-  }
-}
-if (!function_exists('o6_icon_list_exc')) {
-  function o6_icon_list_exc()
-  {
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>';
   }
 }
 if (!function_exists('o6_air_code')) {
@@ -434,8 +378,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= o6e($o6_dest) ?> Tour Package – <?= o6e($o6_company) ?></title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link href="option6.css" rel="stylesheet" />
 </head>
 
@@ -1296,25 +1239,10 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
       ?>
       <?php o6_render_page_header($hero, 'Costing Details'); ?>
 
-    <div class="content-container">
-      <div class="scope-matrix-grid">
-        
-      <div class="matrix-column-wrapper">
-          <div class="matrix-header inclusions-bg">
-            <div class="header-badge-circle"><i class="fa-solid fa-check"></i></div>
-            <h3>What's Included</h3>
-          </div>
-          <div class="matrix-list-body">
-            <span class="matrix-scope-tag">PACKAGE SCOPE</span>
-            <ul>
-              <?php foreach ($o6_included as $item) : ?>
-                <li>
-                  <span class="item-icon-wrap item-icon-wrap--inc" aria-hidden="true" style="color: #1a5c3f;"><?= o6_icon_list_inc() ?></span>
-                  <span class="item-text"><?= nl2br(o6e($item)) ?></span>
-                </li>
-              <?php endforeach; ?>
-            </ul>
-          </div>
+      <div class="content-container">
+        <div class="section-intro"></br>
+          <h2 class="main-section-title">Your Investment Matrix</h2>
+          <p class="section-desc">Consolidated cost structure breakdown per package tier definitions.</p>
         </div>
         <?php if (!$o6_is_per_person) { ?>
           <table class="financial-breakdown-table card-container">
@@ -1332,66 +1260,11 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
               <?php foreach ($o6_cost_grp as $ci => $row) :
                 $tax_amount = '0.00';
 
-        <div class="matrix-column-wrapper">
-          <div class="matrix-header exclusions-bg">
-            <div class="header-badge-circle"><i class="fa-solid fa-xmark"></i></div>
-            <h3>What's Excluded</h3>
-          </div>
-          <div class="matrix-list-body">
-            <span class="matrix-scope-tag text-red">OUT OF SCOPE</span>
-            <ul>
-              <?php foreach ($o6_excluded as $item) : ?>
-                <li>
-                  <span class="item-icon-wrap item-icon-wrap--exc" aria-hidden="true" style="color: var(--japan-crimson);"><?= o6_icon_list_exc() ?></span>
-                  <span class="item-text"><?= nl2br(o6e($item)) ?></span>
-                </li>
-              <?php endforeach; ?>
-            </ul>
-          </div>
-        </div>
-
-
-      </div>
-    </div>
-
-    <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
-  </div>
-  <?php $o6_pg++; ?>
-
-  <!-- PAGE 8 — COSTING & PAYMENT -->
-  <div class="page">
-    <?php
-    $o6_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
-    $o6_is_per_person = ($o6_costing_type == 'per person');
-    $o6_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
-    ?>
-    <?php o6_render_page_header($hero, 'Costing Details'); ?>
-
-    <div class="content-container">
-      <div class="section-intro"></br>
-        <h2 class="main-section-title">Your Investment Matrix</h2>
-        <p class="section-desc">Consolidated cost structure breakdown per package tier definitions.</p>
-      </div>
-      <?php if (!$o6_is_per_person) { ?>
-        <table class="financial-breakdown-table card-container">
-          <thead>
-            <tr>
-              <th>PACKAGE TYPE</th>
-              <th>TOUR COST</th>
-              <th>TAX</th>
-              <th>TCS</th>
-              <th>TRAVEL COST</th>
-              <th>GRAND TOTAL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($o6_cost_grp as $ci => $row) :
-              $tax_amount = '0.00';
-
-              if (!empty($row['tax_display'])) {
-                preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-                if (!empty($m[1])) {
-                  $tax_amount = $m[1];
+                if (!empty($row['tax_display'])) {
+                  preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
+                  if (!empty($m[1])) {
+                    $tax_amount = $m[1];
+                  }
                 }
                 $is_rec = (stripos(o6nv($row['package_type'], ''), 'premium') !== false)
                   || (stripos(o6nv($row['package_type'], ''), 'recommended') !== false)

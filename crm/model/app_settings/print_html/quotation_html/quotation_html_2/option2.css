@@ -41,7 +41,8 @@ body {
   padding: 0;
 }
 body {
-  font-family: var(--sans);
+  /* font-family: var(--sans); */
+  font-family: Calibri, Arial, sans-serif;
   color: var(--ink);
   background: radial-gradient(1200px 700px at 50% -10%, #1d3556 0%, transparent 60%), #0a1426;
   -webkit-font-smoothing: antialiased;
@@ -164,7 +165,8 @@ body {
 .strip__no {
   font-family: var(--serif);
   font-style: italic;
-  color: rgba(255, 255, 255, 0.62);
+  /* color: rgba(255, 255, 255, 0.62); */
+  color: rgb(221 229 232);
   font-size: 14px;
   white-space: nowrap;
   margin-bottom: 6px;
@@ -264,19 +266,19 @@ body.header-b .strip__content {
   gap: 12px;
   margin: 0;
 }
-.kicker-heading{
-margin-top: 30px !important;
+.kicker-heading {
+  margin-top: 30px !important;
 }
-.gold-rule{
-background:var(--gradient-gold);
-border:0;
-width:64px;
-height:2px;
+.gold-rule {
+  background: var(--gradient-gold);
+  border: 0;
+  width: 64px;
+  height: 2px;
 }
-.mt-2{
-  margin-top:calc(var(--spacing) * 2);
+.mt-2 {
+  margin-top: calc(var(--spacing) * 2);
 }
-hr{
+hr {
   color: inherit;
 }
 .kicker::before {
@@ -369,8 +371,8 @@ body.cover-b .cv-b {
   gap: 6px;
 }
 .logo__slot {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
 }
 .logo__name {
   font-family: var(--serif);
@@ -382,7 +384,7 @@ body.cover-b .cv-b {
   font-family: var(--sans);
   font-weight: 400;
   letter-spacing: 0.32em;
-  font-size: 7px;
+  font-size: 9px;
   text-transform: uppercase;
 }
 
@@ -527,7 +529,7 @@ body.cover-b .cv-b {
   height: 20px;
 }
 .incitem span {
-  font-size: 8.5px;
+  font-size: 10px;
   line-height: 1.32;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -751,7 +753,7 @@ body.cover-b .cv-b {
   align-items: center;
 }
 .ov .t {
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
@@ -765,7 +767,7 @@ body.cover-b .cv-b {
   line-height: 1.1;
 }
 .ov .v.sm {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .prep {
@@ -832,7 +834,7 @@ body.cover-b .cv-b {
   padding: 11px 13px 13px;
 }
 .hotel__city {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--gold-deep);
@@ -853,7 +855,7 @@ body.cover-b .cv-b {
   line-height: 1.12;
 }
 .hotel__cat {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
 }
 .hotel__stars {
@@ -875,7 +877,7 @@ body.cover-b .cv-b {
   padding: 6px 8px;
 }
 .hotel__dt .l {
-  font-size: 7px;
+  font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1020,10 +1022,11 @@ body.cover-b .cv-b {
   line-height: 0.9;
 }
 .sector .pt .city {
-  font-size: 8px;
+  font-size: 10.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  font-weight: 450;
+  color: var(--navy);
   margin-top: 2px;
 }
 .sector .mid {
@@ -1051,7 +1054,7 @@ body.cover-b .cv-b {
 }
 .boarding__times {
   display: flex;
-  gap: 10px;
+  gap: 300px;
   margin-top: 10px;
   padding-top: 9px;
   border-top: 1px dashed var(--line);
@@ -1059,16 +1062,18 @@ body.cover-b .cv-b {
 .boarding__times .x {
   flex: 1;
 }
+
 .boarding__times .l {
-  font-size: 7.5px;
+  font-size: 9.8px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted);
+  /* color: var(--muted); */
+  color: var(--navy);
 }
 .boarding__times .v {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: var(--navy);
   margin-top: 2px;
 }
@@ -1428,17 +1433,15 @@ body.cover-b .cv-b {
   color: #b24a45;
 } */
 
-.ie--in h3 .b{
-    background: linear-gradient(135deg, lab(83.9185% 9.76154 50.5538), lab(67.1959% 24.4167 67.5432));
-    color:var(--navy) !important;
+.ie--in h3 .b {
+  background: linear-gradient(135deg, lab(83.9185% 9.76154 50.5538), lab(67.1959% 24.4167 67.5432));
+  color: var(--navy) !important;
 }
 
-
-.ie--ex h3 .b{
-    background:var(--navy) !important;
-    color:var(--gold) !important;
+.ie--ex h3 .b {
+  background: var(--navy) !important;
+  color: var(--gold) !important;
 }
-
 
 .option1-ie-grid {
   display: grid !important;
@@ -1468,8 +1471,8 @@ body.cover-b .cv-b {
 .option1-ie-grid .ie h3 .b {
   width: 36px !important;
   height: 36px !important;
-border-radius: 0.75rem !important;  
-display: inline-flex !important;
+  border-radius: 0.75rem !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex: 0 0 36px !important;
@@ -1510,11 +1513,11 @@ display: inline-flex !important;
 }
 
 .option1-ie-grid .ie--ex li svg {
-  color: color-mix(in oklab, var(--navy) 70%, transparent) !important;
-  stroke: color-mix(in oklab, var(--navy) 70%, transparent) !important;
+  /* color: color-mix(in oklab, var(--navy) 70%, transparent) !important;
+  stroke: color-mix(in oklab, var(--navy) 70%, transparent) !important; */
+      color:#dc2626;
+
 }
-
-
 
 .cost {
   width: 100%;
@@ -2090,7 +2093,7 @@ img {
   font-size: 15px;
 }
 .tnode .rt i {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--gold-deep);
 }
 .ie li i {
@@ -2144,8 +2147,8 @@ img {
 }
 /* ======================== Dipti  */
 .incitem .ico svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: block;
   margin: auto;
 }
@@ -2173,16 +2176,14 @@ img {
   width: 100% !important;
 }
 
-.itinerary-page .strip,
 .inclusion-page .strip,
-.payment-page .strip{
+.payment-page .strip {
   break-after: avoid !important;
   page-break-after: avoid !important;
 }
 
-.itinerary-page .page__body,
 .inclusion-page .page__body,
-.payment-page .page__body{
+.payment-page .page__body {
   break-before: avoid !important;
   page-break-before: avoid !important;
 }
@@ -2257,23 +2258,23 @@ img {
     page-break-inside: avoid !important;
     margin-bottom: 12px !important;
   }
-.itinerary-page{
-  break-before: page !important;
-  page-break-before: always !important;
-}
-.testimonial-page{
-  break-before: page !important;
-  page-break-before: always !important;
-}
-.inclusion-page {
+  .itinerary-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .testimonial-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .inclusion-page {
     page-break-before: always !important;
     break-before: page !important;
   }
-.payment-page {
+  .payment-page {
     page-break-before: always !important;
     break-before: page !important;
   }
-.terms-page {
+  .terms-page {
     page-break-before: always !important;
     break-before: page !important;
   }
@@ -2382,10 +2383,9 @@ img {
     break-inside: avoid;
     page-break-inside: avoid;
   }
-   .option1-ie-grid,
+  .option1-ie-grid,
   .ie {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
-
 }

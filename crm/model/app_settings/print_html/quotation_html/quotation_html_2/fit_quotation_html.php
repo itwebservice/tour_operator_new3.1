@@ -97,7 +97,6 @@ if (!function_exists('o2_list_items')) {
   {
     $html = (string)$html;
 
-    // li / br / p close tag কে line break বানাও
     $html = preg_replace('/<\/li\s*>/i', "\n", $html);
     $html = preg_replace('/<br\s*\/?>/i', "\n", $html);
     $html = preg_replace('/<\/p\s*>/i', "\n", $html);
@@ -247,10 +246,10 @@ $o2_round = o2img(
         <div class="cv-a__inner">
           <div class="logo">
             <img class="logo__slot" src="<?= o2e($o2_logo) ?>" alt="Company logo">
-            <div>
-              <div class="logo__name"><?= o2e($o2_company) ?></div>
-              <div class="logo__tag"><?= o2e($o2_tagline) ?></div>
-            </div>
+            <!-- <div>
+              <div class="logo__name"><//?= o2e($o2_company) ?></div>
+              <div class="logo__tag"><//?= o2e($o2_tagline) ?></div>
+            </div> -->
           </div>
           <div class="cv-a__eyebrow"><?= o2e(o2nv($hero['package_name'], o2nv($hero['tour_name'], 'Exclusive Tour'))) ?></div>
           <h1 class="cv-a__dest"><?= o2e($o2_dest) ?></h1>
@@ -376,7 +375,7 @@ $o2_round = o2img(
           <div class="k">A Personalized Travel Experience</div>
           <h2 style="font-size: 20px;">Exclusively designed for <em><?= o2e($o2_client) ?></em> — an unforgettable journey through <?= o2e($o2_dest) ?>.</h2>
         </div>
-        <p class="greet" style="margin:7mm 0 0; font-size: 13px;">
+        <p class="greet" style="margin:7mm 0 0; font-size: 15px;">
           Dear <b><?= o2e($o2_client_first !== '' ? $o2_client_first : $o2_client) ?></b>,<br>
           Thank you for choosing <?= o2e($o2_company) ?> for your upcoming journey. We are delighted to present this carefully
           crafted travel proposal, designed to deliver memorable experiences, seamless arrangements and exceptional
@@ -523,7 +522,7 @@ $o2_round = o2img(
         'Where You\'ll Stay',
         'Accommodation',
         o2e(strtoupper($o2_pkg)) . ' <b>PACKAGE</b>'
-      ); ?> 
+      ); ?>
       <div class="page__wm"></div>
       <div class="page__body">
         <div class="sec-h">
@@ -581,14 +580,14 @@ $o2_round = o2img(
               <div class="hotel__city" style="color:var(--gold-deep)"><i class="fa-solid fa-circle-info"></i> Common Amenities</div>
               <div class="hotel__name" style="font-size:15px;margin-bottom:8px">Standard in Every Hotel</div>
 
-              <p class="muted" style="font-size:10px;line-height:1.2;margin-top:10px;font-style:italic;">
+              <p class="muted" style="font-size:11px;line-height:1.2;margin-top:10px;font-style:italic;">
                 Enjoy a comfortable stay at carefully selected accommodations that offer a perfect blend of convenience, comfort, and hospitality.
               </p>
 
-              <p class="muted" style="font-size:10px;line-height:1.2;margin-top:8px;font-style:italic;">
+              <p class="muted" style="font-size:11px;line-height:1.2;margin-top:8px;font-style:italic;">
                 Each property is chosen to provide a relaxing environment and essential amenities, ensuring a pleasant experience throughout your journey.
               </p>
-              <p class="muted" style="font-size:9px;margin:10px 0 0;line-height:1.5">All stays are on twin-sharing basis with daily breakfast unless stated otherwise. Room categories may be upgraded subject to availability.</p>
+              <p class="muted" style="font-size:11px;margin:10px 0 0;line-height:1.5">All stays are on twin-sharing basis with daily breakfast unless stated otherwise. Room categories may be upgraded subject to availability.</p>
             </div>
           <?php endif; ?>
         </div>
@@ -640,10 +639,10 @@ $o2_round = o2img(
                       <div class="l">Arrival</div>
                       <div class="v"><?= o2e(o2nv($f['arrival_datetime'], 'NA')) ?></div>
                     </div>
-                    <div class="x">
+                    <!-- <div class="x">
                       <div class="l">Flight</div>
-                      <div class="v"><?= o2e(o2nv($f['airline_code'], '—')) ?></div>
-                    </div>
+                      <div class="v"><//?= o2e(o2nv($f['airline_code'], '—')) ?></div>
+                    </div> -->
                   </div>
                 </div>
                 <div class="boarding__stub">
@@ -905,18 +904,41 @@ $o2_round = o2img(
               </span> What's Included</h3>
             <hr class="gold-rule mt-2">
             <ul>
-
               <?php
-              foreach (o2_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.') as $item): ?>
-                <li>
-                  <svg width="16" height="16" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 6 9 17l-5-5"></path>
-                  </svg>
-                  <?= o2e($item) ?>
-                </li>
-              <?php endforeach; ?>
+              if (!empty($incx['included'])) {
+
+                $html = preg_replace('/<\/span>\s*<span[^>]*>/i', '', $incx['included']);
+
+                preg_match_all('/<p[^>]*>(.*?)<\/p>|<span[^>]*>(.*?)<\/span>/is', $html, $matches);
+
+                $items = array_merge($matches[1], $matches[2]);
+
+                foreach ($items as $item) {
+                  if (trim($item) == '') continue;
+
+                  $item = preg_replace('/<img[^>]*>/i', '', $item);
+                  $item = preg_replace('/<!--.*?-->/s', '', $item);
+                  $item = preg_replace('/<o:p>.*?<\/o:p>/i', '', $item);
+
+                  $item = strip_tags($item);
+                  $item = html_entity_decode(trim($item));
+
+                  if ($item == '') continue;
+              ?>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                    <?= o2e($item) ?>
+                  </li>
+                <?php
+                }
+              } else {
+                ?>
+                <li>Inclusions will be shared as per final quotation.</li>
+              <?php } ?>
             </ul>
           </div>
           <div class="card ie ie--ex">
@@ -931,14 +953,45 @@ $o2_round = o2img(
             <hr class="gold-rule mt-2">
 
             <ul>
-              <?php foreach (o2_list_items(isset($incx['excluded']) ? $incx['excluded'] : '', 'Exclusions will be shared as per final quotation.') as $item): ?>
-                <li><svg width="16" height="16" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 6 6 18"></path>
-                    <path d="M6 6 18 18"></path>
-                  </svg><span><?= nl2br(o2e($item)) ?></span></li>
-              <?php endforeach; ?>
+              <?php
+              if (!empty($incx['excluded'])) {
+
+                $html = preg_replace('/<\/span>\s*<span[^>]*>/i', '', $incx['excluded']);
+
+                preg_match_all('/<p[^>]*>(.*?)<\/p>|<span[^>]*>(.*?)<\/span>/is', $html, $matches);
+
+                $items = array_merge($matches[1], $matches[2]);
+
+                foreach ($items as $item) {
+                  if (trim($item) == '') continue;
+
+                  $item = preg_replace('/<img[^>]*>/i', '', $item);
+                  $item = preg_replace('/<!--.*?-->/s', '', $item);
+                  $item = preg_replace('/<o:p>.*?<\/o:p>/i', '', $item);
+
+                  $item = strip_tags($item);
+                  $item = html_entity_decode(trim($item));
+
+                  if ($item == '') continue;
+              ?>
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#dc2626"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <path d="M18 6L6 18"></path>
+                      <path d="M6 6L18 18"></path>
+                    </svg>
+                    <?= o2e($item) ?>
+                  </li>
+                <?php
+                }
+              } else {
+                ?>
+                <li>Exclusions will be shared as per final quotation.</li>
+              <?php } ?>
             </ul>
           </div>
         </div>
@@ -1268,10 +1321,6 @@ $o2_round = o2img(
       <div class="thanks__wrap">
         <div class="logo">
           <img class="logo__slot" src="<?= o2e($o2_logo) ?>" alt="Company logo">
-          <div>
-            <div class="logo__name"><?= o2e($o2_company) ?></div>
-            <div class="logo__tag"><?= o2e($o2_tagline) ?></div>
-          </div>
         </div>
         <div class="thanks__k">With Heartfelt Gratitude</div>
         <h2 class="thanks__big">Thank You</h2>

@@ -24,7 +24,8 @@
 }
 body {
   /* font-family: 'Inter', sans-serif; */
-  font-family: 'Prata', serif;
+  /* font-family: 'Prata', serif; */
+  font-family: Calibri, Arial, sans-serif;
   background: #dde2e8;
   color: var(--text);
   font-size: 13px;
@@ -261,7 +262,7 @@ body {
   background: var(--white);
 }
 .page-header-right {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -270,8 +271,8 @@ body {
 
 .page-num {
   text-align: right;
-  padding: 5px 28px;
-  font-size: 9px;
+  padding: 5px 30px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 1.5px;
   color: var(--text-muted);
@@ -376,7 +377,7 @@ body {
   margin-bottom: 8px;
 }
 .salutation-card p {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text-mid);
   line-height: 1.7;
 }
@@ -407,7 +408,7 @@ body {
   color: var(--teal);
 }
 .ov-card .lbl {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -415,7 +416,7 @@ body {
   margin-bottom: 3px;
 }
 .ov-card .val {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
@@ -679,8 +680,8 @@ body {
   line-height: 1;
 }
 .flight-city {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--navy);
 }
 .flight-middle {
   flex: 1;
@@ -716,7 +717,7 @@ body {
   letter-spacing: 1.5px;
   font-weight: 600;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--navy);
   margin-top: 3px;
 }
 .flight-footer {
@@ -744,11 +745,11 @@ body {
   color: var(--gold);
 }
 .ff-lbl {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 .ff-val {
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--text);
 }
@@ -796,7 +797,7 @@ body {
 .transfer-type-badge {
   background: var(--gold);
   color: var(--white);
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 20px;
@@ -809,7 +810,7 @@ body {
   margin-bottom: 12px;
 }
 .transfer-item .tlbl {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -886,13 +887,13 @@ body {
   align-items: center;
   gap: 7px;
   font-family: 'Prata', serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 6px;
 }
 .itin-prog-lbl {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -1037,7 +1038,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
-    grid-template-columns: 370px;
+  grid-template-columns: 370px;
 
   justify-content: center;
 }
@@ -1167,7 +1168,7 @@ body {
 .bank-header {
   background: var(--navy);
   padding: 10px 16px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -1191,7 +1192,7 @@ body {
   gap: 4px;
 }
 .bank-item .bi-val {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
@@ -1297,7 +1298,7 @@ body {
 .review-text {
   font-family: 'Prata', serif;
   font-style: italic;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text-mid);
   line-height: 1.65;
   margin-bottom: 10px;
@@ -1308,18 +1309,18 @@ body {
   gap: 10px;
 }
 .review-avatar {
-  width: 38px;
-  height: 38px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
 }
 .review-name {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text);
 }
 .review-meta {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 .review-meta .dot {
@@ -1465,7 +1466,7 @@ body {
   line-height: 1;
 }
 .ty-sub {
-  font-size: 16px;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.7;
   margin-bottom: 36px;

@@ -1055,7 +1055,7 @@ a {
   }
 
   .h-5 {
-    height: calc(var(--spacing) * 5);
+    height: calc(var(--spacing) * 6);
   }
 
   .h-6 {
@@ -1215,7 +1215,7 @@ a {
   }
 
   .w-5 {
-    width: calc(var(--spacing) * 5);
+    width: calc(var(--spacing) * 6);
   }
 
   .w-6 {
@@ -2676,7 +2676,9 @@ a {
   .italic {
     font-style: italic;
   }
-
+.italic-size{
+    margin-left: 40px;
+}
   .not-italic {
     font-style: normal;
   }

@@ -93,8 +93,8 @@ while($row1 = mysqli_fetch_assoc($sq1_q))
 <tfoot>
 	<tr class="active">
 		<th colspan="2" class="text-right">Total Paid : <?= number_format((($sq_paid_amount=='')?0:$sq_paid_amount), 2); ?></th>
-		<th colspan="2" class="text-right">Total Pending : <?= number_format(($sq_pending_amount=='')?0:$sq_pending_amount), 2);?></th>
-		<th colspan="2" class="text-right">Total Cancel: <?= number_format(($sq_cancel_amount=='')?0:$sq_cancel_amount), 2); ?> </th>
+		<th colspan="2" class="text-right">Total Pending : <?= number_format((($sq_pending_amount=='')?0:$sq_pending_amount), 2);?></th>
+		<th colspan="2" class="text-right">Total Cancel: <?= number_format((($sq_cancel_amount=='')?0:$sq_cancel_amount), 2); ?> </th>
 	</tr>
 </tfoot>
 

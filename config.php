@@ -14,9 +14,11 @@ $localIP = getHostByName(getHostName());
 include 'crm/model/app_settings/dropdown_master.php';
 // Create connection
 $servername = "localhost";
-$username = "itourjh2_demo1_u";
-$password = "FWstJYlhxaGK";
-$db_name = "itourjh2_demo1";
+$username = "root";
+$password = "";
+$db_name = "itours_latest";
+
+// $db_name = "tour_operator_theme";
 global $connection;
 $connection = new mysqli($servername, $username, $password, $db_name);
 $conn = $connection;
@@ -26,8 +28,9 @@ if (!$connection) {
   die("Connection failed: " . mysqli_connect_error());
 }
 
-define('BASE_URL', 'https://www.demo1.itoursdemo.co.in/crm/');
-define('BASE_URL_B2C', 'https://www.demo1.itoursdemo.co.in/');
+
+define('BASE_URL', 'http://localhost/tour_operator_new3.1/crm/');   
+define('BASE_URL_B2C', 'http://localhost/tour_operator_new3.1/');
 mysqli_query($connection, "SET SESSION sql_mode = ''");
 
 
