@@ -33,7 +33,7 @@ $localIP = getHostByName(getHostName());
 $servername = "localhost";
 $username = "root";
 $password = "";
-$db_name = "itours_latest";
+$db_name = "itourjh2_demo4";
 
 
 // $db_name = "tour_operator_theme";
@@ -806,17 +806,42 @@ function is_ai_package_quotation($quotation_row)
   if (!is_array($quotation_row)) {
     return false;
   }
-  $refer_id = isset($quotation_row['quotation_refer_id']) ? intval($quotation_row['quotation_refer_id']) : 0;
+  // AI Builder saves package_id = 0. quotation_refer_id is optional
+  // (only set when a custom package exists for that destination).
   $package_id = isset($quotation_row['package_id']) ? intval($quotation_row['package_id']) : 0;
-  return $refer_id > 0 && $package_id == 0;
+  return $package_id == 0;
 }
 
 function get_quotation_package_lookup_id($quotation_row)
 {
   if (is_ai_package_quotation($quotation_row)) {
-    return intval($quotation_row['quotation_refer_id']);
+    return isset($quotation_row['quotation_refer_id']) ? intval($quotation_row['quotation_refer_id']) : 0;
   }
   return isset($quotation_row['package_id']) ? intval($quotation_row['package_id']) : 0;
+}
+
+// Resolve destination for AI quotations (refer package, else tour name match)
+function get_ai_quotation_dest_id($quotation_row)
+{
+  if (!is_array($quotation_row) || !is_ai_package_quotation($quotation_row)) {
+    return 0;
+  }
+  $lookup_id = get_quotation_package_lookup_id($quotation_row);
+  if ($lookup_id > 0) {
+    $pkg = mysqli_fetch_assoc(mysqlQuery("select dest_id from custom_package_master where package_id='$lookup_id' limit 1"));
+    if ($pkg && !empty($pkg['dest_id'])) {
+      return intval($pkg['dest_id']);
+    }
+  }
+  $tour_name = isset($quotation_row['tour_name']) ? trim($quotation_row['tour_name']) : '';
+  if ($tour_name !== '') {
+    $tour_esc = addslashes($tour_name);
+    $dest = mysqli_fetch_assoc(mysqlQuery("select dest_id from destination_master where TRIM(dest_name)='$tour_esc' limit 1"));
+    if ($dest && !empty($dest['dest_id'])) {
+      return intval($dest['dest_id']);
+    }
+  }
+  return 0;
 }
 
 function get_dates_for_package_itineary($quotation_id)

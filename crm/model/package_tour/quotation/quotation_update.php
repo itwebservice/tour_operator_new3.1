@@ -19,9 +19,15 @@ public function quotation_master_update()
 	$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
 	$quotation_refer_id = 0;
 
-	if ($is_ai_quotation == '1' && $dest_id > 0) {
-		$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
+	// Always preserve the saved quotation_refer_id on update (never reassign from destination packages)
+	$existing_quot = mysqli_fetch_assoc(mysqlQuery("select quotation_refer_id, package_id from package_tour_quotation_master where quotation_id='$quotation_id'"));
+	$existing_refer_id = isset($existing_quot['quotation_refer_id']) ? intval($existing_quot['quotation_refer_id']) : 0;
+
+	if ($is_ai_quotation == '1') {
 		$package_id = 0;
+		$quotation_refer_id = $existing_refer_id;
+	} else {
+		$quotation_refer_id = 0;
 	}
 	$tour_name = $_POST['tour_name'];
     $from_date = $_POST['from_date'];
@@ -752,11 +758,12 @@ function quotation_daywiseimages_update(){
 			$package_id = $_POST['package_id'];
 			$is_ai_quotation = isset($_POST['is_ai_quotation']) ? $_POST['is_ai_quotation'] : '0';
 			$dest_id = isset($_POST['dest_id']) ? intval($_POST['dest_id']) : 0;
-			$quotation_refer_id = 0;
-			if ($is_ai_quotation == '1' && $dest_id > 0) {
-				$quotation_refer_id = get_quotation_refer_id_by_dest($dest_id);
+			// Preserve existing quotation_refer_id — do not overwrite with MIN(package_id) for destination
+			$existing_quot = mysqli_fetch_assoc(mysqlQuery("select quotation_refer_id from package_tour_quotation_master where quotation_id='$quotation_id'"));
+			$quotation_refer_id = isset($existing_quot['quotation_refer_id']) ? intval($existing_quot['quotation_refer_id']) : 0;
+			if ($is_ai_quotation == '1') {
 				$package_id = 0;
-				mysqlQuery("update package_tour_quotation_master set package_id='0', quotation_refer_id='$quotation_refer_id' where quotation_id='$quotation_id'");
+				mysqlQuery("update package_tour_quotation_master set package_id='0' where quotation_id='$quotation_id'");
 			}
 			
 			error_log("QUOTATION UPDATE: Itinerary data - checked_programe_arr1: " . print_r($checked_programe_arr1, true));

@@ -212,38 +212,98 @@ $('#frm_tab2').validate({
 		data:{ group_id : group_id },
 		success:function(result){
 		var table = document.getElementById("tbl_package_tour_quotation_dynamic_plane");
-			var plane_arr = JSON.parse(result);
-			if(jQuery.isEmptyObject(plane_arr)){
-				var f_row = table.rows[0];
-				f_row.cells[0].childNodes[0].removeAttribute('checked');
-			};
-		if(table.rows.length!=plane_arr.length){
-			for(var i=1; i<plane_arr.length; i++){
-				addRow('tbl_package_tour_quotation_dynamic_plane');
+		if (!table) {
+			return;
+		}
+
+		var plane_arr = [];
+		try {
+			plane_arr = (typeof result === 'string') ? JSON.parse(result) : result;
+		} catch (e) {
+			console.error('Group Quotation: invalid plane info response', e, result);
+			plane_arr = [];
+		}
+		if (!Array.isArray(plane_arr)) {
+			plane_arr = [];
+		}
+
+		// Reset extra rows before loading tour flights
+		while (table.rows.length > 1) {
+			table.deleteRow(1);
+		}
+
+		if (plane_arr.length === 0) {
+			var empty_row = table.rows[0];
+			var empty_chk = empty_row.cells[0].querySelector('input[type="checkbox"]');
+			if (empty_chk) {
+				empty_chk.checked = false;
 			}
+			var empty_dept = (typeof getCellFormControl === 'function') ? getCellFormControl(empty_row.cells[6]) : empty_row.cells[6].querySelector('input');
+			var empty_arrv = (typeof getCellFormControl === 'function') ? getCellFormControl(empty_row.cells[7]) : empty_row.cells[7].querySelector('input');
+			if (empty_dept) empty_dept.value = from_date + ' 00:00';
+			if (empty_arrv) empty_arrv.value = to_date + ' 00:00';
+			return;
 		}
-		if(plane_arr.length <= 0){
-			var row = table.rows[0];
-			row.cells[6].childNodes[0].value = from_date + ' 00:00';
-			row.cells[7].childNodes[0].value = to_date + ' 00:00';
+
+		for (var r = 1; r < plane_arr.length; r++) {
+			addRow('tbl_package_tour_quotation_dynamic_plane');
 		}
-		for(var i=0; i<plane_arr.length; i++){
+		if (typeof event_airport === 'function') {
+			event_airport('tbl_package_tour_quotation_dynamic_plane');
+		}
+		if (typeof initAllAirlineSelectAddNew === 'function') {
+			initAllAirlineSelectAddNew('#tbl_package_tour_quotation_dynamic_plane');
+		}
+
+		for (var i = 0; i < plane_arr.length; i++) {
 			var row = table.rows[i];
-			
-			row.cells[2].childNodes[0].value = plane_arr[i]['city_name']+' - '+plane_arr[i]['from_location'];
-			row.cells[3].childNodes[0].value = plane_arr[i]['city_name1']+' - '+plane_arr[i]['to_location'];
+			var plane = plane_arr[i] || {};
+			var fromLabel = plane.from_sector || $.trim((plane.city_name || '') + (plane.from_location ? ' - ' + plane.from_location : ''));
+			var toLabel = plane.to_sector || $.trim((plane.city_name1 || '') + (plane.to_location ? ' - ' + plane.to_location : ''));
 
-			row.cells[4].childNodes[0].value = plane_arr[i]['airline_name'];
-			row.cells[5].childNodes[0].value = plane_arr[i]['class'];
-			row.cells[6].childNodes[0].value = from_date + ' 00:00';
-			row.cells[7].childNodes[0].value = to_date + ' 00:00';
-			row.cells[8].childNodes[0].value = plane_arr[i]['from_city'];
-			row.cells[9].childNodes[0].value = plane_arr[i]['to_city'];
+			var fromEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[2]) : row.cells[2].querySelector('select,input');
+			var toEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[3]) : row.cells[3].querySelector('select,input');
+			var airlineEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[4]) : row.cells[4].querySelector('select,input');
+			var classEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[5]) : row.cells[5].querySelector('select,input');
+			var deptEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[6]) : row.cells[6].querySelector('input');
+			var arrvEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[7]) : row.cells[7].querySelector('input');
+			var fromCityEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[8]) : row.cells[8].querySelector('input');
+			var toCityEl = (typeof getCellFormControl === 'function') ? getCellFormControl(row.cells[9]) : row.cells[9].querySelector('input');
+			var chkEl = row.cells[0].querySelector('input[type="checkbox"]');
 
-			$(row.cells[4].childNodes[0]).trigger('change');
-			$(row.cells[5].childNodes[0]).trigger('change');
-			$(row.cells[6].childNodes[0]).trigger('change');
-			$(row.cells[7].childNodes[0]).trigger('change');
+			if (chkEl) {
+				chkEl.checked = true;
+			}
+
+			if (fromEl && fromLabel) {
+				$(fromEl).empty().append(new Option(fromLabel, fromLabel, true, true)).trigger('change');
+			}
+			if (toEl && toLabel) {
+				$(toEl).empty().append(new Option(toLabel, toLabel, true, true)).trigger('change');
+			}
+			if (airlineEl && plane.airline_name !== undefined && plane.airline_name !== null && String(plane.airline_name) !== '') {
+				var $airline = $(airlineEl);
+				var airlineVal = String(plane.airline_name);
+				if ($airline.find('option').filter(function() { return String(this.value) === airlineVal; }).length === 0 && plane.airline_label) {
+					$airline.append(new Option(plane.airline_label, airlineVal, true, true));
+				}
+				$airline.val(airlineVal).trigger('change');
+			}
+			if (classEl && plane.class) {
+				$(classEl).val(plane.class).trigger('change');
+			}
+			if (deptEl) {
+				deptEl.value = from_date + ' 00:00';
+			}
+			if (arrvEl) {
+				arrvEl.value = to_date + ' 00:00';
+			}
+			if (fromCityEl) {
+				fromCityEl.value = plane.from_city || '';
+			}
+			if (toCityEl) {
+				toCityEl.value = plane.to_city || '';
+			}
 		}
 		}
 		});

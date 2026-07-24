@@ -139,13 +139,20 @@ function findImageUrl($image_path, $is_new_quotation = false)
     <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
     <input type="hidden" id="quotation_id" value="<?= $quotation_id ?>" />
     <?php
-    $is_ai_quotation = (intval($sq_quotation['quotation_refer_id']) > 0) ? 1 : 0;
+    $is_ai_quotation = is_ai_package_quotation($sq_quotation) ? 1 : 0;
     $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);
     $sq_pacakge = array('dest_id' => '', 'package_name' => '');
     if ($package_lookup_id > 0) {
         $row_pkg = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$package_lookup_id'"));
         if ($row_pkg) {
             $sq_pacakge = $row_pkg;
+        }
+    }
+    // AI quotes may have no refer package — resolve dest from tour name
+    if ($is_ai_quotation && empty($sq_pacakge['dest_id'])) {
+        $ai_dest_id = get_ai_quotation_dest_id($sq_quotation);
+        if ($ai_dest_id > 0) {
+            $sq_pacakge['dest_id'] = $ai_dest_id;
         }
     }
     $sq_destination = array('dest_name' => '');
@@ -923,9 +930,9 @@ function findImageUrl($image_path, $is_new_quotation = false)
                     flag2 = true,
                     flag3 = true;
 
-                // Check special attraction validation
+                // Check special attraction validation (skip 85-char limit for AI quotations)
                 var attractionInput = row.querySelector('input[id*="special_attaraction"]');
-                if (attractionInput && attractionInput.id) {
+                if (attractionInput && attractionInput.id && $('#is_ai_quotation').val() !== '1') {
                     try {
                         flag1 = validate_spattration(attractionInput.id);
                     } catch (e) {
@@ -1421,6 +1428,17 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
                 if ($('#is_ai_quotation').val() === '1') {
                     console.log('AI quotation loaded - skipping package preselection');
+                    if (typeof $().wysiwyg === 'function') {
+                        $('#inclusions_ai, #exclusions_ai').each(function() {
+                            var $el = $(this);
+                            if ($el.length && !$el.data('wysiwyg')) {
+                                $el.wysiwyg({
+                                    controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
+                                    initialContent: ''
+                                });
+                            }
+                        });
+                    }
                     return;
                 }
 

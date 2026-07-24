@@ -196,8 +196,12 @@ if (!empty($quotation_id)) {
         $quotation_tour_name = $sq_quotation_row['tour_name'];
         $quotation_refer_id_val = intval($sq_quotation_row['quotation_refer_id']);
         $quotation_package_id = intval($sq_quotation_row['package_id']);
-        // quotation_refer_id > 0 = AI quotation, quotation_refer_id = 0 = package tour quotation
-        $is_ai_edit = ($quotation_refer_id_val > 0);
+        // AI Builder quotations are saved with package_id = 0
+        $is_ai_edit = is_ai_package_quotation($sq_quotation_row);
+        // Fallback if client explicitly flags AI (legacy / in-progress edits)
+        if (!$is_ai_edit && isset($_POST['is_ai_quotation']) && $_POST['is_ai_quotation'] === '1') {
+            $is_ai_edit = true;
+        }
 
         // Package-tour edit: use saved package_id from quotation master
         if (!$is_ai_edit && empty($current_package_id) && $quotation_package_id > 0) {
