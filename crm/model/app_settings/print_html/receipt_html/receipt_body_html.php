@@ -24,9 +24,8 @@ $currency_code = isset($_GET['currency_code']) ? $_GET['currency_code'] : $curre
 $tour = isset($_GET['tour']) ? $_GET['tour'] : '';
 $status = isset($_GET['status']) ? $_GET['status'] : '';
 
-$net_amt =$_GET['net_amt'];
-
-$pay_id =$_GET['pay_id'];
+$net_amt = isset($_GET['net_amt']) ? $_GET['net_amt'] : 0;
+$pay_id = isset($_GET['pay_id']) ? $_GET['pay_id'] : '';
 $pass_name = '';
 
 
@@ -38,9 +37,10 @@ if ($booking_name == 'Flight Ticket Booking') {
   $pass_name = isset($_GET['pass_name']) ? $_GET['pass_name'] : '';
 }
 // This is new customization for displaying history
-$table_name = $_GET['table_name'];
-$inside_customer_id = $_GET['in_customer_id'];
-$customer_field = $_GET['customer_field'];
+$table_name = isset($_GET['table_name']) ? $_GET['table_name'] : '';
+$inside_customer_id = isset($_GET['in_customer_id']) ? $_GET['in_customer_id'] : '';
+$customer_field = isset($_GET['customer_field']) ? $_GET['customer_field'] : '';
+$values_query = '';
 if ($table_name != '') {
   $values_query = "select * from $table_name where 1 ";
   if ($table_name != "payment_master" && $table_name != "package_payment_master") {
@@ -52,41 +52,59 @@ if ($table_name != '') {
     $amount_key = "amount";
     $credit_charges = "credit_charges";
   }
-  if ($table_name != 'receipt_payment_master') {
-
-    $values_query .= " and $customer_field = '$inside_customer_id' and clearance_status!='Pending' and clearance_status!='Cancelled'";
-  } else {
+  if ($table_name == 'receipt_payment_master') {
+    // receipt_payment_master PK is `id` (no payment_id / clearance_status)
     $values_query .= " and id='$booking_id'";
     $credit_charges = "";
+  } else {
+    $values_query .= " and $customer_field = '$inside_customer_id' and clearance_status!='Pending' and clearance_status!='Cancelled'";
+    // Payment history cutoff: use the correct PK per table
+    // corporate_advance_master uses advance_id (not payment_id)
+    if ($pay_id !== '' && $pay_id !== null) {
+      if ($table_name == 'corporate_advance_master') {
+        $values_query .= " and advance_id <= '" . (int)$pay_id . "'";
+      } elseif ($table_name == 'other_income_payment_master') {
+        $values_query .= " and payment_id <= '" . (int)$pay_id . "'";
+      } else {
+        $values_query .= " and payment_id <= '" . (int)$pay_id . "'";
+      }
+    }
   }
-  $values_query .= " and payment_id <= '$pay_id'";
 
   $values_query .= " and $amount_key !='0' order by $date_key desc";
 }
 
 
 $total_payment = 0; // Initialize total
+$bal_amount = $outstanding;
 
-$values_fetch = mysqlQuery($values_query);
-while ($rows = mysqli_fetch_assoc($values_fetch)) {
+if ($values_query != '') {
+  $values_fetch = mysqlQuery($values_query);
+  if ($values_fetch) {
+    while ($rows = mysqli_fetch_assoc($values_fetch)) {
 
-    $credit_charges_val = isset($rows[$credit_charges]) ? $rows[$credit_charges] : 0;
+        $credit_charges_val = isset($rows[$credit_charges]) ? $rows[$credit_charges] : 0;
 
-    if ($receipt_type == 'Hotel Receipt' || $receipt_type == 'Tour Receipt' || $receipt_type == 'Activity Receipt' || $receipt_type == 'Visa Receipt') {
-        $converted_amt = $rows[$amount_key] + $credit_charges_val;
-        $payment_amount1 = currency_conversion($currency, $currency_code, $converted_amt);
-        $total_payment += $converted_amt; // Sum actual amount before currency conversion
-    } else {
-        if ($receipt_type == 'B2B Sale Receipt') {
-            $payment_amount1 = number_format($rows[$amount_key], 2);
-            $total_payment += $rows[$amount_key];
-        } else {
+        if ($receipt_type == 'Hotel Receipt' || $receipt_type == 'Tour Receipt' || $receipt_type == 'Activity Receipt' || $receipt_type == 'Visa Receipt') {
             $converted_amt = $rows[$amount_key] + $credit_charges_val;
-            $payment_amount1 = number_format($converted_amt, 2);
-            $total_payment += $converted_amt;
+            $payment_amount1 = currency_conversion($currency, $currency_code, $converted_amt);
+            $total_payment += $converted_amt; // Sum actual amount before currency conversion
+        } else {
+            if ($receipt_type == 'B2B Sale Receipt') {
+                $payment_amount1 = number_format($rows[$amount_key], 2);
+                $total_payment += $rows[$amount_key];
+            } else {
+                $converted_amt = $rows[$amount_key] + $credit_charges_val;
+                $payment_amount1 = number_format($converted_amt, 2);
+                $total_payment += $converted_amt;
+            }
         }
-    }}
-    $bal_amount= $net_amt-$total_payment;
+    }
+    if ($net_amt !== '' && $net_amt !== null) {
+      $bal_amount = floatval($net_amt) - floatval($total_payment);
+    }
+  }
+}
 //***END****/
 if ($receipt_type == 'Hotel Receipt' || $receipt_type == 'Tour Receipt' || $receipt_type == 'Activity Receipt' || $receipt_type == 'Visa Receipt' || $receipt_type =='Package Tour Receipt' ||  $receipt_type =='Group Tour Receipt' || $receipt_type =='Flight Ticket Receipt' || $receipt_type == 'Car Rental Receipt' || $receipt_type == 'Bus Receipt' || trim($receipt_type) == 'Miscellaneous Receipt') {
 

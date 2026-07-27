@@ -786,11 +786,79 @@ function load_booking_hotel_table(hotel_info_arr) {
 	populate_booking_hotel_row(0);
 }
 
-function load_booking_excursion_table(exc_info_arr) {
+function store_booking_quotation_activity_pax(pax_counts) {
+	pax_counts = pax_counts || {};
+	window.bookingQuotationActivityPax = {
+		total_adult: pax_counts.total_adult != null ? pax_counts.total_adult : '',
+		children_with_bed: pax_counts.children_with_bed != null ? pax_counts.children_with_bed : '',
+		children_without_bed: pax_counts.children_without_bed != null ? pax_counts.children_without_bed : '',
+		total_infant: pax_counts.total_infant != null ? pax_counts.total_infant : ''
+	};
+	$('#quot_total_adult').val(window.bookingQuotationActivityPax.total_adult);
+	$('#quot_children_with_bed').val(window.bookingQuotationActivityPax.children_with_bed);
+	$('#quot_children_without_bed').val(window.bookingQuotationActivityPax.children_without_bed);
+	$('#quot_total_infant').val(window.bookingQuotationActivityPax.total_infant);
+}
+
+function get_booking_quotation_activity_pax() {
+	if (window.bookingQuotationActivityPax) {
+		return window.bookingQuotationActivityPax;
+	}
+	return {
+		total_adult: $('#quot_total_adult').val() || '',
+		children_with_bed: $('#quot_children_with_bed').val() || '',
+		children_without_bed: $('#quot_children_without_bed').val() || '',
+		total_infant: $('#quot_total_infant').val() || ''
+	};
+}
+
+// Same as CRM Package Quotation tab2: push traveler counts into every Activity row
+function apply_booking_activity_pax_from_quotation(pax_counts) {
 	var table = document.getElementById('tbl_package_exc_infomration');
 	if (!table) {
 		return;
 	}
+	pax_counts = pax_counts || get_booking_quotation_activity_pax();
+	var total_adult = pax_counts.total_adult;
+	var children_with_bed = pax_counts.children_with_bed;
+	var children_without_bed = pax_counts.children_without_bed;
+	var total_infant = pax_counts.total_infant;
+	if (
+		(total_adult === undefined || total_adult === null || String(total_adult).trim() === '') &&
+		(children_with_bed === undefined || children_with_bed === null || String(children_with_bed).trim() === '') &&
+		(children_without_bed === undefined || children_without_bed === null || String(children_without_bed).trim() === '') &&
+		(total_infant === undefined || total_infant === null || String(total_infant).trim() === '')
+	) {
+		return;
+	}
+	for (var i = 0; i < table.rows.length; i++) {
+		var row = table.rows[i];
+		var adultEl = booking_table_cell_control(row.cells[7]);
+		var chwbEl = booking_table_cell_control(row.cells[8]);
+		var chwobEl = booking_table_cell_control(row.cells[9]);
+		var infantEl = booking_table_cell_control(row.cells[10]);
+		if (adultEl && total_adult !== undefined && total_adult !== null && String(total_adult).trim() !== '') {
+			adultEl.value = total_adult;
+		}
+		if (chwbEl && children_with_bed !== undefined && children_with_bed !== null && String(children_with_bed).trim() !== '') {
+			chwbEl.value = children_with_bed;
+		}
+		if (chwobEl && children_without_bed !== undefined && children_without_bed !== null && String(children_without_bed).trim() !== '') {
+			chwobEl.value = children_without_bed;
+		}
+		if (infantEl && total_infant !== undefined && total_infant !== null && String(total_infant).trim() !== '') {
+			infantEl.value = total_infant;
+		}
+	}
+}
+
+function load_booking_excursion_table(exc_info_arr, pax_counts) {
+	var table = document.getElementById('tbl_package_exc_infomration');
+	if (!table) {
+		return;
+	}
+	pax_counts = pax_counts || {};
+	store_booking_quotation_activity_pax(pax_counts);
 
 	while (table.rows.length > 1) {
 		table.deleteRow(1);
@@ -811,6 +879,8 @@ function load_booking_excursion_table(exc_info_arr) {
 				emptyChk.checked = false;
 			}
 		}
+		// Quotation may have no activities — still fill traveler counts on the blank Activity row (CRM behavior)
+		apply_booking_activity_pax_from_quotation(pax_counts);
 		return;
 	}
 
@@ -823,10 +893,6 @@ function load_booking_excursion_table(exc_info_arr) {
 		var excEl = booking_table_cell_control(row.cells[4]);
 		var transferEl = booking_table_cell_control(row.cells[5]);
 		var vehicleEl = booking_table_cell_control(row.cells[6]);
-		var adultEl = booking_table_cell_control(row.cells[7]);
-		var chwbEl = booking_table_cell_control(row.cells[8]);
-		var chwobEl = booking_table_cell_control(row.cells[9]);
-		var infantEl = booking_table_cell_control(row.cells[10]);
 
 		if (chkEl) {
 			chkEl.checked = true;
@@ -874,20 +940,10 @@ function load_booking_excursion_table(exc_info_arr) {
 				$vehicle.trigger('change');
 			}
 		}
-
-		if (adultEl) {
-			adultEl.value = data.adult || '';
-		}
-		if (chwbEl) {
-			chwbEl.value = data.chwb || '';
-		}
-		if (chwobEl) {
-			chwobEl.value = data.chwob || '';
-		}
-		if (infantEl) {
-			infantEl.value = data.infant || '';
-		}
 	}
+
+	// Always apply quotation traveler counts to Activity (adult / CWB / CWoB / infant)
+	apply_booking_activity_pax_from_quotation(pax_counts);
 
 	if (typeof initAllVehicleSelectAddNew === 'function') {
 		initAllVehicleSelectAddNew('#tbl_package_exc_infomration');
@@ -1204,8 +1260,13 @@ function quotation_info_load() {
 				}
 				//Transport Info
 				load_booking_transport_table(response.transport_info_arr || []);
-				//Excursion Info
-				load_booking_excursion_table(response.exc_info_arr || []);
+				//Excursion/Activity Info — fill pax from quotation traveler counts when activity rows lack them
+				load_booking_excursion_table(response.exc_info_arr || [], {
+					total_adult: response.total_adult,
+					children_with_bed: response.children_with_bed,
+					children_without_bed: response.children_without_bed,
+					total_infant: response.total_infant
+				});
 
 				//Train Info
 				var train_info_arr = response.train_info_arr;
@@ -1292,6 +1353,12 @@ function quotation_info_load() {
 	else {
 		window._quotation_tcsper = '';
 		window._quotation_tcsvalue = 0;
+		store_booking_quotation_activity_pax({
+			total_adult: '',
+			children_with_bed: '',
+			children_without_bed: '',
+			total_infant: ''
+		});
 		$('#tcs_tax').val('');
 		$('#tcs1').val('0.00');
 		$('#txt_package_tour_name').val('');
@@ -1638,12 +1705,19 @@ function package_dynamic_reflect(dest_name) {
 function get_excursion_list(id) {
 	var city_id = $('#' + id).val();
 	var base_url = $('#base_url').val();
-	var count = id.substring(10);
+	var count = id.replace(/^city_name-/, '');
+	var $excursion = $('#excursion-' + count);
 
 	$.post(base_url + 'view/package_booking/quotation/home/excursion_name_load.php', { city_id: city_id }, function (
 		data
 	) {
-		$('#excursion-' + count).html(data);
+		if ($excursion.data('select2')) {
+			$excursion.select2('destroy');
+		}
+		$excursion.empty().html(data);
+		if ($excursion.hasClass('app_select2') || $excursion.data('select2')) {
+			$excursion.select2({ width: '200px' });
+		}
 	});
 }
 /////////////////////////////////////Quotation information load end/////////////////////////////////////

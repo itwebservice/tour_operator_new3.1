@@ -5,11 +5,11 @@ include "../../../../../model/model.php";
 
 /** Error reporting */
 
-error_reporting(E_ALL);
+error_reporting(0);
 
-ini_set('display_errors', TRUE);
+ini_set('display_errors', FALSE);
 
-ini_set('display_startup_errors', TRUE);
+ini_set('display_startup_errors', FALSE);
 
 date_default_timezone_set('Europe/London');
 
@@ -327,6 +327,7 @@ for ($col = 'A'; $col !== 'N'; $col++) {
 $objPHPExcel->setActiveSheetIndex(0);
 
 // Redirect output to a client’s web browser (Excel5)
+if (function_exists('excel_prepare_download')) { excel_prepare_download(); }
 header('Content-Type: application/vnd.ms-excel');
 header('Content-Disposition: attachment;filename="Room Allocation Report(' . date('d-m-Y H:i') . ').xls"');
 header('Cache-Control: max-age=0');

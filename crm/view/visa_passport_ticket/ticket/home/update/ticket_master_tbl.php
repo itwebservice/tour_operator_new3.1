@@ -109,11 +109,11 @@ if($sq_entry_count>0){
 		    <td><input type="text" id="middle_name<?= $count ?>_u" name="middle_name"  onchange="fname_validate(this.id)"  placeholder="Middle Name" title="Middle Name" value="<?= $row_entry['middle_name'] ?>" style="width:120px;"/></td>
 		    <td><input type="text" id="last_name<?= $count ?>_u" name="last_name"  onchange="fname_validate(this.id)"  placeholder="Last Name" title="Last Name" value="<?= $row_entry['last_name'] ?>" style="width:120px;"/></td>    
 		    <td class="hidden"><input type="text" id="birth_date<?= $count ?>_u" name="birth_date" placeholder="Birth Date" title="Birth Date" class="app_datepicker" onchange="adolescence_reflect(this.id)" value="<?= get_date_user($row_entry['birth_date']) ?>"/></td>
-			<td><select id="adolescence<?= $count ?>_u" name="adolescence" placeholder="*Adolescence" title="Adolescence" style="width:125px;" disabled>
+			<td><select id="adolescence<?= $count ?>_u" name="adolescence" class="app_select2 form-control" placeholder="*Adolescence" title="Adolescence" style="width:125px;" disabled>
 					<option value="">Select Adolescence</option>
-					<option <?php echo ($row_entry['adolescence'] == 'Adult')?"selected":"" ?> >Adult</option>
-					<option <?php echo ($row_entry['adolescence'] == 'Child')?"selected":"" ?> >Child</option>
-					<option <?php echo ($row_entry['adolescence'] == 'Infant')?"selected":"" ?> >Infant</option>
+					<option value="Adult" <?php echo ($row_entry['adolescence'] == 'Adult')?"selected":"" ?>>Adult</option>
+					<option value="Child" <?php echo ($row_entry['adolescence'] == 'Child')?"selected":"" ?>>Child</option>
+					<option value="Infant" <?php echo ($row_entry['adolescence'] == 'Infant')?"selected":"" ?>>Infant</option>
     			</select>
 			</td>
 		    <td><input type="text" id="ticket_no<?= $count ?>_u" style="text-transform: uppercase;width:120px;" name="ticket_no" placeholder="Ticket No" onchange="validate_spaces(this.id)" title="Ticket No" value="<?= $row_entry['ticket_no'] ?>"/></td>
@@ -128,6 +128,11 @@ if($sq_entry_count>0){
 		</tr>
 		<script>
 			$('#birth_date<?= $count ?>_u').datetimepicker({ timepicker:false, format:'d-m-Y' });
+			if (typeof initAppSelect2Element === 'function') {
+				initAppSelect2Element('#adolescence<?= $count ?>_u', { width: '125px' });
+			} else {
+				$('#adolescence<?= $count ?>_u').select2({ width: '125px', minimumResultsForSearch: 0 });
+			}
 		</script>
 		<?php
 	}

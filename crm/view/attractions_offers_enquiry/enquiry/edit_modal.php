@@ -201,7 +201,7 @@ $row_user = mysqli_fetch_assoc(mysqlQuery("Select name,user_id from customer_use
                                 </select>
                             </div>
                             <div class="col-md-4 col-sm-6 mg_bt_10_xs">
-                                <select name="enquiry_u" id="enquiry_u" title="Enquiry Type" class="form-control">
+                                <select name="enquiry_u" id="enquiry_u" title="Enquiry Type" class="form-control app_select2" style="width:100%">
                                     <option value="<?= $enq_details['enquiry'] ?> " selected>
                                         <?= $enq_details['enquiry'] ?></option>
                                     <option value="<?= "Strong" ?>">Strong</option>
@@ -238,7 +238,7 @@ $row_user = mysqli_fetch_assoc(mysqlQuery("Select name,user_id from customer_use
     // for dynamic added row search box issue 
 $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 $('#enquiry_edit_modal').modal('show');
-$('#assigned_emp_id_u,#country_code1').select2({
+$('#assigned_emp_id_u,#country_code1,#enquiry_u,#reference_id_u').select2({
     dropdownParent: $("#enquiry_edit_modal")});
 
 $("#txt_enquiry_date_u").datetimepicker({
@@ -246,14 +246,16 @@ $("#txt_enquiry_date_u").datetimepicker({
     format: 'd-m-Y'
 });
 
-
-// $('.app_select2').select2({
-//     dropdownParent: $("#enquiry_edit_modal")});
-
-$('.app_select2').select2();
-    
 $("#txt_followup_date_u").datetimepicker({
     format: 'd-m-Y H:i'
+});
+
+// Prevent Enter in inputs from submitting (autocomplete selection uses Enter)
+$('#frm_emquiry_edit').on('keydown', 'input', function(e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        e.preventDefault();
+        return false;
+    }
 });
 
 // end/////////////////
@@ -294,6 +296,7 @@ function customer_fields_reflect() {
 ///////////////////////***Enquiry Master update start*********//////////////
 $(function() {
     $('#frm_emquiry_edit').validate({
+        ignore: [],
         rules: {
             txt_followup_date_u: {
                 required: true
@@ -309,6 +312,25 @@ $(function() {
             },
             txt_landline_no_u: {
                 required: true
+            }
+        },
+        errorPlacement: function(error, element) {
+            if (element.hasClass('select2-hidden-accessible')) {
+                error.insertAfter(element.next('.select2'));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).addClass('error').removeClass('valid');
+            if ($(element).hasClass('select2-hidden-accessible')) {
+                $(element).next('.select2').find('.select2-selection').addClass('error');
+            }
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('error').addClass('valid');
+            if ($(element).hasClass('select2-hidden-accessible')) {
+                $(element).next('.select2').find('.select2-selection').removeClass('error');
             }
         },
         submitHandler: function(form, event) {

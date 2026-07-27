@@ -10,11 +10,11 @@
     <td><input type="text" id="middle_name1" name="middle_name1" onchange="fname_validate(this.id)" placeholder="Middle Name" title="Middle Name" style="width:120px;"/></td>
     <td><input type="text" id="last_name1" name="last_name1" onchange="fname_validate(this.id)" placeholder="Last Name" title="Last Name" style="width:120px;"/></td> 
     <td class="hidden"><input type="text" id="" name="birth_date" class="app_datepicker" placeholder="DOB" title="DOB" onchange="adolescence_reflect(this.id)" value="<?= date('d-m-Y',  strtotime(' -1 day'))?>"/></td>    
-    <td><select id="adolescence1" name="adolescence" placeholder="*Adolescence" title="Adolescence" style="width:164px;">
+      <td><select id="adolescence1" name="adolescence" class="app_select2 form-control" placeholder="*Adolescence" title="Adolescence" style="width:164px;">
             <option value="">Select Adolescence</option>
-            <option>Adult</option>
-            <option>Child</option>
-            <option>Infant</option>
+            <option value="Adult">Adult</option>
+            <option value="Child">Child</option>
+            <option value="Infant">Infant</option>
         </select>
     </td>
     <td><input type="text" id="" style="text-transform: uppercase;width:125px;" onchange="validate_spaces(this.id)" name="ticket_no" placeholder="Ticket No" title="Ticket No"/></td>
@@ -50,4 +50,9 @@
 var date = new Date();
 var yest = date.setDate(date.getDate()-1);
 $('#birth_date1').datetimepicker({ timepicker:false, maxDate:yest, format:'d-m-Y' });
+if (typeof initAppSelect2Element === 'function') {
+    initAppSelect2Element('#adolescence1', { width: '164px' });
+} else {
+    $('#adolescence1').select2({ width: '164px', minimumResultsForSearch: 0 });
+}
 </script>

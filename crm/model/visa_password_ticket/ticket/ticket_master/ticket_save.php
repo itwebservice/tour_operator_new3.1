@@ -257,20 +257,23 @@ class ticket_save
 			$GLOBALS['flag'] = false;
 			echo "error--Sorry, Payment not saved!";
 		}
-		//Update customer credit note balance
-		$payment_amount1 = $payment_amount;
-		$sq_credit_note = mysqlQuery("select * from credit_note_master where customer_id='$customer_id'");
-		$i = 0;
-		while ($row_credit = mysqli_fetch_assoc($sq_credit_note)) {
-
-			if ($row_credit['payment_amount'] <= $payment_amount1 && $payment_amount1 != '0') {
-				$payment_amount1 = $payment_amount1 - $row_credit['payment_amount'];
-				$temp_amount = 0;
-			} else {
-				$temp_amount = $row_credit['payment_amount'] - $payment_amount1;
-				$payment_amount1 = 0;
+		//Update customer credit note balance (only when paying by Credit Note)
+		if ($payment_mode == 'Credit Note') {
+			$payment_amount1 = $payment_amount;
+			$sq_credit_note = mysqlQuery("select * from credit_note_master where customer_id='$customer_id' and payment_amount>0 order by id asc");
+			while ($row_credit = mysqli_fetch_assoc($sq_credit_note)) {
+				if ($payment_amount1 == 0 || $payment_amount1 == '0') {
+					break;
+				}
+				if ($row_credit['payment_amount'] <= $payment_amount1) {
+					$payment_amount1 = $payment_amount1 - $row_credit['payment_amount'];
+					$temp_amount = 0;
+				} else {
+					$temp_amount = $row_credit['payment_amount'] - $payment_amount1;
+					$payment_amount1 = 0;
+				}
+				mysqlQuery("update credit_note_master set payment_amount ='$temp_amount' where id='$row_credit[id]'");
 			}
-			$sq_credit = mysqlQuery("update credit_note_master set payment_amount ='$temp_amount' where id='$row_credit[id]'");
 		}
 		//Get Particular
 		$pax = $adults + $childrens;

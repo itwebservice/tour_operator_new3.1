@@ -387,9 +387,9 @@ else if($reflections[0]->tax_apply_on == '3') {
                                     value="<?= $sq_booking['discount'] ?>">
                             </div>
                         </div>
-                        <div class="row mg_bt_10">
+                        <div class="row ">
                         <div class="col-md-2 col-sm-6 col-xs-12 mg_bt_10">
-                                        <small>&nbsp;</small>
+                                        <!-- <small>&nbsp;</small> -->
                                         <!-- <label for="tcs_tax">Select TCS Tax</label> -->
                                         <select title="Select Tax" id="tcs_tax" name="tcs_tax" class="form-control">
                                             <option value="">Select TCS Tax</option>

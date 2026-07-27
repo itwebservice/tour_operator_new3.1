@@ -232,7 +232,9 @@ $o4_travel_from = o4nv($ov['travel_from'], '');
 $o4_travel_to   = o4nv($ov['travel_to'], '');
 $o4_travel_range = trim($o4_travel_from . ($o4_travel_to !== '' ? ' — ' . $o4_travel_to : ''));
 $o4_pkg_badge  = '';
-if (!empty($cost['computed']['group'][0]['package_type'])) {
+if (!empty($q['package_types_label'])) {
+  $o4_pkg_badge = $q['package_types_label'];
+} elseif (!empty($cost['computed']['group'][0]['package_type'])) {
   $o4_pkg_badge = $cost['computed']['group'][0]['package_type'];
 } elseif (!empty($hotels[0]['package_type'])) {
   $o4_pkg_badge = $hotels[0]['package_type'];
@@ -916,13 +918,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
           <?php foreach ($o4_cost_grp as $ci => $row) :
             $is_featured = ($ci === $o4_featured_idx);
 
-            $tax_amount = '0.00';
-            if (!empty($row['tax_display'])) {
-              preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-              if (!empty($m[1])) {
-                $tax_amount = $m[1];
-              }
-            }
+            $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($row) : (isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '0.00');
           ?>
 
             <div class="pricing-card<?= $is_featured ? ' featured' : '' ?>">
@@ -939,7 +935,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
 
               <div class="pricing-row">
                 <span>Tax</span>
-                <span>INR <?= o4e($tax_amount) ?></span>
+                <span><?= o4e($tax_amount) ?></span>
               </div>
 
               <div class="pricing-row">
@@ -953,7 +949,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
               </div>
 
               <div class="pricing-total-lbl">Grand Total</div>
-              <div class="pricing-total-val"><?= o4e(o4nv($row['total_display'], '0')) ?></div>
+              <div class="pricing-total-val"><?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o4e') : o4e(o4nv($row['total_display'], '0')) ?></div>
             </div>
 
           <?php endforeach; ?>
@@ -967,13 +963,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
             <?php foreach ($o4_pp as $ci => $pp) :
               $is_featured = ($ci === 0);
 
-              $tax_amount = '0.00';
-              if (!empty($pp['tax_display'])) {
-                preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                if (!empty($m[1])) {
-                  $tax_amount = $m[1];
-                }
-              }
+              $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
             ?>
 
               <div class="pricing-card<?= $is_featured ? ' featured' : '' ?>">
@@ -1005,7 +995,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
 
                 <div class="pricing-row">
                   <span>Tax</span>
-                  <span>INR <?= o4e($tax_amount) ?></span>
+                  <span><?= o4e($tax_amount) ?></span>
                 </div>
 
                 <div class="pricing-row">

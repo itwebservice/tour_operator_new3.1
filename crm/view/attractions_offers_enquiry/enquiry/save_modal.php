@@ -152,7 +152,7 @@ $branch_status = $_POST['branch_status'];
                                 </select>
                             </div>
                             <div class="col-md-4 col-sm-6 mg_bt_10_xs">
-                                <select name="enquiry" id="enquiry" title="Enquiry Type" class="form-control">
+                                <select name="enquiry" id="enquiry" title="Enquiry Type" class="form-control app_select2" style="width:100%">
                                     <option value="">Enquiry Type</option>
                                     <option value="<?= "Strong" ?>">Strong</option>
                                     <option value="<?= "Hot" ?>">Hot</option>
@@ -186,7 +186,7 @@ $branch_status = $_POST['branch_status'];
 <script>
     $.fn.modal.Constructor.prototype.enforceFocus = function() {};
     $('#enquiry_save_modal').modal('show');
-    $('#reference_id,#assigned_emp_id,#country_code').select2({
+    $('#reference_id,#assigned_emp_id,#country_code,#enquiry').select2({
         dropdownParent: $("#enquiry_save_modal")
     });
     $("#txt_enquiry_date").datetimepicker({
@@ -196,12 +196,14 @@ $branch_status = $_POST['branch_status'];
     $("#txt_followup_date").datetimepicker({
         format: 'd-m-Y H:i'
     });
-    // $('.app_select2').select2({
-    //     dropdownParent: $("#enquiry_save_modal")});
 
-
-
-    $('.app_select2').select2();
+    // Prevent Enter in inputs from submitting (autocomplete selection uses Enter)
+    $('#frm_emquiry_save').on('keydown', 'input', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
 
     function enquiry_fields_reflect() {
         var enquiry_type = $('#enquiry_type').val();
@@ -233,6 +235,7 @@ $branch_status = $_POST['branch_status'];
     ///////////////////////***Enquiry Master save start*********//////////////
     $(function() {
         $('#frm_emquiry_save').validate({
+            ignore: [],
             rules: {
                 txt_name: {
                     required: true
@@ -254,6 +257,25 @@ $branch_status = $_POST['branch_status'];
                 },
                 txt_landline_no: {
                     required: true
+                }
+            },
+            errorPlacement: function(error, element) {
+                if (element.hasClass('select2-hidden-accessible')) {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).addClass('error').removeClass('valid');
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2').find('.select2-selection').addClass('error');
+                }
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('error').addClass('valid');
+                if ($(element).hasClass('select2-hidden-accessible')) {
+                    $(element).next('.select2').find('.select2-selection').removeClass('error');
                 }
             },
             submitHandler: function(form, e) {
@@ -459,7 +481,7 @@ $branch_status = $_POST['branch_status'];
         } else {
 
             $('#vi_confirm_box').vi_confirm_box({
-                message: msg + "<br>Are you sure to save?",
+                message: msg + "Are you sure to save?",
                 callback: function(data1) {
                     if (data1 == "yes") {
                         actual_enq_save(obj);

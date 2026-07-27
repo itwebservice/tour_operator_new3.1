@@ -201,7 +201,7 @@ function tour_details_reflect(cmb_tour_group) {
     }
   });
 
-  /////////// Plane ////////////////
+  /////////// Plane (prefer Group Quotation flights for this Tour Date) ////////////////
   $.ajax({
     type: 'post',
     url: '../inc/get_plane_info.php',
@@ -209,52 +209,105 @@ function tour_details_reflect(cmb_tour_group) {
     success: function (result) {
 
       var table = document.getElementById("tbl_plane_travel_details_dynamic_row");
-      var plane_arr = JSON.parse(result);
-      if (jQuery.isEmptyObject(plane_arr)) {
-        var f_row = table.rows[0];
-        f_row.cells[0].childNodes[0].removeAttribute('checked');
-        document.getElementById('chk_plane_select_all').removeAttribute('checked');
-      };
-      if (table.rows.length == 1) {
-          for (var k = 1; k < table.rows.length; k++) {
-              document.getElementById("tbl_plane_travel_details_dynamic_row")
-                  .deleteRow(k);
-          }
-      } else {
-          while (table.rows.length > 1) {
-              document.getElementById("tbl_plane_travel_details_dynamic_row")
-                  .deleteRow(table.rows.length-1);
-              table.rows.length--;
-          }
+      if (!table) {
+        return;
       }
-      var f_row = table.rows[0];
-      f_row.cells[2].childNodes[0].value = curr_datetime;
-      f_row.cells[3].childNodes[0].value = curr_datetime;
-      f_row.cells[4].childNodes[0].value = '';
-      document.getElementById(f_row.cells[6].childNodes[0].id).selectedIndex = 0;
-      document.getElementById(f_row.cells[7].childNodes[0].id).selectedIndex = 0;
-      f_row.cells[8].childNodes[0].value = '';
-      if (table.rows.length != plane_arr.length) {
-          for (var j = 0; j < plane_arr.length - 1; j++) {
-              addRow('tbl_plane_travel_details_dynamic_row');
-          }
+
+      var plane_arr = [];
+      try {
+        plane_arr = (typeof result === 'string') ? JSON.parse(result) : result;
+      } catch (e) {
+        console.error('Group Tour: invalid plane info response', e, result);
+        plane_arr = [];
       }
+      if (!Array.isArray(plane_arr)) {
+        plane_arr = [];
+      }
+
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+      if (plane_arr.length === 0) {
+        var empty_row = table.rows[0];
+        var empty_chk = empty_row.cells[0].querySelector('input[type="checkbox"]');
+        if (empty_chk) {
+          empty_chk.checked = false;
+        }
+        var selectAll = document.getElementById('chk_plane_select_all');
+        if (selectAll) {
+          selectAll.checked = false;
+        }
+        return;
+      }
+
+      for (var r = 1; r < plane_arr.length; r++) {
+        addRow('tbl_plane_travel_details_dynamic_row');
+      }
+      if (typeof event_airport === 'function') {
+        event_airport('tbl_plane_travel_details_dynamic_row', 4, 5);
+      }
+      if (typeof initAllAirlineSelectAddNew === 'function') {
+        initAllAirlineSelectAddNew('#tbl_plane_travel_details_dynamic_row');
+      }
+
       for (var i = 0; i < plane_arr.length; i++) {
-
         var row = table.rows[i];
-        row.cells[0].childNodes[0].setAttribute('checked', 'true');
+        var plane = plane_arr[i] || {};
+        var fromLabel = plane.from_sector || $.trim((plane.from_city || '') + (plane.from_location ? ' - ' + plane.from_location : ''));
+        var toLabel = plane.to_sector || $.trim((plane.to_city || '') + (plane.to_location ? ' - ' + plane.to_location : ''));
 
-        row.cells[2].childNodes[0].value = plane_arr[i]['dapart_time'];
-        row.cells[3].childNodes[0].value = plane_arr[i]['arraval_time'];
-        row.cells[4].childNodes[0].value = plane_arr[i]['from_city'] + ' - ' + plane_arr[i]['from_location'];
-        row.cells[5].childNodes[0].value = plane_arr[i]['to_city'] + ' - ' + plane_arr[i]['to_location'];
-        row.cells[6].childNodes[0].value = plane_arr[i]['airline_name'];
-        row.cells[7].childNodes[0].value = plane_arr[i]['class'];
-        $(row.cells[6].childNodes[0]).trigger('change');
-        $(row.cells[7].childNodes[0]).trigger('change');
-        row.cells[10].childNodes[0].value = plane_arr[i]['from_city_id'];
-        row.cells[11].childNodes[0].value = plane_arr[i]['to_city_id'];
+        var getCtrl = (typeof getCellFormControl === 'function') ? getCellFormControl : function (cell) {
+          return cell ? cell.querySelector('select,input') : null;
+        };
+        var chkEl = row.cells[0].querySelector('input[type="checkbox"]');
+        var depEl = getCtrl(row.cells[2]);
+        var arrEl = getCtrl(row.cells[3]);
+        var fromEl = getCtrl(row.cells[4]);
+        var toEl = getCtrl(row.cells[5]);
+        var airlineEl = getCtrl(row.cells[6]);
+        var classEl = getCtrl(row.cells[7]);
+        var fromCityEl = getCtrl(row.cells[10]);
+        var toCityEl = getCtrl(row.cells[11]);
 
+        if (chkEl) {
+          chkEl.checked = true;
+        }
+        if (depEl) {
+          depEl.value = plane.dapart_time || curr_datetime;
+        }
+        if (arrEl) {
+          arrEl.value = plane.arraval_time || curr_datetime;
+        }
+        if (fromEl && fromLabel) {
+          $(fromEl).empty().append(new Option(fromLabel, fromLabel, true, true)).trigger('change');
+        }
+        if (toEl && toLabel) {
+          $(toEl).empty().append(new Option(toLabel, toLabel, true, true)).trigger('change');
+        }
+        if (airlineEl && plane.airline_name !== undefined && plane.airline_name !== null && String(plane.airline_name) !== '') {
+          var $airline = $(airlineEl);
+          var airlineVal = String(plane.airline_name);
+          if ($airline.find('option').filter(function () { return String(this.value) === airlineVal; }).length === 0 && plane.airline_label) {
+            $airline.append(new Option(plane.airline_label, airlineVal, true, true));
+          }
+          $airline.val(airlineVal).trigger('change');
+        }
+        if (classEl && plane.class) {
+          $(classEl).val(plane.class).trigger('change');
+        }
+        if (fromCityEl) {
+          fromCityEl.value = plane.from_city_id || '';
+        }
+        if (toCityEl) {
+          toCityEl.value = plane.to_city_id || '';
+        }
+        if (depEl && depEl.id && typeof dynamic_datetime === 'function') {
+          dynamic_datetime(depEl.id);
+        }
+        if (arrEl && arrEl.id && typeof dynamic_datetime === 'function') {
+          dynamic_datetime(arrEl.id);
+        }
       }
     }
   });

@@ -55,7 +55,7 @@ textarea.form-control {
             <select id="dest_ids1" name="dest_names1" title="Destination" class="form-control" style="width:100%" disabled>
               <option value="<?php echo (int)$row_dest['dest_id']; ?>" selected><?php echo htmlspecialchars($row_dest['dest_name'], ENT_QUOTES); ?></option>
             </select>
-            <small class="text-muted">Itineraries are locked to the package destination.</small>
+           
             <?php } else { ?>
             <select id="dest_ids1" name="dest_names1" title="Select Destination" class="form-control" style="width:100%" required>
               <option value="">*Destination</option>

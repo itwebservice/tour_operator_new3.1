@@ -39,16 +39,50 @@ $quot_info_arr['tour_name'] = isset($sq_quotation_1['package_name']) ? $sq_quota
 
 $quot_info_arr['package_id'] = $sq_quotation['package_id'];
 
-$quot_info_arr['children_without_bed'] = $sq_quotation['children_without_bed'];
+$total_adult = isset($sq_quotation['total_adult']) ? $sq_quotation['total_adult'] : '';
+$total_infant = isset($sq_quotation['total_infant']) ? $sq_quotation['total_infant'] : '';
+$children_without_bed = isset($sq_quotation['children_without_bed']) ? $sq_quotation['children_without_bed'] : '';
+$children_with_bed = isset($sq_quotation['children_with_bed']) ? $sq_quotation['children_with_bed'] : '';
 
-$quot_info_arr['children_with_bed'] = $sq_quotation['children_with_bed'];
+// If quotation traveler counts are empty/zero, take them from enquiry (dashboard) — same source CRM quotation uses
+$need_enquiry_pax = (
+	($total_adult === '' || $total_adult === null || (float)$total_adult == 0) &&
+	($total_infant === '' || $total_infant === null || (float)$total_infant == 0) &&
+	($children_without_bed === '' || $children_without_bed === null || (float)$children_without_bed == 0) &&
+	($children_with_bed === '' || $children_with_bed === null || (float)$children_with_bed == 0)
+);
+$enquiry_content_arr1 = (isset($sq_enquiry['enquiry_content']) && $sq_enquiry['enquiry_content'] != '') ? json_decode($sq_enquiry['enquiry_content'], true) : array();
+if ($need_enquiry_pax && is_array($enquiry_content_arr1)) {
+	foreach ($enquiry_content_arr1 as $enquiry_content_arr2) {
+		if (!isset($enquiry_content_arr2['name'])) {
+			continue;
+		}
+		if ($enquiry_content_arr2['name'] == 'total_adult') {
+			$total_adult = $enquiry_content_arr2['value'];
+		}
+		if ($enquiry_content_arr2['name'] == 'total_infant') {
+			$total_infant = $enquiry_content_arr2['value'];
+		}
+		if ($enquiry_content_arr2['name'] == 'children_without_bed') {
+			$children_without_bed = $enquiry_content_arr2['value'];
+		}
+		if ($enquiry_content_arr2['name'] == 'children_with_bed') {
+			$children_with_bed = $enquiry_content_arr2['value'];
+		}
+	}
+}
+
+$quot_info_arr['total_adult'] = ($total_adult === '' || $total_adult === null) ? 0 : $total_adult;
+$quot_info_arr['total_infant'] = ($total_infant === '' || $total_infant === null) ? 0 : $total_infant;
+$quot_info_arr['children_without_bed'] = ($children_without_bed === '' || $children_without_bed === null) ? 0 : $children_without_bed;
+$quot_info_arr['children_with_bed'] = ($children_with_bed === '' || $children_with_bed === null) ? 0 : $children_with_bed;
 
 $quot_info_arr['from_date'] = get_date_user($sq_quotation['from_date']);
 
 $quot_info_arr['to_date'] = get_date_user($sq_quotation['to_date']);
 
 $quot_info_arr['total_days'] = $sq_quotation['total_days'];
-
+	
 $quot_info_arr['booking_type'] = $sq_quotation['booking_type'];
 $bsm_values = json_decode($sq_costing['bsmValues']);
 if (!is_array($bsm_values) || !isset($bsm_values[0])) {

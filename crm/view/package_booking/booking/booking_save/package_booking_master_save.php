@@ -43,6 +43,10 @@ $all_tab = ($hide_flight=='hidden' && $hide_cruise=='hidden' && $hide_train=='hi
     <input type="hidden" id="tcs" name="tcs" value="<?= $sq_tcs['tax_amount'] ?>">
     <input type="hidden" id="tcs_apply" name="tcs_apply" value="<?= $sq_tcs['apply'] ?>">
     <input type="hidden" id="tcs_calc" name="tcs_calc" value="<?= $sq_tcs['calc'] ?>">
+    <input type="hidden" id="quot_total_adult" name="quot_total_adult" value="">
+    <input type="hidden" id="quot_children_with_bed" name="quot_children_with_bed" value="">
+    <input type="hidden" id="quot_children_without_bed" name="quot_children_without_bed" value="">
+    <input type="hidden" id="quot_total_infant" name="quot_total_infant" value="">
 <div class="bk_tab_head bg_light">
     <ul> 
         <li>

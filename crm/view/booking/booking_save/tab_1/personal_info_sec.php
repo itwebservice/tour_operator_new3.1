@@ -47,12 +47,12 @@
         <input class="form-control" type="text" id="txt_m_address" name="txt_m_address"
             onchange="validate_address(this.id)" placeholder="Address" title="Address" readonly />
     </div>
-    <div class="col-md-3 col-xs-12 mg_tp_10 mg_bt_10_xs">
-        <input type="text" id="company_name" class="hidden" name="company_name" title="Company Name"
+     <div class="col-md-3 col-xs-12 mg_tp_10 mg_bt_10_xs hidden" id="company_div">
+        <input type="text" id="company_name" name="company_name" title="Company Name"
             placeholder="Company Name" title="Company Name" readonly>
     </div>
-    <div class="col-md-3 col-sm-4 col-xs-12 mg_tp_10">
-        <input type="text" id="credit_amount" class="hidden" name="credit_amount" placeholder="Credit Note Balance"
+    <div class="col-md-3 col-xs-12 mg_tp_10 hidden" id="credit_div">
+        <input type="text" id="credit_amount" name="credit_amount" placeholder="Credit Note Balance"
             title="Credit Note Balance" readonly>
     </div>
 </div>

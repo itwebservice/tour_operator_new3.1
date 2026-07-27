@@ -1120,6 +1120,7 @@ if("<?= $enquiry_type ?>" =="Group Booking" || "<?= $enquiry_type ?>" == "Packag
 		source: JSON.parse($('#destinations').val()),
 		select: function (event, ui) {
 			$("#tour_name").val(ui.item.label);
+			return false;
 		},
 		open: function(event, ui) {
 			$(this).autocomplete("widget").css({
@@ -1132,6 +1133,15 @@ if("<?= $enquiry_type ?>" =="Group Booking" || "<?= $enquiry_type ?>" == "Packag
 			.appendTo(ul);
 		
 	};
+
+	// Enter selects from autocomplete; do not submit the enquiry form
+	$("#tour_name").on("keydown", function(e) {
+		if (e.key === "Enter" || e.keyCode === 13) {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+	});
 }
 </script>
 <script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>

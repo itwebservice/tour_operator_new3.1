@@ -244,7 +244,9 @@ $o6_travel_from = o6nv($ov['travel_from'], '');
 $o6_travel_to   = o6nv($ov['travel_to'], '');
 $o6_travel_range = trim($o6_travel_from . ($o6_travel_to !== '' ? ' to ' . $o6_travel_to : ''));
 $o6_pkg_badge   = '';
-if (!empty($cost['computed']['group'][0]['package_type'])) {
+if (!empty($q['package_types_label'])) {
+  $o6_pkg_badge = $q['package_types_label'];
+} elseif (!empty($cost['computed']['group'][0]['package_type'])) {
   $o6_pkg_badge = $cost['computed']['group'][0]['package_type'];
 } elseif (!empty($hotels[0]['package_type'])) {
   $o6_pkg_badge = $hotels[0]['package_type'];
@@ -1258,14 +1260,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             </thead>
             <tbody>
               <?php foreach ($o6_cost_grp as $ci => $row) :
-                $tax_amount = '0.00';
-
-                if (!empty($row['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-                  if (!empty($m[1])) {
-                    $tax_amount = $m[1];
-                  }
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($row) : (isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '0.00');
                 $is_rec = (stripos(o6nv($row['package_type'], ''), 'premium') !== false)
                   || (stripos(o6nv($row['package_type'], ''), 'recommended') !== false)
                   || (stripos(o6nv($row['package_type'], ''), 'royal') !== false)
@@ -1277,10 +1272,10 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
                     <?php if ($is_rec) : ?> <span class="table-rec-badge">RECOMMENDED</span><?php endif; ?>
                   </td>
                   <td><?= o6e(o6nv($row['tour_cost_display'], '0')) ?></td>
-                  <td>INR <?= o6e($tax_amount) ?></td>
+                  <td><?= o6e($tax_amount) ?></td>
                   <td><?= o6e(o6nv($row['tcs_display'], '0')) ?></td>
                   <td><?= o6e(o6nv($row['travel_display'], '0')) ?></td>
-                  <td class="final-total-field<?= $is_rec ? ' focus-color' : '' ?>"><?= o6e(o6nv($row['total_display'], '0')) ?></td>
+                  <td class="final-total-field<?= $is_rec ? ' focus-color' : '' ?>"><?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o6e') : o6e(o6nv($row['total_display'], '0')) ?></td>
                   </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -1305,14 +1300,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             <tbody>
               <?php foreach ($o6_pp as $pp) :
 
-                $tax_amount = '0.00';
-
-                if (!empty($pp['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                  if (!empty($m[1])) {
-                    $tax_amount = $m[1];
-                  }
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
               ?>
                 <tr>
                   <td><?= o6e(o6nv($pp['package_type'], 'Package')) ?></td>
@@ -1321,7 +1309,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
                   <td><?= o6e(o6nv($pp['pp_cwnb_display'], '0')) ?></td>
                   <td><?= o6e(o6nv($pp['pp_infant_display'], '0')) ?></td>
 
-                  <td>INR <?= o6e($tax_amount) ?></td>
+                  <td><?= o6e($tax_amount) ?></td>
 
                   <td><?= o6e(o6nv($pp['tcs_display'], '0')) ?></td>
                   <td><?= o6e(o6nv($pp['visa_display'], '0')) ?></td>

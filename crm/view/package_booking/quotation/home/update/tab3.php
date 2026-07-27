@@ -53,7 +53,7 @@ if (!function_exists('quotation_excursion_options_html')) {
 ?>
 <form id="frm_tab3">
 
-    <div class="app_panel">
+    <div class="app_panel" style="overflow-x: hidden;">
 
 
 

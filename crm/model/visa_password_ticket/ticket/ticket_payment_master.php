@@ -41,11 +41,35 @@ class ticket_payment_master
 			exit;
 		} else {
 
+			$sq_ticket_info = mysqli_fetch_assoc(mysqlQuery("select customer_id from ticket_master where ticket_id='$ticket_id'"));
+			$customer_id = isset($sq_ticket_info['customer_id']) ? $sq_ticket_info['customer_id'] : 0;
+
+			// Deduct credit note balance only for Credit Note receipts
+			if ($payment_mode == 'Credit Note' && $customer_id != '') {
+				$payment_amount1 = $payment_amount;
+				$sq_credit_note = mysqlQuery("select * from credit_note_master where customer_id='$customer_id' and payment_amount>0 order by id asc");
+				while ($row_credit = mysqli_fetch_assoc($sq_credit_note)) {
+					if ($payment_amount1 == 0 || $payment_amount1 == '0') {
+						break;
+					}
+					if ($row_credit['payment_amount'] <= $payment_amount1) {
+						$payment_amount1 = $payment_amount1 - $row_credit['payment_amount'];
+						$temp_amount = 0;
+					} else {
+						$temp_amount = $row_credit['payment_amount'] - $payment_amount1;
+						$payment_amount1 = 0;
+					}
+					mysqlQuery("update credit_note_master set payment_amount ='$temp_amount' where id='$row_credit[id]'");
+				}
+			}
+
 			//Finance save
 			$this->finance_save($payment_id, $branch_admin_id);
 
 			//Bank and Cash Book Save
-			$this->bank_cash_book_save($payment_id, $branch_admin_id);
+			if ($payment_mode != 'Credit Note') {
+				$this->bank_cash_book_save($payment_id, $branch_admin_id);
+			}
 
 			if ($GLOBALS['flag']) {
 				commit_t();

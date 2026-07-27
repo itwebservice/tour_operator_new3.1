@@ -265,7 +265,9 @@ $o3_logo      = o3nv($hero['company_logo'], '');
 $o3_strip     = o3_cover_strip($q, $hotels, $itin, $assets);
 $o3_tour_id   = o3nv($hero['package_code'], o3nv($ov['tour_id'], ''));
 $o3_pkg_badge = '';
-if (!empty($cost['computed']['group'][0]['package_type'])) {
+if (!empty($q['package_types_label'])) {
+  $o3_pkg_badge = $q['package_types_label'];
+} elseif (!empty($cost['computed']['group'][0]['package_type'])) {
   $o3_pkg_badge = $cost['computed']['group'][0]['package_type'];
 } elseif (!empty($hotels[0]['package_type'])) {
   $o3_pkg_badge = $hotels[0]['package_type'];
@@ -964,21 +966,14 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
             ?>
               <tr<?= $is_royal ? ' class="royal-row"' : '' ?>>
                 <?php
-                $tax_amount = '0.00';
-
-                if (!empty($row['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-                  if (!empty($m[1])) {
-                    $tax_amount = $m[1];
-                  }
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($row) : (isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '0.00');
                 ?>
                 <td class="pkg-name"><?php if ($is_royal) : ?><span class="royal-star">★</span> <?php endif; ?><?= o3e(o3nv($row['package_type'], 'Package')) ?></td>
                 <td>&#8377;<?= o3e(o3nv($row['tour_cost_display'], '0')) ?></td>
-                <td>&#8377; INR<?= o3e($tax_amount) ?></td>
+                <td>&#8377; <?= o3e($tax_amount) ?></td>
                 <td>&#8377;<?= o3e(o3nv($row['tcs_display'], '0')) ?></td>
                 <td>&#8377;<?= o3e(o3nv($row['travel_display'], '0')) ?></td>
-                <td class="grand-total">&#8377;<?= o3e(o3nv($row['total_display'], '0')) ?></td>
+                <td class="grand-total">&#8377;<?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o3e') : o3e(o3nv($row['total_display'], '0')) ?></td>
                 </tr>
               <?php endforeach; ?>
           </tbody>
@@ -1005,13 +1000,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
             <tbody>
               <?php foreach ($o3_pp as $pp) { ?>
                 <?php
-                $tax_amount = '0.00';
-                if (!empty($pp['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                  if (!empty($m[1])) {
-                    $tax_amount = $m[1];
-                  }
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
                 ?>
 
                 <tr>
@@ -1020,7 +1009,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
                   <td>&#8377; <?= o3e(o3nv($pp['pp_cwb_display'], '0')) ?></td>
                   <td>&#8377; <?= o3e(o3nv($pp['pp_cwnb_display'], '0')) ?></td>
                   <td>&#8377; <?= o3e(o3nv($pp['pp_infant_display'], '0')) ?></td>
-                  <td>&#8377; INR</br><?= o3e($tax_amount) ?></td>
+                  <td>&#8377; <?= o3e($tax_amount) ?></td>
                   <td>&#8377; <?= o3e(o3nv($pp['tcs_display'], '0')) ?></td>
                   <td>&#8377; <?= o3e(o3nv($pp['visa_display'], '0')) ?></td>
                   <td>&#8377; <?= o3e(o3nv($pp['guide_display'], '0')) ?></td>

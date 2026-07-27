@@ -38,7 +38,7 @@ if($estimate_id!=""){
 			$estimate_type_val = get_estimate_type_name($row_estimate['estimate_type'], $row_estimate['estimate_type_id']);
 			$vendor_type_val = get_vendor_name($row_estimate['vendor_type'], $row_estimate['vendor_type_id']);
 
-			$bg = ($row_estimate['cancel_est_flag']!="0") ? "success" : "";
+			$bg = ($row_estimate['cancel_est_flag']!="0") ? "danger" : "";
 			?>
 			<tr class="<?= $bg ?>">
 				<td><?= ++$count ?></td>

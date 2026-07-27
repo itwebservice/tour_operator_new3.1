@@ -2,32 +2,62 @@ function addDyn(t) {
     var a = $("#" + t).attr("data-counter");
     a = parseInt(a) + 1, $("#" + t).attr("data-counter", a);
     var e = $("#" + t).find(".dynform-item:first").clone().appendTo("#" + t).hide().fadeIn(500);
+
+    // Remove cloned Select2 UI leftovers before rebinding IDs/values
+    $(e).find(".select2-container").remove();
+    $(e).find("select").each(function() {
+        $(this).removeClass("select2-hidden-accessible")
+            .removeAttr("data-select2-id aria-hidden tabindex")
+            .show();
+    });
+
+    // Destroy cloned datetimepickers so they can be re-inited cleanly
+    $(e).find(".app_datetimepicker, .app_datepicker").each(function() {
+        if ($(this).data("xdsoft_datetimepicker")) {
+            $(this).datetimepicker("destroy");
+        }
+    });
+
     $(e).find("input, textarea, select").each(function() {
-        var t = $(this).attr("id");
-        off = t.split("-"), $(this).attr("id", off[0] + "-" + a);
-        if($(this).is('select')){   
-            $(this).next('.select2').remove();       
-        	$(this).prop("selectedIndex", 0);
+        var fieldId = $(this).attr("id");
+        if (!fieldId) {
+            return;
         }
-        else{
-        	$(this).val("");
+        // Keep field name prefix; only update trailing section counter
+        // e.g. departure_datetime-1 -> departure_datetime-2, basic_fare-1-0 -> basic_fare-2
+        var parts = fieldId.split("-");
+        $(this).attr("id", parts[0] + "-" + a);
+        if ($(this).is("select")) {
+            $(this).prop("selectedIndex", 0);
+        } else {
+            $(this).val("");
         }
-        $(this).attr('data-toggle', 'tooltip');
-        $("[data-toggle='tooltip']").tooltip();
-    }), $(e).append('<button type="button" class="dynform-btn" onclick="deleteDyn(this)"><i class="fa fa-times"></i></button>'), $("#" + t).find(".app_datetimepicker").each(function() {
+        $(this).attr("data-toggle", "tooltip");
+    });
+
+    $(e).find("[data-toggle='tooltip']").tooltip();
+
+    if ($(e).find(".dynform-btn").length === 0) {
+        $(e).append('<button type="button" class="dynform-btn" onclick="deleteDyn(this)"><i class="fa fa-times"></i></button>');
+    }
+
+    // Init widgets ONLY on the newly added section (never re-init existing ones)
+    $(e).find(".app_datetimepicker").each(function() {
         $(this).datetimepicker({
             format: "d-m-Y H:i"
-        })
-    }), $("#" + t).find(".app_datepicker").each(function() {
+        });
+    });
+    $(e).find(".app_datepicker").each(function() {
         $(this).datetimepicker({
             timepicker: !1,
             format: "d-m-Y"
-        })
-    }), $("#" + t).find(".app_select").each(function() {
-        $(this).select2()
+        });
     });
-    var e = $("#" + t).find(".dynform-item:last").removeAttr("style");
-    console.log(e);
+    $(e).find(".app_select").each(function() {
+        $(this).select2();
+    });
+
+    $("#" + t).find(".dynform-item:last").removeAttr("style");
 }
 
 function deleteDyn(t) {

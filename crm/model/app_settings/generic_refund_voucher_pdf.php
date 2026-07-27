@@ -187,9 +187,14 @@ $pdf->SetXY(125, 165+$offset);
 $pdf->MultiCell(70, 7, 'For '.$app_name, 0, 'C');
 
 // $pdf->rect(140, 145+$offset, 40, 20);
-if(check_sign())
+$sign_path = get_signature_path();
+if($sign_path !== '')
 {
-$pdf->Image(get_signature(true), 140, 145+$offset, 40, 20);
+	try {
+		$pdf->Image($sign_path, 140, 145+$offset, 40, 20);
+	} catch (Exception $e) {
+		// Skip signature if image cannot be parsed (e.g. unsupported PNG)
+	}
 }
 
 $filename = $refund_to.'_RefundVoucher'.'.pdf';

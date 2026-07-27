@@ -138,11 +138,121 @@ if (!function_exists('gqd_parse_service_tax')) {
           continue;
         }
         $seg = explode(':', $part);
-        $amount += isset($seg[2]) ? (float) $seg[2] : 0;
-        $label  .= (isset($seg[0]) ? $seg[0] : '') . (isset($seg[1]) ? $seg[1] : '') . ', ';
+        // Amount is always the last colon-separated segment (handles "CGST:(9.00%):2227.50")
+        $seg_amount = (count($seg) > 0) ? (float) str_replace(',', '', trim(end($seg))) : 0;
+        $amount += $seg_amount;
+        $label  .= (isset($seg[0]) ? trim($seg[0]) : '') . (isset($seg[1]) ? trim($seg[1]) : '') . ', ';
       }
     }
     return array($amount, trim(rtrim(trim($label), ',')));
+  }
+}
+
+if (!function_exists('gqd_tax_display_amount')) {
+  /**
+   * Prefer converted tax_amount_display; never rely on hard-coded "INR" parsing.
+   */
+  function gqd_tax_display_amount($row)
+  {
+    if (is_array($row) && isset($row['tax_amount_display']) && $row['tax_amount_display'] !== '' && $row['tax_amount_display'] !== null) {
+      return $row['tax_amount_display'];
+    }
+    if (is_array($row) && isset($row['tax_amount']) && $row['tax_amount'] !== '' && $row['tax_amount'] !== null) {
+      return number_format((float) $row['tax_amount'], 2);
+    }
+    if (is_array($row) && !empty($row['tax_display'])) {
+      // Fallback: last number in the display string (currency-agnostic)
+      if (preg_match('/([\d,]+\.\d{2}|[\d,]+)\s*$/', trim($row['tax_display']), $m)) {
+        return $m[1];
+      }
+      return $row['tax_display'];
+    }
+    return '0.00';
+  }
+}
+
+if (!function_exists('gqd_total_with_before_discount')) {
+  /**
+   * Grand total HTML like document PDF: "INR 9000 <s>INR 10000</s>" when discount applied.
+   * $escape_fn optional (e.g. o1e); applied to amounts only, not <s> tags.
+   */
+  function gqd_total_with_before_discount($row, $total_key = 'total_display', $before_key = 'before_discount_display', $escape_fn = null)
+  {
+    if (!is_array($row)) {
+      return '';
+    }
+    $total = isset($row[$total_key]) ? (string) $row[$total_key] : '';
+    $before = isset($row[$before_key]) ? (string) $row[$before_key] : '';
+    if (is_callable($escape_fn)) {
+      $total = call_user_func($escape_fn, $total);
+      $before = call_user_func($escape_fn, $before);
+    }
+    if ($before !== '') {
+      return $total . ' <s>' . $before . '</s>';
+    }
+    return $total;
+  }
+}
+
+if (!function_exists('gqd_hotels_by_package_type')) {
+  /**
+   * Group hotel rows by package_type (document PDF style headings).
+   * Preserves first-seen package type order.
+   */
+  function gqd_hotels_by_package_type($hotels)
+  {
+    $grouped = array();
+    if (!is_array($hotels)) {
+      return $grouped;
+    }
+    foreach ($hotels as $h) {
+      if (!is_array($h)) {
+        continue;
+      }
+      $pt = isset($h['package_type']) ? trim((string) $h['package_type']) : '';
+      if ($pt === '') {
+        $pt = 'Package';
+      }
+      if (!isset($grouped[$pt])) {
+        $grouped[$pt] = array();
+      }
+      $grouped[$pt][] = $h;
+    }
+    return $grouped;
+  }
+}
+
+if (!function_exists('gqd_package_type_names')) {
+  /**
+   * Unique package type names from costing entries, then hotels (preserving order).
+   */
+  function gqd_package_type_names($costing_entries, $hotels = array())
+  {
+    $names = array();
+    $seen = array();
+    $push = function ($pt) use (&$names, &$seen) {
+      $pt = trim((string) $pt);
+      if ($pt === '' || isset($seen[$pt])) {
+        return;
+      }
+      $seen[$pt] = true;
+      $names[] = $pt;
+    };
+    if (is_array($costing_entries)) {
+      foreach ($costing_entries as $ce) {
+        if (is_array($ce) && isset($ce['package_type'])) {
+          $push($ce['package_type']);
+        }
+      }
+    }
+    if (empty($names) && is_array($hotels)) {
+      foreach ($hotels as $h) {
+        if (is_array($h) && isset($h['package_type'])) {
+          $push($h['package_type']);
+        }
+      }
+    }
+    return $names;
   }
 }
 
@@ -515,7 +625,7 @@ if (!function_exists('get_generic_quotation_data')) {
       $hotels[] = array(
         'hotel_name'    => isset($hm['hotel_name']) ? $hm['hotel_name'] : '',
         'hotel_city'    => isset($cm['city_name']) ? $cm['city_name'] : '',
-        'room_type'     => isset($h['meal_plan']) ? $h['meal_plan'] : '',
+        'room_type'     => isset($h['room_category']) ? $h['room_category'] : '',
         'meal_plan'     => isset($h['meal_plan']) ? $h['meal_plan'] : '',
         'check_in'      => function_exists('get_date_user') ? get_date_user($h['check_in']) : $h['check_in'],
         'check_out'     => function_exists('get_date_user') ? get_date_user($h['check_out']) : $h['check_out'],
@@ -844,6 +954,7 @@ if (!function_exists('get_generic_quotation_data')) {
         'tour_cost_display'  => $conv($tour_cost),
         'tax_amount'         => $tax_amount,
         'tax_label'          => $tax_label,
+        'tax_amount_display' => $conv($tax_amount),
         'tax_display'        => trim($tax_label . ' ' . $conv($tax_amount)),
         'tcs_percent'        => $tcs_per,
         'tcs_value'          => $tcs_value,
@@ -852,6 +963,11 @@ if (!function_exists('get_generic_quotation_data')) {
         'travel_display'     => $conv($g_travel),
         'total_cost'         => $g_total,
         'total_display'      => $conv($g_total),
+        // Same as document PDF: discounted total + strikethrough before-discount amount
+        'discount'           => $discount,
+        'act_discount'       => $act_discount,
+        'before_discount_total' => ($act_discount != 0) ? ($g_total + $act_discount) : 0,
+        'before_discount_display' => ($act_discount != 0) ? $conv($g_total + $act_discount) : '',
       );
 
       // ---- Per-person view ----
@@ -894,6 +1010,7 @@ if (!function_exists('get_generic_quotation_data')) {
         'pp_infant'          => $infant_final,
         'pp_infant_display'  => $conv($infant_final),
         'tax_amount'         => $tax_amount,
+        'tax_amount_display' => $conv($tax_amount),
         'tax_display'        => trim($tax_label . ' ' . $conv($tax_amount)),
         'tcs_percent'        => $tcs_per,
         'tcs_value'          => $tcs_value,
@@ -914,6 +1031,11 @@ if (!function_exists('get_generic_quotation_data')) {
         ),
         'grand_total'        => $pp_grand,
         'grand_total_display' => $conv($pp_grand),
+        // Same as document PDF: discounted total + strikethrough before-discount amount
+        'discount'           => $discount,
+        'act_discount'       => $act_discount,
+        'before_discount_total' => ($act_discount != 0) ? ($pp_grand + $act_discount) : 0,
+        'before_discount_display' => ($act_discount != 0) ? $conv($pp_grand + $act_discount) : '',
       );
 
       // Quotation grand total uses the relevant view for its costing type.
@@ -1055,6 +1177,11 @@ if (!function_exists('get_generic_quotation_data')) {
       );
     }
     // =====================
+    // Package type names (multiple package types on one quotation)
+    $package_type_names = gqd_package_type_names($costing_entries, $hotels);
+    $hotels_by_package_type = gqd_hotels_by_package_type($hotels);
+    $package_types_label = !empty($package_type_names) ? implode(', ', $package_type_names) : 'Package';
+
     // =====================================================================
     // ASSEMBLE
     // =====================================================================
@@ -1066,6 +1193,9 @@ if (!function_exists('get_generic_quotation_data')) {
       'currency'     => isset($currency) ? $currency : '',
       'currency_code' => $currency_code,
       'testimonials' => $testimonials,
+      'package_types' => $package_type_names,
+      'package_types_label' => $package_types_label,
+      'hotels_by_package_type' => $hotels_by_package_type,
       'sections_present' => array(
         'hotels'     => $count_hotel > 0,
         'flights'    => $count_plane > 0,

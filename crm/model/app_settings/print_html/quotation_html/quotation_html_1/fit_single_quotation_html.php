@@ -209,18 +209,35 @@ function o1_flight_date($v)
 // ===================================
 
 
-$o1_pkg_type = '';
-if (!empty($cost['computed']['group'][0]['package_type'])) {
-  $o1_pkg_type = $cost['computed']['group'][0]['package_type'];
+$o1_pkg_names = array();
+if (!empty($q['package_types']) && is_array($q['package_types'])) {
+  $o1_pkg_names = $q['package_types'];
+} elseif (!empty($cost['computed']['group'])) {
+  foreach ($cost['computed']['group'] as $g_row) {
+    if (!empty($g_row['package_type'])) {
+      $o1_pkg_names[] = $g_row['package_type'];
+    }
+  }
+  $o1_pkg_names = array_values(array_unique($o1_pkg_names));
 } elseif (!empty($hotels[0]['package_type'])) {
-  $o1_pkg_type = $hotels[0]['package_type'];
-} else {
-  $o1_pkg_type = 'Package';
+  $o1_pkg_names[] = $hotels[0]['package_type'];
+}
+if (empty($o1_pkg_names)) {
+  $o1_pkg_names = array('Package');
 }
 
-$o1_pkg_label = stripos($o1_pkg_type, 'package') !== false
-  ? $o1_pkg_type
-  : $o1_pkg_type . ' Package';
+$o1_pkg_type = $o1_pkg_names[0];
+$o1_pkg_types_label = isset($q['package_types_label']) && $q['package_types_label'] !== ''
+  ? $q['package_types_label']
+  : implode(', ', $o1_pkg_names);
+
+$o1_pkg_label = (count($o1_pkg_names) > 1)
+  ? $o1_pkg_types_label
+  : (stripos($o1_pkg_type, 'package') !== false ? $o1_pkg_type : $o1_pkg_type . ' Package');
+
+$o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels_by_package_type']))
+  ? $q['hotels_by_package_type']
+  : (function_exists('gqd_hotels_by_package_type') ? gqd_hotels_by_package_type($hotels) : array('Package' => $hotels));
 
 // Web preview: continuous scroll layout (no per-page headers, footers, or A4 gaps).
 $o1_continuous_view = true;
@@ -649,8 +666,8 @@ $o1_continuous_view = true;
               </rect>
             </svg>
             <div class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)] mt-2">Package Type</div>
-            <div class="font-display text-3xl mt-1"><span><?= o1e(o1nv($o1_row['package_type'], 'Package')) ?></span></div>
-            <div class="text-cream/70 text-xs mt-1.5 font-serif-soft italic">Hand-picked value with luxury touchpoints.</div>
+            <div class="font-display text-3xl mt-1"><span><?= o1e($o1_pkg_types_label) ?></span></div>
+            <div class="text-cream/70 text-xs mt-1.5 font-serif-soft italic"><?= count($o1_pkg_names) > 1 ? 'Multiple package options for your journey.' : 'Hand-picked value with luxury touchpoints.' ?></div>
             <div class="absolute -right-6 -bottom-6 w-28 h-28 rounded-full" style="background:oklch(0.78 0.13 78 / 0.2)">
             </div>
           </div>
@@ -750,11 +767,20 @@ $o1_continuous_view = true;
         <div class="mt-6 space-y-4">
           <?php
           $o1_hotels = is_array($hotels) ? $hotels : array();
-          if (empty($o1_hotels)) {
-            $o1_hotels = array();
+          if (empty($o1_hotels_by_pkg) && !empty($o1_hotels)) {
+            $o1_hotels_by_pkg = array('Package' => $o1_hotels);
           }
           $o1_hi = 0;
-          foreach ($o1_hotels as $h):
+          if (!empty($o1_hotels_by_pkg)):
+            foreach ($o1_hotels_by_pkg as $o1_pkg_heading => $o1_pkg_hotels):
+              if (count($o1_hotels_by_pkg) > 1):
+          ?>
+            <div class="rounded-lg px-4 py-2.5 text-cream text-sm uppercase tracking-[0.18em] font-semibold" style="background:var(--gradient-navy)">
+              Package Type — <?= o1e($o1_pkg_heading) ?>
+            </div>
+          <?php
+              endif;
+              foreach ($o1_pkg_hotels as $h):
             $o1_hi++;
             $o1_hnights = (int) o1nv(isset($h['total_nights']) ? $h['total_nights'] : '', 0);
             // $o1_hphoto  = o1img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . ((($o1_hi - 1) % 3) + 1) . '.jpg');
@@ -821,8 +847,8 @@ $o1_continuous_view = true;
                   <!-- ====================== -->
                 </div>
                 <h3 class="font-display text-2xl text-[color:var(--navy)] mt-1.5"><?= o1e(o1nv(isset($h['hotel_name']) ? $h['hotel_name'] : '', 'Hotel')) ?></h3>
-                <div class="text-[13px] font-serif-soft italic text-[color:var(--ink)]/70 mt-0.5"><?= o1e(o1nv(isset($h['room_category']) ? $h['room_category'] : '', o1nv(isset($h['room_type']) ? $h['room_type'] : '', ''))) ?></div>
-                <div class="grid grid-cols-3 gap-3 mt-4">
+                <div class="text-[13px] font-serif-soft italic text-[color:var(--ink)]/70 mt-0.5"><?= o1e(o1nv(isset($h['room_category']) ? $h['room_category'] : '', '')) ?></div>
+                <div class="grid grid-cols-<?= !empty($h['meal_plan']) ? '4' : '3' ?> gap-3 mt-4">
                   <div class="rounded-lg bg-[color:var(--cream)] p-2.5 border border-[color:var(--gold)]/20">
                     <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--navy)]/60">Check-in</div>
                     <div class="font-display text-sm text-[color:var(--navy)] mt-0.5"><?= o1e(o1nv(isset($h['check_in']) ? $h['check_in'] : '', 'NA')) ?></div>
@@ -835,17 +861,21 @@ $o1_continuous_view = true;
                     <div class="text-[9px] uppercase tracking-[0.22em] text-[color:var(--gold)]">Nights</div>
                     <div class="font-display text-sm mt-0.5"><?= o1e($o1_hnights) ?> Night<?= ($o1_hnights == 1 ? '' : 's') ?></div>
                   </div>
-                </div>
-                <div class="flex flex-wrap gap-2 mt-3">
-                  <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/30 text-[color:var(--navy)] border border-[color:var(--gold)]/30">TV Screen</span>
-                  <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/30 text-[color:var(--navy)] border border-[color:var(--gold)]/30">Coffee Maker</span>
-                  <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/30 text-[color:var(--navy)] border border-[color:var(--gold)]/30">Wardrobe</span>
-                  <span class="text-[10px] px-2.5 py-1 rounded-full bg-[color:var(--gold-soft)]/30 text-[color:var(--navy)] border border-[color:var(--gold)]/30">Room service</span>
+                  <?php if (!empty($h['meal_plan'])): ?>
+                  <div class="rounded-lg bg-[color:var(--cream)] p-2.5 border border-[color:var(--gold)]/20">
+                    <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--navy)]/60">Meal Plan</div>
+                    <div class="font-display text-sm text-[color:var(--navy)] mt-0.5"><?= o1e($h['meal_plan']) ?></div>
+                  </div>
+                  <?php endif; ?>
                 </div>
               </div>
             </div>
-          <?php endforeach; ?>
-          <?php if (empty($o1_hotels)): ?>
+          <?php
+              endforeach;
+            endforeach;
+          endif;
+          ?>
+          <?php if (empty($o1_hotels) && empty($o1_hotels_by_pkg)): ?>
             <div class="rounded-xl bg-white border border-[color:var(--gold)]/25 p-6 text-center text-[color:var(--ink)]/60 text-sm">No accommodation details available.</div>
           <?php endif; ?>
         </div>
@@ -1662,22 +1692,17 @@ $o1_continuous_view = true;
                                                                         ?></div> -->
                 <!-- ================== Dipti -->
                 <?php
-                $tax_amount = '0.00';
-
-                if (!empty($o1_row['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $o1_row['tax_display'], $matches);
-                  $tax_amount = isset($matches[1]) ? $matches[1] : '0.00';
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($o1_row) : (isset($o1_row['tax_amount_display']) ? $o1_row['tax_amount_display'] : '0.00');
                 ?>
 
                 <div class="text-right text-[color:var(--ink)]/85">
-                  INR <?= o1e($tax_amount) ?>
+                  &#8377; <?= o1e($tax_amount) ?>
                 </div>
                 <!-- <div class="text-right text-[color:var(--ink)]/85">&#8377; <? //= o1e(o1nv($o1_row['total_display'], '0')) 
                                                                                 ?></div> -->
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tcs_display']) ?></div>
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['travel_display']) ?></div>
-                <div class="text-right font-display text-lg text-[color:var(--navy)]">&#8377; <?= o1e($o1_row['total_display']) ?></div>
+                <div class="text-right font-display text-lg text-[color:var(--navy)]">&#8377; <?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($o1_row, 'total_display', 'before_discount_display', 'o1e') : o1e($o1_row['total_display']) ?></div>
               </div>
             <?php $o1_ci++;
             endforeach; ?>
@@ -1744,20 +1769,13 @@ $o1_continuous_view = true;
                     <?php
                     $row_bg = ($i % 2 == 0) ? '#ffffff' : '#f6efdf';
 
-                    $tax_amount = 'INR 0.00';
-
-                    if (!empty($pp['tax_display'])) {
-                      preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                      if (!empty($m[1])) {
-                        $tax_amount = 'INR ' . $m[1];
-                      }
-                    }
+                    $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
                     ?>
 
                     <tr style="background:<?= $row_bg ?>;">
 
                       <td style="padding:32px 18px;font-size:16px;color:#0b2343;font-family:Arial, Helvetica, sans-serif;">
-                        <?= o1e($pp['package_type']) ?>
+                        <?= o1e($pp['package_type']) ?><?php if (!empty($pp['grand_total_display'])): ?> <span style="font-size:12px;font-weight:600;">(<?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($pp, 'grand_total_display', 'before_discount_display', 'o1e') : o1e($pp['grand_total_display']) ?>)</span><?php endif; ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">

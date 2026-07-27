@@ -173,9 +173,23 @@ function vendor_request_view_modal(request_id)
 	      url: base_url+'../../../../../../controller/vendor/quotation_request/dmc_quotation_reply_save.php',
 	      data:{transport_cost : transport_cost, hotel_cost : hotel_cost, excursion_cost : excursion_cost, visa_cost : visa_cost, total_cost : total_cost ,enquiry_spec : enquiry_spec, request_id : request_id, supplier_id : supplier_id , created_by : created_by, currency_code : currency_code, enquiry_id : enquiry_id},
 	      success: function(message){
-	        success_msg_alert(message);
+	        var msg = (message || '').toString().trim();
+	        if (msg.indexOf('error--') === 0) {
+	          error_msg_alert(msg.split('--')[1] || msg);
+	          $('#form_send').button('reset');
+	          return;
+	        }
+	        success_msg_alert(msg);
 			$('#form_send').button('reset'); 
 			reset_form('frm_enquiry_save');
+			setTimeout(function(){
+				window.close();
+				setTimeout(function(){
+					if (!window.closed) {
+						document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;font-family:Arial,sans-serif;"><h2 style="color:#3c763d;">Response sent successfully</h2><p>You can close this window now.</p></div>';
+					}
+				}, 400);
+			}, 1200);
 	     }  
 	    }); 
     }

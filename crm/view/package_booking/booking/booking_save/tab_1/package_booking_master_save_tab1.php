@@ -531,4 +531,4 @@
     }
 </script>
 <?php include "guideline_modal.php"; ?>
-<script src="../js/tab_1.js"></script>
+<script src="../js/tab_1.js?v=20260727b"></script>

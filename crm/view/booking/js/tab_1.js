@@ -14,18 +14,18 @@ function customer_info_load(div_id, offset = '') {
       $('#txt_m_email_id' + offset).val(result.email_id);
       $('#txt_m_address' + offset).val(result.address);
       if (result.company_name != '') {
-        $('#company_name' + offset).removeClass('hidden');
+        $('#company_div' + offset).removeClass('hidden');
         $('#company_name' + offset).val(result.company_name);
       }
       else {
-        $('#company_name' + offset).addClass('hidden');
+        $('#company_div' + offset).addClass('hidden');
       }
       if (result.payment_amount != '' || result.payment_amount != '0') {
-        $('#credit_amount' + offset).removeClass('hidden');
+        $('#credit_div' + offset).removeClass('hidden');
         $('#credit_amount' + offset).val(result.payment_amount);
       }
       else {
-        $('#credit_amount' + offset).addClass('hidden');
+        $('#credit_div' + offset).addClass('hidden');
         $('#credit_amount' + offset).val(0);
       }
     }

@@ -315,7 +315,9 @@ $o5_tour_id     = o5nv($hero['package_code'], o5nv($ov['tour_id'], ''));
 $o5_duration    = o5nv($ov['duration_label'], o5nv($hero['duration_label'], ''));
 $o5_travel_pill = trim(o5nv($ov['travel_from'], '') . (o5nv($ov['travel_to'], '') !== '' ? ' to ' . o5nv($ov['travel_to'], '') : ''));
 $o5_pkg_badge   = '';
-if (!empty($cost['computed']['group'][0]['package_type'])) {
+if (!empty($q['package_types_label'])) {
+  $o5_pkg_badge = $q['package_types_label'];
+} elseif (!empty($cost['computed']['group'][0]['package_type'])) {
   $o5_pkg_badge = $cost['computed']['group'][0]['package_type'];
 } elseif (!empty($hotels[0]['package_type'])) {
   $o5_pkg_badge = $hotels[0]['package_type'];
@@ -998,13 +1000,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
                       || (stripos(o5nv($row['package_type'], ''), 'recommended') !== false)
                       || ($ci === 1 && count($o5_cost_grp) > 1);
 
-                    $tax_amount = '0.00';
-                    if (!empty($row['tax_display'])) {
-                      preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-                      if (!empty($m[1])) {
-                        $tax_amount = $m[1];
-                      }
-                    }
+                    $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($row) : (isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '0.00');
                   ?>
                     <tr<?= $is_rec ? ' class="recommended"' : '' ?>>
                       <td>
@@ -1012,10 +1008,10 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
                         <?php if ($is_rec) : ?><span class="rec-inline-badge">RECOMMENDED</span><?php endif; ?>
                       </td>
                       <td><?= o5e(o5nv($row['tour_cost_display'], '0')) ?></td>
-                      <td>INR <?= o5e($tax_amount) ?></td>
+                      <td><?= o5e($tax_amount) ?></td>
                       <td><?= o5e(o5nv($row['tcs_display'], '0')) ?></td>
                       <td><?= o5e(o5nv($row['travel_display'], '0')) ?></td>
-                      <td><?= o5e(o5nv($row['total_display'], '0')) ?></td>
+                      <td><?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o5e') : o5e(o5nv($row['total_display'], '0')) ?></td>
                       </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -1041,13 +1037,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
                   </thead>
                   <tbody>
                     <?php foreach ($o5_pp as $pp) :
-                      $tax_amount = '0.00';
-                      if (!empty($pp['tax_display'])) {
-                        preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                        if (!empty($m[1])) {
-                          $tax_amount = $m[1];
-                        }
-                      }
+                      $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
                     ?>
                       <tr>
                         <td><strong><?= o5e(o5nv($pp['package_type'], 'Package')) ?></strong></td>
@@ -1055,7 +1045,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
                         <td><?= o5e(o5nv($pp['pp_cwb_display'], 'INR 0.00')) ?></td>
                         <td><?= o5e(o5nv($pp['pp_cwnb_display'], 'INR 0.00')) ?></td>
                         <td><?= o5e(o5nv($pp['pp_infant_display'], 'INR 0.00')) ?></td>
-                        <td>INR <?= o5e($tax_amount) ?></td>
+                        <td><?= o5e($tax_amount) ?></td>
                         <td><?= o5e(o5nv($pp['tcs_display'], 'INR 0.00')) ?></td>
                         <td><?= o5e(o5nv($pp['visa_display'], 'INR 0.00')) ?></td>
                         <td><?= o5e(o5nv($pp['guide_display'], 'INR 0.00')) ?></td>

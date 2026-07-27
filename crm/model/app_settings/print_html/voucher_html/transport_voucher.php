@@ -270,14 +270,7 @@ else { $emp_name = $sq_emp['first_name'].' ' .$sq_emp['last_name']; }
 										while($row_entry = mysqli_fetch_assoc($sq_entry)){
 											$q_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_entry[city_id]'"));
 											$q_excursion = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$row_entry[exc_id]'"));
-											// Get vehicle name
-											$vehicle_name = '';
-											if(isset($row_entry['vehicle_name']) && $row_entry['vehicle_name'] != '' && $row_entry['vehicle_name'] != '0' && $row_entry['vehicle_name'] != null){
-												$sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='".$row_entry['vehicle_name']."'"));
-												if($sq_vehicle && isset($sq_vehicle['vehicle_name'])){
-													$vehicle_name = $sq_vehicle['vehicle_name'];
-												}
-											}
+											$vehicle_name = get_excursion_vehicle_display_name($row_entry);
 											?>
 											<tr>
 												<td><?= $q_city['city_name'] ?></td>

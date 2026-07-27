@@ -190,8 +190,11 @@ if (!function_exists('o2_strip')) {
 $o2_dest          = o2nv($ov['destination'], o2nv($hero['tour_name'], 'Tour'));
 // $o2_pkg           = o2nv($ov['package_type_label'], o2nv(!empty($hotels[0]['package_type']) ? $hotels[0]['package_type'] : '', 'Package'));
 $o2_pkg = o2nv(
-  !empty($hotels[0]['package_type']) ? $hotels[0]['package_type'] : '',
-  o2nv($ov['package_type_label'], 'Package')
+  !empty($q['package_types_label']) ? $q['package_types_label'] : '',
+  o2nv(
+    !empty($hotels[0]['package_type']) ? $hotels[0]['package_type'] : '',
+    o2nv($ov['package_type_label'], 'Package')
+  )
 );
 $o2_client        = o2nv($ov['client_name'], o2nv($hero['client_name'], ''));
 $o2_client_first  = trim((string) preg_replace('/\s+.*/', '', $o2_client));
@@ -1043,13 +1046,7 @@ $o2_round = o2img(
                 foreach ($o2_grp as $o2_row):
                   $o2_rec = ($o2_ci === 1 || (count($o2_grp) === 1));
 
-                  $tax_amount = 'INR 0.00';
-                  if (!empty($o2_row['tax_display'])) {
-                    preg_match('/INR\s*([\d,\.]+)/i', $o2_row['tax_display'], $matches);
-                    if (!empty($matches[1])) {
-                      $tax_amount = 'INR ' . $matches[1];
-                    }
-                  }
+                  $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($o2_row) : (isset($o2_row['tax_amount_display']) ? $o2_row['tax_amount_display'] : '0.00');
                 ?>
                   <tr<?= $o2_rec ? ' class="rec"' : '' ?>>
                     <td class="pk">
@@ -1067,7 +1064,7 @@ $o2_round = o2img(
                     <td><?= o2e($tax_amount) ?></td>
                     <td><?= o2e(o2nv($o2_row['tcs_display'], 'INR 0.00')) ?></td>
                     <td><?= o2e(o2nv($o2_row['travel_display'], 'INR 0.00')) ?></td>
-                    <td class="gt"><?= o2e(o2nv($o2_row['total_display'], 'INR 0.00')) ?></td>
+                    <td class="gt"><?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($o2_row, 'total_display', 'before_discount_display', 'o2e') : o2e(o2nv($o2_row['total_display'], 'INR 0.00')) ?></td>
                     </tr>
                   <?php
                   $o2_ci++;
@@ -1104,13 +1101,7 @@ $o2_round = o2img(
                     <?php
                     $o2_rec = ($i === 1 || (count($o2_pp) === 1));
 
-                    $tax_amount = 'INR 0.00';
-                    if (!empty($pp['tax_display'])) {
-                      preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                      if (!empty($m[1])) {
-                        $tax_amount = 'INR ' . $m[1];
-                      }
-                    }
+                    $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
                     ?>
 
                     <tr<?= $o2_rec ? ' class="rec"' : '' ?>>

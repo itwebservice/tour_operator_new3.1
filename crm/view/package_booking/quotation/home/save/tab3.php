@@ -36,7 +36,7 @@
                                                     <?php echo get_package_type_dropdown(); ?>
                                                 </select>
 
-                                                <button type="button" id="addHotelInfobtnsubmit" class="btn btn-excel btn-sm"
+                                                <button type="button" id="addHotelInfobtnsubmit" class="btn btn-excel btn-sm" title="Add Hotel Row"
                                                     onClick="addHotelInfo('tbl_package_tour_quotation_dynamic_hotel');city_lzloading('.city_name1');">
                                                     <i class="fa fa-plus"></i>
                                                 </button>
@@ -1149,7 +1149,9 @@
             row.cells[6].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
             row.cells[13].childNodes[1].value = parseFloat(total_cost) + parseFloat(exc_cost);
             $(row.cells[6].childNodes[1]).trigger('change');
-            get_business(row.cells[3].childNodes[1].id, 'true');
+            if (typeof get_business === 'function') {
+                get_business(row.cells[3].childNodes[1].id, 'true');
+            }
         }
     }
 

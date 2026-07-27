@@ -110,10 +110,10 @@ $booking_id = $_POST['booking_id'];
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
+				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 					<input type="text" name="cancel_amount" id="cancel_amount" class="text-right" placeholder="*Cancel amount(Tax Incl)" title="Cancel amount(Tax Incl)" onchange="validate_balance(this.id);calculate_total_refund()" value="<?= $sq_hotel_info['cancel_amount'] ?>">
 				</div>
-				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
+				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 					<select title="Select Tax" id="tax_value" name="tax_value" class="form-control" onchange="calculate_total_refund();">
 					<?php
 					if($sq_hotel_info['cancel_flag'] == 0){ ?>
@@ -125,21 +125,23 @@ $booking_id = $_POST['booking_id'];
 					<?php } ?>
 					</select>
 				</div>
-				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
+				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 					<input type="text" title="Tax Subtotal" id="tour_service_tax_subtotal" name="tour_service_tax_subtotal" value="<?= $sq_hotel_info['tax_amount'] ?>" readonly>
 					<input type="hidden" id="ledger_posting" />
 				</div>
-				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
+				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 					<input type="text" name="cancel_amount_exc" id="cancel_amount_exc" class="text-right" placeholder="*Cancellation Charges" title="Cancellation Charges" onchange="validate_balance(this.id);calculate_total_refund()" value="<?= $sq_hotel_info['cancel_amount_exc'] ?>">
 				</div>
-				<div class="col-md-3 col-sm-6 col-xs-12 mg_tp_10 mg_bt_10_xs">
+			</div>
+			<div class="row">
+				<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 					<input type="text" name="total_refund_amount" id="total_refund_amount" class="amount_feild_highlight text-right" placeholder="Total Refund" title="Total Refund" readonly value="<?= $sq_hotel_info['refund_total_fee'] ?>">
 				</div>
 			</div>
 			<?php if($sq_hotel_info['cancel_flag'] == 0){ ?>
-				<div class="row mg_tp_20">
-					<div class="col-md-4 col-md-offset-4 text-center">
-						<button id="btn_refund_save" id="cancel_booking" class="btn btn-sm btn-success"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
+				<div class="row mg_tp_10">
+					<div class="col-md-12 text-center">
+						<button type="submit" id="btn_refund_save" class="btn btn-sm btn-success"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
 					</div>
 				</div>
 			<?php } ?>

@@ -230,7 +230,7 @@ $('#frm_tab4').validate({
 				var seat_no = row.cells[10].childNodes[0].value;
 				var meal_plan = row.cells[11].childNodes[0].value;
 				var main_ticket =($('#reissue_check1:checked').length > 0) ? row.cells[12].childNodes[0].value : '';
-				var trip_details = JSON.stringify($('#flight_details'+(i+1)).html());
+				var trip_details = JSON.stringify($('#flight_details'+(i+1)).val() || $('#flight_details'+(i+1)).html());
 
 				first_name_arr.push(first_name);
 				middle_name_arr.push(middle_name);

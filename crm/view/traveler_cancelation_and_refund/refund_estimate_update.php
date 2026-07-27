@@ -76,6 +76,9 @@ if($sq_tour_count > 0){
 		<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
 			<input type="text" name="cancel_amount_exc" id="cancel_amount_exc" class="form-control text-right" placeholder="*Cancellation Charges" title="Cancellation Charges" onchange="validate_balance(this.id);calculate_total_refund()" value="<?= $ecancel_amount_exc ?>">
 		</div>
+		
+	</div>
+	<div class="row">
 		<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs mg_tp_10">
 			<input type="text" name="total_refund_amount" id="total_refund_amount" class="form-control  amount_feild_highlight text-right" placeholder="Total Refund" title="Total Refund" readonly value="<?= $etotal_refund_amount ?>">
 		</div>

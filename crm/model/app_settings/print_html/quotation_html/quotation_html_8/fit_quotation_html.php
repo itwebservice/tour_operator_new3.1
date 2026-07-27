@@ -210,7 +210,9 @@ $o8_travel_from  = o8nv($ov['travel_from'], '');
 $o8_travel_to    = o8nv($ov['travel_to'], '');
 $o8_travel_range = trim($o8_travel_from . ($o8_travel_to !== '' ? ' — ' . $o8_travel_to : ''));
 $o8_pkg_badge    = '';
-if (!empty($cost['computed']['group'][0]['package_type'])) {
+if (!empty($q['package_types_label'])) {
+  $o8_pkg_badge = $q['package_types_label'];
+} elseif (!empty($cost['computed']['group'][0]['package_type'])) {
   $o8_pkg_badge = $cost['computed']['group'][0]['package_type'];
 } elseif (!empty($hotels[0]['package_type'])) {
   $o8_pkg_badge = $hotels[0]['package_type'];
@@ -533,6 +535,10 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                   <h3><?= o8e(o8nv($h['hotel_name'], 'Hotel')) ?></h3>
                   <small class="hotel-category">ROOM CATEGORY</small>
                   <div class="room-name"><?= o8e($room_label) ?></div>
+                  <?php if (!empty($h['meal_plan'])) : ?>
+                  <small class="hotel-category" style="margin-top:8px;display:block;">MEAL PLAN</small>
+                  <div class="room-name"><?= o8e($h['meal_plan']) ?></div>
+                  <?php endif; ?>
                   <div class="hotel-dates">
                     <div><span>CHECK-IN</span><strong><?= o8e(o8nv($h['check_in'], '')) ?></strong></div>
                     <div><span>CHECK-OUT</span><strong><?= o8e(o8nv($h['check_out'], '')) ?></strong></div>
@@ -905,13 +911,7 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
               foreach ($o8_grp as $ci => $row) :
                 $is_rec = o8_is_recommended_pkg(o8nv($row['package_type'], ''), $ci, $o8_gcnt);
 
-                $tax_amount = '0.00';
-                if (!empty($row['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-                  if (!empty($m[1])) {
-                    $tax_amount = $m[1];
-                  }
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($row) : (isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '0.00');
               ?>
 
                 <tr<?= $is_rec ? ' class="recommended-row"' : '' ?>>
@@ -920,11 +920,11 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                     <?php if ($is_rec) : ?><span class=" recommended-badge">RECOMMENDED</span><?php endif; ?>
                   </td>
                   <td><?= o8e(o8nv($row['tour_cost_display'], '0')) ?></td>
-                  <td>INR <?= o8e($tax_amount) ?></td>
+                  <td><?= o8e($tax_amount) ?></td>
                   <td><?= o8e(o8nv($row['tcs_display'], '0')) ?></td>
                   <td><?= o8e(o8nv($row['travel_display'], '0')) ?></td>
                   <td class="<?= $is_rec ? 'highlight-total' : 'grand-total' ?>">
-                    <?= o8e(o8nv($row['total_display'], '0')) ?>
+                    <?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o8e') : o8e(o8nv($row['total_display'], '0')) ?>
                   </td>
                   </tr>
 
@@ -955,13 +955,7 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
             <tbody>
               <?php foreach ($o8_pp as $i => $pp) :
 
-                $tax_amount = '0.00';
-                if (!empty($pp['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                  if (!empty($m[1])) {
-                    $tax_amount = $m[1];
-                  }
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
               ?>
 
                 <tr>
@@ -970,7 +964,7 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                   <td><?= o8e(o8nv($pp['pp_cwb_display'], '0')) ?></td>
                   <td><?= o8e(o8nv($pp['pp_cwnb_display'], '0')) ?></td>
                   <td><?= o8e(o8nv($pp['pp_infant_display'], '0')) ?></td>
-                  <td>INR <?= o8e($tax_amount) ?></td>
+                  <td><?= o8e($tax_amount) ?></td>
                   <td><?= o8e(o8nv($pp['tcs_display'], '0')) ?></td>
                   <td><?= o8e(o8nv($pp['visa_display'], '0')) ?></td>
                   <td><?= o8e(o8nv($pp['guide_display'], '0')) ?></td>

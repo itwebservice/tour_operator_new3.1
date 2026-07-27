@@ -316,7 +316,9 @@ $o7_tour_id     = o7nv($hero['package_code'], o7nv($ov['tour_id'], ''));
 $o7_duration    = o7nv($ov['duration_label'], o7nv($hero['duration_label'], ''));
 $o7_travel_range = trim(o7nv($ov['travel_from'], '') . (o7nv($ov['travel_to'], '') !== '' ? ' to ' . o7nv($ov['travel_to'], '') : ''));
 $o7_pkg_badge   = '';
-if (!empty($cost['computed']['group'][0]['package_type'])) {
+if (!empty($q['package_types_label'])) {
+  $o7_pkg_badge = $q['package_types_label'];
+} elseif (!empty($cost['computed']['group'][0]['package_type'])) {
   $o7_pkg_badge = $cost['computed']['group'][0]['package_type'];
 } elseif (!empty($hotels[0]['package_type'])) {
   $o7_pkg_badge = $hotels[0]['package_type'];
@@ -1125,11 +1127,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
             <tbody>
               <?php foreach ($o7_cost_grp as $ci => $row) :
 
-                $tax_amount = '0.00';
-                if (!empty($row['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m);
-                  if (!empty($m[1])) $tax_amount = $m[1];
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($row) : (isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '0.00');
 
                 $is_rec = (stripos(o7nv($row['package_type'], ''), 'premium') !== false)
                   || (stripos(o7nv($row['package_type'], ''), 'royal') !== false)
@@ -1145,7 +1143,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
                   <td><?= o7e(o7nv($row['tax_display'], '0')) ?></td>
                   <td><?= o7e(o7nv($row['tcs_display'], '0')) ?></td>
                   <td><?= o7e(o7nv($row['travel_display'], '0')) ?></td>
-                  <td><strong><?= o7e(o7nv($row['total_display'], '0')) ?></strong></td>
+                  <td><strong><?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o7e') : o7e(o7nv($row['total_display'], '0')) ?></strong></td>
                   </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -1168,11 +1166,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
             </thead>
             <tbody>
               <?php foreach ($o7_pp as $pp) :
-                $tax_amount = '0.00';
-                if (!empty($pp['tax_display'])) {
-                  preg_match('/INR\s*([\d,\.]+)/i', $pp['tax_display'], $m);
-                  if (!empty($m[1])) $tax_amount = $m[1];
-                }
+                $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($pp) : (isset($pp['tax_amount_display']) ? $pp['tax_amount_display'] : '0.00');
               ?>
                 <tr>
                   <td><strong><?= o7e(o7nv($pp['package_type'], 'Package')) ?></strong></td>
@@ -1180,7 +1174,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
                   <td><?= o7e(o7nv($pp['pp_cwb_display'], '0')) ?></td>
                   <td><?= o7e(o7nv($pp['pp_cwnb_display'], '0')) ?></td>
                   <td><?= o7e(o7nv($pp['pp_infant_display'], '0')) ?></td>
-                  <td>INR <?= o7e($tax_amount) ?></td>
+                  <td><?= o7e($tax_amount) ?></td>
                   <td><?= o7e(o7nv($pp['tcs_display'], '0')) ?></td>
                   <td><?= o7e(o7nv($pp['visa_display'], '0')) ?></td>
                   <td><?= o7e(o7nv($pp['guide_display'], '0')) ?></td>

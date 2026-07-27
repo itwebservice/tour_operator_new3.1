@@ -66,7 +66,7 @@ else{
 					$('#company_name'+offset).addClass('hidden');
 					$('#company_div'+offset).addClass('hidden');
 				}
-				if(result.payment_amount != '' || result.payment_amount != '0'){
+				if(parseFloat(result.payment_amount) > 0){
 					$('#credit_amount'+offset).removeClass('hidden');
 					$('#credit_div'+offset).removeClass('hidden');
 					$('#credit_amount'+offset).val(result.payment_amount);	

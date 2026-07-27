@@ -1720,26 +1720,68 @@ function foo(tableID, quot_table_id, rowCounts) {
   }
 
   if (tableID == "tbl_package_exc_infomration") {
-    row.cells[0].childNodes[0].setAttribute(
-      "id",
-      "check-btn-exc" + foo.counter
-    );
+    var excChk = row.cells[0].querySelector("input[type=checkbox]");
+    if (excChk) {
+      excChk.setAttribute("id", "check-btn-exc" + foo.counter);
+      excChk.checked = true;
+      excChk.disabled = false;
+    }
 
-    row.cells[2].childNodes[0].setAttribute("id", "exc_date-" + foo.counter);
-    row.cells[3].childNodes[0].setAttribute("id", "city_name-" + foo.counter);
-    $(row.cells[3].childNodes[0]).next("span").remove();
-    row.cells[4].childNodes[0].setAttribute("id", "excursion-" + foo.counter);
-    row.cells[5].childNodes[0].setAttribute(
-      "id",
-      "transfer_option-" + foo.counter
-    );
-    row.cells[6].childNodes[0].setAttribute("id", "adult-" + foo.counter);
-    row.cells[7].childNodes[0].setAttribute("id", "child-" + foo.counter);
-    row.cells[8].childNodes[0].setAttribute("id", "childwo-" + foo.counter);
-    row.cells[9].childNodes[0].setAttribute("id", "infant-" + foo.counter);
+    var excDateEl = row.cells[2].querySelector("input, select, textarea");
+    var excCityEl = row.cells[3].querySelector("input, select, textarea");
+    var excNameEl = row.cells[4].querySelector("input, select, textarea");
+    var excTransferEl = row.cells[5].querySelector("input, select, textarea");
+    var excVehicleEl = row.cells[6].querySelector("input, select, textarea");
+    var excAdultEl = row.cells[7].querySelector("input, select, textarea");
+    var excChildEl = row.cells[8].querySelector("input, select, textarea");
+    var excChildwoEl = row.cells[9].querySelector("input, select, textarea");
+    var excInfantEl = row.cells[10] ? row.cells[10].querySelector("input, select, textarea") : null;
 
-    if (row.cells[10]) {
-      row.cells[10].style.display = "none";
+    if (excDateEl) {
+      excDateEl.setAttribute("id", "exc_date-" + foo.counter);
+      excDateEl.setAttribute("name", "exc_date-" + foo.counter);
+    }
+    if (excCityEl) {
+      excCityEl.setAttribute("id", "city_name-" + foo.counter);
+      excCityEl.setAttribute("name", "city_name-" + foo.counter);
+      $(excCityEl).next("span").remove();
+    }
+    if (excNameEl) {
+      excNameEl.setAttribute("id", "excursion-" + foo.counter);
+      excNameEl.setAttribute("name", "excursion-" + foo.counter);
+    }
+    if (excTransferEl) {
+      excTransferEl.setAttribute("id", "transfer_option-" + foo.counter);
+      excTransferEl.setAttribute("name", "transfer_option-" + foo.counter);
+    }
+    if (excVehicleEl) {
+      excVehicleEl.setAttribute("id", "vehicle_id-" + foo.counter);
+      excVehicleEl.setAttribute("name", "vehicle_id-" + foo.counter);
+    }
+    if (excAdultEl) {
+      excAdultEl.setAttribute("id", "adult-" + foo.counter);
+      excAdultEl.setAttribute("name", "adult-" + foo.counter);
+    }
+    if (excChildEl) {
+      excChildEl.setAttribute("id", "child-" + foo.counter);
+      excChildEl.setAttribute("name", "child-" + foo.counter);
+    }
+    if (excChildwoEl) {
+      excChildwoEl.setAttribute("id", "childwo-" + foo.counter);
+      excChildwoEl.setAttribute("name", "childwo-" + foo.counter);
+    }
+    if (excInfantEl) {
+      excInfantEl.setAttribute("id", "infant-" + foo.counter);
+      excInfantEl.setAttribute("name", "infant-" + foo.counter);
+    }
+
+    // Hide entry_id cell on newly added update rows (cell 11), keep infant visible
+    if (row.cells[11]) {
+      row.cells[11].style.display = "none";
+      var excEntryEl = row.cells[11].querySelector("input, select, textarea");
+      if (excEntryEl) {
+        excEntryEl.value = "";
+      }
     }
   }
   //*******Package tour quotation dynamic table start*******//
@@ -3859,7 +3901,21 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[5].childNodes[0].setAttribute("id", "birth_date" + idx + prefix);
     $(row.cells[5]).addClass("hidden");
 
-    row.cells[6].childNodes[0].setAttribute("id", "adolescence" + idx + prefix);
+   var adolescenceSelect = row.cells[6].querySelector("select");
+    if (adolescenceSelect) {
+      adolescenceSelect.setAttribute("id", "adolescence" + idx + prefix);
+      adolescenceSelect.classList.add("app_select2");
+      $(adolescenceSelect).prop("disabled", false);
+      if (typeof initAppSelect2Element === "function") {
+        initAppSelect2Element(adolescenceSelect, { width: "125px" });
+      } else {
+        var $adl = $(adolescenceSelect);
+        if ($adl.data("select2")) {
+          $adl.select2("destroy");
+        }
+        $adl.select2({ width: "125px", minimumResultsForSearch: 0 });
+      }
+    }
     row.cells[7].childNodes[0].setAttribute("id", "ticket_no" + idx + prefix);
     row.cells[8].childNodes[0].setAttribute("id", "gds_pnr" + idx + prefix);
     row.cells[9].childNodes[0].setAttribute("id", "baggage_info" + idx + prefix);
@@ -3884,7 +3940,7 @@ function foo(tableID, quot_table_id, rowCounts) {
       $(row.cells[15]).addClass("hidden");
     }
 
-    $(row.cells[6].childNodes[0]).prop("disabled", false);
+    
   }
 
   // end 
@@ -5036,7 +5092,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         } else if (["text","number","hidden","textarea"].includes(cloned.type)) {
             cloned.value = "";
         } else if (cloned.type === "checkbox") {
-            cloned.checked = (tableID === "tbl_package_tour_quotation_dynamic_transport_u" || tableID === "tbl_package_tour_quotation_dynamic_excursion");
+            cloned.checked = (tableID === "tbl_package_tour_quotation_dynamic_transport_u" || tableID === "tbl_package_tour_quotation_dynamic_excursion" || tableID === "tbl_package_exc_infomration");
             cloned.disabled = false;
         }
 

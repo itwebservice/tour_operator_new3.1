@@ -310,6 +310,10 @@ function get_vendor_type_id(vendor_id, offset='')
 
     $('#frm_payment_save').validate({
 
+        // Validate only on Save — not when Mode/Amount changes or fields blur
+        onfocusout: false,
+        onkeyup: false,
+
         rules: {
 
             booking_id: {
@@ -330,11 +334,10 @@ function get_vendor_type_id(vendor_id, offset='')
 
             bank_id: {
                 required: function() {
-                    if ($('#cmb_payment_mode').val() != "Cash") {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    // Only for Cheque / NEFT / RTGS / etc. — not Credit Card / Cash / Advance.
+                    return typeof payment_mode_requires_bank === 'function'
+                        ? payment_mode_requires_bank($('#cmb_payment_mode').val())
+                        : ($('#cmb_payment_mode').val() != 'Cash' && $('#cmb_payment_mode').val() != 'Credit Card');
                 }
             },
 

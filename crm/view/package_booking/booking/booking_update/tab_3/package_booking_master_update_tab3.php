@@ -324,31 +324,39 @@
                                                     style="width:200px"></td>
                                             <td><select id="city_name-1<?= $count_et ?>" class="form-control city_name"
                                                     name="city_name-1<?= $count_et ?>" title="City Name"
-                                                    style="width:100%" onchange="get_excursion_list(this.id);" data-add-new-option="true">
+                                                    style="width:100%" onchange="get_excursion_list(this.id);" data-add-new-option="true"
+                                                    data-selected-city="<?= htmlspecialchars((string)$row_exc_acc['city_id'], ENT_QUOTES) ?>">
                                                     <?php
                                                             $sq_transport = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_exc_acc[city_id]'"));
                                                             ?>
-                                                    <option value="<?= $sq_transport['city_id'] ?>">
+                                                    <option value="<?= $sq_transport['city_id'] ?>" selected>
                                                         <?= $sq_transport['city_name'] ?></option>
                                                 </select>
                                             </td>
                                             <td><select id="excursion-1<?= $count_et ?>" class="form-control"
                                                     title="Activity Name" name="excursion-1<?= $count_et ?>"
-                                                    style="width:200px">
+                                                    style="width:200px"
+                                                    data-selected-exc="<?= htmlspecialchars((string)$row_exc_acc['exc_id'], ENT_QUOTES) ?>">
                                                     <option value="">*Activity Name</option>
 
                                                     <?php
-                                                            $sq_exc = mysqlQuery("select * from excursion_master_tariff where city_id = " . $row_exc_acc['city_id']);
+                                                            $selected_exc_id = (string)$row_exc_acc['exc_id'];
+                                                            $selected_exc_found = false;
+                                                            $sq_exc = mysqlQuery("select * from excursion_master_tariff where city_id = '" . intval($row_exc_acc['city_id']) . "'");
                                                             while ($rows =  mysqli_fetch_assoc($sq_exc)) {
-                                                                if ($row_exc_acc['exc_id'] == $rows['entry_id']) {
-                                                                    $selected = "selected";
-                                                                } else {
-                                                                    $selected = "";
+                                                                $is_selected = ((string)$rows['entry_id'] === $selected_exc_id);
+                                                                if ($is_selected) {
+                                                                    $selected_exc_found = true;
                                                                 }
                                                             ?>
 
-                                                    <option value="<?php echo $rows['entry_id'] ?>" <?= $selected ?>>
+                                                    <option value="<?php echo $rows['entry_id'] ?>" <?= $is_selected ? 'selected' : '' ?>>
                                                         <?php echo $rows['excursion_name'] ?></option>
+                                                    <?php }
+                                                            // Fallback if saved activity is missing from city list
+                                                            if (!$selected_exc_found && !empty($sq_ex['entry_id'])) {
+                                                    ?>
+                                                    <option value="<?= $sq_ex['entry_id'] ?>" selected><?= $sq_ex['excursion_name'] ?></option>
                                                     <?php } ?>
                                                 </select></td>
                                             <td><select name="transfer_option-1<?= $count_et ?>"
@@ -418,7 +426,7 @@
                                             format: 'd-m-Y H:i'
                                         });
                                         $('#transfer_option-1<?= $count_et ?>').select2({ width: '200px' });
-                                        $('#vehicle_name-1<?= $count_et ?>').select2({ width: '200px' });
+                                        $('#vehicle_id-1<?= $count_et ?>').select2({ width: '200px' });
                                         </script>
                                         <?php } ?>
                                     </table>
@@ -451,8 +459,13 @@
 function init_booking_update_city_selects() {
     $('.city_name').each(function () {
         var $city = $(this);
-        var selectedVal = $city.val();
+        var selectedVal = $city.val() || $city.attr('data-selected-city') || '';
         var selectedText = $city.find('option:selected').text();
+        // Prevent onchange=get_excursion_list from wiping the saved Activity while restoring city Select2
+        var onchangeBackup = this.getAttribute('onchange');
+        if (onchangeBackup) {
+            this.removeAttribute('onchange');
+        }
         if ($city.data('select2')) {
             $city.select2('destroy');
         }
@@ -463,6 +476,25 @@ function init_booking_update_city_selects() {
             }
             this.value = selectedVal;
             $city.trigger('change.select2');
+        }
+        if (onchangeBackup) {
+            this.setAttribute('onchange', onchangeBackup);
+        }
+    });
+
+    // Re-assert saved Activity selections after city Select2 init
+    $('#tbl_package_exc_infomration select[id^="excursion-"]').each(function () {
+        var $exc = $(this);
+        var selectedExc = $exc.attr('data-selected-exc') || $exc.find('option[selected]').attr('value') || $exc.val();
+        if (!selectedExc) {
+            return;
+        }
+        if (!$exc.find('option[value="' + selectedExc + '"]').length) {
+            return;
+        }
+        $exc.val(selectedExc);
+        if ($exc.data('select2')) {
+            $exc.trigger('change.select2');
         }
     });
 }

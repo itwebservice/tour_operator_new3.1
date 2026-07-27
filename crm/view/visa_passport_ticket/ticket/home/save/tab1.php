@@ -347,7 +347,7 @@
 		var gds_pnr = $('#gds_pnr' + count).val();
 		var journey_type = $('#journey_type' + count).val();
 		//  || 'One Way';
-		var flight_details = $('#flight_details'+count).html();
+		var flight_details = $('#flight_details'+count).val() || $('#flight_details'+count).html();
 		var departure_or_arrival = $('#departure_or_arrival' + count).val();
 		var flight_duration = $('#flight_duration' + count).val();
 		var flight_fair_amount = $('#flight_fair_amount' + count).val();
@@ -446,7 +446,7 @@
 	            var seat_no = row.cells[10].childNodes[0].value;
 	            var meal_plan = row.cells[11].childNodes[0].value;
 	            var main_ticket = row.cells[12].childNodes[0].value;
-	            var trip_details = $('#flight_details'+(i+1)).html();	
+	            var trip_details = $('#flight_details'+(i+1)).val() || $('#flight_details'+(i+1)).html();
 	            var basic_fare_total = 0;
 	            var basic_fare_arr = [];
 	            var trip_data_check_arr = [];

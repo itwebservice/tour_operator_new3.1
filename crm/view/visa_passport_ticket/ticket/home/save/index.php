@@ -146,7 +146,8 @@ function copy_details(){
 		if(no_days<=730 && no_days>0){ adl = "Infant"; }
 		if(no_days>730 && no_days<=4384){ adl = "Children"; }
 		if(no_days>4384){ adl = "Adult"; } 
-		$('#adolescence'+count).val(adl);
+		$('#adolescence'+count).val(adl).trigger('change');
+
 	}
     
 	//*******************Get Dynamic Customer Name Dropdown**********************//

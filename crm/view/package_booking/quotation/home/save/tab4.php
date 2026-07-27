@@ -2297,20 +2297,45 @@ function calculateCostingCards() {
     // ===== TRANSPORT PER PERSON =====
     let transport_pp = (pp_arr_travelData[0]['total_cost'] / total_number) || 0;
 
-    // ===== SET DEFAULT VALUES =====
-    $('#adult_hotel_pp').val(pp_arr[0]['adult_cost'] || 0);
-    $('#adult_transfer_pp').val(transport_pp.toFixed(2));
+    // // ===== SET DEFAULT VALUES =====
+    // $('#adult_hotel_pp').val(pp_arr[0]['adult_cost'] || 0);
+    // $('#adult_transfer_pp').val(transport_pp.toFixed(2));
 
-    $('#cweb_hotel_pp').val(pp_arr[0]['child_with_bed'] || 0);
-    $('#cweb_transfer_pp').val(transport_pp.toFixed(2));
+    // $('#cweb_hotel_pp').val(pp_arr[0]['child_with_bed'] || 0);
+    // $('#cweb_transfer_pp').val(transport_pp.toFixed(2));
 
-    $('#cwnb_hotel_pp').val(pp_arr[0]['child_without_bed'] || 0);
-    $('#cwnb_transfer_pp').val(transport_pp.toFixed(2));
+    // $('#cwnb_hotel_pp').val(pp_arr[0]['child_without_bed'] || 0);
+    // $('#cwnb_transfer_pp').val(transport_pp.toFixed(2));
 
-    if (!$('#infant_hotel_pp').val()) {
-    $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || '');
-}
-    $('#infant_transfer_pp').val(transport_pp.toFixed(2));
+    // if (!$('#infant_hotel_pp').val()) {
+    // $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || '');
+    if (!$('#adult_hotel_pp').val() || $('#adult_hotel_pp').val() == 0) {
+        $('#adult_hotel_pp').val(pp_arr[0]['adult_cost'] || 0);
+    }
+    if (!$('#adult_transfer_pp').val() || $('#adult_transfer_pp').val() == 0) {
+        $('#adult_transfer_pp').val(transport_pp.toFixed(2));
+    }
+ 
+    if (!$('#cweb_hotel_pp').val() || $('#cweb_hotel_pp').val() == 0) {
+        $('#cweb_hotel_pp').val(pp_arr[0]['child_with_bed'] || 0);
+    }
+    if (!$('#cweb_transfer_pp').val() || $('#cweb_transfer_pp').val() == 0) {
+        $('#cweb_transfer_pp').val(transport_pp.toFixed(2));
+    }
+ 
+    if (!$('#cwnb_hotel_pp').val() || $('#cwnb_hotel_pp').val() == 0) {
+        $('#cwnb_hotel_pp').val(pp_arr[0]['child_without_bed'] || 0);
+    }
+    if (!$('#cwnb_transfer_pp').val() || $('#cwnb_transfer_pp').val() == 0) {
+        $('#cwnb_transfer_pp').val(transport_pp.toFixed(2));
+    }
+ 
+    if (!$('#infant_hotel_pp').val() || $('#infant_hotel_pp').val() == 0) {
+        $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || 0);
+    }
+    if (!$('#infant_transfer_pp').val() || $('#infant_transfer_pp').val() == 0) {
+        $('#infant_transfer_pp').val(transport_pp.toFixed(2));
+    }
 
     // ===== COMMON FUNCTION =====
     function calculateCard(type, count) {

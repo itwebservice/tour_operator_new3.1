@@ -3,7 +3,7 @@
         <button type="button" class="btn btn-excel btn-sm" title="Add Activity" onclick="activity_save_modal()"><i class="fa fa-plus"></i></button>
     </div>
     <div class="col-xs-6 text-right mg_bt_20_sm_xs">
-    <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_exc_infomration');city_lzloading('select[name=city_name-1]')"><i class="fa fa-plus"></i></button>
+    <button type="button" class="btn btn-excel btn-sm" onClick="addRow('tbl_package_exc_infomration');city_lzloading('select[name^=city_name]')"><i class="fa fa-plus"></i></button>
     <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('tbl_package_exc_infomration')"><i class="fa fa-trash"></i></button>
 </div> </div>
 <div class="row main_block">
@@ -11,7 +11,7 @@
         <div class="table-responsive">
             <table id="tbl_package_exc_infomration" class="table table-bordered table-hover pd_bt_51 table-striped no-marg" style="width: 1111px;">
                 <tr>
-                    <td><input id="check-btn-exc" type="checkbox" ></td>
+                    <td><input id="check-btn-exc" type="checkbox" checked></td>
                     <td><input maxlength="15" type="text" name="username"  value="1" placeholder="Sr. No." disabled/></td>
                     <td><input type="text" id="exc_date-1" name="exc_date-1" placeholder="Activity Date & Time" title="Activity Date & Time" class="app_datetimepicker" value="<?= date('d-m-Y H:i') ?>" style="width:200px"></td>
                     <td><select id="city_name-1" class="form-control" name="city_name-1" title="City Name" style="width:200px" onchange="get_excursion_list(this.id);" data-add-new-option="true">
@@ -19,13 +19,14 @@
                     </td>
                     <td><select id="excursion-1" class="form-control" title="Activity Name" name="excursion-1" style="width:200px">
                         <option value="">*Activity Name</option>
-                    <td><select name="transfer_option-1" id="transfer_option-1" data-toggle="tooltip" class="form-contrl app_select2" title="Transfer Option" style="width:200px">
+                    </select></td>
+                    <td><select name="transfer_option-1" id="transfer_option-1" data-toggle="tooltip" class="form-control app_select2" title="Transfer Option" style="width:200px">
                         <option value="Private Transfer">Private Transfer</option>
                         <option value="Without Transfer">Without Transfer</option>
                         <option value="Sharing Transfer">Sharing Transfer</option>
                         <option value="SIC">SIC</option>
                         </select></td>
-                    <td><select name="vehicle_name-1" id="vehicle_name-1" style="width: 200px" class="form-control app_select2" title="Select Vehicle" data-add-new-option="true">
+                    <td><select name="vehicle_id-1" id="vehicle_id-1" style="width: 200px" class="form-control app_select2" title="Select Vehicle" data-add-new-option="true">
                         <option value=''>Select Vehicle</option>
                         <?php
                         $sq_vehicle = mysqlQuery("select * from b2b_transfer_master where status='Active' order by vehicle_name");
@@ -45,8 +46,7 @@
 </div>
 <script>
     city_lzloading('select[name="city_name-1"]');
-
-    $('#vehicle_name-1').select2({
-            width: '200px'
-        });
+    $('#exc_date-1').datetimepicker({ format: 'd-m-Y H:i' });
+    $('#transfer_option-1').select2({ width: '200px' });
+    $('#vehicle_id-1').select2({ width: '200px' });
 </script>

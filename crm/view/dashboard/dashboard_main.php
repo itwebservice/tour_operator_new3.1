@@ -53,9 +53,7 @@ if ($role_id > '7') {
 		}
 	})();
 </script>
-<script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
-<elevenlabs-convai agent-id="agent_1901krgdr6jyedwt06z6grvqgzx0">
-</elevenlabs-convai>
+
 
 <?php
 /*======******Footer******=======*/

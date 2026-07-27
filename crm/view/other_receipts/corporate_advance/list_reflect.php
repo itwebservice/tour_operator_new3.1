@@ -74,7 +74,8 @@ while($row_income = mysqli_fetch_assoc($sq_income)){
 	$bank_name = $row_income['bank_name'];
 	$receipt_type = 'Customer Advance';
 
-	$url1 = BASE_URL."model/app_settings/print_html/receipt_html/receipt_body_html.php?payment_id_name=$payment_id_name&payment_id=$payment_id&receipt_date=$receipt_date&booking_id=$booking_id&customer_id=$customer_id&booking_name=$booking_name&travel_date=$travel_date&payment_amount=$payment_amount&transaction_id=$transaction_id&payment_date=$payment_date&bank_name=$bank_name&confirm_by=&receipt_type=$receipt_type&payment_mode=$payment_mode1&branch_status=$branch_status&outstanding=0&table_name=corporate_advance_master&customer_field=cust_id&in_customer_id=$customer_id&currency_code=$currency&status=";
+	$pay_id = $row_income['advance_id'];
+	$url1 = BASE_URL."model/app_settings/print_html/receipt_html/receipt_body_html.php?payment_id_name=$payment_id_name&payment_id=$payment_id&receipt_date=$receipt_date&booking_id=$booking_id&customer_id=$customer_id&booking_name=$booking_name&travel_date=$travel_date&payment_amount=$payment_amount&transaction_id=$transaction_id&payment_date=$payment_date&bank_name=$bank_name&confirm_by=&receipt_type=$receipt_type&payment_mode=$payment_mode1&branch_status=$branch_status&outstanding=0&table_name=corporate_advance_master&customer_field=cust_id&in_customer_id=$customer_id&currency_code=$currency&status=&pay_id=$pay_id";
 
 	$temp_arr = array( "data" => array(
 		(int)(++$count),

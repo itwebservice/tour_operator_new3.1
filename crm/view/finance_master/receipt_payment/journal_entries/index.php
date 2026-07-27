@@ -91,6 +91,9 @@ $financial_year_id = $_SESSION['financial_year_id'];
 		}, function(data) {
 			pagination_load(data, columns, false, true, 20, 'tbl_list');
 			$('.loader').remove();
+		}).fail(function() {
+			$('.loader').remove();
+			error_msg_alert('Unable to load journal entries. Please try again.');
 		});
 	}
 	list_reflect();

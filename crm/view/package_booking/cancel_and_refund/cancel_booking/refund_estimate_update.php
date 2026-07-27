@@ -94,10 +94,12 @@ $cancle_count = mysqli_num_rows(mysqlQuery("select * from package_travelers_deta
 		<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
 			<input type="text" name="cancel_amount_exc" id="cancel_amount_exc" class="text-right" placeholder="*Cancellation Charges" title="Cancellation Charges" onchange="validate_balance(this.id);calculate_total_refund()" value="<?= $e_cancel_amount_exc ?>">
 		</div>
-		<div class="col-md-3 col-sm-6 col-xs-12 mg_tp_10 mg_bt_10_xs">
-			<input type="text" name="total_refund_amount" id="total_refund_amount" class="amount_feild_highlight text-right" placeholder="Total Refund" title="Total Refund" readonly value="<?= $e_total_refund_amount ?>">
-		</div>
+		
 	</div>
+	<div class="row">
+		<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
+			<input type="text" name="total_refund_amount" id="total_refund_amount" class="text-right" placeholder="*Total Refund Amount" title="Total Refund Amount" value="<?= $e_total_refund_amount ?>" readonly>
+		</div>
 	<?php if ($pass_count != $cancle_count || $sq_c_info == '0') { ?>
 		<div class="row mg_tp_20">
 			<div class="col-md-12 text-center">

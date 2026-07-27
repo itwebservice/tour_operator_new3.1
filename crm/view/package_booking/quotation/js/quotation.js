@@ -229,8 +229,8 @@ function quotation_cost_calculate(id) {
 	var sub_total = parseFloat(tour_cost) + parseFloat(transport_cost) + parseFloat(excursion_cost);
 	$('#basic_amount' + suffix).val(sub_total.toFixed(2));
 
-	if (id != 'basic_amount' + suffix) {
-		$('#basic_amount' + suffix).trigger('change');
+	if (id != 'basic_amount' + suffix && typeof get_business === 'function') {
+		get_business('basic_amount' + suffix, 'true');
 	}
 	var service_charge = $('#service_charge' + suffix).val();
 	var service_tax_subtotal = $('#service_tax_subtotal' + suffix).val();

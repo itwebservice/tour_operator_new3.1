@@ -146,7 +146,10 @@ if($sq_cancel_count>0){
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
             <input type="text" name="cancel_amount_exc" id="cancel_amount_exc" class="text-right" placeholder="*Cancellation Charges" title="Cancellation Charges" onchange="validate_balance(this.id);calculate_total_refund()" value="<?= $sq_visa_info['cancel_amount_exc'] ?>">
         </div>
-		<div class="col-md-3 col-sm-6 col-xs-12 mg_tp_10 mg_bt_10_xs">
+	
+	</div>
+	<div class="row">
+			<div class="col-md-3 col-sm-6 col-xs-12 mg_tp_10 mg_bt_10_xs">
 			<input type="text" name="total_refund_amount" id="total_refund_amount" class="amount_feild_highlight text-right" placeholder="Total Refund" title="Total Refund" readonly value="<?= $refund_amount ?>">
 		</div>
 	</div>

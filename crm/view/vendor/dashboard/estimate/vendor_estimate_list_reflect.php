@@ -181,7 +181,7 @@ $footer_data = array(
 		'total_footers' => 6,
 
 		'foot0' => "Total : ",
-		'col0' => 7,
+		'col0' => 3,
 		'class0' => "text-right info",
 
 		'foot1' => number_format($total_estimate_amt, 2),

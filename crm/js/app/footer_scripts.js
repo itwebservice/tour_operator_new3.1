@@ -1,3 +1,5 @@
+
+
 $(function () {
 	$('form').attr('autocomplete', 'off');
 	$('input').attr('autocomplete', 'off');
@@ -3887,6 +3889,17 @@ function pagination_load(
 			dataset = '[]';
 		}
 		try {
+			if (typeof dataset === 'string') {
+				// Strip accidental PHP warnings/notices before JSON payload
+				var jsonStart = dataset.indexOf('[');
+				var jsonStartObj = dataset.indexOf('{');
+				if (jsonStart === -1 || (jsonStartObj !== -1 && jsonStartObj < jsonStart)) {
+					jsonStart = jsonStartObj;
+				}
+				if (jsonStart > 0) {
+					dataset = dataset.substring(jsonStart);
+				}
+			}
 			dataset_main = JSON.parse(dataset);
 		} catch (e) {
 			console.error('pagination_load: invalid JSON response', e, dataset);
@@ -3909,21 +3922,25 @@ function pagination_load(
 		var table_data = dataset_main;
 	}
 	if (footer_string) {
-		table_data.pop();
-		if ($.trim($('#' + table_id + ' tfoot').html())) {
-			document.getElementById(table_id).deleteTFoot();
+		var lastRow = dataset_main.length ? dataset_main[dataset_main.length - 1] : null;
+		var footerData = lastRow && lastRow.footer_data ? lastRow.footer_data : null;
+		if (footerData) {
+			table_data.pop();
+			if ($.trim($('#' + table_id + ' tfoot').html())) {
+				document.getElementById(table_id).deleteTFoot();
+			}
+			for (var i = 0; i < parseInt(footerData['total_footers'] || 0); i++) {
+				html +=
+					'<th class=" ' +
+					(footerData['class' + i] || '') +
+					' " colspan=\'' +
+					(footerData['col' + i] || 1) +
+					"'>" +
+					(footerData['foot' + i] || '') +
+					'</th>';
+			}
+			html = '<tfoot><tr>' + html + '</tr></tfoot>';
 		}
-		for (var i = 0; i < parseInt(dataset_main[dataset_main.length - 1].footer_data['total_footers']); i++) {
-			html +=
-				'<th class=" ' +
-				dataset_main[dataset_main.length - 1].footer_data['class' + i] +
-				' " colspan=\'' +
-				dataset_main[dataset_main.length - 1].footer_data['col' + i] +
-				"'>" +
-				dataset_main[dataset_main.length - 1].footer_data['foot' + i] +
-				'</th>';
-		}
-		html = '<tfoot><tr>' + html + '</tr></tfoot>';
 	}
 	if ($.fn.DataTable.isDataTable('#' + table_id)) {
 		$('#' + table_id).DataTable().clear().destroy(); // for managin error
@@ -4088,6 +4105,7 @@ function get_identifier_block(identifier, payment_mode, credit_card_details, cre
 
 		var cache_rules = JSON.parse($('#cache_data').val());
 		var credit_card_company = cache_rules[0]['credit_card_data'];
+		var seenIdentifiers = {};
 
 		credit_card_company && credit_card_company.filter((data) => {
 
@@ -4097,7 +4115,11 @@ function get_identifier_block(identifier, payment_mode, credit_card_details, cre
 
 				var identifiers = membership_no['nos'];
 				identifiers && identifiers.map((i) => {
-					let i1 = i.substring(0, 4);
+					let i1 = String(i).substring(0, 4);
+					if (!i1 || seenIdentifiers[i1]) {
+						return;
+					}
+					seenIdentifiers[i1] = true;
 					select.options[select.options.length] = new Option(i1, i1);
 				});
 			});
@@ -4185,6 +4207,7 @@ function get_identifier_block1(identifier, payment_mode, credit_card_details, cr
 
 		var cache_rules = JSON.parse($('#cache_data').val());
 		var credit_card_company = cache_rules[0]['credit_card_data'];
+		var seenIdentifiers = {};
 
 		credit_card_company && credit_card_company.filter((data) => {
 
@@ -4194,7 +4217,11 @@ function get_identifier_block1(identifier, payment_mode, credit_card_details, cr
 
 				var identifiers = membership_no['nos'];
 				identifiers && identifiers.map((i) => {
-					let i1 = i.substring(0, 4);
+					let i1 = String(i).substring(0, 4);
+					if (!i1 || seenIdentifiers[i1]) {
+						return;
+					}
+					seenIdentifiers[i1] = true;
 					select.options[select.options.length] = new Option(i1, i1);
 				});
 			});

@@ -25,7 +25,20 @@ set_error_handler("myErrorHandler");
 header('Access-Control-Allow-Origin: *');
 function myErrorHandler($errno, $errstr, $errfile, $errline)
 {
+  // Swallow notices/warnings/deprecations so they do not corrupt Excel/PDF downloads
   // echo  "<br><br>".$errno."<br>".$errstr."<br>".$errfile."<br>".$errline;
+  return true;
+}
+
+/** Clear buffers and hide errors before streaming Excel downloads */
+function excel_prepare_download()
+{
+  error_reporting(0);
+  @ini_set('display_errors', '0');
+  @ini_set('display_startup_errors', '0');
+  while (ob_get_level() > 0) {
+    @ob_end_clean();
+  }
 }
 $localIP = getHostByName(getHostName());
 
@@ -741,6 +754,23 @@ function get_signature($url = false)
   return $htmlSign;
 }
 
+// Local filesystem path for FPDF (URLs cannot be opened by FPDF Image())
+function get_signature_path()
+{
+  $QrQry = mysqlQuery('select sign_url from app_settings');
+  $result = mysqli_fetch_assoc($QrQry);
+  if (empty($result['sign_url'])) {
+    return '';
+  }
+  $relative_path = substr($result['sign_url'], 9);
+  $file_path = __DIR__ . '/../' . $relative_path;
+  if (file_exists($file_path)) {
+    $real = realpath($file_path);
+    return $real !== false ? $real : $file_path;
+  }
+  return '';
+}
+
 
 function ensure_quotation_refer_id_column()
 {
@@ -787,6 +817,30 @@ function ensure_booking_excursion_vehicle_id_column()
     }
   }
   return true;
+}
+
+// Resolve display vehicle name from booking excursion row (vehicle_id, with legacy vehicle_name fallback)
+function get_excursion_vehicle_display_name($row)
+{
+  if (!is_array($row)) {
+    return '';
+  }
+  $vehicle_id_ref = 0;
+  if (isset($row['vehicle_id']) && $row['vehicle_id'] != '' && $row['vehicle_id'] != '0') {
+    $vehicle_id_ref = intval($row['vehicle_id']);
+  } elseif (isset($row['vehicle_name']) && $row['vehicle_name'] != '' && $row['vehicle_name'] != '0') {
+    // Legacy: vehicle_name may store transfer master entry_id
+    if (ctype_digit((string)$row['vehicle_name'])) {
+      $vehicle_id_ref = intval($row['vehicle_name']);
+    } else {
+      return (string)$row['vehicle_name'];
+    }
+  }
+  if ($vehicle_id_ref <= 0) {
+    return '';
+  }
+  $sq_vehicle = mysqli_fetch_assoc(mysqlQuery("select vehicle_name from b2b_transfer_master where entry_id='$vehicle_id_ref'"));
+  return ($sq_vehicle && isset($sq_vehicle['vehicle_name'])) ? $sq_vehicle['vehicle_name'] : '';
 }
 
 function get_quotation_refer_id_by_dest($dest_id)

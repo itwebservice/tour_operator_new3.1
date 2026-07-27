@@ -50,7 +50,8 @@ $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['br
                   <ul class="dropdown_menu no-pad"> -->
                     <!-- <li><span onclick="show_report_reflect('Group Tour')">Group Tour</span></li>
                     <li><span onclick="show_report_reflect('Package Tour')">Package Tour</span></li> -->
-                    <li onclick="show_report_reflect('Other Sale')"><a href="#">Revenue & Expenses <span class="caret"></span></a></li>
+                    <li onclick="show_report_reflect('Other Sale')">
+                      <a href="#">Revenue & Expenses </a></li>
                   <!-- </ul>
                 </li> -->
                 <!-- Single Menu end -->

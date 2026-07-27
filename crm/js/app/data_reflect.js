@@ -102,19 +102,39 @@ function payment_mode_requires_bank(payment_mode) {
 }
 
 function payment_installment_clear_bank_validation(offset) {
+  // Clear bank-field errors on mode change only — do not re-run validator.element()
+  // (that would show "Creditor Bank required" as soon as Cheque/NEFT/etc. is selected).
   var bankFieldIds = ['#bank_id' + offset, '#txt_bank_name' + offset, '#txt_transaction_id' + offset];
   var $form = $(bankFieldIds[0]).closest('form');
-  if (!$form.length || !$form.data('validator')) {
-    return;
-  }
-  var validator = $form.validate();
+  var validator = ($form.length && $form.data('validator')) ? $form.validate() : null;
   bankFieldIds.forEach(function (selector) {
     var $field = $(selector);
-    if ($field.length) {
-      $field.removeClass('error');
-      validator.element($field[0]);
+    if (!$field.length) {
+      return;
+    }
+    $field.removeClass('error');
+    if (!validator) {
+      return;
+    }
+    var name = $field.attr('name');
+    if (name) {
+      if (validator.invalid) {
+        delete validator.invalid[name];
+      }
+      if (validator.submitted) {
+        delete validator.submitted[name];
+      }
+    }
+    validator.errorsFor($field[0]).remove();
+    if (validator.settings.unhighlight) {
+      validator.settings.unhighlight.call(validator, $field[0], validator.settings.errorClass, validator.settings.validClass);
     }
   });
+  if (validator) {
+    validator.errorList = $.grep(validator.errorList || [], function (err) {
+      return bankFieldIds.indexOf('#' + (err.element && err.element.id)) === -1;
+    });
+  }
 }
 
 function payment_installment_enable_disable_fields(offset = '') {

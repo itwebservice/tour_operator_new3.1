@@ -186,7 +186,8 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                         <tr class="table-heading-row">
                           <th style="text-align: left;">City</th>
                           <th style="text-align: left;">Hotel Name</th>
-                          <th style="text-align: left;">room_category</th>
+                          <th style="text-align: left;">Room Category</th>
+                          <th style="text-align: left;">Meal Plan</th>
                           <th style="text-align: left;">Check_IN</th>
                           <th style="text-align: left;">Check_OUT</th>
                         </tr>
@@ -202,6 +203,7 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                             <td><?php echo $city_name['city_name']; ?></td>
                             <td><?php echo $hotel_name['hotel_name'] . $similar_text; ?></td>
                             <td><?php echo $row_hotel['room_category']; ?></td>
+                            <td><?php echo !empty($row_hotel['meal_plan']) ? $row_hotel['meal_plan'] : ''; ?></td>
                             <td><?= get_date_user($row_hotel['check_in']) ?></td>
                             <td><?= get_date_user($row_hotel['check_out']) ?></td>
                           </tr>

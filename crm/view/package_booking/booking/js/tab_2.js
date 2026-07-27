@@ -15,6 +15,9 @@ $('#frm_tab_2').validate({
     $('.bk_tab').removeClass('active');
     $('#tab_3').addClass('active');
     $('html, body').animate({ scrollTop: $('.bk_tab_head').offset().top }, 200);
+    if (typeof apply_booking_activity_pax_from_quotation === 'function') {
+      apply_booking_activity_pax_from_quotation();
+    }
 
   }
 });

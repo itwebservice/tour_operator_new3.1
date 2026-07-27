@@ -318,12 +318,26 @@ $pass_entry_id = isset($_POST['entry_id']) ? $_POST['entry_id'] : '';
 
 $type_of_tour = (isset($flight_details[0])) ? $flight_details[0]->type_of_tour : '';
 $departure_datetime_arr = (isset($flight_details[0])) ? $flight_details[0]->departure_datetime_arr : [];
-$loop_items = (isset($flight_details[0]->departure_datetime_arr)) ? sizeof($flight_details[0]->departure_datetime_arr) : '1';
+$loop_items = (isset($flight_details[0]->departure_datetime_arr)) ? sizeof($flight_details[0]->departure_datetime_arr) : 1;
 $button_name = ($type == 'update') ? 'Update' : 'Save';
 $status = '';
 if($pass_entry_id!=''){
 	$sq_pass = mysqli_fetch_assoc(mysqlQuery("select * from ticket_master_entries where entry_id='$pass_entry_id'"));
 	$status = $sq_pass['status'];
+}
+// Resolve section count before rendering so data-counter matches generated fields
+if ($type == 'save' && empty($flight_details[0]->departure_datetime_arr)) {
+	if ($journey_type == 'One Way') {
+		$loop_items = 1;
+	} elseif ($journey_type == 'Round Trip') {
+		$loop_items = 2;
+	} elseif ($journey_type == 'Multi City') {
+		$loop_items = 3;
+	}
+}
+$loop_items = (int)$loop_items;
+if ($loop_items < 1) {
+	$loop_items = 1;
 }
 ?>
 <div class="modal fade" id="flight_details_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
@@ -405,18 +419,6 @@ if($pass_entry_id!=''){
                     </div>
                     <div class="dynform-wrap" id="div_dynamic_ticket_info" data-counter="<?= $loop_items ?>">
 						<?php
-
-
-if ($type == 'save') {
-	if ($journey_type == 'One Way') {
-		$loop_items = 1;
-	} elseif ($journey_type == 'Round Trip') {
-		$loop_items = 2;
-	} elseif ($journey_type == 'Multi City') {
-		$loop_items = 3;
-	}
-}
-
 						for($i = 0; $i < $loop_items; $i++){
 							$sq_trip_entries_count = $i+1;
 							$entry_id = isset($flight_details[0]) ? $flight_details[0]->trip_entry_id_arr[$i] : 0;
@@ -505,10 +507,10 @@ if ($type == 'save') {
 								<div class="dynform-item" for="chk_tickett<?= $sq_trip_entries_count ?>" <?=$css?>>
 									<div class="row">
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="text" id="departure_datetime-<?= $i ?>" name="departure_datetime" class="app_datetimepicker departure_datetime" placeholder="*Departure Date-Time" title="Departure Date-Time"  data-dyn-valid="required">
+											<input type="text" id="departure_datetime-<?= $sq_trip_entries_count ?>" name="departure_datetime" class="app_datetimepicker departure_datetime" placeholder="*Departure Date-Time" title="Departure Date-Time" value="<?= htmlspecialchars($date) ?>" data-dyn-valid="required">
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="text"  name="arrival_datetime" class="app_datetimepicker arrival_datetime" placeholder="*Arrival Date-Time" id ="arrival_datetime-<?= $i ?>" title="Arrival Date-Time" data-dyn-valid="required">
+											<input type="text"  name="arrival_datetime" class="app_datetimepicker arrival_datetime" placeholder="*Arrival Date-Time" id ="arrival_datetime-<?= $sq_trip_entries_count ?>" title="Arrival Date-Time" value="<?= htmlspecialchars($arrival_datetime) ?>" data-dyn-valid="required">
 
 											                   <!-- <select name="from_sector-1" id="from_sector-1" style="width:100%"
                                                                     class="form-control app_select2 "
@@ -523,10 +525,11 @@ if ($type == 'save') {
 											<?php
 											$city_id = $from_city;
 											$sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='$city_id'"));
+											$airpf_value = isset($sq_city['city_name']) ? $sq_city['city_name'] . " - " . $departure_city : '';
 											?>
-											<input id="airpf-<?= $i ?>" name="airpf" title="Enter Departure Airport" data-toggle="tooltip" class="form-control autocomplete airpf" placeholder="*Enter Departure Airport" data-dyn-valid="required" >
-											<input type="hidden" name="from_city" id="from_city-<?= $i  ?>" data-dyn-valid="required" />
-											<input type="hidden" name="departure_city" id="departure_city-<?= $i ?>" data-dyn-valid="required">
+											<input id="airpf-<?= $sq_trip_entries_count ?>" name="airpf" title="Enter Departure Airport" data-toggle="tooltip" class="form-control autocomplete airpf" placeholder="*Enter Departure Airport" data-dyn-valid="required" value="<?= htmlspecialchars($airpf_value) ?>">
+											<input type="hidden" name="from_city" id="from_city-<?= $sq_trip_entries_count  ?>" data-dyn-valid="required" value="<?= htmlspecialchars($from_city) ?>" />
+											<input type="hidden" name="departure_city" id="departure_city-<?= $sq_trip_entries_count ?>" data-dyn-valid="required" value="<?= htmlspecialchars($departure_city) ?>">
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
 											<input type="text" id="dterm-<?= $sq_trip_entries_count ?>" name="dterm" onchange="validate_specialChar(this.id)" placeholder="Departure Terminal" title="Departure Terminal" data-dyn-valid="" value="<?= $dep_terminal ?>">
@@ -542,10 +545,11 @@ if ($type == 'save') {
 											<?php
 											$city_id = $to_city;
 											$sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='$city_id'"));
+											$airpt_value = isset($sq_city['city_name']) ? $sq_city['city_name'] . " - " . $arrival_city : '';
 											?>
-											<input id="airpt-<?= $i ?>" name="airpt" class="form-control autocomplete airpt" title="Enter Arrival Airport" data-toggle="tooltip" placeholder="*Enter Arrival Airport" data-dyn-valid="required" >
-											<input type="hidden" name="to_city" id="to_city-<?= $i  ?>" data-dyn-valid="required" />
-											<input type="hidden" name="arrival_city" id="arrival_city-<?= $i ?>" data-dyn-valid="required"  >
+											<input id="airpt-<?= $sq_trip_entries_count ?>" name="airpt" class="form-control autocomplete airpt" title="Enter Arrival Airport" data-toggle="tooltip" placeholder="*Enter Arrival Airport" data-dyn-valid="required" value="<?= htmlspecialchars($airpt_value) ?>">
+											<input type="hidden" name="to_city" id="to_city-<?= $sq_trip_entries_count  ?>" data-dyn-valid="required" value="<?= htmlspecialchars($to_city) ?>" />
+											<input type="hidden" name="arrival_city" id="arrival_city-<?= $sq_trip_entries_count ?>" data-dyn-valid="required" value="<?= htmlspecialchars($arrival_city) ?>" >
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
 											<input type="text" id="aterm-<?= $sq_trip_entries_count ?>" name="aterm" onchange="validate_specialChar(this.id)" placeholder="Arrival Terminal" title="Arrival Terminal" data-dyn-valid="" value="<?= $arr_terminal ?>">
@@ -571,7 +575,7 @@ if ($type == 'save') {
 											</select>
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="text" id="flight_duration-<?= $sq_trip_entries_count ?>" name="flight_duration" placeholder="Flight Duration" title="Flight Duration" value="<?= $current_flight_duration ?>" >
+											<input type="text" id="flight_duration-<?= $sq_trip_entries_count ?>" name="flight_duration" placeholder="Flight Duration" title="Flight Duration" value="<?= htmlspecialchars($flight_duration !== '' ? $flight_duration : $current_flight_duration) ?>" >
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
 											<input type="text" id="layover_time-<?= $sq_trip_entries_count ?>" name="layover_time" placeholder="Layover Time" title="Layover Time" value="<?= $layover_time ?>" >
@@ -580,13 +584,13 @@ if ($type == 'save') {
 											<input type="text" id="sub_category-<?= $sq_trip_entries_count ?>" name="sub_category"  placeholder="Sub Category" title="Sub Category" value="<?= $sub_category ?>" >
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="text" id="flight_no-<?= $i ?>" style="text-transform: uppercase;" name="flight_no" onchange="validate_specialChar(this.id)" placeholder="Flight No" title="Flight No" data-dyn-valid="" >
+											<input type="text" id="flight_no-<?= $sq_trip_entries_count ?>" style="text-transform: uppercase;" name="flight_no" onchange="validate_specialChar(this.id)" placeholder="Flight No" title="Flight No" data-dyn-valid="" value="<?= htmlspecialchars($flight_no) ?>">
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="text" id="airlin_pnr-<?= $sq_trip_entries_count ?>" style="text-transform: uppercase;" onchange=" validate_specialChar(this.id)" name="airlin_pnr" placeholder="GDS PNR" title="GDS PNR" data-dyn-valid="" value="<?= $gds_pnr ?>">
+											<input type="text" id="airlin_pnr-<?= $sq_trip_entries_count ?>" style="text-transform: uppercase;" onchange=" validate_specialChar(this.id)" name="airlin_pnr" placeholder="GDS PNR" title="GDS PNR" data-dyn-valid="" value="<?= htmlspecialchars($airlin_pnr !== '' ? $airlin_pnr : $gds_pnr) ?>">
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 hidden mg_bt_10">
-											<input type="hidden" id="cancel_status-<?= $sq_trip_entries_count ?>" name="cancel_status" value="<?= $sq_entry['status'] ?>" data-dyn-valid="" >
+											<input type="hidden" id="cancel_status-<?= $sq_trip_entries_count ?>" name="cancel_status" value="<?= isset($sq_entry['status']) ? $sq_entry['status'] : '' ?>" data-dyn-valid="" >
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
 											<input type="text" id="no_of_pieces-<?= $sq_trip_entries_count ?>" name="no_of_pieces"  placeholder="No of pieces" title="No of pieces" value="<?= $no_of_pieces ?>" >
@@ -595,12 +599,12 @@ if ($type == 'save') {
 											<textarea name="special_note" id="special_note-<?= $sq_trip_entries_count ?>" onchange="validate_address(this.id)" rows="1" placeholder="Special Note" title="Special Note" data-dyn-valid=""><?= $special_note ?></textarea>
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="text" id="aircraft_type-<?= $sq_trip_entries_count ?>" name="aircraft_type"  placeholder="Aircraft Type" title="Aircraft Type" value="<?= $flight_carrier ?>" >
+											<input type="text" id="aircraft_type-<?= $sq_trip_entries_count ?>" name="aircraft_type"  placeholder="Aircraft Type" title="Aircraft Type" value="<?= htmlspecialchars($aircraft_type !== '' ? $aircraft_type : $flight_carrier) ?>" >
 										</div>
 									</div>	
 									<div class="row">
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="text" id="operating_carrier-<?= $i ?>" name="operating_carrier" placeholder="Operated By" title="Operated By" >
+											<input type="text" id="operating_carrier-<?= $sq_trip_entries_count ?>" name="operating_carrier" placeholder="Operated By" title="Operated By" value="<?= htmlspecialchars($operating_carrier) ?>">
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
 											<input type="text" id="frequent_flyer-<?= $sq_trip_entries_count ?>" name="frequent_flyer" placeholder="Frequent Flyer" title="Frequent Flyer" value="<?= $frequent_flyer ?>" >
@@ -614,14 +618,14 @@ if ($type == 'save') {
 											</select>
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
-											<input type="number" id="basic_fare-<?= $sq_trip_entries_count ?>-<?= $i ?>" name="basic_fare" placeholder="Basic Fare" class="basic_fare" title="Basic Fare" required >
+											<input type="number" id="basic_fare-<?= $sq_trip_entries_count ?>" name="basic_fare" placeholder="Basic Fare" class="basic_fare" title="Basic Fare" value="<?= htmlspecialchars($basic_fare) ?>" required >
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10">
 											<select name="refund_type" id="refund_type-<?= $sq_trip_entries_count ?>" title="Refund Type" data-dyn-valid="required" >
-											<?php if($refund_type=''){?><option value="<?= $refund_type ?>"><?= $refund_type ?></option><?php } ?>
+											<?php if($refund_type != ''){?><option value="<?= $refund_type ?>"><?= $refund_type ?></option><?php } ?>
 												<option value="">Refund Type</option>
-												<option value="Refundable">Refundable</option>
-												<option value="Non Refundable">Non Refundable</option>
+												<option value="Refundable" <?= ($refund_type == 'Refundable') ? 'selected' : '' ?>>Refundable</option>
+												<option value="Non Refundable" <?= ($refund_type == 'Non Refundable') ? 'selected' : '' ?>>Non Refundable</option>
 											</select>
 										</div>
 										<div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10 hidden">
@@ -636,8 +640,8 @@ if ($type == 'save') {
 								</div>
 
 								<script>
-							$('#departure_datetime-<?= $i ?>, #arrival_datetime-<?= $i ?>').datetimepicker({ format:'d-m-Y H:i' });
-							$('#airlines_name-<?= $i ?>,#plane_from_location-<?= $i ?>,#plane_to_location-<?= $i ?>').select2();
+							$('#departure_datetime-<?= $sq_trip_entries_count ?>, #arrival_datetime-<?= $sq_trip_entries_count ?>').datetimepicker({ format:'d-m-Y H:i' });
+							$('#airlines_name-<?= $sq_trip_entries_count ?>').select2();
 							</script>
 							<?php } ?>
 							<!-- loop end -->
@@ -882,7 +886,7 @@ $('#frm_flight_details').validate({
 			'cancel_status_arr':cancel_status_arr
 		});
 		dynamic_section_arr = JSON.stringify(dynamic_section_arr);
-		$('#flight_details'+count).html(dynamic_section_arr);
+		$('#flight_details'+count).val(dynamic_section_arr);
 		if(type == 'update'){ var msg = 'Flight ticket details updated!'; }else{ var msg = 'Flight ticket details saved!'; }
 		success_msg_alert(msg);
 		$('#flight_details_modal').modal('hide');
@@ -891,9 +895,9 @@ $('#frm_flight_details').validate({
         var rowCount = table.rows.length;
         for(var i=0; i<rowCount; i++){
 			var row = table.rows[i];
-			var trip_details = $('#flight_details'+(i+1)).html();
+			var trip_details = $('#flight_details'+(i+1)).val();
 			if(trip_details == ''||trip_details==null){
-				$('#flight_details'+(0)).html(dynamic_section_arr);
+				$('#flight_details'+(i+1)).val(dynamic_section_arr);
 			}
 		}
 	}
@@ -1010,6 +1014,7 @@ function airport_load_main_sale(ids){
 </script>
 
 <script>
+	<?php if(!isset($flight_details[0])){ ?>
 	
 	<?php if($selected_portal=='Tripjack'){ 
 		
@@ -1018,17 +1023,17 @@ function airport_load_main_sale(ids){
 		$to_arr = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival'"));
 		
 		?>
-		$('#airpf-0').val('<?= $from_dep['airport_name'];?>');
-		$('#airpt-0').val('<?= $to_arr['airport_name'];?>');
+		$('#airpf-1').val('<?= $from_dep['airport_name'];?>');
+		$('#airpt-1').val('<?= $to_arr['airport_name'];?>');
 
 
-		$('#from_city-0').val('<?= $from_dep['city_id'];?>');
+		$('#from_city-1').val('<?= $from_dep['city_id'];?>');
 
-		$('#to_city-0').val('<?= $to_arr['city_id']; ?>');
+		$('#to_city-1').val('<?= $to_arr['city_id']; ?>');
 
 
-		$('#departure_city-0').val('<?= $from_dep['airport_name'];?>');
-		$('#arrival_city-0').val('<?= $to_arr['airport_name'];?>');
+		$('#departure_city-1').val('<?= $from_dep['airport_name'];?>');
+		$('#arrival_city-1').val('<?= $to_arr['airport_name'];?>');
 		
 
 
@@ -1040,19 +1045,19 @@ function airport_load_main_sale(ids){
 		$to_arr = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$flight_second_section'"));
 		
 		?>
-		$('#airpf-0').val('<?= $from_dep['airport_name'];?>');
-		$('#airpt-0').val('<?= $to_arr['airport_name'];?>');
+		$('#airpf-1').val('<?= $from_dep['airport_name'];?>');
+		$('#airpt-1').val('<?= $to_arr['airport_name'];?>');
 
 
 
 
-	$('#from_city-0').val('<?= $from_dep['city_id'];?>');
+	$('#from_city-1').val('<?= $from_dep['city_id'];?>');
 
-		$('#to_city-0').val('<?= $to_arr['city_id']; ?>');
+		$('#to_city-1').val('<?= $to_arr['city_id']; ?>');
 
 
-		$('#departure_city-0').val('<?= $from_dep['airport_name'];?>');
-		$('#arrival_city-0').val('<?= $to_arr['airport_name'];?>');
+		$('#departure_city-1').val('<?= $from_dep['airport_name'];?>');
+		$('#arrival_city-1').val('<?= $to_arr['airport_name'];?>');
 
 	<?php }elseif($selected_portal=='Amadeus'){ 
 		
@@ -1061,23 +1066,23 @@ function airport_load_main_sale(ids){
 		$to_arr = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$_flight_to'"));
 		
 		?>
-		$('#airpf-0').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$flight_first_section'"))['airport_name'];?>');
-		$('#airpt-0').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$flight_second_section'"))['airport_name'];?>');
-		// $('#operating_carrier-0').val('<?= $_flight_operator_no; ?>');
-		$('#flight_no-0').val('<?= $__flight_no; ?>');
+		$('#airpf-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$flight_first_section'"))['airport_name'];?>');
+		$('#airpt-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$flight_second_section'"))['airport_name'];?>');
+		// $('#operating_carrier-1').val('<?= $_flight_operator_no; ?>');
+		$('#flight_no-1').val('<?= $__flight_no; ?>');
 		
 		$('.basic_fare').val('<?= $fair_amount; ?>');
-		$('#airpf-0').val('<?= $from_dep['airport_name'];?>');
-		$('#airpt-0').val('<?= $to_arr['airport_name'];?>');
+		$('#airpf-1').val('<?= $from_dep['airport_name'];?>');
+		$('#airpt-1').val('<?= $to_arr['airport_name'];?>');
 
 
-		$('#from_city-0').val('<?= $from_dep['city_id'];?>');
+		$('#from_city-1').val('<?= $from_dep['city_id'];?>');
 
-		$('#to_city-0').val('<?= $to_arr['city_id']; ?>');
+		$('#to_city-1').val('<?= $to_arr['city_id']; ?>');
 
 
-		$('#departure_city-0').val('<?= $from_dep['airport_name'];?>');
-		$('#arrival_city-0').val('<?= $to_arr['airport_name'];?>');
+		$('#departure_city-1').val('<?= $from_dep['airport_name'];?>');
+		$('#arrival_city-1').val('<?= $to_arr['airport_name'];?>');
 		
 		
 		$('input[name="departure_datetime"]').val('<?= $_flight_d_date.' '.$_flight_d_time; ?>');
@@ -1089,92 +1094,93 @@ function airport_load_main_sale(ids){
 		$to_arr = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$_flight_to'"));
 		
 		?>
-		// $('#operating_carrier-0').val('<?= $_flight_operator_no; ?>');
-		$('#flight_no-0').val('<?= $__flight_no; ?>');
+		// $('#operating_carrier-1').val('<?= $_flight_operator_no; ?>');
+		$('#flight_no-1').val('<?= $__flight_no; ?>');
 		$('input[name="departure_datetime"]').val('<?=$_flight_d_date.' '.$_flight_d_time;?>');
 		$('input[name="arrival_datetime"]').val('<?= $_flight_a_date . ' ' . $_flight_a_time; ?>');
-		$('#airpf-0').val('<?= $from_dep['airport_name'];?>');
-		$('#airpt-0').val('<?= $to_arr['airport_name'];?>');
+		$('#airpf-1').val('<?= $from_dep['airport_name'];?>');
+		$('#airpt-1').val('<?= $to_arr['airport_name'];?>');
 
 
 
-			$('#from_city-0').val('<?= $from_dep['city_id'];?>');
+			$('#from_city-1').val('<?= $from_dep['city_id'];?>');
 
-		$('#to_city-0').val('<?= $to_arr['city_id']; ?>');
+		$('#to_city-1').val('<?= $to_arr['city_id']; ?>');
 
 
-		$('#departure_city-0').val('<?= $from_dep['airport_name'];?>');
-		$('#arrival_city-0').val('<?= $to_arr['airport_name'];?>');
+		$('#departure_city-1').val('<?= $from_dep['airport_name'];?>');
+		$('#arrival_city-1').val('<?= $to_arr['airport_name'];?>');
 
 
 		$('.basic_fare').val('<?= $fair_amount; ?>');
 	<?php } ?>
 
 	<?php if($selected_portal=='Tripjack'){ ?>
-		$('#operating_carrier-0').val('<?= $operated_by; ?>');
+		$('#operating_carrier-1').val('<?= $operated_by; ?>');
 		<?php $operated_for_round_trip = _get_operated_for_round_trip($_POST['departure_or_arrival'] ?? ''); ?>
-   	    $('#operating_carrier-1').val(<?= json_encode($operated_for_round_trip) ?>);
+   	    $('#operating_carrier-2').val(<?= json_encode($operated_for_round_trip) ?>);
 		<?php $operated_for_multi_city_trip = _get_operated_for_multi_city_trip($_POST['departure_or_arrival'] ?? ''); ?>
-   	    $('#operating_carrier-2').val(<?= json_encode($operated_for_multi_city_trip) ?>);
+   	    $('#operating_carrier-3').val(<?= json_encode($operated_for_multi_city_trip) ?>);
 	<?php }elseif($selected_portal=='TBO-Train'){ ?>
-		$('#operating_carrier-0').val('<?= $_flight_operator_no; ?>');
+		$('#operating_carrier-1').val('<?= $_flight_operator_no; ?>');
 	<?php } ?>
 
 	<?php if($selected_portal=='Tripjack'){ ?>
-		$('#flight_no-0').val('<?= $current_flight_no; ?>');
+		$('#flight_no-1').val('<?= $current_flight_no; ?>');
 		<?php $flight_no_for_round_trip = _get_flight_no_for_round_trip($_POST['departure_or_arrival'] ?? ''); ?>
-        $('#flight_no-1').val(<?= json_encode($flight_no_for_round_trip) ?>);
+        $('#flight_no-2').val(<?= json_encode($flight_no_for_round_trip) ?>);
 		<?php $flight_no_for_multi_city_trip = _get_flight_no_for_multi_city_trip($_POST['departure_or_arrival'] ?? ''); ?>
-   		$('#flight_no-2').val(<?= json_encode($flight_no_for_multi_city_trip) ?>);
+   		$('#flight_no-3').val(<?= json_encode($flight_no_for_multi_city_trip) ?>);
 		$('.basic_fare').val('<?= $flight_fair_amount; ?>');
 
 		<?php }elseif($selected_portal=='TBO-Train'){ ?>
-			$('#flight_no-0').val('<?= $_flight_no; ?>');
+			$('#flight_no-1').val('<?= $_flight_no; ?>');
 			$('.basic_fare').val('<?= $fair_amount; ?>');
 	<?php } ?>
 
 	
 
     <?php $arrival_for_round_trip = _get_arrival_for_round_trip($_POST['departure_or_arrival'] ?? ''); ?>
-    $('#airpf-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_round_trip'"))['airport_name'];?>');
+    $('#airpf-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_round_trip'"))['airport_name'];?>');
 
 
-		$('#from_city-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_round_trip'"))['city_id']; ?>');
+		$('#from_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_round_trip'"))['city_id']; ?>');
 
-		   $('#departure_city-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_round_trip'"))['airport_name'];?>');
+		   $('#departure_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_round_trip'"))['airport_name'];?>');
 
 	<?php $arrival_date_for_round_trip = _get_arrival_date_for_round_trip($_POST['departure_or_arrival'] ?? ''); ?>
-    // $('#arrival_datetime-1').val(<?= json_encode($arrival_date_for_round_trip) ?>);
+    // $('#arrival_datetime-2').val(<?= json_encode($arrival_date_for_round_trip) ?>);
 
 	<?php $arrival_airport_for_round_trip = _get_arrival_airport_date_for_round_trip($_POST['departure_or_arrival'] ?? ''); ?>
-    $('#airpt-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_round_trip'"))['airport_name'];?>');
+    $('#airpt-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_round_trip'"))['airport_name'];?>');
 
 	
-	$('#to_city-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_round_trip'"))['city_id']; ?>');
+	$('#to_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_round_trip'"))['city_id']; ?>');
 
-	  $('#arrival_city-1').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_round_trip'"))['airport_name'];?>');
+	  $('#arrival_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_round_trip'"))['airport_name'];?>');
 
 	
 
 	<?php $arrival_for_multi_city_trip = _get_arrival_for_multi_city_trip($_POST['departure_or_arrival'] ?? ''); ?>
-    $('#airpf-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_multi_city_trip'"))['airport_name'];?>');
+    $('#airpf-3').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_multi_city_trip'"))['airport_name'];?>');
 
 
-	$('#arrival_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_multi_city_trip'"))['airport_name'];?>');
+	$('#arrival_city-3').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_multi_city_trip'"))['airport_name'];?>');
 
-	$('#from_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_multi_city_trip'"))['city_id']; ?>');
+	$('#from_city-3').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_for_multi_city_trip'"))['city_id']; ?>');
 	
 	<?php $arrival_date_for_multi_city_trip = _get_arrival_date_for_multi_city_trip($_POST['departure_or_arrival'] ?? ''); ?>
-    // $('#arrival_datetime-2').val(<?= json_encode($arrival_date_for_multi_city_trip) ?>);
+    // $('#arrival_datetime-3').val(<?= json_encode($arrival_date_for_multi_city_trip) ?>);
 
 	<?php $arrival_airport_for_multi_city_trip = _get_arrival__for_multi_city_trip($_POST['departure_or_arrival'] ?? ''); ?>
-    $('#airpt-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_multi_city_trip'"))['airport_name'];?>');
+    $('#airpt-3').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_multi_city_trip'"))['airport_name'];?>');
 
-	$('#to_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_multi_city_trip'"))['city_id']; ?>');
+	$('#to_city-3').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_multi_city_trip'"))['city_id']; ?>');
 
 
-	$('#departure_city-2').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_multi_city_trip'"))['airport_name'];?>');
+	$('#departure_city-3').val('<?= mysqli_fetch_assoc(mysqlQuery("SELECT * FROM airport_master WHERE airport_code = '$arrival_airport_for_multi_city_trip'"))['airport_name'];?>');
 
+	<?php } // end empty flight_details guard ?>
 </script>
 <script>
 	$('.airpf').keyup( function(){

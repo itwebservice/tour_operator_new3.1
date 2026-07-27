@@ -366,35 +366,31 @@ $(function () {
 
 		for (var i = 0; i < rowCount; i++) {
 			var row = table.rows[i];
-			if (row.cells[0].childNodes[0].checked) {
-				var exc_date = row.cells[2].childNodes[0].value;
-				var exc_city = row.cells[3].childNodes[0].value;
-				var exc_name = row.cells[4].childNodes[0].value;
-				var transfer_option = row.cells[5].childNodes[0].value;
-				var vehicle_id = row.cells[6].childNodes[0].value;
-				var adult = row.cells[7].childNodes[0].value;
-				var cwb = row.cells[8].childNodes[0].value;
-				var cwob = row.cells[9].childNodes[0].value;
-				var infant = row.cells[10].childNodes[0].value;
+			var chkEl = (typeof booking_table_cell_control === 'function')
+				? booking_table_cell_control(row.cells[0])
+				: row.cells[0].childNodes[0];
+			if (chkEl && chkEl.checked) {
+				var dateEl = booking_table_cell_control(row.cells[2]);
+				var cityEl = booking_table_cell_control(row.cells[3]);
+				var nameEl = booking_table_cell_control(row.cells[4]);
+				var transferEl = booking_table_cell_control(row.cells[5]);
+				var vehicleEl = booking_table_cell_control(row.cells[6]);
+				var adultEl = booking_table_cell_control(row.cells[7]);
+				var cwbEl = booking_table_cell_control(row.cells[8]);
+				var cwobEl = booking_table_cell_control(row.cells[9]);
+				var infantEl = booking_table_cell_control(row.cells[10]);
+				var entryEl = row.cells[11] ? booking_table_cell_control(row.cells[11]) : null;
 
-
-				if (row.cells[11]) {
-					var exc_entry_id = row.cells[11].childNodes[0].value;
-				}
-				else {
-					var exc_entry_id = '';
-				}
-
-				exc_date_arr.push(exc_date);
-				exc_city_arr.push(exc_city);
-				exc_name_arr.push(exc_name);
-				transfer_arr.push(transfer_option)
-				vehicle_id_arr.push(vehicle_id);
-				exc_entry_id_arr.push(exc_entry_id);
-				adult_arr.push(adult);
-				cwb_arr.push(cwb);
-				cwob_arr.push(cwob);
-				infant_arr.push(infant);
+				exc_date_arr.push(dateEl ? dateEl.value : '');
+				exc_city_arr.push(cityEl ? cityEl.value : '');
+				exc_name_arr.push(nameEl ? nameEl.value : '');
+				transfer_arr.push(transferEl ? transferEl.value : '');
+				vehicle_id_arr.push(vehicleEl ? vehicleEl.value : '');
+				exc_entry_id_arr.push(entryEl ? entryEl.value : '');
+				adult_arr.push(adultEl ? adultEl.value : '');
+				cwb_arr.push(cwbEl ? cwbEl.value : '');
+				cwob_arr.push(cwobEl ? cwobEl.value : '');
+				infant_arr.push(infantEl ? infantEl.value : '');
 			}
 		}
 

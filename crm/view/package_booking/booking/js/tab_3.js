@@ -78,6 +78,10 @@ $(document).on('click', '#tab_3_head', function () {
     if (typeof initBookingTransportPickupDrop === 'function') {
       initBookingTransportPickupDrop();
     }
+    // Fill Activity pax from selected quotation traveler counts (CRM quotation behavior)
+    if (typeof apply_booking_activity_pax_from_quotation === 'function') {
+      apply_booking_activity_pax_from_quotation();
+    }
   }, 200);
 });
 
@@ -340,12 +344,19 @@ $(function(){
       for(var i=0; i<rowCount; i++)
       {
         var row = table.rows[i];
-        if(row.cells[0].childNodes[0].checked)
+        var chkEl = (typeof booking_table_cell_control === 'function')
+          ? booking_table_cell_control(row.cells[0])
+          : row.cells[0].childNodes[0];
+        if(chkEl && chkEl.checked)
         {
-          if(row.cells[2].childNodes[0].value==""){ error_msg_alert("Activity Date in row-"+(i+1)+" is required<br>"); return false; }
-          if(row.cells[3].childNodes[0].value==""){ error_msg_alert("Activity City in row-"+(i+1)+" is required<br>"); return false; }
-          if(row.cells[4].childNodes[0].value==""){ error_msg_alert("Activity in row-"+(i+1)+" is required<br>"); return false;}
-          if(row.cells[5].childNodes[0].value==""){ error_msg_alert("Transfer option in row-"+(i+1)+" is required<br>"); return false; }
+          var dateEl = booking_table_cell_control(row.cells[2]);
+          var cityEl = booking_table_cell_control(row.cells[3]);
+          var nameEl = booking_table_cell_control(row.cells[4]);
+          var transferEl = booking_table_cell_control(row.cells[5]);
+          if(!dateEl || dateEl.value==""){ error_msg_alert("Activity Date in row-"+(i+1)+" is required<br>"); return false; }
+          if(!cityEl || cityEl.value==""){ error_msg_alert("Activity City in row-"+(i+1)+" is required<br>"); return false; }
+          if(!nameEl || nameEl.value==""){ error_msg_alert("Activity in row-"+(i+1)+" is required<br>"); return false;}
+          if(!transferEl || transferEl.value==""){ error_msg_alert("Transfer option in row-"+(i+1)+" is required<br>"); return false; }
 
           count++; 
         }
