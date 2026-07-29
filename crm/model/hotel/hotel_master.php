@@ -130,21 +130,26 @@ class hotel_master{
         fclose($handle);
         if(isset($unprocessedArray) && !empty($unprocessedArray))
         {
-          $filePath='../../download/unprocessed_hotel_records'.$created_at.''.$timestamp.'.csv';
-          $save = preg_replace('/(\/+)/','/',$filePath);
-          $downloadurl='../../../download/unprocessed_hotel_records'.$created_at.''.$timestamp.'.csv';
-          header("Content-type: text/csv ; charset:utf-8");
-          header("Content-Disposition: attachment; filename=file.csv");
-          header("Pragma: no-cache");
-          header("Expires: 0");
-          $output = fopen($save, "w");
-          fputcsv($output, array('City Id' , 'Hotel Name' , 'Mobile' , 'landline' , 'Email' , 'Contact Person' , 'Emergency Contact No' ,'Hotel Address', 'State Id' ,  'Website' , 'Bank_Name' , 'Account_Name' , 'Account No' , 'Branch' , 'IFSC Swift Code' , 'Tax No', 'PAN TAN No' , 'Hotel Category' ,'Child Without Bed From Age','Child Without Bed To Age','Child With Bed From Age','Child With Bed To Age','Hotel Type','Hotel Description','Opening Balance','Balance Side'));
-          
-          foreach($unprocessedArray as $row){
-            fputcsv($output, $row);
+          $downloadDir = realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR . 'download';
+          if (!is_dir($downloadDir)) {
+            @mkdir($downloadDir, 0777, true);
           }
-          fclose($output);
-          echo "<script> window.location ='$downloadurl'; </script>";
+          $fileName = 'unprocessed_hotel_records'.$created_at.''.$timestamp.'.csv';
+          $save = $downloadDir . DIRECTORY_SEPARATOR . $fileName;
+          $downloadurl = BASE_URL . 'download/' . $fileName;
+          $output = @fopen($save, "w");
+          if ($output === false) {
+            echo "error--Unable to create unprocessed records file. Please ensure the download folder exists and is writable.";
+            $flag = false;
+          } else {
+            fputcsv($output, array('City Id' , 'Hotel Name' , 'Mobile' , 'landline' , 'Email' , 'Contact Person' , 'Emergency Contact No' ,'Hotel Address', 'State Id' ,  'Website' , 'Bank_Name' , 'Account_Name' , 'Account No' , 'Branch' , 'IFSC Swift Code' , 'Tax No', 'PAN TAN No' , 'Hotel Category' ,'Child Without Bed From Age','Child Without Bed To Age','Child With Bed From Age','Child With Bed To Age','Hotel Type','Hotel Description','Opening Balance','Balance Side'));
+            
+            foreach($unprocessedArray as $row){
+              fputcsv($output, $row);
+            }
+            fclose($output);
+            echo "<script> window.location ='$downloadurl'; </script>";
+          }
         } 
     }
 

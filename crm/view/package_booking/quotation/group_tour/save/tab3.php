@@ -622,6 +622,9 @@ $(function(){
 		  }
 
 		group_quotation_cost_calculate('');
+		if (typeof cost_reflect === 'function') {
+			cost_reflect();
+		}
 
 
 	  $('.accordion_content').removeClass("indicator");

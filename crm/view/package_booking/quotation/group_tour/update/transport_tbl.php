@@ -19,7 +19,7 @@
 				<tr>
 					<td><input class="css-checkbox" id="chk_transport1" type="checkbox"><label class="css-label" for="chk_transport1"> </label></td>
 					<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
-					<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2">
+					<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
 							<option value="">Select Vehicle</option>
 							<?php
 							$sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -57,7 +57,7 @@
 						<td><input class="css-checkbox" id="chk_transport1<?= $count ?>" type="checkbox" checked><label class="css-label" for="chk_transport1<?= $count ?>" checked> <label></td>
 						<td><input maxlength="15" value="<?= $count ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
 						
-						<td class="col-md-2"><select name="transport_vehicle_name<?= $count ?>_u" id="transport_vehicle_name<?= $count ?>_u" title="Select Vehicle" style="width:200px" class="form-control app_select2">
+						<td class="col-md-2"><select name="transport_vehicle_name<?= $count ?>_u" id="transport_vehicle_name<?= $count ?>_u" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
 								<option value="<?php echo $sq_vehicle['entry_id']; ?>"><?php echo $sq_vehicle['vehicle_name']; ?></option>
 								<option value="">Select Vehicle</option>
 								<?php
@@ -151,5 +151,7 @@ function addTransportRow(){
 		$('#tbl_group_tour_quotation_transport_u').find('.app_select2').select2();
 	}, 100);
 }
+$('#transport_vehicle_name1').select2();
+$('#transport_vehicle_name<?= $count ?>_u').select2();
 </script>
 

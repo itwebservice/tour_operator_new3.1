@@ -311,7 +311,7 @@ $o5_logo        = o5nv($hero['company_logo'], '');
 $o5_cover_imgs  = o5_cover_images($hero, $gallery, $hotels, $itin, $assets);
 $o5_banner_img  = o5img(o5nv($hero['cover_image'], ''), !empty($gallery[0]) ? o5_media_url($gallery[0]) : $assets . 'banner.jpg');
 $o5_ty_bg       = o5img(o5nv($hero['cover_image'], ''), $assets . 'thankyou.jpg');
-$o5_tour_id     = o5nv($hero['package_code'], o5nv($ov['tour_id'], ''));
+$o5_tour_id     = o5nv($ov['enquiry_code'], o5nv($ov['enquiry_id'], ''));
 $o5_duration    = o5nv($ov['duration_label'], o5nv($hero['duration_label'], ''));
 $o5_travel_pill = trim(o5nv($ov['travel_from'], '') . (o5nv($ov['travel_to'], '') !== '' ? ' to ' . o5nv($ov['travel_to'], '') : ''));
 $o5_pkg_badge   = '';
@@ -480,7 +480,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
             <div class="ov-card-title">Quotation Details</div>
           </div>
           <div class="ov-row"><span class="lbl">Quotation ID</span><span class="val"><?= o5e(o5nv($hero['quotation_code'], '')) ?></span></div>
-          <div class="ov-row"><span class="lbl">Tour ID</span><span class="val"><?= o5e($o5_tour_id) ?></span></div>
+          <div class="ov-row"><span class="lbl">Enquiry ID</span><span class="val"><?= o5e($o5_tour_id) ?></span></div>
           <div class="ov-row"><span class="lbl">Quotation Date</span><span class="val"><?= o5e(o5nv($ov['quotation_date'], '')) ?></span></div>
         </div>
         <div class="ov-card">

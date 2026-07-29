@@ -579,6 +579,10 @@ if (!function_exists('get_generic_quotation_data')) {
       'destination'     => isset($dest['dest_name']) ? $dest['dest_name'] : (isset($master['tour_name']) ? $master['tour_name'] : ''),
       'company_name'    => $company_name,
       'tour_id'         => $package_id,
+      'enquiry_id'      => (isset($master['enquiry_id']) && $master['enquiry_id'] != '0') ? $master['enquiry_id'] : '',
+      'enquiry_code'    => (isset($master['enquiry_id']) && $master['enquiry_id'] != '' && $master['enquiry_id'] != '0')
+        ? (function_exists('get_enquiry_id') ? get_enquiry_id($master['enquiry_id'], $year) : $master['enquiry_id'])
+        : '',
       'quotation_date'  => function_exists('get_date_user') ? get_date_user($quotation_date) : $quotation_date,
       'quotation_date_raw' => $quotation_date,
       'travel_from'     => function_exists('get_date_user') ? get_date_user($master['from_date']) : $master['from_date'],

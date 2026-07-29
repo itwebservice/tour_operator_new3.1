@@ -3,6 +3,8 @@
 /////// Data reflect for payment details start/////////////////////////////////////////////////
 function payment_details_reflected_data(tbl_id) {
 	var tour_id = $('#cmb_tour_name').val();
+	var quotation_id = $('#quotation_id').val();
+	var useQuotationRates = quotation_id && quotation_id !== '' && quotation_id !== '0';
 	var count = 0;
 	var table = document.getElementById(tbl_id);
 	var rowCount = table.rows.length;
@@ -38,6 +40,65 @@ function payment_details_reflected_data(tbl_id) {
 			}
 		}
 	} //for loop end
+
+	function applyQuotationCategoryCosts() {
+		var adult_rate = parseFloat($('#quot_adult_rate').val()) || 0;
+		var with_bed_rate = parseFloat($('#quot_with_bed_rate').val()) || 0;
+		var without_bed_rate = parseFloat($('#quot_without_bed_rate').val()) || 0;
+		var infant_rate = parseFloat($('#quot_infant_rate').val()) || 0;
+		var single_rate = parseFloat($('#quot_single_person_rate').val()) || 0;
+		if (single_rate == 0) {
+			single_rate = adult_rate;
+		}
+
+		// With quotation selected: always use adolescence categories (do not collapse 1 pax to Single Person)
+		$('#txt_adult_seats').val(parseInt(adult_seats) || 0);
+		$('#txt_child_b_seats').val(parseInt(child_b_seats) || 0);
+		$('#txt_child_wb_seats').val(parseInt(child_wb_seats) || 0);
+		$('#txt_infant_seats').val(parseInt(infant_seats) || 0);
+		$('#txt_single_person_seats').val(0);
+
+		$('#txt_adult_expense').val((adult_seats * adult_rate).toFixed(2));
+		$('#txt_child_bed_expense').val((child_b_seats * with_bed_rate).toFixed(2));
+		$('#txt_child_wbed_expense').val((child_wb_seats * without_bed_rate).toFixed(2));
+		$('#txt_infant_expense').val((infant_seats * infant_rate).toFixed(2));
+		$('#txt_single_person_expense').val(parseFloat(0).toFixed(2));
+
+		if (typeof tour_cost_calculate === 'function') {
+			tour_cost_calculate('');
+		} else {
+			var total =
+				(parseFloat($('#txt_adult_expense').val()) || 0) +
+				(parseFloat($('#txt_child_bed_expense').val()) || 0) +
+				(parseFloat($('#txt_child_wbed_expense').val()) || 0) +
+				(parseFloat($('#txt_infant_expense').val()) || 0) +
+				(parseFloat($('#txt_single_person_expense').val()) || 0);
+			$('#txt_total_expense').val(total.toFixed(2));
+			$('#txt_tour_fee').val(total.toFixed(2));
+			calculate_total_discount('');
+		}
+	}
+
+	if (useQuotationRates) {
+		var hasMemberCategories =
+			parseInt(adult_seats) > 0 ||
+			parseInt(child_b_seats) > 0 ||
+			parseInt(child_wb_seats) > 0 ||
+			parseInt(infant_seats) > 0;
+
+		// If passenger adolescence is not set yet, keep quotation amounts already loaded
+		if (!hasMemberCategories) {
+			return;
+		}
+
+		applyQuotationCategoryCosts();
+		$('#txt_stay_total_seats').val(count);
+		$('#txt_total_seats').val(
+			parseInt(adult_seats) + parseInt(child_b_seats) + parseInt(child_wb_seats) + parseInt(infant_seats)
+		);
+		return;
+	}
+
 	if(count == 1){
 		sp_seats = 1;
 		$('#txt_single_person_seats').val(sp_seats);
@@ -74,7 +135,7 @@ function payment_details_reflected_data(tbl_id) {
 			parseInt(adult_seats) + parseInt(child_b_seats) + parseInt(child_wb_seats) + parseInt(infant_seats);
 		$('#txt_stay_total_seats').val(count);
 		$('#txt_total_seats').val(total_seats);
-	
+
 		var adult_type = 'Adult';
 		var child_b_type = 'Child With Bed';
 		var child_wb_type = 'Child Without Bed';

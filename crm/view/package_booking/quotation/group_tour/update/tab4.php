@@ -40,7 +40,6 @@ else if($bsmValues[0]->tax_apply_on == '3') {
             <small>&nbsp;</small>
 			<input type="hidden" id="pck_adult_cost" name="pck_adult_cost" value="<?= $row_cost['adult_cost'] ?>">
 			<input type="text" id="adult_cost2" name="adult_cost2" placeholder="Adult Cost" title="Adult Cost"  onchange="group_quotation_cost_calculate1(this.id);validate_balance(this.id)" value="<?php echo $sq_quotation['adult_cost']; ?>">  
-			<input type="hidden" id="total_adult1" name="total_adult1" value="0">  
 		</div>
 		<div class="col-md-2">
             <small>&nbsp;</small>
@@ -51,19 +50,16 @@ else if($bsmValues[0]->tax_apply_on == '3') {
             <small>&nbsp;</small>
 			<input type="hidden" id="pck_child_cost" name="pck_child_cost" value="<?= $row_cost['child_without_cost'] ?>">
 			<input type="text" id="children_cost2" name="children_cost2" placeholder="Child Without Bed Cost" title="Child Without Bed Cost" onchange="group_quotation_cost_calculate1(this.id);validate_balance(this.id)"  value="<?php echo $sq_quotation['children_cost']; ?>"> 
-			<input type="hidden" id="total_child1" name="total_child1" value="0">  
 		</div>
 		<div class="col-md-2"> 
             <small>&nbsp;</small>
 			<input type="hidden" id="pck_infant_cost" name="pck_infant_cost" value="<?= $row_cost['infant_cost'] ?>">
 			<input type="text" id="infant_cost2" name="infant_cost2" placeholder="Infant Cost" title="Infant Cost"  onchange="group_quotation_cost_calculate1(this.id);validate_balance(this.id)"  value="<?php echo $sq_quotation['infant_cost']; ?>">  
-			<input type="hidden" id="total_infant1" name="total_infant1" value="0">  
 		</div>
 		<div class="col-md-2"> 
             <small>&nbsp;</small>
 			<input type="hidden" id="pck_single_person_cost" name="pck_single_person_cost" value="<?= $row_cost['single_person_cost'] ?>">
 			<input type="text" id="single_person_cost2" name="single_person_cost2" placeholder="Single Person Cost" title="Single Person Cost"  onchange="group_quotation_cost_calculate1(this.id);validate_balance(this.id)"  value="<?php echo $sq_quotation['single_person_cost']; ?>">  
-			<input type="hidden" id="single_person1" name="single_person1" value="0">  
 		</div>
 		
 		<div class="col-md-2">
@@ -175,32 +171,23 @@ function cost_reflect(){
 	var child_with_bed = $('#children_with_bed1').val();
 	var single_person = $('#single_person1').val();
 
-	if(total_adult==""){ total_adult = 0;}
-	if(total_infant==""){total_infant = 0;}
-	if(total_wb_children==""){ total_wb_children = 0;}
-	if(child_with_bed==""){ child_with_bed = 0;}
-	if(single_person==""){ single_person = 0;}
+	if(total_adult=="" || isNaN(total_adult)){ total_adult = 0;}
+	if(total_infant=="" || isNaN(total_infant)){total_infant = 0;}
+	if(total_wb_children=="" || isNaN(total_wb_children)){ total_wb_children = 0;}
+	if(child_with_bed=="" || isNaN(child_with_bed)){ child_with_bed = 0;}
+	if(single_person=="" || isNaN(single_person)){ single_person = 0;}
 
-	var pck_adult_cost = $('#pck_adult_cost').val();
-	var pck_child_cost = $('#pck_child_cost').val();
-	var pck_infant_cost = $('#pck_infant_cost').val();
-	var single_person_cost = $('#pck_single_person_cost').val();
-	var pck_with_bed_cost = $('#pck_with_bed_cost').val();
+	var pck_adult_cost = parseFloat($('#pck_adult_cost').val()) || 0;
+	var pck_child_cost = parseFloat($('#pck_child_cost').val()) || 0;
+	var pck_infant_cost = parseFloat($('#pck_infant_cost').val()) || 0;
+	var pck_single_person_cost = parseFloat($('#pck_single_person_cost').val()) || 0;
+	var pck_with_bed_cost = parseFloat($('#pck_with_bed_cost').val()) || 0;
 
-	var adult_cost1 = parseInt(total_adult) * parseFloat(pck_adult_cost);
-	$("#adult_cost2").val(parseFloat(adult_cost1));
-
-	var child_cost1 = parseInt(total_wb_children) * parseFloat(pck_child_cost);
-	$("#children_cost2").val(parseFloat(child_cost1));
-
-	var infant_cost1 = parseInt(total_infant) * parseFloat(pck_infant_cost);
-	$("#infant_cost2").val(parseFloat(infant_cost1));
-
-	var single_person_cost = parseInt(single_person) * parseFloat(single_person_cost);
-	$("#single_person_cost2").val(parseFloat(single_person_cost));
-
-	var with_bed_cost3 = parseInt(child_with_bed) * parseFloat(pck_with_bed_cost);  
-	$("#with_bed_cost2").val(parseFloat(with_bed_cost3));
+	$("#adult_cost2").val((parseInt(total_adult, 10) * pck_adult_cost).toFixed(2));
+	$("#children_cost2").val((parseInt(total_wb_children, 10) * pck_child_cost).toFixed(2));
+	$("#infant_cost2").val((parseInt(total_infant, 10) * pck_infant_cost).toFixed(2));
+	$("#single_person_cost2").val((parseInt(single_person, 10) * pck_single_person_cost).toFixed(2));
+	$("#with_bed_cost2").val((parseInt(child_with_bed, 10) * pck_with_bed_cost).toFixed(2));
 
 	group_quotation_cost_calculate1('');
 }
@@ -213,14 +200,11 @@ function group_quotation_cost_calculate1(id){
 	var with_bed_cost1 = $('#with_bed_cost2').val();
 	var single_person_cost1 = $('#single_person_cost2').val();
 
-	if(adult_cost1==""){ adult_cost1 = 0;}
-	if(infant_cost1==""){children_cost1 = 0;}
-	if(children_cost1==""){ children_cost1 = 0;}
-	if(with_bed_cost1==""){ with_bed_cost1 = 0;}
-	if(single_person_cost1==""){ single_person_cost1 = 0;}
-
-	if(service_tax==""){service_tax = 0;}
-	if(total_tour_cost==""){total_tour_cost1 = 0;}
+	if(adult_cost1=="" || isNaN(adult_cost1)){ adult_cost1 = 0;}
+	if(infant_cost1=="" || isNaN(infant_cost1)){ infant_cost1 = 0;}
+	if(children_cost1=="" || isNaN(children_cost1)){ children_cost1 = 0;}
+	if(with_bed_cost1=="" || isNaN(with_bed_cost1)){ with_bed_cost1 = 0;}
+	if(single_person_cost1=="" || isNaN(single_person_cost1)){ single_person_cost1 = 0;}
 
 	var total2 = parseFloat(adult_cost1) + parseFloat(children_cost1) + parseFloat(infant_cost1) + parseFloat(with_bed_cost1) + parseFloat(single_person_cost1);
 
@@ -231,8 +215,8 @@ function group_quotation_cost_calculate1(id){
 
 	var service_tax_amount = 0;
 	var service_tax_subtotal = $('#service_tax_subtotal').val();
-	var total_tour_cost = $('#total_tour_cost').val();
 	var service_charge = $('#service_charge').val();
+	if(service_charge=="" || isNaN(service_charge)){ service_charge = 0;}
 	
 		if (parseFloat(service_tax_subtotal) !== 0.0 && service_tax_subtotal !== '') {
 			var service_tax_subtotal1 = service_tax_subtotal.split(',');
@@ -243,11 +227,15 @@ function group_quotation_cost_calculate1(id){
 		}
 		total2 = ($('#basic_show').html() == '&nbsp;') ? total2 : parseFloat($('#basic_show').text().split(' : ')[1]);
 		service_charge = ($('#service_show').html() == '&nbsp;') ? service_charge : parseFloat($('#service_show').text().split(' : ')[1]);
+		if (isNaN(total2)) total2 = 0;
+		if (isNaN(service_charge)) service_charge = 0;
+		if (isNaN(service_tax_amount)) service_tax_amount = 0;
 
 		 // Get previous TCS amount
-        var totalTcs = parseFloat($("#tcs_1").val())
+        var totalTcs = parseFloat($("#tcs_1").val());
+		if (isNaN(totalTcs)) totalTcs = 0;
 
-	total_tour_cost1 = parseFloat(total2) + parseFloat(service_tax_amount)+ parseFloat(service_charge) + parseFloat(totalTcs);
+	var total_tour_cost1 = parseFloat(total2) + parseFloat(service_tax_amount)+ parseFloat(service_charge) + parseFloat(totalTcs);
 
 	
 	$('#total_tour_cost').val(total_tour_cost1);

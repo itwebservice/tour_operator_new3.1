@@ -48,10 +48,10 @@ $role = $_SESSION['role'];
                   <input type="text" id="payment_date" name="payment_date" class="form-control" placeholder="*Date" title="Payment Date" value="<?= date('d-m-Y')?>" onchange="check_valid_date(this.id)">
                 </div>  
                 <div class="col-md-4">
-                  <input type="text" id="payment_amount" name="payment_amount" class="form-control" placeholder="*Payment Amount" title="Payment Amount" onchange="validate_balance(this.id);payment_amount_validate(this.id,'payment_mode','txt_transaction_id','txt_bank_name','bank_id');get_credit_card_charges1('identifier','payment_mode','payment_amount','credit_card_details','credit_charges','tax_credit_charges','credit_charges_amt');">
+                  <input type="text" id="payment_amount" name="payment_amount" class="form-control" placeholder="*Payment Amount" title="Payment Amount" onchange="validate_balance(this.id);payment_amount_validate(this.id,'payment_mode','transaction_id','bank_name','bank_id');get_credit_card_charges1('identifier','payment_mode','payment_amount','credit_card_details','credit_charges','tax_credit_charges','credit_charges_amt');">
                 </div>             
                 <div class="col-md-4">
-                  <select name="payment_mode" id="payment_mode" class="form-control" title="Payment Mode" onchange="payment_master_toggles(this.id, 'bank_name', 'transaction_id', 'bank_id');payment_installment_enable_disable_fields();get_identifier_block1('identifier','payment_mode','credit_card_details','credit_charges','tax_credit_charges');get_credit_card_charges1('identifier','payment_mode','payment_amount','credit_card_details','credit_charges','tax_credit_charges','credit_charges_amt')">
+                  <select name="payment_mode" id="payment_mode" class="form-control" title="Payment Mode" onchange="payment_master_toggles(this.id, 'bank_name', 'transaction_id', 'bank_id');get_identifier_block1('identifier','payment_mode','credit_card_details','credit_charges','tax_credit_charges');get_credit_card_charges1('identifier','payment_mode','payment_amount','credit_card_details','credit_charges','tax_credit_charges','credit_charges_amt')">
                     <option value="">*Payment Mode</option>
                     <option value="Cash">Cash</option>
                     <option value="Cheque">Cheque</option>

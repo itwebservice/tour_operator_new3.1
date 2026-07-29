@@ -8,6 +8,44 @@
 
                     <div class="row">
                         <input type="hidden" id="whatsapp_switch" value="<?= $whatsapp_switch ?>">
+                        <input type="hidden" id="quot_adult_rate" value="0">
+                        <input type="hidden" id="quot_with_bed_rate" value="0">
+                        <input type="hidden" id="quot_without_bed_rate" value="0">
+                        <input type="hidden" id="quot_infant_rate" value="0">
+                        <input type="hidden" id="quot_single_person_rate" value="0">
+                        <input type="hidden" id="group_quot_transport_loaded" value="0">
+                        <div class="col-sm-4 mg_bt_10_sm_xs">
+                            <select name="quotation_id" id="quotation_id" title="Select Quotation" style="width:100%;" class="form-control app_select2"
+                                onchange="group_quotation_info_load()">
+                                <option value="">*Select Quotation</option>
+                                <option value="0">Sale Without Quotation</option>
+                                <?php
+                                $quot_query = "select * from group_tour_quotation_master where status='1' order by quotation_id desc";
+                                if ($branch_status == 'yes') {
+                                    if ($role == 'Branch Admin' || $role == 'Accountant') {
+                                        $quot_query = "select * from group_tour_quotation_master where status='1' and branch_admin_id='$branch_admin_id' order by quotation_id desc";
+                                    } elseif ($role != 'Admin' && $role != 'Branch Admin') {
+                                        $quot_query = "select * from group_tour_quotation_master where status='1' and emp_id='$emp_id' and branch_admin_id='$branch_admin_id' order by quotation_id desc";
+                                    }
+                                } elseif ($role != 'Admin' && $role != 'Branch Admin') {
+                                    $quot_query = "select * from group_tour_quotation_master where status='1' and emp_id='$emp_id' order by quotation_id desc";
+                                }
+                                $sq_quotation = mysqlQuery($quot_query);
+                                while ($row_quotation = mysqli_fetch_assoc($sq_quotation)) {
+                                    $yr = explode("-", $row_quotation['quotation_date']);
+                                    $quotation_cost = $row_quotation['quotation_cost'];
+                                    $currency_amount = '';
+                                    if (isset($currency) && $row_quotation['currency_code'] != '0' && $currency != $row_quotation['currency_code']) {
+                                        $currency_amount1 = currency_conversion($currency, $row_quotation['currency_code'], $quotation_cost);
+                                        $currency_amount = ' (' . $currency_amount1 . ')';
+                                    }
+                                ?>
+                                <option value="<?= $row_quotation['quotation_id'] ?>">
+                                    <?= get_quotation_id($row_quotation['quotation_id'], $yr[0]) . ' : ' . $row_quotation['customer_name'] . ' : ' . $quotation_cost . ' /-' . $currency_amount ?>
+                                </option>
+                                <?php } ?>
+                            </select>
+                        </div>
                         <div class="col-sm-4 mg_bt_10_sm_xs">
                             <select class="form-control" style="width:100%" id="cmb_tour_name" name="cmb_tour_name"
                                 title="Tour Name"
@@ -77,6 +115,7 @@
 <script>
 $(document).ready(function() {
     $("#cmb_tour_name").select2();
+    $("#quotation_id").select2();
 });
 tour_type_reflect('cmb_tour_name');
 </script>

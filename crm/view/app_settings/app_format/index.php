@@ -80,15 +80,6 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
 
             <?= get_destinations_option($sq_settings['format_dest_id']) ?>
           </select>
-          <?php
-          if (!empty($sq_settings['format_dest_id'])) {
-          ?>
-            <script>
-              $('#destination_format_filter').trigger('change');
-            </script>
-          <?php
-          }
-          ?>
         </div>
         <div class="col-md-6 no-pad">
           <div class="col-md-6 text-left">
@@ -268,6 +259,8 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
     $('#display_modal_invoive_btn').button('loading');
     $('#display_modal_invoive_btn').prop('disabled', true);
     var base_url = $('#base_url').val();
+    // Hide upload modal if open so invoice view is not blocked by duplicate modal markup
+    $('#format_upload_modal').modal('hide');
     $.post(base_url + 'view/app_settings/basic_info/view/index.php', {}, function(data) {
       $('#invoice_format_image').html(data);
       $('#display_modal_invoive_btn').button('reset');
@@ -317,10 +310,15 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
   function upload_modal() {
 
     var base_url = $('#base_url').val();
+    // Hide invoice view modal if open so upload modal shows correctly
+    $('#invoice_format_view_modal').modal('hide');
     $.post(base_url + 'view/app_settings/app_format/upload_img.php', {}, function(data) {
       $('#upload_modal_div').html(data);
     });
   }
+  <?php if (!empty($sq_settings['format_dest_id'])) { ?>
+  $('#destination_format_filter').val('<?= (int)$sq_settings['format_dest_id'] ?>').trigger('change.select2');
+  <?php } ?>
   display_images('format_list');
 
   // ========================= Dipti

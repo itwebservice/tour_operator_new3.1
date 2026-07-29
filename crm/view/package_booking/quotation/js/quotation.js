@@ -140,32 +140,22 @@ function group_quotation_cost_calculate(id) {
 	var children_cost = $('#children_cost').val();
 	var infant_cost = $('#infant_cost').val();
 	var with_bed_cost = $('#with_bed_cost').val();
-	var with_bed_cost = $('#with_bed_cost').val();
 	var single_person_cost = $('#single_person_cost').val();
 
-	if (infant_cost == '') infant_cost = 0;
-	if (tour_cost == ''){
-		tour_cost = 0;
-	}
-	if (total_tour_cost == ''){
-		total_tour_cost1 = 0;
-	}
-	if (infant_cost == ''){
-		infant_cost = 0;
-	}
-	if (single_person_cost == ''){
-		single_person_cost = 0;
-	}
-	if (adult_cost == ''){
-		adult_cost = 0;
-	}
-	var total = parseFloat(adult_cost) + parseFloat(children_cost) + parseFloat(infant_cost) + parseFloat(with_bed_cost)  +parseFloat(single_person_cost);
+	if (adult_cost == '' || isNaN(adult_cost)) adult_cost = 0;
+	if (children_cost == '' || isNaN(children_cost)) children_cost = 0;
+	if (infant_cost == '' || isNaN(infant_cost)) infant_cost = 0;
+	if (with_bed_cost == '' || isNaN(with_bed_cost)) with_bed_cost = 0;
+	if (single_person_cost == '' || isNaN(single_person_cost)) single_person_cost = 0;
+
+	var total = parseFloat(adult_cost) + parseFloat(children_cost) + parseFloat(infant_cost) + parseFloat(with_bed_cost) + parseFloat(single_person_cost);
 	$('#tour_cost').val(total.toFixed(2));
 
 	if (id != 'tour_cost') {
 		$('#tour_cost').trigger('change');
 	}
 	var service_charge = $('#service_charge').val();
+	if (service_charge == '' || isNaN(service_charge)) service_charge = 0;
 	var service_tax_subtotal = $('#service_tax_subtotal').val();
 	var service_tax_amount = 0;
 	if (parseFloat(service_tax_subtotal) !== 0.0 && service_tax_subtotal !== ''){
@@ -177,8 +167,14 @@ function group_quotation_cost_calculate(id) {
 	}
 	total = ($('#basic_show').html() == '&nbsp;') ? total : parseFloat($('#basic_show').text().split(' : ')[1]);
 	service_charge = ($('#service_show').html() == '&nbsp;') ? service_charge : parseFloat($('#service_show').text().split(' : ')[1]);
+	if (isNaN(total)) total = 0;
+	if (isNaN(service_charge)) service_charge = 0;
+	if (isNaN(service_tax_amount)) service_tax_amount = 0;
 
-	total_tour_cost1 = parseFloat(total) + parseFloat(service_tax_amount) + parseFloat(service_charge);
+	var totalTcs = parseFloat($('#tcs1-').val());
+	if (isNaN(totalTcs)) totalTcs = 0;
+
+	var total_tour_cost1 = parseFloat(total) + parseFloat(service_tax_amount) + parseFloat(service_charge) + parseFloat(totalTcs);
 	$('#total_tour_cost').val(Math.round(total_tour_cost1));
 }
 function quotationCostingFieldSuffix(fieldId) {
@@ -568,6 +564,9 @@ function get_enquiry_details(offset = '') {
 			var total_pax = parseFloat(result.total_adult) + parseFloat(result.children_without_bed) + parseFloat(result.children_with_bed) + parseFloat(result.total_infant) + parseFloat(result.total_single_person);
 			if (total_pax == '') total_pax = 0;
 			$('#total_passangers' + offset).val(total_pax);
+			if (typeof cost_reflect === 'function') {
+				cost_reflect();
+			}
 			$('#from_date' + offset).val(result.travel_from_date);
 			$('#to_date' + offset).val(result.travel_to_date);
 			if($('#enquiry_id').val() == '0'){

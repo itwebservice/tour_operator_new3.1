@@ -39,17 +39,13 @@ $offset = $_POST['dynamic_estimate_count'];
 
 
 
-        <?php
-		if ($offset != 1) {
-		?>
+     
         <div class="col-sm-2 col-xs-12 pull-right text-right mg_tp_10">
 
             <button type="button" class="btn btn-danger btn-sm"
                 onclick="close_estimate('div_estimate_<?= $offset ?>')"><i class="fa fa-times"></i></button>
         </div>
-        <?php
-		}
-		?>
+     
     </div>
 
 

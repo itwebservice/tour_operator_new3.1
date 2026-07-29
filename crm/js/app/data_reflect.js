@@ -138,7 +138,13 @@ function payment_installment_clear_bank_validation(offset) {
 }
 
 function payment_installment_enable_disable_fields(offset = '') {
-  var payment_mode = $("#cmb_payment_mode" + offset).val();
+  var $mode = $("#cmb_payment_mode" + offset);
+  // Used only on booking installment forms (cmb_payment_mode*). Skip on other screens
+  // (e.g. Purchase MultiPayment) so Debitor Bank is not re-disabled after mode change.
+  if (!$mode.length) {
+    return;
+  }
+  var payment_mode = $mode.val();
   var bankNameId = "#txt_bank_name" + offset;
   var transactionId = "#txt_transaction_id" + offset;
   var bankId = "#bank_id" + offset;

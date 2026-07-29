@@ -464,48 +464,18 @@ function ucfirst(str) {
 		url: '../group_tour/save/get_costing_info.php',
 		data:{ group_id : group_id },
 		success:function(result){
-			var cost_arr = JSON.parse(result);   	
+			var cost_arr = JSON.parse(result);
 
-			var total_adult = $("#total_adult").val();
-			var adult_cost = total_adult * cost_arr.adult_cost;
-			$("#adult_cost").val(parseFloat(adult_cost));
-			var total_wb_child = $("#children_without_bed").val();
-			
-			if(total_wb_child == 0){
-				$('#children_cost').val(0);
-			}else{
-			var child_wb_cost = total_wb_child * cost_arr.children_wb_cost;
-				$('#children_cost').val(child_wb_cost);
-			}
-			var total_infant = $("#total_infant").val();
+			// Store per-person rates from Tours & Travels group tour master
+			$('#pck_adult_cost').val(parseFloat(cost_arr.adult_cost) || 0);
+			$('#pck_with_bed_cost').val(parseFloat(cost_arr.with_bed_cost) || 0);
+			$('#pck_child_cost').val(parseFloat(cost_arr.children_wb_cost) || 0);
+			$('#pck_infant_cost').val(parseFloat(cost_arr.infant_cost) || 0);
+			$('#pck_single_person_cost').val(parseFloat(cost_arr.single_person_cost) || 0);
 
-			var infant_cost = total_infant * cost_arr.infant_cost;
-			$("#infant_cost").val(parseFloat(infant_cost));
-
-
-			var child_with_bed = $('#children_with_bed').val();
-			if(child_with_bed==0){
-				$("#with_bed_cost").val(0);
+			if (typeof cost_reflect === 'function') {
+				cost_reflect();
 			}
-			else{
-				var with_bed_cost2 = child_with_bed * cost_arr.with_bed_cost;   
-				$("#with_bed_cost").val(with_bed_cost2);
-			}
-			var single_person = $('#single_person').val();
-			if(single_person==0){
-				$("#with_bed_cost").val(0);
-			}
-			else{
-				var single_person_cost2 = single_person * cost_arr.single_person_cost;   
-				$("#single_person_cost").val(single_person_cost2);
-			}
-			var adult_cost = $("#adult_cost").val();
-			var children_cost = $("#children_cost").val();
-			var infant_cost = $("#infant_cost").val();
-			var with_bed_cost = $("#with_bed_cost").val();
-
-			var total_cost = parseFloat(adult_cost) + parseFloat(child_wb_cost) + parseFloat(with_bed_cost2) + parseFloat(infant_cost) + parseFloat(with_bed_cost);     	 
-			$("#tour_cost").val(parseFloat(total_cost));
 		}
 		});	
 		$('a[href="#tab3"]').tab('show');

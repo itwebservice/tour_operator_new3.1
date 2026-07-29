@@ -632,6 +632,7 @@ function begin_widget()
 
                                                                                       function getFormatImg($format, $dest_id = 0)
                                                                                       {
+                                                                                        global $app_quot_img;
                                                                                         $imgUrl = "";
                                                                                         $formatMain = "Portrait-Creative";
                                                                                         switch ($format) {
@@ -680,6 +681,17 @@ function begin_widget()
                                                                                               $imgUrl = $db2['img_url'];
                                                                                             }
                                                                                           }
+                                                                                        }
+                                                                                        // Fallback: any image for this format type, then app setting image
+                                                                                        if ($imgUrl == '') {
+                                                                                          $anyQry = mysqlQuery("SELECT img_url FROM `format_image_master` where type='$formatMain' and img_url!='' LIMIT 1");
+                                                                                          if ($anyQry && mysqli_num_rows($anyQry) > 0) {
+                                                                                            $anyRow = mysqli_fetch_assoc($anyQry);
+                                                                                            $imgUrl = $anyRow['img_url'];
+                                                                                          }
+                                                                                        }
+                                                                                        if ($imgUrl == '' && !empty($app_quot_img)) {
+                                                                                          $imgUrl = $app_quot_img;
                                                                                         }
                                                                                         return $imgUrl;
                                                                                       }

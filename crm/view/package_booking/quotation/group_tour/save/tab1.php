@@ -129,7 +129,7 @@ $role_id = $_SESSION['role_id'];
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
             <input type="number" id="total_adult" name="total_adult" placeholder="*Total Adult(s)" title="Total Adult(s)"
-                onchange="total_passangers_calculate(); validate_balance(this.id)">
+                onchange="total_passangers_calculate(); validate_balance(this.id);cost_reflect();">
 
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
@@ -142,19 +142,19 @@ $role_id = $_SESSION['role_id'];
 
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
             <input type="number" class="form-control" id="children_without_bed" name="children_without_bed"
-                onchange="validate_balance(this.id);total_passangers_calculate();" placeholder="Child Without Bed(s)"
+                onchange="validate_balance(this.id);total_passangers_calculate();cost_reflect();" placeholder="Child Without Bed(s)"
                 title="Child Without Bed(s)">
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
             <input type="number" id="total_infant" name="total_infant" placeholder="Total Infant(s)"
-                title="Total Infant(s)" onchange="total_passangers_calculate(); validate_balance(this.id)">
+                title="Total Infant(s)" onchange="total_passangers_calculate(); validate_balance(this.id);cost_reflect();">
 
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
             <input type="number" id="single_person" name="single_person" placeholder="Total Single Person"
-                title="Total Single Person" onchange="total_passangers_calculate();">
+                title="Total Single Person" onchange="total_passangers_calculate();cost_reflect();">
 
         </div>
 

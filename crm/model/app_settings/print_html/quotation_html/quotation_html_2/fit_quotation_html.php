@@ -410,8 +410,8 @@ $o2_round = o2img(
                 </svg>
               </span>
               <div>
-                <div class="t">Tour ID</div>
-                <div class="v sm"><?= o2e(o2nv($ov['tour_id'], '')) ?></div>
+                <div class="t">Enquiry ID</div>
+                <div class="v sm"><?= o2e(o2nv($ov['enquiry_code'], o2nv($ov['enquiry_id'], ''))) ?></div>
               </div>
             </div>
             <div class="card ov"><span class="ic">

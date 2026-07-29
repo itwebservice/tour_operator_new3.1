@@ -183,7 +183,7 @@
 				<input type="text" name="booking_date1" id="booking_date1" onchange="validate_bookingDate('booking_date1','due_date');check_valid_date(this.id);get_auto_values('booking_date1','basic_cost','payment_mode','service_charge','markup','update','true','service_charge','discount',true);" placeholder="Booking Date" title="Booking Date" value="<?= get_date_user($sq_ticket['created_at']) ?>">
 
 			</div>
-			<div class="col-md-2 col-sm-4 col-xs-12 mg_bt_10">
+			<!-- <div class="col-md-2 col-sm-4 col-xs-12 mg_bt_10">
                                 <select name="currency_code" id="acurrency_code1" title="Currency" style="width:100%"  data-toggle="tooltip" required>
                                     <?php
                                     
@@ -208,7 +208,7 @@
                                     </option>
                                     <?php } ?>
                                 </select>
-                            </div>
+                            </div> -->
 
 		</div>
 

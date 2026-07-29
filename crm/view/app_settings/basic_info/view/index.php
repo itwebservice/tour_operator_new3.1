@@ -1,7 +1,7 @@
 <?php
 include "../../../../model/model.php";
 ?>
-<div class="modal fade profile_box_modal" id="display_modal" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade profile_box_modal" id="invoice_format_view_modal" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="invoiceFormatViewLabel">
 <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
     	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -29,7 +29,7 @@ include "../../../../model/model.php";
 </div>
 
 <script>
-$('#display_modal').modal('show');
+$('#invoice_format_view_modal').modal('show');
 </script>
 <script type="text/javascript">
 	$('.owl-carousel').owlCarousel({

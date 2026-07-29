@@ -4,12 +4,12 @@ include "../../../model/model.php";
 
 
 
-<div class="modal fade profile_box_modal" id="display_modal" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade profile_box_modal" id="format_upload_modal" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="formatUploadModalLabel">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" data-original-title="" title="">×</span></button>
-                <h4 class="modal-title" id="myModalLabel">Upload Image</h4>
+                <h4 class="modal-title" id="formatUploadModalLabel">Upload Image</h4>
             </div>
 
             <div class="modal-body ">
@@ -64,7 +64,7 @@ include "../../../model/model.php";
 </div>
 
 <script>
-    $('#display_modal').modal('show');
+    $('#format_upload_modal').modal('show');
     $('#destination_format_filter_upload').select2();
 
 
@@ -131,7 +131,7 @@ include "../../../model/model.php";
             imgUrl: imgUrl,
         }, function(data) {
             success_msg_alert(data);
-            $('#display_modal').modal('hide');
+            $('#format_upload_modal').modal('hide');
             display_images('format_list');
         });
 

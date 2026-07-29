@@ -1,130 +1,82 @@
 <?php
 include "../../../model/model.php";
 $format = $_POST['format'];
-$destination = $_POST['destination'];
-$basic_format = "Landscape-Standard-Creative";
+$destination = isset($_POST['destination']) ? $_POST['destination'] : '';
+$basic_format = "Portrait-Creative";
 if ($format == 2) {
-  $count = 129;
-  $dir = 'https://itourscloud.com/quotation_format_images/Landscape-Standard-Creative/';
   $basic_format = "Landscape-Standard";
 } else if ($format == 3) {
-  $count = 129;
-  $dir = 'https://itourscloud.com/quotation_format_images/Landscape-Standard-Creative/';
   $basic_format = "Landscape-Creative";
-  
-}
-else if($format == 1 || $format == 9){ $count = 10; $dir = 'https://itourscloud.com/quotation_format_images/Portrait-Standard/';
+} else if ($format == 1 || $format == 9) {
   $basic_format = "Portrait-Standard";
-  
-}
-else if($format == 5 || $format == 10){ $count = 52; $dir = 'https://itourscloud.com/quotation_format_images/Portrait-Advanced/';
+} else if ($format == 5 || $format == 10) {
   $basic_format = "Portrait-Advanced";
 } else if ($format == 6) {
-  $count = 98;
-  $dir = 'https://itourscloud.com/quotation_format_images/Landscape-Advanced/';
   $basic_format = "Landscape-Advanced";
-} else { //Format : 4
-  $count = 65;
-  $dir = 'https://itourscloud.com/quotation_format_images/Portrait-Creative/';
+} else {
+  // Format : 4 and others
   $basic_format = "Portrait-Creative";
 }
-$sq_saved = mysqli_fetch_assoc(mysqlQuery("select quot_format, quot_img_url from app_settings where setting_id='1'"));
-$saved_img_url = isset($sq_saved['quot_img_url']) ? $sq_saved['quot_img_url'] : '';
-$saved_format = isset($sq_saved['quot_format']) ? $sq_saved['quot_format'] : '';
 
-// for($i = 1; $i<=$count; $i++){
-//   $image_path = $dir.$i.'.jpg';
-//   $sq_setting = mysqli_num_rows(mysqlQuery("select * from app_settings where quot_format='$format' and quot_img_url='$image_path'"));
-//   if($sq_setting>0){
-//     $checked = 'checked';
-//   }else{
-//     $checked = '';
-//   }
-?>
-<!-- <div class="gallary-image">
-    <div class="col-sm-3">
-      <div class="gallary-single-image mg_bt_30 mg_bt_10_sm_xs" style="width: 100%;">
-          <img src="<//?php echo $dir . $i . '.jpg'; ?>" id="image<//?php echo $i; ?>" alt="title" class="img-responsive">
-          <span class="img-check-btn">
-            <input type="radio" id="image_select<//?php echo $i; ?>" name="image_check" value="<//?php echo $dir . $i . '.jpg' ?>" <?= $checked ?>>
-          </span>
-          <div class="table-image-btns">
-            <ul style="margin-left: -40%;">
-              <span style="color: #fff; "><//?php echo $sq_gal['description']; ?></span>
-            </ul>
-          </div>
-      </div>
-    </div>
-</div> -->
-
-<?php
 $query = "select * from format_image_master where type='$basic_format'";
-
-if (!empty($destination)) {
+if ($destination !== '' && $destination !== null) {
   $query .= " and dest_id='$destination'";
 } else {
   $query .= " and dest_id='0'";
 }
 $queryImg = mysqlQuery($query);
-$count = 0;
-
-              // Find default image position from Destination 1
-
-             $default_position = 1;
-              $pos = 0;
-
-              $res = mysqlQuery("
-SELECT id,is_selected
-FROM format_image_master
-WHERE type='$basic_format'
-AND dest_id='1'
-ORDER BY id
-");
-
-              while ($r = mysqli_fetch_assoc($res)) {
-                $pos++;
-                if ($r['is_selected'] == 1) {
-                  $default_position = $pos;
-                  break;
-                }
-              }
-
 
 $app_setting = mysqli_fetch_assoc(mysqlQuery("
-SELECT quot_format, quot_img_url
+SELECT quot_format, quot_img_url, format_dest_id
 FROM app_settings
 WHERE setting_id='1'
 "));
 
-$selected_img = $app_setting['quot_img_url'];
-$saved_format = $app_setting['quot_format'];
-$current_format_selected = ($saved_format == $format);
-$position = 0;
+$selected_img = isset($app_setting['quot_img_url']) ? $app_setting['quot_img_url'] : '';
+$saved_format = isset($app_setting['quot_format']) ? $app_setting['quot_format'] : '';
+$saved_dest = isset($app_setting['format_dest_id']) ? $app_setting['format_dest_id'] : '';
+$current_format_selected = ((string)$saved_format === (string)$format);
+// Match saved dest: empty filter means dest 0
+$filter_dest = ($destination !== '' && $destination !== null) ? (string)$destination : '0';
+$current_dest_selected = ((string)$saved_dest === $filter_dest);
 
+$count = 0;
+$any_checked = false;
+$rows = array();
 while ($db = mysqli_fetch_array($queryImg)) {
-  $position++;
-  if ($current_format_selected) {
-    $checked = ($selected_img == $db['img_url']) ? "checked" : "";
-  } else {
-    $checked = ($position == $default_position) ? "checked" : "";
+  $rows[] = $db;
+}
+
+// Prefer per-destination is_selected for this format type
+foreach ($rows as $db) {
+  if (!empty($db['is_selected']) && (string)$db['is_selected'] === '1') {
+    $any_checked = true;
+    break;
+  }
+}
+
+foreach ($rows as $db) {
+  $checked = '';
+  if (!empty($db['is_selected']) && (string)$db['is_selected'] === '1') {
+    $checked = 'checked';
+  } elseif (!$any_checked && $current_format_selected && $current_dest_selected && $selected_img !== '' && $selected_img == $db['img_url']) {
+    // Fallback for older saves where is_selected was not set
+    $checked = 'checked';
+    $any_checked = true;
   }
 ?>
   <div class="gallary-image">
     <div class="col-sm-3">
       <div class="gallary-single-image mg_bt_30 mg_bt_10_sm_xs" style="width: 100%;">
-        <img src="<?php echo $db['img_url']; ?>" id="image<?php echo $count; ?>" alt="title" class="img-responsive">
+        <img src="<?php echo htmlspecialchars($db['img_url'], ENT_QUOTES); ?>" id="image<?php echo $count; ?>" alt="title" class="img-responsive">
         <span class="img-check-btn">
           <input
             type="radio"
             id="image_select<?php echo $count; ?>"
             name="image_check"
-            value="<?php echo $db['img_url']; ?>"
+            value="<?php echo htmlspecialchars($db['img_url'], ENT_QUOTES); ?>"
             <?php echo $checked; ?>>
-          <div class="table-image-btns">
-            <ul style="margin-left: -40%;">
-              <!-- <span style="color: #fff; "><//?php echo $sq_gal['description']; ?></span> -->
-            </ul>
-          </div>
+        </span>
       </div>
     </div>
   </div>

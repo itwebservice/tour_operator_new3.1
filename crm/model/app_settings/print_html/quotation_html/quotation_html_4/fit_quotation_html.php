@@ -226,7 +226,7 @@ if (!function_exists('o4_render_page_header')) {
 
 $o4_dest       = o4nv($ov['destination'], o4nv($hero['tour_name'], 'Tour'));
 $o4_client     = o4nv($ov['client_name'], o4nv($hero['client_name'], 'Guest'));
-$o4_tour_id    = o4nv($hero['package_code'], o4nv($ov['tour_id'], ''));
+$o4_tour_id    = o4nv($ov['enquiry_code'], o4nv($ov['enquiry_id'], ''));
 $o4_duration   = o4nv($ov['duration_label'], o4nv($hero['duration_label'], ''));
 $o4_travel_from = o4nv($ov['travel_from'], '');
 $o4_travel_to   = o4nv($ov['travel_to'], '');
@@ -384,7 +384,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
           </div>
           <div class="ov-card">
             <div class="icon">🏷️</div>
-            <div class="lbl">Tour ID</div>
+            <div class="lbl">Enquiry ID</div>
             <div class="val"><?= o4e($o4_tour_id) ?></div>
           </div>
           <div class="ov-card">

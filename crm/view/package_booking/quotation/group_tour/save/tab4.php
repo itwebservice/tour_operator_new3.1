@@ -4,27 +4,28 @@
 
 		<div class="col-md-2">
 		<small>&nbsp;Adult Cost</small>
+			<input type="hidden" id="pck_adult_cost" name="pck_adult_cost" value="0">
 			<input type="text" id="adult_cost" name="adult_cost" placeholder="Adult Cost" title="Adult Cost" onchange="group_quotation_cost_calculate(this.id);validate_balance(this.id)" value="0" >  
-			<input type="hidden" id="total_adult1" name="total_adult1" value="0">  
 		</div>
 		<div class="col-md-2">
 		<small>&nbsp;Child With Bed Cost</small>
+			<input type="hidden" id="pck_with_bed_cost" name="pck_with_bed_cost" value="0">
 			<input type="text" id="with_bed_cost" name="with_bed_cost" placeholder="Child With Bed Cost" title="Child With Bed Cost" value="0" onchange="group_quotation_cost_calculate(this.id);validate_balance(this.id);"> 
 		</div>
 		<div class="col-md-2">
 		<small>&nbsp;Child Without Bed Cost</small>
+			<input type="hidden" id="pck_child_cost" name="pck_child_cost" value="0">
 			<input type="text" id="children_cost" name="children_cost" placeholder="Child Without Bed Cost" title="Child Without Bed Cost" value="0" onchange="group_quotation_cost_calculate(this.id); validate_balance(this.id);"> 
-			<input type="hidden" id="total_child1" name="total_child1" value="0">  
 		</div>
 		<div class="col-md-2"> 
 		<small>&nbsp;Infant Cost</small>
+			<input type="hidden" id="pck_infant_cost" name="pck_infant_cost" value="0">
 			<input type="text" id="infant_cost" name="infant_cost" placeholder="Infant Cost" title="Infant Cost" value="0" onchange="group_quotation_cost_calculate(this.id);validate_balance(this.id);">  
-			<input type="hidden" id="total_infant1" name="total_infant1" value="0">  
 		</div>
 		<div class="col-md-2"> 
 		<small>&nbsp;Single Person Cost</small>
+			<input type="hidden" id="pck_single_person_cost" name="pck_single_person_cost" value="0">
 			<input type="text" id="single_person_cost" name="single_person_cost" placeholder="Single Person Cost" title="Single Person Cost" value="0" onchange="group_quotation_cost_calculate(this.id);validate_balance(this.id);">  
-			<input type="hidden" id="single_person_cost1" name="single_person_cost1" value="0">  
 		</div>
 		<div class="col-md-2">
 			<small id="basic_show" style="color:#000000">&nbsp;</small>
@@ -159,6 +160,34 @@ $(document).ready(function(){
 });
 
 function switch_to_tab3(){ $('a[href="#tab3"]').tab('show'); }
+
+function cost_reflect(){
+	var total_adult = $('#total_adult').val();
+	var total_infant = $('#total_infant').val();
+	var total_wb_children = $('#children_without_bed').val();
+	var child_with_bed = $('#children_with_bed').val();
+	var single_person = $('#single_person').val();
+
+	if(total_adult == '' || isNaN(total_adult)){ total_adult = 0; }
+	if(total_infant == '' || isNaN(total_infant)){ total_infant = 0; }
+	if(total_wb_children == '' || isNaN(total_wb_children)){ total_wb_children = 0; }
+	if(child_with_bed == '' || isNaN(child_with_bed)){ child_with_bed = 0; }
+	if(single_person == '' || isNaN(single_person)){ single_person = 0; }
+
+	var pck_adult_cost = parseFloat($('#pck_adult_cost').val()) || 0;
+	var pck_child_cost = parseFloat($('#pck_child_cost').val()) || 0;
+	var pck_infant_cost = parseFloat($('#pck_infant_cost').val()) || 0;
+	var pck_single_person_cost = parseFloat($('#pck_single_person_cost').val()) || 0;
+	var pck_with_bed_cost = parseFloat($('#pck_with_bed_cost').val()) || 0;
+
+	$("#adult_cost").val((parseInt(total_adult, 10) * pck_adult_cost).toFixed(2));
+	$("#children_cost").val((parseInt(total_wb_children, 10) * pck_child_cost).toFixed(2));
+	$("#infant_cost").val((parseInt(total_infant, 10) * pck_infant_cost).toFixed(2));
+	$("#single_person_cost").val((parseInt(single_person, 10) * pck_single_person_cost).toFixed(2));
+	$("#with_bed_cost").val((parseInt(child_with_bed, 10) * pck_with_bed_cost).toFixed(2));
+
+	group_quotation_cost_calculate('');
+}
 
 $('#frm_tab4').validate({
 

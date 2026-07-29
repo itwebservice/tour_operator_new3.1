@@ -312,7 +312,7 @@ $o7_initials    = o7_company_initials($o7_company);
 $o7_cover_imgs  = o7_cover_images($hero, $gallery, $hotels, $itin, $assets);
 $o7_cover_bg    = o7img(o7nv($hero['cover_image'], ''), !empty($o7_cover_imgs[0]) ? $o7_cover_imgs[0] : $assets . 'cover-1.jpg');
 $o7_banner_img  = o7img(o7nv($hero['cover_image'], ''), !empty($gallery[0]) ? o7_media_url($gallery[0]) : $o7_cover_bg);
-$o7_tour_id     = o7nv($hero['package_code'], o7nv($ov['tour_id'], ''));
+$o7_tour_id     = o7nv($ov['enquiry_code'], o7nv($ov['enquiry_id'], ''));
 $o7_duration    = o7nv($ov['duration_label'], o7nv($hero['duration_label'], ''));
 $o7_travel_range = trim(o7nv($ov['travel_from'], '') . (o7nv($ov['travel_to'], '') !== '' ? ' to ' . o7nv($ov['travel_to'], '') : ''));
 $o7_pkg_badge   = '';
@@ -542,7 +542,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
           <div class="ov-item">
             <div class="ov-icon">🏷️</div>
             <div class="ov-text">
-              <div class="ov-lbl">Tour ID</div>
+              <div class="ov-lbl">Enquiry ID</div>
               <div class="ov-val"><?= o7e($o7_tour_id) ?></div>
             </div>
           </div>

@@ -20,7 +20,7 @@
                 <tr>
                     <td><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" autocomplete="off"><label for="chk_transport1"></label></td>
                     <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
-                    <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2">
+                    <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
                             <option value="">Select Vehicle</option>
                             <?php
                             $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -48,7 +48,7 @@
                        
                         <td><input maxlength="15" value="<?= $count ?>" type="text" name="username" placeholder="Sr No." class="form-control" disabled /></td>
                         
-                        <td class="col-md-3"><select id="vehicle_name<?= $offset.$count?>_d" name="vehicle_name<?= $offset.$count?>_d" title="Select Vehicle" style="width:100%" class="form-control app_select2">
+                        <td class="col-md-3"><select id="vehicle_name<?= $offset.$count?>_d" name="vehicle_name<?= $offset.$count?>_d" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
                             <option value="">Select Vehicle</option>
                             <?php
                             $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -121,5 +121,6 @@
 // Initialize destination loading for pickup and drop locations
 destinationLoading('.pickup_from_u', "Pickup Location");
 destinationLoading('.drop_to_u', "Drop-off Location");
+$('#vehicle_name<?= $offset.$count?>_d').select2();
 </script>
 

@@ -566,9 +566,9 @@ $o1_continuous_view = true;
                     </path>
                   </svg>
                 </div>
-                <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--navy)]/60">Tour ID</div>
+                <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--navy)]/60">Enquiry ID</div>
               </div>
-              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]"><?= o1e(o1nv($ov['tour_id'], '-')) ?></div>
+              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]"><?= o1e(o1nv($ov['enquiry_code'], o1nv($ov['enquiry_id'], '-'))) ?></div>
             </div>
             <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
               <div class="flex items-center gap-2.5">

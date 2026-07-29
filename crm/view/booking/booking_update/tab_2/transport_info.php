@@ -58,7 +58,7 @@ $traveler_group_id = $sq_tourwise_id['traveler_group_id'];
                     <td><input class="css-checkbox" id="chk_transport<?= $count ?>_u" type="checkbox" checked><label class="css-label" for="chk_transport<?= $count ?>_u"> </label></td>
                     <td><input maxlength="15" value="<?= $count ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                     <td class="col-md-2">
-                        <select name="transport_vehicle_name<?= $count ?>_u" id="transport_vehicle_name<?= $count ?>_u" title="Select Vehicle" style="width:200px" class="form-control app_select2">
+                        <select name="transport_vehicle_name<?= $count ?>_u" id="transport_vehicle_name<?= $count ?>_u" title="Select Vehicle" style="width:200px" class="form-control app_select2"data-add-new-option="true">
                             <option value="<?= $row_transport['vehicle_name'] ?>"><?= $vehicle_name ?></option>
                             <?php
                             $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -100,7 +100,7 @@ $traveler_group_id = $sq_tourwise_id['traveler_group_id'];
                     <td><input class="css-checkbox" id="chk_transport1_u" type="checkbox" checked><label class="css-label" for="chk_transport1_u"> </label></td>
                     <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled autocomplete="off"></td>
                     <td class="col-md-2">
-                        <select name="transport_vehicle_name1_u" id="transport_vehicle_name1_u" title="Select Vehicle" style="width:200px" class="form-control app_select2">
+                        <select name="transport_vehicle_name1_u" id="transport_vehicle_name1_u" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
                             <option value="">Select Vehicle</option>
                             <?php
                             $sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");

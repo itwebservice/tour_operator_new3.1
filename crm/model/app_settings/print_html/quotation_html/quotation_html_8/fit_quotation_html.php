@@ -203,7 +203,7 @@ $o8_client       = o8nv($ov['client_name'], o8nv($hero['client_name'], 'Guest'))
 $o8_first        = o8_first_name($o8_client);
 $o8_company      = o8nv($hero['company_name'], o8nv($ty['company_name'], 'Travel Partner'));
 $o8_logo         = o8nv($hero['company_logo'], o8nv($ty['company_logo'], ''));
-$o8_tour_id      = o8nv($hero['package_code'], o8nv($ov['tour_id'], ''));
+$o8_tour_id      = o8nv($ov['enquiry_code'], o8nv($ov['enquiry_id'], ''));
 $o8_quot_code    = o8nv($hero['quotation_code'], '');
 $o8_duration     = o8nv($ov['duration_label'], o8nv($hero['duration_label'], ''));
 $o8_travel_from  = o8nv($ov['travel_from'], '');
@@ -395,7 +395,7 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
         <h2 class="overview-heading">Tour Overview</h2>
         <div class="overview-grid">
           <div class="overview-card"><label>Quotation ID</label><strong><?= o8e($o8_quot_code) ?></strong></div>
-          <div class="overview-card"><label>Tour ID</label><strong><?= o8e($o8_tour_id) ?></strong></div>
+          <div class="overview-card"><label>Enquiry ID</label><strong><?= o8e($o8_tour_id) ?></strong></div>
           <div class="overview-card"><label>Quotation Date</label><strong><?= o8e(o8nv($ov['quotation_date'], '')) ?></strong></div>
           <!-- <div class="overview-card"><label>Travel Date</label><strong><? //= o8e($o8_travel_range) 
                                                                             ?></strong></div> -->

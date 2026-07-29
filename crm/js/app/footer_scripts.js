@@ -2946,15 +2946,15 @@ function payment_master_toggles(payment_mode_id, bank_name_id, transaction_id_id
 
 	if (payment_mode == 'Cash' || payment_mode == '' || payment_mode == 'Credit Note' || payment_mode == 'Debit Note' || payment_mode == 'Credit Card' || payment_mode == 'Advance' || payment_mode == 'To Supplier') {
 
-		$('#' + bank_name_id).prop({ disabled: 'disabled', readonly: 'readonly', value: '' });
-		$('#' + transaction_id_id).prop({ disabled: 'disabled', readonly: 'readonly', value: '' });
-		$('#' + bank_id_id).prop({ disabled: 'disabled', readonly: 'readonly', value: '' });
+		$('#' + bank_name_id).prop('disabled', true).prop('readonly', true).val('');
+		$('#' + transaction_id_id).prop('disabled', true).prop('readonly', true).val('');
+		$('#' + bank_id_id).prop('disabled', true).prop('readonly', true).val('');
 	}
 	else {
 
-		$('#' + bank_name_id).prop({ disabled: '', readonly: '' });
-		$('#' + transaction_id_id).prop({ disabled: '', readonly: '' });
-		$('#' + bank_id_id).prop({ disabled: '', readonly: '' });
+		$('#' + bank_name_id).prop('disabled', false).prop('readonly', false);
+		$('#' + transaction_id_id).prop('disabled', false).prop('readonly', false);
+		$('#' + bank_id_id).prop('disabled', false).prop('readonly', false);
 	}
 }
 

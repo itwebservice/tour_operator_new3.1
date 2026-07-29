@@ -155,8 +155,42 @@ class app_settings_master
 
     $invoice_format_list = $_POST['invoice_format_list'];
     $quot_format = $_POST['quot_format'];
-    $image = $_POST['image'];
-    $dest_id = $_POST['dest_id'];
+    $image = isset($_POST['image']) ? $_POST['image'] : '';
+    $dest_id = (isset($_POST['dest_id']) && $_POST['dest_id'] !== '') ? $_POST['dest_id'] : '0';
+    if (function_exists('mysqlREString')) {
+      $image = mysqlREString($image);
+    } else {
+      $image = addslashes($image);
+    }
+
+    // Map quotation format option → format_image_master.type (same as display_images / getFormatImg)
+    $format_type = 'Portrait-Creative';
+    switch ((int)$quot_format) {
+      case 1:
+      case 9:
+        $format_type = 'Portrait-Standard';
+        break;
+      case 2:
+        $format_type = 'Landscape-Standard';
+        break;
+      case 3:
+        $format_type = 'Landscape-Creative';
+        break;
+      case 4:
+        $format_type = 'Portrait-Creative';
+        break;
+      case 5:
+      case 10:
+        $format_type = 'Portrait-Advanced';
+        break;
+      case 6:
+        $format_type = 'Landscape-Advanced';
+        break;
+      default:
+        $format_type = 'Portrait-Standard';
+        break;
+    }
+
     $sq_invoice = mysqlQuery("update generic_count_master set invoice_format='$invoice_format_list' where id='1'");
 
     $sq_app_setting_count = mysqli_num_rows(mysqlQuery("select setting_id from app_settings"));
@@ -168,28 +202,14 @@ class app_settings_master
       $query = "insert into app_settings ( setting_id, quot_format, quot_img_url,format_dest_id) values ( '$setting_id', '$quot_format', '$image','$dest_id')";
 
       $sq_setting = mysqlQuery($query);
+      $sq_invoice = $sq_setting;
+    } else {
+      $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='$dest_id' where setting_id='1'");
     }
 
-    // =========================== Dipti
-    else {
-      if (empty($dest_id)) {
-        $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
-      } else {
-        $sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='$dest_id' where setting_id='1'");
-        mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
-        mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
-      }
-    }
-    // ====================================
-
-    // else{
-    // 	if(empty($dest_id))
-    // 	{
-    // 		$sq_invoice = mysqlQuery("update app_settings set quot_format='$quot_format',quot_img_url='$image',format_dest_id='0' where setting_id='1'");
-    // 	}
-    // 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id'");
-    // 	mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' and img_url='$image'");
-    // }
+    // Persist selected cover per destination + format type so it restores when filter is reopened
+    mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '0' WHERE dest_id='$dest_id' AND type='$format_type'");
+    mysqlQuery("UPDATE `format_image_master` SET `is_selected` = '1' WHERE dest_id='$dest_id' AND type='$format_type' AND img_url='$image'");
 
 
     // ========================== Dipti

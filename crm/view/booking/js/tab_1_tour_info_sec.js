@@ -432,136 +432,19 @@ function tour_details_reflect(cmb_tour_group) {
   });
 
   /////////////// Transport ////////////////
+  var quotation_id = $('#quotation_id').val();
+  var quotTransportLoaded = $('#group_quot_transport_loaded').val();
+  // Prefer transport from selected group quotation (includes service duration & vehicle count)
+  if (quotation_id && quotation_id != '0' && quotTransportLoaded == '1') {
+    return;
+  }
   var tour_id = $('#cmb_tour_name').val();  // Get tour master ID, not group ID
   $.ajax({
     type: 'post',
     url: 'tab_2/get_transport_info.php',
     data: { tour_id: tour_id },  // Send tour_id instead of group_id
     success: function (result) {
-      var table = document.getElementById("tbl_booking_transport");
-      var transport_arr = JSON.parse(result);
-      
-      if (jQuery.isEmptyObject(transport_arr)) {
-        var f_row = table.rows[0];
-        f_row.cells[0].childNodes[0].removeAttribute('checked');
-      }
-      
-      // Clear existing rows except first
-      while (table.rows.length > 1) {
-        table.deleteRow(1);
-      }
-      
-      // Get today's date in dd-mm-yyyy format
-      var today = new Date();
-      var dd = String(today.getDate()).padStart(2, '0');
-      var mm = String(today.getMonth() + 1).padStart(2, '0');
-      var yyyy = today.getFullYear();
-      var todayDate = dd + '-' + mm + '-' + yyyy;
-      
-      // Add rows if needed
-      if (table.rows.length < transport_arr.length) {
-        for (var i = 1; i < transport_arr.length; i++) {
-          addRow('tbl_booking_transport');
-        }
-      }
-      
-      // Wait for rows to be added to DOM
-      setTimeout(function () {
-        for (var i = 0; i < transport_arr.length; i++) {
-          var row = table.rows[i];
-          
-          // Set vehicle using querySelector
-          var vehicleSelect = row.cells[2].querySelector('select');
-          if(vehicleSelect){
-            vehicleSelect.value = transport_arr[i]['vehicle_id'];
-            $(vehicleSelect).trigger('change');
-          }
-          
-          // Set dates using querySelector
-          var startDateInput = row.cells[3].querySelector('input');
-          if(startDateInput) startDateInput.value = todayDate;
-          
-          var endDateInput = row.cells[4].querySelector('input');
-          if(endDateInput) endDateInput.value = todayDate;
-          
-        // Set pickup location - Add pre-selected option then init with AJAX
-        if (transport_arr[i]['pickup_value'] && transport_arr[i]['pickup_value'] != '') {
-          var pickupSelect = row.cells[5].querySelector('select');
-          if(pickupSelect){
-            var $pickupSelect = $(pickupSelect);
-            // Add the pre-selected option
-            var pickupHtml = '<optgroup value="' + transport_arr[i]['pickup_type'] + '" label="' + ucfirst(transport_arr[i]['pickup_type']) + '">' +
-              '<option value="' + transport_arr[i]['pickup_value'] + '" selected>' + transport_arr[i]['pickup_location'] + '</option>' +
-              '</optgroup>';
-            $pickupSelect.html(pickupHtml);
-            // Initialize with AJAX so user can search for other options
-            destinationLoading($pickupSelect, 'Pickup Location');
-          }
-        }
-        
-        // Set drop location - Add pre-selected option then init with AJAX
-        if (transport_arr[i]['drop_value'] && transport_arr[i]['drop_value'] != '') {
-          var dropSelect = row.cells[6].querySelector('select');
-          if(dropSelect){
-            var $dropSelect = $(dropSelect);
-            // Add the pre-selected option
-            var dropHtml = '<optgroup value="' + transport_arr[i]['drop_type'] + '" label="' + ucfirst(transport_arr[i]['drop_type']) + '">' +
-              '<option value="' + transport_arr[i]['drop_value'] + '" selected>' + transport_arr[i]['drop_location'] + '</option>' +
-              '</optgroup>';
-            $dropSelect.html(dropHtml);
-            // Initialize with AJAX so user can search for other options
-            destinationLoading($dropSelect, 'Drop-off Location');
-          }
-        }
-        
-        // Set service duration from tour data
-        if (transport_arr[i]['service_duration'] && transport_arr[i]['service_duration'] != '') {
-          var durationSelect = row.cells[7].querySelector('select');
-          if(durationSelect){
-            var $durationSelect = $(durationSelect);
-            // Add the option if it doesn't exist, then select it
-            var durationValue = transport_arr[i]['service_duration'];
-            if ($durationSelect.find('option:contains("' + durationValue + '")').length === 0) {
-              $durationSelect.append('<option value="' + durationValue + '">' + durationValue + '</option>');
-            }
-            // Select by text match
-            $durationSelect.find('option').filter(function() {
-              return $(this).text() === durationValue;
-            }).prop('selected', true);
-          }
-        }
-        
-        // Set vehicle count from tour data
-        var vehicleCountInput = row.cells[8].querySelector('input');
-        if(vehicleCountInput){
-          vehicleCountInput.value = transport_arr[i]['vehicle_count'] || '';
-        }
-        
-        // Check the checkbox
-        var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
-        if(checkbox){
-          checkbox.checked = true;
-          checkbox.setAttribute('checked', 'checked');
-        }
-      }
-      
-      // DON'T call destinationLoading on ALL dropdowns - it will clear the pre-populated options!
-      // Each dropdown was already initialized with AJAX in the loop above
-      
-      // Reinitialize datepicker for all transport date fields (including new rows)
-      $('#tbl_booking_transport').find('.app_datepicker').datetimepicker({ 
-        timepicker: false, 
-        format: 'd-m-Y' 
-      });
-      
-      // Reinitialize vehicle dropdowns (simple select2, not AJAX)
-      $('#tbl_booking_transport').find('select[name^="transport_vehicle_name"]').each(function(){
-        if(!$(this).hasClass('select2-hidden-accessible')){
-          $(this).select2();
-        }
-      });
-      
-      }, 300);
+      fill_group_booking_transport_table(JSON.parse(result), false);
     }
   });
 
@@ -571,4 +454,333 @@ function tour_details_reflect(cmb_tour_group) {
 function ucfirst(str) {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function group_quotation_info_load() {
+  var quotation_id = $('#quotation_id').val();
+  $('#group_quot_transport_loaded').val('0');
+  if (quotation_id === '' || quotation_id === null) {
+    return;
+  }
+  // Sale without quotation — clear rates and fall back to tour master costing
+  if (quotation_id === '0') {
+    $('#quot_adult_rate').val(0);
+    $('#quot_with_bed_rate').val(0);
+    $('#quot_without_bed_rate').val(0);
+    $('#quot_infant_rate').val(0);
+    $('#quot_single_person_rate').val(0);
+    payment_details_reflected_data('tbl_member_dynamic_row');
+    return;
+  }
+
+  $.ajax({
+    type: 'post',
+    url: '../inc/group_quotation_info_load.php',
+    data: { quotation_id: quotation_id },
+    success: function (result) {
+      var response;
+      try {
+        response = JSON.parse(result);
+      } catch (e) {
+        console.error('Invalid quotation response', result);
+        return;
+      }
+      if (!response || response.status !== 'ok') {
+        return;
+      }
+
+      // Store quotation per-person rates for costing
+      $('#quot_adult_rate').val(response.adult_rate || 0);
+      $('#quot_with_bed_rate').val(response.with_bed_rate || 0);
+      $('#quot_without_bed_rate').val(response.without_bed_rate || 0);
+      $('#quot_infant_rate').val(response.infant_rate || 0);
+      $('#quot_single_person_rate').val(response.single_person_rate || 0);
+
+      // Apply quotation category amounts immediately (do not wait for member-row counting)
+      apply_group_quotation_costing(response);
+
+      // Set tour name then tour date from quotation
+      if (response.tour_id) {
+        $('#cmb_tour_name').val(String(response.tour_id));
+        if ($('#cmb_tour_name').hasClass('select2-hidden-accessible')) {
+          $('#cmb_tour_name').trigger('change.select2');
+        }
+        tour_type_reflect('cmb_tour_name');
+        tour_group_reflect('cmb_tour_name', false);
+        setTimeout(function () {
+          if (response.tour_group) {
+            $('#cmb_tour_group').val(String(response.tour_group));
+            seats_availability_reflect();
+            seats_availability_check();
+            due_date_reflect();
+            // Load other travelling sections from tour master, but transport from quotation
+            $('#group_quot_transport_loaded').val('1');
+            tour_details_reflect('cmb_tour_group');
+            // Fill transport after tour_details AJAX starts; delay so DOM/select2 are ready
+            setTimeout(function () {
+              fill_group_booking_transport_table(response.transport_info_arr || [], true);
+            }, 400);
+          }
+        }, 600);
+      } else {
+        $('#group_quot_transport_loaded').val('1');
+        fill_group_booking_transport_table(response.transport_info_arr || [], true);
+      }
+
+      if (response.booking_type) {
+        $('#tour_type_r').val(response.booking_type);
+      }
+      if (response.currency_code) {
+        $('#gcurrency_code').val(response.currency_code);
+      }
+      if (response.tax_apply_on) {
+        $('#tax_apply_on').val(response.tax_apply_on);
+      }
+      if (response.tax_value) {
+        $('#tax_value').val(response.tax_value);
+      }
+      if (response.tcsper !== undefined && response.tcsper !== null && response.tcsper !== '') {
+        $('#tcs_tax-').val(String(response.tcsper));
+      }
+      if (response.tcsvalue !== undefined) {
+        $('#tcs1').val(response.tcsvalue);
+      }
+    }
+  });
+}
+
+function apply_group_quotation_costing(response) {
+  if (!response) return;
+
+  var adultSeats = parseInt(response.total_adult, 10) || 0;
+  var cwbSeats = parseInt(response.children_with_bed, 10) || 0;
+  var cwobSeats = parseInt(response.children_without_bed, 10) || 0;
+  var infantSeats = parseInt(response.total_infant, 10) || 0;
+  var singleSeats = parseInt(response.single_person, 10) || 0;
+
+  $('#txt_adult_seats').val(adultSeats);
+  $('#txt_child_b_seats').val(cwbSeats);
+  $('#txt_child_wb_seats').val(cwobSeats);
+  $('#txt_infant_seats').val(infantSeats);
+  $('#txt_single_person_seats').val(singleSeats);
+
+  $('#txt_adult_expense').val(parseFloat(response.adult_cost || 0).toFixed(2));
+  $('#txt_child_bed_expense').val(parseFloat(response.with_bed_cost || 0).toFixed(2));
+  $('#txt_child_wbed_expense').val(parseFloat(response.children_cost || 0).toFixed(2));
+  $('#txt_infant_expense').val(parseFloat(response.infant_cost || 0).toFixed(2));
+  $('#txt_single_person_expense').val(parseFloat(response.single_person_cost || 0).toFixed(2));
+
+  var totalPass = adultSeats + cwbSeats + cwobSeats + infantSeats + singleSeats;
+  $('#txt_total_seats').val(totalPass);
+  $('#txt_stay_total_seats').val(totalPass || response.total_passangers || 0);
+
+  if (typeof tour_cost_calculate === 'function') {
+    tour_cost_calculate('');
+  } else {
+    var total =
+      parseFloat(response.adult_cost || 0) +
+      parseFloat(response.with_bed_cost || 0) +
+      parseFloat(response.children_cost || 0) +
+      parseFloat(response.infant_cost || 0) +
+      parseFloat(response.single_person_cost || 0);
+    $('#txt_total_expense').val(total.toFixed(2));
+    $('#txt_tour_fee').val(total.toFixed(2));
+    if (typeof calculate_total_discount === 'function') {
+      calculate_total_discount('');
+    }
+  }
+}
+
+function fill_group_booking_transport_table(transport_arr, fromQuotation) {
+  var table = document.getElementById('tbl_booking_transport');
+  if (!table) {
+    return;
+  }
+  transport_arr = transport_arr || [];
+
+  if (!transport_arr.length) {
+    var f_row = table.rows[0];
+    if (f_row && f_row.cells[0]) {
+      var chk = f_row.cells[0].querySelector('input[type="checkbox"]');
+      if (chk) {
+        chk.removeAttribute('checked');
+        chk.checked = false;
+      }
+    }
+    while (table.rows.length > 1) {
+      table.deleteRow(1);
+    }
+    return;
+  }
+
+  while (table.rows.length > 1) {
+    table.deleteRow(1);
+  }
+  while (table.rows.length < transport_arr.length) {
+    addRow('tbl_booking_transport');
+  }
+
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
+  var yyyy = today.getFullYear();
+  var todayDate = dd + '-' + mm + '-' + yyyy;
+
+  setTimeout(function () {
+    for (var i = 0; i < transport_arr.length; i++) {
+      var row = table.rows[i];
+      if (!row) continue;
+
+      var vehicleSelect = row.cells[2].querySelector('select');
+      if (vehicleSelect) {
+        vehicleSelect.value = transport_arr[i]['vehicle_id'];
+        $(vehicleSelect).trigger('change');
+      }
+
+      var startDateInput = row.cells[3].querySelector('input');
+      if (startDateInput) {
+        startDateInput.value = (fromQuotation && transport_arr[i]['start_date'])
+          ? transport_arr[i]['start_date']
+          : todayDate;
+      }
+      var endDateInput = row.cells[4].querySelector('input');
+      if (endDateInput) {
+        endDateInput.value = (fromQuotation && transport_arr[i]['end_date'])
+          ? transport_arr[i]['end_date']
+          : todayDate;
+      }
+
+      if (transport_arr[i]['pickup_value'] && transport_arr[i]['pickup_value'] != '') {
+        var pickupSelect = row.cells[5].querySelector('select');
+        if (pickupSelect) {
+          var $pickupSelect = $(pickupSelect);
+          var pickupHtml =
+            '<optgroup value="' +
+            transport_arr[i]['pickup_type'] +
+            '" label="' +
+            ucfirst(transport_arr[i]['pickup_type']) +
+            '">' +
+            '<option value="' +
+            transport_arr[i]['pickup_value'] +
+            '" selected>' +
+            transport_arr[i]['pickup_location'] +
+            '</option>' +
+            '</optgroup>';
+          $pickupSelect.html(pickupHtml);
+          destinationLoading($pickupSelect, 'Pickup Location');
+        }
+      }
+
+      if (transport_arr[i]['drop_value'] && transport_arr[i]['drop_value'] != '') {
+        var dropSelect = row.cells[6].querySelector('select');
+        if (dropSelect) {
+          var $dropSelect = $(dropSelect);
+          var dropHtml =
+            '<optgroup value="' +
+            transport_arr[i]['drop_type'] +
+            '" label="' +
+            ucfirst(transport_arr[i]['drop_type']) +
+            '">' +
+            '<option value="' +
+            transport_arr[i]['drop_value'] +
+            '" selected>' +
+            transport_arr[i]['drop_location'] +
+            '</option>' +
+            '</optgroup>';
+          $dropSelect.html(dropHtml);
+          destinationLoading($dropSelect, 'Drop-off Location');
+        }
+      }
+
+      if (transport_arr[i]['service_duration'] && transport_arr[i]['service_duration'] != '') {
+        var durationSelect = row.cells[7].querySelector('select');
+        if (durationSelect) {
+          var $durationSelect = $(durationSelect);
+          var durationValue = String(transport_arr[i]['service_duration']).trim();
+          var durationId = transport_arr[i]['s_duration_id']
+            ? String(transport_arr[i]['s_duration_id'])
+            : '';
+
+          // Ensure option exists (dropdown values are entry_id, text is duration label)
+          if (durationId && !$durationSelect.find('option[value="' + durationId + '"]').length) {
+            $durationSelect.append(
+              '<option value="' + durationId + '">' + durationValue + '</option>'
+            );
+          }
+          if (!durationId) {
+            var matched = $durationSelect.find('option').filter(function () {
+              return $(this).text().trim() === durationValue;
+            });
+            if (matched.length) {
+              durationId = matched.first().attr('value');
+            } else {
+              durationId = durationValue;
+              $durationSelect.append(
+                '<option value="' + durationId + '">' + durationValue + '</option>'
+              );
+            }
+          }
+
+          durationSelect.value = durationId;
+          if ($durationSelect.data('select2')) {
+            $durationSelect.val(durationId).trigger('change');
+          } else {
+            $durationSelect.select2({ width: '170px' });
+            $durationSelect.val(durationId).trigger('change');
+          }
+        }
+      }
+
+      var vehicleCountInput = row.cells[8].querySelector('input');
+      if (vehicleCountInput) {
+        vehicleCountInput.value =
+          transport_arr[i]['vehicle_count'] !== undefined &&
+          transport_arr[i]['vehicle_count'] !== null
+            ? transport_arr[i]['vehicle_count']
+            : '';
+      }
+
+      var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.checked = true;
+        checkbox.setAttribute('checked', 'checked');
+      }
+    }
+
+    $('#tbl_booking_transport').find('.app_datepicker').datetimepicker({
+      timepicker: false,
+      format: 'd-m-Y'
+    });
+    $('#tbl_booking_transport')
+      .find('select[name^="transport_vehicle_name"]')
+      .each(function () {
+        if (!$(this).hasClass('select2-hidden-accessible')) {
+          $(this).select2();
+        }
+      });
+    // Re-assert duration after select2 inits (can wipe value on first paint)
+    for (var d = 0; d < transport_arr.length; d++) {
+      if (!transport_arr[d]['service_duration']) continue;
+      var dRow = table.rows[d];
+      if (!dRow) continue;
+      var dSelect = dRow.cells[7].querySelector('select');
+      if (!dSelect) continue;
+      var dVal = transport_arr[d]['s_duration_id']
+        ? String(transport_arr[d]['s_duration_id'])
+        : '';
+      var dText = String(transport_arr[d]['service_duration']).trim();
+      if (!dVal) {
+        var opt = $(dSelect)
+          .find('option')
+          .filter(function () {
+            return $(this).text().trim() === dText;
+          })
+          .first();
+        if (opt.length) dVal = opt.attr('value');
+      }
+      if (dVal) {
+        $(dSelect).val(dVal).trigger('change');
+      }
+    }
+  }, 500);
 }

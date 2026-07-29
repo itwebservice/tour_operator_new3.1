@@ -54,5 +54,7 @@
     if (typeof initAllVehicleSelectAddNew === 'function') {
         initAllVehicleSelectAddNew('#tbl_booking_transport');
     }
+     $('#transport_service_duration1').select2({});
+
 </script>
 

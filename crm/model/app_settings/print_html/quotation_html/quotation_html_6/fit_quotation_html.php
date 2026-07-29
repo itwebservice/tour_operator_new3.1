@@ -237,7 +237,7 @@ $o6_client      = o6nv($ov['client_name'], o6nv($hero['client_name'], 'Guest'));
 $o6_first       = o6_first_name($o6_client);
 $o6_company     = o6nv($hero['company_name'], 'Travel Partner');
 $o6_logo        = o6nv($hero['company_logo'], '');
-$o6_tour_id     = o6nv($hero['package_code'], o6nv($ov['tour_id'], ''));
+$o6_tour_id     = o6nv($ov['enquiry_code'], o6nv($ov['enquiry_id'], ''));
 $o6_quot_code   = o6nv($hero['quotation_code'], '');
 $o6_duration    = o6nv($ov['duration_label'], o6nv($hero['duration_label'], ''));
 $o6_travel_from = o6nv($ov['travel_from'], '');
@@ -499,7 +499,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             <span class="val font-highlight"><?= o6e($o6_quot_code) ?></span>
           </div>
           <div class="overview-item">
-            <span class="label">TOUR ID</span>
+            <span class="label">ENQUIRY ID</span>
             <span class="val"><?= o6e($o6_tour_id) ?></span>
           </div>
           <div class="overview-item">

@@ -263,7 +263,7 @@ $o3_cover_img = o3img(o3nv($hero['cover_image'], ''), $assets . 'cover.jpg');
 list($o3_b1, $o3_b2) = o3_brand_lines(o3nv($hero['company_name'], 'Travel Partner'));
 $o3_logo      = o3nv($hero['company_logo'], '');
 $o3_strip     = o3_cover_strip($q, $hotels, $itin, $assets);
-$o3_tour_id   = o3nv($hero['package_code'], o3nv($ov['tour_id'], ''));
+$o3_tour_id   = o3nv($ov['enquiry_code'], o3nv($ov['enquiry_id'], ''));
 $o3_pkg_badge = '';
 if (!empty($q['package_types_label'])) {
   $o3_pkg_badge = $q['package_types_label'];
@@ -428,7 +428,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         <div class="ov-card">
           <div class="ov-icon" style="background:#2a5298;">🎯</div>
           <div>
-            <div class="ov-label">Tour ID</div>
+            <div class="ov-label">Enquiry ID</div>
             <div class="ov-value"><?= o3e($o3_tour_id) ?></div>
           </div>
         </div>

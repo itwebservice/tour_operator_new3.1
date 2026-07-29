@@ -28,7 +28,9 @@ $sq_terms_cond = mysqli_fetch_assoc(mysqlQuery("select * from terms_and_conditio
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from group_tour_quotation_master where quotation_id='$quotation_id'"));
 $sq_package_program = mysqlQuery("select * from group_tour_program where tour_id ='$sq_quotation[tour_group_id]'");
 $sq_tour = mysqli_fetch_assoc(mysqlQuery("select * from tour_master where tour_id='$sq_quotation[tour_group_id]'"));
-$sq_dest = mysqli_fetch_assoc(mysqlQuery("select link from video_itinerary_master where dest_id = '$sq_tour[dest_id]'"));
+if (!$sq_tour) { $sq_tour = array(); }
+$dest_id = isset($sq_tour['dest_id']) ? $sq_tour['dest_id'] : 0;
+$sq_dest = mysqli_fetch_assoc(mysqlQuery("select link from video_itinerary_master where dest_id = '$dest_id'"));
 $sq_login = mysqli_fetch_assoc(mysqlQuery("select * from roles where id='$sq_quotation[login_id]'"));
 $sq_emp_info = mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id='$sq_login[emp_id]'"));
 
@@ -94,7 +96,7 @@ $currency_amount1 = currency_conversion($currency,$sq_quotation['currency_code']
     <section class="landingSec main_block">
 
       <div class="landingPageTop main_block">
-        <img src="<?= getFormatImg($app_quot_format, $sq_tour['dest_id']) ?>" class="img-responsive">
+        <img src="<?= getFormatImg($app_quot_format, $dest_id) ?>" class="img-responsive">
         <h1 class="landingpageTitle"><?= $sq_quotation['tour_name'] ?></h1>
         <span class="landingPageId"><?= get_quotation_id($quotation_id,$year) ?><br><?= get_date_user($sq_quotation['from_date']) . ' To ' . get_date_user($sq_quotation['to_date']) ?></span>
       </div>

@@ -223,7 +223,7 @@
 
             </div>
 
-            <div class="col-md-3 col-sm-6 mg_bt_10 hidden">
+            <div class="col-md-3 col-sm-6 mg_bt_10">
 
                 <select name="active_flag" id="active_flag" title="Status" class="hidden">
 
@@ -239,8 +239,8 @@
                 <input type="hidden" id="salary" name="salary" placeholder="Salary" title="Salary" value="0.00">
 
             </div>
-        <!-- </div> -->
-        <!-- <div class="row"> -->
+        </div>
+        <div class="row">
 
             <div class="col-md-3 col-sm-6 col-xs-7 text-left">
 
@@ -271,7 +271,7 @@
                 </div>
             </div>
 
-        <!-- </div> -->
+        </div>
 
     </div>
     <div class="panel panel-default panel-body app_panel_style feildset-panel mg_tp_30">
