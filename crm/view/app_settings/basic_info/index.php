@@ -387,6 +387,8 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 				var qr_url = $('#qr_upload_url_i').val();
 				var sign_url = $('#sign_upload_url_i').val();
 
+				var app_email_id= $('#app_email_id').val();
+
 				$('#setting_save').button('loading');
 				if ($('#frm_basic_info').valid()) {
 					$('#vi_confirm_box').vi_confirm_box({
@@ -414,7 +416,8 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 										tax_pay_date: tax_pay_date,
 										credit_card: credit_card,
 										qr_url: qr_url,
-										sign_url: sign_url
+										sign_url: sign_url,
+										app_email_id:app_email_id
 									},
 									success: function(result) {
 										msg_popup_reload(result);

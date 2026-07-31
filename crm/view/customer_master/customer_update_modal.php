@@ -187,12 +187,40 @@ $email_id = $encrypt_decrypt->fnDecrypt($sq_customer['email_id'], $secret_key);
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script>
 
+// Opera/Chromium: Bootstrap modal enforceFocus blocks typing in Select2 search
+$.fn.modal.Constructor.prototype.enforceFocus = function () {};
 
-$('#gl_id1,#cust_state1,#country_code1').select2({
-    dropdownParent: $("#customer_update_modal")});
-    $('.app_select2').select2({
-        dropdownParent: $("#customer_update_modal")});
+function init_customer_update_select2() {
+    var $modal = $('#customer_update_modal');
+    $modal.find('select.app_select2').each(function () {
+        var $el = $(this);
+        if ($el.data('select2')) {
+            $el.select2('destroy');
+        }
+        $el.select2({
+            width: '100%',
+            dropdownParent: $modal,
+            minimumResultsForSearch: 0
+        });
+    });
+}
+
+init_customer_update_select2();
+
+$(document).off('select2:open.customerUpdate').on('select2:open.customerUpdate', '#customer_update_modal select', function () {
+    setTimeout(function () {
+        var $search = $('.select2-container--open .select2-search__field');
+        if ($search.length) {
+            $search.focus();
+        }
+    }, 0);
+});
+
 $('#customer_update_modal').modal('show');
+$('#customer_update_modal').one('shown.bs.modal', function () {
+    // Re-init after global shown.bs.modal handler so dropdown stays inside modal
+    setTimeout(init_customer_update_select2, 0);
+});
 $('#birth_date1').datetimepicker({
     timepicker: false,
     format: 'd-m-Y'

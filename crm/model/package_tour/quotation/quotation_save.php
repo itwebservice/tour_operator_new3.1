@@ -530,47 +530,111 @@ public function program_entries_save($quotation_id_arr,$attraction_arr, $program
 
 }public function pp_costing_save($quotation_id_arr, $pp_costing_arr)
 {
-    for($i = 0; $i < sizeof($quotation_id_arr); $i++)
-    {
-        $quotation_id = $quotation_id_arr[$i];
+    ensure_pp_costing_package_type_column();
+    // Supports:
+    // 1) Multi-package under ONE quotation: [{ package_type, rows: [...] }, ...]
+    //    → all blocks saved to the primary quotation_id with package_type
+    // 2) Legacy flat: [adult, cweb, cwnb, infant]
+    $is_multi = isset($pp_costing_arr[0]) && is_array($pp_costing_arr[0]) && isset($pp_costing_arr[0]['rows']);
 
-        foreach ($pp_costing_arr as $row)
-        {
+    // Prefer saving all PP packages onto the last/primary quotation that holds costing_entries
+    $primary_quotation_id = '';
+    if (is_array($quotation_id_arr) && sizeof($quotation_id_arr) > 0) {
+        $primary_quotation_id = $quotation_id_arr[sizeof($quotation_id_arr) - 1];
+    }
+
+    if ($is_multi) {
+        $quotation_id = $primary_quotation_id;
+        // Clear previous PP for this quotation so re-save is clean
+        mysqlQuery("DELETE FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
+
+        foreach ($pp_costing_arr as $pkg) {
+            if (!is_array($pkg) || !isset($pkg['rows']) || !is_array($pkg['rows'])) {
+                continue;
+            }
+            $package_type = isset($pkg['package_type']) ? mysqlREString($pkg['package_type']) : '';
+            foreach ($pkg['rows'] as $row) {
+                if (!is_array($row) || !isset($row['type'])) {
+                    continue;
+                }
+                $this->pp_costing_insert_row($quotation_id, $package_type, $row);
+            }
+        }
+        return;
+    }
+
+    for ($i = 0; $i < sizeof($quotation_id_arr); $i++) {
+        $quotation_id = $quotation_id_arr[$i];
+        foreach ($pp_costing_arr as $row) {
+            if (!is_array($row) || !isset($row['type'])) {
+                continue;
+            }
+            $this->pp_costing_insert_row($quotation_id, '', $row);
+        }
+    }
+}
+
+private function pp_costing_insert_row($quotation_id, $package_type, $row)
+{
             $type = $row['type'];
+            $tax_apply_on = pp_tax_apply_on_to_db(isset($row['tax_apply_on']) ? $row['tax_apply_on'] : '');
+            $tax_value = isset($row['tax_value']) ? $row['tax_value'] : '';
+            $tax_amount = isset($row['tax_amount']) ? $row['tax_amount'] : 0;
+            $tcs = isset($row['tcs']) ? $row['tcs'] : '';
+            $tcs_amount = isset($row['tcs_amount']) ? $row['tcs_amount'] : 0;
+            $tcs_percent = 0;
+            if ((string)$tcs === '2') { $tcs_percent = 2; }
+            if ((string)$tcs === '3') { $tcs_percent = 20; }
+
+            $hotel = isset($row['hotel']) ? $row['hotel'] : 0;
+            $transfer = isset($row['transfer']) ? $row['transfer'] : 0;
+            $activity = isset($row['activity']) ? $row['activity'] : 0;
+            $land_cost = isset($row['land_cost']) ? $row['land_cost'] : 0;
+            $service_charge = isset($row['service_charge']) ? $row['service_charge'] : 0;
+            $discount_in = isset($row['discount_in']) ? $row['discount_in'] : 0;
+            $discount_amount = isset($row['discount_amount']) ? $row['discount_amount'] : 0;
+            $flight = isset($row['flight']) ? $row['flight'] : 0;
+            $train = isset($row['train']) ? $row['train'] : 0;
+            $cruise = isset($row['cruise']) ? $row['cruise'] : 0;
+            $visa = isset($row['visa']) ? $row['visa'] : 0;
+            $guide = isset($row['guide']) ? $row['guide'] : 0;
+            $misc = isset($row['misc']) ? $row['misc'] : 0;
+            $total = isset($row['total']) ? $row['total'] : 0;
+            $package_type_sql = mysqlREString($package_type);
 
             $sq = "INSERT INTO package_quotation_pp_costing SET 
                 quotation_id= '$quotation_id',
                 pax_type = '$type',
+                package_type = '$package_type_sql',
 
-                hotel_cost = '{$row['hotel']}',
-                transfer_cost = '{$row['transfer']}',
-                activity_cost = '{$row['activity']}',
-                land_cost = '{$row['land_cost']}',
+                hotel_cost = '$hotel',
+                transfer_cost = '$transfer',
+                activity_cost = '$activity',
+                land_cost = '$land_cost',
 
-                service_charge = '{$row['service_charge']}',
-                discount_in = '{$row['discount_in']}',
-                discount_amount = '{$row['discount_amount']}',
+                service_charge = '$service_charge',
+                discount_in = '$discount_in',
+                discount_amount = '$discount_amount',
 
-                flight_cost = '{$row['flight']}',
-                train_cost = '{$row['train']}',
-                cruise_cost = '{$row['cruise']}',
-                visa_cost = '{$row['visa']}',
-                guide_cost = '{$row['guide']}',
-                misc_cost = '{$row['misc']}',
+                flight_cost = '$flight',
+                train_cost = '$train',
+                cruise_cost = '$cruise',
+                visa_cost = '$visa',
+                guide_cost = '$guide',
+                misc_cost = '$misc',
 
-                tax_apply_on = '{$row['tax_apply_on']}',
-                tax_value = '{$row['tax_value']}',
-                tax_amount = '{$row['tax_amount']}',
+                tax_apply_on = '$tax_apply_on',
+                tax_value = '".mysqlREString($tax_value)."',
+                tax_amount = '$tax_amount',
 
-                tcs = '{$row['tcs']}',
-                tcs_amount = '{$row['tcs_amount']}',
+                tcs = '$tcs',
+                tcs_percent = '$tcs_percent',
+                tcs_amount = '$tcs_amount',
 
-                total_cost = '{$row['total']}'
+                total_cost = '$total'
             ";
 
             mysqlQuery($sq);
-        }
-    }
 }
     public function costing_entries_save($tcs_arr,$tcsvalue_arr,$quotation_id,$tour_cost_arr,$basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr,$transport_cost_arr,$excursion_cost_arr,$adult_cost_arr,$infant_cost_arr,$child_with_arr,$child_without_arr,$bsmValues,$package_type_c_arr,$discount_in_arr,$discount_arr)
     {

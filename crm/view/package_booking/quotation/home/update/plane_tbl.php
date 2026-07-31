@@ -25,15 +25,15 @@
 							<option value="">*To Sector</option>
 						</select>
 					</td>            
-		            <td title="Airline Name"><select id="airline_name1" class="form-control app_select2"  title="Airline Name" name="airline_name1" style="width: 160px;" data-add-new-option="true">
+		            <td title="Airline Name"><select id="airline_name1" class="form-control app_select2"  title="Airline Name" name="airline_name1" style="width: 120px;" data-add-new-option="true">
 		                    <option value="">Airline Name</option>
 		                    <?php get_airline_name_dropdown(); ?>
 		            </select></td>
-		            <td title="Class"><select name="plane_class" id="plane_class1" title="Class" class="form-control app_select2" style="width:100px">
+		            <td title="Class"><select name="plane_class" id="plane_class1" title="Class" class="form-control app_select2" style="width:170px">
                             	<?php get_flight_class_dropdown(); ?>
 				            </select></td>
-		            <td><input type="text" id="txt_dapart1" name="txt_dapart1"  class="app_datetimepicker" placeholder="Departure Date and time" onchange="get_to_datetime(this.id,'txt_arrval1')" title="Departure Date and time" style="width:180px" /></td>	           
-		            <td><input type="text" id="txt_arrval1" name="txt_arrval1" class="app_datetimepicker" placeholder="Arrival Date and time" title="Arrival Date and time" style="width:180px" onchange="validate_validDatetime('txt_dapart1',this.id)"/></td>
+		            <td><input type="text" id="txt_dapart1" name="txt_dapart1"  class="app_datetimepicker" placeholder="Departure Date and time" onchange="get_to_datetime(this.id,'txt_arrval1')" title="Departure Date and time" style="width:150px" /></td>	           
+		            <td><input type="text" id="txt_arrval1" name="txt_arrval1" class="app_datetimepicker" placeholder="Arrival Date and time" title="Arrival Date and time" style="width:150px" onchange="validate_validDatetime('txt_dapart1',this.id)"/></td>
 					<td><input type="hidden" id="from_city-1"></td>
 					<td><input type="hidden" id="to_city-1"></td>
 		            <td><input type="hidden" id="txt_count1" name="txt_count1" value=""></td></tr>
@@ -41,7 +41,7 @@
 		        <script>
 		            $('#txt_dapart1, #txt_arrval1').datetimepicker({ timepicker:true, format:'d-m-Y H:i' });
 	            	$('#txt_arrval1, #txt_dapart1').datetimepicker({format:'d-m-Y H:i' });
-	            	$('#plane_class1').select2({ width: '100px' });
+	            	$('#plane_class1').select2({ width: '170px' });
 	            </script>
 				<?php
 			}

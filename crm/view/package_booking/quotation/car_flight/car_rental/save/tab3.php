@@ -55,10 +55,10 @@
 								<td class='col-md-5 no-pad' style="padding-left: 5px !important;position: relative;"><textarea id="day_program1" name="day_program" style="height:90px;" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
 								</td>
 								<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay1" style="margin-top: 35px;" name="overnight_stay" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" placeholder="Overnight Stay" title="Overnight Stay"></td>
-								<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan1" title="meal plan" style="margin-top: 35px;" name="meal_plan" class="form-control mg_bt_10" data-original-title="Meal Plan">
+								<!-- <td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan1" title="meal plan" style="margin-top: 35px;" name="meal_plan" class="form-control mg_bt_10" data-original-title="Meal Plan">
 										<?php get_mealplan_dropdown(); ?>
 										</select></td>
-								<td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm itinerary-btn" style="margin-top: 35px; border:none;" data-row="1" id="itinerary1" title="Add Itinerary" onClick="add_itinerary_car_quotation(0,'special_attaraction1','day_program1','overnight_stay1','meal_plan1','Day-1')"><i class="fa fa-plus"></i></button></td>
+								<td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm itinerary-btn" style="margin-top: 35px; border:none;" data-row="1" id="itinerary1" title="Add Itinerary" onClick="add_itinerary_car_quotation(0,'special_attaraction1','day_program1','overnight_stay1','meal_plan1','Day-1')"><i class="fa fa-plus"></i></button></td> -->
 								<td style="display:none"><input type="text" name="package_id_n" value="" autocomplete="off" class="form-control" data-original-title="" title=""></td>
 							</tr>
 						</tbody>

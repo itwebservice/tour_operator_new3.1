@@ -434,7 +434,7 @@ $o2_round = o2img(
               </span>
               <div>
                 <div class="t">Travel Dates</div>
-                <div class="v sm"><?= o2e($o2_travel_dates) ?></div>
+                <div class="v sm"><?= o2nv($ov['travel_from'], '') ?> &ndash; <br/><?= o2nv($ov['travel_to'], '') ?></div>
               </div>
             </div>
             <div class="card ov"><span class="ic">

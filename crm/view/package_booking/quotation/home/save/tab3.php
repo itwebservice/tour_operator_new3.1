@@ -1,3 +1,8 @@
+<style>
+    #ui-datepicker-div {
+        display: none !important;
+    }
+</style>
 <form id="frm_tab3">
     <div class="app_panel" style="overflow:hidden;">
 
@@ -896,9 +901,12 @@
                                 'adult_cost': hotel_arr[i]['adult_cost'],
                                 'child_with_bed': hotel_arr[i]['child_with_bed'],
                                 'child_without_bed': hotel_arr[i]['child_without_bed'],
+                                'infant_cost': hotel_arr[i]['infant_cost'] || 0,
                                 'package_id': hotel_arr[i]['package_id'],
                                 'flag': hotel_arr[i]['flag'],
-                                'package_type': row.cells[2].childNodes[0].value,
+                                'package_type': (typeof quotationGetHotelRowPackageType === 'function'
+                                    ? quotationGetHotelRowPackageType(row)
+                                    : (row.cells[2].childNodes[0].value)),
                                 'checked': true
                             });
                         } else {
@@ -908,8 +916,11 @@
                                 'adult_cost': 0,
                                 'child_with_bed': 0,
                                 'child_without_bed': 0,
+                                'infant_cost': 0,
                                 'package_id': hotel_arr[i]['package_id'],
-                                'package_type': row.cells[2].childNodes[0].value,
+                                'package_type': (typeof quotationGetHotelRowPackageType === 'function'
+                                    ? quotationGetHotelRowPackageType(row)
+                                    : (row.cells[2].childNodes[0].value)),
                                 'checked': false
                             });
                         }
@@ -1576,6 +1587,7 @@
                         'adult_cost': adult_cost_total1,
                         'cwb_cost': cwb_cost_total1,
                         'cwob_cost': cwob_cost_total1,
+                        'infant_cost': 0,
                         'type': unique_package_type_arr[i],
                         'checked': false
                     });
@@ -1598,42 +1610,19 @@
                 var per_cwob = [];
                 var per_infant = [];
 
-                //Adult & Child Per Person Costing
-                var table = document.getElementById("tbl_package_tour_quotation_adult_child");
-                if (table.rows.length == 1) {
-                    for (var k = 1; k < table.rows.length; k++) {
-                        document.getElementById("tbl_package_tour_quotation_adult_child").deleteRow(k);
-                    }
-                } else {
-                    while (table.rows.length > 1) {
-                        document.getElementById("tbl_package_tour_quotation_adult_child").deleteRow((
-                            table.rows.length - 1));
-                        table.rows.length--;
-                    }
-                }
-                if (table.rows.length != hotel_per_person_arr.length) {
-                    for (var i = 1; i < hotel_per_person_arr.length; i++) {
-
-                        addRow('tbl_package_tour_quotation_adult_child');
-                    }
-                }
+                // Per-person hotel totals (arrays only — UI blocks are built later, one full design per package)
                 if (hotel_per_person_arr.length === 0) {
-                    var row = table.rows[0];
-                    row.cells[0].childNodes[0].value = 'NA';
-                    row.cells[1].childNodes[0].value = 0;
-                }
-                for (var k = 0; k < hotel_per_person_arr.length; k++) {
-
-                    var row = table.rows[k];
-                    row.cells[0].childNodes[0].value = hotel_per_person_arr[k]['type'];
-                    row.cells[1].childNodes[0].value = hotel_per_person_arr[k]['adult_cost'];
-                    row.cells[2].childNodes[0].value = hotel_per_person_arr[k]['cwb_cost'];
-                    row.cells[3].childNodes[0].value = hotel_per_person_arr[k]['cwob_cost'];
-                    row.cells[4].childNodes[0].value = 0;
-                    per_adult.push(hotel_per_person_arr[k]['adult_cost']);
-                    per_cwb.push(hotel_per_person_arr[k]['cwb_cost']);
-                    per_cwob.push(hotel_per_person_arr[k]['cwob_cost']);
+                    per_adult.push(0);
+                    per_cwb.push(0);
+                    per_cwob.push(0);
                     per_infant.push(0);
+                } else {
+                    for (var k = 0; k < hotel_per_person_arr.length; k++) {
+                        per_adult.push(hotel_per_person_arr[k]['adult_cost']);
+                        per_cwb.push(hotel_per_person_arr[k]['cwb_cost']);
+                        per_cwob.push(hotel_per_person_arr[k]['cwob_cost']);
+                        per_infant.push(hotel_per_person_arr[k]['infant_cost'] || 0);
+                    }
                 }
                 ////////////////////Hotel End//////////////////////////
                 //Transport Information
@@ -1741,10 +1730,10 @@
                         parseInt(total_passangers));
                 }
                 var table = document.getElementById("tbl_package_tour_quotation_adult_child");
-                var rowCount = table.rows.length;
+                var rowCount = (table && table.rows) ? table.rows.length : hotel_per_person_arr.length;
                 if (per_adult.length == 0) {
 
-                    for (var j = 0; j < rowCount; j++) {
+                    for (var j = 0; j < Math.max(rowCount, hotel_per_person_arr.length, 1); j++) {
                         per_adult.push(0);
                         per_cwb.push(0);
                         per_cwob.push(0);
@@ -1753,7 +1742,6 @@
                 }
                 for (var j = 0; j < package_type_arr; j++) {
 
-                    var row = table.rows[j];
                     var adult_cost_total1 = (per_adult[j]) ? per_adult[j] : 0;
                     var cwb_cost_total1 = (per_cwb[j]) ? per_cwb[j] : 0;
                     var cwob_cost_total1 = (per_cwob[j]) ? per_cwob[j] : 0;
@@ -1765,28 +1753,17 @@
                     var child_without_bede = (parseInt(child_without_bed) !== 0) ? per_person_tr_arr[
                         0] : 0;
                     var exc_infant_coste = (parseInt(total_infant) !== 0) ? per_person_tr_arr[0] : 0;
-                    row.cells[1].childNodes[0].value = parseFloat(hadult_cost) + parseFloat(
-                        adult_cost_total1);
-                    row.cells[2].childNodes[0].value = parseFloat(child_with_bed_coste) + parseFloat(
-                        cwb_cost_total1);
-                    row.cells[3].childNodes[0].value = parseFloat(child_without_bede) + parseFloat(
-                        cwob_cost_total1);
-                    row.cells[4].childNodes[0].value = parseFloat(exc_infant_coste) + parseFloat(
-                        infant_cost_total1);
+                    // Keep hotel-only in per_* ; transfer stored on package object for PP fields
+                    if (hotel_per_person_arr[j]) {
+                        hotel_per_person_arr[j].transfer_adult = hadult_cost;
+                        hotel_per_person_arr[j].transfer_cweb = child_with_bed_coste;
+                        hotel_per_person_arr[j].transfer_cwnb = child_without_bede;
+                        hotel_per_person_arr[j].transfer_infant = exc_infant_coste;
+                    }
                 }
 
                 if (unique_package_id_arr.length !== 0) {
-                    per_adult = [];
-                    per_cwb = [];
-                    per_cwob = [];
-                    per_infant = [];
-                    for (var j = 0; j < rowCount; j++) {
-                        var row = table.rows[j];
-                        per_adult.push(row.cells[1].childNodes[0].value);
-                        per_cwb.push(row.cells[2].childNodes[0].value);
-                        per_cwob.push(row.cells[3].childNodes[0].value);
-                        per_infant.push(row.cells[4].childNodes[0].value);
-                    }
+                    // per_* remain hotel-only for package-wise PP hotel fields
                 }
                 ////////////////// Transport End ///////////////////////
                 var children_with_bed = $('#children_with_bed').val();
@@ -1890,29 +1867,17 @@ if (final_count === 0) final_count = 1;
 // ===== PER PERSON TRANSFER =====
 var final_tranfer_cost = parseFloat(exc_ftransfer_cost) / final_count;
 
-// ===== FINAL VALUES =====
-$("#adult_activity_pp").val(
-    (hadult_cost + (parseInt(adult_count) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
-);
+// ===== FINAL VALUES (applied to every package PP block below) =====
+var pp_activity_adult = (hadult_cost + (parseInt(adult_count) !== 0 ? final_tranfer_cost : 0));
+var pp_activity_cweb = (child_with_bed_coste + (parseInt(child_with_bed) !== 0 ? final_tranfer_cost : 0));
+var pp_activity_cwnb = (child_without_bede + (parseInt(child_without_bed) !== 0 ? final_tranfer_cost : 0));
+var pp_activity_infant = (exc_infant_coste + (parseInt(total_infant) !== 0 ? final_tranfer_cost : 0));
 
-$("#cweb_activity_pp").val(
-    (child_with_bed_coste + (parseInt(child_with_bed) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
-);
-
-$("#cwnb_activity_pp").val(
-    (child_without_bede + (parseInt(child_without_bed) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
-);
-
-$("#infant_activity_pp").val(
-    (exc_infant_coste + (parseInt(total_infant) !== 0 ? final_tranfer_cost : 0)).toFixed(2)
-);
-               
-              
                 var table = document.getElementById("tbl_package_tour_quotation_adult_child");
-                var rowCount = table.rows.length;
+                var rowCount = (table && table.rows) ? table.rows.length : hotel_per_person_arr.length;
                 if (per_adult.length == 0) {
 
-                    for (var j = 0; j < rowCount; j++) {
+                    for (var j = 0; j < Math.max(rowCount, hotel_per_person_arr.length, 1); j++) {
                         per_adult.push(0);
                         per_cwb.push(0);
                         per_cwob.push(0);
@@ -1921,25 +1886,50 @@ $("#infant_activity_pp").val(
                 }
                 for (var j = 0; j < package_type_arr; j++) {
 
-                    var row = table.rows[j];
                     var adult_cost_total1 = (per_adult[j]) ? per_adult[j] : 0;
                     var cwb_cost_total1 = (per_cwb[j]) ? per_cwb[j] : 0;
                     var cwob_cost_total1 = (per_cwob[j]) ? per_cwob[j] : 0;
                     var infant_cost_total1 = (per_infant[j]) ? per_infant[j] : 0;
-                    row.cells[1].childNodes[0].value = parseFloat(parseFloat(hadult_cost) + parseFloat(
-                        adult_cost_total1) + parseFloat(exc_atransfer_cost)).toFixed(2);
-                    row.cells[2].childNodes[0].value = parseFloat(parseFloat(child_with_bed_coste) +
-                        parseFloat(cwb_cost_total1) + parseFloat(exc_cwtransfer_cost)).toFixed(2);
-                    row.cells[3].childNodes[0].value = parseFloat(parseFloat(child_without_bede) +
-                        parseFloat(cwob_cost_total1)).toFixed(2);
-                    row.cells[4].childNodes[0].value = parseFloat(parseFloat(exc_infant_coste) +
-                        parseFloat(infant_cost_total1)).toFixed(2);
+                    // Keep hotel-only costs for PP hotel fields; activity/transfer applied separately
+                    if (hotel_per_person_arr[j]) {
+                        hotel_per_person_arr[j].activity_adult = pp_activity_adult;
+                        hotel_per_person_arr[j].activity_cweb = pp_activity_cweb;
+                        hotel_per_person_arr[j].activity_cwnb = pp_activity_cwnb;
+                        hotel_per_person_arr[j].activity_infant = pp_activity_infant;
+                    }
                 }
 
                 applyGroupCostingTransportTotals(unique_package_id_arr, package_type_arr);
 
-                // Populate tab4 costing table before switching
+                // Populate group costing table first
                 populateTab4CostingTable();
+
+                // Then build Per Person UI last (so it is not overwritten):
+                // Package → Adult/CWEB/CWNB/Infant tables → next package
+                if (typeof quotationPopulatePpCostingFromHotels === 'function') {
+                    var adult_count_pp = parseInt($('#total_adult').val(), 10) || 0;
+                    var cwnb_count_pp = parseInt($('#children_without_bed').val(), 10) || 0;
+                    var cweb_count_pp = parseInt($('#children_with_bed').val(), 10) || 0;
+                    var infant_count_pp = parseInt($('#total_infant').val(), 10) || 0;
+                    var total_pax_pp = adult_count_pp + cwnb_count_pp + cweb_count_pp + infant_count_pp;
+                    if (total_pax_pp === 0) total_pax_pp = 1;
+                    var transport_pp_opt = (typeof per_person_tr_arr !== 'undefined' && per_person_tr_arr && per_person_tr_arr[0])
+                        ? (parseFloat(per_person_tr_arr[0]) || 0)
+                        : 0;
+                    quotationPopulatePpCostingFromHotels(hotel_per_person_arr, {
+                        transport_pp: transport_pp_opt,
+                        activity_adult: pp_activity_adult,
+                        activity_cweb: pp_activity_cweb,
+                        activity_cwnb: pp_activity_cwnb,
+                        activity_infant: pp_activity_infant,
+                        force: true
+                    });
+                } else {
+                    $("#adult_activity_pp").val(pp_activity_adult.toFixed(2));
+                    $("#cweb_activity_pp").val(pp_activity_cweb.toFixed(2));
+                    $("#cwnb_activity_pp").val(pp_activity_cwnb.toFixed(2));
+                    $("#infant_activity_pp").val(pp_activity_infant.toFixed(2));
+                }
 
                 $('.accordion_content').removeClass("indicator");
                 $('#tab3_head').addClass('done');
@@ -2201,6 +2191,7 @@ $("#infant_activity_pp").val(
                     : 0
             };
             populateGroupCostingFromHotels(aggregated_hotel_arr, aggregated_hotel_arr, costingOptions);
+            // PP multi-package blocks are built by the Tab3 Next handler after this call
             console.log("Tab4 costing populated with", aggregated_hotel_arr.length, "package types");
             if (typeof quotationRestoreTab4CostingState === 'function') {
                 quotationRestoreTab4CostingState({

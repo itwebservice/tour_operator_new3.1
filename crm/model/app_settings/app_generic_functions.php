@@ -95,6 +95,61 @@ function begin_widget()
                                                                                         }
                                                                                       }
 
+                                                                                      /**
+                                                                                       * package_quotation_pp_costing.tax_apply_on is ENUM('basic','service','total')
+                                                                                       * UI dropdown values are 2=Basic, 3=Service, 4=Total (1=placeholder)
+                                                                                       */
+                                                                                      function pp_tax_apply_on_to_db($ui_val)
+                                                                                      {
+                                                                                        $v = strtolower(trim((string) $ui_val));
+                                                                                        if ($v === '2' || $v === 'basic') {
+                                                                                          return 'basic';
+                                                                                        }
+                                                                                        if ($v === '3' || $v === 'service') {
+                                                                                          return 'service';
+                                                                                        }
+                                                                                        if ($v === '4' || $v === 'total') {
+                                                                                          return 'total';
+                                                                                        }
+                                                                                        // placeholder / empty → default total
+                                                                                        return 'total';
+                                                                                      }
+
+                                                                                      function pp_tax_apply_on_to_ui($db_val)
+                                                                                      {
+                                                                                        $v = strtolower(trim((string) $db_val));
+                                                                                        if ($v === 'basic' || $v === '2') {
+                                                                                          return '2';
+                                                                                        }
+                                                                                        if ($v === 'service' || $v === '3') {
+                                                                                          return '3';
+                                                                                        }
+                                                                                        if ($v === 'total' || $v === '4') {
+                                                                                          return '4';
+                                                                                        }
+                                                                                        return '1';
+                                                                                      }
+
+                                                                                      function pp_tcs_to_ui($db_val)
+                                                                                      {
+                                                                                        // DB may store 2.00 / 2 / "2"
+                                                                                        $n = (int) floatval($db_val);
+                                                                                        if ($n === 2 || $n === 5) {
+                                                                                          return '2'; // UI option 2 = 2% TCS (calc uses 5% historically in some screens)
+                                                                                        }
+                                                                                        if ($n === 3 || $n === 20) {
+                                                                                          return '3';
+                                                                                        }
+                                                                                        if ($n === 1) {
+                                                                                          return '1';
+                                                                                        }
+                                                                                        // Already UI option id
+                                                                                        if ($db_val === '2' || $db_val === '3' || $db_val === '1') {
+                                                                                          return (string) $db_val;
+                                                                                        }
+                                                                                        return '1';
+                                                                                      }
+
                                                                                       // function currency_conversion($from_currency, $to_currency, $quotation_cost)
                                                                                       // {
                                                                                       //   $from_currency_logo = mysqli_fetch_assoc(mysqlQuery("SELECT `default_currency`,`currency_code` FROM `currency_name_master` WHERE id=" . $from_currency));

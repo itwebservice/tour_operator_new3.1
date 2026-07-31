@@ -2002,6 +2002,357 @@ function quotationPopulateGroupCostingFromHotels(hotel_main_arr, options) {
 	return true;
 }
 
+function quotationPpCostingSuffix(index, total) {
+	if (total <= 1) {
+		return '';
+	}
+	return '-' + (index + 1);
+}
+
+function quotationPpFieldId(baseId, suffix) {
+	return baseId + (suffix || '');
+}
+
+function quotationStripPpCostingRowSelect2($row) {
+	$row.find('select').each(function () {
+		var $select = $(this);
+		if ($select.data('select2')) {
+			try {
+				$select.select2('destroy');
+			} catch (e) {}
+		}
+	});
+	$row.find('.select2-container').remove();
+}
+
+function quotationPpCostingRenumberRow($row, newSuffix) {
+	var idMap = {};
+	$row.find('[id]').each(function () {
+		var oldId = this.id;
+		if (!oldId) {
+			return;
+		}
+		var baseId = oldId.replace(/-\d+$/, '');
+		var newId = baseId + (newSuffix || '');
+		idMap[oldId] = newId;
+		this.id = newId;
+		if (this.name) {
+			var baseName = String(this.name).replace(/-\d+$/, '');
+			this.name = baseName + (newSuffix || '');
+		}
+	});
+	$row.find('label[for]').each(function () {
+		var target = $(this).attr('for');
+		if (target && idMap[target]) {
+			$(this).attr('for', idMap[target]);
+		}
+	});
+	$row.attr('data-pp-suffix', newSuffix || '');
+	// Only first block keeps the shared adult_child table id
+	$row.find('table[id^="tbl_package_tour_quotation_adult_child"]').attr(
+		'id',
+		newSuffix ? ('tbl_package_tour_quotation_adult_child' + newSuffix) : 'tbl_package_tour_quotation_adult_child'
+	);
+}
+
+function quotationPpCostingSetRowValues($row, suffix, data, options) {
+	options = options || {};
+	data = data || {};
+	var force = !!options.force;
+	var packageType = data.type || data.package_type || 'NA';
+	var packageId = data.package_id || data.id || '';
+	var adultHotel = parseFloat(data.adult_cost) || 0;
+	var cwebHotel = parseFloat(data.cwb_cost != null ? data.cwb_cost : data.child_with_bed) || 0;
+	var cwnbHotel = parseFloat(data.cwob_cost != null ? data.cwob_cost : data.child_without_bed) || 0;
+	var infantHotel = parseFloat(data.infant_cost) || 0;
+	var transportPp = parseFloat(options.transport_pp) || 0;
+	var transferAdult = data.transfer_adult != null ? parseFloat(data.transfer_adult) || 0 : transportPp;
+	var transferCweb = data.transfer_cweb != null ? parseFloat(data.transfer_cweb) || 0 : transportPp;
+	var transferCwnb = data.transfer_cwnb != null ? parseFloat(data.transfer_cwnb) || 0 : transportPp;
+	var transferInfant = data.transfer_infant != null ? parseFloat(data.transfer_infant) || 0 : transportPp;
+	var activityAdult = data.activity_adult != null ? parseFloat(data.activity_adult) || 0 : (parseFloat(options.activity_adult) || 0);
+	var activityCweb = data.activity_cweb != null ? parseFloat(data.activity_cweb) || 0 : (parseFloat(options.activity_cweb) || 0);
+	var activityCwnb = data.activity_cwnb != null ? parseFloat(data.activity_cwnb) || 0 : (parseFloat(options.activity_cwnb) || 0);
+	var activityInfant = data.activity_infant != null ? parseFloat(data.activity_infant) || 0 : (parseFloat(options.activity_infant) || 0);
+
+	// One package-type row only per block
+	$row.find('table[id*="tbl_package_tour_quotation_adult_child"] tr').slice(1).remove();
+
+	var $pkg = $row.find('#' + quotationPpFieldId('ppackage_type1', suffix));
+	if ($pkg.length) {
+		$pkg.val(packageType);
+	}
+	var $pkgId = $row.find('#' + quotationPpFieldId('pacakge_id2', suffix));
+	if ($pkgId.length) {
+		$pkgId.val(packageId);
+	}
+	$row.find('#' + quotationPpFieldId('adult_cost', suffix)).val(adultHotel);
+	$row.find('#' + quotationPpFieldId('child_with', suffix)).val(cwebHotel);
+	$row.find('#' + quotationPpFieldId('child_without', suffix)).val(cwnbHotel);
+	$row.find('#' + quotationPpFieldId('infant_cost', suffix)).val(infantHotel);
+
+	function setVal(baseId, value) {
+		var $el = $row.find('#' + quotationPpFieldId(baseId, suffix));
+		if (!$el.length) {
+			return;
+		}
+		if (force) {
+			$el.val(value);
+			return;
+		}
+		var cur = $el.val();
+		if (cur === '' || cur === null || parseFloat(cur) === 0) {
+			$el.val(value);
+		}
+	}
+
+	// Hotel from tariff by pax type (adult / CWEB / CWNB / infant) — package-wise
+	setVal('adult_hotel_pp', adultHotel);
+	setVal('cweb_hotel_pp', cwebHotel);
+	setVal('cwnb_hotel_pp', cwnbHotel);
+	setVal('infant_hotel_pp', infantHotel);
+
+	setVal('adult_transfer_pp', Number(transferAdult).toFixed(2));
+	setVal('cweb_transfer_pp', Number(transferCweb).toFixed(2));
+	setVal('cwnb_transfer_pp', Number(transferCwnb).toFixed(2));
+	setVal('infant_transfer_pp', Number(transferInfant).toFixed(2));
+
+	setVal('adult_activity_pp', Number(activityAdult).toFixed(2));
+	setVal('cweb_activity_pp', Number(activityCweb).toFixed(2));
+	setVal('cwnb_activity_pp', Number(activityCwnb).toFixed(2));
+	setVal('infant_activity_pp', Number(activityInfant).toFixed(2));
+}
+
+function quotationBuildHotelPerPersonArrFromPpCosting() {
+	var hotel_per_person_arr = [];
+	var per_person_costing = [];
+	try {
+		var hotel_pp_val = $('#hotel_pp_costing').val();
+		if (hotel_pp_val) {
+			per_person_costing = JSON.parse(hotel_pp_val);
+		}
+	} catch (err) {
+		per_person_costing = [];
+	}
+	if (!Array.isArray(per_person_costing) || !per_person_costing.length) {
+		return hotel_per_person_arr;
+	}
+
+	var adult_count = parseInt($('#total_adult').val(), 10) || 0;
+	var child_with_bed = parseInt($('#children_with_bed').val(), 10) || 0;
+	var child_without_bed = parseInt($('#children_without_bed').val(), 10) || 0;
+	var unique_package_type_arr = [];
+	for (var i = 0; i < per_person_costing.length; i++) {
+		var ptype = per_person_costing[i]['package_type'] || '';
+		if (ptype && unique_package_type_arr.indexOf(ptype) === -1) {
+			unique_package_type_arr.push(ptype);
+		}
+	}
+	if (!unique_package_type_arr.length) {
+		unique_package_type_arr.push('NA');
+	}
+
+	for (var u = 0; u < unique_package_type_arr.length; u++) {
+		var adult_cost_total1 = 0;
+		var cwb_cost_total1 = 0;
+		var cwob_cost_total1 = 0;
+		var infant_cost_total1 = 0;
+		var package_id = '';
+		for (var k = 0; k < per_person_costing.length; k++) {
+			if (per_person_costing[k]['checked'] !== true) {
+				continue;
+			}
+			if (per_person_costing[k]['package_type'] != unique_package_type_arr[u]) {
+				continue;
+			}
+			var adult_cost_total = (adult_count > 0) ? parseFloat(per_person_costing[k]['adult_cost']) || 0 : 0;
+			var cwb_cost_total = (child_with_bed > 0) ? parseFloat(per_person_costing[k]['child_with_bed']) || 0 : 0;
+			var cwob_cost_total = (child_without_bed > 0) ? parseFloat(per_person_costing[k]['child_without_bed']) || 0 : 0;
+			var infant_cost_total = parseFloat(per_person_costing[k]['infant_cost']) || 0;
+			adult_cost_total1 += adult_cost_total;
+			cwb_cost_total1 += cwb_cost_total;
+			cwob_cost_total1 += cwob_cost_total;
+			infant_cost_total1 += infant_cost_total;
+			if (!package_id && per_person_costing[k]['package_id']) {
+				package_id = per_person_costing[k]['package_id'];
+			}
+		}
+		hotel_per_person_arr.push({
+			package_id: package_id,
+			adult_cost: adult_cost_total1,
+			cwb_cost: cwb_cost_total1,
+			cwob_cost: cwob_cost_total1,
+			infant_cost: infant_cost_total1,
+			type: unique_package_type_arr[u],
+			checked: true
+		});
+	}
+	return hotel_per_person_arr;
+}
+
+function quotationPopulatePpCostingFromHotels(hotel_per_person_arr, options) {
+	var $container = $('#quotation_pp_costing_container');
+	if (!$container.length) {
+		return false;
+	}
+	options = options || {};
+	options.force = (options.force !== false); // default force when rebuilding from Tab3
+
+	var $template = $container.find('.quotation-pp-costing-row').first();
+	if (!$template.length) {
+		return false;
+	}
+
+	quotationStripPpCostingRowSelect2($template);
+	// Ensure template has a single package-type row (never multi-row addRow leftovers)
+	$template.find('table[id*="tbl_package_tour_quotation_adult_child"] tr').slice(1).remove();
+
+	var $templateClone = $template.clone(false, false);
+	quotationStripPpCostingRowSelect2($templateClone);
+	$templateClone.find('input, select, textarea').each(function () {
+		if (this.type === 'checkbox' || this.type === 'radio') {
+			return;
+		}
+		if (this.tagName === 'SELECT') {
+			this.selectedIndex = 0;
+			return;
+		}
+		if ($(this).attr('id') && /hotel_pp|transfer_pp|activity_pp|land_cost_pp|service_charge_pp|discount_amount_pp|tax_amount_pp|tcs_amount_pp|total_amount_pp|_cost$|landcost/.test(this.id)) {
+			$(this).val('0');
+		}
+	});
+	$container.empty();
+
+	if (!hotel_per_person_arr || !hotel_per_person_arr.length) {
+		hotel_per_person_arr = [{ type: 'NA', adult_cost: 0, cwb_cost: 0, cwob_cost: 0, infant_cost: 0 }];
+	}
+
+	var total = hotel_per_person_arr.length;
+	for (var i = 0; i < total; i++) {
+		if (i > 0) {
+			$container.append('<hr class="quotation-package-costing-separator">');
+		}
+		var suffix = quotationPpCostingSuffix(i, total);
+		var $row = $templateClone.clone(false, false);
+		quotationStripPpCostingRowSelect2($row);
+		quotationPpCostingRenumberRow($row, suffix);
+		$container.append($row);
+		quotationPpCostingSetRowValues($row, suffix, hotel_per_person_arr[i], options);
+	}
+
+	if (typeof calculateCostingCards === 'function') {
+		setTimeout(function () {
+			calculateCostingCards(true);
+		}, 0);
+	}
+	return true;
+}
+
+function quotationCollectPpCostingEntries(options) {
+	options = options || {};
+	// save: adult_hotel_pp / adult_tax_amount_pp
+	// update: adult_hotel_pp_update / adult_tax_amt_pp_update
+	var mode = options.mode === 'update' ? 'update' : 'save';
+	var packages = [];
+	var $rows = $('#quotation_pp_costing_container .quotation-pp-costing-row');
+
+	function fieldIds(prefix) {
+		if (mode === 'update') {
+			return {
+				hotel: prefix + '_hotel_pp_update',
+				transfer: prefix + '_transfer_pp_update',
+				activity: prefix + '_activity_pp_update',
+				land_cost: prefix + '_land_cost_pp_update',
+				service_charge: prefix + '_service_charge_pp_update',
+				discount_in: prefix + '_discount_in_pp_update',
+				discount_amount: prefix + '_discount_amount_pp_update',
+				flight: prefix + '_flight_pp_update',
+				train: prefix + '_train_pp_update',
+				cruise: prefix + '_cruise_pp_update',
+				visa: prefix + '_visa_pp_update',
+				guide: prefix + '_guide_pp_update',
+				misc: prefix + '_misc_pp_update',
+				tax_apply_on: prefix + '_tax_apply_on_pp_update',
+				tax_value: prefix + '_select_tax_pp_update',
+				tax_amount: prefix + '_tax_amt_pp_update',
+				tcs: prefix + '_select_tcs_pp_update',
+				tcs_amount: prefix + '_tcs_amount_pp_update',
+				total: prefix + '_total_amount_pp_update'
+			};
+		}
+		return {
+			hotel: prefix + '_hotel_pp',
+			transfer: prefix + '_transfer_pp',
+			activity: prefix + '_activity_pp',
+			land_cost: prefix + '_land_cost_pp',
+			service_charge: prefix + '_service_charge_pp',
+			discount_in: prefix + '_discount_in_pp',
+			discount_amount: prefix + '_discount_amount_pp',
+			flight: prefix + '_flight_pp',
+			train: prefix + '_train_pp',
+			cruise: prefix + '_cruise_pp',
+			visa: prefix + '_visa_pp',
+			guide: prefix + '_guide_pp',
+			misc: prefix + '_misc_pp',
+			tax_apply_on: prefix + '_tax_apply_on_pp',
+			tax_value: prefix + '_select_tax_pp',
+			tax_amount: prefix + '_tax_amount_pp',
+			tcs: prefix + '_select_tcs_pp',
+			tcs_amount: prefix + '_tcs_amount_pp',
+			total: prefix + '_total_amount_pp'
+		};
+	}
+
+	function readPP($scope, prefix, suffix) {
+		var ids = fieldIds(prefix);
+		var g = function (base) {
+			var sel = '#' + quotationPpFieldId(base, suffix);
+			return $scope && $scope.length ? $scope.find(sel) : $(sel);
+		};
+		return {
+			type: prefix,
+			hotel: +g(ids.hotel).val() || 0,
+			transfer: +g(ids.transfer).val() || 0,
+			activity: +g(ids.activity).val() || 0,
+			land_cost: +g(ids.land_cost).val() || 0,
+			service_charge: +g(ids.service_charge).val() || 0,
+			discount_in: g(ids.discount_in).val() || '',
+			discount_amount: +g(ids.discount_amount).val() || 0,
+			flight: +g(ids.flight).val() || 0,
+			train: +g(ids.train).val() || 0,
+			cruise: +g(ids.cruise).val() || 0,
+			visa: +g(ids.visa).val() || 0,
+			guide: +g(ids.guide).val() || 0,
+			misc: +g(ids.misc).val() || 0,
+			tax_apply_on: g(ids.tax_apply_on).val() || '',
+			tax_value: g(ids.tax_value).val() || '',
+			tax_amount: +g(ids.tax_amount).val() || 0,
+			tcs: g(ids.tcs).val() || '',
+			tcs_amount: +g(ids.tcs_amount).val() || 0,
+			total: +g(ids.total).val() || 0
+		};
+	}
+
+	if (!$rows.length) {
+		return [{
+			package_type: $('#ppackage_type1').val() || '',
+			package_id: $('#pacakge_id2').val() || '',
+			rows: [readPP(null, 'adult', ''), readPP(null, 'cweb', ''), readPP(null, 'cwnb', ''), readPP(null, 'infant', '')]
+		}];
+	}
+
+	$rows.each(function () {
+		var $row = $(this);
+		var suffix = $row.attr('data-pp-suffix') || '';
+		packages.push({
+			package_type: $row.find('#' + quotationPpFieldId('ppackage_type1', suffix)).val() || ($row.attr('data-package-type') || ''),
+			package_id: $row.find('#' + quotationPpFieldId('pacakge_id2', suffix)).val() || '',
+			rows: [readPP($row, 'adult', suffix), readPP($row, 'cweb', suffix), readPP($row, 'cwnb', suffix), readPP($row, 'infant', suffix)]
+		});
+	});
+	return packages;
+}
+
 function quotationCollectGroupCostingEntries() {
 	if (!isQuotationGroupCostingDiv()) {
 		return null;

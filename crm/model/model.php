@@ -800,6 +800,20 @@ function ensure_excursion_vehicle_id_column()
   return true;
 }
 
+function ensure_pp_costing_package_type_column()
+{
+  static $checked = false;
+  if ($checked) {
+    return true;
+  }
+  $checked = true;
+  $result = mysqlQuery("SHOW COLUMNS FROM package_quotation_pp_costing LIKE 'package_type'");
+  if ($result && mysqli_num_rows($result) == 0) {
+    mysqlQuery("ALTER TABLE package_quotation_pp_costing ADD COLUMN package_type VARCHAR(100) NULL DEFAULT NULL AFTER pax_type");
+  }
+  return true;
+}
+
 function ensure_booking_excursion_vehicle_id_column()
 {
   static $checked = false;

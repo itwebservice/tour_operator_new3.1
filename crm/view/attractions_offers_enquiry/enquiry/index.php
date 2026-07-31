@@ -498,9 +498,9 @@
 	    { data: "mobile_no", title: "Mobile_No" },
 	    { data: "tour_type", title: "Tour_type" },
 	    { data: "destination", title: "Destination" },
-	    { data: "enquiry_date", title: "Enquiry_date", className: "action_width" },
-	    { data: "followup_datetime", title: "Followup_dateTime", className: "action_width" },
-	    { data: "follow_up_type", title: "Follow_up_type", className: "action_width" },
+	    // { data: "enquiry_date", title: "Enquiry_date", className: "action_width" },
+	    // { data: "followup_datetime", title: "Followup_dateTime", className: "action_width" },
+	    // { data: "follow_up_type", title: "Follow_up_type", className: "action_width" },
 	    { data: "allocate_to", title: "Allocate_To", className: "action_width" },
 	    {
 	        data: "actions",

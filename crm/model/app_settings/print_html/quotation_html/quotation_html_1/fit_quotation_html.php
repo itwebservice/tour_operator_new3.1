@@ -571,7 +571,7 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
                 </div>
                 <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--navy)]/60">Travel Dates</div>
               </div>
-              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]"><?= o1e($ov['travel_from']) ?> &ndash; <?= o1e($ov['travel_to']) ?></div>
+              <div class="mt-2.5 font-display text-lg text-[color:var(--navy)]"><?= o1e($ov['travel_from']) ?> &ndash; <br/><?= o1e($ov['travel_to']) ?></div>
             </div>
             <div class="rounded-xl bg-white p-4 border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
               <div class="flex items-center gap-2.5">
@@ -1749,7 +1749,18 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e(function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($o1_row) : o1nv(isset($o1_row['tax_amount_display']) ? $o1_row['tax_amount_display'] : '', '0.00')) ?></div>
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tcs_display']) ?></div>
                 <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['travel_display']) ?></div>
-                <div class="text-right font-display text-lg text-[color:var(--navy)]">&#8377; <?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($o1_row, 'total_display', 'before_discount_display', 'o1e') : o1e($o1_row['total_display']) ?></div>
+               <?php
+                $o1_gt_total = isset($o1_row['total_display']) ? (string) $o1_row['total_display'] : '';
+                $o1_gt_before = isset($o1_row['before_discount_display']) ? (string) $o1_row['before_discount_display'] : '';
+                ?>
+                <div class="text-right font-display text-[color:var(--navy)]" style="line-height:1.25;">
+                  <?php if ($o1_gt_before !== ''): ?>
+                    <div style="font-size:12px;font-weight:600;white-space:nowrap;">&#8377;&nbsp;<?= o1e($o1_gt_total) ?></div>
+                    <div style="font-size:10px;margin-top:2px;text-decoration:line-through;opacity:0.55;white-space:nowrap;">&#8377;&nbsp;<?= o1e($o1_gt_before) ?></div>
+                  <?php else: ?>
+                    <div class="text-lg">&#8377; <?= o1e($o1_gt_total) ?></div>
+                  <?php endif; ?>
+                </div>
               </div>
             <?php $o1_ci++;
             endforeach; ?>

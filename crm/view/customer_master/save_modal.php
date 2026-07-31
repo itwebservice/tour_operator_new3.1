@@ -71,7 +71,7 @@ $branch_admin_id = $_SESSION['branch_admin_id'];
                         </div>
                         <div class="row ">
                             <div class="col-md-2 col-sm-4 col-xs-12 mg_bt_10">
-                                <select name="country_code" id="country_code" class="app_select2" style="width:100%">>
+                                <select name="country_code" id="country_code" class="app_select2" style="width:100%">
                                     <?= get_country_code() ?>
                                 </select>
                             </div>
@@ -158,11 +158,36 @@ $branch_admin_id = $_SESSION['branch_admin_id'];
 
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script>
-    
-$('#cust_state,#country_code').select2({
-    dropdownParent: $("#customer_save_modal")});
-    $('.app_select2').select2({
-        dropdownParent: $("#customer_save_modal")}); 
+// Opera/Chromium: Bootstrap modal enforceFocus blocks typing in Select2 search
+$.fn.modal.Constructor.prototype.enforceFocus = function () {};
+
+function init_customer_save_select2() {
+    var $modal = $('#customer_save_modal');
+    $modal.find('select.app_select2').each(function () {
+        var $el = $(this);
+        if ($el.data('select2')) {
+            $el.select2('destroy');
+        }
+        $el.select2({
+            width: '100%',
+            dropdownParent: $modal,
+            minimumResultsForSearch: 0
+        });
+    });
+}
+
+init_customer_save_select2();
+
+// Keep search field focusable after B2B/Corporate dynamic fields reload
+$(document).off('select2:open.customerSave').on('select2:open.customerSave', '#customer_save_modal select', function () {
+    setTimeout(function () {
+        var $search = $('.select2-container--open .select2-search__field');
+        if ($search.length) {
+            $search.focus();
+        }
+    }, 0);
+});
+
 var date = new Date();
 var yest = date.setDate(date.getDate() - 1);
 $('#cust_birth_date').datetimepicker({
@@ -171,6 +196,10 @@ $('#cust_birth_date').datetimepicker({
     format: 'd-m-Y'
 });
 $('#customer_save_modal').modal('show');
+$('#customer_save_modal').one('shown.bs.modal', function () {
+    // Re-init after global shown.bs.modal handler so dropdown stays inside modal
+    setTimeout(init_customer_save_select2, 0);
+});
 $('#div_customer_update_modal').html('');
 $('select').on("change", function(e) {
     $(this).valid()
@@ -345,5 +374,3 @@ $(function() {
 
 });
 </script>
-
-<script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

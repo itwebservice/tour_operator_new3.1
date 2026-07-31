@@ -3380,11 +3380,34 @@ function buildPlaneAirportAjaxConfig() {
 
 function preparePlaneAirportSelect($select) {
 	$select.addClass('plane-airport-select');
-	var currentVal = $select.val();
-	var currentText = $select.find('option:selected').text();
+	// Destroy select2 first so option values/text are read from the raw <select>
+	if ($select.data('select2')) {
+		try {
+			capturePlaneAirportSelect2Config($select);
+			$select.select2('destroy');
+		} catch (e) {}
+	}
+	var currentVal = '';
+	var currentText = '';
+	var $selected = $select.find('option:selected').filter(function () {
+		return String($(this).attr('value') || '') !== '';
+	}).first();
+	if (!$selected.length) {
+		$selected = $select.find('option').filter(function () {
+			return String($(this).attr('value') || '') !== '';
+		}).first();
+	}
+	if ($selected.length) {
+		currentVal = String($selected.attr('value') || '');
+		currentText = $.trim($selected.text() || currentVal);
+	}
+	if (!currentVal) {
+		currentVal = $select.val() || '';
+		currentText = $.trim($select.find('option:selected').text() || currentVal);
+	}
 	$select.empty();
-	if (currentVal && currentText) {
-		$select.append($('<option></option>').attr('value', currentVal).text(currentText));
+	if (currentVal) {
+		$select.append($('<option></option>').attr('value', currentVal).text(currentText || currentVal).prop('selected', true));
 	} else {
 		$select.append($('<option></option>').attr('value', '').text(''));
 	}
@@ -3403,11 +3426,6 @@ function initPlaneAirportSelect2(container) {
 	$selects.each(function () {
 		var $sel = $(this);
 		preparePlaneAirportSelect($sel);
-
-		if ($sel.data('select2')) {
-			capturePlaneAirportSelect2Config($sel);
-			$sel.select2('destroy');
-		}
 
 		var config = capturePlaneAirportSelect2Config($sel, true);
 		config.ajax = buildPlaneAirportAjaxConfig();

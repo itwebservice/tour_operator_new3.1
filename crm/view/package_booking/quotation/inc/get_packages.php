@@ -1809,7 +1809,7 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
         // Create the new row HTML
         newRow.innerHTML = `
         <td style="width: 50px;">
-            <input class="css-checkbox mg_bt_10" id="chk_program${offset}" type="checkbox" checked>
+            <input class="css-checkbox mg_bt_10 custom_checkbox" id="chk_program${offset}" type="checkbox" checked style="margin-top: 40px;>
             <label class="css-label" style="margin-top: 55px;" for="chk_program${offset}"></label>
         </td>
         <td style="width: 50px;" class="hidden">

@@ -1,13 +1,6 @@
 <?php
 class itinerary_master{
 
-    private function sanitize_itinerary_text($text)
-    {
-        $text = (string) $text;
-        $text = preg_replace('/<\/?(b|u)>/i', '', $text);
-        return str_replace(array('**', '__'), '', $text);
-    }
-
     public function csv_save()
     {
         $itinerary_csv_dir = $_POST['itinerary_csv_dir'];
@@ -59,9 +52,9 @@ class itinerary_master{
         else{
             for($i=0; $i<sizeof($dwp_arr); $i++){
 
-                $sp_arr1 = addslashes($this->sanitize_itinerary_text($sp_arr[$i]));
-                $dwp_arr1 = addslashes($this->sanitize_itinerary_text($dwp_arr[$i]));
-                $os_arr1 = addslashes($this->sanitize_itinerary_text($os_arr[$i]));
+                $sp_arr1 = addslashes($sp_arr[$i]);
+                $dwp_arr1 = addslashes($dwp_arr[$i]);
+                $os_arr1 = addslashes($os_arr[$i]);
                 $sq = mysqlQuery("select max(entry_id) as max from itinerary_master");
                 $value = mysqli_fetch_assoc($sq);
                 $entry_id = $value['max'] + 1;
@@ -103,9 +96,9 @@ class itinerary_master{
 				}
             }
             else{
-                $sp_arr1 = addslashes($this->sanitize_itinerary_text($sp_arr[$i]));
-                $dwp_arr1 = addslashes($this->sanitize_itinerary_text($dwp_arr[$i]));
-                $os_arr1 = addslashes($this->sanitize_itinerary_text($os_arr[$i]));
+                $sp_arr1 = addslashes($sp_arr[$i]);
+                $dwp_arr1 = addslashes($dwp_arr[$i]);
+                $os_arr1 = addslashes($os_arr[$i]);
                 $img_path1 = isset($img_arr[$i]) ? addslashes($img_arr[$i]) : '';
                 
                 if($entry_id_arr[$i]==""){

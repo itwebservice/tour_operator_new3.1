@@ -72,15 +72,15 @@
 										<td class='col-md-5 no-pad' style="padding-left: 5px !important;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" style="height:90px;" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"><?php echo $row_tours['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
 										</td>
 										<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><input type="text" id="overnight_stay<?= $count ?>-u" name="overnight_stay" style="margin-top: 35px;" onchange="validate_spaces(this.id);" class="form-control mg_bt_10" placeholder="Overnight Stay" title="Overnight Stay" value="<?= $row_tours['stay'] ?>"></td>
-										<td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan<?= $count ?>" title="" name="meal_plan" style="margin-top: 35px;"
+										<!-- <td class="col-md-1/2 no-pad" style="padding-left: 5px !important;"><select id="meal_plan<?= $count ?>" title="" name="meal_plan" style="margin-top: 35px;"
 												class="form-control mg_bt_10" data-original-title="Meal Plan">
 												<?php if ($row_tours['meal_plan'] != '') { ?>
 												<option value="<?= $row_tours['meal_plan'] ?>">
 													<?= $row_tours['meal_plan'] ?></option><?php } ?>
 												<?php get_mealplan_dropdown(); ?>
 											</select>
-										</td>
-										<td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" id="itinerary<?= $count ?>" title="Add Itinerary" style="margin-top: 35px; border:none;" onClick="add_itinerary_car_quotation(0,'special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?= $count ?>-u','meal_plan<?= $count ?>','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button></td>
+										</td> -->
+										<!-- <td class='col-md-1 pad_8'><button type="button" class="btn btn-info btn-iti btn-sm" id="itinerary<?= $count ?>" title="Add Itinerary" style="margin-top: 35px; border:none;" onClick="add_itinerary_car_quotation(0,'special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?= $count ?>-u','meal_plan<?= $count ?>','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button></td> -->
 										<td style="display:none"><input type="text" value="<?php echo $row_tours['id'] ?>"></td>
 									</tr>
 								<?php }

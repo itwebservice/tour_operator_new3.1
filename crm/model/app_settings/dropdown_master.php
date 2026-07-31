@@ -454,191 +454,122 @@ function get_destinations_option($selected)
   }
 }
 
+/**
+ * Build one customer autocomplete hint row (shared by get_customer_hint / get_customer_hint_1).
+ * $label_mode: 'name' = company or person name; 'email' = email as label/value
+ */
+function build_customer_hint_row($row_cust, $label_mode = 'name')
+{
+  global $encrypt_decrypt, $secret_key;
+
+  $phone_code = isset($row_cust['country_code']) ? trim((string) $row_cust['country_code']) : '';
+  $contact_no = $encrypt_decrypt->fnDecrypt($row_cust['contact_no'], $secret_key);
+  if ($phone_code !== '') {
+    $contact_no = str_replace($phone_code, '', $contact_no);
+  }
+  $email_id = $encrypt_decrypt->fnDecrypt($row_cust['email_id'], $secret_key);
+
+  $country_label = '';
+  if ($phone_code !== '') {
+    $phone_esc = function_exists('mysqlREString') ? mysqlREString($phone_code) : addslashes($phone_code);
+    $sq_code = mysqli_fetch_assoc(mysqlQuery("SELECT country_code FROM `country_list_master` where phone_code='$phone_esc'"));
+    if ($sq_code && !empty($sq_code['country_code'])) {
+      $country_label = $sq_code['country_code'] . ' (' . $phone_code . ')';
+    } else {
+      $country_label = $phone_code;
+    }
+  }
+
+  $state_id = isset($row_cust['state_id']) ? $row_cust['state_id'] : '';
+  $state_name = '';
+  if ($state_id !== '' && $state_id !== null && $state_id !== '0') {
+    $state_esc = function_exists('mysqlREString') ? mysqlREString($state_id) : addslashes($state_id);
+    $sq_state = mysqli_fetch_assoc(mysqlQuery("SELECT state_name FROM state_master WHERE id='$state_esc'"));
+    if ($sq_state && isset($sq_state['state_name'])) {
+      $state_name = $sq_state['state_name'];
+    }
+  }
+
+  $is_corp = ($row_cust['type'] == 'Corporate' || $row_cust['type'] == 'B2B');
+  if ($label_mode === 'email') {
+    $label = $email_id;
+    $value = $email_id;
+  } elseif ($is_corp) {
+    $label = $row_cust['company_name'];
+    $value = $row_cust['company_name'];
+  } else {
+    $label = trim($row_cust['first_name'] . ' ' . $row_cust['last_name']);
+    $value = $label;
+  }
+
+  $to_be_push = array(
+    'customer_id' => $row_cust['customer_id'],
+    'value' => $value,
+    'label' => $label,
+    'contact_no' => $contact_no,
+    'email_id' => $email_id,
+    'country_code' => $country_label,
+    'country_id' => $phone_code,
+    'state_id' => $state_id,
+    'state_name' => $state_name,
+    'type' => $row_cust['type'],
+  );
+
+  if ($is_corp) {
+    $user_arr = array();
+    $cid_esc = function_exists('mysqlREString') ? mysqlREString($row_cust['customer_id']) : addslashes($row_cust['customer_id']);
+    $sq_user = mysqlQuery("SELECT user_id,name FROM `customer_users` where customer_id ='$cid_esc'");
+    while ($row_user = mysqli_fetch_assoc($sq_user)) {
+      $user_arr[] = array('user_id' => $row_user['user_id'], 'name' => $row_user['name']);
+    }
+    $to_be_push['user_arr'] = $user_arr;
+  }
+
+  return $to_be_push;
+}
+
 function get_customer_hint($branch_status = 'no')
 {
   $final_array = array();
-  global $encrypt_decrypt, $secret_key;
   $role = $_SESSION['role'];
   $branch_admin_id = $_SESSION['branch_admin_id'];
 
   if ($branch_status == 'yes' && $role != 'Admin') {
     $sq_query = mysqlQuery("select * from customer_master where active_flag!='Inactive' and branch_admin_id='$branch_admin_id' order by customer_id desc");
-
-    while ($row_cust_new = mysqli_fetch_assoc($sq_query)) {
-      $row_cust = $row_cust_new;
-      $contact_no = $encrypt_decrypt->fnDecrypt($row_cust['contact_no'], $secret_key);
-      $contact_no = str_replace($row_cust['country_code'], "", $contact_no);
-      $sq_code = mysqli_fetch_assoc(mysqlQuery("SELECT country_code FROM `country_list_master` where phone_code ='$row_cust[country_code]'"));
-
-      $email_id = $encrypt_decrypt->fnDecrypt($row_cust['email_id'], $secret_key);
-      if ($row_cust['type'] == 'Corporate' || $row_cust['type'] == 'B2B') {
-
-        $sq_user = mysqlQuery("SELECT user_id,name FROM `customer_users` where customer_id ='$row_cust[customer_id]'");
-        $user_arr = array();
-        while ($row_user = mysqli_fetch_assoc($sq_user)) {
-          array_push($user_arr, ['user_id' => $row_user['user_id'], 'name' => $row_user['name']]);
-        }
-        $to_be_push = [
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $row_cust['company_name'],
-          "label" => $row_cust['company_name'],
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $sq_code['country_code'] . ' (' . $row_cust['country_code'] . ')',
-          "country_id" => $row_cust['country_code'],
-          'type' => $row_cust['type'],
-          "user_arr" => $user_arr
-        ];
-      } else {
-        $to_be_push = [
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $row_cust['first_name'] . ' ' . $row_cust['last_name'],
-          "label" => $row_cust['first_name'] . ' ' . $row_cust['last_name'],
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $sq_code['country_code'] . ' (' . $row_cust['country_code'] . ')',
-          "country_id" => $row_cust['country_code'],
-          'type' => $row_cust['type']
-        ];
-      }
-      array_push($final_array, $to_be_push);
-    }
   } else {
     $sq_query = mysqlQuery("select * from customer_master where active_flag!='Inactive' order by customer_id desc");
-    while ($row_cust = mysqli_fetch_assoc($sq_query)) {
-      $sq_user = mysqlQuery("SELECT user_id,name FROM `customer_users` where customer_id ='$row_cust[customer_id]'");
-      $user_arr = array();
-      while ($row_user = mysqli_fetch_assoc($sq_user)) {
-        array_push($user_arr, ['user_id' => $row_user['user_id'], 'name' => $row_user['name']]);
-      }
-      $contact_no = $encrypt_decrypt->fnDecrypt($row_cust['contact_no'], $secret_key);
-      $contact_no = str_replace($row_cust['country_code'], "", $contact_no);
-      $sq_code = mysqli_fetch_assoc(mysqlQuery("SELECT country_code FROM `country_list_master` where phone_code ='$row_cust[country_code]'"));
-      $email_id = $encrypt_decrypt->fnDecrypt($row_cust['email_id'], $secret_key);
-      $country_code = isset($sq_code['country_code']) ? $sq_code['country_code'] . ' (' . $row_cust['country_code'] . ')' : '';
-      if ($row_cust['type'] == 'Corporate' || $row_cust['type'] == 'B2B') {
-        $to_be_push = array(
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $row_cust['company_name'],
-          "label" => $row_cust['company_name'],
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $country_code,
-          'type' => $row_cust['type'],
-          "country_id" => $row_cust['country_code'],
-          "user_arr" => $user_arr
-        );
-      } else {
-        $to_be_push = array(
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $row_cust['first_name'] . ' ' . $row_cust['last_name'],
-          "label" => $row_cust['first_name'] . ' ' . $row_cust['last_name'],
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $country_code,
-          "country_id" => $row_cust['country_code'],
-          'type' => $row_cust['type']
-        );
-      }
-      array_push($final_array, $to_be_push);
-    }
   }
-  echo json_encode($final_array);
+  while ($row_cust = mysqli_fetch_assoc($sq_query)) {
+    $final_array[] = build_customer_hint_row($row_cust, 'name');
+  }
+  echo htmlspecialchars(json_encode($final_array), ENT_QUOTES, 'UTF-8');
 }
-
-
-
 
 function get_customer_hint_1($branch_status = 'no')
 {
   $final_array = array();
-  global $encrypt_decrypt, $secret_key;
   $role = $_SESSION['role'];
   $branch_admin_id = $_SESSION['branch_admin_id'];
 
+  // Support legacy call shapes: get_customer_hint_1('enq','yes') or get_customer_hint_1('yes')
+  $args = func_get_args();
+  if (count($args) >= 2) {
+    $branch_status = $args[1];
+  } elseif (count($args) === 1 && ($args[0] === 'yes' || $args[0] === 'no')) {
+    $branch_status = $args[0];
+  } else {
+    $branch_status = 'no';
+  }
+
   if ($branch_status == 'yes' && $role != 'Admin') {
     $sq_query = mysqlQuery("select * from customer_master where active_flag!='Inactive' and branch_admin_id='$branch_admin_id' order by customer_id desc");
-
-    while ($row_cust_new = mysqli_fetch_assoc($sq_query)) {
-      $row_cust = $row_cust_new;
-      $contact_no = $encrypt_decrypt->fnDecrypt($row_cust['contact_no'], $secret_key);
-      $contact_no = str_replace($row_cust['country_code'], "", $contact_no);
-      $sq_code = mysqli_fetch_assoc(mysqlQuery("SELECT country_code FROM `country_list_master` where phone_code ='$row_cust[country_code]'"));
-
-      $email_id = $encrypt_decrypt->fnDecrypt($row_cust['email_id'], $secret_key);
-      if ($row_cust['type'] == 'Corporate' || $row_cust['type'] == 'B2B') {
-
-        $sq_user = mysqlQuery("SELECT user_id,name FROM `customer_users` where customer_id ='$row_cust[customer_id]'");
-        $user_arr = array();
-        while ($row_user = mysqli_fetch_assoc($sq_user)) {
-          array_push($user_arr, ['user_id' => $row_user['user_id'], 'name' => $row_user['name']]);
-        }
-        $to_be_push = [
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $email_id,
-          "label" => $email_id,
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $sq_code['country_code'] . ' (' . $row_cust['country_code'] . ')',
-          "country_id" => $row_cust['country_code'],
-          'type' => $row_cust['type'],
-          "user_arr" => $user_arr
-        ];
-      } else {
-        $to_be_push = [
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $email_id,
-          "label" => $email_id,
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $sq_code['country_code'] . ' (' . $row_cust['country_code'] . ')',
-          "country_id" => $row_cust['country_code'],
-          'type' => $row_cust['type']
-        ];
-      }
-      array_push($final_array, $to_be_push);
-    }
   } else {
     $sq_query = mysqlQuery("select * from customer_master where active_flag!='Inactive' order by customer_id desc");
-    while ($row_cust = mysqli_fetch_assoc($sq_query)) {
-      $sq_user = mysqlQuery("SELECT user_id,name FROM `customer_users` where customer_id ='$row_cust[customer_id]'");
-      $user_arr = array();
-      while ($row_user = mysqli_fetch_assoc($sq_user)) {
-        array_push($user_arr, ['user_id' => $row_user['user_id'], 'name' => $row_user['name']]);
-      }
-      $contact_no = $encrypt_decrypt->fnDecrypt($row_cust['contact_no'], $secret_key);
-      $contact_no = str_replace($row_cust['country_code'], "", $contact_no);
-      $sq_code = mysqli_fetch_assoc(mysqlQuery("SELECT country_code FROM `country_list_master` where phone_code ='$row_cust[country_code]'"));
-      $email_id = $encrypt_decrypt->fnDecrypt($row_cust['email_id'], $secret_key);
-      $country_code = isset($sq_code['country_code']) ? $sq_code['country_code'] . ' (' . $row_cust['country_code'] . ')' : '';
-      if ($row_cust['type'] == 'Corporate' || $row_cust['type'] == 'B2B') {
-        $to_be_push = array(
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $email_id,
-          "label" => $email_id,
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $country_code,
-          'type' => $row_cust['type'],
-          "country_id" => $row_cust['country_code'],
-          "user_arr" => $user_arr
-        );
-      } else {
-        $to_be_push = array(
-          "customer_id" => $row_cust['customer_id'],
-          "value" => $email_id,
-          "label" => $email_id,
-          "contact_no" => $contact_no,
-          "email_id" => $email_id,
-          "country_code" => $country_code,
-          "country_id" => $row_cust['country_code'],
-          'type' => $row_cust['type']
-        );
-      }
-      array_push($final_array, $to_be_push);
-    }
   }
-  echo json_encode($final_array);
+  while ($row_cust = mysqli_fetch_assoc($sq_query)) {
+    $final_array[] = build_customer_hint_row($row_cust, 'email');
+  }
+  echo htmlspecialchars(json_encode($final_array), ENT_QUOTES, 'UTF-8');
 }
 
 //Get Corporate customer dropdown

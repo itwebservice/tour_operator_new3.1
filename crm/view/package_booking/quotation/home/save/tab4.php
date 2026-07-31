@@ -1,5 +1,6 @@
 <style>
-#tbl_package_tour_quotation_dynamic_costing .quotation-package-costing-separator {
+#tbl_package_tour_quotation_dynamic_costing .quotation-package-costing-separator,
+#quotation_pp_costing_container .quotation-package-costing-separator {
     border: 0;
     border-top: 2px solid #e0e0e0;
     margin: 22px 0;
@@ -224,9 +225,9 @@
                                                                     </tr>
                                                                     
                                                                 </table>
-                                                                <div>
-                                                                </div>
                                                             </div>
+                                                            <div id="quotation_pp_costing_container">
+                                                            <div class="quotation-pp-costing-row mg_bt_20" data-pp-suffix="">
                                                             <!-- Adult & child cost -->
                                                             <div class="row">
                                                                 <div class="col-xs-12">
@@ -761,6 +762,8 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                                            </div><!-- /.quotation-pp-costing-row -->
+                                                            </div><!-- /#quotation_pp_costing_container -->
 
                                                         </div>
                                                     </div>
@@ -907,9 +910,12 @@ if (input) {
                                 'adult_cost': hotel_arr[i]['adult_cost'],
                                 'child_with_bed': hotel_arr[i]['child_with_bed'],
                                 'child_without_bed': hotel_arr[i]['child_without_bed'],
+                                'infant_cost': hotel_arr[i]['infant_cost'] || 0,
                                 'package_id': hotel_arr[i]['package_id'],
                                 'flag': hotel_arr[i]['flag'],
-                                'package_type': row.cells[2].childNodes[0].value,
+                                'package_type': (typeof quotationGetHotelRowPackageType === 'function'
+                                    ? quotationGetHotelRowPackageType(row)
+                                    : (row.cells[2].childNodes[0].value)),
                                 'checked': true
                             });
                         } else {
@@ -919,8 +925,11 @@ if (input) {
                                 'adult_cost': 0,
                                 'child_with_bed': 0,
                                 'child_without_bed': 0,
+                                'infant_cost': 0,
                                 'package_id': hotel_arr[i]['package_id'],
-                                'package_type': row.cells[2].childNodes[0].value,
+                                'package_type': (typeof quotationGetHotelRowPackageType === 'function'
+                                    ? quotationGetHotelRowPackageType(row)
+                                    : (row.cells[2].childNodes[0].value)),
                                 'checked': false
                             });
                         }
@@ -1613,12 +1622,57 @@ if (input) {
 
             var costingEntries = (typeof collectGroupCostingEntries === 'function')
                 ? collectGroupCostingEntries()
-                : [];
+                : ((typeof quotationCollectGroupCostingEntries === 'function')
+                    ? quotationCollectGroupCostingEntries()
+                    : []);
 
-            if (!costingEntries.length) {
+            if (!costingEntries || !costingEntries.length) {
                 error_msg_alert('Please enter land costing details before saving.');
                 resetQuotationSaveState();
                 return false;
+            }
+
+            // Per Person mode: validate PP tax fields (not hidden Group Costing tax dropdowns)
+            if (costing_type == 2) {
+                var ppPackages = (typeof quotationCollectPpCostingEntries === 'function')
+                    ? quotationCollectPpCostingEntries()
+                    : [];
+                if (!ppPackages.length) {
+                    error_msg_alert('Please enter Per Person costing details before saving.');
+                    resetQuotationSaveState();
+                    return false;
+                }
+                var adult_count_v = parseInt($('#total_adult').val(), 10) || 0;
+                var cweb_count_v = parseInt($('#children_with_bed').val(), 10) || 0;
+                var cwnb_count_v = parseInt($('#children_without_bed').val(), 10) || 0;
+                var infant_count_v = parseInt($('#total_infant').val(), 10) || 0;
+                var paxRequired = {
+                    adult: adult_count_v > 0,
+                    cweb: cweb_count_v > 0,
+                    cwnb: cwnb_count_v > 0,
+                    infant: infant_count_v > 0
+                };
+                for (var pi = 0; pi < ppPackages.length; pi++) {
+                    var pkgLabel = ppPackages[pi].package_type || ('Package ' + (pi + 1));
+                    var rows = ppPackages[pi].rows || [];
+                    for (var ri = 0; ri < rows.length; ri++) {
+                        var prow = rows[ri];
+                        if (!prow || !paxRequired[prow.type]) {
+                            continue;
+                        }
+                        // value "1" is the placeholder "Tax Apply On" in PP dropdowns
+                        if (!prow.tax_apply_on || prow.tax_apply_on === '1') {
+                            error_msg_alert('Select Tax Apply On for ' + prow.type + ' (' + pkgLabel + ')');
+                            resetQuotationSaveState();
+                            return false;
+                        }
+                        if (!prow.tax_value) {
+                            error_msg_alert('Select Tax for ' + prow.type + ' (' + pkgLabel + ')');
+                            resetQuotationSaveState();
+                            return false;
+                        }
+                    }
+                }
             }
 
             for (var i = 0; i < costingEntries.length; i++) {
@@ -1645,15 +1699,18 @@ if (input) {
                     resetQuotationSaveState();
                     return false;
                 }
-                if (tax_apply_on == "") {
-                    error_msg_alert('Select Tax Apply On in row' + (i + 1));
-                    resetQuotationSaveState();
-                    return false;
-                }
-                if (tax_value == "") {
-                    error_msg_alert('Select Tax in row' + (i + 1));
-                    resetQuotationSaveState();
-                    return false;
+                // Group Costing tax is required only when Group Costing tab is active
+                if (costing_type != 2) {
+                    if (tax_apply_on == "") {
+                        error_msg_alert('Select Tax Apply On in row' + (i + 1));
+                        resetQuotationSaveState();
+                        return false;
+                    }
+                    if (tax_value == "") {
+                        error_msg_alert('Select Tax in row' + (i + 1));
+                        resetQuotationSaveState();
+                        return false;
+                    }
                 }
                 tour_cost_arr.push(tour_cost);
                 transport_cost_arr.push(transport_cost);
@@ -1815,46 +1872,39 @@ if (input) {
 // ==============================
 
         var pp_costing_arr = [];
-
-    function getPP(prefix) {
-        return {
-            type: prefix,
-
-            hotel: +$('#' + prefix + '_hotel_pp').val() || 0,
-            transfer: +$('#' + prefix + '_transfer_pp').val() || 0,
-            activity: +$('#' + prefix + '_activity_pp').val() || 0,
-            land_cost: +$('#' + prefix + '_land_cost_pp').val() || 0,
-
-            service_charge: +$('#' + prefix + '_service_charge_pp').val() || 0,
-
-            discount_in: $('#' + prefix + '_discount_in_pp').val(),
-            discount_amount: +$('#' + prefix + '_discount_amount_pp').val() || 0,
-
-            flight: +$('#' + prefix + '_flight_pp').val() || 0,
-            train: +$('#' + prefix + '_train_pp').val() || 0,
-            cruise: +$('#' + prefix + '_cruise_pp').val() || 0,
-            visa: +$('#' + prefix + '_visa_pp').val() || 0,
-            guide: +$('#' + prefix + '_guide_pp').val() || 0,
-            misc: +$('#' + prefix + '_misc_pp').val() || 0,
-
-            tax_apply_on: $('#' + prefix + '_tax_apply_on_pp').val(),
-            tax_value: $('#' + prefix + '_select_tax_pp').val(),
-            tax_amount: +$('#' + prefix + '_tax_amount_pp').val() || 0,
-
-            tcs: $('#' + prefix + '_select_tcs_pp').val(),
-            tcs_amount: +$('#' + prefix + '_tcs_amount_pp').val() || 0,
-
-            total: +$('#' + prefix + '_total_amount_pp').val() || 0
-        };
-    }
-
-    // push all
-    pp_costing_arr.push(getPP('adult'));
-    pp_costing_arr.push(getPP('cweb'));
-    pp_costing_arr.push(getPP('cwnb'));
-    pp_costing_arr.push(getPP('infant'));
-
-    
+        if (typeof quotationCollectPpCostingEntries === 'function') {
+            pp_costing_arr = quotationCollectPpCostingEntries();
+        } else {
+            function getPP(prefix) {
+                return {
+                    type: prefix,
+                    hotel: +$('#' + prefix + '_hotel_pp').val() || 0,
+                    transfer: +$('#' + prefix + '_transfer_pp').val() || 0,
+                    activity: +$('#' + prefix + '_activity_pp').val() || 0,
+                    land_cost: +$('#' + prefix + '_land_cost_pp').val() || 0,
+                    service_charge: +$('#' + prefix + '_service_charge_pp').val() || 0,
+                    discount_in: $('#' + prefix + '_discount_in_pp').val(),
+                    discount_amount: +$('#' + prefix + '_discount_amount_pp').val() || 0,
+                    flight: +$('#' + prefix + '_flight_pp').val() || 0,
+                    train: +$('#' + prefix + '_train_pp').val() || 0,
+                    cruise: +$('#' + prefix + '_cruise_pp').val() || 0,
+                    visa: +$('#' + prefix + '_visa_pp').val() || 0,
+                    guide: +$('#' + prefix + '_guide_pp').val() || 0,
+                    misc: +$('#' + prefix + '_misc_pp').val() || 0,
+                    tax_apply_on: $('#' + prefix + '_tax_apply_on_pp').val(),
+                    tax_value: $('#' + prefix + '_select_tax_pp').val(),
+                    tax_amount: +$('#' + prefix + '_tax_amount_pp').val() || 0,
+                    tcs: $('#' + prefix + '_select_tcs_pp').val(),
+                    tcs_amount: +$('#' + prefix + '_tcs_amount_pp').val() || 0,
+                    total: +$('#' + prefix + '_total_amount_pp').val() || 0
+                };
+            }
+            pp_costing_arr = [{
+                package_type: $('#ppackage_type1').val() || '',
+                package_id: $('#pacakge_id2').val() || '',
+                rows: [getPP('adult'), getPP('cweb'), getPP('cwnb'), getPP('infant')]
+            }];
+        }
 
             // Get the temporary quotation ID from sessionStorage
             var temp_quotation_id = sessionStorage.getItem('temp_quotation_id');
@@ -2274,16 +2324,10 @@ function uploadItineraryImages(quotationId, images) {
     });
 }
 
-function calculateCostingCards() {
+function calculateCostingCards(forceHotelFromTariff) {
 
     let hotelData = $('#hotel_pp_costing').val();
     let travelData = $("#travel_pp_costing").val();
-
-    if (!hotelData || !travelData) return;
-
-    let pp_arr = JSON.parse(hotelData);
-    console.log(pp_arr);
-    let pp_arr_travelData = JSON.parse(travelData);
 
     // ===== PAX COUNT =====
     let adult_count  = +$('#total_adult').val() || 0;
@@ -2295,110 +2339,99 @@ function calculateCostingCards() {
     if (total_number === 0) total_number = 1;
 
     // ===== TRANSPORT PER PERSON =====
-    let transport_pp = (pp_arr_travelData[0]['total_cost'] / total_number) || 0;
+    let transport_pp = 0;
+    try {
+        if (travelData) {
+            let pp_arr_travelData = JSON.parse(travelData);
+            if (pp_arr_travelData && pp_arr_travelData[0]) {
+                transport_pp = (parseFloat(pp_arr_travelData[0]['total_cost']) / total_number) || 0;
+            }
+        }
+    } catch (e) {
+        transport_pp = 0;
+    }
 
-    // // ===== SET DEFAULT VALUES =====
-    // $('#adult_hotel_pp').val(pp_arr[0]['adult_cost'] || 0);
-    // $('#adult_transfer_pp').val(transport_pp.toFixed(2));
+    var $ppRows = $('#quotation_pp_costing_container .quotation-pp-costing-row');
 
-    // $('#cweb_hotel_pp').val(pp_arr[0]['child_with_bed'] || 0);
-    // $('#cweb_transfer_pp').val(transport_pp.toFixed(2));
-
-    // $('#cwnb_hotel_pp').val(pp_arr[0]['child_without_bed'] || 0);
-    // $('#cwnb_transfer_pp').val(transport_pp.toFixed(2));
-
-    // if (!$('#infant_hotel_pp').val()) {
-    // $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || '');
-    if (!$('#adult_hotel_pp').val() || $('#adult_hotel_pp').val() == 0) {
-        $('#adult_hotel_pp').val(pp_arr[0]['adult_cost'] || 0);
-    }
-    if (!$('#adult_transfer_pp').val() || $('#adult_transfer_pp').val() == 0) {
-        $('#adult_transfer_pp').val(transport_pp.toFixed(2));
-    }
- 
-    if (!$('#cweb_hotel_pp').val() || $('#cweb_hotel_pp').val() == 0) {
-        $('#cweb_hotel_pp').val(pp_arr[0]['child_with_bed'] || 0);
-    }
-    if (!$('#cweb_transfer_pp').val() || $('#cweb_transfer_pp').val() == 0) {
-        $('#cweb_transfer_pp').val(transport_pp.toFixed(2));
-    }
- 
-    if (!$('#cwnb_hotel_pp').val() || $('#cwnb_hotel_pp').val() == 0) {
-        $('#cwnb_hotel_pp').val(pp_arr[0]['child_without_bed'] || 0);
-    }
-    if (!$('#cwnb_transfer_pp').val() || $('#cwnb_transfer_pp').val() == 0) {
-        $('#cwnb_transfer_pp').val(transport_pp.toFixed(2));
-    }
- 
-    if (!$('#infant_hotel_pp').val() || $('#infant_hotel_pp').val() == 0) {
-        $('#infant_hotel_pp').val(pp_arr[0]['infant_cost'] || 0);
-    }
-    if (!$('#infant_transfer_pp').val() || $('#infant_transfer_pp').val() == 0) {
-        $('#infant_transfer_pp').val(transport_pp.toFixed(2));
+    function setHotelTransfer($row, suffix, hotelVals) {
+        function setVal(baseId, value, force) {
+            var $el = $row.find('#' + (typeof quotationPpFieldId === 'function' ? quotationPpFieldId(baseId, suffix) : (baseId + (suffix || ''))));
+            if (!$el.length) {
+                $el = $('#' + baseId + (suffix || ''));
+            }
+            if (!$el.length) return;
+            if (force || !$el.val() || $el.val() == 0) {
+                $el.val(value);
+            }
+        }
+        setVal('adult_hotel_pp', hotelVals.adult || 0, forceHotelFromTariff);
+        setVal('cweb_hotel_pp', hotelVals.cweb || 0, forceHotelFromTariff);
+        setVal('cwnb_hotel_pp', hotelVals.cwnb || 0, forceHotelFromTariff);
+        setVal('infant_hotel_pp', hotelVals.infant || 0, forceHotelFromTariff);
+        setVal('adult_transfer_pp', transport_pp.toFixed(2), false);
+        setVal('cweb_transfer_pp', transport_pp.toFixed(2), false);
+        setVal('cwnb_transfer_pp', transport_pp.toFixed(2), false);
+        setVal('infant_transfer_pp', transport_pp.toFixed(2), false);
     }
 
     // ===== COMMON FUNCTION =====
-    function calculateCard(type, count) {
+    function calculateCard($row, type, count, suffix) {
+        var sid = function (base) {
+            return '#' + (typeof quotationPpFieldId === 'function' ? quotationPpFieldId(base, suffix) : (base + (suffix || '')));
+        };
+        var $find = function (base) {
+            var $el = $row && $row.length ? $row.find(sid(base)) : $(sid(base));
+            return $el.length ? $el : $(sid(base));
+        };
 
         if (count === 0) {
-            $('#' + type + '_hotel_pp').val(0);
-            $('#' + type + '_transfer_pp').val(0);
-            $('#' + type + '_activity_pp').val(0);
-            $('#' + type + '_land_cost_pp').val(0);
-            $('#' + type + '_service_charge_pp').val(0);
-            $('#' + type + '_tax_amount_pp').val(0);
-            $('#' + type + '_tcs_amount_pp').val(0);
-            $('#' + type + '_total_amount_pp').val(0);
+            $find(type + '_hotel_pp').val(0);
+            $find(type + '_transfer_pp').val(0);
+            $find(type + '_activity_pp').val(0);
+            $find(type + '_land_cost_pp').val(0);
+            $find(type + '_service_charge_pp').val(0);
+            $find(type + '_tax_amount_pp').val(0);
+            $find(type + '_tcs_amount_pp').val(0);
+            $find(type + '_total_amount_pp').val(0);
             return;
         }
 
-        // ===== BASE =====
-        let hotel    = +$('#' + type + '_hotel_pp').val() || 0;
-        let transfer = +$('#' + type + '_transfer_pp').val() || 0;
-        let activity = +$('#' + type + '_activity_pp').val() || 0;
+        let hotel    = +$find(type + '_hotel_pp').val() || 0;
+        let transfer = +$find(type + '_transfer_pp').val() || 0;
+        let activity = +$find(type + '_activity_pp').val() || 0;
 
         let land_cost = hotel + transfer + activity;
-        $('#' + type + '_land_cost_pp').val(land_cost.toFixed(2));
+        $find(type + '_land_cost_pp').val(land_cost.toFixed(2));
 
-        // ===== SERVICE CHARGE (10%) =====
         let service_charge = land_cost * 0.10;
+        $find(type + '_service_charge_pp').val(service_charge.toFixed(2));
 
-        // 🔥 IMPORTANT: Show ORIGINAL service charge in UI
-        $('#' + type + '_service_charge_pp').val(service_charge.toFixed(2));
-
-        // ===== DISCOUNT (APPLY INTERNALLY ONLY) =====
-        let discount_type = $('#' + type + '_discount_in_pp').val();
-        let discount_val  = +$('#' + type + '_discount_amount_pp').val() || 0;
+        let discount_type = $find(type + '_discount_in_pp').val();
+        let discount_val  = +$find(type + '_discount_amount_pp').val() || 0;
 
         let discount_amount = (discount_type == "1")
             ? (service_charge * discount_val) / 100
             : discount_val;
 
-        // prevent over-discount
         if (discount_amount > service_charge) discount_amount = service_charge;
 
-        // 👉 INTERNAL VALUE ONLY (DO NOT SHOW IN UI)
-        let final_service_charge = service_charge - discount_amount;
+        let final_service_charge = service_charge + 0 - discount_amount;
 
-        // ===== EXTRA COST =====
-        let flight = +$('#' + type + '_flight_pp').val() || 0;
-        let train  = +$('#' + type + '_train_pp').val() || 0;
-        let cruise = +$('#' + type + '_cruise_pp').val() || 0;
-        let visa   = +$('#' + type + '_visa_pp').val() || 0;
-        let guide  = +$('#' + type + '_guide_pp').val() || 0;
-        let misc   = +$('#' + type + '_misc_pp').val() || 0;
+        let flight = +$find(type + '_flight_pp').val() || 0;
+        let train  = +$find(type + '_train_pp').val() || 0;
+        let cruise = +$find(type + '_cruise_pp').val() || 0;
+        let visa   = +$find(type + '_visa_pp').val() || 0;
+        let guide  = +$find(type + '_guide_pp').val() || 0;
+        let misc   = +$find(type + '_misc_pp').val() || 0;
 
         let extra_cost = flight + train + cruise + visa + guide + misc;
-
-        // ===== BASE AMOUNT (USE DISCOUNTED SERVICE CHARGE) =====
         let base_amount = land_cost + final_service_charge + extra_cost;
 
-        // ===== TAX =====
-        let tax_text = $('#' + type + '_select_tax_pp option:selected').text();
+        let tax_text = $find(type + '_select_tax_pp').find('option:selected').text();
         let tax_match = tax_text.match(/\d+(\.\d+)?/);
         let tax_percent = tax_match ? parseFloat(tax_match[0]) : 0;
 
-        let tax_apply_on = $('#' + type + '_tax_apply_on_pp').val();
+        let tax_apply_on = $find(type + '_tax_apply_on_pp').val();
 
         let tax_base = 0;
         if (tax_apply_on == "2") tax_base = land_cost;
@@ -2406,26 +2439,72 @@ function calculateCostingCards() {
         else if (tax_apply_on == "4") tax_base = base_amount;
 
         let tax_amount = (tax_base * tax_percent) / 100;
-        $('#' + type + '_tax_amount_pp').val(tax_amount.toFixed(2));
+        $find(type + '_tax_amount_pp').val(tax_amount.toFixed(2));
 
-        // ===== TCS =====
-        let tcs_val = $('#' + type + '_select_tcs_pp').val();
+        let tcs_val = $find(type + '_select_tcs_pp').val();
         let tcs_percent = (tcs_val == "2") ? 5 : (tcs_val == "3") ? 20 : 0;
 
         let tcs_amount = ((base_amount + tax_amount) * tcs_percent) / 100;
-        $('#' + type + '_tcs_amount_pp').val(tcs_amount.toFixed(2));
+        $find(type + '_tcs_amount_pp').val(tcs_amount.toFixed(2));
 
-        // ===== FINAL TOTAL =====
         let total = base_amount + tax_amount + tcs_amount;
-
-        $('#' + type + '_total_amount_pp').val(total.toFixed(2));
+        $find(type + '_total_amount_pp').val(total.toFixed(2));
     }
 
-    // ===== RUN =====
-    calculateCard('adult', adult_count);
-    calculateCard('cweb', cweb_count);
-    calculateCard('cwnb', cwnb_count);
-    calculateCard('infant', infant_count);
+    var packageHotelArr = [];
+    if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function') {
+        packageHotelArr = quotationBuildHotelPerPersonArrFromPpCosting();
+    } else if (hotelData) {
+        try {
+            var pp_arr = JSON.parse(hotelData);
+            if (pp_arr && pp_arr[0]) {
+                packageHotelArr = [{
+                    adult_cost: pp_arr[0]['adult_cost'] || 0,
+                    cwb_cost: pp_arr[0]['child_with_bed'] || 0,
+                    cwob_cost: pp_arr[0]['child_without_bed'] || 0,
+                    infant_cost: pp_arr[0]['infant_cost'] || 0,
+                    type: pp_arr[0]['package_type'] || ''
+                }];
+            }
+        } catch (e) {}
+    }
+
+    $ppRows = $('#quotation_pp_costing_container .quotation-pp-costing-row');
+    if (!$ppRows.length) {
+        $ppRows = $();
+        // legacy single block
+        var hotelVals = packageHotelArr[0] || {};
+        setHotelTransfer($(document), '', {
+            adult: hotelVals.adult_cost || 0,
+            cweb: hotelVals.cwb_cost || 0,
+            cwnb: hotelVals.cwob_cost || 0,
+            infant: hotelVals.infant_cost || 0
+        });
+        calculateCard(null, 'adult', adult_count, '');
+        calculateCard(null, 'cweb', cweb_count, '');
+        calculateCard(null, 'cwnb', cwnb_count, '');
+        calculateCard(null, 'infant', infant_count, '');
+        return;
+    }
+
+    $ppRows.each(function (idx) {
+        var $row = $(this);
+        var suffix = $row.attr('data-pp-suffix') || '';
+        var hotelVals = packageHotelArr[idx] || packageHotelArr[0] || {};
+        if (hotelVals.type) {
+            $row.find('#' + (typeof quotationPpFieldId === 'function' ? quotationPpFieldId('ppackage_type1', suffix) : ('ppackage_type1' + suffix))).val(hotelVals.type);
+        }
+        setHotelTransfer($row, suffix, {
+            adult: hotelVals.adult_cost || 0,
+            cweb: hotelVals.cwb_cost || 0,
+            cwnb: hotelVals.cwob_cost || 0,
+            infant: hotelVals.infant_cost || 0
+        });
+        calculateCard($row, 'adult', adult_count, suffix);
+        calculateCard($row, 'cweb', cweb_count, suffix);
+        calculateCard($row, 'cwnb', cwnb_count, suffix);
+        calculateCard($row, 'infant', infant_count, suffix);
+    });
 }
 $(document).on('input change', '.costing-table input, .costing-table select', function () {
     calculateCostingCards();
@@ -2439,6 +2518,13 @@ $(document).ready(function () {
     console.log("READY RUNNING");
 
     quotation_cost_calculate('tour_cost-');
+    if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
+        && typeof quotationPopulatePpCostingFromHotels === 'function') {
+        var initPp = quotationBuildHotelPerPersonArrFromPpCosting();
+        if (initPp.length) {
+            quotationPopulatePpCostingFromHotels(initPp, {});
+        }
+    }
     calculateCostingCards();
 
   
@@ -2474,6 +2560,30 @@ function costing_reflect()
 	if(id=="perperson_costing"){
 		$('#group_costing_tab').hide();
 		$('#per_person_costing_tab').show();
+		if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
+			&& typeof quotationPopulatePpCostingFromHotels === 'function') {
+			var ppHotels = quotationBuildHotelPerPersonArrFromPpCosting();
+			if (ppHotels.length) {
+				var travelData = $("#travel_pp_costing").val();
+				var transport_pp = 0;
+				try {
+					if (travelData) {
+						var td = JSON.parse(travelData);
+						var adult_count  = +$('#total_adult').val() || 0;
+						var cwnb_count   = +$('#children_without_bed').val() || 0;
+						var cweb_count   = +$('#children_with_bed').val() || 0;
+						var infant_count = +$('#total_infant').val() || 0;
+						var total_number = adult_count + cwnb_count + cweb_count + infant_count;
+						if (total_number === 0) total_number = 1;
+						if (td && td[0]) {
+							transport_pp = (parseFloat(td[0]['total_cost']) / total_number) || 0;
+						}
+					}
+				} catch (e) {}
+				quotationPopulatePpCostingFromHotels(ppHotels, { transport_pp: transport_pp });
+			}
+		}
+		calculateCostingCards(true);
 	}
 
 }

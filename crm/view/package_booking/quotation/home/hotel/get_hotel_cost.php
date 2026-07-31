@@ -127,6 +127,7 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 							'adult_cost'=>$adult_cost,
 							'child_with_bed'=>$cwb_cost,
 							'child_without_bed'=>$cwob_cost,
+							'infant_cost'=>0,
 							'package_id'=>$package_id_arr[$i],
 							'flag'=>'true'
 						)
@@ -141,6 +142,7 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 						'adult_cost'=>0,
 						'child_with_bed'=>0,
 						'child_without_bed'=>0,
+						'infant_cost'=>0,
 						'package_id'=>$package_id_arr[$i],
 						'flag'=>'false'
 					));
@@ -155,6 +157,7 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 				'adult_cost'=>0,
 				'child_with_bed'=>0,
 				'child_without_bed'=>0,
+				'infant_cost'=>0,
 				'package_id'=>$package_id_arr[$i],
 				'flag'=>'false'
 			));
@@ -167,6 +170,7 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 			'adult_cost'=>0,
 			'child_with_bed'=>0,
 			'child_without_bed'=>0,
+			'infant_cost'=>0,
 			'package_id'=>$package_id_arr[$i],
 			'flag'=>'false'
 		)

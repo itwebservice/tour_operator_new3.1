@@ -34,7 +34,8 @@ color: #ffffff;
 input.labelauty + label, input.labelauty:checked + label, input.labelauty:checked:not([disabled]) + label:hover{
 background-color:<?= $theme_color ?>;
 }
-#tbl_package_tour_quotation_dynamic_costing .quotation-package-costing-separator {
+#tbl_package_tour_quotation_dynamic_costing .quotation-package-costing-separator,
+#quotation_pp_costing_container .quotation-package-costing-separator {
     border: 0;
     border-top: 2px solid #e0e0e0;
     margin: 22px 0;
@@ -348,596 +349,76 @@ background-color:<?= $theme_color ?>;
                         </div>
                         <!-- Per Person Costing -->
                         <div id="per_person_costing_tab" class="costing_section main_block mg_bt_20" style="display: none;">
-                              <?php 
-                                     $pp_costing = [];
-                                     
+                              <?php
+                                     ensure_pp_costing_package_type_column();
+                                     // Load PP rows keyed by package_type + pax_type
+                                     $pp_by_package = array();
+                                     $pp_legacy = array();
                                      $sq_pp = mysqlQuery("SELECT * FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
                                      if ($sq_pp) {
                                          while ($row = mysqli_fetch_assoc($sq_pp)) {
-                                             $pp_costing[$row['pax_type']] = $row;
+                                             $ptype_key = trim((string) (isset($row['package_type']) ? $row['package_type'] : ''));
+                                             if ($ptype_key === '') {
+                                                 $pp_legacy[$row['pax_type']] = $row;
+                                             } else {
+                                                 if (!isset($pp_by_package[$ptype_key])) {
+                                                     $pp_by_package[$ptype_key] = array();
+                                                 }
+                                                 $pp_by_package[$ptype_key][$row['pax_type']] = $row;
+                                             }
                                          }
                                      }
-                                     
-                                     // Safe getter function
-                                     function get_pp_val($pp_costing, $type, $field){
-                                         return isset($pp_costing[$type][$field]) ? $pp_costing[$type][$field] : '';
+
+                                     // Package list from costing entries (same as Group Costing multi rows)
+                                     $pp_package_list = array();
+                                     $sq_cost_pp = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order, id");
+                                     while ($row_ce = mysqli_fetch_assoc($sq_cost_pp)) {
+                                         $pp_package_list[] = $row_ce;
                                      }
-                                     ?>
+                                     if (!count($pp_package_list)) {
+                                         $pp_package_list[] = array('package_type' => 'NA', 'id' => '');
+                                     }
+                                     // If legacy PP has no package_type, attach to first package
+                                     if (count($pp_legacy) && count($pp_package_list)) {
+                                         $first_type = trim((string) $pp_package_list[0]['package_type']);
+                                         if ($first_type !== '' && empty($pp_by_package[$first_type])) {
+                                             $pp_by_package[$first_type] = $pp_legacy;
+                                         }
+                                     }
+                                     $sq_cost_count = count($pp_package_list);
+                                     $currency_code_selected = isset($sq_quotation['currency_code']) ? $sq_quotation['currency_code'] : '';
+                              ?>
                                         <div class="row">
                                             <div class="col-xs-12">
                                                 <div class="panel panel-default panel-body app_panel_style">
-                                                    <legend >Land Cost</legend>
-                                                    <!-- Adult & child cost -->
-                                                    <?php
-                                                    $count = 0;
-                                                    $countp = 1;
-                                                    $sq_cost_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id'"));
-                                                    ?>
+                                                    <legend>Land Cost</legend>
                                                     <input type="hidden" id="sq_ppcost_count" value="<?= $sq_cost_count ?>" />
+                                                    <div id="quotation_pp_costing_container">
                                                     <?php
-                                                    $sq_q_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' ");
-                                                    while ($row_q_costing1 = mysqli_fetch_assoc($sq_q_costing1)) {
-
-                                                        $id = $row_q_costing1['id'];
+                                                    $pp_total = count($pp_package_list);
+                                                    for ($ppi = 0; $ppi < $pp_total; $ppi++) {
+                                                        $row_ce = $pp_package_list[$ppi];
+                                                        $package_type = isset($row_ce['package_type']) ? $row_ce['package_type'] : 'NA';
+                                                        $entry_id = isset($row_ce['id']) ? $row_ce['id'] : '';
+                                                        $suffix = ($pp_total <= 1) ? '' : ('-' . ($ppi + 1));
+                                                        $pp_pkg = isset($pp_by_package[$package_type]) ? $pp_by_package[$package_type] : array();
+                                                        if ($ppi > 0) {
+                                                            echo '<hr class="quotation-package-costing-separator">';
+                                                        }
+                                                        include __DIR__ . '/pp_costing_package_block.php';
+                                                    }
                                                     ?>
-                                                    <div class="row mg_tp_10">
-                                                        <div class="col-md-2">
-                                                            <span>Package Type</span>
-                                                            <input type="text" id="package_type<?= $countp ?>" onchange="validate_balance(this.id);"
-                                                                name="package_type" placeholder="Package Type" title="Package Type"
-                                                                value="<?= $row_q_costing1['package_type'] ?>" readonly>
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                                                  <span>Currency</span>
-                                                                                         <select name="currency_code_pp" id="currency_code_pp" title="Currency" style="width:100%" data-toggle="tooltip">
-                                                                                          <option value="">*Select Currency</option>
-                                                                                          <option value="1">USD</option>
-                                                                                          <option value="2">EUR</option>
-                                                                                          <option value="3">GBP</option>
-                                                                                          <option value="4">INR</option>
-                                                                                          <option value="5">AUD</option>
-                                                                                          <option value="6">CAD</option>
-                                                                                          <option value="7">CHF</option>
-                                                                                          <option value="8">CNY</option>
-                                                                                          <option value="9">JPY</option>
-                                                                                         </select>
-                       
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <span>Adult Cost</span>
-                                                            <input type="text" id='adult_cost1<?= $countp ?>' onchange="validate_balance(this.id);"
-                                                                name="adult_cost1" placeholder="Adult Cost" title="Adult Cost"
-                                                                value="<?= $row_q_costing1['adult_cost'] ?>" style="display: none;">
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <span>Child with Bed Cost</span>
-                                                            <input type="text" id="child_with1<?= $countp ?>" onchange="validate_balance(this.id);"
-                                                                name="child_with1" placeholder="Child with Bed Cost" title="Child with Bed Cost"
-                                                                value="<?= $row_q_costing1['child_with'] ?>" style="display: none;">
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <span>Child w/o Bed Cost</span>
-                                                            <input type="text" id="child_without1<?= $countp ?>"
-                                                                onchange="validate_balance(this.id);" name="child_without1"
-                                                                placeholder="Child w/o Bed Cost" title="Child w/o Bed Cost"
-                                                                value="<?= $row_q_costing1['child_without'] ?>" style="display: none;">
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <span>Infant Cost</span>
-                                                            <input type="text" id="infant_cost1<?= $countp ?>" onchange="validate_balance(this.id);"
-                                                                name="infant_cost1" placeholder="Infant Cost" title="Infant Cost"
-                                                                value="<?= $row_q_costing1['infant_cost'] ?>" style="display: none;">
-                                                        </div>
-                                                        <input type="hidden" id="entry_id1<?= $countp ?>" value="<?= $row_q_costing1['id'] ?>">
-                                                    </div>
-                                                    <?php $countp++;
-                                                    } ?>
-
-                                            <div class="costing-content-wp">
-                                                <div class="costing-card-wp mg_tp_10">
-                                                    <div class="row">
-                                                        <div class="col-md-3">
-                                                            <div class="costing-card">
-                                                                <div class="costing-card-icon">
-                                                                    <i class="fa fa-regular fa-user icon"></i>
-                                                                </div>
-                                                                <div class="costing-card-detail" >
-                                                                    <p class="costing-card-label">Adult<br> (Double Sharing)</p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="costing-card-table" style="display: block;">
-                                                                <table class="table table-bordered costing-table " id="" name="">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Components</th>
-                                                                            <th>Cost</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                         <tr data-type="hotel">
-                                                                            <td>Hotel</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','hotel_cost') ?>" id="adult_hotel_pp_update" name="adult_hotel_pp_update"  placeholder="Hotel" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="transfer">
-                                                                            <td>Transfer</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','transfer_cost') ?>" id="adult_transfer_pp_update" name="adult_transfer_pp_update"  placeholder="Transfer" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="activity">
-                                                                            <td>Activity</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','activity_cost') ?>" id="adult_activity_pp_update" name="adult_activity_pp_update"  placeholder="Activity" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
-                                                                            <td  class="price">
-                                                                                <input type="text" value="<?= get_pp_val($pp_costing,'adult','land_cost') ?>"onchange=";" id="adult_land_cost_pp_update" name="adult_land_cost_pp_update" placeholder="Adult Cost" title="Adult Cost">
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr data-type="service_charge">
-                                                                            <td>Service Charges </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','service_charge') ?>" id="adult_service_charge_pp_update" name="adult_service_charge_pp_update" placeholder="Service Charges" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount">
-                                                                            <td>Discount In</td>
-                                                                            <td ><select name="adult_discount_in_pp_update" id="adult_discount_in_pp_update"  class="form-control">
-                                                                                     <option value="1">Percentage</option>
-                                                                                     <option value="2">Flat</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
-                                                                            <td ><input type="number" value="<?= get_pp_val($pp_costing,'adult','discount_amount') ?>"  id="adult_discount_amount_pp_update" name="adult_discount_amount_pp_update" placeholder="Discount Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="flight_acost">
-                                                                            <td>Flight Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','flight_cost') ?>" id="adult_flight_pp_update" name="adult_flight_pp_update" placeholder="Flight Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                       
-                                                                        <tr data-type="train_acost">
-                                                                            <td>Train Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','train_cost') ?>" id="adult_train_pp_update" name="adult_train_pp_update"  placeholder="Train Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>Cruise Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','cruise_cost') ?>" id="adult_cruise_pp_update" name="adult_cruise_pp_update"  placeholder="Cruise Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="visa_acost">
-                                                                            <td>Visa Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','visa_cost') ?>"  id="adult_visa_pp_update" name="adult_visa_pp_update"  placeholder="Visa Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="guide_acost">
-                                                                            <td>Guide Cost </td> 
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','guide_cost') ?>" id="adult_guide_pp_update" name="adult_guide_pp_update"  placeholder="Guide Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="miscellaneous_acost">
-                                                                            <td>Miscellaneous Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','misc_cost') ?>" id="adult_misc_pp_update" name="adult_misc_pp_update"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax_apply_on">
-                                                                            <td>Tax Apply On</td>
-                                                                        <td ><select id="adult_tax_apply_on_pp_update" name="adult_tax_apply_on_pp_update"  class="form-control">
-                                                                              <option value="<?php get_pp_val($pp_costing,'adult','tax_apply_on') ?>"><?php echo $tax_apply_on ?></option>
-                                                                                     <option value="1">Tax Apply On</option>
-                                                                                     <option value="2">Basic Amount</option>
-                                                                                     <option value="3">Service Charge</option>
-                                                                                     <option value="4">Total</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax">
-                                                                            <td>Select Tax</td>
-                                                                            <td ><select id="adult_select_tax_pp_update" name="adult_select_tax_pp_update" class="form-control">
-                                                                                    <option value="">*Select Tax</option>
-                                                                                <?php get_tax_dropdown('Income') ?>
-                                                                                   
-                                                                                </select></td>
-                                                                        </tr>
-                                                                          <tr data-type="tax_value">
-                                                                            <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number"  value="<?= get_pp_val($pp_costing,'adult','tax_amount') ?>" id="adult_tax_amt_pp_update" name="adult_tax_amt_pp_update"  placeholder="Tax Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                             <tr data-type="tcs">
-                                                                            <td>TCS</td>
-                                                                            <td ><select id="adult_select_tcs_pp_update" name="adult_select_tcs_pp_update"  class="form-control">
-                                                                                     <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">2% TCS</option>
-                                                                                     <option value="3">20% TCS</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tcs_value">
-                                                                            <td>TCS Amount </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','tcs_amount') ?>" id="adult_tcs_amount_pp_update" name="adult_tcs_amount_pp_update"  placeholder="TCS" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="total">
-                                                                            <td>Total Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','total_cost') ?>" id="adult_total_amount_pp_update" name="adult_total_amount_pp_update" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
-                                                                        </tr>
-                                                                       
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-md-3">
-                                                            <div class="costing-card">
-                                                                <div class="costing-card-icon">
-                                                                    <i class="fa fa-regular fa-user icon"></i>
-                                                                </div>
-                                                                <div class="costing-card-detail" >
-                                                                   <p class="costing-card-label">CWEB<br> (Child With Extra Bed)</p>
-                                                                </div>
-                                                            </div>
-                                                         <div class="costing-card-table" style="display: block;">
-                                                                <table class="table table-bordered costing-table " id="" name="">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Components</th>
-                                                                            <th>Cost</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                         <tr data-type="hotel">
-                                                                            <td>Hotel</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','hotel_cost') ?>" id="cweb_hotel_pp_update" name="cweb_hotel_pp_update"  placeholder="Hotel" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="transfer">
-                                                                            <td>Transfer</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','transfer_cost') ?>" id="cweb_transfer_pp_update" name="cweb_transfer_pp_update"  placeholder="Transfer" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="activity">
-                                                                            <td>Activity</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','activity_cost') ?>" id="cweb_activity_pp_update" name="cweb_activity_pp_update"  placeholder="Activity" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
-                                                                            <td  class="price">
-                                                                                <input type="text" value="<?= get_pp_val($pp_costing,'cweb','land_cost') ?>"onchange=";" id="cweb_land_cost_pp_update" name="cweb_land_cost_pp_update" placeholder="cweb Cost" title="cweb Cost">
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr data-type="service_charge">
-                                                                            <td>Service Charges </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','service_charge') ?>" id="cweb_service_charge_pp_update" name="cweb_service_charge_pp_update" placeholder="Service Charges" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount">
-                                                                            <td>Discount In</td>
-                                                                            <td ><select name="cweb_discount_in_pp_update" id="cweb_discount_in_pp_update"  class="form-control">
-                                                                                     <option value="1">Percentage</option>
-                                                                                     <option value="2">Flat</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
-                                                                            <td ><input type="number" value="<?= get_pp_val($pp_costing,'cweb','discount_amount') ?>"  id="cweb_discount_amount_pp_update" name="cweb_discount_amount_pp_update" placeholder="Discount Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="flight_acost">
-                                                                            <td>Flight Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','flight_cost') ?>" id="cweb_flight_pp_update" name="cweb_flight_pp_update" placeholder="Flight Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                       
-                                                                        <tr data-type="train_acost">
-                                                                            <td>Train Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','train_cost') ?>" id="cweb_train_pp_update" name="cweb_train_pp_update"  placeholder="Train Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>Cruise Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','cruise_cost') ?>" id="cweb_cruise_pp_update" name="cweb_cruise_pp_update"  placeholder="Cruise Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="visa_acost">
-                                                                            <td>Visa Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','visa_cost') ?>"  id="cweb_visa_pp_update" name="cweb_visa_pp_update"  placeholder="Visa Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="guide_acost">
-                                                                            <td>Guide Cost </td> 
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','guide_cost') ?>" id="cweb_guide_pp_update" name="cweb_guide_pp_update"  placeholder="Guide Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="miscellaneous_acost">
-                                                                            <td>Miscellaneous Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','misc_cost') ?>" id="cweb_misc_pp_update" name="cweb_misc_pp_update"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax_apply_on">
-                                                                            <td>Tax Apply On</td>
-                                                                            <td ><select id="cweb_tax_apply_on_pp_update" name="cweb_tax_apply_on_pp_update"  class="form-control">
-                                                                                     <option value="1">Tax Apply On</option>
-                                                                                     <option value="2">Basic Amount</option>
-                                                                                     <option value="3">Service Charge</option>
-                                                                                     <option value="4">Total</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax">
-                                                                            <td>Select Tax</td>
-                                                                            <td ><select id="cweb_select_tax_pp_update" name="cweb_select_tax_pp_update" class="form-control">
-                                                                                    <option value="">*Select Tax</option>
-                                                                                <?php get_tax_dropdown('Income') ?>
-                                                                                   
-                                                                                </select></td>
-                                                                        </tr>
-                                                                          <tr data-type="tax_value">
-                                                                            <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number"  value="<?= get_pp_val($pp_costing,'cweb','tax_amount') ?>" id="cweb_tax_amt_pp_update" name="cweb_tax_amt_pp_update"  placeholder="Tax Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                             <tr data-type="tcs">
-                                                                            <td>TCS</td>
-                                                                            <td ><select id="cweb_select_tcs_pp_update" name="cweb_select_tcs_pp_update"  class="form-control">
-                                                                                     <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">2% TCS</option>
-                                                                                     <option value="3">20% TCS</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tcs_value">
-                                                                            <td>TCS Amount </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','tcs_amount') ?>" id="cweb_tcs_amount_pp_update" name="cweb_tcs_amount_pp_update"  placeholder="TCS" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="total">
-                                                                            <td>Total Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cweb','total_cost') ?>" id="cweb_total_amount_pp_update" name="cweb_total_amount_pp_update" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
-                                                                        </tr>
-                                                                       
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-md-3">
-                                                            <div class="costing-card">
-                                                                <div class="costing-card-icon">
-                                                                    <i class="fa fa-regular fa-user icon"></i>
-                                                                </div>
-                                                                <div class="costing-card-detail" >
-                                                                   
-                                                                    <p class="costing-card-label">CWNB<br> (Child With No Bed)</p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="costing-card-table" style="display: block;">
-                                                                <table class="table table-bordered costing-table " id="" name="">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Components</th>
-                                                                            <th>Cost</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                         <tr data-type="hotel">
-                                                                            <td>Hotel</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','hotel_cost') ?>" id="cwnb_hotel_pp_update" name="cwnb_hotel_pp_update"  placeholder="Hotel" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="transfer">
-                                                                            <td>Transfer</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','transfer_cost') ?>" id="cwnb_transfer_pp_update" name="cwnb_transfer_pp_update"  placeholder="Transfer" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="activity">
-                                                                            <td>Activity</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','activity_cost') ?>" id="cwnb_activity_pp_update" name="cwnb_activity_pp_update"  placeholder="Activity" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
-                                                                            <td  class="price">
-                                                                                <input type="text" value="<?= get_pp_val($pp_costing,'cwnb','land_cost') ?>"onchange=";" id="cwnb_land_cost_pp_update" name="cwnb_land_cost_pp_update" placeholder="cwnb Cost" title="cwnb Cost">
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr data-type="service_charge">
-                                                                            <td>Service Charges </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','service_charge') ?>" id="cwnb_service_charge_pp_update" name="cwnb_service_charge_pp_update" placeholder="Service Charges" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount">
-                                                                            <td>Discount In</td>
-                                                                            <td ><select name="cwnb_discount_in_pp_update" id="cwnb_discount_in_pp_update"  class="form-control">
-                                                                                     <option value="1">Percentage</option>
-                                                                                     <option value="2">Flat</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
-                                                                            <td ><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','discount_amount') ?>"  id="cwnb_discount_amount_pp_update" name="cwnb_discount_amount_pp_update" placeholder="Discount Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="flight_acost">
-                                                                            <td>Flight Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','flight_cost') ?>" id="cwnb_flight_pp_update" name="cwnb_flight_pp_update" placeholder="Flight Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                       
-                                                                        <tr data-type="train_acost">
-                                                                            <td>Train Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','train_cost') ?>" id="cwnb_train_pp_update" name="cwnb_train_pp_update"  placeholder="Train Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>Cruise Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','cruise_cost') ?>" id="cwnb_cruise_pp_update" name="cwnb_cruise_pp_update"  placeholder="Cruise Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="visa_acost">
-                                                                            <td>Visa Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','visa_cost') ?>"  id="cwnb_visa_pp_update" name="cwnb_visa_pp_update"  placeholder="Visa Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="guide_acost">
-                                                                            <td>Guide Cost </td> 
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','guide_cost') ?>" id="cwnb_guide_pp_update" name="cwnb_guide_pp_update"  placeholder="Guide Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="miscellaneous_acost">
-                                                                            <td>Miscellaneous Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','misc_cost') ?>" id="cwnb_misc_pp_update" name="cwnb_misc_pp_update"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax_apply_on">
-                                                                            <td>Tax Apply On</td>
-                                                                            <td ><select id="cwnb_tax_apply_on_pp_update" name="cwnb_tax_apply_on_pp_update"  class="form-control">
-                                                                                     <option value="1">Tax Apply On</option>
-                                                                                     <option value="2">Basic Amount</option>
-                                                                                     <option value="3">Service Charge</option>
-                                                                                     <option value="4">Total</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax">
-                                                                            <td>Select Tax</td>
-                                                                            <td ><select id="cwnb_select_tax_pp_update" name="cwnb_select_tax_pp_update" class="form-control">
-                                                                                    <option value="">*Select Tax</option>
-                                                                                <?php get_tax_dropdown('Income') ?>
-                                                                                   
-                                                                                </select></td>
-                                                                        </tr>
-                                                                          <tr data-type="tax_value">
-                                                                            <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number"  value="<?= get_pp_val($pp_costing,'cwnb','tax_amount') ?>" id="cwnb_tax_amt_pp_update" name="cwnb_tax_amt_pp_update"  placeholder="Tax Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                             <tr data-type="tcs">
-                                                                            <td>TCS</td>
-                                                                            <td ><select id="cwnb_select_tcs_pp_update" name="cwnb_select_tcs_pp_update"  class="form-control">
-                                                                                     <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">2% TCS</option>
-                                                                                     <option value="3">20% TCS</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tcs_value">
-                                                                            <td>TCS Amount </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','tcs_amount') ?>" id="cwnb_tcs_amount_pp_update" name="cwnb_tcs_amount_pp_update"  placeholder="TCS" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="total">
-                                                                            <td>Total Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'cwnb','total_cost') ?>" id="cwnb_total_amount_pp_update" name="cwnb_total_amount_pp_update" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
-                                                                        </tr>
-                                                                       
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="col-md-3">
-                                                            <div class="costing-card">
-                                                                <div class="costing-card-icon">
-                                                                    <i class="fa fa-regular fa-user icon"></i>
-                                                                </div>
-                                                                <div class="costing-card-detail">
-                                                                    
-                                                                    <p class="costing-card-label">Infant</p>
-                                                                </div>
-                                                            </div>
-                                                          <div class="costing-card-table" style="display: block;">
-                                                                <table class="table table-bordered costing-table " id="" name="">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Components</th>
-                                                                            <th>Cost</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                         <tr data-type="hotel">
-                                                                            <td>Hotel</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','hotel_cost') ?>" id="adult_hotel_pp_update" name="adult_hotel_pp_update"  placeholder="Hotel" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="transfer">
-                                                                            <td>Transfer</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','transfer_cost') ?>" id="adult_transfer_pp_update" name="adult_transfer_pp_update"  placeholder="Transfer" title="" class="form-control" ></td>
-                                                                        </tr>
-
-                                                                        <tr data-type="activity">
-                                                                            <td>Activity</td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','activity_cost') ?>" id="adult_activity_pp_update" name="adult_activity_pp_update"  placeholder="Activity" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td data-type="land_cost">Land Cost <br/> <span>(Hotel+Transfer+Activity)</span></td>
-                                                                            <td  class="price">
-                                                                                <input type="text" value="<?= get_pp_val($pp_costing,'adult','land_cost') ?>"onchange=";" id="adult_land_cost_pp_update" name="adult_land_cost_pp_update" placeholder="Adult Cost" title="Adult Cost">
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr data-type="service_charge">
-                                                                            <td>Service Charges </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','service_charge') ?>" id="adult_service_charge_pp_update" name="adult_service_charge_pp_update" placeholder="Service Charges" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount">
-                                                                            <td>Discount In</td>
-                                                                            <td ><select name="adult_discount_in_pp_update" id="adult_discount_in_pp_update"  class="form-control">
-                                                                                     <option value="1">Percentage</option>
-                                                                                     <option value="2">Flat</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                        <tr data-type="discount_amount">
-                                                                            <td  class="price">Discount Amount </td>
-                                                                            <td ><input type="number" value="<?= get_pp_val($pp_costing,'adult','discount_amount') ?>"  id="adult_discount_amount_pp_update" name="adult_discount_amount_pp_update" placeholder="Discount Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="flight_acost">
-                                                                            <td>Flight Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','flight_cost') ?>" id="adult_flight_pp_update" name="adult_flight_pp_update" placeholder="Flight Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                       
-                                                                        <tr data-type="train_acost">
-                                                                            <td>Train Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','train_cost') ?>" id="adult_train_pp_update" name="adult_train_pp_update"  placeholder="Train Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>Cruise Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','cruise_cost') ?>" id="adult_cruise_pp_update" name="adult_cruise_pp_update"  placeholder="Cruise Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="visa_acost">
-                                                                            <td>Visa Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','visa_cost') ?>"  id="adult_visa_pp_update" name="adult_visa_pp_update"  placeholder="Visa Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="guide_acost">
-                                                                            <td>Guide Cost </td> 
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','guide_cost') ?>" id="adult_guide_pp_update" name="adult_guide_pp_update"  placeholder="Guide Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                        <tr data-type="miscellaneous_acost">
-                                                                            <td>Miscellaneous Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','misc_cost') ?>" id="adult_misc_pp_update" name="adult_misc_pp_update"  placeholder="Miscellaneous Cost" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax_apply_on">
-                                                                            <td>Tax Apply On</td>
-                                                                            <td ><select id="adult_tax_apply_on_pp_update" name="adult_tax_apply_on_pp_update"  class="form-control">
-                                                                                       <option value="1">Tax Apply On</option>
-                                                                                     <option value="2">Basic Amount</option>
-                                                                                     <option value="3">Service Charge</option>
-                                                                                     <option value="4">Total</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tax">
-                                                                            <td>Select Tax</td>
-                                                                            <td ><select id="adult_select_tax_pp_update" name="adult_select_tax_pp_update" class="form-control">
-                                                                                    <option value="">*Select Tax</option>
-                                                                                <?php get_tax_dropdown('Income') ?>
-                                                                                   
-                                                                                </select></td>
-                                                                        </tr>
-                                                                          <tr data-type="tax_value">
-                                                                            <td>Tax Amount </td>
-                                                                            <td  class="price"><input type="number"  value="<?= get_pp_val($pp_costing,'adult','tax_amount') ?>" id="adult_tax_amt_pp_update" name="adult_tax_amt_pp_update"  placeholder="Tax Amount" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                             <tr data-type="tcs">
-                                                                            <td>TCS</td>
-                                                                            <td ><select id="adult_select_tcs_pp_update" name="adult_select_tcs_pp_update"  class="form-control">
-                                                                                     <option value="1">*TCS Tax</option>
-                                                                                     <option value="2">2% TCS</option>
-                                                                                     <option value="3">20% TCS</option>
-                                                                                </select></td>
-                                                                        </tr>
-                                                                           <tr data-type="tcs_value">
-                                                                            <td>TCS Amount </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','tcs_amount') ?>" id="adult_tcs_amount_pp_update" name="adult_tcs_amount_pp_update"  placeholder="TCS" title="" class="form-control" ></td>
-                                                                        </tr>
-                                                                           <tr data-type="total">
-                                                                            <td>Total Cost </td>
-                                                                            <td  class="price"><input type="number" value="<?= get_pp_val($pp_costing,'adult','total_cost') ?>" id="adult_total_amount_pp_update" name="adult_total_amount_pp_update" placeholder="Total Cost" title="" class="form-control totalcost-input" ></td>
-                                                                        </tr>
-                                                                       
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                                    
-                                                </div>
-
-                                            </div>
-
+                                        </div>
                         </div>
                 </div>
         </div>
       </div>
 
                  
-            
+
             <div class="row  mg_tp_20 text-center row  text-center mg_bt_30">
                 <div class="col-xs-12">
                     <button class="btn btn-info btn-sm ico_left" type="button" onclick="switch_to_tab3()"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Previous</button>
@@ -1730,6 +1211,48 @@ $('#frm_tab4').validate({
             return false;
         }
 
+        var costing_type_pre = getQuotationCostingType();
+        if (costing_type_pre == 2) {
+            var paxRequired = {
+                adult: (parseInt($('#total_adult12').val(), 10) || 0) > 0,
+                cweb: (parseInt($('#children_with_bed12').val(), 10) || 0) > 0,
+                cwnb: (parseInt($('#children_without_bed12').val(), 10) || 0) > 0,
+                infant: (parseInt($('#total_infant12').val(), 10) || 0) > 0
+            };
+            var ppTypes = ['adult', 'cweb', 'cwnb', 'infant'];
+            var $ppRows = $('#quotation_pp_costing_container .quotation-pp-costing-row');
+            if (!$ppRows.length) {
+                $ppRows = $(document);
+            }
+            var taxOk = true;
+            $ppRows.each(function (pkgIdx) {
+                var suffix = $(this).attr('data-pp-suffix') || '';
+                var pkgLabel = $(this).attr('data-package-type') || ('Package ' + (pkgIdx + 1));
+                for (var pti = 0; pti < ppTypes.length; pti++) {
+                    var ptype = ppTypes[pti];
+                    if (!paxRequired[ptype]) {
+                        continue;
+                    }
+                    var taxApply = $('#' + ptype + '_tax_apply_on_pp_update' + suffix).val();
+                    var taxVal = $('#' + ptype + '_select_tax_pp_update' + suffix).val();
+                    if (!taxApply || taxApply === '1') {
+                        error_msg_alert('Select Tax Apply On for ' + ptype + ' (' + pkgLabel + ')');
+                        taxOk = false;
+                        return false;
+                    }
+                    if (!taxVal) {
+                        error_msg_alert('Select Tax for ' + ptype + ' (' + pkgLabel + ')');
+                        taxOk = false;
+                        return false;
+                    }
+                }
+            });
+            if (!taxOk) {
+                resetQuotationUpdateState();
+                return false;
+            }
+        }
+
         for (var i = 0; i < costingEntries.length; i++) {
 
             var entry = costingEntries[i];
@@ -1753,15 +1276,17 @@ $('#frm_tab4').validate({
                 resetQuotationUpdateState();
                 return false;
             }
-            if (tax_apply_on == "") {
-                error_msg_alert('Select Tax Apply On in row' + (i + 1));
-                resetQuotationUpdateState();
-                return false;
-            }
-            if (tax_value == "") {
-                error_msg_alert('Select Tax in row' + (i + 1));
-                resetQuotationUpdateState();
-                return false;
+            if (costing_type_pre != 2) {
+                if (tax_apply_on == "") {
+                    error_msg_alert('Select Tax Apply On in row' + (i + 1));
+                    resetQuotationUpdateState();
+                    return false;
+                }
+                if (tax_value == "") {
+                    error_msg_alert('Select Tax in row' + (i + 1));
+                    resetQuotationUpdateState();
+                    return false;
+                }
             }
 
             package_type_c_arr.push(package_type_c);
@@ -1778,26 +1303,33 @@ $('#frm_tab4').validate({
             costing_id_arr.push(costing_id);
         }
         var bsmValues = collectUpdateCostingBsmValues();
-        // PP Costing
+        // PP hotel costs per package (hidden fields on each .quotation-pp-costing-row)
         var adult_cost_arr = [];
         var infant_cost_arr = [];
         var child_with_arr = [];
         var child_without_arr = [];
         var entry_id_arr = [];
-        var sq_ppcost_count = $('#sq_ppcost_count').val();
-        for (var i = 1; i <= sq_ppcost_count; i++) {
-
-            var adult_cost = $('#adult_cost1' + i).val();
-            var infant_cost = $('#infant_cost1' + i).val();
-            var child_with = $('#child_with1' + i).val();
-            var child_without = $('#child_without1' + i).val();
-            var entry_id = $('#entry_id1' + i).val();
-
-            adult_cost_arr.push(adult_cost);
-            infant_cost_arr.push(infant_cost);
-            child_with_arr.push(child_with);
-            child_without_arr.push(child_without);
-            entry_id_arr.push(entry_id);
+        var $ppCostRows = $('#quotation_pp_costing_container .quotation-pp-costing-row');
+        if ($ppCostRows.length) {
+            $ppCostRows.each(function () {
+                var suffix = $(this).attr('data-pp-suffix') || '';
+                // Prefer live card hotel values; fall back to hidden package costs
+                adult_cost_arr.push($('#adult_hotel_pp_update' + suffix).val() || $('#adult_cost' + suffix).val() || 0);
+                infant_cost_arr.push($('#infant_hotel_pp_update' + suffix).val() || $('#infant_cost' + suffix).val() || 0);
+                child_with_arr.push($('#cweb_hotel_pp_update' + suffix).val() || $('#child_with' + suffix).val() || 0);
+                child_without_arr.push($('#cwnb_hotel_pp_update' + suffix).val() || $('#child_without' + suffix).val() || 0);
+                entry_id_arr.push($('#pp_entry_id' + suffix).val() || '');
+            });
+        } else {
+            // Legacy fallback: adult_cost11, adult_cost12, ...
+            var sq_ppcost_count = parseInt($('#sq_ppcost_count').val(), 10) || 0;
+            for (var i = 1; i <= sq_ppcost_count; i++) {
+                adult_cost_arr.push($('#adult_cost1' + i).val() || 0);
+                infant_cost_arr.push($('#infant_cost1' + i).val() || 0);
+                child_with_arr.push($('#child_with1' + i).val() || 0);
+                child_without_arr.push($('#child_without1' + i).val() || 0);
+                entry_id_arr.push($('#entry_id1' + i).val() || '');
+            }
         }
         //Per person travel costing
         var flight_acost = $('#flight_acost1').val();
@@ -1812,6 +1344,9 @@ $('#frm_tab4').validate({
         var other_desc = $('#other_desc1').val();
 
         var costing_type = getQuotationCostingType();
+        var pp_costing_arr = (typeof quotationCollectPpCostingEntries === 'function')
+            ? quotationCollectPpCostingEntries({ mode: 'update' })
+            : [];
         var inclExclData = getInclusionsExclusionsForQuotation();
         var inclusions = inclExclData.inclusions;
         var exclusions = inclExclData.exclusions;
@@ -1973,7 +1508,8 @@ $('#frm_tab4').validate({
                             discount: discount,
                             flight_acost : flight_acost,flight_ccost:flight_ccost,flight_icost:flight_icost,train_acost:train_acost,train_ccost:train_ccost,train_icost:train_icost,                            cruise_acost:cruise_acost,cruise_ccost:cruise_ccost,cruise_icost:cruise_icost,other_desc:other_desc,
                             is_ai_quotation: is_ai_quotation,
-                            dest_id: dest_id
+                            dest_id: dest_id,
+                            pp_costing_arr: JSON.stringify(pp_costing_arr)
                         },
 
                         success: function(message) {
@@ -2403,37 +1939,38 @@ function uploadSingleImage(imageData, quotationId, base_url) {
 
 function calculateCostingCardsUpdate() {
 
-    // ===== TOTAL PAX =====
-    let total_adult = +$('#total_adult').val() || 0;
-    let cwb = +$('#children_with_bed').val() || 0;
-    let cnb = +$('#children_without_bed').val() || 0;
-    let infant = +$('#total_infant').val() || 0;
+    // ===== TOTAL PAX (update form uses *12 ids from Tab1) =====
+    let total_adult = +$('#total_adult12').val() || +$('#total_adult').val() || 0;
+    let cwb = +$('#children_with_bed12').val() || +$('#children_with_bed').val() || 0;
+    let cnb = +$('#children_without_bed12').val() || +$('#children_without_bed').val() || 0;
+    let infant = +$('#total_infant12').val() || +$('#total_infant').val() || 0;
 
-    let total_pax = total_adult + cwb + cnb + infant;
-
-    // ===== COMMON FUNCTION =====
-    function calculateBlock(prefix, pax_count) {
-
-        if (pax_count === 0 || total_pax === 0) {
-            $(`#${prefix}_total_amount_pp_update`).val(0);
+    function calculateBlock(prefix, pax_count, suffix) {
+        suffix = suffix || '';
+        if (pax_count === 0) {
+            // Keep loaded values visible; only clear when user changes inputs and pax is zero
             return;
         }
 
+        var sid = function (base) {
+            return '#' + base + suffix;
+        };
+
         // ===== BASIC =====
-        let hotel = +$(`#${prefix}_hotel_pp_update`).val() || 0;
-        let transfer = +$(`#${prefix}_transfer_pp_update`).val() || 0;
-        let activity = +$(`#${prefix}_activity_pp_update`).val() || 0;
+        let hotel = +$(sid(prefix + '_hotel_pp_update')).val() || 0;
+        let transfer = +$(sid(prefix + '_transfer_pp_update')).val() || 0;
+        let activity = +$(sid(prefix + '_activity_pp_update')).val() || 0;
 
         let land_cost = hotel + transfer + activity;
-        $(`#${prefix}_land_cost_pp_update`).val(land_cost.toFixed(2));
+        $(sid(prefix + '_land_cost_pp_update')).val(land_cost.toFixed(2));
 
         // ===== SERVICE CHARGE (10%) =====
         let service_charge = land_cost * 0.10;
-        $(`#${prefix}_service_charge_pp_update`).val(service_charge.toFixed(2));
+        $(sid(prefix + '_service_charge_pp_update')).val(service_charge.toFixed(2));
 
         // ===== DISCOUNT =====
-        let discount_type = $(`#${prefix}_discount_in_pp_update`).val();
-        let discount_input = +$(`#${prefix}_discount_amount_pp_update`).val() || 0;
+        let discount_type = $(sid(prefix + '_discount_in_pp_update')).val();
+        let discount_input = +$(sid(prefix + '_discount_amount_pp_update')).val() || 0;
 
         let discount = 0;
         if (discount_type == 1) {
@@ -2445,21 +1982,21 @@ function calculateCostingCardsUpdate() {
         let service_after_discount = service_charge - discount;
 
         // ===== OTHER COSTS =====
-        let flight = +$(`#${prefix}_flight_pp_update`).val() || 0;
-        let train = +$(`#${prefix}_train_pp_update`).val() || 0;
-        let cruise = +$(`#${prefix}_cruise_pp_update`).val() || 0;
-        let visa = +$(`#${prefix}_visa_pp_update`).val() || 0;
-        let guide = +$(`#${prefix}_guide_pp_update`).val() || 0;
-        let misc = +$(`#${prefix}_misc_pp_update`).val() || 0;
+        let flight = +$(sid(prefix + '_flight_pp_update')).val() || 0;
+        let train = +$(sid(prefix + '_train_pp_update')).val() || 0;
+        let cruise = +$(sid(prefix + '_cruise_pp_update')).val() || 0;
+        let visa = +$(sid(prefix + '_visa_pp_update')).val() || 0;
+        let guide = +$(sid(prefix + '_guide_pp_update')).val() || 0;
+        let misc = +$(sid(prefix + '_misc_pp_update')).val() || 0;
 
         let other_cost =
             flight + train + cruise + visa + guide + misc;
 
         // ===== TAX =====
-        let tax_apply_on = $(`#${prefix}_tax_apply_on_pp_update`).val();
+        let tax_apply_on = $(sid(prefix + '_tax_apply_on_pp_update')).val();
         let tax_percent = 0;
 
-        let tax_text = $(`#${prefix}_select_tax_pp_update option:selected`).text();
+        let tax_text = $(sid(prefix + '_select_tax_pp_update') + ' option:selected').text();
         let match = tax_text.match(/(\d+(\.\d+)?)%/);
         if (match) tax_percent = parseFloat(match[1]);
 
@@ -2474,11 +2011,11 @@ function calculateCostingCardsUpdate() {
         }
 
         let tax_amount = (tax_base * tax_percent) / 100;
-        $(`#${prefix}_tax_amt_pp_update`).val(tax_amount.toFixed(2));
+        $(sid(prefix + '_tax_amt_pp_update')).val(tax_amount.toFixed(2));
 
         // ===== TCS =====
         let tcs_percent = 0;
-        let tcs_val = $(`#${prefix}_select_tcs_pp_update`).val();
+        let tcs_val = $(sid(prefix + '_select_tcs_pp_update')).val();
 
         if (tcs_val == 2) tcs_percent = 5;
         if (tcs_val == 3) tcs_percent = 20;
@@ -2490,25 +2027,62 @@ function calculateCostingCardsUpdate() {
             tax_amount;
 
         let tcs_amount = (subtotal * tcs_percent) / 100;
-        $(`#${prefix}_tcs_amount_pp_update`).val(tcs_amount.toFixed(2));
+        $(sid(prefix + '_tcs_amount_pp_update')).val(tcs_amount.toFixed(2));
 
         // ===== FINAL TOTAL =====
         let final_total = subtotal + tcs_amount;
 
-        $(`#${prefix}_total_amount_pp_update`).val(final_total.toFixed(2));
+        $(sid(prefix + '_total_amount_pp_update')).val(final_total.toFixed(2));
     }
 
-    // ===== CALL FOR ALL =====
-    calculateBlock('adult', total_adult);
-    calculateBlock('cweb', cwb);
-    calculateBlock('cwnb', cnb);
-    calculateBlock('infant', infant);
+    var $ppRows = $('#quotation_pp_costing_container .quotation-pp-costing-row');
+    if ($ppRows.length) {
+        $ppRows.each(function () {
+            var suffix = $(this).attr('data-pp-suffix') || '';
+            calculateBlock('adult', total_adult, suffix);
+            calculateBlock('cweb', cwb, suffix);
+            calculateBlock('cwnb', cnb, suffix);
+            calculateBlock('infant', infant, suffix);
+        });
+    } else {
+        calculateBlock('adult', total_adult, '');
+        calculateBlock('cweb', cwb, '');
+        calculateBlock('cwnb', cnb, '');
+        calculateBlock('infant', infant, '');
+    }
 }
 
-$(document).on('keyup change', '.costing-table input, .costing-table select', function () {
+$(document).on('keyup change', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
     calculateCostingCardsUpdate();
 });
 $(document).ready(function () {
+    // Restore saved tax dropdown selections for every package block
+    function restorePpTaxSelect($tax) {
+        var selected = $tax.attr('data-selected') || '';
+        if (!selected) {
+            return;
+        }
+        $tax.val(selected);
+        if ($tax.val() !== selected) {
+            var matched = false;
+            $tax.find('option').each(function () {
+                var optVal = $(this).attr('value') || '';
+                var optText = $.trim($(this).text() || '');
+                if (optVal === selected || optText === selected) {
+                    $(this).prop('selected', true);
+                    matched = true;
+                    return false;
+                }
+            });
+            if (!matched) {
+                $tax.append($('<option></option>').attr('value', selected).text(selected).prop('selected', true));
+            }
+        }
+    }
+    $('#quotation_pp_costing_container select[id*="_select_tax_pp_update"]').each(function () {
+        restorePpTaxSelect($(this));
+    });
+    calculateCostingCardsUpdate();
 
     function calculate_land_cost(prefix) {
         let hotel = Number($('#' + prefix + '_hotel_pp_update').val()) || 0;

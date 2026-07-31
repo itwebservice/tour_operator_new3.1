@@ -5,75 +5,87 @@ class app_settings_master
 
 
 
-  public function app_basic_info_save()
+ public function app_basic_info_save()
 
-  {
+{
 
-    $app_version = trim($_POST['app_version']);
-    $currency_code = $_POST['currency_code'];
-    $app_contact_no = $_POST['app_contact_no'];
-    $app_landline_no = $_POST['app_landline_no'];
-    $tax_name = trim(strtoupper($_POST['tax_name']));
-    $service_tax_no = strtoupper($_POST['service_tax_no']);
-    $app_address = trim($_POST['app_address']);
-    $app_website = $_POST['app_website'];
-    $app_name = trim($_POST['app_name']);
-    $app_cin = $_POST['cin_no'];
+	$app_version = trim($_POST['app_version']);
+	$currency_code = $_POST['currency_code'];
+	$app_contact_no = $_POST['app_contact_no'];
+	$app_landline_no = $_POST['app_landline_no'];
+	$tax_name = trim(strtoupper($_POST['tax_name']));
+	$service_tax_no = strtoupper($_POST['service_tax_no']);
+	$app_address = trim($_POST['app_address']);
+	$app_website = $_POST['app_website'];
+	$app_name = trim($_POST['app_name']);
+	$app_cin = $_POST['cin_no'];
 
-    $cancel_pdf_url = $_POST['pdf_upload_url'];
-    $credit_card = $_POST['credit_card'];
+	$cancel_pdf_url = $_POST['pdf_upload_url'];
+	$credit_card = $_POST['credit_card'];
 
-    $state = $_POST['state'];
-    $country = $_POST['country'];
-    $acc_email = $_POST['acc_email'];
-    $tax_type = $_POST['tax_type'];
-    $tax_pay_date = $_POST['tax_pay_date'];
-    $tax_pay_date1 = get_date_db($tax_pay_date);
-    $qr_url = $_POST['qr_url'];
-    $sign_url = $_POST['sign_url'];
+	$app_email_id = trim($_POST['app_email_id']);
 
-    $sq_app_setting_count = mysqli_num_rows(mysqlQuery("select * from app_settings"));
-    $app_address = addslashes($app_address);
-    $app_name = addslashes($app_name);
-    if ($sq_app_setting_count == '0') {
-      $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(setting_id) as max from app_settings"));
+	$state = $_POST['state'];
+	$country = $_POST['country'];
+	$acc_email = $_POST['acc_email'];
+	$tax_type = $_POST['tax_type'];
+	$tax_pay_date = $_POST['tax_pay_date'];
+	$tax_pay_date1 = get_date_db($tax_pay_date);
+	$qr_url = $_POST['qr_url'];
+	$sign_url = $_POST['sign_url'];
+	
+ 	$sq_app_setting_count = mysqli_num_rows(mysqlQuery("select * from app_settings"));
+ 	$app_address = addslashes($app_address);	
+ 	$app_name = addslashes($app_name);
+	if($sq_app_setting_count == '0'){
+		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(setting_id) as max from app_settings"));
 
-      $setting_id = $sq_max['max'] + 1;
+		$setting_id = $sq_max['max'] + 1;
 
-      $query = "insert into app_settings ( setting_id, app_version,currency, app_contact_no, app_landline_no,  tax_name, service_tax_no, app_address, app_website, app_name,app_cin, policy_url , state_id, accountant_email, tax_type, tax_pay_date, credit_card_charges,country,qr_url,sign_url) 
-		values ( '$setting_id', '$app_version','$currency_code', '$app_contact_no', '$app_landline_no', '$tax_name', '$service_tax_no', '$app_address', '$app_website', '$app_name','$app_cin', '$cancel_pdf_url','$state','$acc_email','$tax_type','$tax_pay_date1','$credit_card','$country','$qr_url','$sign_url')";
+		$query = "insert into app_settings ( setting_id, app_version,currency, app_contact_no, app_landline_no,  tax_name, service_tax_no, app_address, app_website, app_name,app_cin, policy_url , state_id, accountant_email, tax_type, tax_pay_date, credit_card_charges,country,qr_url,sign_url,app_email_id) 
+		values ( '$setting_id', '$app_version','$currency_code', '$app_contact_no', '$app_landline_no', '$tax_name', '$service_tax_no', '$app_address', '$app_website', '$app_name','$app_cin', '$cancel_pdf_url','$state','$acc_email','$tax_type','$tax_pay_date1','$credit_card','$country','$qr_url','$sign_url','$app_email_id')";
 
-      $sq_setting = mysqlQuery($query);
+		$sq_setting = mysqlQuery($query);
 
-      if ($sq_setting) {
+		if($sq_setting){
 
 
-        echo "Company profile details has been successfully saved.";
+			echo "Company profile details has been successfully saved.";
 
-        exit;
-      } else {
+			exit;
 
-        echo "error--Sorry, Company profile details are not saved!";
-      }
-    } else {
-      $checkUpload = mysqli_fetch_assoc(mysqlQuery("select * from app_settings"));
-      if (empty($qr_url) && !empty($checkUpload['qr_url'])) {
-        $qr_url = $checkUpload['qr_url'];
-      }
-      if (empty($sign_url) && !empty($checkUpload['sign_url'])) {
-        $sign_url = $checkUpload['sign_url'];
-      }
-      $query = "update app_settings set app_version = '$app_version', app_contact_no = '$app_contact_no', app_landline_no='$app_landline_no', tax_name='$tax_name', service_tax_no = '$service_tax_no', app_address = '$app_address', app_website = '$app_website', app_name = '$app_name',app_cin='$app_cin', policy_url='$cancel_pdf_url', currency='$currency_code', state_id='$state', accountant_email='$acc_email', tax_type='$tax_type', tax_pay_date='$tax_pay_date1',credit_card_charges='$credit_card',country='$country',qr_url='$qr_url',sign_url='$sign_url' where setting_id='1'";
-      $sq_setting = mysqlQuery($query);
+		}
 
-      if ($sq_setting) {
-        echo "Company profile details has been successfully updated.";
-        exit;
-      } else {
-        echo "error--Sorry, Company profile details are not saved!";
-      }
-    }
-  }
+		else{
+
+			echo "error--Sorry, Company profile details are not saved!";
+
+		}
+
+	}
+
+	else{
+		$checkUpload = mysqli_fetch_assoc(mysqlQuery("select * from app_settings"));
+		if(empty($qr_url) && !empty($checkUpload['qr_url']))
+		{
+			$qr_url = $checkUpload['qr_url'];
+		}
+		if(empty($sign_url) && !empty($checkUpload['sign_url']))
+		{
+			$sign_url = $checkUpload['sign_url'];
+		}
+		$query = "update app_settings set app_version = '$app_version', app_contact_no = '$app_contact_no', app_landline_no='$app_landline_no', tax_name='$tax_name', service_tax_no = '$service_tax_no', app_address = '$app_address', app_website = '$app_website', app_name = '$app_name',app_cin='$app_cin', policy_url='$cancel_pdf_url', currency='$currency_code', state_id='$state', accountant_email='$acc_email', tax_type='$tax_type', tax_pay_date='$tax_pay_date1',credit_card_charges='$credit_card',country='$country',qr_url='$qr_url',sign_url='$sign_url',app_email_id='$app_email_id' where setting_id='1'";
+		$sq_setting = mysqlQuery($query);
+	
+		if($sq_setting){
+			echo "Company profile details has been successfully updated.";
+			exit;
+		}
+		else{
+			echo "error--Sorry, Company profile details are not saved!";
+		}
+	}
+}
 
   function app_cred_info_save()
 
