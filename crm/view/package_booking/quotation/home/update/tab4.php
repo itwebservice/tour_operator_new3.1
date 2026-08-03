@@ -1937,13 +1937,38 @@ function uploadSingleImage(imageData, quotationId, base_url) {
         }
     });
 
-function calculateCostingCardsUpdate() {
+function calculateCostingCardsUpdate(options) {
+    options = options || {};
+    // On user typing: keep their input (incl. clearing zeros). Only recalc service charge
+    // when land components change or on initial/forced refresh.
+    var recalcServiceCharge = (options.recalcServiceCharge === true);
+    var $active = $(document.activeElement);
 
     // ===== TOTAL PAX (update form uses *12 ids from Tab1) =====
     let total_adult = +$('#total_adult12').val() || +$('#total_adult').val() || 0;
     let cwb = +$('#children_with_bed12').val() || +$('#children_with_bed').val() || 0;
     let cnb = +$('#children_without_bed12').val() || +$('#children_without_bed').val() || 0;
     let infant = +$('#total_infant12').val() || +$('#total_infant').val() || 0;
+
+    function numFrom($el) {
+        var v = $el.val();
+        if (v === '' || v === null || typeof v === 'undefined') {
+            return 0;
+        }
+        var n = parseFloat(v);
+        return isNaN(n) ? 0 : n;
+    }
+
+    // Never overwrite the field the user is currently typing in
+    function writeIfNotFocused($el, value) {
+        if (!$el || !$el.length) {
+            return;
+        }
+        if ($active && $active.length && $el[0] === $active[0]) {
+            return;
+        }
+        $el.val(value);
+    }
 
     function calculateBlock(prefix, pax_count, suffix) {
         suffix = suffix || '';
@@ -1955,22 +1980,31 @@ function calculateCostingCardsUpdate() {
         var sid = function (base) {
             return '#' + base + suffix;
         };
+        var $serviceEl = $(sid(prefix + '_service_charge_pp_update'));
+        var serviceFocused = ($active.length && $serviceEl.length && $serviceEl[0] === $active[0]);
 
-        // ===== BASIC =====
-        let hotel = +$(sid(prefix + '_hotel_pp_update')).val() || 0;
-        let transfer = +$(sid(prefix + '_transfer_pp_update')).val() || 0;
-        let activity = +$(sid(prefix + '_activity_pp_update')).val() || 0;
+        // ===== BASIC (empty string stays empty in the field; treat as 0 for math only) =====
+        let hotel = numFrom($(sid(prefix + '_hotel_pp_update')));
+        let transfer = numFrom($(sid(prefix + '_transfer_pp_update')));
+        let activity = numFrom($(sid(prefix + '_activity_pp_update')));
 
         let land_cost = hotel + transfer + activity;
-        $(sid(prefix + '_land_cost_pp_update')).val(land_cost.toFixed(2));
+        writeIfNotFocused($(sid(prefix + '_land_cost_pp_update')), land_cost.toFixed(2));
 
-        // ===== SERVICE CHARGE (10%) =====
-        let service_charge = land_cost * 0.10;
-        $(sid(prefix + '_service_charge_pp_update')).val(service_charge.toFixed(2));
+        let service_charge;
+        // Only auto-fill SC from business rules when hotel/transfer/activity change,
+        // and never while the user is editing the service charge field itself.
+        if (recalcServiceCharge && !serviceFocused) {
+            service_charge = (typeof get_pp_service_charge_from_business_rules === 'function')
+                ? get_pp_service_charge_from_business_rules(land_cost, 'update')
+                : 0;
+            $serviceEl.val(Number(service_charge).toFixed(2));
+        }
+        service_charge = numFrom($serviceEl);
 
         // ===== DISCOUNT =====
         let discount_type = $(sid(prefix + '_discount_in_pp_update')).val();
-        let discount_input = +$(sid(prefix + '_discount_amount_pp_update')).val() || 0;
+        let discount_input = numFrom($(sid(prefix + '_discount_amount_pp_update')));
 
         let discount = 0;
         if (discount_type == 1) {
@@ -1978,16 +2012,19 @@ function calculateCostingCardsUpdate() {
         } else {
             discount = discount_input;
         }
+        if (discount > service_charge) {
+            discount = service_charge;
+        }
 
         let service_after_discount = service_charge - discount;
 
         // ===== OTHER COSTS =====
-        let flight = +$(sid(prefix + '_flight_pp_update')).val() || 0;
-        let train = +$(sid(prefix + '_train_pp_update')).val() || 0;
-        let cruise = +$(sid(prefix + '_cruise_pp_update')).val() || 0;
-        let visa = +$(sid(prefix + '_visa_pp_update')).val() || 0;
-        let guide = +$(sid(prefix + '_guide_pp_update')).val() || 0;
-        let misc = +$(sid(prefix + '_misc_pp_update')).val() || 0;
+        let flight = numFrom($(sid(prefix + '_flight_pp_update')));
+        let train = numFrom($(sid(prefix + '_train_pp_update')));
+        let cruise = numFrom($(sid(prefix + '_cruise_pp_update')));
+        let visa = numFrom($(sid(prefix + '_visa_pp_update')));
+        let guide = numFrom($(sid(prefix + '_guide_pp_update')));
+        let misc = numFrom($(sid(prefix + '_misc_pp_update')));
 
         let other_cost =
             flight + train + cruise + visa + guide + misc;
@@ -2011,7 +2048,7 @@ function calculateCostingCardsUpdate() {
         }
 
         let tax_amount = (tax_base * tax_percent) / 100;
-        $(sid(prefix + '_tax_amt_pp_update')).val(tax_amount.toFixed(2));
+        writeIfNotFocused($(sid(prefix + '_tax_amt_pp_update')), tax_amount.toFixed(2));
 
         // ===== TCS =====
         let tcs_percent = 0;
@@ -2027,12 +2064,12 @@ function calculateCostingCardsUpdate() {
             tax_amount;
 
         let tcs_amount = (subtotal * tcs_percent) / 100;
-        $(sid(prefix + '_tcs_amount_pp_update')).val(tcs_amount.toFixed(2));
+        writeIfNotFocused($(sid(prefix + '_tcs_amount_pp_update')), tcs_amount.toFixed(2));
 
         // ===== FINAL TOTAL =====
         let final_total = subtotal + tcs_amount;
 
-        $(sid(prefix + '_total_amount_pp_update')).val(final_total.toFixed(2));
+        writeIfNotFocused($(sid(prefix + '_total_amount_pp_update')), final_total.toFixed(2));
     }
 
     var $ppRows = $('#quotation_pp_costing_container .quotation-pp-costing-row');
@@ -2052,8 +2089,14 @@ function calculateCostingCardsUpdate() {
     }
 }
 
-$(document).on('keyup change', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
-    calculateCostingCardsUpdate();
+$(document).on('input change keyup', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
+    var id = (this.id || '');
+    // Service charge must NOT be overwritten when typing in the SC field.
+    // Only rebuild SC from business rules when hotel / transfer / activity change.
+    var isLandComponent = /_(hotel|transfer|activity)_pp_update/.test(id);
+    calculateCostingCardsUpdate({
+        recalcServiceCharge: isLandComponent
+    });
 });
 $(document).ready(function () {
     // Restore saved tax dropdown selections for every package block
@@ -2082,58 +2125,8 @@ $(document).ready(function () {
     $('#quotation_pp_costing_container select[id*="_select_tax_pp_update"]').each(function () {
         restorePpTaxSelect($(this));
     });
-    calculateCostingCardsUpdate();
-
-    function calculate_land_cost(prefix) {
-        let hotel = Number($('#' + prefix + '_hotel_pp_update').val()) || 0;
-        let transfer = Number($('#' + prefix + '_transfer_pp_update').val()) || 0;
-        let activity = Number($('#' + prefix + '_activity_pp_update').val()) || 0;
-
-        let land = hotel + transfer + activity;
-        $('#' + prefix + '_land_cost_pp_update').val(land);
-    }
-
-    function calculate_total(prefix) {
-        let land = Number($('#' + prefix + '_land_cost_pp_update').val()) || 0;
-        let service = Number($('#' + prefix + '_service_charge_pp_update').val()) || 0;
-        let flight = Number($('#' + prefix + '_flight_pp_update').val()) || 0;
-        let train = Number($('#' + prefix + '_train_pp_update').val()) || 0;
-        let cruise = Number($('#' + prefix + '_cruise_pp_update').val()) || 0;
-        let visa = Number($('#' + prefix + '_visa_pp_update').val()) || 0;
-        let guide = Number($('#' + prefix + '_guide_pp_update').val()) || 0;
-        let misc = Number($('#' + prefix + '_misc_pp_update').val()) || 0;
-        let tax = Number($('#' + prefix + '_tax_amt_pp_update').val()) || 0;
-        let tcs = Number($('#' + prefix + '_tcs_amount_pp_update').val()) || 0;
-
-        let total = land + service + flight + train + cruise + visa + guide + misc + tax + tcs;
-
-        $('#' + prefix + '_total_amount_pp_update').val(total);
-    }
-
-    const types = ['adult', 'cweb', 'cwnb', 'infant'];
-
-    types.forEach(function (type) {
-
-        $(document).on('input', `#${type}_hotel_pp_update, #${type}_transfer_pp_update, #${type}_activity_pp_update`, function () {
-            calculate_land_cost(type);
-            calculate_total(type);
-        });
-
-        $(document).on('input', `#${type}_service_charge_pp_update,
-            #${type}_flight_pp_update,
-            #${type}_train_pp_update,
-            #${type}_cruise_pp_update,
-            #${type}_visa_pp_update,
-            #${type}_guide_pp_update,
-            #${type}_misc_pp_update,
-            #${type}_tax_amt_pp_update,
-            #${type}_tcs_amount_pp_update`, function () {
-
-            calculate_total(type);
-        });
-
-    });
-
+    // Initial load: keep saved service charges (do not overwrite with rules)
+    calculateCostingCardsUpdate({ recalcServiceCharge: false });
 });
 function getQuotationCostingType()
 {
@@ -2157,5 +2150,4 @@ function costing_reflect()
 
 }
 costing_reflect();
-</script>
 </script>

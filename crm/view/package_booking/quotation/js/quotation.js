@@ -2025,6 +2025,20 @@ function quotationStripPpCostingRowSelect2($row) {
 	$row.find('.select2-container').remove();
 }
 
+function quotationInitPpCostingSelect2($scope) {
+	var $root = $scope && $scope.length ? $scope : $('#quotation_pp_costing_container');
+	if (!$root.length) {
+		$root = $(document);
+	}
+	$root.find('select[id^="currency_code_pp"]').each(function () {
+		var $select = $(this);
+		if ($select.data('select2')) {
+			return;
+		}
+		$select.select2({ width: '100%' });
+	});
+}
+
 function quotationPpCostingRenumberRow($row, newSuffix) {
 	var idMap = {};
 	$row.find('[id]').each(function () {
@@ -2069,7 +2083,8 @@ function quotationPpCostingSetRowValues($row, suffix, data, options) {
 	var transferAdult = data.transfer_adult != null ? parseFloat(data.transfer_adult) || 0 : transportPp;
 	var transferCweb = data.transfer_cweb != null ? parseFloat(data.transfer_cweb) || 0 : transportPp;
 	var transferCwnb = data.transfer_cwnb != null ? parseFloat(data.transfer_cwnb) || 0 : transportPp;
-	var transferInfant = data.transfer_infant != null ? parseFloat(data.transfer_infant) || 0 : transportPp;
+	// Infants excluded from transfer passenger split (adult + cweb + cwnb)
+	var transferInfant = data.transfer_infant != null ? parseFloat(data.transfer_infant) || 0 : 0;
 	var activityAdult = data.activity_adult != null ? parseFloat(data.activity_adult) || 0 : (parseFloat(options.activity_adult) || 0);
 	var activityCweb = data.activity_cweb != null ? parseFloat(data.activity_cweb) || 0 : (parseFloat(options.activity_cweb) || 0);
 	var activityCwnb = data.activity_cwnb != null ? parseFloat(data.activity_cwnb) || 0 : (parseFloat(options.activity_cwnb) || 0);
@@ -2239,6 +2254,8 @@ function quotationPopulatePpCostingFromHotels(hotel_per_person_arr, options) {
 		$container.append($row);
 		quotationPpCostingSetRowValues($row, suffix, hotel_per_person_arr[i], options);
 	}
+
+	quotationInitPpCostingSelect2($container);
 
 	if (typeof calculateCostingCards === 'function') {
 		setTimeout(function () {

@@ -166,7 +166,11 @@ class app_settings_master
   {
 
     $invoice_format_list = $_POST['invoice_format_list'];
-    $quot_format = $_POST['quot_format'];
+    $quot_format = isset($_POST['quot_format']) ? $_POST['quot_format'] : '';
+    // Default to Option-1 when no format is selected
+    if ($quot_format === '' || $quot_format === null || (int) $quot_format <= 0) {
+      $quot_format = 1;
+    }
     $image = isset($_POST['image']) ? $_POST['image'] : '';
     $dest_id = (isset($_POST['dest_id']) && $_POST['dest_id'] !== '') ? $_POST['dest_id'] : '0';
     if (function_exists('mysqlREString')) {

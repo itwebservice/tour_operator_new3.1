@@ -941,6 +941,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
     <?php
     $o3_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
     $o3_is_per_person = ($o3_costing_type == 'per person');
+    $o3_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
     $o3_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
     ?>
     <div class="costing-section page-flow-section">
@@ -980,7 +981,9 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
         </table>
       <?php } else { ?>
 
-        <?php if (!empty($o3_pp)) { ?>
+        <?php if (!empty($o3_pp_entries)) { ?>
+          <?php gqd_render_pp_entries_table($o3_pp_entries, array('escape' => 'o3e', 'table_class' => 'costing-table')); ?>
+        <?php } elseif (!empty($o3_pp)) { ?>
           <table class="costing-table">
             <thead>
               <tr>

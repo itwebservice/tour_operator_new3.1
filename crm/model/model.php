@@ -217,9 +217,14 @@ if ($sq_app_setting_count == 1) {
   $app_credit_charge = $sq_app_setting['credit_card_charges'];
   $_SESSION['unique_receipt_id'] = $app_version . "/";
   $app_quot_format = $sq_app_setting['quot_format'];
+  // Default quotation format to Option-1 when not set
+  if ($app_quot_format === '' || $app_quot_format === null || (int) $app_quot_format <= 0) {
+    $app_quot_format = 1;
+  }
   $app_quot_img = $sq_app_setting['quot_img_url'];
 } else {
   $app_version = $app_email_id = $app_email_id_send = $app_user_name_send = $currency = $app_contact_no = $service_tax_no = $app_address = $app_website = $app_name = $bank_acc_no = $bank_name_setting = $bank_branch_name = $bank_ifsc_code = $bank_swift_code = $app_smtp_status = $app_smtp_host = $app_smtp_port = $app_smtp_password = $app_smtp_method = $app_terms_condition = $cin_no = $app_landline_no = $acc_name = $accountant_email = $app_credit_charge = $app_quot_format = $app_send_contact_no = $app_quot_img = $b2c_flag = $tax_name = "";
+  $app_quot_format = 1;
 }
 
 //**********Theme color scheme variables**************//

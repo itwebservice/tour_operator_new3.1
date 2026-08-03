@@ -118,26 +118,18 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
                           <div class="col-xs-12 no-pad">
                         <div class="ai-chat-container">
                             <div class="touraiToggleBtn_div">
-                                <button class="btn btn-info btn-sm ico_left" id="touraiToggleBtn" type="button" aria-label="Toggle AI assistant">
-                                    <span class="ai-toggle-icon"><i class=""><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.6838 0L10.8879 2.38783L8.50006 3.18377V4.13245L10.8879 4.9284L11.6838 7.31623H12.6325L13.4285 4.9284L15.8163 4.13245V3.18377L13.4285 2.38783L12.6325 0H11.6838Z" fill="white"/>
-                                        <path d="M5.01289 8.51283L6.18383 5H7.13251L8.30346 8.51283L11.8163 9.68377V10.6325L8.30346 11.8034L7.13251 15.3162H6.18383L5.01289 11.8034L1.50006 10.6325V9.68377L5.01289 8.51283Z" fill="white"/>
-                                        <path d="M2.17582 1L1.63186 2.63186L0 3.17582V3.82416L1.63186 4.36811L2.17582 5.99997H2.82416L3.36811 4.36811L4.99997 3.82416V3.17582L3.36811 2.63186L2.82416 1H2.17582Z" fill="white"/>
-                                        </svg>
-                                        </i></span>
-                                    <span>AI</span>
+                                <button class="btn btn-info btn-sm" id="touraiToggleBtn" type="button" aria-label="Toggle AI assistant">
+                                    <i class="fa fa-magic"></i>&nbsp;AI
                                 </button>
                             </div>
                         
-                            <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
+                            <div class="ai-chat-box-container">
+                                <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
                                 <textarea id="aiMessageInput" placeholder="Type your message..."></textarea>
-                                <button type="button" class="send-btn" id="btnAnalyseMessage" aria-label="Analyse message">
-                                    <svg viewBox="0 0 24 24">
-                                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
-                                    </svg>
-                                </button>
+                                 <button type="button" class="btn btn-sm btn-success send-btn"  id="btnAnalyseMessage"><i class="fa fa-paper-plane-o"></i>&nbsp;&nbsp;Send</button>
                             </div>
                             <div id="aiApiInfo"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -1834,7 +1826,7 @@ $(function () {
                 return;
             }
 
-            $('#aiApiInfo').text('Please Wait Analysing...');
+             $('#aiApiInfo').html('<i class="fa fa-spinner fa-spin"></i> <span>Please Wait...</span>');
             $('#btnAnalyseMessage').prop('disabled', true);
 
             $.ajax({

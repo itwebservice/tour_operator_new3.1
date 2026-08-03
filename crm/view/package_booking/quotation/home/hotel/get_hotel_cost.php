@@ -113,10 +113,11 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 
 						//Group Costing
 						$hotel_cost += ($total_rooms_arr[$i] * $room_cost) + ($child_without_bed * $cwob_cost) + ($child_with_bed * $cwb_cost) + ($extra_bed_arr[$i] * $extra_bed_cost);
-						//Per Person costing
-						$adult_cost += ($adult_count != 0) ? $adult_cost + (($total_rooms_arr[$i] * $room_cost) + ($extra_bed_arr[$i] * $extra_bed_cost)) / ($adult_count) : 0;
-						$cwb_cost = ($child_with_bed != 0) ?($child_with_bed * $cwb_cost) / $child_with_bed :0;
-						$cwob_cost = ($child_without_bed != 0) ?($child_without_bed * $cwob_cost) / $child_without_bed :0;
+						// Per Person: 1 room (double bed) = 2 adults → adult share = room_cost / 2
+						$adult_cost += ($room_cost / 2);
+						// CWEB / CWNB = tariff rate for the stay (already summed across nights)
+						$cwb_cost = ($child_with_bed != 0) ? $cwb_cost : 0;
+						$cwob_cost = ($child_without_bed != 0) ? $cwob_cost : 0;
 					}
 				}
 				if($blackdated_count > 0 || $weekenddated_count > 0 || $contracted_count > 0){

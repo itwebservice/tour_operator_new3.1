@@ -1237,6 +1237,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
       <?php
       $o6_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
       $o6_is_per_person = ($o6_costing_type == 'per person');
+      $o6_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
       $o6_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
       ?>
       <?php o6_render_page_header($hero, 'Costing Details'); ?>
@@ -1281,6 +1282,9 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
             </tbody>
           </table>
         <?php } else { ?>
+          <?php if (!empty($o6_pp_entries)) { ?>
+            <?php gqd_render_pp_entries_table($o6_pp_entries, array('escape' => 'o6e', 'table_class' => 'financial-breakdown-table card-container')); ?>
+          <?php } else { ?>
           <table class="financial-breakdown-table card-container">
             <thead>
               <tr>
@@ -1319,6 +1323,7 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
               <?php endforeach; ?>
             </tbody>
           </table>
+          <?php } ?>
         <?php } ?>
 
         <p class="table-disclaimer-text"><i class="fa-solid fa-circle-info"></i> Notes: <?= o6e(o6nv(isset($incx['note']) ? $incx['note'] : '', 'Rates are subject to availability at the time of final confirmation.')) ?></p>

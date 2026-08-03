@@ -1059,4 +1059,79 @@ function calculate_charges(rules_array, type, basic_amount, markup_amount1) {
 	
 }
 
+/**
+ * Per Person costing service charge using the same Package Tour business rules
+ * as Group costing (other_master_rules via get_other_rules).
+ * land_cost is treated as Basic (same role as group basic_amount).
+ * Result is a per-person amount for the PP service-charge field.
+ */
+function get_pp_service_charge_from_business_rules(land_cost, type) {
+	type = type || 'save';
+	land_cost = parseFloat(land_cost);
+	if (isNaN(land_cost)) land_cost = 0;
+
+	if (typeof get_other_rules !== 'function' || typeof get_charges_on_conditions !== 'function' || typeof calculate_charges !== 'function') {
+		return 0;
+	}
+
+	var payment_mode = $('#payment_mode').val();
+	var rules = get_other_rules('Package Tour', 'quotation_date');
+	var service_charge_result = rules && rules.filter(function (rule) {
+		return rule['rule_for'] === '1';
+	});
+	var rules_array = get_charges_on_conditions(service_charge_result, land_cost, payment_mode, type);
+	if (!rules_array || !rules_array.length) {
+		return 0;
+	}
+
+	var raw = calculate_charges(rules_array, type, land_cost, 0);
+	raw = parseFloat(raw);
+	if (isNaN(raw)) raw = 0;
+
+	var adults = 0;
+	var child_wb = 0;
+	var child_wob = 0;
+	var infants = 0;
+	if (type === 'save') {
+		adults = parseInt($('#total_adult').val(), 10) || 0;
+		child_wb = parseInt($('#children_with_bed').val(), 10) || 0;
+		child_wob = parseInt($('#children_without_bed').val(), 10) || 0;
+		infants = parseInt($('#total_infant').val(), 10) || 0;
+	} else {
+		adults = parseInt($('#total_adult12').val(), 10) || parseInt($('#total_adult').val(), 10) || 0;
+		child_wb = parseInt($('#children_with_bed12').val(), 10) || parseInt($('#children_with_bed').val(), 10) || 0;
+		child_wob = parseInt($('#children_without_bed12').val(), 10) || parseInt($('#children_without_bed').val(), 10) || 0;
+		infants = parseInt($('#total_infant12').val(), 10) || parseInt($('#total_infant').val(), 10) || 0;
+	}
+	var pax_like_group = adults + child_wb + child_wob;
+	if (pax_like_group < 1) pax_like_group = 1;
+	var all_pax = adults + child_wb + child_wob + infants;
+	if (all_pax < 1) all_pax = 1;
+
+	var apply_on = String(rules_array[0].apply_on);
+	var fee_type = rules_array[0].fee_type;
+	var pp_amount = raw;
+
+	// calculate_charges returns package/group-style totals for some apply_on values;
+	// convert to a single per-person amount for the PP costing card.
+	if (apply_on === '1') {
+		// Per pax: undo adults+child multiplier
+		pp_amount = raw / pax_like_group;
+	} else if (apply_on === '2') {
+		// Per invoice: Flat is one fee for whole booking → share per person;
+		// Percentage is already % of this land_cost
+		if (fee_type === 'Flat') {
+			pp_amount = raw / all_pax;
+		}
+	} else if (apply_on === '3' || apply_on === '4' || apply_on === '5') {
+		// Per hotel / night / room: Flat is package total → share; % already on this land
+		if (fee_type === 'Flat') {
+			pp_amount = raw / all_pax;
+		}
+	}
+
+	if (isNaN(pp_amount) || !isFinite(pp_amount)) pp_amount = 0;
+	return parseFloat(pp_amount.toFixed(2));
+}
+
 

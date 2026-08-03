@@ -237,16 +237,22 @@
                                                                                 <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;"><input type="text" id="ppackage_type1" name="ppackage_type1" placeholder="Package Type" title="Package Type" readonly></td>
                                                                                 <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;">
                                                                                          <select name="currency_code_pp" id="currency_code_pp" title="Currency" style="width:100%" data-toggle="tooltip">
+                                                                                          <?php
+                                                                                          $sq_app_setting_pp = mysqli_fetch_assoc(mysqlQuery("select currency from app_settings"));
+                                                                                          if (!empty($sq_app_setting_pp['currency']) && $sq_app_setting_pp['currency'] != '0') {
+                                                                                              $sq_currencyd_pp = mysqli_fetch_assoc(mysqlQuery("SELECT `id`,`currency_code` FROM `currency_name_master` WHERE id=" . $sq_app_setting_pp['currency']));
+                                                                                              if ($sq_currencyd_pp) {
+                                                                                          ?>
+                                                                                          <option value="<?= $sq_currencyd_pp['id'] ?>"><?= $sq_currencyd_pp['currency_code'] ?></option>
+                                                                                          <?php }
+                                                                                          } ?>
                                                                                           <option value="">*Select Currency</option>
-                                                                                          <option value="1">USD</option>
-                                                                                          <option value="2">EUR</option>
-                                                                                          <option value="3">GBP</option>
-                                                                                          <option value="4">INR</option>
-                                                                                          <option value="5">AUD</option>
-                                                                                          <option value="6">CAD</option>
-                                                                                          <option value="7">CHF</option>
-                                                                                          <option value="8">CNY</option>
-                                                                                          <option value="9">JPY</option>
+                                                                                          <?php
+                                                                                          $sq_currency_pp = mysqlQuery("select * from currency_name_master order by currency_code");
+                                                                                          while ($row_currency_pp = mysqli_fetch_assoc($sq_currency_pp)) {
+                                                                                          ?>
+                                                                                          <option value="<?= $row_currency_pp['id'] ?>"><?= $row_currency_pp['currency_code'] ?></option>
+                                                                                          <?php } ?>
                                                                                          </select>                       
                                                                                 </td>
                                                                                 
@@ -798,6 +804,14 @@
 <?= end_panel() ?>
 
 <script>
+
+$(document).ready(function () {
+    if (typeof quotationInitPpCostingSelect2 === 'function') {
+        quotationInitPpCostingSelect2();
+    } else if ($('#currency_code_pp').length && !$('#currency_code_pp').data('select2')) {
+        $('#currency_code_pp').select2({ width: '100%' });
+    }
+});
 
 function getQuotationEditorContent(textareaId) {
     var $target = $('#' + textareaId);
@@ -2324,7 +2338,21 @@ function uploadItineraryImages(quotationId, images) {
     });
 }
 
-function calculateCostingCards(forceHotelFromTariff) {
+function calculateCostingCards(forceHotelFromTariff, options) {
+    options = options || {};
+    // force  = overwrite from tariff (tab switch / populate)
+    // seed  = fill only empty fields (initial load)
+    // none  = user is typing — only recalc totals
+    var fillMode = 'seed';
+    if (forceHotelFromTariff === true) {
+        fillMode = 'force';
+    } else if (options.autoFill === false) {
+        fillMode = 'none';
+    }
+    var autoFill = fillMode !== 'none';
+    var forceFill = fillMode === 'force';
+    // Recalc SC from business rules when seeding/forcing, or when land inputs changed
+    var recalcServiceCharge = autoFill || (options.recalcServiceCharge === true);
 
     let hotelData = $('#hotel_pp_costing').val();
     let travelData = $("#travel_pp_costing").val();
@@ -2335,17 +2363,24 @@ function calculateCostingCards(forceHotelFromTariff) {
     let cweb_count   = +$('#children_with_bed').val() || 0;
     let infant_count = +$('#total_infant').val() || 0;
 
-    let total_number = adult_count + cwnb_count + cweb_count + infant_count;
-    if (total_number === 0) total_number = 1;
+    // Transfer passengers = adult + cweb + cwnb (infants excluded)
+    let transfer_passengers = adult_count + cwnb_count + cweb_count;
+    if (transfer_passengers === 0) transfer_passengers = 1;
 
     // ===== TRANSPORT PER PERSON =====
     let transport_pp = 0;
     try {
         if (travelData) {
             let pp_arr_travelData = JSON.parse(travelData);
-            if (pp_arr_travelData && pp_arr_travelData[0]) {
-                transport_pp = (parseFloat(pp_arr_travelData[0]['total_cost']) / total_number) || 0;
+            var travel_total = 0;
+            if (Array.isArray(pp_arr_travelData)) {
+                for (var ti = 0; ti < pp_arr_travelData.length; ti++) {
+                    if (pp_arr_travelData[ti] && pp_arr_travelData[ti].checked !== false) {
+                        travel_total += parseFloat(pp_arr_travelData[ti]['total_cost']) || 0;
+                    }
+                }
             }
+            transport_pp = travel_total / transfer_passengers;
         }
     } catch (e) {
         transport_pp = 0;
@@ -2360,18 +2395,24 @@ function calculateCostingCards(forceHotelFromTariff) {
                 $el = $('#' + baseId + (suffix || ''));
             }
             if (!$el.length) return;
-            if (force || !$el.val() || $el.val() == 0) {
+            if (force) {
+                $el.val(value);
+                return;
+            }
+            // Seed only truly empty fields — do not treat "0" as empty (blocks clearing/editing)
+            var cur = $el.val();
+            if (cur === '' || cur === null || typeof cur === 'undefined') {
                 $el.val(value);
             }
         }
-        setVal('adult_hotel_pp', hotelVals.adult || 0, forceHotelFromTariff);
-        setVal('cweb_hotel_pp', hotelVals.cweb || 0, forceHotelFromTariff);
-        setVal('cwnb_hotel_pp', hotelVals.cwnb || 0, forceHotelFromTariff);
-        setVal('infant_hotel_pp', hotelVals.infant || 0, forceHotelFromTariff);
-        setVal('adult_transfer_pp', transport_pp.toFixed(2), false);
-        setVal('cweb_transfer_pp', transport_pp.toFixed(2), false);
-        setVal('cwnb_transfer_pp', transport_pp.toFixed(2), false);
-        setVal('infant_transfer_pp', transport_pp.toFixed(2), false);
+        setVal('adult_hotel_pp', hotelVals.adult || 0, forceFill);
+        setVal('cweb_hotel_pp', hotelVals.cweb || 0, forceFill);
+        setVal('cwnb_hotel_pp', hotelVals.cwnb || 0, forceFill);
+        setVal('infant_hotel_pp', hotelVals.infant || 0, forceFill);
+        setVal('adult_transfer_pp', (adult_count > 0 ? transport_pp : 0).toFixed(2), forceFill);
+        setVal('cweb_transfer_pp', (cweb_count > 0 ? transport_pp : 0).toFixed(2), forceFill);
+        setVal('cwnb_transfer_pp', (cwnb_count > 0 ? transport_pp : 0).toFixed(2), forceFill);
+        setVal('infant_transfer_pp', '0.00', forceFill);
     }
 
     // ===== COMMON FUNCTION =====
@@ -2384,15 +2425,8 @@ function calculateCostingCards(forceHotelFromTariff) {
             return $el.length ? $el : $(sid(base));
         };
 
+        // Match update screen: keep editable values when pax count is 0
         if (count === 0) {
-            $find(type + '_hotel_pp').val(0);
-            $find(type + '_transfer_pp').val(0);
-            $find(type + '_activity_pp').val(0);
-            $find(type + '_land_cost_pp').val(0);
-            $find(type + '_service_charge_pp').val(0);
-            $find(type + '_tax_amount_pp').val(0);
-            $find(type + '_tcs_amount_pp').val(0);
-            $find(type + '_total_amount_pp').val(0);
             return;
         }
 
@@ -2403,8 +2437,16 @@ function calculateCostingCards(forceHotelFromTariff) {
         let land_cost = hotel + transfer + activity;
         $find(type + '_land_cost_pp').val(land_cost.toFixed(2));
 
-        let service_charge = land_cost * 0.10;
-        $find(type + '_service_charge_pp').val(service_charge.toFixed(2));
+        let service_charge;
+        // Only auto-apply business-rule service charge when seeding/forcing or land inputs change
+        if (recalcServiceCharge) {
+            service_charge = (typeof get_pp_service_charge_from_business_rules === 'function')
+                ? get_pp_service_charge_from_business_rules(land_cost, 'save')
+                : 0;
+            $find(type + '_service_charge_pp').val(Number(service_charge).toFixed(2));
+        }
+        var scRaw = $find(type + '_service_charge_pp').val();
+        service_charge = (scRaw === '' || scRaw === null || typeof scRaw === 'undefined') ? 0 : (parseFloat(scRaw) || 0);
 
         let discount_type = $find(type + '_discount_in_pp').val();
         let discount_val  = +$find(type + '_discount_amount_pp').val() || 0;
@@ -2474,12 +2516,14 @@ function calculateCostingCards(forceHotelFromTariff) {
         $ppRows = $();
         // legacy single block
         var hotelVals = packageHotelArr[0] || {};
-        setHotelTransfer($(document), '', {
-            adult: hotelVals.adult_cost || 0,
-            cweb: hotelVals.cwb_cost || 0,
-            cwnb: hotelVals.cwob_cost || 0,
-            infant: hotelVals.infant_cost || 0
-        });
+        if (autoFill) {
+            setHotelTransfer($(document), '', {
+                adult: hotelVals.adult_cost || 0,
+                cweb: hotelVals.cwb_cost || 0,
+                cwnb: hotelVals.cwob_cost || 0,
+                infant: hotelVals.infant_cost || 0
+            });
+        }
         calculateCard(null, 'adult', adult_count, '');
         calculateCard(null, 'cweb', cweb_count, '');
         calculateCard(null, 'cwnb', cwnb_count, '');
@@ -2491,23 +2535,31 @@ function calculateCostingCards(forceHotelFromTariff) {
         var $row = $(this);
         var suffix = $row.attr('data-pp-suffix') || '';
         var hotelVals = packageHotelArr[idx] || packageHotelArr[0] || {};
-        if (hotelVals.type) {
+        if (autoFill && hotelVals.type) {
             $row.find('#' + (typeof quotationPpFieldId === 'function' ? quotationPpFieldId('ppackage_type1', suffix) : ('ppackage_type1' + suffix))).val(hotelVals.type);
         }
-        setHotelTransfer($row, suffix, {
-            adult: hotelVals.adult_cost || 0,
-            cweb: hotelVals.cwb_cost || 0,
-            cwnb: hotelVals.cwob_cost || 0,
-            infant: hotelVals.infant_cost || 0
-        });
+        if (autoFill) {
+            setHotelTransfer($row, suffix, {
+                adult: hotelVals.adult_cost || 0,
+                cweb: hotelVals.cwb_cost || 0,
+                cwnb: hotelVals.cwob_cost || 0,
+                infant: hotelVals.infant_cost || 0
+            });
+        }
         calculateCard($row, 'adult', adult_count, suffix);
         calculateCard($row, 'cweb', cweb_count, suffix);
         calculateCard($row, 'cwnb', cwnb_count, suffix);
         calculateCard($row, 'infant', infant_count, suffix);
     });
 }
-$(document).on('input change', '.costing-table input, .costing-table select', function () {
-    calculateCostingCards();
+$(document).on('input change', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
+    var id = (this.id || '');
+    var isLandComponent = /_hotel_pp|_transfer_pp|_activity_pp/.test(id) && !/_land_cost_pp/.test(id);
+    // While typing: don't refill hotel/transfer from tariff; only recalc SC when land parts change
+    calculateCostingCards(false, {
+        autoFill: false,
+        recalcServiceCharge: isLandComponent
+    });
 });
 
 // =========================
@@ -2572,16 +2624,25 @@ function costing_reflect()
 						var adult_count  = +$('#total_adult').val() || 0;
 						var cwnb_count   = +$('#children_without_bed').val() || 0;
 						var cweb_count   = +$('#children_with_bed').val() || 0;
-						var infant_count = +$('#total_infant').val() || 0;
-						var total_number = adult_count + cwnb_count + cweb_count + infant_count;
-						if (total_number === 0) total_number = 1;
-						if (td && td[0]) {
-							transport_pp = (parseFloat(td[0]['total_cost']) / total_number) || 0;
+						var transfer_passengers = adult_count + cwnb_count + cweb_count;
+						if (transfer_passengers === 0) transfer_passengers = 1;
+						var travel_total = 0;
+						if (Array.isArray(td)) {
+							for (var ti = 0; ti < td.length; ti++) {
+								if (td[ti] && td[ti].checked !== false) {
+									travel_total += parseFloat(td[ti]['total_cost']) || 0;
+								}
+							}
 						}
+						transport_pp = travel_total / transfer_passengers;
 					}
 				} catch (e) {}
 				quotationPopulatePpCostingFromHotels(ppHotels, { transport_pp: transport_pp });
+			} else if (typeof quotationInitPpCostingSelect2 === 'function') {
+				quotationInitPpCostingSelect2();
 			}
+		} else if (typeof quotationInitPpCostingSelect2 === 'function') {
+			quotationInitPpCostingSelect2();
 		}
 		calculateCostingCards(true);
 	}

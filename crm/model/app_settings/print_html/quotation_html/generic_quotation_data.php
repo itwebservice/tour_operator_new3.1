@@ -194,6 +194,204 @@ if (!function_exists('gqd_total_with_before_discount')) {
   }
 }
 
+if (!function_exists('gqd_render_pp_entries_table')) {
+  /**
+   * Render Per Person costing entries PDF table.
+   * Package name is a section heading; first cost row is "Land Cost".
+   * Columns: Adult PP | CWB PP | CWNB PP | Infant PP (only when pax count > 0).
+   * Total Amount shown below each package block (after discount, with
+   * strikethrough before-discount like group costing). No Total row/column.
+   * Rows with all pax amounts <= 0 are omitted (Flight/Cruise/Misc/Tax/TCS/etc).
+   *
+   * @param array $entries from $cost['computed']['pp_entries']
+   * @param array $opts escape (callable), symbol (string), table_class (string), table_style (string)
+   */
+  function gqd_render_pp_entries_table($entries, $opts = array())
+  {
+    if (!is_array($entries) || empty($entries)) {
+      return;
+    }
+    $escape = (isset($opts['escape']) && is_callable($opts['escape']))
+      ? $opts['escape']
+      : function ($v) {
+        return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+      };
+    $symbol = isset($opts['symbol']) ? $opts['symbol'] : '&#8377;';
+    $table_class = isset($opts['table_class']) ? (string) $opts['table_class'] : '';
+    $table_style = isset($opts['table_style'])
+      ? (string) $opts['table_style']
+      : 'width:100%;border-collapse:collapse;font-size:12px;';
+    $th_style = isset($opts['th_style'])
+      ? (string) $opts['th_style']
+      : 'padding:10px 8px;text-align:center;border:1px solid #d0d0d0;background:#0b2a4a;color:#fff;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;';
+    $td_style = isset($opts['td_style'])
+      ? (string) $opts['td_style']
+      : 'padding:8px;text-align:right;border:1px solid #e0e0e0;';
+    $td_label = isset($opts['td_label_style'])
+      ? (string) $opts['td_label_style']
+      : 'padding:8px 10px;text-align:left;border:1px solid #e0e0e0;font-weight:600;';
+    $force_all_pax_cols = !empty($opts['force_all_pax_cols']);
+    $simple = !empty($opts['simple']);
+
+    if ($simple && !isset($opts['th_style'])) {
+      $th_style = 'font-size:16px;font-weight:600;padding:8px 5px;text-align:center;border:1px solid #ccc;background:#fff;color:#333;';
+    }
+    if ($simple && !isset($opts['td_style'])) {
+      $td_style = 'font-size:14px;padding:8px 5px;text-align:right;border:1px solid #ccc;';
+    }
+    if ($simple && !isset($opts['td_label_style'])) {
+      $td_label = 'font-size:14px;padding:8px 5px;text-align:left;border:1px solid #ccc;font-weight:600;';
+    }
+
+    $fmt = function ($triplet, $key) use ($escape, $symbol) {
+      $disp = (is_array($triplet) && isset($triplet[$key])) ? $triplet[$key] : '0.00';
+      $plain_key = str_replace('_display', '_plain', $key);
+      if (is_array($triplet) && !empty($triplet[$plain_key])) {
+        return call_user_func($escape, $disp);
+      }
+      return $symbol . ' ' . call_user_func($escape, $disp);
+    };
+
+    $has_cost = function ($triplet) {
+      if (!is_array($triplet)) {
+        return false;
+      }
+      $a = isset($triplet['adult']) ? (float) $triplet['adult'] : 0;
+      $b = isset($triplet['cwb']) ? (float) $triplet['cwb'] : 0;
+      $c = isset($triplet['cwnb']) ? (float) $triplet['cwnb'] : 0;
+      $i = isset($triplet['infant']) ? (float) $triplet['infant'] : 0;
+      return ($a > 0 || $b > 0 || $c > 0 || $i > 0);
+    };
+
+    $row_defs = array(
+      array('key' => 'land', 'label' => 'Land Cost'),
+      array('key' => 'flight', 'label' => 'Flight'),
+      array('key' => 'train', 'label' => 'Train'),
+      array('key' => 'cruise', 'label' => 'Cruise'),
+      array('key' => 'visa', 'label' => 'Visa'),
+      array('key' => 'guide', 'label' => 'Guide'),
+      array('key' => 'misc', 'label' => 'Misc'),
+      array('key' => 'discount', 'label' => 'Discount'),
+      array('key' => 'tax', 'label' => 'Tax'),
+      array('key' => 'tcs', 'label' => 'TCS'),
+    );
+
+    $packages_rendered = 0;
+    $pax_counts = array('adult' => 0, 'cwb' => 0, 'cwnb' => 0, 'infant' => 0);
+    if (!empty($entries[0]['pax_counts']) && is_array($entries[0]['pax_counts'])) {
+      $pax_counts = array_merge($pax_counts, $entries[0]['pax_counts']);
+    }
+    if (!empty($opts['pax_counts']) && is_array($opts['pax_counts'])) {
+      $pax_counts = array_merge($pax_counts, $opts['pax_counts']);
+    }
+
+    // Adult / CWB / CWNB / Infant — always keep when force_all_pax_cols (document)
+    $pax_cols = array();
+    if ($force_all_pax_cols || (int) $pax_counts['adult'] > 0) {
+      $pax_cols[] = array('key' => 'adult', 'label' => 'Adult PP(' . (int) $pax_counts['adult'] . ')', 'disp' => 'adult_display');
+    }
+    if ($force_all_pax_cols || (int) $pax_counts['cwb'] > 0) {
+      $pax_cols[] = array('key' => 'cwb', 'label' => 'CWB PP(' . (int) $pax_counts['cwb'] . ')', 'disp' => 'cwb_display');
+    }
+    if ($force_all_pax_cols || (int) $pax_counts['cwnb'] > 0) {
+      $pax_cols[] = array('key' => 'cwnb', 'label' => 'CWNB PP(' . (int) $pax_counts['cwnb'] . ')', 'disp' => 'cwnb_display');
+    }
+    if ($force_all_pax_cols || (int) $pax_counts['infant'] > 0) {
+      $pax_cols[] = array('key' => 'infant', 'label' => 'Infant PP(' . (int) $pax_counts['infant'] . ')', 'disp' => 'infant_display');
+    }
+    if (empty($pax_cols)) {
+      $pax_cols[] = array('key' => 'adult', 'label' => 'Adult PP(0)', 'disp' => 'adult_display');
+    }
+    $col_count = 1 + count($pax_cols);
+
+    echo '<table class="' . call_user_func($escape, $table_class) . '" style="' . $table_style . '">';
+    echo '<thead><tr>';
+    echo '<th style="' . $th_style . 'text-align:left;"></th>';
+    foreach ($pax_cols as $col) {
+      echo '<th style="' . $th_style . '">' . call_user_func($escape, $col['label']) . '</th>';
+    }
+    echo '</tr></thead><tbody>';
+
+    foreach ($entries as $pkg) {
+      $pkg_name = isset($pkg['package_type']) ? $pkg['package_type'] : 'Package';
+
+      $visible = array();
+      foreach ($row_defs as $def) {
+        $key = $def['key'];
+        $triplet = isset($pkg[$key]) ? $pkg[$key] : array();
+        if (!$has_cost($triplet)) {
+          continue;
+        }
+        $visible[] = array(
+          'key' => $key,
+          'label' => $def['label'],
+          'triplet' => $triplet,
+        );
+      }
+      if (empty($visible)) {
+        continue;
+      }
+
+      if ($packages_rendered > 0) {
+        echo '<tr><td colspan="' . $col_count . '" style="height:8px;border:none;background:transparent;"></td></tr>';
+      }
+
+      if ($simple) {
+        echo '<tr>';
+        echo '<td colspan="' . $col_count . '" style="padding:8px 5px;font-size:14px;font-weight:700;border:1px solid #ccc;background:#fff;color:#333;">'
+          . call_user_func($escape, $pkg_name) . '</td>';
+        echo '</tr>';
+      } else {
+        echo '<tr style="background:#0b2a4a;color:#fff;">';
+        echo '<td colspan="' . $col_count . '" style="padding:10px 12px;font-size:13px;font-weight:700;letter-spacing:0.5px;border:1px solid #0b2a4a;">'
+          . call_user_func($escape, $pkg_name) . '</td>';
+        echo '</tr>';
+      }
+
+      foreach ($visible as $ri => $vrow) {
+        $bg = $simple ? '' : (($ri % 2 === 0) ? 'background:#fff;' : 'background:#faf8f3;');
+        echo '<tr' . ($bg !== '' ? ' style="' . $bg . '"' : '') . '>';
+        echo '<td style="' . $td_label . '">' . call_user_func($escape, $vrow['label']) . '</td>';
+        foreach ($pax_cols as $col) {
+          echo '<td style="' . $td_style . '">' . $fmt($vrow['triplet'], $col['disp']) . '</td>';
+        }
+        echo '</tr>';
+      }
+
+      $total_amt_html = '';
+      $total_disp = isset($pkg['total_amount_display']) ? (string) $pkg['total_amount_display'] : '';
+      $before_disp = isset($pkg['before_discount_display']) ? (string) $pkg['before_discount_display'] : '';
+      if ($total_disp !== '') {
+        if (function_exists('gqd_total_with_before_discount')) {
+          $total_amt_html = $symbol . '&nbsp;' . gqd_total_with_before_discount($pkg, 'total_amount_display', 'before_discount_display', $escape);
+        } elseif ($before_disp !== '') {
+          $total_amt_html = $symbol . '&nbsp;' . call_user_func($escape, $total_disp)
+            . ' <s style="opacity:0.55;">' . $symbol . '&nbsp;' . call_user_func($escape, $before_disp) . '</s>';
+        } else {
+          $total_amt_html = $symbol . '&nbsp;' . call_user_func($escape, $total_disp);
+        }
+      }
+      if ($total_amt_html !== '') {
+        if ($simple) {
+          echo '<tr>';
+          echo '<td colspan="' . max(1, $col_count - 1) . '" style="padding:8px 5px;text-align:right;border:1px solid #ccc;font-weight:700;">Total Amount</td>';
+          echo '<td style="padding:8px 5px;text-align:right;border:1px solid #ccc;font-weight:700;">' . $total_amt_html . '</td>';
+          echo '</tr>';
+        } else {
+          echo '<tr style="background:#f3efe4;">';
+          echo '<td colspan="' . max(1, $col_count - 1) . '" style="padding:10px 12px;text-align:right;border:1px solid #e0e0e0;font-weight:700;color:#0b2a4a;">Total Amount</td>';
+          echo '<td style="padding:10px 8px;text-align:right;border:1px solid #e0e0e0;font-weight:700;color:#0b2a4a;line-height:1.35;">' . $total_amt_html . '</td>';
+          echo '</tr>';
+        }
+      }
+
+      $packages_rendered++;
+    }
+
+    echo '</tbody></table>';
+  }
+}
+
 if (!function_exists('gqd_hotels_by_package_type')) {
   /**
    * Group hotel rows by package_type (document PDF style headings).
@@ -1046,6 +1244,223 @@ if (!function_exists('get_generic_quotation_data')) {
       $grand_total_numeric += ((isset($master['costing_type']) && $master['costing_type'] == 1) ? $g_total : $pp_grand);
     }
 
+    // ---- Per-person costing entries (package_quotation_pp_costing) ----------
+    // PDF layout: for each package → Land (DMC), Flight, Train, Cruise, Visa,
+    // Misc, Discount, Tax, Total across Adult / CWB / CWNB (Infant omitted).
+    $pp_entries_raw = gqd_rows("select * from package_quotation_pp_costing where quotation_id='$quotation_id'");
+    $pp_by_pkg = array();
+    foreach ($pp_entries_raw as $pp_row) {
+      $pkg_key = isset($pp_row['package_type']) ? trim((string) $pp_row['package_type']) : '';
+      $pax_key = strtolower(trim(isset($pp_row['pax_type']) ? (string) $pp_row['pax_type'] : ''));
+      if ($pax_key === 'cwb' || $pax_key === 'child_with' || $pax_key === 'child_with_bed') {
+        $pax_key = 'cweb';
+      } elseif ($pax_key === 'cwob' || $pax_key === 'cwnb' || $pax_key === 'child_without' || $pax_key === 'child_without_bed') {
+        $pax_key = 'cwnb';
+      } elseif ($pax_key === 'adults') {
+        $pax_key = 'adult';
+      } elseif ($pax_key === 'infants') {
+        $pax_key = 'infant';
+      }
+      if ($pax_key !== 'adult' && $pax_key !== 'cweb' && $pax_key !== 'cwnb' && $pax_key !== 'infant') {
+        continue;
+      }
+      if (!isset($pp_by_pkg[$pkg_key])) {
+        $pp_by_pkg[$pkg_key] = array(
+          'package_type' => $pkg_key,
+          'adult' => array(),
+          'cweb' => array(),
+          'cwnb' => array(),
+          'infant' => array(),
+        );
+      }
+      $pp_by_pkg[$pkg_key][$pax_key] = $pp_row;
+    }
+
+    $pp_entries_computed = array();
+    $pp_ordered_keys = array();
+    foreach ($costing_entries as $ce) {
+      $pkg_key = isset($ce['package_type']) ? trim((string) $ce['package_type']) : '';
+      if ($pkg_key !== '' && !in_array($pkg_key, $pp_ordered_keys, true)) {
+        $pp_ordered_keys[] = $pkg_key;
+      }
+    }
+    foreach (array_keys($pp_by_pkg) as $pkg_key) {
+      if (!in_array($pkg_key, $pp_ordered_keys, true)) {
+        $pp_ordered_keys[] = $pkg_key;
+      }
+    }
+
+    $pp_field = function ($pax_row, $field) {
+      return (float) (isset($pax_row[$field]) ? $pax_row[$field] : 0);
+    };
+    $pp_is_percent_discount = function ($pax_row) {
+      $in = isset($pax_row['discount_in']) ? trim((string) $pax_row['discount_in']) : '';
+      return ($in === '1' || strcasecmp($in, 'Percentage') === 0);
+    };
+    $pp_act_discount = function ($pax_row) use ($pp_field, $pp_is_percent_discount) {
+      $amt = $pp_field($pax_row, 'discount_amount');
+      if ($pp_is_percent_discount($pax_row)) {
+        return ($pp_field($pax_row, 'service_charge') * $amt) / 100;
+      }
+      return $amt;
+    };
+    $pp_triplet = function ($pkg_block, $field) use ($pp_field, $conv) {
+      $a = $pp_field(isset($pkg_block['adult']) ? $pkg_block['adult'] : array(), $field);
+      $b = $pp_field(isset($pkg_block['cweb']) ? $pkg_block['cweb'] : array(), $field);
+      $c = $pp_field(isset($pkg_block['cwnb']) ? $pkg_block['cwnb'] : array(), $field);
+      $i = $pp_field(isset($pkg_block['infant']) ? $pkg_block['infant'] : array(), $field);
+      return array(
+        'adult' => $a,
+        'cwb' => $b,
+        'cwnb' => $c,
+        'infant' => $i,
+        'adult_display' => $conv($a),
+        'cwb_display' => $conv($b),
+        'cwnb_display' => $conv($c),
+        'infant_display' => $conv($i),
+      );
+    };
+    // Discount: show % when Percentage selected, currency amount when Flat
+    $pp_discount_triplet = function ($pkg_block) use ($pp_field, $pp_is_percent_discount, $conv) {
+      $fmt_pct = function ($n) {
+        $s = number_format((float) $n, 2, '.', '');
+        $s = rtrim(rtrim($s, '0'), '.');
+        return $s . '%';
+      };
+      $cell = function ($pax_row) use ($pp_field, $pp_is_percent_discount, $conv, $fmt_pct) {
+        $amt = $pp_field($pax_row, 'discount_amount');
+        if ($pp_is_percent_discount($pax_row)) {
+          return array('value' => $amt, 'plain' => true, 'display' => $fmt_pct($amt));
+        }
+        return array('value' => $amt, 'plain' => false, 'display' => $conv($amt));
+      };
+      $a = $cell(isset($pkg_block['adult']) ? $pkg_block['adult'] : array());
+      $b = $cell(isset($pkg_block['cweb']) ? $pkg_block['cweb'] : array());
+      $c = $cell(isset($pkg_block['cwnb']) ? $pkg_block['cwnb'] : array());
+      $i = $cell(isset($pkg_block['infant']) ? $pkg_block['infant'] : array());
+      return array(
+        'adult' => $a['value'],
+        'cwb' => $b['value'],
+        'cwnb' => $c['value'],
+        'infant' => $i['value'],
+        'adult_display' => $a['display'],
+        'cwb_display' => $b['display'],
+        'cwnb_display' => $c['display'],
+        'infant_display' => $i['display'],
+        'adult_plain' => $a['plain'],
+        'cwb_plain' => $b['plain'],
+        'cwnb_plain' => $c['plain'],
+        'infant_plain' => $i['plain'],
+      );
+    };
+
+    foreach ($pp_ordered_keys as $pkg_key) {
+      if (!isset($pp_by_pkg[$pkg_key])) {
+        continue;
+      }
+      $pkg_block = $pp_by_pkg[$pkg_key];
+
+      // Package total amount (same formula as list): sum of (pax_count × total_cost)
+      // Before-discount uses actual discount rupees (handles % vs flat)
+      $ta = $pp_field(isset($pkg_block['adult']) ? $pkg_block['adult'] : array(), 'total_cost');
+      $tb = $pp_field(isset($pkg_block['cweb']) ? $pkg_block['cweb'] : array(), 'total_cost');
+      $tc = $pp_field(isset($pkg_block['cwnb']) ? $pkg_block['cwnb'] : array(), 'total_cost');
+      $ti = $pp_field(isset($pkg_block['infant']) ? $pkg_block['infant'] : array(), 'total_cost');
+      $da = $pp_act_discount(isset($pkg_block['adult']) ? $pkg_block['adult'] : array());
+      $db = $pp_act_discount(isset($pkg_block['cweb']) ? $pkg_block['cweb'] : array());
+      $dc = $pp_act_discount(isset($pkg_block['cwnb']) ? $pkg_block['cwnb'] : array());
+      $di = $pp_act_discount(isset($pkg_block['infant']) ? $pkg_block['infant'] : array());
+
+      $pkg_total = ($ta * $adults) + ($tb * $cwb) + ($tc * $cwob) + ($ti * $infants);
+      $pkg_before = (($ta + $da) * $adults) + (($tb + $db) * $cwb) + (($tc + $dc) * $cwob) + (($ti + $di) * $infants);
+      $act_disc = $pkg_before - $pkg_total;
+
+      // TCS per pax: prefer tcs_amount, then tcsvalue (not the percent flag in `tcs`)
+      $pp_tcs_triplet = function ($pkg_block) use ($pp_field, $conv) {
+        $cell = function ($pax_row) use ($pp_field, $conv) {
+          $amt = $pp_field($pax_row, 'tcs_amount');
+          if ($amt <= 0) {
+            $amt = $pp_field($pax_row, 'tcsvalue');
+          }
+          return $amt;
+        };
+        $a = $cell(isset($pkg_block['adult']) ? $pkg_block['adult'] : array());
+        $b = $cell(isset($pkg_block['cweb']) ? $pkg_block['cweb'] : array());
+        $c = $cell(isset($pkg_block['cwnb']) ? $pkg_block['cwnb'] : array());
+        $i = $cell(isset($pkg_block['infant']) ? $pkg_block['infant'] : array());
+        return array(
+          'adult' => $a, 'cwb' => $b, 'cwnb' => $c, 'infant' => $i,
+          'adult_display' => $conv($a), 'cwb_display' => $conv($b),
+          'cwnb_display' => $conv($c), 'infant_display' => $conv($i),
+        );
+      };
+
+      $land_t = $pp_triplet($pkg_block, 'land_cost');
+      $flight_t = $pp_triplet($pkg_block, 'flight_cost');
+      $train_t = $pp_triplet($pkg_block, 'train_cost');
+      $cruise_t = $pp_triplet($pkg_block, 'cruise_cost');
+      $visa_t = $pp_triplet($pkg_block, 'visa_cost');
+      $guide_t = $pp_triplet($pkg_block, 'guide_cost');
+      $misc_t = $pp_triplet($pkg_block, 'misc_cost');
+      $tax_t = $pp_triplet($pkg_block, 'tax_amount');
+      $tcs_t = $pp_tcs_triplet($pkg_block);
+      $svc_t = $pp_triplet($pkg_block, 'service_charge');
+
+      $sum_pax = function ($triplet) use ($adults, $cwb, $cwob, $infants) {
+        return ((float) $triplet['adult'] * $adults)
+          + ((float) $triplet['cwb'] * $cwb)
+          + ((float) $triplet['cwnb'] * $cwob)
+          + ((float) $triplet['infant'] * $infants);
+      };
+
+      $land_total = $sum_pax($land_t);
+      $svc_total = $sum_pax($svc_t);
+      $tax_total = $sum_pax($tax_t);
+      $tcs_total = $sum_pax($tcs_t);
+      $travel_total = $sum_pax($flight_t) + $sum_pax($train_t) + $sum_pax($cruise_t)
+        + $sum_pax($visa_t) + $sum_pax($guide_t) + $sum_pax($misc_t);
+      // Tour cost = land + service after discount (act_disc already reflected in total_cost)
+      $tour_cost_total = $pkg_total - $tax_total - $tcs_total - $travel_total;
+      if ($tour_cost_total < 0) {
+        $tour_cost_total = $land_total + $svc_total - $act_disc;
+      }
+
+      $pp_entries_computed[] = array(
+        'package_type' => ($pkg_key !== '') ? $pkg_key : 'Package',
+        'land' => $land_t,
+        'flight' => $flight_t,
+        'train' => $train_t,
+        'cruise' => $cruise_t,
+        'visa' => $visa_t,
+        'guide' => $guide_t,
+        'misc' => $misc_t,
+        'discount' => $pp_discount_triplet($pkg_block),
+        'tax' => $tax_t,
+        'tcs' => $tcs_t,
+        'total' => $pp_triplet($pkg_block, 'total_cost'),
+        'total_amount' => $pkg_total,
+        'total_amount_display' => $conv($pkg_total),
+        'act_discount' => $act_disc,
+        'before_discount_total' => ($act_disc > 0) ? $pkg_before : 0,
+        'before_discount_display' => ($act_disc > 0) ? $conv($pkg_before) : '',
+        // Group-style package aggregates (document / backoffice / view)
+        'tour_cost' => $tour_cost_total,
+        'tour_cost_display' => $conv($tour_cost_total),
+        'tax_total' => $tax_total,
+        'tax_display' => $conv($tax_total),
+        'tcs_total' => $tcs_total,
+        'tcs_display' => $conv($tcs_total),
+        'travel_cost' => $travel_total,
+        'travel_display' => $conv($travel_total),
+        'pax_counts' => array(
+          'adult' => (int) $adults,
+          'cwb' => (int) $cwb,
+          'cwnb' => (int) $cwob,
+          'infant' => (int) $infants,
+        ),
+      );
+    }
+
     $costing = array(
       'costing_type'       => isset($master['costing_type']) ? $master['costing_type'] : '',
       'costing_type_label' => (isset($master['costing_type']) && $master['costing_type'] == 1) ? 'Group' : 'Per Person',
@@ -1054,9 +1469,11 @@ if (!function_exists('get_generic_quotation_data')) {
       'entries_raw'        => $costing_entries,
       'group'              => $group_cost,
       'per_person'         => $per_person_cost,
+      'pp_entries_raw'     => $pp_entries_raw,
       'computed'           => array(
         'group'        => $group_computed,
         'per_person'   => $per_person_computed,
+        'pp_entries'   => $pp_entries_computed,
         'grand_total'  => $grand_total_numeric,
         'grand_total_display' => $conv($grand_total_numeric),
       ),

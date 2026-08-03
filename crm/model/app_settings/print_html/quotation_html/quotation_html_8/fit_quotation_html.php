@@ -885,6 +885,7 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
         ));
       }
 
+      $o8_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
       $o8_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
       ?>
 
@@ -934,7 +935,9 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
 
         <?php } ?>
 
-        <?php if ($o8_is_per_person && !empty($o8_pp)) { ?>
+        <?php if ($o8_is_per_person && !empty($o8_pp_entries)) { ?>
+          <?php gqd_render_pp_entries_table($o8_pp_entries, array('escape' => 'o8e', 'table_class' => 'costing-table')); ?>
+        <?php } elseif ($o8_is_per_person && !empty($o8_pp)) { ?>
 
           <table class="costing-table" style="table-layout:fixed;width:100%;">
             <thead>

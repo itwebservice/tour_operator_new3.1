@@ -23,49 +23,60 @@ $sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master
 
 // Get costing details
 $sq_cost = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM package_tour_quotation_costing_entries WHERE quotation_id = '$quotation_id' ORDER BY sort_order LIMIT 1"));
-
-// Calculate costs
-$basic_cost = $sq_cost['basic_amount'];
-$service_charge = $sq_cost['service_charge'];
-$service_tax_amount = 0;
-
-$bsmValues = json_decode($sq_cost['bsmValues'], true);
-$discount_in = $sq_cost['discount_in'];
-$discount = $sq_cost['discount'];
-
-if ($discount_in == 'Percentage') {
-    $act_discount = (float)($service_charge) * (float)($discount) / 100;
-} else {
-    $act_discount = ($service_charge != 0) ? $discount : 0;
+if (!is_array($sq_cost)) {
+    $sq_cost = array();
 }
 
-$service_charge = $service_charge - (float)($act_discount);
+// Calculate costs (cast empty strings to 0 for PHP 8+ number_format)
+$basic_cost = (float) (isset($sq_cost['basic_amount']) ? $sq_cost['basic_amount'] : 0);
+$service_charge = (float) (isset($sq_cost['service_charge']) ? $sq_cost['service_charge'] : 0);
+$service_tax_amount = 0.0;
+$act_discount = 0.0;
+$tcsper = 0.0;
+$tcsvalue = 0.0;
+
+$bsmValues = json_decode(isset($sq_cost['bsmValues']) ? $sq_cost['bsmValues'] : '', true);
+$discount_in = isset($sq_cost['discount_in']) ? $sq_cost['discount_in'] : '';
+$discount = (float) (isset($sq_cost['discount']) ? $sq_cost['discount'] : 0);
+
+if ($discount_in == 'Percentage') {
+    $act_discount = $service_charge * $discount / 100;
+} else {
+    $act_discount = ($service_charge != 0) ? $discount : 0.0;
+}
+
+$service_charge = $service_charge - $act_discount;
 
 // Calculate service tax
 $name = '';
-if ($sq_cost['service_tax_subtotal'] !== 0.00 && ($sq_cost['service_tax_subtotal']) !== '') {
-    $service_tax_subtotal1 = explode(',', $sq_cost['service_tax_subtotal']);
+$tax_subtotal = isset($sq_cost['service_tax_subtotal']) ? $sq_cost['service_tax_subtotal'] : '';
+if ($tax_subtotal !== 0.00 && $tax_subtotal !== '' && $tax_subtotal !== null) {
+    $service_tax_subtotal1 = explode(',', (string) $tax_subtotal);
     for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
         $service_tax = explode(':', $service_tax_subtotal1[$i]);
-        $service_tax_amount = (float)($service_tax_amount) + (float)($service_tax[2]);
-        $name .= $service_tax[0] . ' ';
-        $percent = $service_tax[1];
+        $service_tax_amount += (float) (isset($service_tax[2]) ? $service_tax[2] : 0);
+        $name .= (isset($service_tax[0]) ? $service_tax[0] : '') . ' ';
+        $percent = isset($service_tax[1]) ? $service_tax[1] : '';
     }
 }
 
 // Calculate TCS
-if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-    $tcsper = $bsmValues[0]['tcsper'];
-    $tcsvalue = $bsmValues[0]['tcsvalue'];
-} else {
-    $tcsper = 0;
-    $tcsvalue = 0;
+if (is_array($bsmValues) && isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN' && $bsmValues[0]['tcsper'] !== '') {
+    $tcsper = (float) $bsmValues[0]['tcsper'];
+    $tcsvalue = (float) (isset($bsmValues[0]['tcsvalue']) && $bsmValues[0]['tcsvalue'] !== '' && $bsmValues[0]['tcsvalue'] !== 'NaN'
+        ? $bsmValues[0]['tcsvalue'] : 0);
 }
 
-// Calculate total costs
-$quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $sq_quotation['train_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'] + (float)($tcsvalue) - $act_discount;
+$train_cost = (float) (isset($sq_quotation['train_cost']) ? $sq_quotation['train_cost'] : 0);
+$cruise_cost = (float) (isset($sq_quotation['cruise_cost']) ? $sq_quotation['cruise_cost'] : 0);
+$flight_cost = (float) (isset($sq_quotation['flight_cost']) ? $sq_quotation['flight_cost'] : 0);
+$visa_cost = (float) (isset($sq_quotation['visa_cost']) ? $sq_quotation['visa_cost'] : 0);
+$guide_cost = (float) (isset($sq_quotation['guide_cost']) ? $sq_quotation['guide_cost'] : 0);
+$misc_cost = (float) (isset($sq_quotation['misc_cost']) ? $sq_quotation['misc_cost'] : 0);
 
-$travel_cost = $sq_quotation['train_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'];
+// Calculate total costs
+$quotation_cost = (float) ($basic_cost + $service_charge + $service_tax_amount + $train_cost + $cruise_cost + $flight_cost + $visa_cost + $guide_cost + $misc_cost + $tcsvalue - $act_discount);
+$travel_cost = (float) ($train_cost + $flight_cost + $cruise_cost + $visa_cost + $guide_cost + $misc_cost);
 
 // Format dates
 $quotation_date = $sq_quotation['quotation_date'];
@@ -261,12 +272,21 @@ $header_content .= "* " . ($sq_quotation['children_with_bed'] + $sq_quotation['c
 $header_content .= "* {$sq_quotation['total_infant']} Infant\n";
 $header_content .= "               \n";
 
-// Price Structure section
-$price_section = "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-$price_section .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-$price_section .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-$price_section .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-$price_section .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+// Price Structure section (Group = Tour/Travel/Tax/Total; PP = Adult PP / Discount / Tax / Total)
+$price_section = '';
+if (isset($sq_quotation['costing_type']) && (int) $sq_quotation['costing_type'] === 2) {
+    include_once __DIR__ . '/../../../../model/app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+    if (function_exists('gqd_render_pp_costing_whatsapp_text')) {
+        $price_section = gqd_render_pp_costing_whatsapp_text($quotation_id, array('first_only' => true));
+    }
+}
+if ($price_section === '') {
+    $price_section = "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
+    $price_section .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
+    $price_section .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
+    $price_section .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
+    $price_section .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+}
 
 // Hotels + Itinerary + Transportation section
 $itinerary_section = '';

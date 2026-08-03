@@ -29,7 +29,7 @@ include_once('../../../layouts/fullwidth_app_header.php');
                 <span class="text">Travelling</span>
             </a>
         </li>
-        <li class="hidden">
+        <li>
             <a href="javascript:void(0)" id="tab3_head">
                 <span class="num" title="Daywise Images">3<i class="fa fa-check"></i></span><br>
                 <span class="text">Daywise Images</span>

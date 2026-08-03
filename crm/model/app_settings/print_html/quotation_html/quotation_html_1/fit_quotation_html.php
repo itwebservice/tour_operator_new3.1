@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * ============================================================================
@@ -1708,12 +1708,13 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
             </ul>
           </div>
         </div>
-        <div class="mt-4 payment-page>
+        <div class="mt-4 payment-page">
           <?php
           $o1_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
-          $is_per_person = ($o1_costing_type == 'per person');
+          $o1_costing_raw = isset($cost['costing_type']) ? (string) $cost['costing_type'] : '';
+          $is_per_person = ($o1_costing_type == 'per person' || ($o1_costing_raw !== '' && $o1_costing_raw !== '1'));
           ?>
-          <div class=" flex items-end justify-between">
+          <div class="flex items-end justify-between">
           <h3 class="font-display text-2xl text-[color:var(--navy)]">Costing Details</h3>
           <!-- <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">All values in INR · per package</span> -->
           <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">
@@ -1770,9 +1771,16 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
 
 
         <?php
+        $o1_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
         $o1_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
         ?>
-        <?php if ($is_per_person && !empty($o1_pp)) { ?>
+        <?php if ($is_per_person && !empty($o1_pp_entries)) { ?>
+          <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+            <div style="margin-top:15px;border:1px solid #e4d3b3;border-radius:18px;overflow:hidden;padding:8px;">
+              <?php gqd_render_pp_entries_table($o1_pp_entries, array('escape' => 'o1e')); ?>
+            </div>
+          </div>
+        <?php } elseif ($is_per_person && !empty($o1_pp)) { ?>
           <div class="mt-4 rounded-xl overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
             <div style="margin-top:15px;border:1px solid #e4d3b3;border-radius:18px;overflow:hidden;">
               <table style="width:100%; border-collapse:separate; border-spacing:0; font-family:Arial, Helvetica, sans-serif;">
@@ -1875,9 +1883,9 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
                   <?php } ?>
                 </tbody>
               </table>
-            <?php } ?>
             </div>
           </div>
+        <?php } ?>
           <div class="text-[10px] text-[color:var(--ink)]/55 mt-2 italic italic-size">* Prices indicative and subject to availability at the time of booking confirmation.</div>
           <div class="page-foot absolute bottom-0 left-0 right-0 px-10 py-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-[color:var(--navy)]/60 border-t border-[color:var(--gold)]/30 bg-cream">
             <span><?= o1e($o1_company) ?> · Luxury Voyages</span>

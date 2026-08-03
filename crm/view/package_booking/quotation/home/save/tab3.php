@@ -1723,11 +1723,14 @@
                     package_id: uniquepackages[i],
                     transport_cost: (isNaN(transport_cost_total) ? 0 : transport_cost_total)
                 });
-                var total_passangers = $('#total_passangers').val();
+                // Transfer PP: vehicle cost / (adult + cweb + cwnb) — infants excluded
+                var transfer_passengers = parseInt(adult_count, 10) + parseInt(child_with_bed, 10) + parseInt(child_without_bed, 10);
+                if (!transfer_passengers || transfer_passengers < 1) {
+                    transfer_passengers = 1;
+                }
                 var per_person_tr_arr = [];
                 for (var t = 0; t < unique_package_id_arr.length; t++) {
-                    per_person_tr_arr.push(parseFloat(unique_package_id_arr[t]['transport_cost']) /
-                        parseInt(total_passangers));
+                    per_person_tr_arr.push(parseFloat(unique_package_id_arr[t]['transport_cost']) / transfer_passengers);
                 }
                 var table = document.getElementById("tbl_package_tour_quotation_adult_child");
                 var rowCount = (table && table.rows) ? table.rows.length : hotel_per_person_arr.length;
@@ -1747,12 +1750,12 @@
                     var cwob_cost_total1 = (per_cwob[j]) ? per_cwob[j] : 0;
                     var infant_cost_total1 = (per_infant[j]) ? per_infant[j] : 0;
 
-                    var hadult_cost = (parseInt(adult_count) !== 0) ? per_person_tr_arr[0] : 0;
-                    var child_with_bed_coste = (parseInt(child_with_bed) !== 0) ? per_person_tr_arr[0] :
-                        0;
-                    var child_without_bede = (parseInt(child_without_bed) !== 0) ? per_person_tr_arr[
-                        0] : 0;
-                    var exc_infant_coste = (parseInt(total_infant) !== 0) ? per_person_tr_arr[0] : 0;
+                    var transfer_pp_val = per_person_tr_arr[0] || 0;
+                    var hadult_cost = (parseInt(adult_count) !== 0) ? transfer_pp_val : 0;
+                    var child_with_bed_coste = (parseInt(child_with_bed) !== 0) ? transfer_pp_val : 0;
+                    var child_without_bede = (parseInt(child_without_bed) !== 0) ? transfer_pp_val : 0;
+                    // Infants not in transfer passenger count
+                    var exc_infant_coste = 0;
                     // Keep hotel-only in per_* ; transfer stored on package object for PP fields
                     if (hotel_per_person_arr[j]) {
                         hotel_per_person_arr[j].transfer_adult = hadult_cost;
@@ -1816,7 +1819,7 @@
                         }
                         var e_amount = row.cells[10].childNodes[0].value;
                         total_amount = parseFloat(total_amount) + parseFloat(e_amount);
-                        //For per person costing
+                        //For per person costing (ticket totals from tariff)
                         exc_adult_cost = parseFloat(exc_adult_cost) + parseFloat(row.cells[11]
                             .childNodes[0].value);
                          
@@ -1828,9 +1831,12 @@
                           
                         exc_infant_cost = parseFloat(exc_infant_cost) + parseFloat(row.cells[14]
                             .childNodes[0].value);
-                          
-                        exc_transfer_cost = parseFloat(exc_transfer_cost) + parseFloat(row.cells[16]
-                            .childNodes[0].value);
+                        // transfer_total is in cell 17 (cell 16 is no_of_vehicles)
+                        var exc_row_transfer = 0;
+                        if (row.cells[17] && row.cells[17].childNodes[0]) {
+                            exc_row_transfer = parseFloat(row.cells[17].childNodes[0].value) || 0;
+                        }
+                        exc_transfer_cost = parseFloat(exc_transfer_cost) + exc_row_transfer;
                             
                     }
                 }
@@ -1842,37 +1848,32 @@
                 var cwob_cost_total = 0;
                 var infant_cost_total = 0;
 
-                var hadult_cost = parseFloat(exc_adult_cost) / parseInt(adult_count);
-                var child_with_bed_coste = (parseInt(child_with_bed) !== 0) ? parseFloat(
-                    exc_child_cot) / parseInt(child_with_bed) : 0;
-                var child_without_bede = (parseInt(child_without_bed) !== 0) ? parseFloat(
-                    exc_childwo_cot) / parseInt(child_without_bed) : 0;
-                var exc_infant_coste = (parseInt(total_infant) !== 0) ? parseFloat(exc_infant_cost) /
-                    parseInt(total_infant) : 0;
-                var exc_ftransfer_cost = (parseInt(adult_count) !== 0) ? parseFloat(exc_transfer_cost) /
-                    (parseInt(adult_count) + parseInt(child_with_bed)) : 0;
+                adult_count = parseInt(adult_count, 10) || 0;
+                child_with_bed = parseInt(child_with_bed, 10) || 0;
+                child_without_bed = parseInt(child_without_bed, 10) || 0;
+                total_infant = parseInt(total_infant, 10) || 0;
 
-                var exc_atransfer_cost = (parseInt(adult_count) !== 0) ? exc_ftransfer_cost : 0;
-                var exc_cwtransfer_cost = (parseInt(child_with_bed) !== 0) ? exc_ftransfer_cost : 0;
+                // Ticket cost per pax type (tariff total / pax count = per-person ticket)
+                var ticket_adult = (adult_count > 0) ? (parseFloat(exc_adult_cost) / adult_count) : 0;
+                var ticket_cweb = (child_with_bed > 0) ? (parseFloat(exc_child_cot) / child_with_bed) : 0;
+                var ticket_cwnb = (child_without_bed > 0) ? (parseFloat(exc_childwo_cot) / child_without_bed) : 0;
+                var ticket_infant = (total_infant > 0) ? (parseFloat(exc_infant_cost) / total_infant) : 0;
 
-              // ===== TOTAL COUNT =====
-var final_count = 
-    parseInt(adult_count) + 
-    parseInt(child_with_bed) + 
-    parseInt(child_without_bed) + 
-    parseInt(total_infant);
+                // Activity transfer share: activity vehicle transfer / (adult + cweb + cwnb)
+                var activity_passengers = adult_count + child_with_bed + child_without_bed;
+                if (activity_passengers < 1) {
+                    activity_passengers = 1;
+                }
+                var activity_transfer_pp = parseFloat(exc_transfer_cost) / activity_passengers;
+                if (isNaN(activity_transfer_pp)) {
+                    activity_transfer_pp = 0;
+                }
 
-if (final_count === 0) final_count = 1;
-
-// ===== PER PERSON TRANSFER =====
-var final_tranfer_cost = parseFloat(exc_ftransfer_cost) / final_count;
-
-// ===== FINAL VALUES (applied to every package PP block below) =====
-var pp_activity_adult = (hadult_cost + (parseInt(adult_count) !== 0 ? final_tranfer_cost : 0));
-var pp_activity_cweb = (child_with_bed_coste + (parseInt(child_with_bed) !== 0 ? final_tranfer_cost : 0));
-var pp_activity_cwnb = (child_without_bede + (parseInt(child_without_bed) !== 0 ? final_tranfer_cost : 0));
-var pp_activity_infant = (exc_infant_coste + (parseInt(total_infant) !== 0 ? final_tranfer_cost : 0));
-
+                // Activity PP = (transfer / passengers) + ticket cost for that pax type
+                var pp_activity_adult = ticket_adult + ((adult_count > 0) ? activity_transfer_pp : 0);
+                var pp_activity_cweb = ticket_cweb + ((child_with_bed > 0) ? activity_transfer_pp : 0);
+                var pp_activity_cwnb = ticket_cwnb + ((child_without_bed > 0) ? activity_transfer_pp : 0);
+                var pp_activity_infant = ticket_infant + ((total_infant > 0) ? activity_transfer_pp : 0);
                 var table = document.getElementById("tbl_package_tour_quotation_adult_child");
                 var rowCount = (table && table.rows) ? table.rows.length : hotel_per_person_arr.length;
                 if (per_adult.length == 0) {
@@ -1910,9 +1911,8 @@ var pp_activity_infant = (exc_infant_coste + (parseInt(total_infant) !== 0 ? fin
                     var adult_count_pp = parseInt($('#total_adult').val(), 10) || 0;
                     var cwnb_count_pp = parseInt($('#children_without_bed').val(), 10) || 0;
                     var cweb_count_pp = parseInt($('#children_with_bed').val(), 10) || 0;
-                    var infant_count_pp = parseInt($('#total_infant').val(), 10) || 0;
-                    var total_pax_pp = adult_count_pp + cwnb_count_pp + cweb_count_pp + infant_count_pp;
-                    if (total_pax_pp === 0) total_pax_pp = 1;
+                    var transfer_passengers_pp = adult_count_pp + cwnb_count_pp + cweb_count_pp;
+                    if (transfer_passengers_pp === 0) transfer_passengers_pp = 1;
                     var transport_pp_opt = (typeof per_person_tr_arr !== 'undefined' && per_person_tr_arr && per_person_tr_arr[0])
                         ? (parseFloat(per_person_tr_arr[0]) || 0)
                         : 0;

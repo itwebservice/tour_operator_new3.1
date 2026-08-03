@@ -1109,6 +1109,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
         <?php
         $o7_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
         $o7_is_per_person = ($o7_costing_type == 'per person');
+        $o7_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
         $o7_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
         ?>
         <?php if (!$o7_is_per_person) { ?>
@@ -1149,6 +1150,9 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
             </tbody>
           </table>
         <?php } else { ?>
+          <?php if (!empty($o7_pp_entries)) { ?>
+            <?php gqd_render_pp_entries_table($o7_pp_entries, array('escape' => 'o7e', 'table_class' => 'cost-table')); ?>
+          <?php } else { ?>
           <table class="cost-table">
             <thead>
               <tr>
@@ -1183,6 +1187,7 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
               <?php endforeach; ?>
             </tbody>
           </table>
+          <?php } ?>
 
         <?php } ?>
         <div class="cost-note">

@@ -1076,10 +1076,13 @@ $o2_round = o2img(
           <?php } else { ?>
 
             <?php
+            $o2_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
             $o2_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
             ?>
 
-            <?php if (!empty($o2_pp)) { ?>
+            <?php if (!empty($o2_pp_entries)) { ?>
+              <?php gqd_render_pp_entries_table($o2_pp_entries, array('escape' => 'o2e', 'table_class' => 'cost')); ?>
+            <?php } elseif (!empty($o2_pp)) { ?>
               <table class="cost">
                 <thead>
                   <tr>

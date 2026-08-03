@@ -119,12 +119,7 @@ background-color:<?= $theme_color ?>;
                 <div class="ai-chat-box" id="aiChatBox" aria-hidden="true">
                     <textarea id="aiMessageInput" placeholder="Type your message..."></textarea>
 
-                    <button type="button" class="send-btn" id="btnAnalyseMessage" aria-label="Analyse message">
-                        <!-- Send Icon -->
-                        <svg viewBox="0 0 24 24">
-                        <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
-                        </svg>
-                    </button>
+                      <button type="button" class="btn btn-sm btn-success send-btn"  id="btnAnalyseMessage"><i class="fa fa-paper-plane-o"></i>&nbsp;&nbsp;Send</button>
                 </div>
                 <div id="aiApiInfo"></div>
 
@@ -1038,7 +1033,7 @@ $(document).on('click', '#tab2_head', function() {
             $('#aiApiInfo').text('Please paste quotation or itinerary text.');
             return;
         }
-        $('#aiApiInfo').text('Please Wait Analysing...');
+        $('#aiApiInfo').html('<i class="fa fa-spinner fa-spin"></i> <span>Please Wait...</span>');
         $('#btnAnalyseMessage').prop('disabled', true);
         $.ajax({
             type: 'post',

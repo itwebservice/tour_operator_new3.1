@@ -378,66 +378,108 @@ $quotation_count = mysqli_num_rows($sq_query);
 								if ($sq_query) {
 									while ($row_tours = mysqli_fetch_assoc($sq_query)) {
 									$sq_tours_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$row_tours[package_id]'"));
-									$sq_cost = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$row_tours[quotation_id]'"));
-
-									$basic_cost = $sq_cost['basic_amount'];
-									$service_charge = $sq_cost['service_charge'];
-									$service_tax_amount = 0;
-									$tax_show = '';
-									// $bsmValues = json_decode($sq_cost['bsmValues']);
-									$bsmValues = json_decode($sq_cost['bsmValues'], true);
-									$discount_in = $sq_cost['discount_in'];
-									$discount = $sq_cost['discount'];
-									if ($discount_in == 'Percentage') {
-										$act_discount = (float)($service_charge) * (float)($discount) / 100;
-									} else {
-										$act_discount = ($service_charge != 0) ? $discount : 0;
+									$sq_cost = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$row_tours[quotation_id]' order by sort_order limit 1"));
+									if (!is_array($sq_cost)) {
+										$sq_cost = array();
 									}
-									$service_charge = $service_charge - (float)($act_discount);
-									$tour_cost = $basic_cost + $service_charge;
-									$name = '';
-									if ($sq_cost['service_tax_subtotal'] !== 0.00 && ($sq_cost['service_tax_subtotal']) !== '') {
-										$service_tax_subtotal1 = explode(',', $sq_cost['service_tax_subtotal']);
-										for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
-											$service_tax = explode(':', $service_tax_subtotal1[$i]);
-											$service_tax_amount = (float)($service_tax_amount) + (float)($service_tax[2]);
-											$name .= $service_tax[0] . ' ';
-											$percent = $service_tax[1];
+
+									$quotation_cost = 0;
+									$pp_cost_applied = false;
+									// Per Person: same formula as datatable (pax × first-package total_cost)
+									if (isset($row_tours['costing_type']) && (string) $row_tours['costing_type'] === '2') {
+										$qid = (int) $row_tours['quotation_id'];
+										$adults = (float) $row_tours['total_adult'];
+										$child_wb = (float) $row_tours['children_with_bed'];
+										$child_wob = (float) $row_tours['children_without_bed'];
+										$infants = (float) $row_tours['total_infant'];
+										$pp_adult_total = 0;
+										$pp_cweb_total = 0;
+										$pp_cwnb_total = 0;
+										$pp_infant_total = 0;
+										$pp_rows_found = false;
+
+										$sq_first_pkg = mysqli_fetch_assoc(mysqlQuery(
+											"SELECT package_type FROM package_tour_quotation_costing_entries
+											 WHERE quotation_id='$qid'
+											 ORDER BY sort_order ASC, id ASC
+											 LIMIT 1"
+										));
+										if (!$sq_first_pkg) {
+											$sq_first_pkg = mysqli_fetch_assoc(mysqlQuery(
+												"SELECT package_type FROM package_quotation_pp_costing
+												 WHERE quotation_id='$qid'
+												 ORDER BY id ASC
+												 LIMIT 1"
+											));
+										}
+										if ($sq_first_pkg) {
+											$first_package_type = isset($sq_first_pkg['package_type']) ? $sq_first_pkg['package_type'] : '';
+											$pkg_sql = mysqlREString($first_package_type);
+											if ($first_package_type === '' || $first_package_type === null) {
+												$pkg_where = "(package_type='' OR package_type IS NULL)";
+											} else {
+												$pkg_where = "package_type='$pkg_sql'";
+											}
+											$sq_pp_rows = mysqlQuery(
+												"SELECT pax_type, total_cost FROM package_quotation_pp_costing
+												 WHERE quotation_id='$qid' AND $pkg_where"
+											);
+											while ($pp_row = mysqli_fetch_assoc($sq_pp_rows)) {
+												$pp_rows_found = true;
+												$ptype = strtolower(trim($pp_row['pax_type']));
+												$ptotal = (float) $pp_row['total_cost'];
+												if ($ptype === 'adult') {
+													$pp_adult_total = $ptotal;
+												} elseif ($ptype === 'cweb') {
+													$pp_cweb_total = $ptotal;
+												} elseif ($ptype === 'cwnb') {
+													$pp_cwnb_total = $ptotal;
+												} elseif ($ptype === 'infant') {
+													$pp_infant_total = $ptotal;
+												}
+											}
+										}
+										if ($pp_rows_found) {
+											$quotation_cost =
+												($adults * $pp_adult_total) +
+												($child_wb * $pp_cweb_total) +
+												($child_wob * $pp_cwnb_total) +
+												($infants * $pp_infant_total);
+											$pp_cost_applied = true;
 										}
 									}
-									if ($bsmValues[0]->service != '') {   //inclusive service charge
-										$newBasic = $tour_cost + $service_tax_amount;
-										$tax_show = '';
-									} else {
-										$tax_show =  $name . $percent . ($service_tax_amount);
-										$newBasic = $tour_cost;
-									}
-									////////////Basic Amount Rules
-									if ($bsmValues[0]->basic != '') { //inclusive markup
-										$newBasic = $tour_cost + $service_tax_amount;
-										$tax_show = '';
-									}
 
-
-
-									if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-										$tcsper = $bsmValues[0]['tcsper'];
-										$tcsvalue = $bsmValues[0]['tcsvalue'];
-									} else {
-										$tcsper = 0;
+									// Group costing (or PP legacy fallback when pp rows missing)
+									if (!$pp_cost_applied) {
+										$basic_cost = (float) (isset($sq_cost['basic_amount']) ? $sq_cost['basic_amount'] : 0);
+										$service_charge = (float) (isset($sq_cost['service_charge']) ? $sq_cost['service_charge'] : 0);
+										$service_tax_amount = 0;
+										$bsmValues = json_decode(isset($sq_cost['bsmValues']) ? $sq_cost['bsmValues'] : '', true);
+										$discount_in = isset($sq_cost['discount_in']) ? $sq_cost['discount_in'] : '';
+										$discount = (float) (isset($sq_cost['discount']) ? $sq_cost['discount'] : 0);
+										if ($discount_in == 'Percentage') {
+											$act_discount = $service_charge * $discount / 100;
+										} else {
+											$act_discount = ($service_charge != 0) ? $discount : 0;
+										}
+										$tax_sub = isset($sq_cost['service_tax_subtotal']) ? $sq_cost['service_tax_subtotal'] : '';
+										if ($tax_sub !== 0.00 && $tax_sub !== '' && $tax_sub !== null) {
+											$service_tax_subtotal1 = explode(',', (string) $tax_sub);
+											for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
+												$service_tax = explode(':', $service_tax_subtotal1[$i]);
+												$service_tax_amount += (float) (isset($service_tax[2]) ? $service_tax[2] : 0);
+											}
+										}
 										$tcsvalue = 0;
+										if (is_array($bsmValues) && isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN' && $bsmValues[0]['tcsper'] !== '') {
+											$tcsvalue = (float) (isset($bsmValues[0]['tcsvalue']) && $bsmValues[0]['tcsvalue'] !== '' && $bsmValues[0]['tcsvalue'] !== 'NaN'
+												? $bsmValues[0]['tcsvalue'] : 0);
+										}
+										$quotation_cost = $basic_cost + $service_charge + $service_tax_amount
+											+ (float) $row_tours['train_cost'] + (float) $row_tours['cruise_cost'] + (float) $row_tours['flight_cost']
+											+ (float) $row_tours['visa_cost'] + (float) $row_tours['guide_cost'] + (float) $row_tours['misc_cost']
+											+ (float) $tcsvalue - (float) $act_discount;
 									}
-
-									$basic_cost = $sq_cost['basic_amount'];
-									$service_charge = $sq_cost['service_charge'];
-
-
-
-
-									// $quotation_cost = $sq_cost['total_tour_cost']+ $row_tours['train_cost'] + $row_tours['cruise_cost']+ $row_tours['flight_cost'] + $row_tours['visa_cost'] + $row_tours['guide_cost'] + $row_tours['misc_cost'];
-									// $quotation_cost = ceil($quotation_cost);
-
-									$quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $row_tours['train_cost'] + $row_tours['cruise_cost'] + $row_tours['flight_cost'] + $row_tours['visa_cost'] + $row_tours['guide_cost'] + $row_tours['misc_cost'] + (float)($tcsvalue) - $act_discount;
 
 									$quotation_cost_1 = currency_conversion($currency, $row_tours['currency_code'], $quotation_cost);
 

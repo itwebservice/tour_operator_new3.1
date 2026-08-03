@@ -1258,194 +1258,7 @@ class quotation_email_send
 
 			if ($sq_quotation['costing_type'] == 2) {
 
-				$sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id'  order by sort_order limit 1");
-				while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
-
-					$service_charge = $sq_costing['service_charge'];
-					$discount_in = $sq_costing['discount_in'];
-					$discount = $sq_costing['discount'];
-					if ($discount_in == 'Percentage') {
-						$act_discount = (float)($service_charge) * (float)($discount) / 100;
-					} else {
-						$act_discount = ($service_charge != 0) ? $discount : 0;
-					}
-					$service_charge = $service_charge - (float)($act_discount);
-					$total_pax = (float)($sq_quotation['total_adult']) + (float)($sq_quotation['children_with_bed']) + (float)($sq_quotation['children_without_bed']) + (float)($sq_quotation['total_infant']);
-					$per_service_charge = (float)($service_charge) / (float)($total_pax);
-					$o_per_service_charge = (float)($sq_costing['service_charge']) / (float)($total_pax);
-
-					$adult_cost = ($sq_quotation['total_adult'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['adult_cost'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-
-					$adult_cost1 = ((float)($sq_costing['adult_cost'] + (float)($per_service_charge)));
-
-					$child_with = ($sq_quotation['children_with_bed'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['child_with'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-					$child_with1 = ((float)($sq_costing['child_with'] + (float)($per_service_charge)));
-
-					$child_without = ($sq_quotation['children_without_bed'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['child_without'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-
-					$child_without1 = ((float)($sq_costing['child_without'] + (float)($per_service_charge)));
-
-					$infant_cost = ($sq_quotation['total_infant'] != '0') ? currency_conversion($currency, $sq_quotation['currency_code'], ((float)($sq_costing['infant_cost'] + (float)($per_service_charge)))) : currency_conversion($currency, $sq_quotation['currency_code'], 0);
-
-					$infant_cost1 = ((float)($sq_costing['infant_cost'] + (float)($per_service_charge)));
-
-					// Without currency
-					$adult_costw = ($sq_quotation['total_adult'] != '0') ? ((float)($sq_costing['adult_cost'] + (float)($per_service_charge)) * intval($sq_quotation['total_adult'])) : 0;
-					$child_withw = ($sq_quotation['children_with_bed'] != '0') ? ((float)($sq_costing['child_with'] + (float)($per_service_charge)) * intval($sq_quotation['children_with_bed'])) : 0;
-					$child_withoutw = ($sq_quotation['children_without_bed'] != '0') ? ((float)($sq_costing['child_without'] + (float)($per_service_charge)) * intval($sq_quotation['children_without_bed'])) : 0;
-					$infant_costw = ($sq_quotation['total_infant'] != '0') ? ((float)($sq_costing['infant_cost'] + (float)($per_service_charge)) * intval($sq_quotation['total_infant'])) : 0;
-					$o_adult_costw = ($sq_quotation['total_adult'] != '0') ? ((float)($sq_costing['adult_cost'] + (float)($o_per_service_charge)) * intval($sq_quotation['total_adult'])) : 0;
-					$o_child_withw = ($sq_quotation['children_with_bed'] != '0') ? ((float)($sq_costing['child_with'] + (float)($o_per_service_charge)) * intval($sq_quotation['children_with_bed'])) : 0;
-					$o_child_withoutw = ($sq_quotation['children_without_bed'] != '0') ? ((float)($sq_costing['child_without'] + (float)($o_per_service_charge)) * intval($sq_quotation['children_without_bed'])) : 0;
-					$o_infant_costw = ($sq_quotation['total_infant'] != '0') ? ((float)($sq_costing['infant_cost'] + (float)($o_per_service_charge)) * intval($sq_quotation['total_infant'])) : 0;
-
-					$service_tax_amount = 0;
-					$tax_show = '';
-					$bsmValues = json_decode($sq_costing['bsmValues'], true);
-					$name = '';
-					if ($sq_costing['service_tax_subtotal'] !== 0.00 && ($sq_costing['service_tax_subtotal']) !== '') {
-						$service_tax_subtotal1 = explode(',', $sq_costing['service_tax_subtotal']);
-						for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
-							$service_tax = explode(':', $service_tax_subtotal1[$i]);
-							$service_tax_amount = (float)($service_tax_amount) + (float)($service_tax[2]);
-							$name .= $service_tax[0] . $service_tax[1] . ', ';
-						}
-					}
-
-					if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-						$tcsper = $bsmValues[0]['tcsper'];
-						$tcsvalue = $bsmValues[0]['tcsvalue'];
-					} else {
-						$tcsper = 0;
-						$tcsvalue = 0;
-					}
-					$service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
-
-					$tax1 = $service_tax_amount;
-
-					$total_child = (float)($sq_quotation['children_with_bed']) + (float)($sq_quotation['children_without_bed']);
-
-					$quotation_cost = (float)($adult_costw) + (float)($child_withw) + (float)($child_withoutw) + (float)($infant_costw);
-					$o_quotation_cost = (float)($o_adult_costw) + (float)($o_child_withw) + (float)($o_child_withoutw) + (float)($o_infant_costw);
-
-					$other_cost = $service_tax_amount + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'];
-					$travel_cost = ($sq_plane_count > 0) ? $sq_quotation['flight_ccost'] + $sq_quotation['flight_icost'] + $sq_quotation['flight_acost'] : 0;
-					$travel_cost += ($sq_train_count > 0) ? $sq_quotation['train_ccost'] + $sq_quotation['train_icost'] + $sq_quotation['train_acost'] : 0;
-					$travel_cost += ($sq_cruise_count > 0) ?  $sq_quotation['cruise_acost'] + $sq_quotation['cruise_icost'] + $sq_quotation['cruise_ccost'] : 0;
-
-					$train_cost_a = $sq_quotation['train_acost'] * intval($sq_quotation['total_adult']);
-					$train_cost_cw = $sq_quotation['train_ccost'] * intval($sq_quotation['children_with_bed']);
-					$train_cost_cwo =  $sq_quotation['train_ccost'] * intval($sq_quotation['children_without_bed']);
-					$train_cost_i = $sq_quotation['train_icost'] * intval($sq_quotation['total_infant']);
-
-					$train_total_cost = ($sq_train_count > 0) ? $train_cost_a + $train_cost_cw + $train_cost_cwo + $train_cost_i : 0;
-					// flight cost
-					$flight_cost_a = $sq_quotation['flight_acost'] * intval($sq_quotation['total_adult']);
-					$flight_cost_cw = $sq_quotation['flight_ccost'] * intval($sq_quotation['children_with_bed']);
-					$flight_cost_cwo =  $sq_quotation['flight_ccost'] * intval($sq_quotation['children_without_bed']);
-					$flight_cost_i = $sq_quotation['flight_icost'] * intval($sq_quotation['total_infant']);
-
-					$flight_total_cost = ($sq_plane_count > 0) ? $flight_cost_a + $flight_cost_cw + $flight_cost_cwo + $flight_cost_i : 0;
-					// Cruise cost
-
-
-					$cruise_cost_a = $sq_quotation['cruise_acost'] * intval($sq_quotation['total_adult']);
-					$cruise_cost_cw = $sq_quotation['cruise_ccost'] * intval($sq_quotation['children_with_bed']);
-					$cruise_cost_cwo =  $sq_quotation['cruise_ccost'] * intval($sq_quotation['children_without_bed']);
-					$cruise_cost_i = $sq_quotation['cruise_icost'] * intval($sq_quotation['total_infant']);
-
-					$cruise_total_cost = ($sq_cruise_count > 0) ? $cruise_cost_a + $cruise_cost_cw + $cruise_cost_cwo + $cruise_cost_i : 0;
-
-
-
-
-					$quotation_cost = (float)($quotation_cost) + (float)($train_total_cost) + (float)($flight_total_cost) + (float)($cruise_total_cost) + (float)($other_cost) + (float)($tcsvalue);
-					//   $quotation_cost = ceil($quotation_cost);
-					$currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'], $quotation_cost);
-					$tcs_show1 = currency_conversion($currency, $sq_quotation['currency_code'], $tcsvalue);
-					$o_quotation_cost = (float)($o_quotation_cost) + (float)($train_total_cost) + (float)($flight_total_cost) + (float)($cruise_total_cost) + (float)($other_cost) + (float)($tcsvalue);
-					//   $o_quotation_cost = ceil($o_quotation_cost);
-					//   $act_tour_cost_camount = ($discount!=0) ? currency_conversion($currency, $sq_quotation['currency_code'], $o_quotation_cost) : ''; 
-
-
-
-
-
-
-
-
-					$tax = str_replace(',', '', $name) . $service_tax_amount_show;
-					$tcs_cost = '(' . $tcsper . '%) ' . $tcs_show1;
-					$visa = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['visa_cost']);
-					$visa1 = $sq_quotation['visa_cost'];
-					$guide = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['guide_cost']);
-
-					$guide1 = $sq_quotation['guide_cost'];
-					$misc = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['misc_cost']);
-					$misc1 = $sq_quotation['misc_cost'];
-					$flight_a = $sq_quotation['total_adult'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['flight_acost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-					$flight_a1 = $sq_quotation['flight_acost'];
-					$flight_cwb = ($sq_quotation['children_with_bed'] != 0 || $sq_quotation['children_without_bed'] != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['flight_ccost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-
-					$flight_cwb1 = $sq_quotation['flight_ccost'];
-
-					$flight_i = $sq_quotation['total_infant'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['flight_icost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-
-					$flight_i1 = $sq_quotation['flight_icost'];
-
-					$train_a = $sq_quotation['total_adult'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['train_acost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-
-					$train_a1 = (float)($sq_quotation['train_acost']);
-
-					$train_cwb = ($sq_quotation['children_with_bed'] != 0 || $sq_quotation['children_without_bed'] != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['train_ccost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-
-
-					$train_cwb1 = (float)($sq_quotation['train_ccost']);
-
-					$train_i = $sq_quotation['total_infant'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['train_icost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-
-					$train_i1 = (float)($sq_quotation['train_icost']);
-
-					$cruise_a = $sq_quotation['total_adult'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['cruise_acost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-					$cruise_a1 = (float)($sq_quotation['cruise_acost']);
-
-					$cruise_cwb = ($sq_quotation['children_with_bed'] != 0  || $sq_quotation['children_without_bed'] != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['cruise_ccost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-
-					$cruise_cwb1 = (float)($sq_quotation['cruise_ccost']);
-
-					$cruise_i = $sq_quotation['total_infant'] != 0 ? currency_conversion($currency, $sq_quotation['currency_code'], (float)($sq_quotation['cruise_icost'])) : currency_conversion($currency, $sq_quotation['currency_code'], (float)(0));
-
-					$cruise_i1 = (float)($sq_quotation['cruise_icost']);
-					// // *Train Cost:* 
-					// *Cruise Cost:*
-
-
-
-					$total_pkg_cost = (float)($adult_cost1) * (float)($adults) +
-						(float)($child_with1) * (float)($child_wb) + (float)($child_without1) * (float)($child_wob) +
-						(float)($infants) * (float)($infant_cost1) +
-						(float)($tax1) +
-						(float)($tcsvalue) +
-						(float)($visa1) +
-						(float)($guide1) +
-						(float)($misc1) +
-						(float)($flight_a1) * (float)($adults) +
-						(float)($child_wb) * (float)($flight_cwb1) + (float)($child_wob) * (float)($flight_cwb1) +
-						(float)($infants) * (float)($flight_i1) +
-						(float)($train_a1) * (float)($adults) +
-						(float)($child_wb) * (float)($train_cwb1) +  (float)($child_wob) * (float)($train_cwb1) +
-						(float)($infants) * (float)($train_i1) +
-						(float)($cruise_a1) * (float)($adults) +
-						(float)($child_wb) * (float)($cruise_cwb1) + (float)($child_wob) * (float)($cruise_cwb1) +
-						(float)($infants) * (float)($cruise_i1);
-
-
-					$currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'], $total_pkg_cost);
-
-
-
-
-					$maindetail = "*Quotation ID :* $quoatationid 
+				$maindetail = "*Quotation ID :* $quoatationid 
 
  *$tourname*
  * $from_date for $duration
@@ -1460,164 +1273,19 @@ class quotation_email_send
 				if ($infants > 0) {
 					$maindetail .= " * $infants Infant\n";
 				}
-				
+
 				$maindetail .= "\n";
-				
-				// Show passenger costs only if non-zero
-				if ($adults > 0 && extract_numeric($adult_cost) > 0) {
-					$maindetail .= "*Adult Amount:* $adult_cost\n";
+
+				// Per Person: simple WhatsApp lines (Adult PP / Discount / Tax / Total)
+				include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+				$pp_price = '';
+				if (function_exists('gqd_render_pp_costing_whatsapp_text')) {
+					$pp_price = gqd_render_pp_costing_whatsapp_text($quotation_id, array('first_only' => true));
 				}
-				if ($child_wb > 0 && extract_numeric($child_with) > 0) {
-					$maindetail .= "*Child with Bed Amount:* $child_with\n";
-				}
-				if ($child_wob > 0 && extract_numeric($child_without) > 0) {
-					$maindetail .= "*Child without Bed Amount:* $child_without\n";
-				}
-				if ($infants > 0 && extract_numeric($infant_cost) > 0) {
-					$maindetail .= "*Infant Amount:* $infant_cost\n";
-				}
-
-				$maindetail .= "\n*Taxes:*\n";
-				
-				// Show taxes only if non-zero
-				if (extract_numeric($service_tax_amount_show) > 0) {
-					$maindetail .= "*Tax:* $tax\n";
-				}
-				if (extract_numeric($tcs_show1) > 0) {
-					$maindetail .= "*TCS:* $tcs_cost\n";
-				}
-				
-				$maindetail .= "";
-
-					$maindetail .= "\n";
-
-					// Other Costs section
-					if (
-						extract_numeric($visa) > 0 ||
-						extract_numeric($guide) > 0 ||
-						extract_numeric($misc) > 0
-					) {
-						$maindetail .= "*Other Cost:*\n\n";
-						if (extract_numeric($visa) > 0) {
-							$maindetail .= "*Visa Amount:* " . $visa . "\n\n";
-						}
-						if (extract_numeric($guide) > 0) {
-							$maindetail .= "*Guide Amount:* " . $guide . "\n\n";
-						}
-						if (extract_numeric($misc) > 0) {
-							$maindetail .= "*Miscellaneous Amount:* " . $misc . "\n";
-						}
-						$maindetail .= "\n"; // Add space after Other Costs
-					}
-
-					// Travel Costs section
-					if (
-						extract_numeric($flight_a) > 0 ||
-						extract_numeric($flight_cwb) > 0 ||
-						extract_numeric($flight_i) > 0 ||
-						extract_numeric($train_a) > 0 ||
-						extract_numeric($train_cwb) > 0 ||
-						extract_numeric($train_i) > 0 ||
-						extract_numeric($cruise_a) > 0 ||
-						extract_numeric($cruise_cwb) > 0 ||
-						extract_numeric($cruise_i) > 0
-					) {
-						$maindetail .= "*Travel Cost:*\n\n";
-
-						// Flight Section
-						if (extract_numeric($flight_a) > 0) {
-							$maindetail .= "*Flight Adult Amount:* " . $flight_a . "\n\n";
-						}
-						if (extract_numeric($flight_cwb) > 0) {
-							$maindetail .= "*Flight Child Amount:* " . $flight_cwb . "\n\n";
-						}
-						if (extract_numeric($flight_i) > 0) {
-							$maindetail .= "*Flight Infant Amount:* " . $flight_i . "\n\n";
-						}
-						$maindetail .= "";
-
-						// Train Section
-						if (extract_numeric($train_a) > 0) {
-							$maindetail .= "*Train Adult Amount:* " . $train_a . "\n\n";
-						}
-						if (extract_numeric($train_cwb) > 0) {
-							$maindetail .= "*Train Child Amount:* " . $train_cwb . "\n\n";
-						}
-						if (extract_numeric($train_i) > 0) {
-							$maindetail .= "*Train Infant Amount:* " . $train_i . "\n\n";
-						}
-						$maindetail .= "";
-
-						// Cruise Section
-						if (extract_numeric($cruise_a) > 0) {
-							$maindetail .= "*Cruise Adult Amount:* " . $cruise_a . "\n\n";
-						}
-						if (extract_numeric($cruise_cwb) > 0) {
-							$maindetail .= "*Cruise Child Amount:* " . $cruise_cwb . "\n\n";
-						}
-						if (extract_numeric($cruise_i) > 0) {
-							$maindetail .= "*Cruise Infant Amount:* " . $cruise_i . "\n\n";
-						}
-						$maindetail .= ""; // Final space
-					}
-
-
-
-
-					// $maindetail .= '';
-
-
-					// // Check if each amount is non-zero before adding text
-					// if (extract_numeric($visa) > 0) {
-					//     $maindetail .= "*Visa Amount*: " . $visa . "\n";
-					// }
-					// if (extract_numeric($guide) > 0) {
-					//     $maindetail .= "*Guide Amount:* " .$guide. "\n";
-					// }
-					// if (extract_numeric($misc) > 0) {
-					//     $maindetail .= "*Miscellaneous Amount:* " .$misc. "\n";
-					// }
-					// if (extract_numeric($flight_a) >  0) {
-					//     $maindetail .= "*Flight Adult Amount:* " .$flight_a . "\n";
-					// }
-					// if (extract_numeric($flight_cwb) > 0) {
-					//     $maindetail .= "*Flight Child Amount:* " .$flight_cwb . "\n";
-					// }
-					// if (extract_numeric($flight_i) > 0) {
-					//     $maindetail .= "*Flight  Infant Amount:* " .$flight_i . "\n";
-					// }
-
-
-					// if (extract_numeric($train_a ) > 0) {
-					//     $maindetail .= "*Train Adult Amount:* " .$train_a . "\n";
-					// }
-					// if (extract_numeric($train_cwb) > 0) {
-					//     $maindetail .= "*Train Child Amount:* " .$train_cwb . "\n";
-					// }
-					// if (extract_numeric($train_i) > 0) {
-					//     $maindetail .= "*Train  Infant Amount:* " .$train_i . "\n";
-					// }
-
-					// if (extract_numeric($cruise_a) > 0) {
-					//     $maindetail .= "*Cruise Adult Amount:* " .$cruise_a . "\n";
-					// }
-					// if (extract_numeric($cruise_cwb) > 0) {
-					//     $maindetail .= "*Cruise Child Amount:* " .$cruise_cwb . "\n";
-					// }
-					// if (extract_numeric($cruise_i) > 0) {
-					//     $maindetail .= "*Cruise  Infant Amount:* " .$cruise_i . "\n";
-					// }
-
-
-
-
-
-
-					$maindetail .= "*Total Price :*  $currency_amount1 " . "\n";
-
-
-
-					// $currency_amount1 =$newBasic;
+				if ($pp_price !== '') {
+					$maindetail .= $pp_price;
+				} else {
+					$maindetail .= "*Total Price :* 0.00\n";
 				}
 			} else {
 
@@ -2311,11 +1979,22 @@ Thank you.');
 
 		// Price Structure - only show if selected
 		if (in_array('price_structure', $options)) {
-			$whatsapp_msg .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-			$whatsapp_msg .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-			$whatsapp_msg .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-			$whatsapp_msg .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-			$whatsapp_msg .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+			$pp_price = '';
+			if (isset($sq_quotation['costing_type']) && (int) $sq_quotation['costing_type'] === 2) {
+				include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+				if (function_exists('gqd_render_pp_costing_whatsapp_text')) {
+					$pp_price = gqd_render_pp_costing_whatsapp_text($quotation_id, array('first_only' => true));
+				}
+			}
+			if ($pp_price !== '') {
+				$whatsapp_msg .= $pp_price;
+			} else {
+				$whatsapp_msg .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
+				$whatsapp_msg .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
+				$whatsapp_msg .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
+				$whatsapp_msg .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
+				$whatsapp_msg .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+			}
 		}
 
 		// Hotels - always show

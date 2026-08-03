@@ -2582,17 +2582,20 @@ border: 1px solid #d8d6de;
 	line-height: 1;
 }
 
+.ai-chat-box-container{
+	width: 95%;
+	margin: 0 auto;
+}
+
 .ai-chat-box {
 	position: relative;
 	z-index: 1000;
-	width: 85%;
 	background: #fff;
 	border: 1px solid #e2e4ea;
 	border-radius: 22px;
 	padding: 20px 20px 56px;
 	box-shadow: 0 0.5px 10px rgba(0, 0, 0, 0.1);
-	margin: 10 auto 30px !important;
-	
+	margin: 15px auto 15px !important;
 }
 
 
@@ -2734,15 +2737,32 @@ textarea.ai-chat-textarea.form-control:focus,
 }
 
 #touraiToggleBtn{
-	width: 70px;
-	background: <?= $theme_color ?>
+	min-width: 60px;
+	padding: 5px 14px;
+	border: none;
+	border-radius: 4px;
+	background: transparent;
+	color: <?= $theme_color ?>;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+#touraiToggleBtn:hover,
+#touraiToggleBtn:focus{
+	background: transparent !important;
+	opacity: 0.9;
+	box-shadow: none !important;
+}
+#touraiToggleBtn .fa{
+	margin-right: 2px;
 }
 
 .touraiToggleBtn_div{
 	display: flex;
 	align-items: center;
-	justify-content: end;
+	justify-content: flex-end;
 	padding-right: 15px;
+	margin-bottom: 8px;
 }
 
 @media (max-width: 1100px) {
@@ -2774,27 +2794,10 @@ textarea.ai-chat-textarea.form-control:focus,
 	position: absolute;
 	right: 20px;
 	bottom: 10px;
-	width: 44px;
-	height: 44px;
-	border-radius: 50%;
-	border: none;
-	background: #e5e7eb;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	transition: 0.2s ease;
 }
 
-.send-btn:hover {
-	background: #d1d5db;
-}
 
-.send-btn svg {
-	width: 18px;
-	height: 18px;
-	fill: #111827;
-}
+
 
 .ai-chat-container #aiApiInfo {
 	display: block;
@@ -2808,6 +2811,11 @@ textarea.ai-chat-textarea.form-control:focus,
 	white-space: pre-wrap;
 	word-break: break-word;
 	color: #333;
+}
+.ai-chat-container #aiApiInfo .fa-spinner {
+	margin-right: 6px;
+	color: #666;
+	vertical-align: middle;
 }
 #tbl_package_tour_member .select2-container .select2-selection--single{
     width:70px !important;

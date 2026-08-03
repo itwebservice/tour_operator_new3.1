@@ -146,42 +146,91 @@ if (!function_exists('render_quotation_email_pdf_style')) {
 		$navy = '#0d1e3b';
 		$gold = '#e5ac4c';
 		$type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
-		$is_pp = ($type === 'per person');
+		$costing_type_raw = isset($cost['costing_type']) ? $cost['costing_type'] : '';
+		$is_pp = ($type === 'per person' || ($costing_type_raw !== '' && (string) $costing_type_raw !== '1'));
 
-		$html = qes_section_bar('Costing Details', 'All values in INR · ' . ($is_pp ? 'Per Person' : 'Per Package'));
-		$html .= '<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid rgba(229,172,76,0.35);border-top:0;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:4px;">';
+		$html = qes_section_bar('Costing Details', ($is_pp ? 'Per Person' : 'Per Package'));
 
-		if (!$is_pp) {
-			$rows = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
-			if (empty($rows)) {
-				$rows = array(array('package_type' => 'Package', 'tour_cost_display' => '0', 'tax_display' => '0', 'tcs_display' => '0', 'travel_display' => '0', 'total_display' => '0'));
+		if ($is_pp) {
+			$pp_entries = isset($cost['computed']['pp_entries']) && is_array($cost['computed']['pp_entries'])
+				? $cost['computed']['pp_entries']
+				: array();
+
+			// Same Per Person breakdown table as Option-1 PDF
+			if (!empty($pp_entries) && function_exists('gqd_render_pp_entries_table')) {
+				$html .= '<div style="border:1px solid rgba(229,172,76,0.35);border-top:0;border-radius:0 0 8px 8px;background:#fff;padding:12px 14px;margin-bottom:4px;">';
+				ob_start();
+				gqd_render_pp_entries_table($pp_entries, array(
+					'escape' => 'qes_esc',
+					'table_class' => '',
+					'table_style' => 'width:100%;border-collapse:collapse;font-size:12px;font-family:Inter,Arial,sans-serif;',
+					'symbol' => '&#8377;',
+				));
+				$html .= ob_get_clean();
+				$html .= '</div>';
+				$html .= '<p style="font-size:11px;color:#888;font-style:italic;margin:6px 0 0;">* Prices indicative and subject to availability at confirmation.</p>';
+				return $html;
 			}
-			$html .= '<tr style="background:' . $navy . ';color:#fff;">'
-				. '<td style="padding:10px 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Package</td>'
-				. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Tour Cost</td>'
-				. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Tax</td>'
-				. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">TCS</td>'
-				. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Travel</td>'
-				. '<td align="right" style="padding:10px 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:' . $gold . ';">Grand Total</td></tr>';
-			$i = 0;
-			foreach ($rows as $row) {
-				$bg = ($i % 2 === 1) ? '#faf6ee' : '#ffffff';
-				$tax = '0.00';
-				if (!empty($row['tax_display']) && preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m)) {
-					$tax = $m[1];
+
+			// Fallback: legacy flat PP totals when package_quotation_pp_costing rows are missing
+			$pp_rows = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
+			$html .= '<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid rgba(229,172,76,0.35);border-top:0;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:4px;">';
+			if (!empty($pp_rows)) {
+				$html .= '<tr style="background:' . $navy . ';color:#fff;">'
+					. '<td style="padding:10px 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Package</td>'
+					. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Adult</td>'
+					. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">CWB</td>'
+					. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">CWOB</td>'
+					. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Infant</td>'
+					. '<td align="right" style="padding:10px 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:' . $gold . ';">Total</td></tr>';
+				$i = 0;
+				foreach ($pp_rows as $row) {
+					$bg = ($i % 2 === 1) ? '#faf6ee' : '#ffffff';
+					$html .= '<tr style="background:' . $bg . ';border-top:1px solid rgba(229,172,76,0.2);">'
+						. '<td style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;color:' . $navy . ';font-size:14px;">' . qes_esc(qes_nv(isset($row['package_type']) ? $row['package_type'] : 'Package', 'Package')) . '</td>'
+						. '<td align="right" style="padding:12px 8px;font-size:13px;">' . qes_esc(qes_nv(isset($row['adult_display']) ? $row['adult_display'] : '0', '0')) . '</td>'
+						. '<td align="right" style="padding:12px 8px;font-size:13px;">' . qes_esc(qes_nv(isset($row['cwb_display']) ? $row['cwb_display'] : (isset($row['child_with_display']) ? $row['child_with_display'] : '0'), '0')) . '</td>'
+						. '<td align="right" style="padding:12px 8px;font-size:13px;">' . qes_esc(qes_nv(isset($row['cwnb_display']) ? $row['cwnb_display'] : (isset($row['child_without_display']) ? $row['child_without_display'] : '0'), '0')) . '</td>'
+						. '<td align="right" style="padding:12px 8px;font-size:13px;">' . qes_esc(qes_nv(isset($row['infant_display']) ? $row['infant_display'] : '0', '0')) . '</td>'
+						. '<td align="right" style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;font-size:15px;color:' . $navy . ';font-weight:700;">' . qes_esc(qes_nv(isset($row['total_display']) ? $row['total_display'] : '0', '0')) . '</td></tr>';
+					$i++;
 				}
-				$html .= '<tr style="background:' . $bg . ';border-top:1px solid rgba(229,172,76,0.2);">'
-					. '<td style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;color:' . $navy . ';font-size:14px;">' . qes_esc(qes_nv($row['package_type'], 'Package')) . '</td>'
-					. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['tour_cost_display'], '0')) . '</td>'
-					. '<td align="right" style="padding:12px 8px;font-size:13px;">INR ' . qes_esc($tax) . '</td>'
-					. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['tcs_display'], '0')) . '</td>'
-					. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['travel_display'], '0')) . '</td>'
-					. '<td align="right" style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;font-size:16px;color:' . $navy . ';font-weight:700;">&#8377; ' . qes_esc(qes_nv($row['total_display'], '0')) . '</td></tr>';
-				$i++;
+			} else {
+				$gt = isset($cost['computed']['grand_total_display']) ? $cost['computed']['grand_total_display'] : '0';
+				$html .= '<tr><td style="padding:16px;font-family:\'Playfair Display\',Georgia,serif;font-size:18px;color:' . $navy . ';">Grand Total: <span style="color:' . $gold . ';">' . qes_esc($gt) . '</span></td></tr>';
 			}
-		} else {
-			$gt = isset($cost['computed']['grand_total_display']) ? $cost['computed']['grand_total_display'] : '0';
-			$html .= '<tr><td style="padding:16px;font-family:\'Playfair Display\',Georgia,serif;font-size:18px;color:' . $navy . ';">Grand Total: <span style="color:' . $gold . ';">' . qes_esc($gt) . '</span></td></tr>';
+			$html .= '</table>';
+			$html .= '<p style="font-size:11px;color:#888;font-style:italic;margin:6px 0 0;">* Prices indicative and subject to availability at confirmation.</p>';
+			return $html;
+		}
+
+		$html .= '<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid rgba(229,172,76,0.35);border-top:0;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:4px;">';
+		$rows = isset($cost['computed']['group']) ? $cost['computed']['group'] : array();
+		if (empty($rows)) {
+			$rows = array(array('package_type' => 'Package', 'tour_cost_display' => '0', 'tax_display' => '0', 'tcs_display' => '0', 'travel_display' => '0', 'total_display' => '0'));
+		}
+		$html .= '<tr style="background:' . $navy . ';color:#fff;">'
+			. '<td style="padding:10px 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Package</td>'
+			. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Tour Cost</td>'
+			. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Tax</td>'
+			. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">TCS</td>'
+			. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Travel</td>'
+			. '<td align="right" style="padding:10px 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:' . $gold . ';">Grand Total</td></tr>';
+		$i = 0;
+		foreach ($rows as $row) {
+			$bg = ($i % 2 === 1) ? '#faf6ee' : '#ffffff';
+			$tax = '0.00';
+			if (!empty($row['tax_display']) && preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m)) {
+				$tax = $m[1];
+			}
+			$html .= '<tr style="background:' . $bg . ';border-top:1px solid rgba(229,172,76,0.2);">'
+				. '<td style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;color:' . $navy . ';font-size:14px;">' . qes_esc(qes_nv($row['package_type'], 'Package')) . '</td>'
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['tour_cost_display'], '0')) . '</td>'
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">INR ' . qes_esc($tax) . '</td>'
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['tcs_display'], '0')) . '</td>'
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['travel_display'], '0')) . '</td>'
+				. '<td align="right" style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;font-size:16px;color:' . $navy . ';font-weight:700;">&#8377; ' . qes_esc(qes_nv($row['total_display'], '0')) . '</td></tr>';
+			$i++;
 		}
 		$html .= '</table>';
 		$html .= '<p style="font-size:11px;color:#888;font-style:italic;margin:6px 0 0;">* Prices indicative and subject to availability at confirmation.</p>';

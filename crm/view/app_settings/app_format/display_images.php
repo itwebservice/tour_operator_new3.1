@@ -1,7 +1,11 @@
 <?php
 include "../../../model/model.php";
-$format = $_POST['format'];
+$format = isset($_POST['format']) ? $_POST['format'] : '';
 $destination = isset($_POST['destination']) ? $_POST['destination'] : '';
+// Default to Option-1 when no format selected
+if ($format === '' || $format === null || (int) $format <= 0) {
+  $format = 1;
+}
 $basic_format = "Portrait-Creative";
 if ($format == 2) {
   $basic_format = "Landscape-Standard";

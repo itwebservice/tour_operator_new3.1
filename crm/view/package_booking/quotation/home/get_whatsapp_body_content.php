@@ -159,11 +159,22 @@ $email_content .= "               \n";
 
 // Price Structure - only show if selected
 if (in_array('price_structure', $options)) {
-    $email_content .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-    $email_content .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-    $email_content .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-    $email_content .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-    $email_content .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+    $pp_price = '';
+    if (isset($sq_quotation['costing_type']) && (int) $sq_quotation['costing_type'] === 2) {
+        include_once __DIR__ . '/../../../../model/app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+        if (function_exists('gqd_render_pp_costing_whatsapp_text')) {
+            $pp_price = gqd_render_pp_costing_whatsapp_text($quotation_id, array('first_only' => true));
+        }
+    }
+    if ($pp_price !== '') {
+        $email_content .= $pp_price;
+    } else {
+        $email_content .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
+        $email_content .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
+        $email_content .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
+        $email_content .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
+        $email_content .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+    }
 }
 
 

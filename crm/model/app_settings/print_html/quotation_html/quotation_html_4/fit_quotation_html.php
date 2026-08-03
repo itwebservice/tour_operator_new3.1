@@ -904,6 +904,7 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
       <?php
       $o4_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
       $o4_is_per_person = ($o4_costing_type == 'per person');
+      $o4_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
       $o4_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
       ?>
 
@@ -957,7 +958,9 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
 
       <?php } else { ?>
 
-        <?php if (!empty($o4_pp)) { ?>
+        <?php if (!empty($o4_pp_entries)) { ?>
+          <?php gqd_render_pp_entries_table($o4_pp_entries, array('escape' => 'o4e')); ?>
+        <?php } elseif (!empty($o4_pp)) { ?>
 
           <div class="pricing-grid">
             <?php foreach ($o4_pp as $ci => $pp) :

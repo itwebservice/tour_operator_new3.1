@@ -608,10 +608,10 @@ $count = 0;
 <div class="row mg_tp_30">
 <div class="col-md-12">
 <h3 class="editor_title">Costing Details</h3>
+<?php if ($sq_quotation['costing_type'] == 1) { ?>
 	<div class="table-responsive">
 	<table class="table table-hover table-bordered no-marg">
 		<thead>
-		<?php if($sq_quotation['costing_type'] == 1){ ?>
 			<tr class="table-heading-row">
 				<?php if($role != 'B2b'){		 ?>
 				<th>Package_type</th>
@@ -644,10 +644,7 @@ $count = 0;
 			while($sq_cost = mysqli_fetch_assoc($sq_cost1)){
 				$tour_cost = $sq_cost['tour_cost'] + $sq_cost['transport_cost'] + $sq_cost['excursion_cost'];
 				$basic_costing = $sq_cost['tour_cost'] + $sq_cost['transport_cost'] +  $sq_cost['excursion_cost'];
-				?>
-				<?php
 				$bsmValues=json_decode($sq_cost['bsmValues'],true);
-			
 				?>
 				<tr>
 					<td><?= $sq_cost['package_type'] ?></td>
@@ -676,56 +673,19 @@ $count = 0;
 				</tr>
 				<?php } ?>
 		</tbody>
-		<?php }else{?>
-			<tr class="table-heading-row">
-				<th>Package_Type</th>
-				<th>Adult</th>
-				<th>CWB</th>
-				<th>CWOB</th>
-				<th>Infant</th>
-				<th>Service_Charge</th>
-				<th>Tax</th>
-				<th>Tcs</th>
-				<th>Flight(A/C/I)</th>
-				<th>Train(A/C/I)</th>
-				<th>Cruise(A/C/I)</th>
-				<th>Visa</th>
-				<th>Guide</th>
-				<th>Misc</th>
-			</tr>
-		</thead>
-		<tbody>
-			<?php
-			$sq_cost1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id = '$sq_quotation[quotation_id]'");
-			while($sq_cost = mysqli_fetch_assoc($sq_cost1)){
-				?>
-
-<?php
-				$bsmValues=json_decode($sq_cost['bsmValues'],true);
-			
-				?>
-			<tr>
-				<td><?= $sq_cost['package_type'] ?></td>
-				<td><?= number_format($sq_cost['adult_cost'],2) ?></td>
-				<td><?= number_format($sq_cost['child_with'],2)  ?></td>
-				<td><?= number_format($sq_cost['child_without'],2)  ?></td>
-				<td><?= number_format($sq_cost['infant_cost'],2)  ?></td>
-				<td><?= number_format($sq_cost['service_charge'],2) ?></td>
-		
-				<td><?= ($sq_cost['service_tax_subtotal']!='')?$sq_cost['service_tax_subtotal']:'0.00' ?></td>
-				<td>Tcs:(<?=$bsmValues[0]['tcsper']?>%):<?=$bsmValues[0]['tcsvalue']?></td>
-				<td><?=  (( $sq_quotation['total_adult'] != 0)? number_format($sq_quotation['flight_acost'],2):number_format(0,2)).'/'. (( $sq_quotation['children_with_bed'] != 0)|| ($sq_quotation['children_without_bed'] != 0)?number_format($sq_quotation['flight_ccost'],2):number_format(0,2)).'/'. (( $sq_quotation['total_infant'] != 0) ?number_format($sq_quotation['flight_icost'],2):number_format(0,2))  ?></td>
-				<td><?= (( $sq_quotation['total_adult'] != 0) ? number_format($sq_quotation['train_acost'],2):number_format(0,2)).'/'.(( $sq_quotation['children_with_bed'] != 0)|| ($sq_quotation['children_without_bed'] != 0)?number_format($sq_quotation['train_ccost'],2):number_format(0,2)).'/'.(( $sq_quotation['total_infant'] != 0) ?number_format($sq_quotation['train_icost'],2):number_format(0,2))  ?></td>
-				<td><?= (( $sq_quotation['total_adult'] != 0)? number_format($sq_quotation['cruise_acost'],2):number_format(0,2)).'/'.(( $sq_quotation['children_with_bed'] != 0)|| ($sq_quotation['children_without_bed'] != 0)?number_format($sq_quotation['cruise_ccost'],2):number_format(0,2)).'/'.(( $sq_quotation['total_infant'] != 0) ?number_format($sq_quotation['cruise_icost'],2):number_format(0,2))  ?></td>
-				<td><?= number_format($sq_quotation['visa_cost'],2)  ?></td>
-				<td><?= number_format($sq_quotation['guide_cost'],2)  ?></td>
-				<td><?= number_format($sq_quotation['misc_cost'],2)  ?></td>
-			</tr>
-			<?php } ?>
-		</tbody>
-		<?php } ?>
 	</table>
 	</div>
+<?php } else {
+	// Per Person — same breakdown as Document (Land/Flight/…/Tax × Adult/CWB/CWNB/Infant)
+	include_once '../../../../model/app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+	echo '<div class="table-responsive" style="padding:8px;">';
+	if (function_exists('gqd_render_pp_costing_for_doc')) {
+		gqd_render_pp_costing_for_doc($sq_quotation['quotation_id']);
+	} else {
+		echo '<p>No per person costing entries found for this quotation.</p>';
+	}
+	echo '</div>';
+} ?>
 </div>
 </div>
 

@@ -974,6 +974,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
             <?php
             $o5_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
             $o5_is_per_person = ($o5_costing_type == 'per person');
+            $o5_pp_entries = isset($cost['computed']['pp_entries']) ? $cost['computed']['pp_entries'] : array();
             $o5_pp = isset($cost['computed']['per_person']) ? $cost['computed']['per_person'] : array();
             ?>
 
@@ -1019,7 +1020,9 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
 
             <?php } else { ?>
 
-              <?php if (!empty($o5_pp)) { ?>
+              <?php if (!empty($o5_pp_entries)) { ?>
+                <?php gqd_render_pp_entries_table($o5_pp_entries, array('escape' => 'o5e', 'table_class' => 'costing-table')); ?>
+              <?php } elseif (!empty($o5_pp)) { ?>
                 <table class="costing-table">
                   <thead>
                     <tr>

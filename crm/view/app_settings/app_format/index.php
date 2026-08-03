@@ -15,8 +15,12 @@ $quot_format_labels = array(
   9  => 'Portrait Standard',
   10 => 'Portrait Advanced',
 );
-$qf_val = (int) $sq_settings['quot_format'];
-$quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val] : 'Option-1';
+$qf_val = (int) (isset($sq_settings['quot_format']) ? $sq_settings['quot_format'] : 0);
+// If nothing / invalid option is stored, default to Option-1
+if ($qf_val <= 0 || !isset($quot_format_labels[$qf_val])) {
+  $qf_val = 1;
+}
+$quot_format = $quot_format_labels[$qf_val];
 ?>
 
 <form id="app_format_info" class="mg_tp_30">
@@ -83,7 +87,7 @@ $quot_format = isset($quot_format_labels[$qf_val]) ? $quot_format_labels[$qf_val
         </div>
         <div class="col-md-6 no-pad">
           <div class="col-md-6 text-left">
-            <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Bydefault Portrait Standard Format is used."><i class="fa fa-question-circle"></i></button>
+            <button type="button" data-toggle="tooltip" class="btn btn-excel" title="By default Option-1 format is used."><i class="fa fa-question-circle"></i></button>
             <a class="btn btn-info btn-sm ico_left" data-toggle="tooltip" data-placement="bottom" title="View" href="javascript:void(0)" onclick="display_modal('format_list')"><i class="fa fa-eye"></i><span class="">&nbsp;&nbsp;View</span></a>
             <button type="button" class="btn btn-info btn-sm ico_left" data-toggle="tooltip" data-placement="bottom" title="Upload" onclick="upload_modal()"><i class="fa fa-upload"></i><span class="">&nbsp;&nbsp;Upload</span></button>
           </div>

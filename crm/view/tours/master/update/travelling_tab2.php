@@ -361,9 +361,9 @@ $('#frm_tab2').validate({
         $('.collapse').removeClass("in");
         $('#collapse1').addClass("in");
         $('#tab2_head').addClass('done');
-        $('#tab4_head').addClass('active');
+        $('#tab3_head').addClass('active');
         $('.bk_tab').removeClass('active');
-        $('#tab4').addClass('active');
+        $('#tab3').addClass('active');
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
