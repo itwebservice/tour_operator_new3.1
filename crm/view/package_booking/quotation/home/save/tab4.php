@@ -956,6 +956,13 @@ if (input) {
                 
                 //Tab-4 Per person costing
                 $('#hotel_pp_costing').val(JSON.stringify(pp_arr));
+                if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
+                    && typeof quotationApplyHotelTariffToPpFields === 'function') {
+                    quotationApplyHotelTariffToPpFields(quotationBuildHotelPerPersonArrFromPpCosting(), { force: true });
+                }
+                if (typeof calculateCostingCards === 'function') {
+                    calculateCostingCards(true);
+                }
               
             }
         });
@@ -2415,8 +2422,24 @@ function calculateCostingCards(forceHotelFromTariff, options) {
         setVal('infant_transfer_pp', '0.00', forceFill);
     }
 
+    // Optional: only touch one package row / pax card (used when editing a single land field)
+    var scopePaxType = options.scopePaxType || '';
+    var scopeSuffix = (typeof options.scopeSuffix === 'string') ? options.scopeSuffix : null;
+    var paxTypes = ['adult', 'cweb', 'cwnb', 'infant'];
+    var paxCounts = { adult: adult_count, cweb: cweb_count, cwnb: cwnb_count, infant: infant_count };
+
+    function shouldProcessPax(type) {
+        return !scopePaxType || scopePaxType === type;
+    }
+    function shouldProcessSuffix(suffix) {
+        return scopeSuffix === null || String(suffix || '') === String(scopeSuffix || '');
+    }
+
     // ===== COMMON FUNCTION =====
     function calculateCard($row, type, count, suffix) {
+        if (!shouldProcessPax(type) || !shouldProcessSuffix(suffix)) {
+            return;
+        }
         var sid = function (base) {
             return '#' + (typeof quotationPpFieldId === 'function' ? quotationPpFieldId(base, suffix) : (base + (suffix || '')));
         };
@@ -2438,7 +2461,8 @@ function calculateCostingCards(forceHotelFromTariff, options) {
         $find(type + '_land_cost_pp').val(land_cost.toFixed(2));
 
         let service_charge;
-        // Only auto-apply business-rule service charge when seeding/forcing or land inputs change
+        // Only auto-apply business-rule service charge when seeding/forcing or hotel/transfer change
+        // (scoped so editing one card does not wipe SC on other cards; activity never rewrites SC)
         if (recalcServiceCharge) {
             service_charge = (typeof get_pp_service_charge_from_business_rules === 'function')
                 ? get_pp_service_charge_from_business_rules(land_cost, 'save')
@@ -2469,10 +2493,6 @@ function calculateCostingCards(forceHotelFromTariff, options) {
         let extra_cost = flight + train + cruise + visa + guide + misc;
         let base_amount = land_cost + final_service_charge + extra_cost;
 
-        let tax_text = $find(type + '_select_tax_pp').find('option:selected').text();
-        let tax_match = tax_text.match(/\d+(\.\d+)?/);
-        let tax_percent = tax_match ? parseFloat(tax_match[0]) : 0;
-
         let tax_apply_on = $find(type + '_tax_apply_on_pp').val();
 
         let tax_base = 0;
@@ -2480,8 +2500,12 @@ function calculateCostingCards(forceHotelFromTariff, options) {
         else if (tax_apply_on == "3") tax_base = final_service_charge;
         else if (tax_apply_on == "4") tax_base = base_amount;
 
-        let tax_amount = (tax_base * tax_percent) / 100;
-        $find(type + '_tax_amount_pp').val(tax_amount.toFixed(2));
+        // Sum all rates in the tax option (CGST 6% + SGST 6% = both), same as group costing
+        var $taxSelect = $find(type + '_select_tax_pp');
+        let tax_amount = (typeof quotationCalcMultiTaxAmount === 'function')
+            ? quotationCalcMultiTaxAmount(tax_base, $taxSelect)
+            : 0;
+        $find(type + '_tax_amount_pp').val(Number(tax_amount).toFixed(2));
 
         let tcs_val = $find(type + '_select_tcs_pp').val();
         let tcs_percent = (tcs_val == "2") ? 5 : (tcs_val == "3") ? 20 : 0;
@@ -2516,7 +2540,7 @@ function calculateCostingCards(forceHotelFromTariff, options) {
         $ppRows = $();
         // legacy single block
         var hotelVals = packageHotelArr[0] || {};
-        if (autoFill) {
+        if (autoFill && !scopePaxType) {
             setHotelTransfer($(document), '', {
                 adult: hotelVals.adult_cost || 0,
                 cweb: hotelVals.cwb_cost || 0,
@@ -2524,21 +2548,23 @@ function calculateCostingCards(forceHotelFromTariff, options) {
                 infant: hotelVals.infant_cost || 0
             });
         }
-        calculateCard(null, 'adult', adult_count, '');
-        calculateCard(null, 'cweb', cweb_count, '');
-        calculateCard(null, 'cwnb', cwnb_count, '');
-        calculateCard(null, 'infant', infant_count, '');
+        for (var pi = 0; pi < paxTypes.length; pi++) {
+            calculateCard(null, paxTypes[pi], paxCounts[paxTypes[pi]], '');
+        }
         return;
     }
 
     $ppRows.each(function (idx) {
         var $row = $(this);
         var suffix = $row.attr('data-pp-suffix') || '';
+        if (!shouldProcessSuffix(suffix)) {
+            return;
+        }
         var hotelVals = packageHotelArr[idx] || packageHotelArr[0] || {};
-        if (autoFill && hotelVals.type) {
+        if (autoFill && !scopePaxType && hotelVals.type) {
             $row.find('#' + (typeof quotationPpFieldId === 'function' ? quotationPpFieldId('ppackage_type1', suffix) : ('ppackage_type1' + suffix))).val(hotelVals.type);
         }
-        if (autoFill) {
+        if (autoFill && !scopePaxType) {
             setHotelTransfer($row, suffix, {
                 adult: hotelVals.adult_cost || 0,
                 cweb: hotelVals.cwb_cost || 0,
@@ -2546,19 +2572,26 @@ function calculateCostingCards(forceHotelFromTariff, options) {
                 infant: hotelVals.infant_cost || 0
             });
         }
-        calculateCard($row, 'adult', adult_count, suffix);
-        calculateCard($row, 'cweb', cweb_count, suffix);
-        calculateCard($row, 'cwnb', cwnb_count, suffix);
-        calculateCard($row, 'infant', infant_count, suffix);
+        for (var pj = 0; pj < paxTypes.length; pj++) {
+            calculateCard($row, paxTypes[pj], paxCounts[paxTypes[pj]], suffix);
+        }
     });
 }
+
 $(document).on('input change', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
     var id = (this.id || '');
-    var isLandComponent = /_hotel_pp|_transfer_pp|_activity_pp/.test(id) && !/_land_cost_pp/.test(id);
-    // While typing: don't refill hotel/transfer from tariff; only recalc SC when land parts change
+    // Hotel/transfer can refresh SC from business rules — but only on the edited card.
+    // Activity must NOT rewrite SC (clearing activity was wiping SC on every pax/package card).
+    var recalcSc = /_hotel_pp|_transfer_pp/.test(id) && !/_land_cost_pp/.test(id) && !/_activity_pp/.test(id);
+    var parsed = typeof quotationParsePpCostingFieldId === 'function' ? quotationParsePpCostingFieldId(id) : null;
+    var $row = $(this).closest('.quotation-pp-costing-row');
+    var scopeSuffix = $row.length ? ($row.attr('data-pp-suffix') || '') : (parsed ? parsed.suffix : null);
+    // While typing: don't refill hotel/transfer from tariff; only touch the edited card
     calculateCostingCards(false, {
         autoFill: false,
-        recalcServiceCharge: isLandComponent
+        recalcServiceCharge: recalcSc,
+        scopePaxType: parsed ? parsed.paxType : '',
+        scopeSuffix: scopeSuffix
     });
 });
 
@@ -2573,9 +2606,7 @@ $(document).ready(function () {
     if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
         && typeof quotationPopulatePpCostingFromHotels === 'function') {
         var initPp = quotationBuildHotelPerPersonArrFromPpCosting();
-        if (initPp.length) {
-            quotationPopulatePpCostingFromHotels(initPp, {});
-        }
+        quotationPopulatePpCostingFromHotels(initPp, {});
     }
     calculateCostingCards();
 
@@ -2612,39 +2643,67 @@ function costing_reflect()
 	if(id=="perperson_costing"){
 		$('#group_costing_tab').hide();
 		$('#per_person_costing_tab').show();
-		if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
-			&& typeof quotationPopulatePpCostingFromHotels === 'function') {
-			var ppHotels = quotationBuildHotelPerPersonArrFromPpCosting();
-			if (ppHotels.length) {
-				var travelData = $("#travel_pp_costing").val();
-				var transport_pp = 0;
-				try {
-					if (travelData) {
-						var td = JSON.parse(travelData);
-						var adult_count  = +$('#total_adult').val() || 0;
-						var cwnb_count   = +$('#children_without_bed').val() || 0;
-						var cweb_count   = +$('#children_with_bed').val() || 0;
-						var transfer_passengers = adult_count + cwnb_count + cweb_count;
-						if (transfer_passengers === 0) transfer_passengers = 1;
-						var travel_total = 0;
-						if (Array.isArray(td)) {
-							for (var ti = 0; ti < td.length; ti++) {
-								if (td[ti] && td[ti].checked !== false) {
-									travel_total += parseFloat(td[ti]['total_cost']) || 0;
-								}
+		if (typeof quotationSyncCostingUiToHotelSelection === 'function') {
+			quotationSyncCostingUiToHotelSelection();
+		}
+
+		var $existingPp = $('#quotation_pp_costing_container .quotation-pp-costing-row');
+		var ppHotels = (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function')
+			? quotationBuildHotelPerPersonArrFromPpCosting()
+			: [];
+
+		// Prefer light refresh when PP cards already exist — full populate was wiping Activity
+		if ($existingPp.length && ppHotels.length) {
+			if (typeof quotationApplyHotelTariffToPpFields === 'function') {
+				quotationApplyHotelTariffToPpFields(ppHotels, { force: true });
+			}
+			if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+				quotationRefreshPpCostingFromTravelStaySelections({
+					force: true,
+					recalcServiceCharge: true
+				});
+			} else {
+				if (typeof quotationRefreshPpActivityFromExcursion === 'function') {
+					quotationRefreshPpActivityFromExcursion({ force: true, preserveIfEmpty: true });
+				}
+				if (typeof calculateCostingCards === 'function') {
+					calculateCostingCards(true);
+				}
+			}
+		} else if (typeof quotationPopulatePpCostingFromHotels === 'function' && ppHotels.length) {
+			var travelData = $("#travel_pp_costing").val();
+			var transport_pp = 0;
+			try {
+				if (travelData) {
+					var td = JSON.parse(travelData);
+					var adult_count  = +$('#total_adult').val() || 0;
+					var cwnb_count   = +$('#children_without_bed').val() || 0;
+					var cweb_count   = +$('#children_with_bed').val() || 0;
+					var transfer_passengers = adult_count + cwnb_count + cweb_count;
+					if (transfer_passengers === 0) transfer_passengers = 1;
+					var travel_total = 0;
+					if (Array.isArray(td)) {
+						for (var ti = 0; ti < td.length; ti++) {
+							if (td[ti] && td[ti].checked !== false) {
+								travel_total += parseFloat(td[ti]['total_cost']) || 0;
 							}
 						}
-						transport_pp = travel_total / transfer_passengers;
 					}
-				} catch (e) {}
-				quotationPopulatePpCostingFromHotels(ppHotels, { transport_pp: transport_pp });
-			} else if (typeof quotationInitPpCostingSelect2 === 'function') {
-				quotationInitPpCostingSelect2();
-			}
+					transport_pp = travel_total / transfer_passengers;
+				}
+			} catch (e) {}
+			quotationPopulatePpCostingFromHotels(ppHotels, {
+				transport_pp: transport_pp,
+				preserveActivity: true
+			});
 		} else if (typeof quotationInitPpCostingSelect2 === 'function') {
 			quotationInitPpCostingSelect2();
+			if (typeof calculateCostingCards === 'function') {
+				calculateCostingCards(true);
+			}
+		} else if (typeof calculateCostingCards === 'function') {
+			calculateCostingCards(true);
 		}
-		calculateCostingCards(true);
 	}
 
 }

@@ -295,6 +295,10 @@ $('#frm_tab1').validate({
             $('#exc_date-1').val(from_date + ' 00:00');
         }
 
+        if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
+            quotationSyncExcursionDefaultsFromTravel({ forcePax: true });
+        }
+
         var adult = $('#total_adult').val();
         var infant = $('#total_infant').val();
         var chwob = $('#children_without_bed').val();

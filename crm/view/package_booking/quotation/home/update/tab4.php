@@ -1191,6 +1191,10 @@ $('#frm_tab4').validate({
         }
 
         //Costing Information
+        // Ensure deselected hotel package types are not saved in group/PP costing
+        if (typeof quotationSyncCostingUiToHotelSelection === 'function') {
+            quotationSyncCostingUiToHotelSelection();
+        }
         var tour_cost_arr = [];
         var transport_cost_arr = [];
         var excursion_cost_arr = [];
@@ -1943,12 +1947,23 @@ function calculateCostingCardsUpdate(options) {
     // when land components change or on initial/forced refresh.
     var recalcServiceCharge = (options.recalcServiceCharge === true);
     var $active = $(document.activeElement);
+    var scopePaxType = options.scopePaxType || '';
+    var scopeSuffix = (typeof options.scopeSuffix === 'string') ? options.scopeSuffix : null;
 
     // ===== TOTAL PAX (update form uses *12 ids from Tab1) =====
     let total_adult = +$('#total_adult12').val() || +$('#total_adult').val() || 0;
     let cwb = +$('#children_with_bed12').val() || +$('#children_with_bed').val() || 0;
     let cnb = +$('#children_without_bed12').val() || +$('#children_without_bed').val() || 0;
     let infant = +$('#total_infant12').val() || +$('#total_infant').val() || 0;
+    var paxTypes = ['adult', 'cweb', 'cwnb', 'infant'];
+    var paxCounts = { adult: total_adult, cweb: cwb, cwnb: cnb, infant: infant };
+
+    function shouldProcessPax(type) {
+        return !scopePaxType || scopePaxType === type;
+    }
+    function shouldProcessSuffix(suffix) {
+        return scopeSuffix === null || String(suffix || '') === String(scopeSuffix || '');
+    }
 
     function numFrom($el) {
         var v = $el.val();
@@ -1972,6 +1987,9 @@ function calculateCostingCardsUpdate(options) {
 
     function calculateBlock(prefix, pax_count, suffix) {
         suffix = suffix || '';
+        if (!shouldProcessPax(prefix) || !shouldProcessSuffix(suffix)) {
+            return;
+        }
         if (pax_count === 0) {
             // Keep loaded values visible; only clear when user changes inputs and pax is zero
             return;
@@ -1992,8 +2010,9 @@ function calculateCostingCardsUpdate(options) {
         writeIfNotFocused($(sid(prefix + '_land_cost_pp_update')), land_cost.toFixed(2));
 
         let service_charge;
-        // Only auto-fill SC from business rules when hotel/transfer/activity change,
+        // Only auto-fill SC from business rules when hotel/transfer change (not activity),
         // and never while the user is editing the service charge field itself.
+        // Scoped so one card edit does not wipe SC on other cards.
         if (recalcServiceCharge && !serviceFocused) {
             service_charge = (typeof get_pp_service_charge_from_business_rules === 'function')
                 ? get_pp_service_charge_from_business_rules(land_cost, 'update')
@@ -2031,11 +2050,6 @@ function calculateCostingCardsUpdate(options) {
 
         // ===== TAX =====
         let tax_apply_on = $(sid(prefix + '_tax_apply_on_pp_update')).val();
-        let tax_percent = 0;
-
-        let tax_text = $(sid(prefix + '_select_tax_pp_update') + ' option:selected').text();
-        let match = tax_text.match(/(\d+(\.\d+)?)%/);
-        if (match) tax_percent = parseFloat(match[1]);
 
         let tax_base = 0;
 
@@ -2047,8 +2061,12 @@ function calculateCostingCardsUpdate(options) {
             tax_base = land_cost + service_after_discount + other_cost;
         }
 
-        let tax_amount = (tax_base * tax_percent) / 100;
-        writeIfNotFocused($(sid(prefix + '_tax_amt_pp_update')), tax_amount.toFixed(2));
+        // Sum all rates in the tax option (CGST 6% + SGST 6% = both), same as group costing
+        var $taxSelect = $(sid(prefix + '_select_tax_pp_update'));
+        let tax_amount = (typeof quotationCalcMultiTaxAmount === 'function')
+            ? quotationCalcMultiTaxAmount(tax_base, $taxSelect)
+            : 0;
+        writeIfNotFocused($(sid(prefix + '_tax_amt_pp_update')), Number(tax_amount).toFixed(2));
 
         // ===== TCS =====
         let tcs_percent = 0;
@@ -2076,26 +2094,35 @@ function calculateCostingCardsUpdate(options) {
     if ($ppRows.length) {
         $ppRows.each(function () {
             var suffix = $(this).attr('data-pp-suffix') || '';
-            calculateBlock('adult', total_adult, suffix);
-            calculateBlock('cweb', cwb, suffix);
-            calculateBlock('cwnb', cnb, suffix);
-            calculateBlock('infant', infant, suffix);
+            if (!shouldProcessSuffix(suffix)) {
+                return;
+            }
+            for (var i = 0; i < paxTypes.length; i++) {
+                calculateBlock(paxTypes[i], paxCounts[paxTypes[i]], suffix);
+            }
         });
     } else {
-        calculateBlock('adult', total_adult, '');
-        calculateBlock('cweb', cwb, '');
-        calculateBlock('cwnb', cnb, '');
-        calculateBlock('infant', infant, '');
+        for (var j = 0; j < paxTypes.length; j++) {
+            calculateBlock(paxTypes[j], paxCounts[paxTypes[j]], '');
+        }
     }
 }
 
 $(document).on('input change keyup', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
     var id = (this.id || '');
     // Service charge must NOT be overwritten when typing in the SC field.
-    // Only rebuild SC from business rules when hotel / transfer / activity change.
-    var isLandComponent = /_(hotel|transfer|activity)_pp_update/.test(id);
+    // Hotel/transfer may refresh SC from business rules — only on the edited card.
+    // Activity must NOT rewrite SC (clearing activity was wiping SC on every pax/package card).
+    var recalcSc = /_(hotel|transfer)_pp_update/.test(id);
+    var parsed = (typeof quotationParsePpCostingFieldId === 'function')
+        ? quotationParsePpCostingFieldId(id)
+        : null;
+    var $row = $(this).closest('.quotation-pp-costing-row');
+    var scopeSuffix = $row.length ? ($row.attr('data-pp-suffix') || '') : (parsed ? parsed.suffix : null);
     calculateCostingCardsUpdate({
-        recalcServiceCharge: isLandComponent
+        recalcServiceCharge: recalcSc,
+        scopePaxType: parsed ? parsed.paxType : '',
+        scopeSuffix: scopeSuffix
     });
 });
 $(document).ready(function () {
@@ -2146,6 +2173,33 @@ function costing_reflect()
 	if(id=="perperson_costing"){
 		$('#group_costing_tab').hide();
 		$('#per_person_costing_tab').show();
+		if (typeof quotationSyncCostingUiToHotelSelection === 'function') {
+			quotationSyncCostingUiToHotelSelection();
+		}
+		// Recalc hotel tariff then force into PP hotel fields (async — apply happens in get_hotel_cost success)
+		if (typeof get_hotel_cost === 'function') {
+			get_hotel_cost();
+		} else if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
+			&& typeof quotationApplyHotelTariffToPpFields === 'function') {
+			var ppHotels = quotationBuildHotelPerPersonArrFromPpCosting();
+			if (ppHotels.length) {
+				quotationApplyHotelTariffToPpFields(ppHotels, { force: true });
+			}
+		}
+		// Refresh transfer/activity/flight from checked travel-stay rows.
+		// preserveIfEmpty keeps saved/tariff PP amounts when cost cells are still empty.
+		if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+			quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true, recalcServiceCharge: true });
+		} else if (typeof quotationRefreshPpActivityFromExcursion === 'function') {
+			quotationRefreshPpActivityFromExcursion({ force: true, preserveIfEmpty: true });
+			if (typeof calculateCostingCardsUpdate === 'function') {
+				calculateCostingCardsUpdate({ recalcServiceCharge: true });
+			}
+		} else if (typeof get_excursion_amount === 'function') {
+			get_excursion_amount();
+		} else if (typeof calculateCostingCardsUpdate === 'function') {
+			calculateCostingCardsUpdate({ recalcServiceCharge: true });
+		}
 	}
 
 }

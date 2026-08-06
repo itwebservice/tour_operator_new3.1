@@ -2091,23 +2091,49 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[2].childNodes[0].setAttribute("id", "exc_date-" + foo.counter + excursionIdSuffix);
     row.cells[2].childNodes[0].placeholder = "Excursion Date";
 
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1; //January is 0!
-
-    var yyyy = today.getFullYear();
-    if (dd < 10) {
-      dd = "0" + dd;
+    var travelFrom =
+      (typeof jQuery !== "undefined" &&
+        (jQuery("#from_date12").val() || jQuery("#from_date").val())) ||
+      "";
+    var datePart = travelFrom ? String(travelFrom).split(" ")[0] : "";
+    if (!datePart) {
+      var today = new Date();
+      var dd = today.getDate();
+      var mm = today.getMonth() + 1;
+      var yyyy = today.getFullYear();
+      if (dd < 10) dd = "0" + dd;
+      if (mm < 10) mm = "0" + mm;
+      datePart = dd + "-" + mm + "-" + yyyy;
     }
-    if (mm < 10) {
-      mm = "0" + mm;
-    }
-    var today = dd + "-" + mm + "-" + yyyy + " 00:00";
-    row.cells[2].childNodes[0].value = today;
+    row.cells[2].childNodes[0].value = datePart + " 00:00";
     dynamic_datetime(row.cells[2].childNodes[0].id);
     jQuery(row.cells[2].childNodes[0])
       .addClass("form-control")
       .datetimepicker({ format: "d-m-Y H:i" });
+
+    // Prefill pax from Tab1 / dashboard counts
+    var adultCount =
+      (typeof jQuery !== "undefined" &&
+        (jQuery("#total_adult12").val() || jQuery("#total_adult").val())) ||
+      "0";
+    var cwebCount =
+      (typeof jQuery !== "undefined" &&
+        (jQuery("#children_with_bed12").val() ||
+          jQuery("#children_with_bed").val())) ||
+      "0";
+    var cwnbCount =
+      (typeof jQuery !== "undefined" &&
+        (jQuery("#children_without_bed12").val() ||
+          jQuery("#children_without_bed").val())) ||
+      "0";
+    var infantCount =
+      (typeof jQuery !== "undefined" &&
+        (jQuery("#total_infant12").val() || jQuery("#total_infant").val())) ||
+      "0";
+    row.cells[6].childNodes[0].value = adultCount;
+    row.cells[7].childNodes[0].value = cwebCount;
+    row.cells[8].childNodes[0].value = cwnbCount;
+    row.cells[9].childNodes[0].value = infantCount;
 
     if (excursionIdSuffix === "_u") {
       var function_name = "get_excursion_amount_update(id);";

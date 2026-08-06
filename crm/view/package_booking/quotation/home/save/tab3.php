@@ -402,7 +402,7 @@
                                                                     placeholder="Activity Date & Time"
                                                                     title="Activity Date & Time"
                                                                     class="app_datetimepicker"
-                                                                    value="<?= date('d-m-Y H:i') ?>" style="width:150px"
+                                                                    value="" style="width:150px"
                                                                     onchange="get_excursion_amount();"></td>
                                                             <td><select id="city_name-1" class="form-control exc_city"
                                                                     name="city_name-1" title="City Name"
@@ -942,6 +942,13 @@
                 console.log("hotel_cost"+row.cells[13].childNodes[0].value);
                 //Tab-4 Per person costing
                 $('#hotel_pp_costing').val(JSON.stringify(pp_arr));
+                if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
+                    && typeof quotationApplyHotelTariffToPpFields === 'function') {
+                    quotationApplyHotelTariffToPpFields(quotationBuildHotelPerPersonArrFromPpCosting(), { force: true });
+                }
+                if (typeof calculateCostingCards === 'function') {
+                    calculateCostingCards(true);
+                }
 
                 calculateCostingCardsTab3();
             }
@@ -1834,8 +1841,16 @@
                         // transfer_total is in cell 17 (cell 16 is no_of_vehicles)
                         var exc_row_transfer = 0;
                         if (row.cells[17] && row.cells[17].childNodes[0]) {
-                            exc_row_transfer = parseFloat(row.cells[17].childNodes[0].value) || 0;
+                            var transferEl = row.cells[17].childNodes[0];
+                            var transferKey = String(transferEl.id || transferEl.name || '').toLowerCase();
+                            if (transferKey.indexOf('transfer') >= 0) {
+                                exc_row_transfer = parseFloat(transferEl.value) || 0;
+                            }
                         }
+                        if (!exc_row_transfer) {
+                            exc_row_transfer = parseFloat(row.getAttribute('data-transfer-cost')) || 0;
+                        }
+                        row.setAttribute('data-transfer-cost', exc_row_transfer);
                         exc_transfer_cost = parseFloat(exc_transfer_cost) + exc_row_transfer;
                             
                     }
@@ -1854,26 +1869,15 @@
                 total_infant = parseInt(total_infant, 10) || 0;
 
                 // Ticket cost per pax type (tariff total / pax count = per-person ticket)
-                var ticket_adult = (adult_count > 0) ? (parseFloat(exc_adult_cost) / adult_count) : 0;
-                var ticket_cweb = (child_with_bed > 0) ? (parseFloat(exc_child_cot) / child_with_bed) : 0;
-                var ticket_cwnb = (child_without_bed > 0) ? (parseFloat(exc_childwo_cot) / child_without_bed) : 0;
-                var ticket_infant = (total_infant > 0) ? (parseFloat(exc_infant_cost) / total_infant) : 0;
-
-                // Activity transfer share: activity vehicle transfer / (adult + cweb + cwnb)
-                var activity_passengers = adult_count + child_with_bed + child_without_bed;
-                if (activity_passengers < 1) {
-                    activity_passengers = 1;
-                }
-                var activity_transfer_pp = parseFloat(exc_transfer_cost) / activity_passengers;
-                if (isNaN(activity_transfer_pp)) {
-                    activity_transfer_pp = 0;
-                }
-
-                // Activity PP = (transfer / passengers) + ticket cost for that pax type
-                var pp_activity_adult = ticket_adult + ((adult_count > 0) ? activity_transfer_pp : 0);
-                var pp_activity_cweb = ticket_cweb + ((child_with_bed > 0) ? activity_transfer_pp : 0);
-                var pp_activity_cwnb = ticket_cwnb + ((child_without_bed > 0) ? activity_transfer_pp : 0);
-                var pp_activity_infant = ticket_infant + ((total_infant > 0) ? activity_transfer_pp : 0);
+                // Activity transfer share: vehicle transfer / (adult + cweb + cwnb) — infants excluded
+                var activityPpAmounts = (typeof quotationCalcActivityPpFromExcursionTable === 'function')
+                    ? quotationCalcActivityPpFromExcursionTable()
+                    : null;
+                var pp_activity_adult = activityPpAmounts ? activityPpAmounts.activity_adult : 0;
+                var pp_activity_cweb = activityPpAmounts ? activityPpAmounts.activity_cweb : 0;
+                var pp_activity_cwnb = activityPpAmounts ? activityPpAmounts.activity_cwnb : 0;
+                // Infant activity = ticket only (no activity transfer share)
+                var pp_activity_infant = activityPpAmounts ? activityPpAmounts.activity_infant : 0;
                 var table = document.getElementById("tbl_package_tour_quotation_adult_child");
                 var rowCount = (table && table.rows) ? table.rows.length : hotel_per_person_arr.length;
                 if (per_adult.length == 0) {

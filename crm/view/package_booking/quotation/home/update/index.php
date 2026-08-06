@@ -226,6 +226,23 @@ function get_excursion_amount()
                 if (row.cells[14] && row.cells[14].childNodes[0]) {
                     row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
                 }
+                row.setAttribute('data-transfer-cost', amount_arr[i]['transfer_cost'] || 0);
+            } else {
+                if (row.cells[10] && row.cells[10].childNodes[0]) row.cells[10].childNodes[0].value = 0;
+                if (row.cells[11] && row.cells[11].childNodes[0]) row.cells[11].childNodes[0].value = 0;
+                if (row.cells[12] && row.cells[12].childNodes[0]) row.cells[12].childNodes[0].value = 0;
+                if (row.cells[13] && row.cells[13].childNodes[0]) row.cells[13].childNodes[0].value = 0;
+                if (row.cells[14] && row.cells[14].childNodes[0]) row.cells[14].childNodes[0].value = 0;
+                row.setAttribute('data-transfer-cost', 0);
+            }
+        }
+        if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+            quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
+        } else if (typeof quotationRefreshPpActivityFromExcursion === 'function'
+            && $('#per_person_costing_tab').is(':visible')) {
+            quotationRefreshPpActivityFromExcursion({ force: true, preserveIfEmpty: true });
+            if (typeof calculateCostingCardsUpdate === 'function') {
+                calculateCostingCardsUpdate({ recalcServiceCharge: false });
             }
         }
     });
@@ -233,10 +250,36 @@ function get_excursion_amount()
 /**Excursion Amount load**/
 function get_excursion_amount_update(eleid) {
     var base_url = $('#base_url').val();
-    var checkbox = document.getElementById(eleid);
-    if (!checkbox) return;
-    var row = checkbox.closest('tr');
+    var el = document.getElementById(eleid);
+    if (!el) return;
+    var row = el.closest('tr');
     if (!row) return;
+
+    var rowCheckbox = row.cells[0] && row.cells[0].querySelector
+        ? row.cells[0].querySelector('input[type="checkbox"]')
+        : (row.cells[0] && row.cells[0].childNodes[0]);
+    var isChecked = !!(rowCheckbox && rowCheckbox.checked);
+
+    // Unchecked activity row → clear costs immediately and refresh PP
+    if (!isChecked) {
+        if (row.cells[10] && row.cells[10].childNodes[0]) row.cells[10].childNodes[0].value = 0;
+        if (row.cells[11] && row.cells[11].childNodes[0]) row.cells[11].childNodes[0].value = 0;
+        if (row.cells[12] && row.cells[12].childNodes[0]) row.cells[12].childNodes[0].value = 0;
+        if (row.cells[13] && row.cells[13].childNodes[0]) row.cells[13].childNodes[0].value = 0;
+        if (row.cells[14] && row.cells[14].childNodes[0]) row.cells[14].childNodes[0].value = 0;
+        row.setAttribute('data-transfer-cost', 0);
+        var rowSuffixOff = eleid.replace(/^[^-]+-/, '');
+        $('#excursion_amount-' + rowSuffixOff).val(0);
+        if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+            quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
+        } else if (typeof quotationRefreshPpActivityFromExcursion === 'function') {
+            quotationRefreshPpActivityFromExcursion({ force: true });
+            if (typeof calculateCostingCardsUpdate === 'function') {
+                calculateCostingCardsUpdate({ recalcServiceCharge: false });
+            }
+        }
+        return;
+    }
 
     var exc_date = row.cells[2].childNodes[0].value;
     var exc = $(row.cells[4].childNodes[0]).val();
@@ -265,7 +308,29 @@ function get_excursion_amount_update(eleid) {
         if (row.cells[10] && row.cells[10].childNodes[0]) {
             row.cells[10].childNodes[0].value = amount_arr[0]['total_cost'];
         }
+        if (row.cells[11] && row.cells[11].childNodes[0]) {
+            row.cells[11].childNodes[0].value = amount_arr[0]['adult_cost'];
+        }
+        if (row.cells[12] && row.cells[12].childNodes[0]) {
+            row.cells[12].childNodes[0].value = amount_arr[0]['child_cost'];
+        }
+        if (row.cells[13] && row.cells[13].childNodes[0]) {
+            row.cells[13].childNodes[0].value = amount_arr[0]['childwo_cost'];
+        }
+        if (row.cells[14] && row.cells[14].childNodes[0]) {
+            row.cells[14].childNodes[0].value = amount_arr[0]['infant_cost'];
+        }
+        row.setAttribute('data-transfer-cost', amount_arr[0]['transfer_cost'] || 0);
         $('#excursion_amount-' + rowSuffix).val(amount_arr[0]['total_cost']);
+
+        if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+            quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
+        } else if (typeof quotationRefreshPpActivityFromExcursion === 'function') {
+            quotationRefreshPpActivityFromExcursion({ force: true });
+            if (typeof calculateCostingCardsUpdate === 'function') {
+                calculateCostingCardsUpdate({ recalcServiceCharge: false });
+            }
+        }
     });
 }
 

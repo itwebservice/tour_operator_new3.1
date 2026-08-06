@@ -11,6 +11,9 @@
 <div id="vehicle_add_modal"></div>
 
 <style>
+.relative.inline-flex.shrink-0.justify-center{
+  display: none;
+}
     .toast-container {
   width: 90%;
   max-width: 580px;
@@ -89,6 +92,7 @@
   text-decoration: underline !important;
   font-size: 11px;
 }
+
 </style>
 <div id="messageNotifi" class="toast-container toast-pos-right toast-pos-bottom"></div>
 
@@ -201,13 +205,84 @@ $(document).ready(function () {
 		getNotifications();
 	}, 2000);
 });
+
 </script>
 <?php
 }
 ?>
+<style>
+/* Prevent 1s flash of logo / Need help? while widget boots */
+elevenlabs-convai:not(.el-header-ready) {
+  visibility: hidden !important;
+}
+</style>
 <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 
-<elevenlabs-convai agent-id="agent_1901krgdr6jyedwt06z6grvqgzx0" placement="bottom-left">
-</elevenlabs-convai>
+<elevenlabs-convai agent-id="agent_1901krgdr6jyedwt06z6grvqgzx0"></elevenlabs-convai>
+
+<script>
+(function () {
+  var HEADER_SELECTOR = ".flex.items-center.gap-2.min-w-60";
+  var STYLE_ID = "el-hide-need-help-header";
+
+  function injectShadowCss(shadow) {
+    if (!shadow || shadow.getElementById(STYLE_ID)) return;
+    var style = document.createElement("style");
+    style.id = STYLE_ID;
+    // Hide logo + Need help? header only; keep call/chat/tools
+    style.textContent =
+      HEADER_SELECTOR + '{display:none!important;}' +
+      HEADER_SELECTOR + ' *{display:none!important;}';
+    shadow.appendChild(style);
+  }
+
+  function revealWidget(widget) {
+    if (widget && !widget.classList.contains("el-header-ready")) {
+      widget.classList.add("el-header-ready");  
+    }
+  }
+
+  function hideNeedHelpHeader() {
+    var widget = document.querySelector("elevenlabs-convai");
+    if (!widget) return false;
+    if (!widget.shadowRoot) return false;
+
+    injectShadowCss(widget.shadowRoot);
+
+    var headers = widget.shadowRoot.querySelectorAll(HEADER_SELECTOR);
+    headers.forEach(function (el) {
+      var text = (el.textContent || "").trim();
+      if (!text || text.indexOf("Need help?") !== -1) {
+        el.style.setProperty("display", "none", "important");
+      }
+    });
+
+    // Reveal once shadow UI exists (CSS already hides header)
+    if (widget.shadowRoot.childNodes.length) {
+      revealWidget(widget);
+      return true;
+    }
+    return false;
+  }
+
+  var tries = 0;
+  var timer = setInterval(function () {
+    tries++;
+    var done = hideNeedHelpHeader();
+    if (done || tries > 50) {
+      clearInterval(timer);
+      // Fail-safe: never leave widget permanently invisible
+      revealWidget(document.querySelector("elevenlabs-convai"));
+      var widget = document.querySelector("elevenlabs-convai");
+      if (widget && widget.shadowRoot) {
+        new MutationObserver(function () {
+          injectShadowCss(widget.shadowRoot);
+          hideNeedHelpHeader();
+        }).observe(widget.shadowRoot, { childList: true, subtree: true });
+      }
+    }
+  }, 50);
+})();
+</script>
 </body>
 </html>

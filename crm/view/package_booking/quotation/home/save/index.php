@@ -404,8 +404,13 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
                     row.cells[12].childNodes[0].value = amount_arr[i]['child_cost'];
                     row.cells[13].childNodes[0].value = amount_arr[i]['childwo_cost'];
                     row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
+                    row.setAttribute('data-transfer-cost', amount_arr[i]['transfer_cost'] || 0);
                     if (row.cells[17] && row.cells[17].childNodes[0]) {
-                        row.cells[17].childNodes[0].value = amount_arr[i]['transfer_cost'];
+                        var transferEl = row.cells[17].childNodes[0];
+                        var transferKey = String(transferEl.id || transferEl.name || '').toLowerCase();
+                        if (transferKey.indexOf('transfer') >= 0) {
+                            transferEl.value = amount_arr[i]['transfer_cost'];
+                        }
                     }
                 } else {
                     row.cells[10].childNodes[0].value = 0;
@@ -413,8 +418,13 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
                     row.cells[12].childNodes[0].value = 0;
                     row.cells[13].childNodes[0].value = 0;
                     row.cells[14].childNodes[0].value = 0;
+                    row.setAttribute('data-transfer-cost', 0);
                     if (row.cells[17] && row.cells[17].childNodes[0]) {
-                        row.cells[17].childNodes[0].value = 0;
+                        var transferElOff = row.cells[17].childNodes[0];
+                        var transferKeyOff = String(transferElOff.id || transferElOff.name || '').toLowerCase();
+                        if (transferKeyOff.indexOf('transfer') >= 0) {
+                            transferElOff.value = 0;
+                        }
                     }
                 }
             }

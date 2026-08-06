@@ -1413,19 +1413,23 @@ $(document).on('click', '#tab2_head', function() {
                     }
                 }
             });
-            //Activity auto fetch pax count
-            var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
-            var rowCount = table.rows.length;
-            var children_with_bed = $('#children_with_bed').val();
-            var children_without_bed = $('#children_without_bed').val();
-            var total_infant = $('#total_infant').val();
+            //Activity auto fetch pax count + travel/hotel date
+            if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
+                quotationSyncExcursionDefaultsFromTravel({ forcePax: true });
+            } else {
+                var table = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
+                var rowCount = table ? table.rows.length : 0;
+                var children_with_bed = $('#children_with_bed').val();
+                var children_without_bed = $('#children_without_bed').val();
+                var total_infant = $('#total_infant').val();
 
-            for (var i = 0; i < rowCount; i++) {
-                var row = table.rows[i];
-                row.cells[6].childNodes[0].value = total_adult;
-                row.cells[7].childNodes[0].value = children_with_bed;
-                row.cells[8].childNodes[0].value = children_without_bed;
-                row.cells[9].childNodes[0].value = total_infant;
+                for (var i = 0; i < rowCount; i++) {
+                    var row = table.rows[i];
+                    row.cells[6].childNodes[0].value = total_adult;
+                    row.cells[7].childNodes[0].value = children_with_bed;
+                    row.cells[8].childNodes[0].value = children_without_bed;
+                    row.cells[9].childNodes[0].value = total_infant;
+                }
             }
 
             //Selected Packages days reflect
@@ -1471,6 +1475,9 @@ $(document).on('click', '#tab2_head', function() {
         }
         if (typeof syncQuotationTravelStayDates === 'function') {
             syncQuotationTravelStayDates();
+        }
+        if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
+            quotationSyncExcursionDefaultsFromTravel({ forcePax: true });
         }
 
         $('#tab2_head').addClass('done');

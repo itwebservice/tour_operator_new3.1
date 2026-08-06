@@ -1687,12 +1687,12 @@ Thank you.');
 		// Calculate TCS
 		$bsmValues = json_decode($sq_cost['bsmValues'], true);
 		if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-			$tcsvalue = $bsmValues[0]['tcsvalue'];
+			$tcsvalue = (float)($bsmValues[0]['tcsvalue'] ?? 0);
 		}
 
 		// Calculate total costs
-		$quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $sq_quotation['train_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'] + (float)($tcsvalue);
-		$travel_cost = $sq_quotation['train_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'];
+		$quotation_cost = (float)$basic_cost + (float)$service_charge + (float)$service_tax_amount + (float)$sq_quotation['train_cost'] + (float)$sq_quotation['cruise_cost'] + (float)$sq_quotation['flight_cost'] + (float)$sq_quotation['visa_cost'] + (float)$sq_quotation['guide_cost'] + (float)$sq_quotation['misc_cost'] + (float)$tcsvalue;
+		$travel_cost = (float)$sq_quotation['train_cost'] + (float)$sq_quotation['flight_cost'] + (float)$sq_quotation['cruise_cost'] + (float)$sq_quotation['visa_cost'] + (float)$sq_quotation['guide_cost'] + (float)$sq_quotation['misc_cost'];
 
 		// Initialize other variables
 		$hotel_details = '';
@@ -1722,11 +1722,11 @@ Thank you.');
 
 		// Price Structure
 		if (in_array('price_structure', $options)) {
-			$email_content .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-			$email_content .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-			$email_content .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-			$email_content .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-			$email_content .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+			$email_content .= "*Tour Amount :* INR " . number_format((float)($quotation_cost - $travel_cost), 2) . "\n";
+			$email_content .= "*Travel Amount :* INR " . number_format((float)$travel_cost, 2) . "\n";
+			$email_content .= "*Tax :* INR " . number_format((float)$service_tax_amount, 2) . "\n";
+			$email_content .= "*Tcs :* INR " . number_format((float)$tcsvalue, 2) . "\n";
+			$email_content .= "*Total Price :*  INR " . number_format((float)$quotation_cost, 2) . " \n\n";
 		}
 		// Hotels
 		if (!empty($hotel_details)) {
@@ -1855,16 +1855,16 @@ Thank you.');
 		// Calculate TCS
 		if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
 			$tcsper = $bsmValues[0]['tcsper'];
-			$tcsvalue = $bsmValues[0]['tcsvalue'];
+			$tcsvalue = (float)($bsmValues[0]['tcsvalue'] ?? 0);
 		} else {
 			$tcsper = 0;
 			$tcsvalue = 0;
 		}
 
 		// Calculate total costs
-		$quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $sq_quotation['train_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'] + (float)($tcsvalue) - $act_discount;
+		$quotation_cost = (float)$basic_cost + (float)$service_charge + (float)$service_tax_amount + (float)$sq_quotation['train_cost'] + (float)$sq_quotation['cruise_cost'] + (float)$sq_quotation['flight_cost'] + (float)$sq_quotation['visa_cost'] + (float)$sq_quotation['guide_cost'] + (float)$sq_quotation['misc_cost'] + (float)$tcsvalue - (float)$act_discount;
 
-		$travel_cost = $sq_quotation['train_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'];
+		$travel_cost = (float)$sq_quotation['train_cost'] + (float)$sq_quotation['flight_cost'] + (float)$sq_quotation['cruise_cost'] + (float)$sq_quotation['visa_cost'] + (float)$sq_quotation['guide_cost'] + (float)$sq_quotation['misc_cost'];
 
 		// Get hotel details
 		$hotel_details = '';
@@ -1989,11 +1989,11 @@ Thank you.');
 			if ($pp_price !== '') {
 				$whatsapp_msg .= $pp_price;
 			} else {
-				$whatsapp_msg .= "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-				$whatsapp_msg .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-				$whatsapp_msg .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-				$whatsapp_msg .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-				$whatsapp_msg .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+				$whatsapp_msg .= "*Tour Amount :* INR " . number_format((float)($quotation_cost - $travel_cost), 2) . "\n";
+				$whatsapp_msg .= "*Travel Amount :* INR " . number_format((float)$travel_cost, 2) . "\n";
+				$whatsapp_msg .= "*Tax :* INR " . number_format((float)$service_tax_amount, 2) . "\n";
+				$whatsapp_msg .= "*Tcs :* INR " . number_format((float)$tcsvalue, 2) . "\n";
+				$whatsapp_msg .= "*Total Price :*  INR " . number_format((float)$quotation_cost, 2) . " \n\n";
 			}
 		}
 
