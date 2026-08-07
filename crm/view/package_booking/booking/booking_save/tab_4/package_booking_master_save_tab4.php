@@ -458,5 +458,5 @@
 </form>
 
 <?= end_panel() ?>
-<script src="../js/tab_4.js"></script>
-<script src="../js/booking_save.js"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_4.js?v=20260807d"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/booking_save.js?v=20260807d"></script>

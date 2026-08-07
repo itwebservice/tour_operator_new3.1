@@ -81,8 +81,8 @@ $all_tab = ($hide_flight=='hidden' && $hide_cruise=='hidden' && $hide_train=='hi
     </div>
 </div>
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
-<script src='../js/calculations.js'></script>
-<script src='../js/business_rule_calculation.js'></script>
+<script src='<?= BASE_URL ?>view/package_booking/booking/js/calculations.js?v=20260807d'></script>
+<script src='<?= BASE_URL ?>view/package_booking/booking/js/business_rule_calculation.js?v=20260807d'></script>
 <script>
 $(document).on('click', '.bk_tab_head a', function () {
 	setTimeout(function () {

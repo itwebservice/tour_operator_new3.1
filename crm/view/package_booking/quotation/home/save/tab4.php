@@ -841,9 +841,9 @@ function get_hotel_cost() {
         var meal_plan_arr = [];
         var checked_arr = [];
         var package_id_arr = [];
-        var child_with_bed = $('#children_with_bed').val();
-        var child_without_bed = $('#children_without_bed').val();
-        var adult_count = $('#total_adult').val();
+        var child_with_bed = $('#children_with_bed').val() || $('#children_with_bed12').val();
+        var child_without_bed = $('#children_without_bed').val() || $('#children_without_bed12').val();
+        var adult_count = $('#total_adult').val() || $('#total_adult12').val();
         // alert(adult_count);
         adult_count = (adult_count == '') ? 0 : adult_count;
         child_without_bed = (child_without_bed == '') ? 0 : child_without_bed;
@@ -922,6 +922,7 @@ if (input) {
                             pp_arr.push({
                                 'hotel_cost': hotel_arr[i]['hotel_cost'],
                                 'adult_cost': hotel_arr[i]['adult_cost'],
+                                'adult_share_total': hotel_arr[i]['adult_share_total'] || 0,
                                 'child_with_bed': hotel_arr[i]['child_with_bed'],
                                 'child_without_bed': hotel_arr[i]['child_without_bed'],
                                 'infant_cost': hotel_arr[i]['infant_cost'] || 0,
@@ -937,6 +938,7 @@ if (input) {
                             pp_arr.push({
                                 'hotel_cost':0,
                                 'adult_cost': 0,
+                                'adult_share_total': 0,
                                 'child_with_bed': 0,
                                 'child_without_bed': 0,
                                 'infant_cost': 0,

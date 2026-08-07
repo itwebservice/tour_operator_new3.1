@@ -51,5 +51,5 @@ $('#txt_arravl1,#txt_depart1').datetimepicker({
 });
 </script>
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
-<script src="../js/tab_2_calculations.js"></script>
-<script src="../js/tab_2.js?v=20260727b"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_2_calculations.js?v=20260807d"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_2.js?v=20260807d"></script>

@@ -616,4 +616,4 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
 // });
 
     </script>
-<script src="../js/tab_1.js"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_1.js?v=20260807d"></script>

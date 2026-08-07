@@ -679,4 +679,4 @@ function hotel_type_load_cate2(id)
 }
 </script>
 
-<script src="../js/tab_3.js"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_3.js?v=20260807d"></script>

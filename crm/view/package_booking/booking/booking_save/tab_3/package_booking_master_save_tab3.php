@@ -31,7 +31,7 @@
         </div>
     </div>
 </form>
-<script src="../js/tab_3.js?v=20260727b"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_3.js?v=20260807d"></script>
 <script type="text/javascript">
     
 function disabled_transport_details(id) {

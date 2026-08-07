@@ -1,10 +1,10 @@
 <?php
 include_once('../../../../../model/model.php');
 
-//Get selected currency rate
+//Get selected currency rate (company profile default — same as hotel/transfer costing)
 global $currency;
 $sq_to = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='$currency'"));
-$to_currency_rate = $sq_to['currency_rate'];
+$to_currency_rate = floatval(isset($sq_to['currency_rate']) ? $sq_to['currency_rate'] : 0) ?: 1;
 
 $package_id_arr = $_POST['package_id_arr'];
 $total_adult = $_POST['total_adult'];
@@ -80,14 +80,15 @@ for($i=0; $i<sizeof($package_id_arr); $i++){
 
 			$currency_id = $row_tariff_master['currency_id'];
 			$sq_from = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='$currency_id'"));
-			$from_currency_rate = $sq_from['currency_rate'];
+			$from_currency_rate = floatval(isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0) ?: 1;
 			$tariff_count = mysqli_num_rows(mysqlQuery("select * from b2b_transfer_tariff_entries where tariff_id='$row_tariff_master[tariff_id]' and pickup_type = '$row_transport[pickup_type]' and drop_type = '$row_transport[drop_type]' and pickup_location = '$row_transport[pickup]' and drop_location = '$row_transport[drop]' and (from_date <='$tariff_lookup_date' and to_date>='$tariff_lookup_date')"));
 			if($tariff_count != 0){
 				$sq_tariff = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_tariff_entries where tariff_id='$row_tariff_master[tariff_id]' and pickup_type = '$row_transport[pickup_type]' and drop_type = '$row_transport[drop_type]' and pickup_location = '$row_transport[pickup]' and drop_location = '$row_transport[drop]' and (from_date <='$tariff_lookup_date' and to_date>='$tariff_lookup_date')"));
 				$row1 = mysqli_fetch_assoc(mysqlQuery("select duration from service_duration_master where entry_id='$sq_tariff[service_duration]'"));
 				$service_duration = $row1['duration'];
 				$tariff_data = json_decode($sq_tariff['tariff_data']);
-				$total_cost = $tariff_data[0]->total_cost;
+				// Convert tariff currency → company default currency (ROE), same formula as get_transport_cost.php
+				$total_cost = ((float)$from_currency_rate / (float)$to_currency_rate) * (float)$tariff_data[0]->total_cost;
 				break;
 			}else{
 				$total_cost = 0;

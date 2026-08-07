@@ -1,10 +1,10 @@
 <?php
 include_once('../../../../../model/model.php');
 
-//Get selected currency rate
+//Get selected currency rate (company profile default)
 global $currency;
 $sq_to = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='$currency'"));
-$to_currency_rate = $sq_to['currency_rate'];
+$to_currency_rate = floatval(isset($sq_to['currency_rate']) ? $sq_to['currency_rate'] : 0) ?: 1;
 
 $transport_id_arr = $_POST['transport_id_arr'] ?: [];
 $travel_date_arr = $_POST['travel_date_arr'];
@@ -41,8 +41,9 @@ for ($i = 0; $i < sizeof($transport_id_arr); $i++) {
 
 					$currency_id = $row_tariff_master['currency_id'];
 					$sq_from = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='$currency_id'"));
-					$from_currency_rate = $sq_from['currency_rate'];
+					$from_currency_rate = floatval(isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0) ?: 1;
 					$tariff_data = json_decode($sq_tariff['tariff_data']);
+					// (tariff ROE / default ROE) * amount * vehicles — unchanged formula, safer rate fallbacks
 					$total_cost = (((float)($from_currency_rate) / (float)($to_currency_rate)) * (float)($tariff_data[0]->total_cost)) * (float)($vehicle_count_arr[$i]);
 					$arr1 = array(
 						'total_cost' => $total_cost,

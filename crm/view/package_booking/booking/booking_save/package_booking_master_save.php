@@ -22,7 +22,11 @@ $unique_timestapmp = md5(uniqid(rand(), true));
 $unique_timestapmp = $emp_id."".$unique_timestapmp;
 
 $sq_tcs = mysqli_fetch_assoc(mysqlQuery("select * from tcs_master where entry_id='2'"));
-$tcs_readonly = ($sq_tcs['calc'] == '0') ? 'readonly' : '';
+if (!$sq_tcs) {
+    // Fallback when package TCS row (entry_id=2) is missing in DB
+    $sq_tcs = array('calc' => '0', 'tax_amount' => 0, 'apply' => 0);
+}
+$tcs_readonly = (isset($sq_tcs['calc']) && $sq_tcs['calc'] == '0') ? 'readonly' : '';
 
 global $package_flight_switch,$package_cruise_switch,$package_train_switch;
 $hide_flight = ($package_flight_switch == 'Yes') ? 'hidden' : '';
@@ -40,9 +44,9 @@ $all_tab = ($hide_flight=='hidden' && $hide_cruise=='hidden' && $hide_train=='hi
     <input type="hidden" id="hotel_taxes" name="hotel_taxes">
     <input type="hidden" id="hotel_markup_taxes" name="hotel_markup_taxes">
     <input type="hidden" id="hotel_tds" name="hotel_tds">
-    <input type="hidden" id="tcs" name="tcs" value="<?= $sq_tcs['tax_amount'] ?>">
-    <input type="hidden" id="tcs_apply" name="tcs_apply" value="<?= $sq_tcs['apply'] ?>">
-    <input type="hidden" id="tcs_calc" name="tcs_calc" value="<?= $sq_tcs['calc'] ?>">
+    <input type="hidden" id="tcs" name="tcs" value="<?= isset($sq_tcs['tax_amount']) ? $sq_tcs['tax_amount'] : 0 ?>">
+    <input type="hidden" id="tcs_apply" name="tcs_apply" value="<?= isset($sq_tcs['apply']) ? $sq_tcs['apply'] : 0 ?>">
+    <input type="hidden" id="tcs_calc" name="tcs_calc" value="<?= isset($sq_tcs['calc']) ? $sq_tcs['calc'] : 0 ?>">
     <input type="hidden" id="quot_total_adult" name="quot_total_adult" value="">
     <input type="hidden" id="quot_children_with_bed" name="quot_children_with_bed" value="">
     <input type="hidden" id="quot_children_without_bed" name="quot_children_without_bed" value="">
@@ -191,8 +195,8 @@ function copy_details(){
 	}
 }
 </script>
-<script src='../js/calculations.js'></script>
-<script src='../js/business_rule_calculation.js'></script>
+<script src='<?= BASE_URL ?>view/package_booking/booking/js/calculations.js?v=20260807d'></script>
+<script src='<?= BASE_URL ?>view/package_booking/booking/js/business_rule_calculation.js?v=20260807d'></script>
 <?php
 include_once('../../../layouts/fullwidth_app_footer.php');
 ?>

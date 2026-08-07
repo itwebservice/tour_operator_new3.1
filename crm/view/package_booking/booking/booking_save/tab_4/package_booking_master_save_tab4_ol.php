@@ -445,5 +445,5 @@
 </form>
 
 <?= end_panel() ?>
-<script src="../js/tab_4.js"></script>
-<script src="../js/booking_save.js"></script>
+<script src="../../js/tab_4.js?v=20260807c"></script>
+<script src="../../js/booking_save.js?v=20260807c"></script>

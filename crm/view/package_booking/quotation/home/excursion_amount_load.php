@@ -11,10 +11,11 @@ $total_vehicles_arr = isset($_POST['total_vehicles_arr']) ? (array)$_POST['total
 $vehicle_arr = isset($_POST['vehicle_arr']) ? (array)$_POST['vehicle_arr'] : [];
 $amount_arr = array();
 
-//Get selected currency rate
+// Get company-profile default currency rate (same approach as hotel costing)
 global $currency;
 $sq_to = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='$currency'"));
-$to_currency_rate = $sq_to['currency_rate'] ? 1 : 0; //1 is need to stop Uncaught DivisionByZeroError
+// Use actual ROE rate; fallback 1 to avoid DivisionByZero (previous ternary forced rate to 1 whenever truthy)
+$to_currency_rate = floatval(isset($sq_to['currency_rate']) ? $sq_to['currency_rate'] : 0) ?: 1;
 
 for ($i = 0; $i < sizeof($exc_arr); $i++) {
 
@@ -22,7 +23,7 @@ for ($i = 0; $i < sizeof($exc_arr); $i++) {
 	$sq_excursion = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff where entry_id='$exc_arr[$i]'"));
 	$currency_id = isset($sq_excursion['currency_code']) ? $sq_excursion['currency_code'] : $currency;
 	$sq_from = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='$currency_id'"));
-	$from_currency_rate = isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0;
+	$from_currency_rate = floatval(isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0) ?: 1;
 
 	$sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from excursion_master_tariff_basics where exc_id='$exc_arr[$i]' and transfer_option='$transfer_arr[$i]' and (from_date <='$exc_date' and to_date>='$exc_date')"));
 	if (isset($vehicle_arr[$i]) && $vehicle_arr[$i] != '' && $vehicle_arr[$i] != '0') {

@@ -56,6 +56,7 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 
 	$hotel_cost = 0;
 	$adult_cost = 0;
+	$adult_share_total = 0; // converted room+extra before ÷ adults (for PP re-split)
 	$cwb_cost = 0;
 	$cwob_cost = 0;
 	$infant_cost = 0;
@@ -144,12 +145,14 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 
 					// Per Person Costing ONLY (unit rates; quote total = amount × pax count):
 					// Adult PP = ((roomcost × rooms) + (extra_beds × extra_bed_cost)) / adults
+					// Amounts are already in company default currency (ROE applied above).
 					// CWEB PP = cweb tariff for stay (per child)
 					// CWNB PP = cwnb tariff for stay (per child)
 					// Infant  = 0 (not in hotel tariff)
+					$adult_share_total = ((float)$room_cost * (float)$total_rooms) + ((float)$extra_beds * (float)$extra_bed_cost);
 					$adult_cost = 0;
 					if ($adult_count > 0) {
-						$adult_cost = (($room_cost * $total_rooms) + ($extra_beds * $extra_bed_cost)) / $adult_count;
+						$adult_cost = $adult_share_total / $adult_count;
 					}
 					$cwb_cost = ($child_with_bed > 0) ? $cwb_tariff : 0;
 					$cwob_cost = ($child_without_bed > 0) ? $cwob_tariff : 0;
@@ -165,6 +168,7 @@ for($i=0;$i<sizeof($hotel_id_arr);$i++){
 		'hotel_id' => $hotel_id_arr[$i],
 		'hotel_cost' => $hotel_cost,
 		'adult_cost' => $adult_cost,
+		'adult_share_total' => $adult_share_total,
 		'child_with_bed' => $cwb_cost,
 		'child_without_bed' => $cwob_cost,
 		'infant_cost' => $infant_cost,

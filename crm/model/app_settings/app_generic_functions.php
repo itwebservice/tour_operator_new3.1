@@ -171,6 +171,43 @@ function begin_widget()
                                                                                       //   return $currency_amount;
                                                                                       // }
 
+/**
+ * Convert a master tariff amount into company-profile default currency (app_settings.currency).
+ * Uses ROE master with the same formula as quotation hotel costing:
+ *   (from_currency_rate / to_currency_rate) * amount
+ * Returns a plain float (not a formatted display string).
+ * Does not replace currency_conversion() used on PDFs/emails.
+ */
+if (!function_exists('roe_convert_amount_to_default')) {
+	function roe_convert_amount_to_default($amount, $from_currency_id = null)
+	{
+		global $currency;
+		$amount = floatval($amount);
+		if ($amount == 0.0) {
+			return 0.0;
+		}
+
+		$to_currency_id = $currency;
+		if ($from_currency_id === null || $from_currency_id === '' || $from_currency_id === '0') {
+			$from_currency_id = $to_currency_id;
+		}
+
+		$sq_to = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='" . intval($to_currency_id) . "'"));
+		$to_currency_rate = floatval(isset($sq_to['currency_rate']) ? $sq_to['currency_rate'] : 0);
+		if ($to_currency_rate == 0.0) {
+			$to_currency_rate = 1.0; // same safety as get_hotel_cost.php
+		}
+
+		$sq_from = mysqli_fetch_assoc(mysqlQuery("select currency_rate from roe_master where currency_id='" . intval($from_currency_id) . "'"));
+		$from_currency_rate = floatval(isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0);
+		if ($from_currency_rate == 0.0) {
+			$from_currency_rate = 1.0; // same safety as get_hotel_cost.php
+		}
+
+		return ($from_currency_rate / $to_currency_rate) * $amount;
+	}
+}
+
  function currency_conversion($from_currency, $to_currency, $quotation_cost){
     // Amounts may arrive formatted with commas (e.g. "1,400.00")
     if (is_string($quotation_cost)) {

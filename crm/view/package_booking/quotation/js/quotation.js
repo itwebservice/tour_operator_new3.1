@@ -132,6 +132,11 @@ function total_passangers_calculate(offset = '') {
 
 	var total_passangers = parseFloat(total_adult) + parseFloat(total_infant) + parseFloat(children_with_bed) + parseFloat(children_without_bed) + parseFloat(single_person);
 	$('#total_passangers' + offset).val(total_passangers);
+
+	// Pax change affects hotel PP split (adult_share ÷ adults) and child tariff inclusion — refresh costs
+	if (typeof quotationRefreshHotelCostingAfterPaxChange === 'function') {
+		quotationRefreshHotelCostingAfterPaxChange();
+	}
 }
 
 function group_quotation_cost_calculate(id) {
@@ -3003,6 +3008,55 @@ function quotationPpCostingSetRowValues($row, suffix, data, options) {
 	setVal('infant_activity_pp_update', Number(activityInfant).toFixed(2));
 }
 
+/**
+ * After ROE conversion, adult hotel PP must still use the normal formula:
+ *   adult_hotel_pp = adult_share_total / adult_count
+ * adult_share_total = converted (room × rooms + extra beds), same as INR tariff case.
+ */
+function quotationHotelAdultPpFromShare(entry, adult_count) {
+	adult_count = parseFloat(adult_count) || 0;
+	if (adult_count <= 0) {
+		return 0;
+	}
+	var share = parseFloat(entry && entry.adult_share_total);
+	if (!isNaN(share) && share > 0) {
+		return share / adult_count;
+	}
+	// Reconstruct share from group hotel cost when child unit tariffs are known (legacy pp_arr)
+	var hotelCost = parseFloat(entry && entry.hotel_cost) || 0;
+	if (hotelCost > 0) {
+		var cwbCount = parseInt($('#children_with_bed12').val(), 10) || parseInt($('#children_with_bed').val(), 10) || 0;
+		var cwobCount = parseInt($('#children_without_bed12').val(), 10) || parseInt($('#children_without_bed').val(), 10) || 0;
+		var cwbUnit = parseFloat(entry.child_with_bed) || 0;
+		var cwobUnit = parseFloat(entry.child_without_bed) || 0;
+		var reconstructed = hotelCost - (cwbCount * cwbUnit) - (cwobCount * cwobUnit);
+		if (reconstructed > 0) {
+			return reconstructed / adult_count;
+		}
+	}
+	// Fallback: stored adult_cost from PHP (same formula when adult_count matched at load)
+	return parseFloat(entry && entry.adult_cost) || 0;
+}
+
+function quotationRefreshHotelCostingAfterPaxChange() {
+	// Prefer full hotel reload so child tariff inclusion + adult_share stay in sync
+	if (typeof get_hotel_cost === 'function') {
+		get_hotel_cost();
+		return;
+	}
+	// If hotel AJAX is unavailable, re-split existing converted share into PP fields
+	if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
+		&& typeof quotationApplyHotelTariffToPpFields === 'function') {
+		quotationApplyHotelTariffToPpFields(quotationBuildHotelPerPersonArrFromPpCosting(), { force: true });
+	}
+	if (typeof calculateCostingCards === 'function') {
+		calculateCostingCards(true);
+	}
+	if (typeof calculateCostingCardsUpdate === 'function') {
+		calculateCostingCardsUpdate({ recalcServiceCharge: true });
+	}
+}
+
 function quotationBuildHotelPerPersonArrFromPpCosting() {
 	var hotel_per_person_arr = [];
 	var per_person_costing = [];
@@ -3052,7 +3106,8 @@ function quotationBuildHotelPerPersonArrFromPpCosting() {
 				continue;
 			}
 			has_checked_hotel = true;
-			var adult_cost_total = (adult_count > 0) ? parseFloat(per_person_costing[k]['adult_cost']) || 0 : 0;
+			// Always re-apply PP formula on current adult count (after ROE conversion)
+			var adult_cost_total = quotationHotelAdultPpFromShare(per_person_costing[k], adult_count);
 			var cwb_cost_total = (child_with_bed > 0) ? parseFloat(per_person_costing[k]['child_with_bed']) || 0 : 0;
 			var cwob_cost_total = (child_without_bed > 0) ? parseFloat(per_person_costing[k]['child_without_bed']) || 0 : 0;
 			var infant_cost_total = parseFloat(per_person_costing[k]['infant_cost']) || 0;

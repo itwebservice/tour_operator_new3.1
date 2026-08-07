@@ -917,6 +917,7 @@ if (!function_exists('quotation_excursion_options_html')) {
                             pp_arr.push({
                                 'hotel_cost': hotel_arr[i]['hotel_cost'],
                                 'adult_cost': hotel_arr[i]['adult_cost'],
+                                'adult_share_total': hotel_arr[i]['adult_share_total'] || 0,
                                 'child_with_bed': hotel_arr[i]['child_with_bed'],
                                 'child_without_bed': hotel_arr[i]['child_without_bed'],
                                 'infant_cost': hotel_arr[i]['infant_cost'] || 0,
@@ -932,6 +933,7 @@ if (!function_exists('quotation_excursion_options_html')) {
                             pp_arr.push({
                                 'hotel_cost': 0,
                                 'adult_cost': 0,
+                                'adult_share_total': 0,
                                 'child_with_bed': 0,
                                 'child_without_bed': 0,
                                 'infant_cost': 0,

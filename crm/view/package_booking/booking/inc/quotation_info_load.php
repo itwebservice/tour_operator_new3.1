@@ -1,7 +1,7 @@
 <?php
-include "../../../../model/model.php";
-include_once "booking_discount_helper.php";
-$quotation_id = $_POST['quotation_id'];
+include_once __DIR__ . "/../../../../model/model.php";
+include_once __DIR__ . "/booking_discount_helper.php";
+$quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] : 0;
 
 $quot_info_arr = array();
 $train_info_arr =array();
@@ -13,6 +13,30 @@ $exc_info_arr = array();
 $hotel_package_type_arr = array();
 
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
+if (!$sq_quotation) {
+	header('Content-Type: application/json');
+	echo json_encode(array(
+		'tour_name' => '',
+		'package_id' => '',
+		'from_date' => '',
+		'to_date' => '',
+		'total_days' => 0,
+		'booking_type' => '',
+		'total_adult' => 0,
+		'total_infant' => 0,
+		'children_without_bed' => 0,
+		'children_with_bed' => 0,
+		'total_passangers' => 0,
+		'train_info_arr' => array(),
+		'flight_info_arr' => array(),
+		'cruise_info_arr' => array(),
+		'hotel_info_arr' => array(),
+		'transport_info_arr' => array(),
+		'exc_info_arr' => array(),
+		'error' => 'Quotation not found'
+	));
+	exit;
+}
 
 $sq_quotation_1 = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$sq_quotation[package_id]'"));
 
@@ -34,8 +58,8 @@ if (!$sq_costing) {
 }
 
 $quot_info_arr['enquiry_spec'] = isset($sq_enquiry['enquiry_specification']) ? $sq_enquiry['enquiry_specification'] : '';
-$quot_info_arr['total_passangers'] = $sq_quotation['total_passangers'];
-$quot_info_arr['tour_name'] = isset($sq_quotation_1['package_name']) ? $sq_quotation_1['package_name'] : $sq_quotation['tour_name'];
+$quot_info_arr['total_passangers'] = isset($sq_quotation['total_passangers']) ? $sq_quotation['total_passangers'] : 0;
+$quot_info_arr['tour_name'] = isset($sq_quotation_1['package_name']) ? $sq_quotation_1['package_name'] : (isset($sq_quotation['tour_name']) ? $sq_quotation['tour_name'] : '');
 
 $quot_info_arr['package_id'] = $sq_quotation['package_id'];
 

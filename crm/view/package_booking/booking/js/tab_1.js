@@ -1222,12 +1222,19 @@ function quotation_info_load() {
 		$('#dest_div').html('');
 		$('#package_div').html('');
 		$('#package_program').html('');
+		var base_url = $('#base_url').val() || '';
 		$.ajax({
 			type: 'post',
-			url: '../inc/quotation_info_load.php',
+			url: base_url + 'view/package_booking/booking/inc/quotation_info_load.php',
 			data: { quotation_id: quotation_id },
 			success: function (result) {
-				var response = JSON.parse(result);
+				var response;
+				try {
+					response = (typeof result === 'object') ? result : JSON.parse(result);
+				} catch (e) {
+					console.error('quotation_info_load: invalid JSON', e, result);
+					return;
+				}
 				$('#txt_package_tour_name').val(response.tour_name);
 				$('#txt_package_package_id').val(response.package_id);
 				$('#txt_package_from_date').val(response.from_date);
@@ -1249,8 +1256,7 @@ function quotation_info_load() {
 				}
 				else {
 					while (table.rows.length > 1) {
-						document.getElementById('tbl_package_tour_member').deleteRow(k);
-						table.rows.length--;
+						document.getElementById('tbl_package_tour_member').deleteRow(1);
 					}
 				}
 				if (table.rows.length != response.total_passangers) {

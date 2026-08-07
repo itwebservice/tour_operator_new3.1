@@ -69,8 +69,8 @@
 </form>
 
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>
-<script src="../js/tab_2_calculations.js"></script>
-<script src="../js/tab_2.js"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_2_calculations.js?v=20260807d"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_2.js?v=20260807d"></script>
 <script>
 $('#frm_tab_2_u').validate({
     submitHandler: function(form) {

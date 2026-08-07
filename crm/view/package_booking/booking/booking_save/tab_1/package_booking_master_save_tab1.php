@@ -26,6 +26,10 @@
                                 }
                                 $sq_quotation = mysqlQuery($query);
                                 while ($row_quotation = mysqli_fetch_assoc($sq_quotation)) {
+                                    try {
+                                    $name = '';
+                                    $percent = '';
+                                    $currency_amount = '';
 
                                     $sq_enq_count = mysqli_num_rows(mysqlQuery("select * from enquiry_master_entries where followup_status='Converted' and quotation_id='$row_quotation[quotation_id]' and enquiry_id in(select enquiry_id from enquiry_master where enquiry_type='Package Booking') "));
                                     $bg = ($sq_enq_count == 0) ? '' : '#7ab676';
@@ -43,23 +47,25 @@
                                     }
 
                                     $cust_user_name = '';
-                                    if ($row_quotation['user_id'] != 0) {
+                                    if (!empty($row_quotation['user_id']) && $row_quotation['user_id'] != 0) {
                                         $row_user = mysqli_fetch_assoc(mysqlQuery("Select name from customer_users where user_id ='$row_quotation[user_id]'"));
-                                        $cust_user_name = ' (' . $row_user['name'] . ')';
+                                        if ($row_user && isset($row_user['name'])) {
+                                            $cust_user_name = ' (' . $row_user['name'] . ')';
+                                        }
                                     }
 
                                     $yr = explode("-", $row_quotation['quotation_date']);
-                                    $basic_cost = $sq_cost['basic_amount'];
-                                    $service_charge = $sq_cost['service_charge'];
+                                    $basic_cost = (float)(isset($sq_cost['basic_amount']) ? $sq_cost['basic_amount'] : 0);
+                                    $service_charge = (float)(isset($sq_cost['service_charge']) ? $sq_cost['service_charge'] : 0);
                                     $service_tax_amount = 0;
                                     $tax_show = '';
 
-                                    $bsmValues = json_decode($sq_cost['bsmValues']);
+                                    $bsmValues = json_decode(isset($sq_cost['bsmValues']) ? $sq_cost['bsmValues'] : '');
                                     if (!is_array($bsmValues) || !isset($bsmValues[0])) {
                                         $bsmValues = array((object) array('service' => '', 'basic' => '', 'tcsper' => '', 'tcsvalue' => 0));
                                     }
-                                    $discount_in = $sq_cost['discount_in'];
-                                    $discount = $sq_cost['discount'];
+                                    $discount_in = isset($sq_cost['discount_in']) ? $sq_cost['discount_in'] : 'Percentage';
+                                    $discount = isset($sq_cost['discount']) ? $sq_cost['discount'] : 0;
                                     if ($discount_in == 'Percentage') {
                                         $act_discount = (float)($service_charge) * (float)($discount) / 100;
                                     } else {
@@ -68,13 +74,13 @@
                                     $service_charge = $service_charge - (float)($act_discount);
                                     $tour_cost = $basic_cost + $service_charge;
 
-                                    if ($sq_cost['service_tax_subtotal'] !== 0.00 && ($sq_cost['service_tax_subtotal']) !== '') {
+                                    if (isset($sq_cost['service_tax_subtotal']) && $sq_cost['service_tax_subtotal'] !== 0.00 && ($sq_cost['service_tax_subtotal']) !== '') {
                                         $service_tax_subtotal1 = explode(',', $sq_cost['service_tax_subtotal']);
                                         for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
                                             $service_tax = explode(':', $service_tax_subtotal1[$i]);
-                                            $service_tax_amount = (float)($service_tax_amount) + (float)($service_tax[2]);
-                                            $name .= $service_tax[0] . ' ';
-                                            $percent = $service_tax[1];
+                                            $service_tax_amount = (float)($service_tax_amount) + (float)(isset($service_tax[2]) ? $service_tax[2] : 0);
+                                            $name .= (isset($service_tax[0]) ? $service_tax[0] : '') . ' ';
+                                            $percent = isset($service_tax[1]) ? $service_tax[1] : '';
                                         }
                                     }
                                     if (isset($bsmValues[0]->service) && $bsmValues[0]->service != '') {   //inclusive service charge
@@ -91,15 +97,15 @@
                                         $tax_show = '';
                                     }
 
-                                    $quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $row_quotation['train_cost'] + $row_quotation['cruise_cost'] + $row_quotation['flight_cost'] + $row_quotation['visa_cost'] + $row_quotation['guide_cost'] + $row_quotation['misc_cost'];
+                                    $quotation_cost = $basic_cost + $service_charge + $service_tax_amount
+                                        + (float)(isset($row_quotation['train_cost']) ? $row_quotation['train_cost'] : 0)
+                                        + (float)(isset($row_quotation['cruise_cost']) ? $row_quotation['cruise_cost'] : 0)
+                                        + (float)(isset($row_quotation['flight_cost']) ? $row_quotation['flight_cost'] : 0)
+                                        + (float)(isset($row_quotation['visa_cost']) ? $row_quotation['visa_cost'] : 0)
+                                        + (float)(isset($row_quotation['guide_cost']) ? $row_quotation['guide_cost'] : 0)
+                                        + (float)(isset($row_quotation['misc_cost']) ? $row_quotation['misc_cost'] : 0);
 
                                     $tcs_percentage = isset($bsmValues[0]->tcsper) ? $bsmValues[0]->tcsper : 0;
-
-                                    // if ($bsmValues[0]->tcsper != '') { 
-                                    //     $tcs_amount = ($quotation_cost * $tcs_percentage) / 100;
-                                    //     $quotation_cost += $tcs_amount;
-                                    // }
-
 
                                     if (isset($bsmValues[0]->tcsper) && $bsmValues[0]->tcsper != 'NaN') {
                                         $tcsper = $bsmValues[0]->tcsper;
@@ -108,23 +114,30 @@
                                         $tcsper = 0;
                                         $tcsvalue = 0;
                                     }
+                                    if ($tcsvalue === '' || $tcsvalue === null || $tcsvalue === 'NaN') {
+                                        $tcsvalue = 0;
+                                    }
 
-                                    // 
-
-                                    $quotation_cost += $tcsvalue;
-                                    // $quotation_cost = floor($quotation_cost);
+                                    $quotation_cost += (float)$tcsvalue;
                                     //Currency conversion
-                                    $currency_amount1 = currency_conversion($currency, $row_quotation['currency_code'], $quotation_cost);
-                                    if ($row_quotation['currency_code'] != '0' && $currency != $row_quotation['currency_code']) {
+                                    $q_currency = isset($row_quotation['currency_code']) ? $row_quotation['currency_code'] : $currency;
+                                    $currency_amount1 = currency_conversion($currency, $q_currency, $quotation_cost);
+                                    if ($q_currency != '0' && $q_currency != '' && $currency != $q_currency) {
                                         $currency_amount = ' (' . $currency_amount1 . ')';
                                     } else {
                                         $currency_amount = '';
                                     }
+                                    $quot_year = isset($yr[0]) ? $yr[0] : date('Y');
                                 ?>
                                     <option style="background-color:<?= $bg ?> !important;" data-bg="<?= $bg ?>" value="<?= $row_quotation['quotation_id'] ?>">
-                                        <?= get_quotation_id($row_quotation['quotation_id'], $yr[0]) . ' : ' . $row_quotation['customer_name'] . $cust_user_name . ' : ' . $quotation_cost . ' /-' . $currency_amount ?>
+                                        <?= get_quotation_id($row_quotation['quotation_id'], $quot_year) . ' : ' . $row_quotation['customer_name'] . $cust_user_name . ' : ' . $quotation_cost . ' /-' . $currency_amount ?>
                                     </option>
-                                <?php } ?>
+                                <?php
+                                    } catch (Throwable $e) {
+                                        // Skip bad quotation row so the rest of the booking form still renders
+                                        continue;
+                                    }
+                                } ?>
                             </select>
                         </div>
                         <div class="col-md-3 col-sm-4 col-xs-12 mg_bt_10" id="package_types_html">
@@ -531,4 +544,4 @@
     }
 </script>
 <?php include "guideline_modal.php"; ?>
-<script src="../js/tab_1.js?v=20260727b"></script>
+<script src="<?= BASE_URL ?>view/package_booking/booking/js/tab_1.js?v=20260807d"></script>
