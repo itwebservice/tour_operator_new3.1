@@ -265,7 +265,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                             <td style="width: 100px;"><input type="text" id="special_attaraction<?php echo $offset; ?>-u" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction" style='width:220px;margin-top: 35px;' value="<?php echo $row_program['attraction']; ?>"></td>
                                                             <!-- <td style="width: 100px;max-width: 594px;overflow: hidden;"><textarea id="day_program<?php echo $offset; ?>-u" name="day_program" class="form-control mg_bt_10" title="Day-wise Program" rows="3" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" style='width:400px;' value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea>
                                                     </td> -->
-                                                            <td class='col-md-5 no-pad' style="max-width:800px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $offset; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" style=" height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
+                                                            <td class='col-md-5 no-pad' style="max-width:800px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $offset; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" style=" height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3" value="<?php echo $row_program['day_wise_program']; ?>"><?php echo $row_program['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                                                             </td>
                                                             <td class='col-md-1/2 no-pad' style='width:150px;'><input type="text" id="overnight_stay<?php echo $offset; ?>-u" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control mg_bt_10" placeholder="*Overnight Stay" title="Overnight Stay" value="<?php echo $row_program['stay']; ?>" style='width:200px;margin-top: 35px;'></td>
                                                             <td class='col-md-1/2 no-pad' style='width:150px;'><select id="meal_plan<?php echo $offset; ?>-u" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style='width: 140px;margin-top: 35px;'>
@@ -340,7 +340,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
                                                     echo '<td style="width: 50px;"><input class="css-checkbox mg_bt_10" id="chk_program1" type="checkbox" checked><label class="css-label" style="margin-top: 55px;" for="chk_program1"> </label></td>';
                                                     echo '<td style="width: 50px;" class="hidden"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled /></td>';
                                                     echo '<td style="width: 100px;"><input type="text" id="special_attaraction1-u" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction" style="width:220px;margin-top: 35px;"></td>';
-                                                    echo '<td class="col-md-5 no-pad" style="max-width:800px;overflow: hidden;position: relative;"><textarea id="day_program1-u" name="day_program" class="form-control mg_bt_10 day_program" style="height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3"></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>';
+                                                    echo '<td class="col-md-5 no-pad" style="max-width:800px;overflow: hidden;position: relative;"><textarea id="day_program1-u" name="day_program" class="form-control mg_bt_10 day_program" style="height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span></td>';
                                                     echo '<td class="col-md-1/2 no-pad" style="width:150px;"><input type="text" id="overnight_stay1-u" name="overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control mg_bt_10" placeholder="*Overnight Stay" title="Overnight Stay" style="width:200px;margin-top: 35px;"></td>';
                                                     echo '<td class="col-md-1/2 no-pad" style="width:150px;"><select id="meal_plan1-u" title="Meal Plan" name="meal_plan" class="form-control mg_bt_10" style="width: 140px;margin-top: 35px;">';
                                                     echo '<option value="">Select Meal Plan</option>';
@@ -436,7 +436,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
             <input type="text" id="special_attaraction${offset}-u" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control mg_bt_10" placeholder="Special Attraction" title="Special Attraction" style='width:220px;margin-top: 35px;'>
         </td>
         <td class='col-md-5 no-pad' style="max-width:800px;overflow: hidden;position: relative;">
-            <textarea id="day_program${offset}-u" name="day_program" class="form-control mg_bt_10 day_program" style="height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3"></textarea>
+            <textarea id="day_program${offset}-u" name="day_program" class="form-control mg_bt_10 day_program" style="height:900px;" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);" rows="3"></textarea>
             <span class="style_text">
                 <span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span>
                 <span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span>
@@ -941,16 +941,12 @@ function findImageUrl($image_path, $is_new_quotation = false)
                     }
                 }
 
-                // Check day program validation
+                // Day-program 2000-char check skipped on update (same as save final flow)
                 var programTextarea = row.querySelector('textarea[id*="day_program"]');
-                if (programTextarea && programTextarea.id) {
-                    try {
-                        flag2 = validate_dayprogram(programTextarea.id);
-                    } catch (e) {
-                        console.log('TAB2: validate_dayprogram error:', e);
-                        flag2 = true; // Continue if validation fails
-                    }
+                if (programTextarea) {
+                    $(programTextarea).css({ border: '1px solid #ddd' });
                 }
+                flag2 = true;
 
                 // Check overnight stay validation
                 var stayInput = row.querySelector('input[id*="overnight_stay"]');
@@ -1426,19 +1422,28 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 console.log('Result preview:', result.substring(0, 200));
                 $('#package_name_div').html(result);
 
+                // Init WYSIWYG on AJAX-injected inclusion/exclusion editors (keep textarea HTML)
+                if (typeof $().wysiwyg === 'function') {
+                    $('#package_name_div textarea.feature_editor').each(function () {
+                        var $el = $(this);
+                        if ($el.data('wysiwyg')) {
+                            return;
+                        }
+                        var existing = $el.val() || '';
+                        $el.wysiwyg({
+                            controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
+                            initialContent: ''
+                        });
+                        if (existing && $el.data('wysiwyg')) {
+                            try {
+                                $el.wysiwyg('setContent', existing);
+                            } catch (e) {}
+                        }
+                    });
+                }
+
                 if ($('#is_ai_quotation').val() === '1') {
                     console.log('AI quotation loaded - skipping package preselection');
-                    if (typeof $().wysiwyg === 'function') {
-                        $('#inclusions_ai, #exclusions_ai').each(function() {
-                            var $el = $(this);
-                            if ($el.length && !$el.data('wysiwyg')) {
-                                $el.wysiwyg({
-                                    controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
-                                    initialContent: ''
-                                });
-                            }
-                        });
-                    }
                     return;
                 }
 

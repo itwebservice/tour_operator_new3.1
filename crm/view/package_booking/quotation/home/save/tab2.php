@@ -1102,8 +1102,12 @@ $(document).on('click', '#tab2_head', function() {
                 var rowCount = table.rows.length;
                 for (var i = 0; i < rowCount; i++) {
                     var row = table.rows[i];
-                    var inclusion = $('#inclusions' + package_id).val();
-                    var exclusion = $('#exclusions' + package_id).val();
+                    var inclusion = (typeof getQuotationEditorContent === 'function')
+                        ? getQuotationEditorContent('inclusions' + package_id)
+                        : ($('#inclusions' + package_id).val() || '');
+                    var exclusion = (typeof getQuotationEditorContent === 'function')
+                        ? getQuotationEditorContent('exclusions' + package_id)
+                        : ($('#exclusions' + package_id).val() || '');
 
                     incl_arr.push(inclusion);
                     excl_arr.push(exclusion);

@@ -1,3 +1,4 @@
+<?php include "../../../../model/model.php"; ?>
 <style>
     
      
@@ -154,7 +155,7 @@
 
 
 <?php
-include "../../../../model/model.php";
+
 
 $email_id = $_POST['email_id'];
 $mobile_no = $_POST['mobile_no'];
@@ -481,7 +482,17 @@ $quotation_count = mysqli_num_rows($sq_query);
 											+ (float) $tcsvalue - (float) $act_discount;
 									}
 
-									$quotation_cost_1 = currency_conversion($currency, $row_tours['currency_code'], $quotation_cost);
+									// Totals are already in quotation currency — show amount + currency code (no ROE reconvert)
+									$currency_label = '';
+									if (!empty($row_tours['currency_code']) && $row_tours['currency_code'] != '0') {
+										$sq_curr_label = mysqli_fetch_assoc(mysqlQuery(
+											"SELECT currency_code FROM currency_name_master WHERE id='" . intval($row_tours['currency_code']) . "'"
+										));
+										if (!empty($sq_curr_label['currency_code'])) {
+											$currency_label = ' (' . $sq_curr_label['currency_code'] . ')';
+										}
+									}
+									$quotation_cost_1 = $quotation_cost . $currency_label;
 
 									$quotation_date = $row_tours['quotation_date'];
 									$yr = explode("-", $quotation_date);

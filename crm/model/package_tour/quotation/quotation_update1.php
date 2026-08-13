@@ -163,29 +163,8 @@ public function quotation_master_update()
     $day_image_arr = isset($_POST['day_image_arr']) ? $_POST['day_image_arr'] : [];
     $package_p_id_arr = $_POST['package_p_id_arr'];
 
-    $inclusions = isset($_POST['inclusions']) ? $_POST['inclusions'] : '';
-	$exclusions = isset($_POST['exclusions']) ? $_POST['exclusions'] : '';
-	// Multiple name="inclusions" fields on the form can arrive as arrays — keep last non-empty string
-	if (is_array($inclusions)) {
-		$picked = '';
-		foreach ($inclusions as $chunk) {
-			if (is_string($chunk) && trim(strip_tags($chunk)) !== '') {
-				$picked = $chunk;
-			}
-		}
-		$inclusions = $picked !== '' ? $picked : (string)end($inclusions);
-	}
-	if (is_array($exclusions)) {
-		$picked = '';
-		foreach ($exclusions as $chunk) {
-			if (is_string($chunk) && trim(strip_tags($chunk)) !== '') {
-				$picked = $chunk;
-			}
-		}
-		$exclusions = $picked !== '' ? $picked : (string)end($exclusions);
-	}
-	$inclusions = (string)$inclusions;
-	$exclusions = (string)$exclusions;
+    $inclusions = $_POST['inclusions'];
+	$exclusions = $_POST['exclusions'];
 	$costing_type = isset($_POST['costing_type']) ? intval($_POST['costing_type']) : 1;
 	if ($costing_type !== 1 && $costing_type !== 2) {
 		$costing_type = 1;
@@ -258,107 +237,73 @@ public function quotation_master_update()
 
 		ensure_pp_costing_package_type_column();
 
-		// Prefer structured pp_costing_arr; fall back to legacy flat POST fields.
-		// Only rebuild PP costing for Per Person quotations, and never wipe existing
-		// non-zero totals with an all-zero payload (common when hotel tariff refresh fails).
-		if (intval($costing_type) === 2 && count($pp_costing_arr) > 0) {
+		// Prefer structured pp_costing_arr; fall back to legacy flat POST fields
+		if (count($pp_costing_arr) > 0) {
 			$is_multi = isset($pp_costing_arr[0]) && is_array($pp_costing_arr[0]) && isset($pp_costing_arr[0]['rows']);
-			$packages = $is_multi ? $pp_costing_arr : array(array('package_type' => '', 'rows' => $pp_costing_arr));
+			// Rebuild all PP rows for this quotation so multi-package stays in sync
+			mysqlQuery("DELETE FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
 
-			$posted_has_amount = false;
-			$posted_has_rows = false;
-			foreach ($packages as $pkg_check) {
-				if (!is_array($pkg_check) || !isset($pkg_check['rows']) || !is_array($pkg_check['rows'])) {
+			$packages = $is_multi ? $pp_costing_arr : array(array('package_type' => '', 'rows' => $pp_costing_arr));
+			foreach ($packages as $pkg) {
+				if (!is_array($pkg) || !isset($pkg['rows']) || !is_array($pkg['rows'])) {
 					continue;
 				}
-				foreach ($pkg_check['rows'] as $row_check) {
-					if (!is_array($row_check) || empty($row_check['type'])) {
+				$package_type = isset($pkg['package_type']) ? mysqlREString($pkg['package_type']) : '';
+				foreach ($pkg['rows'] as $row) {
+					if (!is_array($row) || empty($row['type'])) {
 						continue;
 					}
-					$posted_has_rows = true;
-					$row_total = isset($row_check['total']) ? (float)$row_check['total'] : 0;
-					$row_hotel = isset($row_check['hotel']) ? (float)$row_check['hotel'] : 0;
-					$row_land = isset($row_check['land_cost']) ? (float)$row_check['land_cost'] : 0;
-					if ($row_total > 0 || $row_hotel > 0 || $row_land > 0) {
-						$posted_has_amount = true;
-						break 2;
-					}
+					$type = mysqlREString($row['type']);
+					$hotel = mysqlREString(isset($row['hotel']) ? $row['hotel'] : 0);
+					$transfer = mysqlREString(isset($row['transfer']) ? $row['transfer'] : 0);
+					$activity = mysqlREString(isset($row['activity']) ? $row['activity'] : 0);
+					$land_cost = mysqlREString(isset($row['land_cost']) ? $row['land_cost'] : 0);
+					$service_charge = mysqlREString(isset($row['service_charge']) ? $row['service_charge'] : 0);
+					$discount_in = mysqlREString(isset($row['discount_in']) ? $row['discount_in'] : '');
+					$discount_amount = mysqlREString(isset($row['discount_amount']) ? $row['discount_amount'] : 0);
+					$flight = mysqlREString(isset($row['flight']) ? $row['flight'] : 0);
+					$train = mysqlREString(isset($row['train']) ? $row['train'] : 0);
+					$cruise = mysqlREString(isset($row['cruise']) ? $row['cruise'] : 0);
+					$visa = mysqlREString(isset($row['visa']) ? $row['visa'] : 0);
+					$guide = mysqlREString(isset($row['guide']) ? $row['guide'] : 0);
+					$misc = mysqlREString(isset($row['misc']) ? $row['misc'] : 0);
+					$tax_apply_on = pp_tax_apply_on_to_db(isset($row['tax_apply_on']) ? $row['tax_apply_on'] : '');
+					$tax_value = mysqlREString(isset($row['tax_value']) ? $row['tax_value'] : '');
+					$tax_amount = mysqlREString(isset($row['tax_amount']) ? $row['tax_amount'] : 0);
+					$tcs = mysqlREString(isset($row['tcs']) ? $row['tcs'] : '');
+					$tcs_amount = mysqlREString(isset($row['tcs_amount']) ? $row['tcs_amount'] : 0);
+					$tcs_percent = 0;
+					if ((string)$tcs === '2') { $tcs_percent = 2; }
+					if ((string)$tcs === '3') { $tcs_percent = 20; }
+					$total = mysqlREString(isset($row['total']) ? $row['total'] : 0);
+
+					mysqlQuery("INSERT INTO package_quotation_pp_costing SET 
+						quotation_id='$quotation_id',
+						pax_type='$type',
+						package_type='$package_type',
+						hotel_cost='$hotel',
+						transfer_cost='$transfer',
+						activity_cost='$activity',
+						land_cost='$land_cost',
+						service_charge='$service_charge',
+						discount_in='$discount_in',
+						discount_amount='$discount_amount',
+						flight_cost='$flight',
+						train_cost='$train',
+						cruise_cost='$cruise',
+						visa_cost='$visa',
+						guide_cost='$guide',
+						misc_cost='$misc',
+						tax_apply_on='$tax_apply_on',
+						tax_value='$tax_value',
+						tax_amount='$tax_amount',
+						tcs='$tcs',
+						tcs_percent='$tcs_percent',
+						tcs_amount='$tcs_amount',
+						total_cost='$total'");
 				}
 			}
-
-			$existing_pp_total = 0;
-			$sq_existing_pp = mysqli_fetch_assoc(mysqlQuery(
-				"SELECT COALESCE(SUM(total_cost),0) AS total_sum FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'"
-			));
-			if ($sq_existing_pp) {
-				$existing_pp_total = (float)$sq_existing_pp['total_sum'];
-			}
-
-			// Skip destructive rebuild when UI posted empty/zero amounts but DB already has values
-			if ($posted_has_rows && ($posted_has_amount || $existing_pp_total <= 0)) {
-				mysqlQuery("DELETE FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
-
-				foreach ($packages as $pkg) {
-					if (!is_array($pkg) || !isset($pkg['rows']) || !is_array($pkg['rows'])) {
-						continue;
-					}
-					$package_type = isset($pkg['package_type']) ? mysqlREString($pkg['package_type']) : '';
-					foreach ($pkg['rows'] as $row) {
-						if (!is_array($row) || empty($row['type'])) {
-							continue;
-						}
-						$type = mysqlREString($row['type']);
-						$hotel = mysqlREString(isset($row['hotel']) ? $row['hotel'] : 0);
-						$transfer = mysqlREString(isset($row['transfer']) ? $row['transfer'] : 0);
-						$activity = mysqlREString(isset($row['activity']) ? $row['activity'] : 0);
-						$land_cost = mysqlREString(isset($row['land_cost']) ? $row['land_cost'] : 0);
-						$service_charge = mysqlREString(isset($row['service_charge']) ? $row['service_charge'] : 0);
-						$discount_in = mysqlREString(isset($row['discount_in']) ? $row['discount_in'] : '');
-						$discount_amount = mysqlREString(isset($row['discount_amount']) ? $row['discount_amount'] : 0);
-						$flight = mysqlREString(isset($row['flight']) ? $row['flight'] : 0);
-						$train = mysqlREString(isset($row['train']) ? $row['train'] : 0);
-						$cruise = mysqlREString(isset($row['cruise']) ? $row['cruise'] : 0);
-						$visa = mysqlREString(isset($row['visa']) ? $row['visa'] : 0);
-						$guide = mysqlREString(isset($row['guide']) ? $row['guide'] : 0);
-						$misc = mysqlREString(isset($row['misc']) ? $row['misc'] : 0);
-						$tax_apply_on = pp_tax_apply_on_to_db(isset($row['tax_apply_on']) ? $row['tax_apply_on'] : '');
-						$tax_value = mysqlREString(isset($row['tax_value']) ? $row['tax_value'] : '');
-						$tax_amount = mysqlREString(isset($row['tax_amount']) ? $row['tax_amount'] : 0);
-						$tcs = mysqlREString(isset($row['tcs']) ? $row['tcs'] : '');
-						$tcs_amount = mysqlREString(isset($row['tcs_amount']) ? $row['tcs_amount'] : 0);
-						$tcs_percent = 0;
-						if ((string)$tcs === '2') { $tcs_percent = 2; }
-						if ((string)$tcs === '3') { $tcs_percent = 20; }
-						$total = mysqlREString(isset($row['total']) ? $row['total'] : 0);
-
-						mysqlQuery("INSERT INTO package_quotation_pp_costing SET 
-							quotation_id='$quotation_id',
-							pax_type='$type',
-							package_type='$package_type',
-							hotel_cost='$hotel',
-							transfer_cost='$transfer',
-							activity_cost='$activity',
-							land_cost='$land_cost',
-							service_charge='$service_charge',
-							discount_in='$discount_in',
-							discount_amount='$discount_amount',
-							flight_cost='$flight',
-							train_cost='$train',
-							cruise_cost='$cruise',
-							visa_cost='$visa',
-							guide_cost='$guide',
-							misc_cost='$misc',
-							tax_apply_on='$tax_apply_on',
-							tax_value='$tax_value',
-							tax_amount='$tax_amount',
-							tcs='$tcs',
-							tcs_percent='$tcs_percent',
-							tcs_amount='$tcs_amount',
-							total_cost='$total'");
-					}
-				}
-			}
-		} elseif (intval($costing_type) === 2 && isset($_POST['adult_hotel_pp_update'])) {
+		} elseif (isset($_POST['adult_hotel_pp_update'])) {
 			$pax_types = ['adult','cweb','cwnb','infant'];
 			foreach ($pax_types as $type) {
 				$hotel = isset($_POST[$type.'_hotel_pp_update']) ? $_POST[$type.'_hotel_pp_update'] : 0;
@@ -724,22 +669,6 @@ public function excursion_entries_save($quotation_id,$city_name_arr_e, $excursio
 public function costing_entries_update($tour_cost_arr,$transport_cost_arr, $basic_amount_arr,$service_charge_arr,$service_tax_subtotal_arr,$total_tour_cost_arr, $costing_id_arr,$excursion_cost_arr,$adult_cost,$infant_cost,$child_with,$child_without,$bsmValues,$quotation_id,$entry_id_arr,$discount_in_arr,$discount_arr)
 {
 	for($i=0; $i<sizeof($tour_cost_arr); $i++){
-
-		if (!isset($costing_id_arr[$i]) || $costing_id_arr[$i] === '' || $costing_id_arr[$i] === null) {
-			continue;
-		}
-
-		$posted_basic = isset($basic_amount_arr[$i]) ? (float)$basic_amount_arr[$i] : 0;
-		$posted_total = isset($total_tour_cost_arr[$i]) ? (float)$total_tour_cost_arr[$i] : 0;
-		$existing_cost = mysqli_fetch_assoc(mysqlQuery(
-			"SELECT basic_amount, total_tour_cost FROM package_tour_quotation_costing_entries WHERE id='".mysqlREString($costing_id_arr[$i])."'"
-		));
-		$existing_basic = $existing_cost ? (float)$existing_cost['basic_amount'] : 0;
-		$existing_total = $existing_cost ? (float)$existing_cost['total_tour_cost'] : 0;
-		// Keep previous amounts when UI accidentally posts zeros (tariff/currency sync glitch)
-		if ($posted_basic <= 0 && $posted_total <= 0 && ($existing_basic > 0 || $existing_total > 0)) {
-			continue;
-		}
 
 		$bsmvaluesEach = json_decode(json_encode($bsmValues[$i]));
 		foreach($bsmvaluesEach[0] as $key => $value){

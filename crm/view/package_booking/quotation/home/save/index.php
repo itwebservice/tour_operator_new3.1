@@ -78,7 +78,25 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
 <input type="hidden" id="base_url" value="<?= BASE_URL ?>" />
 
 <script>
+    // Fresh create form — drop stale Tab4 currency/costing from a previous draft
+    try {
+        sessionStorage.removeItem('quotation_tab4_costing_state');
+        sessionStorage.removeItem('quotation_tab4_travel_cost_state');
+        sessionStorage.removeItem('quotation_tab4_costing_visited');
+    } catch (e) {}
+
     $('#enquiry_id, #currency_code').select2();
+    // Keep create-form currency on company profile default (not a leftover session value)
+    if (typeof quotationInitCostingCurrencyToCompanyDefault === 'function') {
+        quotationInitCostingCurrencyToCompanyDefault();
+    } else {
+        var companyCur = $('#currency_code').attr('data-company-currency')
+            || $('#currency_code_pp').attr('data-company-currency')
+            || '';
+        if (companyCur) {
+            $('#currency_code, #currency_code_pp').val(companyCur).trigger('change.select2');
+        }
+    }
 
     $('#from_date, #to_date, #quotation_date').datetimepicker({
         timepicker: false,

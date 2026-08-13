@@ -497,3 +497,42 @@
 [20-Jul-2026 16:13:35 Asia/Kolkata] Itinerary count: 
 [20-Jul-2026 16:13:35 Asia/Kolkata] Hotel count: 3
 [20-Jul-2026 16:13:35 Asia/Kolkata] Itinerary count: 5
+[10-Aug-2026 13:14:23 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:14:23 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:14:23 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:14:30 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:14:30 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:14:30 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:15:08 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:15:08 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:15:08 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:15:11 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:15:11 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:15:11 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:15:40 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:15:40 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:15:40 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:16:38 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:16:38 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:16:38 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:16:48 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:16:48 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:16:48 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:16:59 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:16:59 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:16:59 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[10-Aug-2026 13:19:18 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 16
+[10-Aug-2026 13:19:18 UTC] PHP Warning:  ini_set(): Session ini settings cannot be changed after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 17
+[10-Aug-2026 13:19:18 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/nikhilsholidays/public_html/crm/model/model.php on line 18
+[11-Aug-2026 16:21:05 Asia/Kolkata] QUOTATION_VIEW: Found image in itinerary_images folder (fallback): ../../../../../uploads/itinerary_images/20260805_105353_09500bb8_Chhatrapati_Shivaji_Maharaj_Terminus_9f900a3e3f.webp
+[11-Aug-2026 16:21:05 Asia/Kolkata] QUOTATION_VIEW: Found image in itinerary_images folder (fallback): ../../../../../uploads/itinerary_images/20260805_105353_d3abf765_deal_iimage27346-1.jpg
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_1_quotation_6_package_33_day_1_1786191707.png
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_2_quotation_6_package_33_day_2_1786191561.jpg
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_3_quotation_6_package_33_day_3_1786191561.webp
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_4_quotation_6_package_33_day_4_1786191707.jpg
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_5_quotation_6_package_33_day_5_1786191561.jpg
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_6_quotation_6_package_33_day_6_1786191560.jfif
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_7_quotation_6_package_33_day_7_1786191561.jpg
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_8_quotation_6_package_33_day_8_1786191561.jpg
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_9_quotation_6_package_33_day_9_1786191561.jpg
+[11-Aug-2026 16:21:27 Asia/Kolkata] QUOTATION_VIEW: Image not found in any location: crm/uploads/quotation_images/day_10_quotation_6_package_33_day_10_1786191707.jpg

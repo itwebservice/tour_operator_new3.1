@@ -55,10 +55,81 @@
                                     }
 
                                     $yr = explode("-", $row_quotation['quotation_date']);
+                                    $costing_type = isset($row_quotation['costing_type']) ? intval($row_quotation['costing_type']) : 1;
+                                    $quotation_cost = 0;
+
+                                    // Per-person quotations: amount = pax counts × PP totals (same as quotation list)
+                                    if ($costing_type === 2) {
+                                        $qid = (int)$row_quotation['quotation_id'];
+                                        $adults = (float)(isset($row_quotation['total_adult']) ? $row_quotation['total_adult'] : 0);
+                                        $child_wb = (float)(isset($row_quotation['children_with_bed']) ? $row_quotation['children_with_bed'] : 0);
+                                        $child_wob = (float)(isset($row_quotation['children_without_bed']) ? $row_quotation['children_without_bed'] : 0);
+                                        $infants = (float)(isset($row_quotation['total_infant']) ? $row_quotation['total_infant'] : 0);
+                                        $pp_adult_total = 0;
+                                        $pp_cweb_total = 0;
+                                        $pp_cwnb_total = 0;
+                                        $pp_infant_total = 0;
+                                        $pp_rows_found = false;
+
+                                        $sq_first_pkg = mysqli_fetch_assoc(mysqlQuery(
+                                            "SELECT package_type FROM package_tour_quotation_costing_entries
+                                             WHERE quotation_id='$qid'
+                                             ORDER BY sort_order ASC, id ASC
+                                             LIMIT 1"
+                                        ));
+                                        if (!$sq_first_pkg) {
+                                            $sq_first_pkg = mysqli_fetch_assoc(mysqlQuery(
+                                                "SELECT package_type FROM package_quotation_pp_costing
+                                                 WHERE quotation_id='$qid'
+                                                 ORDER BY id ASC
+                                                 LIMIT 1"
+                                            ));
+                                        }
+
+                                        if ($sq_first_pkg) {
+                                            $first_package_type = isset($sq_first_pkg['package_type']) ? $sq_first_pkg['package_type'] : '';
+                                            $pkg_sql = mysqlREString($first_package_type);
+                                            if ($first_package_type === '' || $first_package_type === null) {
+                                                $pkg_where = "(package_type='' OR package_type IS NULL)";
+                                            } else {
+                                                $pkg_where = "package_type='$pkg_sql'";
+                                            }
+                                            $sq_pp_rows = mysqlQuery(
+                                                "SELECT pax_type, total_cost FROM package_quotation_pp_costing
+                                                 WHERE quotation_id='$qid' AND $pkg_where"
+                                            );
+                                            while ($pp_row = mysqli_fetch_assoc($sq_pp_rows)) {
+                                                $pp_rows_found = true;
+                                                $ptype = strtolower(trim($pp_row['pax_type']));
+                                                $ptotal = (float)$pp_row['total_cost'];
+                                                if ($ptype === 'adult') {
+                                                    $pp_adult_total = $ptotal;
+                                                } elseif ($ptype === 'cweb') {
+                                                    $pp_cweb_total = $ptotal;
+                                                } elseif ($ptype === 'cwnb') {
+                                                    $pp_cwnb_total = $ptotal;
+                                                } elseif ($ptype === 'infant') {
+                                                    $pp_infant_total = $ptotal;
+                                                }
+                                            }
+                                        }
+
+                                        if ($pp_rows_found) {
+                                            $quotation_cost =
+                                                ($adults * $pp_adult_total) +
+                                                ($child_wb * $pp_cweb_total) +
+                                                ($child_wob * $pp_cwnb_total) +
+                                                ($infants * $pp_infant_total);
+                                        }
+                                    }
+
+                                    // Group costing (or PP fallback when no pp rows)
+                                    if ($costing_type !== 2 || $quotation_cost <= 0) {
                                     $basic_cost = (float)(isset($sq_cost['basic_amount']) ? $sq_cost['basic_amount'] : 0);
                                     $service_charge = (float)(isset($sq_cost['service_charge']) ? $sq_cost['service_charge'] : 0);
                                     $service_tax_amount = 0;
-                                    $tax_show = '';
+                                    $name = '';
+                                    $percent = '';
 
                                     $bsmValues = json_decode(isset($sq_cost['bsmValues']) ? $sq_cost['bsmValues'] : '');
                                     if (!is_array($bsmValues) || !isset($bsmValues[0])) {
@@ -83,19 +154,6 @@
                                             $percent = isset($service_tax[1]) ? $service_tax[1] : '';
                                         }
                                     }
-                                    if (isset($bsmValues[0]->service) && $bsmValues[0]->service != '') {   //inclusive service charge
-                                        $newBasic = $tour_cost + $service_tax_amount;
-                                        $tax_show = '';
-                                    } else {
-                                        $tax_show =  $name . $percent . ($service_tax_amount);
-                                        $newBasic = $tour_cost;
-                                    }
-
-                                    ////////////Basic Amount Rules
-                                    if (isset($bsmValues[0]->basic) && $bsmValues[0]->basic != '') { //inclusive markup
-                                        $newBasic = $tour_cost + $service_tax_amount;
-                                        $tax_show = '';
-                                    }
 
                                     $quotation_cost = $basic_cost + $service_charge + $service_tax_amount
                                         + (float)(isset($row_quotation['train_cost']) ? $row_quotation['train_cost'] : 0)
@@ -105,21 +163,17 @@
                                         + (float)(isset($row_quotation['guide_cost']) ? $row_quotation['guide_cost'] : 0)
                                         + (float)(isset($row_quotation['misc_cost']) ? $row_quotation['misc_cost'] : 0);
 
-                                    $tcs_percentage = isset($bsmValues[0]->tcsper) ? $bsmValues[0]->tcsper : 0;
-
+                                    $tcsvalue = 0;
                                     if (isset($bsmValues[0]->tcsper) && $bsmValues[0]->tcsper != 'NaN') {
-                                        $tcsper = $bsmValues[0]->tcsper;
                                         $tcsvalue = isset($bsmValues[0]->tcsvalue) ? $bsmValues[0]->tcsvalue : 0;
-                                    } else {
-                                        $tcsper = 0;
-                                        $tcsvalue = 0;
                                     }
                                     if ($tcsvalue === '' || $tcsvalue === null || $tcsvalue === 'NaN') {
                                         $tcsvalue = 0;
                                     }
-
                                     $quotation_cost += (float)$tcsvalue;
-                                    //Currency conversion
+                                    }
+
+                                    // Currency conversion label (company default → quotation currency)
                                     $q_currency = isset($row_quotation['currency_code']) ? $row_quotation['currency_code'] : $currency;
                                     $currency_amount1 = currency_conversion($currency, $q_currency, $quotation_cost);
                                     if ($q_currency != '0' && $q_currency != '' && $currency != $q_currency) {
@@ -128,9 +182,10 @@
                                         $currency_amount = '';
                                     }
                                     $quot_year = isset($yr[0]) ? $yr[0] : date('Y');
+                                    $quotation_cost_display = number_format((float)$quotation_cost, 2, '.', '');
                                 ?>
                                     <option style="background-color:<?= $bg ?> !important;" data-bg="<?= $bg ?>" value="<?= $row_quotation['quotation_id'] ?>">
-                                        <?= get_quotation_id($row_quotation['quotation_id'], $quot_year) . ' : ' . $row_quotation['customer_name'] . $cust_user_name . ' : ' . $quotation_cost . ' /-' . $currency_amount ?>
+                                        <?= get_quotation_id($row_quotation['quotation_id'], $quot_year) . ' : ' . $row_quotation['customer_name'] . $cust_user_name . ' : ' . $quotation_cost_display . ' /-' . $currency_amount ?>
                                     </option>
                                 <?php
                                     } catch (Throwable $e) {

@@ -208,6 +208,50 @@ if (!function_exists('roe_convert_amount_to_default')) {
 	}
 }
 
+/**
+ * Numeric ROE conversion between two currency ids.
+ * Same formula as hotel/transfer costing:
+ *   amount_in_to = (from_rate / to_rate) * amount_in_from
+ * Rates mean: 1 unit of that currency = rate units of company base (usually INR=1).
+ * Example: INR(1) → USD(95): 95000 INR → (1/95)*95000 = 1000 USD
+ */
+if (!function_exists('currency_conversion_amount')) {
+	function currency_conversion_amount($from_currency, $to_currency, $amount)
+	{
+		if (is_string($amount)) {
+			$amount = str_replace(',', '', $amount);
+		}
+		$amount = floatval($amount);
+		if ($amount == 0.0) {
+			return 0.0;
+		}
+
+		$from_currency = trim((string)$from_currency);
+		$to_currency = trim((string)$to_currency);
+
+		if ($from_currency === '' || $from_currency === '0' || !ctype_digit($from_currency)) {
+			return $amount;
+		}
+		if ($to_currency === '' || $to_currency === '0' || !ctype_digit($to_currency) || $from_currency === $to_currency) {
+			return $amount;
+		}
+
+		$sq_from = mysqli_fetch_assoc(mysqlQuery("SELECT currency_rate FROM roe_master WHERE currency_id='" . intval($from_currency) . "'"));
+		$from_currency_rate = floatval(isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0);
+		if ($from_currency_rate <= 0) {
+			$from_currency_rate = 1.0;
+		}
+
+		$sq_to = mysqli_fetch_assoc(mysqlQuery("SELECT currency_rate FROM roe_master WHERE currency_id='" . intval($to_currency) . "'"));
+		$to_currency_rate = floatval(isset($sq_to['currency_rate']) ? $sq_to['currency_rate'] : 0);
+		if ($to_currency_rate <= 0) {
+			$to_currency_rate = 1.0;
+		}
+
+		return ($from_currency_rate / $to_currency_rate) * $amount;
+	}
+}
+
  function currency_conversion($from_currency, $to_currency, $quotation_cost){
     // Amounts may arrive formatted with commas (e.g. "1,400.00")
     if (is_string($quotation_cost)) {
@@ -232,23 +276,9 @@ if (!function_exists('roe_convert_amount_to_default')) {
         $to_currency_data = mysqli_fetch_assoc(mysqlQuery("SELECT `default_currency`, `currency_code` FROM `currency_name_master` WHERE id=" . intval($to_currency)));
         $currency_logo = isset($to_currency_data['currency_code']) ? $to_currency_data['currency_code'] : '';
 
-        $sq_from = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM roe_master WHERE currency_id='" . intval($from_currency) . "'"));
-        $from_currency_rate = floatval(isset($sq_from['currency_rate']) ? $sq_from['currency_rate'] : 0);
-
-        $sq_to = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM roe_master WHERE currency_id='" . intval($to_currency) . "'"));
-        $to_currency_rate = floatval(isset($sq_to['currency_rate']) ? $sq_to['currency_rate'] : 0);
-
-        // ✅ Corrected conversion logic
-        if ($from_currency_rate == 1) { 
-            // If converting from USD (default currency) to INR or any other currency, multiply
-            $c_amount = ($quotation_cost != 0) ? ($quotation_cost * $to_currency_rate) : 0;
-        } elseif ($to_currency_rate == 1) { 
-            // If converting from INR (or any other currency) to USD (default currency), divide
-            $c_amount = ($quotation_cost != 0 && $from_currency_rate != 0) ? ($quotation_cost / $from_currency_rate) : 0;
-        } else { 
-            // Other currency-to-currency conversions (standard division formula)
-            $c_amount = ($quotation_cost != 0 && $to_currency_rate != 0) ? ($from_currency_rate / $to_currency_rate) * $quotation_cost : 0;
-        }
+        // Always use ROE formula (same as hotel/transfer): (from_rate / to_rate) * amount
+        // Do NOT special-case rate==1 (that incorrectly multiplied when default was INR).
+        $c_amount = currency_conversion_amount($from_currency, $to_currency, $quotation_cost);
 
         $currency_amount = $currency_logo . ' ' . number_format($c_amount, 2);
     } else {

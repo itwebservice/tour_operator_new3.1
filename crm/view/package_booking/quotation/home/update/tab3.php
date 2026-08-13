@@ -828,8 +828,10 @@ if (!function_exists('quotation_excursion_options_html')) {
 
     });
     //Get Hotel Cost
-    function get_hotel_cost(hotel_id1) {
-
+    // options.forceHotel: false = do not overwrite existing non-zero PP hotel (update load / tab next)
+    function get_hotel_cost(hotel_id1, options) {
+        options = options || {};
+        var forceHotel = options.forceHotel !== false;
         var hotel_id_arr = [];
         var room_cat_arr = [];
         var check_in_arr = [];
@@ -951,16 +953,38 @@ if (!function_exists('quotation_excursion_options_html')) {
                 }
                 if (typeof quotationBuildHotelPerPersonArrFromPpCosting === 'function'
                     && typeof quotationApplyHotelTariffToPpFields === 'function') {
-                    quotationApplyHotelTariffToPpFields(quotationBuildHotelPerPersonArrFromPpCosting(), { force: true });
+                    // skipZero: empty tariff must not wipe saved PP hotel
+                    // forceHotel false (update load/tab next): keep saved amounts (e.g. USD quotation)
+                    quotationApplyHotelTariffToPpFields(quotationBuildHotelPerPersonArrFromPpCosting(), {
+                        force: forceHotel,
+                        skipZero: true
+                    });
                 }
                 if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
-                    quotationRefreshPpCostingFromTravelStaySelections({ force: true, recalcServiceCharge: true });
+                    quotationRefreshPpCostingFromTravelStaySelections({
+                        force: forceHotel,
+                        preserveIfEmpty: true,
+                        recalcServiceCharge: forceHotel
+                    });
                 } else {
                     if (typeof quotationRefreshPpActivityFromExcursion === 'function') {
-                        quotationRefreshPpActivityFromExcursion({ force: true });
+                        quotationRefreshPpActivityFromExcursion({ force: forceHotel, preserveIfEmpty: true });
                     }
                     if (typeof calculateCostingCardsUpdate === 'function') {
-                        calculateCostingCardsUpdate({ recalcServiceCharge: true });
+                        calculateCostingCardsUpdate({
+                            recalcServiceCharge: forceHotel,
+                            fromDefaultCurrencyWrite: true
+                        });
+                    }
+                }
+                // After tariff/travel refresh, put back DB amounts wiped to 0
+                if (typeof quotationRestoreUpdatePpSavedAmounts === 'function') {
+                    quotationRestoreUpdatePpSavedAmounts();
+                    if (typeof calculateCostingCardsUpdate === 'function') {
+                        calculateCostingCardsUpdate({
+                            recalcServiceCharge: false,
+                            fromDefaultCurrencyWrite: true
+                        });
                     }
                 }
             }
@@ -1653,7 +1677,8 @@ if (!function_exists('quotation_excursion_options_html')) {
                 if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
                     quotationSyncExcursionDefaultsFromTravel({ forcePax: false, onlyMissing: true });
                 }
-                get_hotel_cost();
+                // Keep DB PP hotel/transfer/activity when tariff/travel-stay is empty
+                get_hotel_cost(null, { forceHotel: false });
                 get_excursion_amount();
                 get_transport_cost();
             }, 500);
@@ -1669,7 +1694,8 @@ if (!function_exists('quotation_excursion_options_html')) {
             if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
                 quotationSyncExcursionDefaultsFromTravel({ forcePax: false, onlyMissing: true });
             }
-            get_hotel_cost();
+            // Keep DB PP hotel/transfer/activity when tariff/travel-stay is empty
+            get_hotel_cost(null, { forceHotel: false });
             get_excursion_amount();
             get_transport_cost();
         }, 300);

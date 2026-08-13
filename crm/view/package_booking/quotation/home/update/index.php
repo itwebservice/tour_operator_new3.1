@@ -7,8 +7,18 @@ $hide_flight = ($package_flight_switch == 'Yes') ? 'hidden' : '';
 $hide_cruise = ($package_cruise_switch == 'Yes') ? 'hidden' : '';
 $hide_train = ($package_train_switch == 'Yes') ? 'hidden' : '';
 
-$quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] : '';
-$package_id = isset($_POST['package_id']) ? $_POST['package_id'] : '';
+$quotation_id = '';
+if (isset($_POST['quotation_id']) && $_POST['quotation_id'] !== '') {
+    $quotation_id = $_POST['quotation_id'];
+} elseif (isset($_GET['quotation_id']) && $_GET['quotation_id'] !== '') {
+    $quotation_id = $_GET['quotation_id'];
+}
+$package_id = '';
+if (isset($_POST['package_id']) && $_POST['package_id'] !== '') {
+    $package_id = $_POST['package_id'];
+} elseif (isset($_GET['package_id']) && $_GET['package_id'] !== '') {
+    $package_id = $_GET['package_id'];
+}
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
@@ -18,7 +28,17 @@ $sq_count = mysqli_num_rows(mysqlQuery($q));
 $sq = mysqli_fetch_assoc(mysqlQuery($q));
 $branch_status = ($sq_count >0 && $sq['branch_status'] !== NULL && isset($sq['branch_status'])) ? $sq['branch_status'] : 'no';
 
+$quotation_id = preg_replace('/[^0-9]/', '', (string)$quotation_id);
+$package_id = preg_replace('/[^0-9]/', '', (string)$package_id);
 $sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
+if (!$sq_quotation) {
+    echo "<div class='alert alert-danger' style='margin:20px'>Quotation not found. Open update from the quotation list, or use:<br><code>update/index.php?quotation_id=6</code></div>";
+    include_once('../../../../layouts/fullwidth_app_footer.php');
+    exit;
+}
+if ($package_id === '' || $package_id === null) {
+    $package_id = isset($sq_quotation['package_id']) ? $sq_quotation['package_id'] : '';
+}
 ?>
 <!-- Tab panes -->
 <div class="bk_tab_head bg_light">

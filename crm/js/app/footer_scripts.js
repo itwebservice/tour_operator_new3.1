@@ -52,9 +52,16 @@ $(document).ajaxSuccess(function () {
 });
 
 $(function () {
-	$('.feature_editor').wysiwyg({
-		controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
-		initialContent: ''
+	$('.feature_editor').each(function () {
+		var $el = $(this);
+		if ($el.data('wysiwyg')) {
+			return;
+		}
+		// initialContent must be '' so empty fields do not show plugin placeholder "Initial content"
+		$el.wysiwyg({
+			controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
+			initialContent: ''
+		});
 	});
 });
 

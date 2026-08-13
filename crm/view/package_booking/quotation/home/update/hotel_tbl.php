@@ -12,7 +12,7 @@
             $package_type_options = '';
             $sq_package_type = mysqlQuery("select DISTINCT(package_type) from package_tour_quotation_hotel_entries where quotation_id='$quotation_id' order by package_type");
             while($row_hotel1 = mysqli_fetch_assoc($sq_package_type)){
-                $package_type_options .= "<option value=".$row_hotel1['package_type'].">".$row_hotel1['package_type']."</option>";
+                $package_type_options .= '<option value="'.htmlspecialchars($row_hotel1['package_type'], ENT_QUOTES).'">'.htmlspecialchars($row_hotel1['package_type']).'</option>';
             }
             if($sq_hotel_count==0){
                 $package_lookup_id = get_quotation_package_lookup_id($sq_quotation);

@@ -2014,6 +2014,11 @@ function quotationGetCheckedHotelPackageTypes() {
  */
 function quotationSyncCostingUiToHotelSelection() {
 	var allowed = quotationGetCheckedHotelPackageTypes();
+	// If no checked hotel package types were detected, keep existing costing rows.
+	// Otherwise a transient empty selection wipes PP/group blocks and update saves zeros.
+	if (!allowed.length) {
+		return allowed;
+	}
 	var allowedMap = {};
 	for (var a = 0; a < allowed.length; a++) {
 		allowedMap[String(allowed[a])] = true;
@@ -2259,6 +2264,9 @@ function quotationPopulateGroupCostingFromHotels(hotel_main_arr, options) {
 			quotation_cost_calculate('tour_cost' + suffix);
 		}
 	}
+	if (typeof quotationOnDefaultCostingAmountsWritten === 'function') {
+		quotationOnDefaultCostingAmountsWritten({ scope: 'group' });
+	}
 	return true;
 }
 
@@ -2373,12 +2381,20 @@ function quotationApplyActivityPpToFields(activityPp, options) {
 		}
 		if (!$el.length) return;
 		if (force) {
-			$el.val(Number(value).toFixed(2));
+			if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
+				quotationWritePpDefaultCurrencyAmount($el, value);
+			} else {
+				$el.val(Number(value).toFixed(2));
+			}
 			return;
 		}
 		var cur = $el.val();
 		if (cur === '' || cur === null || typeof cur === 'undefined') {
-			$el.val(Number(value).toFixed(2));
+			if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
+				quotationWritePpDefaultCurrencyAmount($el, value);
+			} else {
+				$el.val(Number(value).toFixed(2));
+			}
 		}
 	}
 
@@ -2409,9 +2425,61 @@ function quotationApplyActivityPpToFields(activityPp, options) {
 }
 
 /**
+ * Sum existing PP hotel/transfer/activity amounts (display value, default, or DB saved).
+ * Used so update load does not wipe manually stored amounts when tariff/travel-stay is empty.
+ */
+function quotationGetPpComponentExistingTotal(component) {
+	component = String(component || '');
+	if (!component) return 0;
+	var total = 0;
+	var selector =
+		'[id^="adult_' + component + '_pp"], [id^="cweb_' + component + '_pp"], ' +
+		'[id^="cwnb_' + component + '_pp"], [id^="infant_' + component + '_pp"]';
+	var $scope = $('#quotation_pp_costing_container');
+	if (!$scope.length) {
+		$scope = $(document);
+	}
+	$scope.find(selector).each(function () {
+		var $el = $(this);
+		var cur = parseFloat(String($el.val() || '').replace(/,/g, '')) || 0;
+		var def = parseFloat(String($el.attr('data-default-amount') || '').replace(/,/g, '')) || 0;
+		var saved = parseFloat(String($el.attr('data-saved-amount') || '').replace(/,/g, '')) || 0;
+		total += Math.max(cur, def, saved);
+	});
+	return total;
+}
+
+/**
+ * Restore PP money fields from data-saved-amount when display/default was wiped to 0.
+ * Safe to call repeatedly on update quotation load / after tariff refresh.
+ */
+function quotationRestoreUpdatePpSavedAmounts() {
+	var restored = false;
+	var $scope = $('#quotation_pp_costing_container');
+	if (!$scope.length) return false;
+	$scope.find('input[data-saved-amount]').each(function () {
+		var $el = $(this);
+		var saved = parseFloat(String($el.attr('data-saved-amount')).replace(/,/g, ''));
+		if (isNaN(saved) || saved === 0) {
+			return;
+		}
+		var cur = parseFloat(String($el.val()).replace(/,/g, '')) || 0;
+		var def = parseFloat(String($el.attr('data-default-amount')).replace(/,/g, '')) || 0;
+		// Only put DB amount back when display was wiped to 0 (do not override live tariff)
+		if (cur === 0) {
+			$el.attr('data-default-amount', saved);
+			$el.val(Number(saved).toFixed(2));
+			restored = true;
+		} else if (def === 0) {
+			$el.attr('data-default-amount', cur);
+		}
+	});
+	return restored;
+}
+
+/**
  * Recalculate activity PP from excursion table and push into costing cards.
- * When force-refresh would wipe existing activity to 0 (e.g. excursion breakdown
- * cells empty) but activity rows are still checked, keep current PP values.
+ * When tariff/travel-stay does not supply activity amounts, keep DB/manual PP values.
  */
 function quotationRefreshPpActivityFromExcursion(options) {
 	options = options || {};
@@ -2441,7 +2509,19 @@ function quotationRefreshPpActivityFromExcursion(options) {
 		(parseFloat(activityPp.activity_cwnb) || 0) +
 		(parseFloat(activityPp.activity_infant) || 0);
 
-	// No checked activity rows → clear PP activity
+	var existingTotal = typeof quotationGetPpComponentExistingTotal === 'function'
+		? quotationGetPpComponentExistingTotal('activity')
+		: 0;
+
+	// No checked activity / empty calc → keep stored DB or manual amounts
+	if ((!hasCheckedExcursion || calcTotal === 0) && preserveIfEmpty && existingTotal > 0) {
+		if (typeof quotationRestoreUpdatePpSavedAmounts === 'function') {
+			quotationRestoreUpdatePpSavedAmounts();
+		}
+		return activityPp;
+	}
+
+	// No checked activity rows and nothing saved → clear PP activity
 	if (!hasCheckedExcursion) {
 		if (typeof quotationApplyActivityPpToFields === 'function') {
 			quotationApplyActivityPpToFields({
@@ -2452,19 +2532,6 @@ function quotationRefreshPpActivityFromExcursion(options) {
 			}, { force: true });
 		}
 		return activityPp;
-	}
-
-	// Checked rows but calc is 0 (breakdown cells empty) → do not wipe existing PP activity
-	if (force && preserveIfEmpty && calcTotal === 0) {
-		var existingTotal = 0;
-		$('#quotation_pp_costing_container').find(
-			'[id^="adult_activity_pp"], [id^="cweb_activity_pp"], [id^="cwnb_activity_pp"], [id^="infant_activity_pp"]'
-		).each(function () {
-			existingTotal += parseFloat($(this).val()) || 0;
-		});
-		if (existingTotal > 0) {
-			return activityPp;
-		}
 	}
 
 	if (typeof quotationApplyActivityPpToFields === 'function') {
@@ -2570,12 +2637,20 @@ function quotationApplyTransferPpToFields(transferData, options) {
 		}
 		if (!$el.length) return;
 		if (force) {
-			$el.val(Number(value).toFixed(2));
+			if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
+				quotationWritePpDefaultCurrencyAmount($el, value);
+			} else {
+				$el.val(Number(value).toFixed(2));
+			}
 			return;
 		}
 		var cur = $el.val();
 		if (cur === '' || cur === null || typeof cur === 'undefined') {
-			$el.val(Number(value).toFixed(2));
+			if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
+				quotationWritePpDefaultCurrencyAmount($el, value);
+			} else {
+				$el.val(Number(value).toFixed(2));
+			}
 		}
 	}
 
@@ -2607,8 +2682,7 @@ function quotationApplyTransferPpToFields(transferData, options) {
 
 /**
  * Recalculate transfer PP from transport tables.
- * When force-refresh would wipe existing transfer to 0 (cost cells empty / tariff
- * not yet loaded) but transport rows are still checked, keep current PP values.
+ * When tariff/travel-stay does not supply transfer amounts, keep DB/manual PP values.
  */
 function quotationRefreshPpTransferFromTransport(options) {
 	options = options || {};
@@ -2625,7 +2699,25 @@ function quotationRefreshPpTransferFromTransport(options) {
 
 	var hasCheckedTransport = quotationHasCheckedTransportRows();
 
-	// No checked transport → clear PP transfer
+	var calcTotal =
+		(parseFloat(transfer.transfer_adult) || 0) +
+		(parseFloat(transfer.transfer_cweb) || 0) +
+		(parseFloat(transfer.transfer_cwnb) || 0) +
+		(parseFloat(transfer.transfer_infant) || 0);
+
+	var existingTotal = typeof quotationGetPpComponentExistingTotal === 'function'
+		? quotationGetPpComponentExistingTotal('transfer')
+		: 0;
+
+	// No checked transport / empty calc → keep stored DB or manual amounts
+	if ((!hasCheckedTransport || calcTotal === 0) && preserveIfEmpty && existingTotal > 0) {
+		if (typeof quotationRestoreUpdatePpSavedAmounts === 'function') {
+			quotationRestoreUpdatePpSavedAmounts();
+		}
+		return transfer;
+	}
+
+	// No checked transport and nothing saved → clear PP transfer
 	if (!hasCheckedTransport) {
 		quotationApplyTransferPpToFields({
 			transfer_adult: 0,
@@ -2634,25 +2726,6 @@ function quotationRefreshPpTransferFromTransport(options) {
 			transfer_infant: 0
 		}, { force: true });
 		return transfer;
-	}
-
-	var calcTotal =
-		(parseFloat(transfer.transfer_adult) || 0) +
-		(parseFloat(transfer.transfer_cweb) || 0) +
-		(parseFloat(transfer.transfer_cwnb) || 0) +
-		(parseFloat(transfer.transfer_infant) || 0);
-
-	// Checked rows but calc is 0 (cost not loaded yet) → do not wipe existing PP transfer
-	if (force && preserveIfEmpty && calcTotal === 0) {
-		var existingTotal = 0;
-		$('#quotation_pp_costing_container').find(
-			'[id^="adult_transfer_pp"], [id^="cweb_transfer_pp"], [id^="cwnb_transfer_pp"], [id^="infant_transfer_pp"]'
-		).each(function () {
-			existingTotal += parseFloat($(this).val()) || 0;
-		});
-		if (existingTotal > 0) {
-			return transfer;
-		}
 	}
 
 	quotationApplyTransferPpToFields(transfer, { force: force });
@@ -2718,6 +2791,7 @@ function quotationApplyFlightPpFromPlaneSelection(options) {
 
 /**
  * Push checked transport / activity totals into group costing land fields.
+ * Totals from travel-stay are in company default currency.
  */
 function quotationRefreshGroupCostingLandFromSelections() {
 	var transfer = quotationCalcTransferPpFromTransportTables();
@@ -2736,11 +2810,25 @@ function quotationRefreshGroupCostingLandFromSelections() {
 		}
 	}
 
+	function writeDefaultCurrencyField($el, tariffAmountInCompanyCurrency) {
+		if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
+			quotationWritePpDefaultCurrencyAmount($el, tariffAmountInCompanyCurrency);
+			return;
+		}
+		tariffAmountInCompanyCurrency = parseFloat(tariffAmountInCompanyCurrency) || 0;
+		var factor = window.quotationCurrencyDisplayFactor || 1;
+		var amount = Math.round(tariffAmountInCompanyCurrency * factor * 100) / 100;
+		$el.attr('data-amount-source', 'tariff');
+		$el.attr('data-tariff-company-amount', tariffAmountInCompanyCurrency);
+		$el.attr('data-default-amount', amount);
+		$el.val(Number(amount).toFixed(2));
+	}
+
 	var $groupRoot = $('#group_costing_tab, #tbl_package_tour_quotation_dynamic_costing');
 	$groupRoot.find('[id^="transport_cost"]').each(function () {
 		// Skip travel-stay transport row cost fields (…_u)
 		if (/_u$/.test(this.id)) return;
-		$(this).val(Number(transfer.transport_total || 0).toFixed(2));
+		writeDefaultCurrencyField($(this), transfer.transport_total || 0);
 		if (typeof quotation_cost_calculate1 === 'function') {
 			quotation_cost_calculate1(this.id);
 		} else if (typeof quotation_cost_calculate === 'function') {
@@ -2749,7 +2837,7 @@ function quotationRefreshGroupCostingLandFromSelections() {
 	});
 	$groupRoot.find('[id^="excursion_cost"]').each(function () {
 		if (/_u$/.test(this.id)) return;
-		$(this).val(Number(activityTotal || 0).toFixed(2));
+		writeDefaultCurrencyField($(this), activityTotal || 0);
 		if (typeof quotation_cost_calculate1 === 'function') {
 			quotation_cost_calculate1(this.id);
 		} else if (typeof quotation_cost_calculate === 'function') {
@@ -2793,13 +2881,21 @@ function quotationRefreshPpCostingFromTravelStaySelections(options) {
 
 	if (typeof calculateCostingCardsUpdate === 'function') {
 		calculateCostingCardsUpdate({
-			recalcServiceCharge: options.recalcServiceCharge !== false
+			recalcServiceCharge: options.recalcServiceCharge !== false,
+			// force refresh writes tariff/travel amounts in company default currency
+			fromDefaultCurrencyWrite: force
 		});
 	} else if (typeof calculateCostingCards === 'function') {
-		calculateCostingCards(false, {
-			autoFill: false,
-			recalcServiceCharge: options.recalcServiceCharge !== false
-		});
+		if (force) {
+			calculateCostingCards(true);
+		} else {
+			calculateCostingCards(false, {
+				autoFill: false,
+				recalcServiceCharge: options.recalcServiceCharge !== false
+			});
+		}
+	} else if (force && typeof quotationOnDefaultCostingAmountsWritten === 'function') {
+		quotationOnDefaultCostingAmountsWritten({ scope: 'pp' });
 	}
 }
 
@@ -3143,6 +3239,7 @@ function quotationBuildHotelPerPersonArrFromPpCosting() {
 function quotationApplyHotelTariffToPpFields(hotel_per_person_arr, options) {
 	options = options || {};
 	var force = options.force !== false;
+	var skipZero = options.skipZero === true;
 	var applyTransfer = options.applyTransfer === true;
 	var applyActivity = options.applyActivity === true;
 	if (!hotel_per_person_arr || !hotel_per_person_arr.length) {
@@ -3165,19 +3262,39 @@ function quotationApplyHotelTariffToPpFields(hotel_per_person_arr, options) {
 		var cwebHotel = parseFloat(data.cwb_cost != null ? data.cwb_cost : data.child_with_bed) || 0;
 		var cwnbHotel = parseFloat(data.cwob_cost != null ? data.cwob_cost : data.child_without_bed) || 0;
 		var infantHotel = parseFloat(data.infant_cost) || 0;
+		// Missing hotel tariff (common on local DBs) must not wipe saved PP hotel amounts
+		if (skipZero && adultHotel <= 0 && cwebHotel <= 0 && cwnbHotel <= 0 && infantHotel <= 0) {
+			return;
+		}
 
 		function setField(baseId, value) {
 			var $el = $row.find('#' + quotationPpFieldId(baseId, suffix));
 			if (!$el.length) {
 				return;
 			}
+			if (skipZero && (parseFloat(value) || 0) <= 0) {
+				var existingAmt = (typeof quotationGetFieldDefaultAmount === 'function')
+					? quotationGetFieldDefaultAmount($el)
+					: (parseFloat($el.val()) || 0);
+				if (existingAmt > 0) {
+					return;
+				}
+			}
 			if (force) {
-				$el.val(value);
+				if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
+					quotationWritePpDefaultCurrencyAmount($el, value);
+				} else {
+					$el.val(value);
+				}
 				return;
 			}
 			var cur = $el.val();
 			if (cur === '' || cur === null || parseFloat(cur) === 0) {
-				$el.val(value);
+				if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
+					quotationWritePpDefaultCurrencyAmount($el, value);
+				} else {
+					$el.val(value);
+				}
 			}
 		}
 
@@ -3254,7 +3371,8 @@ function quotationPopulatePpCostingFromHotels(hotel_per_person_arr, options) {
 	options = options || {};
 	options.force = (options.force !== false); // default force when rebuilding from Tab3
 
-	// Capture current activity values before rebuild (tab switch must not wipe them)
+	// Capture current activity values before rebuild (tab switch must not wipe them).
+	// Use default-currency amounts so a prior display currency (e.g. AED) is not double-converted.
 	var preservedActivity = null;
 	if (options.preserveActivity !== false) {
 		preservedActivity = {
@@ -3267,6 +3385,9 @@ function quotationPopulatePpCostingFromHotels(hotel_per_person_arr, options) {
 		if ($first.length) {
 			var readAct = function (base) {
 				var $el = $first.find('[id^="' + base + '"]').first();
+				if (typeof quotationGetFieldDefaultAmount === 'function' && $el.length) {
+					return quotationGetFieldDefaultAmount($el);
+				}
 				return parseFloat($el.val()) || 0;
 			};
 			preservedActivity.activity_adult = readAct('adult_activity_pp');
@@ -3289,6 +3410,9 @@ function quotationPopulatePpCostingFromHotels(hotel_per_person_arr, options) {
 		if ($firstTr.length) {
 			var readTr = function (base) {
 				var $el = $firstTr.find('[id^="' + base + '"]').first();
+				if (typeof quotationGetFieldDefaultAmount === 'function' && $el.length) {
+					return quotationGetFieldDefaultAmount($el);
+				}
 				return parseFloat($el.val()) || 0;
 			};
 			preservedTransfer.transfer_adult = readTr('adult_transfer_pp');
@@ -3373,7 +3497,19 @@ function quotationPopulatePpCostingFromHotels(hotel_per_person_arr, options) {
 			return;
 		}
 		if (this.tagName === 'SELECT') {
-			this.selectedIndex = 0;
+			var sid = String(this.id || this.name || '');
+			if (/currency_code_pp/i.test(sid)) {
+				var companyCur = $(this).attr('data-company-currency')
+					|| (typeof quotationGetCompanyDefaultCurrencyId === 'function' ? quotationGetCompanyDefaultCurrencyId() : '')
+					|| '';
+				if (companyCur) {
+					$(this).val(companyCur);
+				} else {
+					this.selectedIndex = 0;
+				}
+			} else {
+				this.selectedIndex = 0;
+			}
 			return;
 		}
 		if ($(this).attr('id') && /hotel_pp|transfer_pp|activity_pp|land_cost_pp|service_charge_pp|discount_amount_pp|tax_amount_pp|tcs_amount_pp|total_amount_pp|_cost$|landcost/.test(this.id)) {
@@ -3412,7 +3548,28 @@ function quotationPopulatePpCostingFromHotels(hotel_per_person_arr, options) {
 		quotationPpCostingSetRowValues($row, suffix, rowData, options);
 	}
 
+	// Re-apply session currency (Previous→Next) or fall back to company profile default
+	var savedCurrency = (typeof quotationGetSavedTab4CurrencyCode === 'function')
+		? quotationGetSavedTab4CurrencyCode()
+		: '';
+	if (!savedCurrency && typeof quotationGetCompanyDefaultCurrencyId === 'function') {
+		savedCurrency = quotationGetCompanyDefaultCurrencyId();
+	}
+	if (!savedCurrency && typeof quotationGetSelectedCurrencyId === 'function') {
+		savedCurrency = quotationGetSelectedCurrencyId();
+	}
+	if (savedCurrency && typeof quotationEnsureCostingCurrencySelection === 'function') {
+		quotationEnsureCostingCurrencySelection(savedCurrency);
+	}
+
 	quotationInitPpCostingSelect2($container);
+
+	if (savedCurrency && typeof quotationEnsureCostingCurrencySelection === 'function') {
+		quotationEnsureCostingCurrencySelection(savedCurrency);
+	}
+
+	// Keep current ROE factor (for tariff→quotation conversion). Do not reset to 1 —
+	// amounts written below go through quotationWritePpDefaultCurrencyAmount.
 
 	if (typeof calculateCostingCards === 'function') {
 		setTimeout(function () {
@@ -3477,42 +3634,50 @@ function quotationCollectPpCostingEntries(options) {
 		};
 	}
 
+	function readAmt($el) {
+		return (typeof quotationGetFieldDefaultAmount === 'function')
+			? quotationGetFieldDefaultAmount($el)
+			: (+$el.val() || 0);
+	}
+
 	function readPP($scope, prefix, suffix) {
 		var ids = fieldIds(prefix);
 		var g = function (base) {
 			var sel = '#' + quotationPpFieldId(base, suffix);
 			return $scope && $scope.length ? $scope.find(sel) : $(sel);
 		};
+		var discountIn = g(ids.discount_in).val() || '';
+		var discountAmt = (String(discountIn) === '1')
+			? (+g(ids.discount_amount).val() || 0)
+			: readAmt(g(ids.discount_amount));
 		return {
 			type: prefix,
-			hotel: +g(ids.hotel).val() || 0,
-			transfer: +g(ids.transfer).val() || 0,
-			activity: +g(ids.activity).val() || 0,
-			land_cost: +g(ids.land_cost).val() || 0,
-			service_charge: +g(ids.service_charge).val() || 0,
-			discount_in: g(ids.discount_in).val() || '',
-			discount_amount: +g(ids.discount_amount).val() || 0,
-			flight: +g(ids.flight).val() || 0,
-			train: +g(ids.train).val() || 0,
-			cruise: +g(ids.cruise).val() || 0,
-			visa: +g(ids.visa).val() || 0,
-			guide: +g(ids.guide).val() || 0,
-			misc: +g(ids.misc).val() || 0,
+			hotel: readAmt(g(ids.hotel)),
+			transfer: readAmt(g(ids.transfer)),
+			activity: readAmt(g(ids.activity)),
+			land_cost: readAmt(g(ids.land_cost)),
+			service_charge: readAmt(g(ids.service_charge)),
+			discount_in: discountIn,
+			discount_amount: discountAmt,
+			flight: readAmt(g(ids.flight)),
+			train: readAmt(g(ids.train)),
+			cruise: readAmt(g(ids.cruise)),
+			visa: readAmt(g(ids.visa)),
+			guide: readAmt(g(ids.guide)),
+			misc: readAmt(g(ids.misc)),
 			tax_apply_on: g(ids.tax_apply_on).val() || '',
 			tax_value: g(ids.tax_value).val() || '',
-			tax_amount: +g(ids.tax_amount).val() || 0,
+			tax_amount: readAmt(g(ids.tax_amount)),
 			tcs: g(ids.tcs).val() || '',
-			tcs_amount: +g(ids.tcs_amount).val() || 0,
-			total: +g(ids.total).val() || 0
+			tcs_amount: readAmt(g(ids.tcs_amount)),
+			total: readAmt(g(ids.total))
 		};
 	}
 
+	// Do not invent a zero-filled package when PP rows are missing — that would
+	// wipe real DB totals on update. Caller/model treat empty as "keep existing".
 	if (!$rows.length) {
-		return [{
-			package_type: $('#ppackage_type1').val() || '',
-			package_id: $('#pacakge_id2').val() || '',
-			rows: [readPP(null, 'adult', ''), readPP(null, 'cweb', ''), readPP(null, 'cwnb', ''), readPP(null, 'infant', '')]
-		}];
+		return [];
 	}
 
 	$rows.each(function () {
@@ -3532,28 +3697,43 @@ function quotationCollectGroupCostingEntries() {
 		return null;
 	}
 
+	function readAmt($el) {
+		if (typeof quotationGetFieldDefaultAmount === 'function') {
+			return quotationGetFieldDefaultAmount($el);
+		}
+		return $el.val() || '';
+	}
+	function readAmtStr($el) {
+		var v = readAmt($el);
+		return (v === '' || v === null || typeof v === 'undefined') ? '' : String(v);
+	}
+
 	var entries = [];
 	$('#tbl_package_tour_quotation_dynamic_costing').find('[id^="tour_cost-"]').each(function () {
 		var suffix = this.id.replace('tour_cost', '');
 		if (!suffix) {
 			return;
 		}
+		var discountIn = $('#discount_in' + suffix).val() || '';
+		var discountVal = (String(discountIn) === '1')
+			? ($('#discount_amt' + suffix).val() || '')
+			: readAmtStr($('#discount_amt' + suffix));
 		entries.push({
 			package_type_c: $('#package_type' + suffix).val() || '',
-			tour_cost: $('#tour_cost' + suffix).val() || '',
-			transport_cost: $('#transport_cost1' + suffix).val() || '',
-			excursion_cost: $('#excursion_cost' + suffix).val() || '',
-			basic_cost: $('#basic_amount' + suffix).val() || '',
-			service_tax: $('#service_charge' + suffix).val() || '',
-			discount_in: $('#discount_in' + suffix).val() || '',
-			discount: $('#discount_amt' + suffix).val() || '',
+			tour_cost: readAmtStr($('#tour_cost' + suffix)),
+			transport_cost: readAmtStr($('#transport_cost1' + suffix)),
+			excursion_cost: readAmtStr($('#excursion_cost' + suffix)),
+			basic_cost: readAmtStr($('#basic_amount' + suffix)),
+			service_tax: readAmtStr($('#service_charge' + suffix)),
+			discount_in: discountIn,
+			discount: discountVal,
 			tax_apply_on: $('#tax_apply_on' + suffix).val() || '',
 			tax_value: $('#tax_value' + suffix).val() || '',
-			service_tax_subtotal: $('#service_tax_subtotal' + suffix).val() || '',
+			service_tax_subtotal: readAmtStr($('#service_tax_subtotal' + suffix)),
 			tcs: $('#tcs_tax' + suffix).val() || '',
-			tcsvalue: $('#tcs1' + suffix).val() || '',
-			tdsvalue: ($('#tds' + suffix).val() || 0),
-			total_tour_cost: $('#total_tour_cost' + suffix).val() || '',
+			tcsvalue: readAmtStr($('#tcs1' + suffix)),
+			tdsvalue: readAmt($('#tds' + suffix)) || 0,
+			total_tour_cost: readAmtStr($('#total_tour_cost' + suffix)),
 			package_name3: $('#package_name1' + suffix).val() || '',
 			pkg_id: $('#package_id1' + suffix).val() || ''
 		});
@@ -3624,6 +3804,65 @@ function quotationApplyGroupCostingTransportTotals(unique_package_id_arr, packag
 	return true;
 }
 
+/** Company profile default currency id from costing dropdowns. */
+function quotationGetCompanyDefaultCurrencyId() {
+	var fromData = $('#currency_code').attr('data-company-currency')
+		|| $('#currency_code1').attr('data-company-currency')
+		|| $('[id^="currency_code_pp"]').first().attr('data-company-currency')
+		|| '';
+	if (fromData) {
+		return String(fromData);
+	}
+	// Fallback: currently selected option on group/PP (should already be company default on create)
+	return $('#currency_code').val() || $('#currency_code_pp').val() || '';
+}
+
+/** On create load: force all costing currency dropdowns to company profile default. */
+function quotationInitCostingCurrencyToCompanyDefault() {
+	var companyCur = quotationGetCompanyDefaultCurrencyId();
+	if (!companyCur || companyCur === '0') {
+		return;
+	}
+	quotationEnsureCostingCurrencySelection(companyCur);
+	// Do not trigger full ROE change on init — amounts are still empty/default currency
+}
+
+/** Saved quotation/document currency from Tab4 session (group or per-person). */
+function quotationGetSavedTab4CurrencyCode() {
+	try {
+		// Only reuse session currency after the user has visited Tab4 in this draft
+		if (sessionStorage.getItem('quotation_tab4_costing_visited') !== '1') {
+			return '';
+		}
+		var travelRaw = sessionStorage.getItem('quotation_tab4_travel_cost_state');
+		if (travelRaw) {
+			var travel = JSON.parse(travelRaw);
+			if (travel && travel.currency_code) {
+				return String(travel.currency_code);
+			}
+		}
+	} catch (e) {}
+	return '';
+}
+
+/** Keep group + per-person currency dropdowns on the same id (select2-safe). */
+function quotationEnsureCostingCurrencySelection(currencyId) {
+	if (currencyId === undefined || currencyId === null || currencyId === '') {
+		return;
+	}
+	currencyId = String(currencyId);
+	var $all = $('#currency_code, #currency_code1').add($('[id^="currency_code_pp"]'));
+	$all.each(function () {
+		var $el = $(this);
+		if (String($el.val()) !== currencyId) {
+			$el.val(currencyId);
+		}
+		if ($el.data('select2')) {
+			$el.trigger('change.select2');
+		}
+	});
+}
+
 /** Persist Tab4 costing so Previous → Next does not wipe manual edits. */
 function quotationSaveTab4CostingState() {
 	try {
@@ -3633,6 +3872,9 @@ function quotationSaveTab4CostingState() {
 		if (entries && entries.length) {
 			sessionStorage.setItem('quotation_tab4_costing_state', JSON.stringify(entries));
 		}
+		var currencyCode = (typeof quotationGetSelectedCurrencyId === 'function')
+			? quotationGetSelectedCurrencyId()
+			: ($('#currency_code').val() || $('#currency_code_pp').val() || '');
 		sessionStorage.setItem('quotation_tab4_travel_cost_state', JSON.stringify({
 			flight_cost: $('#flight_cost').val() || '',
 			train_cost: $('#train_cost').val() || '',
@@ -3641,7 +3883,7 @@ function quotationSaveTab4CostingState() {
 			guide_cost: $('#guide_cost').val() || '',
 			misc_cost: $('#misc_cost').val() || '',
 			misc_desc: $('#misc_desc').val() || $('#miscellaneous_desc').val() || '',
-			currency_code: $('#currency_code').val() || ''
+			currency_code: currencyCode || ''
 		}));
 		sessionStorage.setItem('quotation_tab4_costing_visited', '1');
 	} catch (e) {
@@ -3748,11 +3990,518 @@ function quotationRestoreTab4CostingState(options) {
 				if ($('#misc_desc').length) $('#misc_desc').val(travel.misc_desc);
 				if ($('#miscellaneous_desc').length) $('#miscellaneous_desc').val(travel.misc_desc);
 			}
-			if (travel.currency_code && $('#currency_code').length) {
-				$('#currency_code').val(travel.currency_code).trigger('change');
+			if (travel.currency_code) {
+				// Sync dropdowns only — do not convert yet. PP/group rebuild writes
+				// default-currency amounts next; calculateCostingCards applies ROE.
+				quotationEnsureCostingCurrencySelection(travel.currency_code);
 			}
 		} catch (e2) {}
 	}
 	return true;
 }
+
+/**
+ * Quotation costing amounts are in the selected quotation currency.
+ * Manual entry (USD selected → user types USD) is stored/displayed as-is — no ROE rewrite.
+ * Tariff/travel amounts arrive in company currency, are tagged data-amount-source=tariff
+ * with data-tariff-company-amount, and convert via ROE on write and on currency change.
+ * ROE: amount_in_to = (from_rate / to_rate) * amount_in_from
+ * Example INR(1)→USD(95): 95000 tariff → 1000 shown/saved in USD
+ */
+window.quotationCurrencyDisplayFactor = window.quotationCurrencyDisplayFactor || 1;
+window.quotationApplyingCurrencyDisplay = false;
+window.quotationWritingDefaultCurrencyAmounts = false;
+
+function quotationGetSelectedCurrencyId() {
+	var $pp = $('[id^="currency_code_pp"]').filter(function () {
+		return $(this).val();
+	}).first();
+	return $('#currency_code').val()
+		|| $('#currency_code1').val()
+		|| ($pp.length ? $pp.val() : '')
+		|| $('#currency_code_pp').val()
+		|| '';
+}
+
+function quotationIsCurrencyConvertibleField($el) {
+	if (!$el || !$el.length) {
+		return false;
+	}
+	var tag = ($el.prop('tagName') || '').toLowerCase();
+	if (tag === 'select' || tag === 'textarea') {
+		return false;
+	}
+	var id = String($el.attr('id') || '');
+	if (!id) {
+		return false;
+	}
+	if (/discount_in|tax_apply_on|select_tax|select_tcs|package_type|package_name|package_id|currency|ppackage|pacakge|other_desc|misc_desc|login_id|upload_url/i.test(id)) {
+		return false;
+	}
+	// Derived amounts — always recalculate from components after ROE (do not convert)
+	if (/land_cost_pp|tax_amount_pp|tax_amt_pp|tcs_amount_pp|total_amount_pp/i.test(id)) {
+		return false;
+	}
+	// Percentage discount value is not a money amount
+	if (/discount_amt|discount_amount/i.test(id)) {
+		var discountInId = id
+			.replace('discount_amt', 'discount_in')
+			.replace('discount_amount_pp_update', 'discount_in_pp_update')
+			.replace('discount_amount_pp', 'discount_in_pp');
+		var $din = $('#' + discountInId);
+		if ($din.length && String($din.val()) === '1') {
+			return false;
+		}
+	}
+	return $el.is('input[type="number"], input[type="text"], input:not([type])')
+		&& !$el.is('[type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="hidden"]');
+}
+
+function quotationGetCostingConvertibleInputs(scope) {
+	var sels;
+	if (scope === 'pp') {
+		sels = [
+			'#quotation_pp_costing_container .costing-table input',
+			'#quotation_pp_costing_container input[id*="_hotel_pp"]',
+			'#quotation_pp_costing_container input[id*="_transfer_pp"]',
+			'#quotation_pp_costing_container input[id*="_activity_pp"]',
+			'#quotation_pp_costing_container input[id*="_land_cost_pp"]',
+			'#quotation_pp_costing_container input[id*="_service_charge_pp"]',
+			'#quotation_pp_costing_container input[id*="_total_amount_pp"]'
+		];
+	} else if (scope === 'group') {
+		sels = [
+			'#tbl_package_tour_quotation_dynamic_costing input',
+			'#flight_cost, #train_cost, #cruise_cost, #visa_cost, #guide_cost, #misc_cost',
+			'#flight_cost1, #train_cost1, #cruise_cost1, #visa_cost1, #guide_cost1, #misc_cost1'
+		];
+	} else {
+		sels = [
+			'#tbl_package_tour_quotation_dynamic_costing input',
+			'#flight_cost, #train_cost, #cruise_cost, #visa_cost, #guide_cost, #misc_cost',
+			'#flight_cost1, #train_cost1, #cruise_cost1, #visa_cost1, #guide_cost1, #misc_cost1',
+			'#quotation_pp_costing_container .costing-table input',
+			'#quotation_pp_costing_container input[id*="_hotel_pp"]',
+			'#quotation_pp_costing_container input[id*="_transfer_pp"]',
+			'#quotation_pp_costing_container input[id*="_activity_pp"]',
+			'#quotation_pp_costing_container input[id*="_land_cost_pp"]',
+			'#quotation_pp_costing_container input[id*="_service_charge_pp"]',
+			'#quotation_pp_costing_container input[id*="_total_amount_pp"]'
+		];
+	}
+	return $(sels.join(',')).filter(function () {
+		return quotationIsCurrencyConvertibleField($(this));
+	});
+}
+
+/** Amounts are stored in quotation currency — data-default-amount matches the visible value. */
+function quotationGetFieldDefaultAmount($el) {
+	if (!$el || !$el.length) {
+		return 0;
+	}
+	var display = parseFloat(String($el.val()).replace(/,/g, '')) || 0;
+	var raw = $el.attr('data-default-amount');
+	if (raw !== undefined && raw !== null && raw !== '') {
+		var parsed = parseFloat(raw);
+		if (isNaN(parsed)) {
+			parsed = 0;
+		}
+		// Stale lock from early empty snapshot while field now has a real amount
+		if (parsed === 0 && display !== 0 && !window.quotationApplyingCurrencyDisplay) {
+			return display;
+		}
+		return parsed;
+	}
+	return display;
+}
+
+/**
+ * Convert a company-currency tariff amount into the selected quotation currency.
+ */
+function quotationConvertTariffAmountToQuotationCurrency(tariffAmount) {
+	tariffAmount = parseFloat(tariffAmount);
+	if (isNaN(tariffAmount)) {
+		tariffAmount = 0;
+	}
+	var factor = window.quotationCurrencyDisplayFactor || 1;
+	if (!factor || isNaN(factor) || Math.abs(factor - 1) < 0.0000001) {
+		return tariffAmount;
+	}
+	return Math.round(tariffAmount * factor * 100) / 100;
+}
+
+/**
+ * If a field shows a real amount but data-default-amount is missing/0 (locked from
+ * an empty page-load snapshot), refresh the default from the current display.
+ */
+function quotationRepairStaleZeroDefaultAmounts(scope) {
+	if (window.quotationApplyingCurrencyDisplay) {
+		return;
+	}
+	quotationGetCostingConvertibleInputs(scope).each(function () {
+		var $el = $(this);
+		var display = parseFloat(String($el.val()).replace(/,/g, '')) || 0;
+		if (display === 0) {
+			return;
+		}
+		var raw = $el.attr('data-default-amount');
+		var def = (raw !== undefined && raw !== null && raw !== '') ? (parseFloat(raw) || 0) : null;
+		if (def === null || def === 0) {
+			$el.attr('data-default-amount', display);
+		}
+	});
+}
+
+function quotationSnapshotDefaultCostingAmounts(force, scope) {
+	quotationGetCostingConvertibleInputs(scope).each(function () {
+		var $el = $(this);
+		if (!force && $el.attr('data-default-amount') !== undefined && $el.attr('data-default-amount') !== '') {
+			return;
+		}
+		var display = parseFloat(String($el.val()).replace(/,/g, ''));
+		if (isNaN(display)) {
+			display = 0;
+		}
+		var existingRaw = $el.attr('data-default-amount');
+		var existingDef = (existingRaw !== undefined && existingRaw !== null && existingRaw !== '')
+			? (parseFloat(existingRaw) || 0)
+			: null;
+		// Never lock empty fields as 0 — and never wipe a real saved default with 0
+		if (display === 0) {
+			if (force || window.quotationWritingDefaultCurrencyAmounts) {
+				return;
+			}
+			if (existingDef !== null && existingDef > 0) {
+				return;
+			}
+		}
+		$el.attr('data-default-amount', display);
+	});
+}
+
+function quotationCaptureDisplayAmountsAsDefault(scope) {
+	if (window.quotationApplyingCurrencyDisplay || window.quotationWritingDefaultCurrencyAmounts) {
+		return;
+	}
+	quotationGetCostingConvertibleInputs(scope).each(function () {
+		var $el = $(this);
+		var display = parseFloat(String($el.val()).replace(/,/g, ''));
+		if (isNaN(display)) {
+			display = 0;
+		}
+		$el.attr('data-default-amount', display);
+	});
+}
+
+function quotationMarkFieldAsTariffAmount($el, companyAmount) {
+	if (!$el || !$el.length) {
+		return;
+	}
+	companyAmount = parseFloat(companyAmount);
+	if (isNaN(companyAmount)) {
+		companyAmount = 0;
+	}
+	$el.attr('data-amount-source', 'tariff');
+	$el.attr('data-tariff-company-amount', companyAmount);
+}
+
+function quotationMarkFieldAsManualAmount($el) {
+	if (!$el || !$el.length) {
+		return;
+	}
+	$el.attr('data-amount-source', 'manual');
+	$el.removeAttr('data-tariff-company-amount');
+}
+
+function quotationIsManualAmountField($el) {
+	return !!( $el && $el.length && String($el.attr('data-amount-source') || '') === 'manual' );
+}
+
+function quotationIsTariffAmountField($el) {
+	return !!( $el && $el.length && String($el.attr('data-amount-source') || '') === 'tariff' );
+}
+
+/**
+ * Write auto service-charge (company currency) into display currency and mark as tariff-sourced.
+ * Skips fields the user edited manually.
+ */
+function quotationWriteTariffServiceCharge($el, companyScAmount) {
+	if (!$el || !$el.length) {
+		return false;
+	}
+	if (quotationIsManualAmountField($el)) {
+		return false;
+	}
+	companyScAmount = parseFloat(companyScAmount);
+	if (isNaN(companyScAmount)) {
+		companyScAmount = 0;
+	}
+	quotationMarkFieldAsTariffAmount($el, companyScAmount);
+	var amount = quotationConvertTariffAmountToQuotationCurrency(companyScAmount);
+	$el.attr('data-default-amount', amount);
+	$el.val(Number(amount).toFixed(2));
+	return true;
+}
+
+function quotationApplyCurrencyFactorToCostingFields(factor, scope) {
+	factor = parseFloat(factor);
+	if (!factor || isNaN(factor)) {
+		factor = 1;
+	}
+	window.quotationCurrencyDisplayFactor = factor;
+	// Only tariff-sourced fields re-convert; manual amounts stay as typed.
+	quotationReconvertTariffSourcedFields(scope);
+}
+
+/**
+ * Re-apply ROE to fields that still carry a company-currency tariff amount.
+ * Manual / saved amounts (no data-amount-source=tariff) are left unchanged.
+ */
+function quotationReconvertTariffSourcedFields(scope) {
+	var convertedAny = false;
+	window.quotationApplyingCurrencyDisplay = true;
+	try {
+		quotationGetCostingConvertibleInputs(scope).each(function () {
+			var $el = $(this);
+			if (!quotationIsTariffAmountField($el)) {
+				return;
+			}
+			var companyRaw = $el.attr('data-tariff-company-amount');
+			if (companyRaw === undefined || companyRaw === null || companyRaw === '') {
+				return;
+			}
+			var companyAmt = parseFloat(String(companyRaw).replace(/,/g, ''));
+			if (isNaN(companyAmt)) {
+				return;
+			}
+			quotationWritePpDefaultCurrencyAmount($el, companyAmt);
+			convertedAny = true;
+		});
+	} finally {
+		window.quotationApplyingCurrencyDisplay = false;
+	}
+	if (!convertedAny) {
+		if (!scope || scope === 'pp') {
+			quotationRecalcPpDerivedAmountsAfterCurrency({ recalcServiceCharge: false });
+		}
+		return convertedAny;
+	}
+	quotationRecalcPpDerivedAmountsAfterCurrency({ recalcServiceCharge: true });
+	// Group costing rows: re-run row calculator after tariff land fields changed
+	if (!scope || scope === 'group') {
+		$('#tbl_package_tour_quotation_dynamic_costing')
+			.find('input[id^="hotel_cost"], input[id^="transport_cost"], input[id^="excursion_cost"]')
+			.filter(function () {
+				return quotationIsTariffAmountField($(this)) && !/_u$/.test(this.id);
+			})
+			.each(function () {
+				if (typeof quotation_cost_calculate1 === 'function') {
+					quotation_cost_calculate1(this.id);
+				} else if (typeof quotation_cost_calculate === 'function') {
+					quotation_cost_calculate(this.id);
+				}
+			});
+	}
+	return convertedAny;
+}
+
+/** Recompute PP land/tax/TCS/total after tariff/currency factor updates. */
+function quotationRecalcPpDerivedAmountsAfterCurrency(options) {
+	options = options || {};
+	var recalcSc = options.recalcServiceCharge === true;
+	if (!$('#quotation_pp_costing_container').length) {
+		return;
+	}
+	if (typeof calculateCostingCardsUpdate === 'function') {
+		calculateCostingCardsUpdate({
+			recalcServiceCharge: recalcSc,
+			fromDefaultCurrencyWrite: false
+		});
+		return;
+	}
+	if (typeof calculateCostingCards === 'function') {
+		calculateCostingCards(false, {
+			autoFill: false,
+			recalcServiceCharge: recalcSc
+		});
+	}
+}
+
+/**
+ * Write a tariff amount (company currency) into a PP field as quotation-currency.
+ * Keeps the company amount so a later currency change can re-convert tariff data only.
+ */
+function quotationWritePpDefaultCurrencyAmount($el, tariffAmountInCompanyCurrency) {
+	if (!$el || !$el.length) {
+		return;
+	}
+	tariffAmountInCompanyCurrency = parseFloat(tariffAmountInCompanyCurrency);
+	if (isNaN(tariffAmountInCompanyCurrency)) {
+		tariffAmountInCompanyCurrency = 0;
+	}
+	quotationMarkFieldAsTariffAmount($el, tariffAmountInCompanyCurrency);
+	var amount = quotationConvertTariffAmountToQuotationCurrency(tariffAmountInCompanyCurrency);
+	$el.attr('data-default-amount', amount);
+	$el.val(Number(amount).toFixed(2));
+}
+
+function quotationGetDefaultCostingTotal() {
+	var total = 0;
+	var $groupTotals = $('input[id^="total_tour_cost"]');
+	if ($groupTotals.length) {
+		$groupTotals.each(function () {
+			total += quotationGetFieldDefaultAmount($(this));
+		});
+		if (total > 0) {
+			return total;
+		}
+	}
+	var adult = quotationGetFieldDefaultAmount($('#adult_total_amount_pp').length ? $('#adult_total_amount_pp') : $('#adult_total_amount_pp_update'));
+	var cweb = quotationGetFieldDefaultAmount($('#cweb_total_amount_pp').length ? $('#cweb_total_amount_pp') : $('#cweb_total_amount_pp_update'));
+	var cwnb = quotationGetFieldDefaultAmount($('#cwnb_total_amount_pp').length ? $('#cwnb_total_amount_pp') : $('#cwnb_total_amount_pp_update'));
+	var infant = quotationGetFieldDefaultAmount($('#infant_total_amount_pp').length ? $('#infant_total_amount_pp') : $('#infant_total_amount_pp_update'));
+	var adultCount = parseInt($('#total_adult12').val(), 10) || parseInt($('#total_adult').val(), 10) || 0;
+	var cwebCount = parseInt($('#children_with_bed12').val(), 10) || parseInt($('#children_with_bed').val(), 10) || 0;
+	var cwnbCount = parseInt($('#children_without_bed12').val(), 10) || parseInt($('#children_without_bed').val(), 10) || 0;
+	var infantCount = parseInt($('#total_infant12').val(), 10) || parseInt($('#total_infant').val(), 10) || 0;
+	return (adult * adultCount) + (cweb * cwebCount) + (cwnb * cwnbCount) + (infant * infantCount);
+}
+
+function quotationRefreshCurrencyConversionPreview() {
+	// Preview text removed — ROE applies only when writing tariff amounts.
+}
+
+/**
+ * Load ROE factor for the selected currency.
+ * - reconvertTariff:true → re-convert fields marked data-amount-source=tariff (manual untouched)
+ * - rewriteFields:true → same as reconvertTariff (legacy alias)
+ * - default / reconvertTariff:false → only refresh the ROE factor (initial page load)
+ */
+function quotationApplySelectedCurrencyToCostingFields(done, options) {
+	options = options || {};
+	var scope = options.scope || options.currencyScope || null;
+	var reconvertTariff = options.reconvertTariff === true || options.rewriteFields === true;
+	quotationRepairStaleZeroDefaultAmounts(scope);
+	quotationSnapshotDefaultCostingAmounts(false, scope);
+	var toCurrency = quotationGetSelectedCurrencyId();
+	if (!toCurrency || toCurrency === '0') {
+		window.quotationCurrencyDisplayFactor = 1;
+		if (reconvertTariff) {
+			quotationApplyCurrencyFactorToCostingFields(1, scope);
+		}
+		if (typeof done === 'function') {
+			done(1);
+		}
+		return;
+	}
+	var base_url = $('#base_url').val() || '';
+	$.post(base_url + 'view/package_booking/quotation/home/hotel/get_currency_conversion.php', {
+		amount: 100,
+		to_currency: toCurrency
+	}, function (resp) {
+		var data = resp;
+		if (typeof resp === 'string') {
+			try { data = JSON.parse(resp); } catch (e) { data = null; }
+		}
+		var factor = 1;
+		if (data && data.factor != null) {
+			factor = parseFloat(data.factor) || 1;
+		}
+		if (data && String(data.from_currency) === String(data.to_currency)) {
+			factor = 1;
+		}
+		window.quotationCurrencyDisplayFactor = factor;
+		if (reconvertTariff) {
+			quotationApplyCurrencyFactorToCostingFields(factor, scope);
+		}
+		if (typeof done === 'function') {
+			done(factor);
+		}
+	}).fail(function () {
+		if (typeof done === 'function') {
+			done(window.quotationCurrencyDisplayFactor || 1);
+		}
+	});
+}
+
+function quotationOnDefaultCostingAmountsWritten(options) {
+	options = options || {};
+	// Tariff writers store company amounts + convert with current factor.
+	// Refresh ROE and re-apply so a late factor load still converts tariff fields.
+	var scope = options.scope || options.currencyScope || null;
+	window.quotationWritingDefaultCurrencyAmounts = true;
+	try {
+		quotationSnapshotDefaultCostingAmounts(true, scope);
+	} finally {
+		window.quotationWritingDefaultCurrencyAmounts = false;
+	}
+	quotationApplySelectedCurrencyToCostingFields(null, { scope: scope, reconvertTariff: true });
+}
+
+function quotationAfterCostingRecalc(options) {
+	options = options || {};
+	if (window.quotationApplyingCurrencyDisplay) {
+		return;
+	}
+	if (options.fromDefaultCurrencyWrite) {
+		quotationOnDefaultCostingAmountsWritten({
+			scope: options.currencyScope || options.scope || 'pp'
+		});
+		return;
+	}
+	quotationCaptureDisplayAmountsAsDefault(options.currencyScope || options.scope || null);
+}
+
+function quotationSyncCurrencyDropdowns(sourceId, value) {
+	var $all = $('#currency_code, #currency_code1').add($('[id^="currency_code_pp"]'));
+	$all.each(function () {
+		var $el = $(this);
+		if (this.id === sourceId) {
+			return;
+		}
+		if ($el.val() !== value) {
+			$el.val(value);
+			if ($el.data('select2')) {
+				$el.trigger('change.select2');
+			}
+		}
+	});
+}
+
+$(document).on('change', '#currency_code, #currency_code1, [id^="currency_code_pp"]', function () {
+	var id = this.id;
+	var val = $(this).val();
+	quotationSyncCurrencyDropdowns(id, val);
+	// Tariff-sourced amounts re-convert via ROE; manual/saved amounts stay as entered
+	quotationApplySelectedCurrencyToCostingFields(function () {
+		if (typeof quotationSaveTab4CostingState === 'function') {
+			quotationSaveTab4CostingState();
+		}
+	}, { reconvertTariff: true });
+});
+
+$(document).on('change', 'input[id^="total_tour_cost"], input[id$="_total_amount_pp"], input[id$="_total_amount_pp_update"]', function () {
+	if (window.quotationApplyingCurrencyDisplay) {
+		return;
+	}
+	quotationCaptureDisplayAmountsAsDefault();
+	quotationRefreshCurrencyConversionPreview();
+});
+
+$(document).on('change input', '#tbl_package_tour_quotation_dynamic_costing input, #flight_cost, #train_cost, #cruise_cost, #visa_cost, #guide_cost, #misc_cost, #flight_cost1, #train_cost1, #cruise_cost1, #visa_cost1, #guide_cost1, #misc_cost1, #quotation_pp_costing_container .costing-table input', function () {
+	if (window.quotationApplyingCurrencyDisplay || window.quotationWritingDefaultCurrencyAmounts) {
+		return;
+	}
+	var $el = $(this);
+	if (!quotationIsCurrencyConvertibleField($el)) {
+		return;
+	}
+	var display = parseFloat(String($el.val()).replace(/,/g, ''));
+	if (isNaN(display)) {
+		display = 0;
+	}
+	// Typed value is already in quotation currency — do not re-convert on currency change
+	quotationMarkFieldAsManualAmount($el);
+	$el.attr('data-default-amount', display);
+});
 
