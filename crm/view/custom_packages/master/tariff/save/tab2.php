@@ -47,12 +47,13 @@
                                         <td><input type='number' id="amount" name="amount" placeholder="*Amount"
                                                 class="form-control" title="Amount" style="width: 100px;" /></td>
                                         <td><select name="agent_type" id="agent_type" title="Agent Type"
-                                                style="width: 150px" class="form-control app_select2" multiple>
-                                                <option value=''>Agent Type</option>
+                                                style="width: 150px" class="form-control app_select2" data-placeholder="*Agent Type" multiple>
+                                                <option value="">Agent Type</option>
                                                 <option value='Platinum'>Platinum</option>
                                                 <option value='Gold'>Gold</option>
                                                 <option value='Silver'>Silver</option>
                                             </select></td>
+                                            
                                         <td><input type="hidden" id="entry_id" name="entry_id" /></td>
                                     </tr>
                                 </table>

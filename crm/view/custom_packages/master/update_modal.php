@@ -390,12 +390,29 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                 <div class="col-xs-6 text-right mg_tp_10">
                                     <button type="button" class="btn btn-excel" title="Add Row" onclick="addRow('tbl_package_hotel_master');city_lzloading('select[name^=city_name1]')"><i class="fa fa-plus"></i></button>
                                 </div>
+                                <style>
+                                    #tbl_package_hotel_master td:first-child,
+                                    #tbl_package_tour_transport td:first-child {
+                                        vertical-align: middle !important;
+                                        text-align: center;
+                                    }
+                                    #tbl_package_hotel_master td:first-child .custom_checkbox,
+                                    #tbl_package_tour_transport td:first-child .custom_checkbox {
+                                        display: inline-block;
+                                        margin: 0 auto;
+                                        vertical-align: middle;
+                                    }
+                                </style>
                                 <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table border_0 table-hover" style="padding: 0 !important;">
                                     <?php
                                     $sq_count = mysqli_num_rows(mysqlQuery("select * from custom_package_hotels where package_id = '$package_id'"));
                                     if ($sq_count == 0) { ?>
                                         <tr>
-                                            <td><input id="chk_dest" type="checkbox"></td>
+                                            <td style="vertical-align:middle; text-align:center;">
+                                                <div style="display:flex; align-items:center;  height:100%;">
+                                                    <input id="chk_dest1" name="chk_dest1" type="checkbox" checked class="custom_checkbox">
+                                                </div>
+                                            </td>
                                             <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                                             <td><select id="city_name" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
                                                 </select></td>
@@ -418,7 +435,10 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                             $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id = '$row_hotel[city_name]'"));
                                         ?>
                                             <tr>
-                                                <td><input id="chk_dest<?php echo $count_hotel; ?>-u" type="checkbox" checked>
+                                                <td style="vertical-align:middle; text-align:center;">
+                                                    <div style="display:flex; align-items:center; justify-content:center; height:100%;">
+                                                        <input id="chk_dest<?php echo $count_hotel; ?>-u" name="chk_dest<?php echo $count_hotel; ?>-u" type="checkbox" checked class="custom_checkbox">
+                                                    </div>
                                                 </td>
                                                 <td><input maxlength="15" value="<?php echo $count_hotel; ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                                                 <td><select id="city_name<?php echo $count_hotel; ?>-u" name="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown app_select2" style="width:100%" title="Select City Name" data-add-new-option="true">
@@ -465,7 +485,11 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                     $sq_count = mysqli_num_rows(mysqlQuery("select * from custom_package_transport where package_id = '$package_id'"));
                                     if ($sq_count == 0) { ?>
                                         <tr>
-                                            <td><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" autocomplete="off" data-original-title="" title="" aria-hidden="true" style="display: none;"><label for="chk_transport1"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label><label class="css-label" for="chk_transport1"> </label></td>
+                                            <td style="vertical-align:middle; text-align:center;">
+                                                <div style="display:flex; align-items:center;  height:100%;">
+                                                    <input id="chk_transport1" name="chk_transport1" type="checkbox" checked class="custom_checkbox">
+                                                </div>
+                                            </td>
                                             <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off" data-original-title="" title=""></td>
                                             <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" style="width:100%" class="form-control app_select2" title="Select Vehicle" data-add-new-option="true">
                                                     <option value="">Select Vehicle</option>
@@ -490,7 +514,10 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                             $sq_transport = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master where entry_id = '$row_tr[vehicle_name]'"));
                                         ?>
                                             <tr>
-                                                <td><input id="chk_transport1<?php echo $count_hotel; ?>-u" type="checkbox" checked>
+                                                <td style="vertical-align:middle; text-align:center;">
+                                                    <div style="display:flex; align-items:center;  height:100%;">
+                                                        <input id="chk_transport1<?php echo $count_hotel; ?>-u" name="chk_transport1<?php echo $count_hotel; ?>-u" type="checkbox" checked class="custom_checkbox">
+                                                    </div>
                                                 </td>
                                                 <td><input maxlength="15" value="<?php echo $count_hotel; ?>" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                                                 <td class="col-md-3"><select name="vehicle_name1-u" id="vehicle_name1<?php echo $count_hotel; ?>-u" style="width:250px" class="form-control app_select2" title="Select Vehicle" data-add-new-option="true">

@@ -53,7 +53,7 @@ $sq_count5 = mysqli_num_rows(mysqlQuery("select * from custom_package_offers whe
                                         <td><input type='number' id="amount" name="amount" placeholder="*Amount"
                                                 class="form-control" title="Amount" style="width: 100px;" /></td>
                                         <td><select name="agent_type" id="agent_type" title="Agent Type"
-                                                style="width: 150px" class="form-control app_select2" multiple>
+                                                style="width: 150px" class="form-control app_select2" data-placeholder="*Agent Type" multiple>
                                                 <option value=''>Agent Type</option>
                                                 <option value='Platinum'>Platinum</option>
                                                 <option value='Gold'>Gold</option>

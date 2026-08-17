@@ -986,6 +986,13 @@ function foo(tableID, quot_table_id, rowCounts) {
         mealPlanWrap.appendChild(mealPlanSelect);
       }
       mealPlanWrap.style.marginTop = "35px";
+      var $mealPlan = $(mealPlanSelect);
+      $(row.cells[5]).find(".select2-container").remove();
+      if ($mealPlan.data("select2")) {
+        $mealPlan.select2("destroy");
+      }
+      $mealPlan.addClass("app_select2");
+      $mealPlan.select2({ width: "100%" });
     }
     for (var i = row.cells[6].childNodes[0].attributes.length; i-- > 0; )
       row.cells[6].childNodes[0].removeAttribute(
@@ -1211,10 +1218,16 @@ function foo(tableID, quot_table_id, rowCounts) {
     var prefix =
       tableID == "tbl_package_hotel_master_dynamic_update" ? "_d" : "";
 
-    row.cells[0].childNodes[0].setAttribute(
-      "id",
-      "chk_dest" + prefix + foo.counter
-    );
+    var hotelChk = row.cells[0].querySelector('input[type="checkbox"]');
+    if (hotelChk) {
+      hotelChk.id = "chk_dest" + prefix + foo.counter;
+      hotelChk.name = "chk_dest" + prefix + foo.counter;
+    } else {
+      row.cells[0].childNodes[0].setAttribute(
+        "id",
+        "chk_dest" + prefix + foo.counter
+      );
+    }
     row.cells[2].childNodes[0].setAttribute(
       "id",
       "city_name" + prefix + foo.counter
@@ -1696,10 +1709,16 @@ function foo(tableID, quot_table_id, rowCounts) {
     tableID == "tbl_package_tour_transport_update"
   ) {
     var prefix = tableID == "tbl_package_tour_transport_update" ? "-u" : "";
-    row.cells[0].childNodes[0].setAttribute(
-      "id",
-      "chk_transport1" + foo.counter + prefix
-    );
+    var transportChk = row.cells[0].querySelector('input[type="checkbox"]');
+    if (transportChk) {
+      transportChk.id = "chk_transport1" + foo.counter + prefix;
+      transportChk.name = "chk_transport1" + foo.counter + prefix;
+    } else {
+      row.cells[0].childNodes[0].setAttribute(
+        "id",
+        "chk_transport1" + foo.counter + prefix
+      );
+    }
     row.cells[2].childNodes[0].setAttribute(
       "id",
       "vehicle_name1" + foo.counter + prefix
@@ -4957,9 +4976,20 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         // Special handling for checkbox cell (index 0) - copy complete HTML structure
         if (i === 0) {
             console.log("DEBUG: Special handling for checkbox cell");
+            newcell.className = oldCell.className;
+            if (oldCell.getAttribute("style")) {
+                newcell.setAttribute("style", oldCell.getAttribute("style"));
+            } else {
+                newcell.style.verticalAlign = "middle";
+                newcell.style.textAlign = "center";
+            }
             var cellContent = oldCell.innerHTML;
             // Replace IDs to be unique for the new row
             cellContent = cellContent.replace(/chk_programd[0-9]+/g, 'chk_programd' + rowCount);
+            cellContent = cellContent.replace(/id="chk_dest[^"]*"/g, 'id="chk_dest' + (rowCount + 1) + '"');
+            cellContent = cellContent.replace(/name="chk_dest[^"]*"/g, 'name="chk_dest' + (rowCount + 1) + '"');
+            cellContent = cellContent.replace(/id="chk_transport[^"]*"/g, 'id="chk_transport' + (rowCount + 1) + '"');
+            cellContent = cellContent.replace(/name="chk_transport[^"]*"/g, 'name="chk_transport' + (rowCount + 1) + '"');
             // Ensure checkbox is checked by default
             cellContent = cellContent.replace(/<input[^>]*type="checkbox"[^>]*>/g, function(match) {
                 if (match.includes('checked')) {
@@ -4969,6 +4999,13 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                 }
             });
             newcell.innerHTML = cellContent;
+            var clonedChk = newcell.querySelector('input[type="checkbox"]');
+            if (clonedChk) {
+                var chkBase = (clonedChk.id || 'chk_dest').replace(/[0-9]+$/, '') || 'chk_dest';
+                clonedChk.id = chkBase + (rowCount + 1);
+                clonedChk.name = clonedChk.id;
+                clonedChk.checked = true;
+            }
             continue;
         }
         
