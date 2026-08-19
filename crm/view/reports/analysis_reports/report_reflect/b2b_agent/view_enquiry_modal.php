@@ -1,5 +1,6 @@
 <?php
 include "../../../../../model/model.php";
+include __DIR__ . '/../inc/analysis_report_helpers.php';
 global $currency;
 $fromdate = !empty($_POST['fromdate']) ? get_date_db($_POST['fromdate']) : null;
 $todate = !empty($_POST['todate']) ? get_date_db($_POST['todate']) : null;
@@ -33,11 +34,7 @@ $count = 1;
                         <div role="tabpanel" class="tab-pane active" id="basic_information">   
                             <?php
                             $sq_booking = mysqli_fetch_assoc(mysqlQuery("select register_id from b2b_registration where customer_id='$customer_id'"));
-                            $quot_query_count = "select register_id from b2b_quotations where register_id='$sq_booking[register_id]'";
-                            if (!empty($fromdate) && !empty($todate)) {
-                                $quot_query_count .= " and DATE(created_at) between '" . $fromdate . "' and '" . $todate . "'";
-                            }
-                            $sq_quot_count = mysqli_num_rows(mysqlQuery($quot_query_count));
+                            $sq_quot_count = analysis_report_b2b_quotation_count($customer_id, $fromdate, $todate);
                             if($sq_quot_count > 0){
                                 ?>
                                 <div class="row">
@@ -53,12 +50,13 @@ $count = 1;
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $quot_query = "select * from b2b_quotations where register_id='$sq_booking[register_id]'";
-                                                if (!empty($fromdate) && !empty($todate)) {
-                                                    $quot_query .= " and DATE(created_at) between '" . $fromdate . "' and '" . $todate . "'";
-                                                }
-                                                $sq_quot = mysqlQuery($quot_query);
-                                                while ($row_quotation = mysqli_fetch_assoc($sq_quot)){
+                                                if (!empty($sq_booking['register_id'])) {
+                                                    $quot_query = "select * from b2b_quotations where register_id='{$sq_booking['register_id']}'";
+                                                    if (!empty($fromdate) && !empty($todate)) {
+                                                        $quot_query .= " and DATE(created_at) between '" . $fromdate . "' and '" . $todate . "'";
+                                                    }
+                                                    $sq_quot = mysqlQuery($quot_query);
+                                                    while ($row_quotation = mysqli_fetch_assoc($sq_quot)){
                                                     $cart_list_arr = $row_quotation['cart_list_arr'];
                                                     $pdf_data_array = json_decode($row_quotation['pdf_data_array']);
                                                     $cust_name = $pdf_data_array[0]->cust_name;
@@ -85,11 +83,43 @@ $count = 1;
                                                     ?>
                                                     <tr>
                                                         <td><?php echo $count; ?></td>
-                                                        <td><?php echo $cust_name; ?></td>
+                                                        <td><?php echo $cust_name; ?> (B2B Portal)</td>
                                                         <td><?php echo get_date_user($row_quotation['created_at']); ?></td>
                                                         <td><?php echo number_format($quotation_cost,2); ?></td>
                                                     </tr>
                                                     <?php $count++; 
+                                                    }
+                                                }
+
+                                                $names = analysis_report_b2b_customer_names($customer_id);
+                                                $name_filters = array();
+                                                if ($names['company_name'] !== '') {
+                                                    $name_filters[] = "e.name = '" . addslashes($names['company_name']) . "'";
+                                                }
+                                                if ($names['full_name'] !== '') {
+                                                    $name_filters[] = "e.name = '" . addslashes($names['full_name']) . "'";
+                                                }
+                                                $name_sql = $name_filters ? (' OR ' . implode(' OR ', $name_filters)) : '';
+                                                $pkg_quot_query = "SELECT q.* FROM package_tour_quotation_master q
+                                                    LEFT JOIN package_tour_booking_master b ON b.quotation_id = q.quotation_id AND b.delete_status='0'
+                                                    LEFT JOIN enquiry_master e ON q.enquiry_id = e.enquiry_id
+                                                    WHERE (b.customer_id='$customer_id'" . $name_sql . ")";
+                                                if (!empty($fromdate) && !empty($todate)) {
+                                                    $pkg_quot_query .= " AND DATE(q.created_at) between '" . $fromdate . "' and '" . $todate . "'";
+                                                }
+                                                $pkg_quot_query .= " GROUP BY q.quotation_id ORDER BY q.quotation_id DESC";
+                                                $sq_pkg_quot = mysqlQuery($pkg_quot_query);
+                                                while ($row_pkg_quot = mysqli_fetch_assoc($sq_pkg_quot)) {
+                                                    $sq_cost = mysqli_fetch_assoc(mysqlQuery("select sum(total_tour_cost) as total_tour_cost from package_tour_quotation_costing_entries where quotation_id='{$row_pkg_quot['quotation_id']}'"));
+                                                    $quotation_cost = $sq_cost['total_tour_cost'] ?? 0;
+                                                    ?>
+                                                    <tr>
+                                                        <td><?php echo $count; ?></td>
+                                                        <td><?php echo $row_pkg_quot['customer_name']; ?> (Package)</td>
+                                                        <td><?php echo get_date_user($row_pkg_quot['quotation_date']); ?></td>
+                                                        <td><?php echo number_format($quotation_cost, 2); ?></td>
+                                                    </tr>
+                                                    <?php $count++;
                                                 }
                                                 ?>
                                             </tbody>
@@ -104,11 +134,7 @@ $count = 1;
                         <div role="tabpanel" class="tab-pane" id="booking_information">
                             <?php
                             $count = 1;
-                            $booking_query_count = "select * from b2b_booking_master where customer_id='$customer_id' and status=''";
-                            if (!empty($fromdate) && !empty($todate)) {
-                                $booking_query_count .= " and DATE(created_at) between '" . $fromdate . "' and '" . $todate . "'";
-                            }
-                            $sq_booking_count = mysqli_num_rows(mysqlQuery($booking_query_count));
+                            $sq_booking_count = analysis_report_b2b_booking_count($customer_id, $fromdate, $todate);
                             if($sq_booking_count > 0){
                                 ?>
                                 <div class="row">
@@ -354,6 +380,24 @@ $count = 1;
                                                         <td><?php echo get_b2b_booking_id($row_booking['booking_id'],$yr[0]); ?></td>
                                                         <td><?php echo get_date_user($date); ?></td>
                                                         <td><?php echo number_format($servie_total,2); ?></td>
+                                                    </tr>
+                                                <?php $count++; } ?>
+
+                                                <?php
+                                                $pkg_booking_query = "select * from package_tour_booking_master where customer_id='$customer_id' and delete_status='0'";
+                                                if (!empty($fromdate) && !empty($todate)) {
+                                                    $pkg_booking_query .= " and DATE(booking_date) between '" . $fromdate . "' and '" . $todate . "'";
+                                                }
+                                                $sq_pkg_booking = mysqlQuery($pkg_booking_query);
+                                                while ($row_pkg_booking = mysqli_fetch_assoc($sq_pkg_booking)) {
+                                                    $date = $row_pkg_booking['booking_date'];
+                                                    $yr = explode("-", $date);
+                                                    ?>
+                                                    <tr>
+                                                        <td><?php echo $count; ?></td>
+                                                        <td><?php echo get_package_booking_id($row_pkg_booking['booking_id'], $yr[0]); ?> (Package)</td>
+                                                        <td><?php echo get_date_user($date); ?></td>
+                                                        <td><?php echo number_format($row_pkg_booking['net_total'], 2); ?></td>
                                                     </tr>
                                                 <?php $count++; } ?>
                                             </tbody>

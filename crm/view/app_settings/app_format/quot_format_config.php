@@ -3,6 +3,46 @@
  * Shared quotation format labels and option → format_image_master.type mapping.
  * Used by upload modal; main format screen keeps its inline array unchanged.
  */
+if (!function_exists('quot_format_get_preview_base_url')) {
+	function quot_format_get_preview_base_url()
+	{
+		return 'https://itoursdemo.co.in/quotation-format/';
+	}
+}
+
+if (!function_exists('quot_format_get_preview_urls')) {
+	/**
+	 * Sample PDF opened from Administration → Format → View (per dropdown option).
+	 */
+	function quot_format_get_preview_urls()
+	{
+		$base = quot_format_get_preview_base_url();
+		return array(
+			'1'  => $base . 'Quotation-Option-1.pdf',
+			'2'  => $base . 'Quotation-Option-2.pdf',
+			'3'  => $base . 'Quotation-Option-3.pdf',
+			'4'  => $base . 'Quotation-Option-4.pdf',
+			'5'  => $base . 'Quotation-Option-5.pdf',
+			'6'  => $base . 'Quotation-Option-6.pdf',
+			'7'  => $base . 'Quotation-Option-7.pdf',
+			'9'  => $base . 'Quotation-Option-6.pdf',
+			'10' => $base . 'Quotation-Option-7.pdf',
+		);
+	}
+}
+
+if (!function_exists('quot_format_get_preview_pdf_url')) {
+	function quot_format_get_preview_pdf_url($quot_format)
+	{
+		$urls = quot_format_get_preview_urls();
+		$key = (string) (int) $quot_format;
+		if ($key !== '0' && isset($urls[$key])) {
+			return $urls[$key];
+		}
+		return $urls['1'];
+	}
+}
+
 if (!function_exists('quot_format_get_labels')) {
 	function quot_format_get_labels()
 	{

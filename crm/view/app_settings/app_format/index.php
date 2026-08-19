@@ -1,20 +1,11 @@
 <?php
 include "../../../model/model.php";
+include __DIR__ . '/quot_format_config.php';
 $sq_settings = mysqli_fetch_assoc(mysqlQuery("select * from app_settings"));
 $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_master"));
 
-$quot_format_labels = array(
-  1  => 'Option-1',
-  2  => 'Option-2',
-  3  => 'Option-3',
-  4  => 'Option-4',
-  5  => 'Option-5',
-  // 6  => 'Option-6',
-  // 7  => 'Option-7',
-  // 8  => 'Option-8',
-  9  => 'Portrait Standard',
-  10 => 'Portrait Advanced',
-);
+$quot_format_labels = quot_format_get_labels();
+$quot_format_preview_urls = quot_format_get_preview_urls();
 $qf_val = (int) (isset($sq_settings['quot_format']) ? $sq_settings['quot_format'] : 0);
 // If nothing / invalid option is stored, default to Option-1
 if ($qf_val <= 0 || !isset($quot_format_labels[$qf_val])) {
@@ -273,30 +264,13 @@ $quot_format = $quot_format_labels[$qf_val];
 
   }
 
+  var quotFormatPreviewUrls = <?= json_encode($quot_format_preview_urls) ?>;
+
   function display_modal(format_list) {
-
-    var format = $('#' + format_list).val();
-    var base_url = $('#base_url').val();
-
-    if (format == 2) {
-      window.open('https://itourscloud.com/quotation_format_images/quot_pdf/Landscape-Standard-Pdf', '_blank');
-      return false;
-    } else if (format == 3) {
-      window.open('https://itourscloud.com/quotation_format_images/quot_pdf/Landscape-Creative-Pdf', '_blank');
-      return false;
-    } else if (format == 4) {
-      window.open('https://itourscloud.com/quotation_format_images/quot_pdf/Portrait-Creative-Pdf', '_blank');
-      return false;
-    } else if (format == 5) {
-      window.open('https://itourscloud.com/quotation_format_images/quot_pdf/Portrait-Advanced-Pdf', '_blank');
-      return false;
-    } else if (format == 6) {
-      window.open('https://itourscloud.com/quotation_format_images/quot_pdf/Landscape-Advanced-Pdf', '_blank');
-      return false;
-    } else {
-      window.open('https://itourscloud.com/quotation_format_images/quot_pdf/Portiat-Standard-Pdf', '_blank');
-      return false;
-    }
+    var format = String($('#' + format_list).val() || '1');
+    var previewUrl = quotFormatPreviewUrls[format] || quotFormatPreviewUrls['1'];
+    window.open(previewUrl, '_blank');
+    return false;
   }
 
   function display_images(format_list) {

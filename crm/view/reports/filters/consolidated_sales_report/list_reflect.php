@@ -25,16 +25,12 @@ $global_total_paid = 0;
 $global_total_balance = 0;
 
 // Function to get customer info
-function get_customer_info($customer_id) {
+function get_customer_info($customer_id, $passenger_name = '', $quotation_id = 0, $booking_id = 0) {
 	global $encrypt_decrypt, $secret_key;
 	$sq_customer_info = mysqli_fetch_assoc(mysqlQuery("select * from customer_master where customer_id='$customer_id'"));
 	$contact_no = $encrypt_decrypt->fnDecrypt($sq_customer_info['contact_no'], $secret_key);
 	$email_id = $encrypt_decrypt->fnDecrypt($sq_customer_info['email_id'], $secret_key);
-	if ($sq_customer_info['type'] == 'Corporate' || $sq_customer_info['type'] == 'B2B') {
-		$customer_name = $sq_customer_info['company_name'];
-	} else {
-		$customer_name = $sq_customer_info['first_name'] . ' ' . $sq_customer_info['last_name'];
-	}
+	$customer_name = get_booking_customer_display_name($sq_customer_info, $passenger_name, $quotation_id, $booking_id);
 	return array('name' => $customer_name, 'contact' => $contact_no, 'email' => $email_id);
 }
 
@@ -105,7 +101,7 @@ $pass_count = mysqli_num_rows(mysqlQuery("select * from package_travelers_detail
 	}
 
 		// Customer info
-		$cust_info = get_customer_info($row_package['customer_id']);
+		$cust_info = get_customer_info($row_package['customer_id'], $row_package['contact_person_name'], $row_package['quotation_id'], $row_package['booking_id']);
 		$customer_name = $cust_info['name'];
 		$contact_no = $cust_info['contact'];
 		$email_id = $cust_info['email'];

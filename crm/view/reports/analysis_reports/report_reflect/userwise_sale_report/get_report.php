@@ -1,5 +1,6 @@
 <?php
-include "../../../../../model/model.php"; 
+include "../../../../../model/model.php";
+include __DIR__ . '/../inc/analysis_report_helpers.php';
 $fromdate = !empty($_POST['fromdate']) ? get_date_db($_POST['fromdate']) :null;
 $todate = !empty($_POST['todate']) ? get_date_db($_POST['todate']) :null;
 $array_s = array();
@@ -38,7 +39,7 @@ function get_emp_enq($id,$type){
 $total_converted =0;
 function get_enq_etr_converted($id,$type){
     $query1 = " SELECT * FROM enquiry_master Inner JOIN enquiry_master_entries on enquiry_master.enquiry_id = enquiry_master_entries.enquiry_id left JOIN emp_master on enquiry_master.enquiry_id=emp_master.emp_id 
-    where enquiry_master.assigned_emp_id='".$id."' and enquiry_master_entries.followup_status = 'Converted' and enquiry_master_entries.status != 'False' ".$_SESSION['dateqry'];
+    where enquiry_master.assigned_emp_id='".$id."' and ".analysis_report_converted_status_sql()." and enquiry_master_entries.status != 'False' ".$_SESSION['dateqry'];
     $res = mysqlQuery($query1);
     $budget = 0;
     $count = mysqli_num_rows($res);

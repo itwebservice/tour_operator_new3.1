@@ -666,6 +666,74 @@ if (!function_exists('format_quotation_total_display')) {
                                                                                         return $customer_name . '=' . $booking_id;
                                                                                       }
 
+                                                                                      function get_booking_customer_display_name($customer_info, $passenger_name = '', $quotation_id = 0, $booking_id = 0)
+                                                                                      {
+                                                                                        $customer_type = isset($customer_info['type']) ? $customer_info['type'] : '';
+                                                                                        if ($customer_type == 'Corporate' || $customer_type == 'B2B') {
+                                                                                          $customer_name = trim(isset($customer_info['company_name']) ? $customer_info['company_name'] : '');
+                                                                                          if ($customer_name === '') {
+                                                                                            $customer_name = trim(trim($customer_info['first_name']) . ' ' . trim($customer_info['middle_name']) . ' ' . trim($customer_info['last_name']));
+                                                                                          }
+                                                                                          $passenger = get_booking_passenger_display_name($booking_id, $quotation_id, $passenger_name);
+
+                                                                                          if ($passenger !== '' && !booking_customer_names_match($passenger, $customer_name, $customer_info)) {
+                                                                                            return $customer_name . ' (' . $passenger . ')';
+                                                                                          }
+                                                                                          return $customer_name;
+                                                                                        }
+
+                                                                                        return trim(trim($customer_info['first_name']) . ' ' . trim($customer_info['middle_name']) . ' ' . trim($customer_info['last_name']));
+                                                                                      }
+
+                                                                                      function booking_customer_names_match($passenger, $customer_name, $customer_info)
+                                                                                      {
+                                                                                        $passenger_norm = strtolower(preg_replace('/\s+/', ' ', trim($passenger)));
+                                                                                        if ($passenger_norm === '') {
+                                                                                          return true;
+                                                                                        }
+                                                                                        $compare_names = array($customer_name);
+                                                                                        $compare_names[] = trim(trim($customer_info['first_name']) . ' ' . trim($customer_info['middle_name']) . ' ' . trim($customer_info['last_name']));
+                                                                                        foreach ($compare_names as $name) {
+                                                                                          $name_norm = strtolower(preg_replace('/\s+/', ' ', trim($name)));
+                                                                                          if ($name_norm !== '' && $name_norm === $passenger_norm) {
+                                                                                            return true;
+                                                                                          }
+                                                                                        }
+                                                                                        return false;
+                                                                                      }
+
+                                                                                      function get_booking_passenger_display_name($booking_id = 0, $quotation_id = 0, $contact_person_name = '')
+                                                                                      {
+                                                                                        if ((int) $booking_id > 0) {
+                                                                                          $sq_trav = mysqli_fetch_assoc(mysqlQuery("select first_name, middle_name, last_name from package_travelers_details where booking_id='" . (int) $booking_id . "' and status!='Cancel' order by traveler_id asc limit 1"));
+                                                                                          if ($sq_trav) {
+                                                                                            $traveler_name = trim(trim($sq_trav['first_name']) . ' ' . trim($sq_trav['middle_name']) . ' ' . trim($sq_trav['last_name']));
+                                                                                            if ($traveler_name !== '') {
+                                                                                              return $traveler_name;
+                                                                                            }
+                                                                                          }
+                                                                                        }
+
+                                                                                        if ((int) $quotation_id > 0) {
+                                                                                          $sq_quo = mysqli_fetch_assoc(mysqlQuery("select user_id, customer_name from package_tour_quotation_master where quotation_id='" . (int) $quotation_id . "'"));
+                                                                                          if (!empty($sq_quo['customer_name'])) {
+                                                                                            $quotation_guest = trim($sq_quo['customer_name']);
+                                                                                            if ($quotation_guest !== '') {
+                                                                                              return $quotation_guest;
+                                                                                            }
+                                                                                          }
+                                                                                          if (!empty($sq_quo['user_id'])) {
+                                                                                            $row_user = mysqli_fetch_assoc(mysqlQuery("Select name from customer_users where user_id ='{$sq_quo['user_id']}'"));
+                                                                                            $user_name = trim(isset($row_user['name']) ? $row_user['name'] : '');
+                                                                                            if ($user_name !== '') {
+                                                                                              return $user_name;
+                                                                                            }
+                                                                                          }
+                                                                                        }
+
+                                                                                        return trim($contact_person_name);
+                                                                                      }
+
                                                                                       function get_vendor_name_report($vendor_type, $vendor_type_id)
                                                                                       {
                                                                                         $vendor_type_val = '';

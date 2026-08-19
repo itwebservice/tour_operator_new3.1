@@ -1,5 +1,6 @@
 <?php
-include "../../../../../model/model.php"; 
+include "../../../../../model/model.php";
+include __DIR__ . '/../inc/analysis_report_helpers.php';
 $fromdate = !empty($_POST['fromdate']) ? get_date_db($_POST['fromdate']) :null;
 $todate = !empty($_POST['todate']) ? get_date_db($_POST['todate']) :null;
 $array_s = array();
@@ -202,7 +203,7 @@ function get_enq_etr_active($id='',$type='display'){
     if($type == 'display')
     {
         $query1 = "SELECT * FROM branches INNER JOIN enquiry_master on branches.branch_id = enquiry_master.branch_admin_id Inner JOIN enquiry_master_entries on enquiry_master.enquiry_id = enquiry_master_entries.enquiry_id
-        where branches.branch_id='".$id."' and enquiry_master_entries.followup_status = 'New'".$_SESSION['dateqry'];
+        where branches.branch_id='".$id."' and ".analysis_report_new_status_sql()." and enquiry_master_entries.status != 'False'".$_SESSION['dateqry'];
         $res = mysqlQuery($query1);
         $budget = 0;
         $count = mysqli_num_rows($res);
@@ -327,7 +328,7 @@ function getColor($id)
     if(mysqli_num_rows($run))
     { 
         $e = mysqli_fetch_array($run)['followup_status'];
-        if($e == 'converted')
+        if(strtolower($e) == 'converted')
         {
             return 'success';
         }
@@ -349,7 +350,7 @@ function get_enq_etr_converted($id='',$type='display'){
    if($type == 'display')
    {
         $query1 = "SELECT * FROM branches INNER JOIN enquiry_master on branches.branch_id = enquiry_master.branch_admin_id Inner JOIN enquiry_master_entries on enquiry_master.enquiry_id = enquiry_master_entries.enquiry_id
-        where branches.branch_id='".$id."' and enquiry_master_entries.followup_status = 'Converted' and enquiry_master_entries.status != 'False' ".$_SESSION['dateqry'];
+        where branches.branch_id='".$id."' and ".analysis_report_converted_status_sql()." and enquiry_master_entries.status != 'False' ".$_SESSION['dateqry'];
         $res = mysqlQuery($query1);
         $budget = 0;
         $count = mysqli_num_rows($res);

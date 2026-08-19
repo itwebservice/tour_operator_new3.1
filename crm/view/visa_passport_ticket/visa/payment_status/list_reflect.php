@@ -67,11 +67,7 @@ while ($row_visa = mysqli_fetch_assoc($sq_visa)) {
 	$sq_customer_info = mysqli_fetch_assoc(mysqlQuery("select * from customer_master where customer_id='$row_visa[customer_id]'"));
 	$contact_no = $encrypt_decrypt->fnDecrypt($sq_customer_info['contact_no'], $secret_key);
 	$email_id = $encrypt_decrypt->fnDecrypt($sq_customer_info['email_id'], $secret_key);
-	if ($sq_customer_info['type'] == 'Corporate' || $sq_customer_info['type'] == 'B2B') {
-		$customer_name = $sq_customer_info['company_name'];
-	} else {
-		$customer_name = $sq_customer_info['first_name'] . ' ' . $sq_customer_info['last_name'];
-	}
+	$customer_name = get_sales_report_customer_name($row_visa['customer_id'], get_sales_report_passenger_name('Visa', $row_visa['visa_id']));
 	$sq_emp = mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id='$row_visa[emp_id]'"));
 	if ($sq_emp['first_name'] == '') {
 		$emp_name = 'Admin';

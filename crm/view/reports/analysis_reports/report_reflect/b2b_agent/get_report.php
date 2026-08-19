@@ -1,5 +1,6 @@
 <?php
 include "../../../../../model/model.php";
+include __DIR__ . '/../inc/analysis_report_helpers.php';
 $fromdate = !empty($_POST['fromdate']) ? get_date_db($_POST['fromdate']) : null;
 $todate = !empty($_POST['todate']) ? get_date_db($_POST['todate']) : null;
 $branch_admin_id = $_SESSION['branch_admin_id'];
@@ -20,19 +21,8 @@ if($branch_status=='yes' && $role!='Admin'){
 $sq_enq1 = mysqlQuery($query);
 $count = 0;
 while ($row_cust = mysqli_fetch_assoc($sq_enq1)) {
-    // Bookings
-    $booking_query = "select customer_id from b2b_booking_master where customer_id='$row_cust[customer_id]' and status=''";
-    if (!empty($fromdate) && !empty($todate)) {
-        $booking_query .= " and DATE(created_at) between '" . $fromdate . "' and '" . $todate . "'";
-    }
-    $sq_booking_count = mysqli_num_rows(mysqlQuery($booking_query));
-    // Quotations
-    $sq_booking = mysqli_fetch_assoc(mysqlQuery("select register_id from b2b_registration where customer_id='$row_cust[customer_id]'"));
-    $quot_query = "select register_id from b2b_quotations where register_id='$sq_booking[register_id]'";
-    if (!empty($fromdate) && !empty($todate)) {
-        $quot_query .= " and DATE(created_at) between '" . $fromdate . "' and '" . $todate . "'";
-    }
-    $sq_quot_count = mysqli_num_rows(mysqlQuery($quot_query));
+    $sq_quot_count = analysis_report_b2b_quotation_count($row_cust['customer_id'], $fromdate, $todate);
+    $sq_booking_count = analysis_report_b2b_booking_count($row_cust['customer_id'], $fromdate, $todate);
 
     $temparr = array("data" => array(
         (int)(++$count),

@@ -77,11 +77,12 @@ while ($row_package = mysqli_fetch_assoc($sq_package)) {
 	$sq_customer_info = mysqli_fetch_assoc(mysqlQuery("select * from customer_master where customer_id='$row_package[customer_id]'"));
 	$contact_no = $encrypt_decrypt->fnDecrypt($sq_customer_info['contact_no'], $secret_key);
 	$email_id = $encrypt_decrypt->fnDecrypt($sq_customer_info['email_id'], $secret_key);
-	if ($sq_customer_info['type'] == 'Corporate' || $sq_customer_info['type'] == 'B2B') {
-		$customer_name = $sq_customer_info['company_name'];
-	} else {
-		$customer_name = $sq_customer_info['first_name'] . ' ' . $sq_customer_info['last_name'];
-	}
+	$customer_name = get_booking_customer_display_name(
+		$sq_customer_info,
+		$row_package['contact_person_name'],
+		$row_package['quotation_id'],
+		$row_package['booking_id']
+	);
 
 	$total_paid = 0;
 	$sq_paid_amount = mysqli_fetch_assoc(mysqlQuery("SELECT sum(amount) as sum,sum(credit_charges) as sumc from  package_payment_master where booking_id='$row_package[booking_id]' and clearance_status!='Pending' and  clearance_status!='Cancelled'"));
@@ -196,12 +197,6 @@ $currency_amount_3= '';
 	$quotation_id = $row_package['quotation_id'];
 	$service_name = "Package Invoice";
 
-	$cust_user_name = '';
-	$sq_quo = mysqli_fetch_assoc(mysqlQuery("select user_id from package_tour_quotation_master where quotation_id='$quotation_id'"));
-	if ($sq_quo['user_id'] != 0) {
-		$row_user = mysqli_fetch_assoc(mysqlQuery("Select name from customer_users where user_id ='$sq_quo[user_id]'"));
-		$cust_user_name = ' (' . $row_user['name'] . ')';
-	}
 	//**Service Tax
 	$taxation_type = $row_package['taxation_type'];
 
@@ -281,7 +276,7 @@ $currency_amount2 = currency_conversion($currency,$row_package['currency_code'],
 
 		(int)(++$count),
 		get_package_booking_id($row_package['booking_id'], $year),
-		$customer_name . $cust_user_name,
+		$customer_name,
 		$contact_no,
 		$email_id,
 		$sq_total_member,

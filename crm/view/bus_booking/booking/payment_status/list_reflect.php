@@ -65,11 +65,7 @@ while ($row_booking = mysqli_fetch_assoc($sq_booking)) {
 	$sq_customer = mysqli_fetch_assoc(mysqlQuery("select * from customer_master where customer_id='$row_booking[customer_id]'"));
 	$contact_no = $encrypt_decrypt->fnDecrypt($sq_customer['contact_no'], $secret_key);
 	$email_id = $encrypt_decrypt->fnDecrypt($sq_customer['email_id'], $secret_key);
-	if ($sq_customer['type'] == 'Corporate' || $sq_customer['type'] == 'B2B') {
-		$customer_name = $sq_customer['company_name'];
-	} else {
-		$customer_name = $sq_customer['first_name'] . ' ' . $sq_customer['last_name'];
-	}
+	$customer_name = get_sales_report_customer_name($row_booking['customer_id'], get_sales_report_passenger_name('Bus', $row_booking['booking_id']));
 	$sq_emp = mysqli_fetch_assoc(mysqlQuery("select * from emp_master where emp_id='$row_booking[emp_id]'"));
 	if ($sq_emp['first_name'] == '') {
 		$emp_name = 'Admin';
