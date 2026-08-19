@@ -114,8 +114,8 @@ function get_cache_data()
     $new_array = array();
     if ($modified_time < time() - 1 * 86400000) {
 
-        //Taxes
-        $result = mysqlQuery("SELECT * FROM tax_master");
+        //Taxes (Active only — used by booking/calculation cache)
+        $result = mysqlQuery("SELECT * FROM tax_master WHERE status='Active'");
         while ($row = mysqli_fetch_array($result)) {
             $temp_array = array(
                 'entry_id' => $row['entry_id'],
@@ -129,8 +129,8 @@ function get_cache_data()
             );
             array_push($taxes_data, $temp_array);
         }
-        //Tax Rules
-        $result = mysqlQuery("SELECT * FROM tax_master_rules");
+        //Tax Rules (Active only)
+        $result = mysqlQuery("SELECT * FROM tax_master_rules WHERE status='Active'");
         while ($row = mysqli_fetch_array($result)) {
             $temp_array = array(
                 'rule_id' => $row['rule_id'],
@@ -150,8 +150,8 @@ function get_cache_data()
             array_push($taxes_rules_data, $temp_array);
         }
 
-        //Other Rules
-        $result = mysqlQuery("SELECT * FROM other_master_rules");
+        //Other Rules (Active only — service charge / markup / commission)
+        $result = mysqlQuery("SELECT * FROM other_master_rules WHERE status='Active'");
         while ($row = mysqli_fetch_array($result)) {
             $temp_array = array(
                 'rule_id' => $row['rule_id'],

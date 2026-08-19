@@ -64,6 +64,7 @@ public function quotation_master_clone()
 			$this->clone_excursion_entries($quotation_id, $quotation_max);
 
 			$this->clone_costing_entries($quotation_id, $quotation_max);
+			$this->clone_pp_costing_entries($quotation_id, $quotation_max);
 			$this->clone_program_entries($quotation_id, $quotation_max);
 			$this->clone_images_entries($quotation_id, $quotation_max);
 			
@@ -694,6 +695,78 @@ public function clone_images_entries($quotation_id, $quotation_max)
 
 }
 
+
+public function clone_pp_costing_entries($quotation_id, $quotation_max){
+
+	$cols=array();
+
+	$result = mysqlQuery("SHOW COLUMNS FROM package_quotation_pp_costing"); 
+
+	 while ($r=mysqli_fetch_assoc($result)) {
+
+	   $cols[]= $r["Field"];
+
+	}
+
+
+
+	  $result = mysqlQuery("SELECT * FROM package_quotation_pp_costing WHERE quotation_id='$quotation_id'");
+
+	  while($r=mysqli_fetch_array($result)) {
+
+
+
+		    $insertSQL = "INSERT INTO package_quotation_pp_costing (".implode(", ",$cols).") VALUES (";
+
+		    $count=count($cols);
+
+
+
+		    foreach($cols as $counter=>$col) {
+
+
+
+		      if($col=='id'){
+
+		      	$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_quotation_pp_costing"));
+
+				$id = $sq_max['max']+1;
+
+				$insertSQL .= "'".$id."'";	
+
+		      }
+
+		      elseif($col=='quotation_id'){
+
+ 			  	$insertSQL .= "'".$quotation_max."'";		
+
+ 			  }
+
+		      else{
+
+		      	$insertSQL .= "'".$r[$col]."'";	
+
+		      }
+
+		      
+
+			  if ($counter<$count-1) {$insertSQL .= ", ";}
+
+
+
+			 }
+
+
+
+			  $insertSQL .= ")";
+
+			  mysqlQuery($insertSQL);
+
+
+
+	  }
+
+}
 
 public function clone_costing_entries($quotation_id, $quotation_max){
 

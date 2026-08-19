@@ -1,5 +1,14 @@
 <?php
 include "../../../model/model.php";
+include __DIR__ . '/quot_format_config.php';
+
+$sq_settings = mysqli_fetch_assoc(mysqlQuery("select quot_format, format_dest_id from app_settings where setting_id='1' limit 1"));
+$qf_val = (int) (isset($sq_settings['quot_format']) ? $sq_settings['quot_format'] : 0);
+$quot_format_labels = quot_format_get_labels();
+if ($qf_val <= 0 || !isset($quot_format_labels[$qf_val])) {
+	$qf_val = 1;
+}
+$format_dest_id = isset($sq_settings['format_dest_id']) ? (int) $sq_settings['format_dest_id'] : 0;
 ?>
 
 
@@ -16,19 +25,17 @@ include "../../../model/model.php";
                 <div class="row">
                     <div class="col-md-6">
                         <select name="format_list_upload" id="format_list_upload" title="Quotation Format List" class="form-control">
-
-                            <option value="Portrait-Standard">Portrait Standard</option>
-                            <option value="Portrait-Creative">Portrait Creative</option>
-                            <option value="Portrait-Advanced">Portrait Advanced</option>
-                            <option value="Landscape-Standard">Landscape Standard</option>
-                            <option value="Landscape-Creative">Landscape Creative</option>
-                            <option value="Landscape-Advanced">Landscape Advanced</option>
+                            <?php foreach ($quot_format_labels as $opt_val => $opt_label) {
+                                $selected = ($qf_val === (int) $opt_val) ? 'selected' : '';
+                            ?>
+                                <option value="<?= (int) $opt_val ?>" <?= $selected ?>><?= htmlspecialchars($opt_label) ?></option>
+                            <?php } ?>
                         </select>
                     </div>
                     <div class="col-md-6">
                         <select name="" id="destination_format_filter_upload" title="Destination" class="form-control" style="width:250px;">
 
-                            <?= get_destinations_option(0) ?>
+                            <?= get_destinations_option($format_dest_id) ?>
                         </select>
                     </div>
                     <div class="col-md-12 text-center mg_tp_10">
@@ -45,13 +52,13 @@ include "../../../model/model.php";
                         </div>
 
                         <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Image Size Should Be Less Than 100KB, Resolution :
-                   portrait standard 807*300,
-                   portrait creative 1240*1470,
-                   portrait advanced 535*1142,
-                   landscape standard 1136*570,
-                   landscape creative 1136*570,
-                   landscape advanced 1137*802
-                   and Format: Jpg/JEPG/Png"><i class="fa fa-question-circle"></i></button>
+                   Option-1 / Portrait Standard: 807×300,
+                   Option-4: 1240×1470,
+                   Option-5 / Portrait Advanced: 535×1142,
+                   Option-2: 1136×570,
+                   Option-3: 1136×570,
+                   Landscape Advanced: 1137×802
+                   and Format: Jpg/JPEG/Png"><i class="fa fa-question-circle"></i></button>
                         <!--  upload End-->
                     </div>
                     <div class="col-md-12 mg_tp_10 text-center">
@@ -67,6 +74,13 @@ include "../../../model/model.php";
     $('#format_upload_modal').modal('show');
     $('#destination_format_filter_upload').select2();
 
+    // Sync with main Quotation Format dropdown when upload modal opens
+    if ($('#format_list').length && $('#format_list').val()) {
+        $('#format_list_upload').val($('#format_list').val());
+    }
+    if ($('#destination_format_filter').length && $('#destination_format_filter').val()) {
+        $('#destination_format_filter_upload').val($('#destination_format_filter').val()).trigger('change.select2');
+    }
 
     upload_qr_company();
 
@@ -102,7 +116,7 @@ include "../../../model/model.php";
                     }
 
                 }
-                if (img_array.length > 1) {
+                if (typeof img_array !== 'undefined' && img_array.length > 1) {
                     error_msg_alert("You can upload only 3 images");
                     return false;
                 }

@@ -15,7 +15,7 @@ $branch_id = isset($_POST['branch_id']) ? $_POST['branch_id'] : '';
 $status = isset($_POST['status']) ? $_POST['status'] : '';
 $quotation_source_type = isset($_POST['quotation_source_type']) ? $_POST['quotation_source_type'] : 'standard';
 
-global $app_quot_format, $modify_entries_switch;
+global $app_quot_format, $modify_entries_switch, $currency;
 if ($status != '') {
 
 	$query = "select * from package_tour_quotation_master where status='$status'";
@@ -299,17 +299,11 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	// $quotation_cost=$total_tour_cost;
 
 
-	// Costing totals are already saved in the quotation currency (e.g. AED).
-	// Show currency code only — do not convert the amount again.
-	$currency_label = '';
-	if (!empty($row_quotation['currency_code']) && $row_quotation['currency_code'] != '0') {
-		$sq_curr_label = mysqli_fetch_assoc(mysqlQuery(
-			"SELECT currency_code FROM currency_name_master WHERE id='" . intval($row_quotation['currency_code']) . "'"
-		));
-		if (!empty($sq_curr_label['currency_code'])) {
-			$currency_label = ' (' . $sq_curr_label['currency_code'] . ')';
-		}
-	}
+	$display_cost_raw = ($row_quotation['costing_type'] == 2) ? $quotation_cost_p : $quotation_cost;
+	$quotation_cost_display = format_quotation_total_display(
+		$display_cost_raw,
+		isset($row_quotation['currency_code']) ? $row_quotation['currency_code'] : $currency
+	);
 	//Proforma Invoice
 	$for = 'Package Tour';
 	$invoice_no = get_quotation_id($row_quotation['quotation_id'], $year);
@@ -470,7 +464,7 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 		$package_name,
 		$row_quotation['customer_name'] . $cust_user_name,
 		get_date_user($row_quotation['quotation_date']),
-		(($row_quotation['costing_type'] == 2) ? $quotation_cost_p : $quotation_cost) . $currency_label,
+		$quotation_cost_display,
 		$emp_name,
 		$mail_button . ' ' . $copy_btn
 	), "bg" => $bg);

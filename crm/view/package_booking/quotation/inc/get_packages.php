@@ -2016,6 +2016,8 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
             uploadLabel.hide();
             uploadLabel.css('display', 'none !important');
             uploadLabel.attr('style', 'display: none !important;');
+            $('#upload_btn_container_' + offset).hide();
+            $('label[for="day_image_' + offset + '"]').hide();
 
             // Hide the requirements tooltip when image is selected
             $('.image-requirements-tooltip').hide();

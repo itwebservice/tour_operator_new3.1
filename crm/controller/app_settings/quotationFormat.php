@@ -1,7 +1,8 @@
 <?php 
 include_once('../../model/model.php');
+include_once(__DIR__ . '/../../view/app_settings/app_format/quot_format_config.php');
 
-$format = $_POST['format'];
+$format = quot_format_resolve_type(isset($_POST['format']) ? $_POST['format'] : '');
 $destination = $_POST['destination'];
 $imgUrl = imgUrl($_POST['imgUrl']);
 

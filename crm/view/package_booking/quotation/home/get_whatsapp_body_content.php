@@ -1,5 +1,6 @@
 <?php
 include "../../../../model/model.php";
+include_once __DIR__ . '/../../../../model/package_tour/quotation/quotation_rich_text_helpers.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -219,7 +220,7 @@ if (in_array('inclusion_exclusion', $options)) {
     $email_content .= "✅  *Inclusions*\n";
     $email_content .= "-----------\n";
     if (!empty($sq_quotation['inclusions'])) {
-        $email_content .= $sq_quotation['inclusions'] . "\n\n";
+        $email_content .= quotation_rich_text_to_whatsapp($sq_quotation['inclusions']) . "\n\n";
     } else {
         $email_content .= "Inclusions will be provided upon confirmation.\n\n";
     }
@@ -228,7 +229,7 @@ if (in_array('inclusion_exclusion', $options)) {
     $email_content .= "❌  *Exclusions*\n";
     $email_content .= "-----------\n";
     if (!empty($sq_quotation['exclusions'])) {
-        $email_content .= $sq_quotation['exclusions'] . "\n\n";
+        $email_content .= quotation_rich_text_to_whatsapp($sq_quotation['exclusions']) . "\n\n";
     } else {
         $email_content .= "Exclusions will be provided upon confirmation.\n\n";
     }

@@ -589,6 +589,7 @@ function findImageUrl($image_path, $is_new_quotation = false)
 
                 // Hide the upload button when image is uploaded
                 $('label[for="day_image_' + offset + '"]').hide();
+                $('#upload_btn_container_' + offset).hide();
 
                 // Show the remove button
                 $('#day_image_preview_' + offset).find('button[onclick*="removeDayImage"]').show();
@@ -899,6 +900,13 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 day_image = window.quotationImages[imageKey].image_url;
                 existing_image_path = day_image;
                 console.log("TAB2: Using uploaded image URL for key", imageKey, ":", day_image);
+            } else if (window.quotationImages && window.quotationImages[imageKey] && window.quotationImages[imageKey].file) {
+                // Pending upload — keep any existing DB path until post-save upload completes
+                if (existingImageInput && existingImageInput.value) {
+                    day_image = existingImageInput.value;
+                    existing_image_path = existingImageInput.value;
+                }
+                console.log("TAB2: Pending image upload for key", imageKey);
             } else if (imageInput) {
                 day_image = imageInput.value;
                 console.log("TAB2: Using day_image for day", i, ":", day_image);

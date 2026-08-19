@@ -104,7 +104,7 @@ $(function () {
 				return false;
 			}
 			var tour_name = $('#txt_package_tour_name').val();
-			var package_id = $('#txt_package_package_id').val();
+			var package_id = $('#txt_package_package_id').val() || $('#package1').val() || '';
 			var tour_type = $('#tour_type').val();
 			var tour_from_date = $('#txt_package_from_date');
 			tour_from_date = $(tour_from_date).val();

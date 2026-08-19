@@ -2,6 +2,7 @@
 error_reporting(E_ALL);
 // include_once('../../model.php');
 include_once dirname(__FILE__) . '/quotation_email_pdf_style_renderer.php';
+include_once dirname(__FILE__) . '/quotation_rich_text_helpers.php';
 
 class quotation_email_send
 {
@@ -781,7 +782,7 @@ class quotation_email_send
 					<tr>
 						<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
 							<tr>
-								<td style="text-align:left;border: 1px solid #888888;width:100%"><pre>' . $sq_quotation['inclusions'] . '</pre></td></tr>
+								<td style="text-align:left;border: 1px solid #888888;width:100%"><div style="line-height:1.65;word-wrap:break-word;">' . quotation_rich_text_for_email_html($sq_quotation['inclusions']) . '</div></td></tr>
 						</table>
 					</tr>';
 			$content .= '<tr>
@@ -793,7 +794,7 @@ class quotation_email_send
 					<tr>
 						<table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
 							<tr>
-								<td style="text-align:left;border: 1px solid #888888;width:100%"><pre>' . $sq_quotation['exclusions'] . '</pre></td></tr>
+								<td style="text-align:left;border: 1px solid #888888;width:100%"><div style="line-height:1.65;word-wrap:break-word;">' . quotation_rich_text_for_email_html($sq_quotation['exclusions']) . '</div></td></tr>
 						</table>
 					</tr>';
 			}
@@ -1700,6 +1701,12 @@ Thank you.');
 		$transport_details = '';
 		$inclusions_details = '';
 		$exclusions_details = '';
+		if (!empty($sq_quotation['inclusions'])) {
+			$inclusions_details = quotation_rich_text_to_whatsapp($sq_quotation['inclusions']);
+		}
+		if (!empty($sq_quotation['exclusions'])) {
+			$exclusions_details = quotation_rich_text_to_whatsapp($sq_quotation['exclusions']);
+		}
 		$terms_and_conditions_details = '';
 		$quotation_link = BASE_URL . 'crm/model/package_tour/quotation/single_quotation.php?quotation=' . base64_encode($quotation_id);
 		$app_name = 'ITOURS LLP PVT LTDS';
@@ -2014,22 +2021,7 @@ Thank you.');
 			$whatsapp_msg .= "✅  *Inclusions*\n";
 			$whatsapp_msg .= "-----------\n";
 			if (!empty($sq_quotation['inclusions'])) {
-				// Remove HTML tags and clean up the text
-				$inclusions = $sq_quotation['inclusions'];
-				$inclusions = strip_tags($inclusions);
-				$inclusions = html_entity_decode($inclusions, ENT_QUOTES, 'UTF-8');
-				$inclusions = preg_replace('/\s+/', ' ', $inclusions); // Replace multiple spaces with single space
-				$inclusions = trim($inclusions);
-
-				// Split by common separators and format as bullet points
-				$inclusions_list = preg_split('/(\.|;|,)/', $inclusions);
-				foreach ($inclusions_list as $inclusion) {
-					$inclusion = trim($inclusion);
-					if (!empty($inclusion)) {
-						$whatsapp_msg .= "• " . $inclusion . "\n";
-					}
-				}
-				$whatsapp_msg .= "\n";
+				$whatsapp_msg .= quotation_rich_text_to_whatsapp($sq_quotation['inclusions']) . "\n\n";
 			} else {
 				$whatsapp_msg .= "Inclusions will be provided upon confirmation.\n\n";
 			}
@@ -2038,22 +2030,7 @@ Thank you.');
 			$whatsapp_msg .= "❌  *Exclusions*\n";
 			$whatsapp_msg .= "-----------\n";
 			if (!empty($sq_quotation['exclusions'])) {
-				// Remove HTML tags and clean up the text
-				$exclusions = $sq_quotation['exclusions'];
-				$exclusions = strip_tags($exclusions);
-				$exclusions = html_entity_decode($exclusions, ENT_QUOTES, 'UTF-8');
-				$exclusions = preg_replace('/\s+/', ' ', $exclusions); // Replace multiple spaces with single space
-				$exclusions = trim($exclusions);
-
-				// Split by common separators and format as bullet points
-				$exclusions_list = preg_split('/(\.|;|,)/', $exclusions);
-				foreach ($exclusions_list as $exclusion) {
-					$exclusion = trim($exclusion);
-					if (!empty($exclusion)) {
-						$whatsapp_msg .= "• " . $exclusion . "\n";
-					}
-				}
-				$whatsapp_msg .= "\n";
+				$whatsapp_msg .= quotation_rich_text_to_whatsapp($sq_quotation['exclusions']) . "\n\n";
 			} else {
 				$whatsapp_msg .= "Exclusions will be provided upon confirmation.\n\n";
 			}

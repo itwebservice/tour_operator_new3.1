@@ -103,9 +103,9 @@ try {
                             AND day_count = '$day_number_esc'";
             
             error_log("DEBUG: Updating package_quotation_program with query: " . $update_query);
-            $result = mysqlQuery($update_query);
+            mysqlQuery($update_query);
             $affected = ($conn instanceof mysqli) ? mysqli_affected_rows($conn) : 0;
-            error_log("DEBUG: Database update result: " . ($result ? 'SUCCESS' : 'FAILED') . ", affected rows: " . $affected);
+            error_log("DEBUG: Primary update affected rows: " . $affected);
 
             if ($affected === 0) {
                 $fallback_query = "UPDATE package_quotation_program 
@@ -120,7 +120,7 @@ try {
                 error_log("DEBUG: Fallback update affected rows: " . $affected);
             }
             
-            if ($result && $affected > 0) {
+            if ($affected > 0) {
                 $response['success'] = true;
                 $response['message'] = "Image uploaded successfully";
                 $response['image_url'] = BASE_URL . $image_url_with_day;

@@ -88,6 +88,12 @@ if (!function_exists('o1_list_item_text')) {
 if (!function_exists('o1_list_items')) {
   function o1_list_items($html, $default = '')
   {
+    if (!function_exists('quotation_rich_text_to_list_items')) {
+      include_once dirname(__FILE__) . '/../../../../package_tour/quotation/quotation_rich_text_helpers.php';
+    }
+    if (function_exists('quotation_rich_text_to_list_items')) {
+      return quotation_rich_text_to_list_items($html, $default);
+    }
     $html = (string)$html;
     $items = array();
 

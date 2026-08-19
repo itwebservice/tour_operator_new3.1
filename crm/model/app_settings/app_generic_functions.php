@@ -288,6 +288,35 @@ if (!function_exists('currency_conversion_amount')) {
     return $currency_amount;
 }
 
+/**
+ * Package quotation list/modal total: INR (company default) first, quotation currency in brackets.
+ * Costing totals are stored in the selected quotation currency.
+ */
+if (!function_exists('format_quotation_total_display')) {
+	function format_quotation_total_display($amount, $quotation_currency_id = null)
+	{
+		global $currency;
+
+		if (is_string($amount)) {
+			$amount = str_replace(',', '', $amount);
+		}
+		$amount = floatval($amount);
+
+		$q_currency = ($quotation_currency_id !== null && $quotation_currency_id !== '' && $quotation_currency_id !== '0')
+			? $quotation_currency_id
+			: $currency;
+
+		$inr_amount = currency_conversion_amount($q_currency, $currency, $amount);
+		$display = number_format($inr_amount, 2);
+
+		if ($q_currency !== '' && $q_currency !== '0' && $currency != $q_currency) {
+			$display .= ' (' . currency_conversion($q_currency, $q_currency, $amount) . ')';
+		}
+
+		return $display;
+	}
+}
+
 
                                                                                       function get_date_user($date)
                                                                                       {

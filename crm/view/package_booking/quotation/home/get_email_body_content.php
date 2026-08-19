@@ -1,5 +1,6 @@
 <?php
 include "../../../../model/model.php";
+include_once __DIR__ . '/../../../../model/package_tour/quotation/quotation_rich_text_helpers.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -322,20 +323,7 @@ if ($transport_count > 0) {
 $inclusion_section = "✅  *Inclusions*\n";
 $inclusion_section .= "-----------\n";
 if (!empty($sq_quotation['inclusions'])) {
-    $inclusions = $sq_quotation['inclusions'];
-    $inclusions = strip_tags($inclusions);
-    $inclusions = html_entity_decode($inclusions, ENT_QUOTES, 'UTF-8');
-    $inclusions = preg_replace('/\s+/', ' ', $inclusions);
-    $inclusions = trim($inclusions);
-
-    $inclusions_list = preg_split('/(\.|;|,)/', $inclusions);
-    foreach ($inclusions_list as $inclusion) {
-        $inclusion = trim($inclusion);
-        if (!empty($inclusion) && strlen($inclusion) > 10) {
-            $inclusion_section .= "• " . $inclusion . "\n";
-        }
-    }
-    $inclusion_section .= "\n";
+    $inclusion_section .= quotation_rich_text_to_whatsapp($sq_quotation['inclusions']) . "\n\n";
 } else {
     $inclusion_section .= "Inclusions will be provided upon confirmation.\n\n";
 }
@@ -343,20 +331,7 @@ if (!empty($sq_quotation['inclusions'])) {
 $inclusion_section .= "❌  *Exclusions*\n";
 $inclusion_section .= "-----------\n";
 if (!empty($sq_quotation['exclusions'])) {
-    $exclusions = $sq_quotation['exclusions'];
-    $exclusions = strip_tags($exclusions);
-    $exclusions = html_entity_decode($exclusions, ENT_QUOTES, 'UTF-8');
-    $exclusions = preg_replace('/\s+/', ' ', $exclusions);
-    $exclusions = trim($exclusions);
-
-    $exclusions_list = preg_split('/(\.|;|,)/', $exclusions);
-    foreach ($exclusions_list as $exclusion) {
-        $exclusion = trim($exclusion);
-        if (!empty($exclusion) && strlen($exclusion) > 10) {
-            $inclusion_section .= "• " . $exclusion . "\n";
-        }
-    }
-    $inclusion_section .= "\n";
+    $inclusion_section .= quotation_rich_text_to_whatsapp($sq_quotation['exclusions']) . "\n\n";
 } else {
     $inclusion_section .= "Exclusions will be provided upon confirmation.\n\n";
 }

@@ -53,7 +53,16 @@ if (!function_exists('qeh_rich_block')) {
 		if ($content === '') {
 			return '';
 		}
-		return qeh_section_heading($title) . qeh_kv_table(array(array('full' => '<div style="color:#555;">' . $content . '</div>')));
+		if (!function_exists('quotation_rich_text_for_email_html')) {
+			include_once __DIR__ . '/../../../../../model/package_tour/quotation/quotation_rich_text_helpers.php';
+		}
+		if (function_exists('quotation_rich_text_for_email_html') && strpos($content, '<') !== false) {
+			$content = quotation_rich_text_for_email_html($content);
+		}
+		$wrap_style = function_exists('quotation_rich_text_word_wrapper_style')
+			? quotation_rich_text_word_wrapper_style()
+			: 'line-height:1.65;word-wrap:break-word;overflow-wrap:break-word;';
+		return qeh_section_heading($title) . qeh_kv_table(array(array('full' => '<div style="color:#555;' . $wrap_style . '">' . $content . '</div>')));
 	}
 }
 

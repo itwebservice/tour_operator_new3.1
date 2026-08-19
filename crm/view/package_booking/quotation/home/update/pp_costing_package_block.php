@@ -62,7 +62,9 @@ $pax_defs = array(
 				value="<?= htmlspecialchars($package_type) ?>" readonly>
 		</div>
 		<div class="col-md-3">
+			
 			<span>Currency</span>
+			
 			<select name="currency_code_pp<?= $suffix ?>" id="currency_code_pp<?= $suffix ?>" title="Currency" style="width:100%" data-toggle="tooltip">
 				<option value="">*Select Currency</option>
 				<?php

@@ -1,6 +1,7 @@
 <?php
 //Generic Files
 include "../../../../model.php";
+include_once __DIR__ . '/../../../../package_tour/quotation/quotation_rich_text_helpers.php';
 
 include "printFunction.php";
 global $app_quot_img, $similar_text, $quot_note, $currency, $tcs_note, $app_quot_format;
@@ -618,7 +619,7 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
             <div class="incluExcluTermsTabPanel inclusions main_block">
               <h3 class="incexTitle" style="font-size:22px;text-align:center;font-weight:600;">INCLUSIONS</h3>
               <div class="tabContent">
-                <div class="real_text"><?= $sq_quotation['inclusions'] ?></div>
+                <div class="real_text" style="<?= quotation_rich_text_word_wrapper_style() ?>"><?= quotation_rich_text_for_email_html($sq_quotation['inclusions']) ?></div>
               </div>
             </div>
           </div>
@@ -631,7 +632,7 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
             <div class="incluExcluTermsTabPanel exclusions main_block">
               <h3 class="incexTitle" style="font-size:22px;text-align:center;font-weight:600;">EXCLUSIONS</h3>
               <div class="tabContent">
-                <div class="real_text"><?= $sq_quotation['exclusions'] ?></div>
+                <div class="real_text" style="<?= quotation_rich_text_word_wrapper_style() ?>"><?= quotation_rich_text_for_email_html($sq_quotation['exclusions']) ?></div>
               </div>
             </div>
           </div>

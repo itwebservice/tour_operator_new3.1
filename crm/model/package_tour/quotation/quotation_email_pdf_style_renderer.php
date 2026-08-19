@@ -7,6 +7,8 @@
  */
 if (!function_exists('render_quotation_email_pdf_style')) {
 
+@include_once dirname(__FILE__) . '/quotation_rich_text_helpers.php';
+
 	function qes_esc($v)
 	{
 		return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
@@ -30,6 +32,9 @@ if (!function_exists('render_quotation_email_pdf_style')) {
 
 	function qes_list_items($html, $default = '')
 	{
+		if (function_exists('quotation_rich_text_to_list_items')) {
+			return quotation_rich_text_to_list_items($html, $default);
+		}
 		$html = (string) $html;
 		if (trim(strip_tags($html)) === '') {
 			return $default !== '' ? array($default) : array();
@@ -40,16 +45,6 @@ if (!function_exists('render_quotation_email_pdf_style')) {
 				$t = trim(strip_tags(html_entity_decode($chunk, ENT_QUOTES, 'UTF-8')));
 				if ($t !== '') {
 					$items[] = $t;
-				}
-			}
-		}
-		if (empty($items)) {
-			$plain = trim(strip_tags(html_entity_decode($html, ENT_QUOTES, 'UTF-8')));
-			$parts = preg_split('/\r\n|\r|\n|•/', $plain);
-			foreach ((array) $parts as $p) {
-				$p = trim($p);
-				if ($p !== '' && strlen($p) > 3) {
-					$items[] = $p;
 				}
 			}
 		}
@@ -294,31 +289,34 @@ if (!function_exists('render_quotation_email_pdf_style')) {
 	{
 		$navy = '#0d1e3b';
 		$gold = '#e5ac4c';
-		$inc_items = qes_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.');
-		$exc_items = qes_list_items(isset($incx['excluded']) ? $incx['excluded'] : '', 'Standard exclusions apply.');
+		$body_style = 'font-size:12px;color:#444;line-height:1.65;margin:0;word-wrap:break-word;overflow-wrap:break-word;';
+
+		$included_html = function_exists('quotation_rich_text_for_email_html')
+			? quotation_rich_text_for_email_html(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.')
+			: qes_esc(implode("\n", qes_list_items(isset($incx['included']) ? $incx['included'] : '', 'Inclusions will be shared as per final quotation.')));
+		$excluded_html = function_exists('quotation_rich_text_for_email_html')
+			? quotation_rich_text_for_email_html(isset($incx['excluded']) ? $incx['excluded'] : '', 'Standard exclusions apply.')
+			: qes_esc(implode("\n", qes_list_items(isset($incx['excluded']) ? $incx['excluded'] : '', 'Standard exclusions apply.')));
 
 		$html = '<table width="100%" cellpadding="0" cellspacing="8" role="presentation"><tr>';
 		$html .= '<td width="50%" valign="top" style="border:1px solid rgba(229,172,76,0.35);border-radius:8px;background:#fff;padding:16px;">'
 			. '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:18px;color:' . $navy . ';margin-bottom:8px;">What\'s Included</div>'
-			. '<div style="height:2px;background:' . $gold . ';width:40px;margin-bottom:12px;"></div><ul style="margin:0;padding-left:16px;font-size:12px;color:#444;">';
-		foreach ($inc_items as $item) {
-			$html .= '<li style="margin-bottom:6px;">' . qes_esc($item) . '</li>';
-		}
-		$html .= '</ul></td>';
+			. '<div style="height:2px;background:' . $gold . ';width:40px;margin-bottom:12px;"></div>'
+			. '<div class="quotation-rich-text" style="' . $body_style . '">' . $included_html . '</div></td>';
 		$html .= '<td width="50%" valign="top" style="border:1px solid rgba(229,172,76,0.35);border-radius:8px;background:#fff;padding:16px;">'
 			. '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:18px;color:' . $navy . ';margin-bottom:8px;">What\'s Excluded</div>'
-			. '<div style="height:2px;background:' . $navy . ';width:40px;margin-bottom:12px;"></div><ul style="margin:0;padding-left:16px;font-size:12px;color:#444;">';
-		foreach ($exc_items as $item) {
-			$html .= '<li style="margin-bottom:6px;">' . qes_esc($item) . '</li>';
-		}
-		$html .= '</ul></td></tr></table>';
+			. '<div style="height:2px;background:' . $navy . ';width:40px;margin-bottom:12px;"></div>'
+			. '<div class="quotation-rich-text" style="' . $body_style . '">' . $excluded_html . '</div></td></tr></table>';
 		return $html;
 	}
 
 	function qes_render_terms_block($terms)
 	{
-		$body = qes_nv($terms['terms_and_conditions'], 'Standard terms and conditions apply.');
-		return qes_section_bar('Terms &amp; Conditions') . qes_card_open()
+		$raw = qes_nv($terms['terms_and_conditions'], 'Standard terms and conditions apply.');
+		$body = function_exists('quotation_rich_text_for_email_html')
+			? quotation_rich_text_for_email_html($raw, 'Standard terms and conditions apply.')
+			: $raw;
+		return qes_section_bar('Terms & Conditions') . qes_card_open()
 			. '<div style="font-size:13px;color:#555;line-height:1.6;">' . $body . '</div>' . qes_card_close();
 	}
 

@@ -53,7 +53,7 @@ border-left: 0 !important;
 
 }
 ul.print_info_list li:before {
-content: '\f0da';
+<!-- content: '\f0da'; -->
 position: absolute;
 font-family: fontawesome;
 left: 0;
@@ -82,7 +82,7 @@ display: inline-block;
 position: relative;
 }
 .print_info_block li:before {
-content: '\f101';
+<!-- content: '\f101'; -->
 position: absolute;
 font-family: fontawesome;
 left: -0px;

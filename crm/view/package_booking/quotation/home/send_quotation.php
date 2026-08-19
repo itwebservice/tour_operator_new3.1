@@ -165,6 +165,7 @@ $specific_quotation_id = isset($_POST['quotation_id']) ? $_POST['quotation_id'] 
 $branch_admin_id = $_SESSION['branch_admin_id'];
 $emp_id = $_SESSION['emp_id'];
 $role = $_SESSION['role'];
+global $currency;
 
 // Function to get quotation URLs for a given quotation_id
 function getQuotationUrls($quotation_id) {
@@ -482,17 +483,10 @@ $quotation_count = mysqli_num_rows($sq_query);
 											+ (float) $tcsvalue - (float) $act_discount;
 									}
 
-									// Totals are already in quotation currency — show amount + currency code (no ROE reconvert)
-									$currency_label = '';
-									if (!empty($row_tours['currency_code']) && $row_tours['currency_code'] != '0') {
-										$sq_curr_label = mysqli_fetch_assoc(mysqlQuery(
-											"SELECT currency_code FROM currency_name_master WHERE id='" . intval($row_tours['currency_code']) . "'"
-										));
-										if (!empty($sq_curr_label['currency_code'])) {
-											$currency_label = ' (' . $sq_curr_label['currency_code'] . ')';
-										}
-									}
-									$quotation_cost_1 = $quotation_cost . $currency_label;
+									$quotation_cost_1 = format_quotation_total_display(
+										$quotation_cost,
+										isset($row_tours['currency_code']) ? $row_tours['currency_code'] : $currency
+									);
 
 									$quotation_date = $row_tours['quotation_date'];
 									$yr = explode("-", $quotation_date);
@@ -2429,6 +2423,20 @@ $(document).on('click', function () {
 
     #emailWhatsappModal .copy-subject-btn {
         margin-bottom: 0;
+    }
+
+    #emailWhatsappModal .quotation-rich-text ul {
+        margin: 0 0 0 18px;
+        padding: 0;
+        list-style: disc;
+    }
+
+    #emailWhatsappModal .quotation-rich-text li {
+        margin-bottom: 8px;
+    }
+
+    #emailWhatsappModal .quotation-rich-text p {
+        margin: 0 0 8px;
     }
 
     #emailWhatsappModal #emailPreviewArea {

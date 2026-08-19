@@ -1521,24 +1521,6 @@ function quotation_info_load() {
 		$.get('../inc/get_destin_dropdown.php', {}, function (data) {
 			$('#dest_div').html(data);
 		});
-
-		// taxes_reflect('', '');
-
-		//Packages load
-		var dest_id = $('#dest_name2').val();
-		if (dest_id != 0) {
-			$.ajax({
-				type: 'post',
-				url: '../inc/get_packages.php',
-				data: { dest_id: dest_id },
-				success: function (result) {
-					$('#package_program').html(result);
-				},
-				error: function (result) {
-					console.log(result.responseText);
-				}
-			});
-		}
 	}
 	//currency dropdown load
 	$.get('../inc/get_currency_dropdown.php', {quotation_id:quotation_id}, function (data) {
@@ -1626,6 +1608,7 @@ function get_package_type_costing() {
 }
 function get_package_program(package) {
 	var package_id = $('#' + package).val();
+	$('#txt_package_package_id').val(package_id || '');
 	if (package_id != 0) {
 		///Package hotel info load
 		$.ajax({
@@ -1668,6 +1651,7 @@ function get_package_program(package) {
 		});
 	}
 	else {
+		$('#txt_package_package_id').val('');
 		$('#txt_package_tour_name').val('');
 		$('#tour_type').val('');
 		$('#txt_package_from_date').val('');
@@ -1679,15 +1663,35 @@ function get_package_program(package) {
 function package_dynamic_reflect(dest_name) {
 
 	var dest_id = $('#' + dest_name).val();
+	if (!dest_id || dest_id === '') {
+		$('#package_div').html('');
+		$('#package_program').html('');
+		$('#txt_package_tour_name').val('');
+		$('#tour_type').val('');
+		$('#txt_package_from_date').val('');
+		$('#txt_package_to_date').val('');
+		$('#txt_tour_total_days').val('');
+		return;
+	}
+
+	var prevPackageId = $('#package1').val() || '';
+
 	$.ajax({
 		type: 'post',
 		url: '../inc/get_packages.php',
 		data: { dest_id: dest_id },
 		success: function (result) {
-			if (dest_id != 0) {
+			if (dest_id != 0 && dest_id != '0') {
 				$('#package_div').html(result);
+				if (prevPackageId && $('#package1').find('option[value="' + prevPackageId + '"]').length) {
+					$('#package1').val(prevPackageId);
+					if ($('#package1').data('select2')) {
+						$('#package1').trigger('change.select2');
+					}
+				}
 			}
 			else {
+				$('#package_div').html('');
 				$('#package_program').html(result);
 			}
 		},
@@ -1696,9 +1700,8 @@ function package_dynamic_reflect(dest_name) {
 		}
 	});
 
-	if (dest_id == 0) {
+	if (dest_id == 0 || dest_id == '0') {
 		$('#package_div').html('');
-		$('#package_program').html('');
 		$('#txt_package_tour_name').val('');
 		$('#tour_type').val('');
 		$('#txt_package_from_date').val('');

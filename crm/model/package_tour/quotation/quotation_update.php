@@ -279,7 +279,9 @@ public function quotation_master_update()
 					$row_total = isset($row_check['total']) ? (float)$row_check['total'] : 0;
 					$row_hotel = isset($row_check['hotel']) ? (float)$row_check['hotel'] : 0;
 					$row_land = isset($row_check['land_cost']) ? (float)$row_check['land_cost'] : 0;
-					if ($row_total > 0 || $row_hotel > 0 || $row_land > 0) {
+					$row_transfer = isset($row_check['transfer']) ? (float)$row_check['transfer'] : 0;
+					$row_activity = isset($row_check['activity']) ? (float)$row_check['activity'] : 0;
+					if ($row_total > 0 || $row_hotel > 0 || $row_land > 0 || $row_transfer > 0 || $row_activity > 0) {
 						$posted_has_amount = true;
 						break 2;
 					}
@@ -426,6 +428,10 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 			$stay = addslashes($stay_arr[$i]);
 			$meal_plan = addslashes($meal_plan_arr[$i]);
 			$day_image = isset($day_image_arr[$i]) ? addslashes($day_image_arr[$i]) : '';
+			$row_package_id = $package_id;
+			if (isset($package_p_id_arr[$i]) && $package_p_id_arr[$i] !== '' && $package_p_id_arr[$i] !== null) {
+				$row_package_id = $package_p_id_arr[$i];
+			}
 
 			if($checked_programe_arr1[$i]=="true")
 			{
@@ -434,9 +440,9 @@ public function program_entries_save($quotation_id,$attraction_arr, $program_arr
 
 				// Use the row index as day count for new rows, or use the provided day count
 				$day_count = isset($day_count_arr[$i]) ? $day_count_arr[$i] : ($i + 1);
-				error_log("DEBUG: Using day_count: $day_count for row $i, day_image: $day_image");
+				error_log("DEBUG: Using day_count: $day_count for row $i, package_id: $row_package_id, day_image: $day_image");
 				
-				$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_image,day_count ) values ('$id', '$quotation_id', '$package_id','$attraction','$program', '$stay','$meal_plan','$day_image',$day_count)");
+				$sq_plane = mysqlQuery("insert into package_quotation_program (id, quotation_id,package_id, attraction, day_wise_program, stay,meal_plan,day_image,day_count ) values ('$id', '$quotation_id', '$row_package_id','$attraction','$program', '$stay','$meal_plan','$day_image',$day_count)");
 				if(!$sq_plane){
 					error_log("ERROR: Failed to insert new itinerary entry: " . mysqli_error($GLOBALS['conn']));
 					echo "error--Tour Itinerary not saved!";

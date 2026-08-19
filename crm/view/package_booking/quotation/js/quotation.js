@@ -2380,6 +2380,9 @@ function quotationApplyActivityPpToFields(activityPp, options) {
 			$el = $('#' + quotationPpFieldId(baseId, suffix));
 		}
 		if (!$el.length) return;
+		if (typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($el)) {
+			return;
+		}
 		if (force) {
 			if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
 				quotationWritePpDefaultCurrencyAmount($el, value);
@@ -2514,7 +2517,8 @@ function quotationRefreshPpActivityFromExcursion(options) {
 		: 0;
 
 	// No checked activity / empty calc → keep stored DB or manual amounts
-	if ((!hasCheckedExcursion || calcTotal === 0) && preserveIfEmpty && existingTotal > 0) {
+	if ((!hasCheckedExcursion || calcTotal === 0) && existingTotal > 0
+		&& (preserveIfEmpty || !hasCheckedExcursion)) {
 		if (typeof quotationRestoreUpdatePpSavedAmounts === 'function') {
 			quotationRestoreUpdatePpSavedAmounts();
 		}
@@ -2523,7 +2527,7 @@ function quotationRefreshPpActivityFromExcursion(options) {
 
 	// No checked activity rows and nothing saved → clear PP activity
 	if (!hasCheckedExcursion) {
-		if (typeof quotationApplyActivityPpToFields === 'function') {
+		if (existingTotal <= 0 && typeof quotationApplyActivityPpToFields === 'function') {
 			quotationApplyActivityPpToFields({
 				activity_adult: 0,
 				activity_cweb: 0,
@@ -2636,6 +2640,9 @@ function quotationApplyTransferPpToFields(transferData, options) {
 			$el = $('#' + quotationPpFieldId(baseId, suffix));
 		}
 		if (!$el.length) return;
+		if (typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($el)) {
+			return;
+		}
 		if (force) {
 			if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
 				quotationWritePpDefaultCurrencyAmount($el, value);
@@ -2710,7 +2717,8 @@ function quotationRefreshPpTransferFromTransport(options) {
 		: 0;
 
 	// No checked transport / empty calc → keep stored DB or manual amounts
-	if ((!hasCheckedTransport || calcTotal === 0) && preserveIfEmpty && existingTotal > 0) {
+	if ((!hasCheckedTransport || calcTotal === 0) && existingTotal > 0
+		&& (preserveIfEmpty || !hasCheckedTransport)) {
 		if (typeof quotationRestoreUpdatePpSavedAmounts === 'function') {
 			quotationRestoreUpdatePpSavedAmounts();
 		}
@@ -2719,12 +2727,14 @@ function quotationRefreshPpTransferFromTransport(options) {
 
 	// No checked transport and nothing saved → clear PP transfer
 	if (!hasCheckedTransport) {
-		quotationApplyTransferPpToFields({
-			transfer_adult: 0,
-			transfer_cweb: 0,
-			transfer_cwnb: 0,
-			transfer_infant: 0
-		}, { force: true });
+		if (existingTotal <= 0) {
+			quotationApplyTransferPpToFields({
+				transfer_adult: 0,
+				transfer_cweb: 0,
+				transfer_cwnb: 0,
+				transfer_infant: 0
+			}, { force: true });
+		}
 		return transfer;
 	}
 
@@ -3635,6 +3645,12 @@ function quotationCollectPpCostingEntries(options) {
 	}
 
 	function readAmt($el) {
+		if (!$el || !$el.length) {
+			return 0;
+		}
+		if (typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($el)) {
+			return parseFloat(String($el.val()).replace(/,/g, '')) || 0;
+		}
 		return (typeof quotationGetFieldDefaultAmount === 'function')
 			? quotationGetFieldDefaultAmount($el)
 			: (+$el.val() || 0);
@@ -4094,12 +4110,37 @@ function quotationGetCostingConvertibleInputs(scope) {
 	});
 }
 
+/**
+ * Mark DB-loaded PP transfer/activity amounts as manual on update so travel-stay
+ * tariff refresh does not wipe values entered directly in costing cards.
+ */
+function quotationMarkSavedPpTransferActivityAsManual() {
+	var $scope = $('#quotation_pp_costing_container');
+	if (!$scope.length) {
+		return;
+	}
+	$scope.find('input[data-saved-amount]').each(function () {
+		var $el = $(this);
+		var id = String($el.attr('id') || '');
+		if (!/(transfer|activity)_pp_update/.test(id)) {
+			return;
+		}
+		var saved = parseFloat(String($el.attr('data-saved-amount')).replace(/,/g, '')) || 0;
+		if (saved > 0 && typeof quotationMarkFieldAsManualAmount === 'function') {
+			quotationMarkFieldAsManualAmount($el);
+		}
+	});
+}
+
 /** Amounts are stored in quotation currency — data-default-amount matches the visible value. */
 function quotationGetFieldDefaultAmount($el) {
 	if (!$el || !$el.length) {
 		return 0;
 	}
 	var display = parseFloat(String($el.val()).replace(/,/g, '')) || 0;
+	if (typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($el)) {
+		return display;
+	}
 	var raw = $el.attr('data-default-amount');
 	if (raw !== undefined && raw !== null && raw !== '') {
 		var parsed = parseFloat(raw);
