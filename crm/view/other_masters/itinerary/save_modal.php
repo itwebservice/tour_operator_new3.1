@@ -187,7 +187,8 @@ function itinerary_csv_upload()
       },
       onComplete: function(file, response){
         status.text('');
-        if(response==="error"){          
+        response = String(response || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+        if(response==="error" || response===""){          
           alert("File is not uploaded.");           
         } else{
           document.getElementById("txt_itinerary_csv_upload_dir").value = response;
@@ -207,7 +208,16 @@ function itinerary_form_csv_save(){
         success:function(result){
             var table = document.getElementById("default_program_list");
             $('#itinerary_html').html(result);
-            var itinerary_arr = JSON.parse($('#itinerary_arr').val());
+            var itinerary_arr = [];
+            try {
+                var raw = $('#itinerary_arr').val();
+                itinerary_arr = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                itinerary_arr = [];
+            }
+            if(!Array.isArray(itinerary_arr)){
+                itinerary_arr = [];
+            }
 
             if(itinerary_arr.length == 0){
               error_msg_alert('Improper itinerary details entered!');
@@ -224,13 +234,15 @@ function itinerary_form_csv_save(){
 
                   var row = table.rows[i];
                   if(!row){ continue; }
-                  itinerary_arr[i]['spa'] = itinerary_arr[i]['spa'].replace(/\\/g, '');
-                  itinerary_arr[i]['dwp'] = itinerary_arr[i]['dwp'].replace(/\\/g, '');
-                  itinerary_arr[i]['os'] = itinerary_arr[i]['os'].replace(/\\/g, '');
-                  row.cells[2].childNodes[0].value = itinerary_arr[i]['spa'];
-                  var dwpTextarea = row.cells[3].querySelector('textarea');
-                  if(dwpTextarea){ dwpTextarea.value = itinerary_arr[i]['dwp']; }
-                  row.cells[4].childNodes[0].value = itinerary_arr[i]['os'];
+                  var spaVal = (itinerary_arr[i]['spa'] || '').replace(/\\/g, '');
+                  var dwpVal = (itinerary_arr[i]['dwp'] || '').replace(/\\/g, '');
+                  var osVal = (itinerary_arr[i]['os'] || '').replace(/\\/g, '');
+                  var spaInput = row.cells[2] ? row.cells[2].querySelector('input') : null;
+                  var dwpTextarea = row.cells[3] ? row.cells[3].querySelector('textarea') : null;
+                  var osInput = row.cells[4] ? row.cells[4].querySelector('input') : null;
+                  if(spaInput){ spaInput.value = spaVal; }
+                  if(dwpTextarea){ dwpTextarea.value = dwpVal; }
+                  if(osInput){ osInput.value = osVal; }
               }
               initializeItineraryTooltips();
             }

@@ -3,39 +3,53 @@ class itinerary_master{
 
     public function csv_save()
     {
-        $itinerary_csv_dir = $_POST['itinerary_csv_dir'];
+        $itinerary_csv_dir = isset($_POST['itinerary_csv_dir']) ? trim(strip_tags($_POST['itinerary_csv_dir'])) : '';
         $itinerary_arr = array();
-        $flag = true;
 
-        $itinerary_csv_dir = explode('uploads', $itinerary_csv_dir);
-        $itinerary_csv_dir = BASE_URL.'uploads'.$itinerary_csv_dir[1];
+        $parts = explode('uploads', $itinerary_csv_dir);
+        if ($itinerary_csv_dir !== '' && isset($parts[1]) && $parts[1] !== '') {
+            // Read from disk. fopen(BASE_URL) hits Apache over HTTP and often fails on local XAMPP.
+            $itinerary_csv_dir = str_replace('\\', '/', CSV_READ_URL.'uploads'.$parts[1]);
+            $itinerary_csv_dir = preg_replace('#/+#', '/', $itinerary_csv_dir);
 
-        begin_t();
-        $count = 1;
-        $arrResult  = array();
-        $handle = fopen($itinerary_csv_dir, "r");
-        if(empty($handle) === false) {       
-
-            while(($data = fgetcsv($handle,"10000", ",")) !== FALSE){
-                if($count == 1) { $count++; continue; }
-                if($count>0){
-                    $spa = str_replace('"',"'",$data[1]);
-                    $dwp = str_replace('"',"'",$data[2]);
-                    $os = str_replace('"',"'",$data[3]);
-                    $arr = array(
-                        "spa" => addslashes($spa),
-                        "dwp" => addslashes($dwp),
-                        "os" => addslashes($os)
+            $handle = @fopen($itinerary_csv_dir, "r");
+            if ($handle !== false) {
+                $count = 0;
+                while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
+                    $count++;
+                    if (!is_array($data) || empty($data)) {
+                        continue;
+                    }
+                    // Strip UTF-8 BOM from the first cell
+                    if (isset($data[0])) {
+                        $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]);
+                    }
+                    // Skip header
+                    if ($count === 1) {
+                        continue;
+                    }
+                    $spa = isset($data[1]) ? trim($data[1]) : '';
+                    $dwp = isset($data[2]) ? trim($data[2]) : '';
+                    $os  = isset($data[3]) ? trim($data[3]) : '';
+                    if ($spa === '' && $dwp === '' && $os === '') {
+                        continue;
+                    }
+                    $itinerary_arr[] = array(
+                        "spa" => $spa,
+                        "dwp" => $dwp,
+                        "os"  => $os
                     );
-                    array_push($itinerary_arr, $arr);
                 }
-                $count++;
+                fclose($handle);
             }
-            fclose($handle);
         }
-        $itinerary_arr = json_encode($itinerary_arr,JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-        $itinerary_arr = ($itinerary_arr != '') ? $itinerary_arr : json_encode(array());
-        echo "<input type='hidden' value='$itinerary_arr' id='itinerary_arr' name='itinerary_arr'/>";
+
+        $json = json_encode($itinerary_arr, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+        if ($json === false || $json === '') {
+            $json = '[]';
+        }
+        // Textarea keeps JSON out of an HTML attribute so quotes/apostrophes cannot truncate the value
+        echo '<textarea id="itinerary_arr" name="itinerary_arr" style="display:none">'.$json.'</textarea>';
     }
     function itinerary_save(){
 
