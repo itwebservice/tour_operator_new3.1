@@ -202,10 +202,17 @@ $sq_location = mysqli_fetch_assoc(mysqlQuery("select * from locations where loca
 
 <script>
 $('#branch_update_modal').modal('show');
-$('#location_id,#state').select2();
-$('#branch_update_modal').on('shown.bs.modal', function() {
+$('#location_id,#state').select2({
+    dropdownParent: $('#branch_update_modal')
+});
+$('#branch_update_modal').on('shown.bs.modal', function(e) {
+    if (e.target !== this) return;
     $('#branch_name1').focus();
-}); //focus after modal open
+});
+
+function close_branch_select2() {
+    $('#location_id, #state').select2('close');
+}
 upload_qr_branch();
 
 function upload_qr_branch() {
@@ -285,6 +292,7 @@ function upload_logo_branch() {
 }
 
 function img_view_modal(branch_id) {
+    close_branch_select2();
     $.post('branches/view_qr.php', {
         branch_id: branch_id
     }, function(data) {
@@ -293,6 +301,7 @@ function img_view_modal(branch_id) {
 }
 
 function img_view_logo_modal(branch_id) {
+    close_branch_select2();
     $.post('branches/view_logo.php', {
         branch_id: branch_id
     }, function(data) {

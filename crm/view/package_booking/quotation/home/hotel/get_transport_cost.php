@@ -15,7 +15,7 @@ $drop_id_arr = $_POST['drop_id_arr'];
 $vehicle_count_arr = $_POST['vehicle_count_arr'];
 $ppackage_id_arr = $_POST['ppackage_id_arr'];
 $ppackage_name_arr = $_POST['ppackage_name_arr'];
-$service_duration_arr = $_POST['service_duration_arr'];
+$service_duration_arr = isset($_POST['service_duration_arr']) ? $_POST['service_duration_arr'] : [];
 
 $transport_info_arr = array();
 $transport_info_arr1 = array();
@@ -32,11 +32,15 @@ for ($i = 0; $i < sizeof($transport_id_arr); $i++) {
 		$vt_count = 0;
 		while ($row_tariff_master = mysqli_fetch_assoc($row_tariff_master1)) {
 
-			$tariff_count = mysqli_num_rows(mysqlQuery("select tariff_entries_id from b2b_transfer_tariff_entries where tariff_id='$row_tariff_master[tariff_id]' and pickup_type = '$pickup_id_arr[$i]' and drop_type = '$drop_id_arr[$i]' and pickup_location = '$pickup_arr[$i]' and drop_location = '$drop_arr[$i]' and (from_date <='$from_date' and to_date>='$from_date') and service_duration = '$service_duration_arr[$i]' order by tariff_entries_id desc"));
+			$service_duration = isset($service_duration_arr[$i]) ? $service_duration_arr[$i] : '';
+			$duration_clause = ($service_duration !== '' && $service_duration !== null)
+				? " and service_duration = '".addslashes($service_duration)."' "
+				: '';
+			$tariff_count = mysqli_num_rows(mysqlQuery("select tariff_entries_id from b2b_transfer_tariff_entries where tariff_id='$row_tariff_master[tariff_id]' and pickup_type = '$pickup_id_arr[$i]' and drop_type = '$drop_id_arr[$i]' and pickup_location = '$pickup_arr[$i]' and drop_location = '$drop_arr[$i]' and (from_date <='$from_date' and to_date>='$from_date') $duration_clause order by tariff_entries_id desc"));
 			if ($tariff_count != 0) {
 
 				$vt_count++;
-				$sq_tariff1 = mysqlQuery("select tariff_data from b2b_transfer_tariff_entries where tariff_id='$row_tariff_master[tariff_id]' and pickup_type = '$pickup_id_arr[$i]' and drop_type = '$drop_id_arr[$i]' and pickup_location = '$pickup_arr[$i]' and drop_location = '$drop_arr[$i]' and (from_date <='$from_date' and to_date>='$from_date') and service_duration = '$service_duration_arr[$i]' order by tariff_entries_id desc");
+				$sq_tariff1 = mysqlQuery("select tariff_data from b2b_transfer_tariff_entries where tariff_id='$row_tariff_master[tariff_id]' and pickup_type = '$pickup_id_arr[$i]' and drop_type = '$drop_id_arr[$i]' and pickup_location = '$pickup_arr[$i]' and drop_location = '$drop_arr[$i]' and (from_date <='$from_date' and to_date>='$from_date') $duration_clause order by tariff_entries_id desc");
 				while ($sq_tariff = mysqli_fetch_assoc($sq_tariff1)) {
 
 					$currency_id = $row_tariff_master['currency_id'];

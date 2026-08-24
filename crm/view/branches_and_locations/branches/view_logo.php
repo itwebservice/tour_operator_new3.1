@@ -44,13 +44,17 @@ $img = !empty($getUrl['logo_url']) ? BASE_URL.substr($getUrl['logo_url'],9) : ''
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 
 <script>
-    $('#logo_view_modal').modal('show');
-    
-    // Prevent parent modal from closing when this modal closes
-    $('#logo_view_modal').on('hidden.bs.modal', function (e) {
+    $('#logo_view_modal').css('z-index', 1065);
+    $('#logo_view_modal').on('show.bs.modal shown.bs.modal hide.bs.modal hidden.bs.modal', function (e) {
         e.stopPropagation();
-        // Re-show parent modal if it was hidden
-        if(!$('#branch_update_modal').hasClass('in')) {
+    });
+    $('#location_id, #state').select2('close');
+    $('#logo_view_modal').modal('show');
+
+    $('#logo_view_modal').on('hidden.bs.modal', function () {
+        if ($('#branch_update_modal').hasClass('in')) {
+            $('body').addClass('modal-open');
+        } else {
             $('#branch_update_modal').modal('show');
         }
     });

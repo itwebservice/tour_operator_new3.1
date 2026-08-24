@@ -1010,16 +1010,19 @@ if (!function_exists('quotation_excursion_options_html')) {
         try {
             var pickup = $('#pickup_from-' + trans_id[1]).val();
             var drop = $('#drop_to-' + trans_id[1]).val();
-            var pickup_type = pickup.split('-')[0];
-            var drop_type = drop.split('-')[0];
-            var pickup1 = pickup.split("-")[1];
-            var drop1 = drop.split("-")[1];
+            var pickupParts = pickup ? String(pickup).split('-') : [];
+            var dropParts = drop ? String(drop).split('-') : [];
+            var pickup_type = pickupParts[0] || '';
+            var drop_type = dropParts[0] || '';
+            var pickup1 = pickupParts.length > 1 ? pickupParts.slice(1).join('-') : '';
+            var drop1 = dropParts.length > 1 ? dropParts.slice(1).join('-') : '';
         } catch (e) {
             console.log(e);
         }
         var vehicle_count = $('#no_vehicles-' + trans_id[1]).val();
         var pname = $('#package_name-' + trans_id[1]).val();
         var pid = $('#package_id-' + trans_id[1]).val();
+        var service_duration = $('#duration-' + trans_id[1]).val();
 
         // Unchecked → clear this row cost and refresh PP (allow wipe)
         var chk = document.getElementById("chk_transport-" + trans_id[1]);
@@ -1060,7 +1063,8 @@ if (!function_exists('quotation_excursion_options_html')) {
                 pickup_id_arr: pickup_id_arr,
                 drop_id_arr: drop_id_arr,
                 ppackage_id_arr: ppackage_id_arr,
-                ppackage_name_arr: ppackage_name_arr
+                ppackage_name_arr: ppackage_name_arr,
+                service_duration_arr: [service_duration]
             },
             success: function(result) {
                 var transport_arr = [];
@@ -1071,16 +1075,21 @@ if (!function_exists('quotation_excursion_options_html')) {
                 }
                 var $cost = $('#transport_cost-' + trans_id[1]);
                 var existingCost = parseFloat($cost.val()) || 0;
-                if (transport_arr.length && transport_arr[0] && transport_arr[0]['total_cost'] != null) {
-                    $cost.val(transport_arr[0]['total_cost']);
-                    // Fresh tariff → force into PP transfer
+                var tariffCost = (transport_arr.length && transport_arr[0] && transport_arr[0]['total_cost'] != null)
+                    ? (parseFloat(transport_arr[0]['total_cost']) || 0)
+                    : 0;
+                if (tariffCost > 0) {
+                    $cost.val(tariffCost);
                     if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
                         quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: false });
                     }
                 } else {
-                    // No matching tariff — keep existing saved/tariff cost; do not zero PP
-                    if (existingCost <= 0 && typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
-                        quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
+                    // No matching tariff — keep saved row cost and still fill PP from it
+                    if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+                        quotationRefreshPpCostingFromTravelStaySelections({
+                            force: existingCost > 0,
+                            preserveIfEmpty: true
+                        });
                     }
                 }
             }
@@ -1090,12 +1099,18 @@ if (!function_exists('quotation_excursion_options_html')) {
     /**
      * Bulk reload transport costs for all update rows (mirrors save get_transport_cost).
      * Used when tab3 initializes / travel dates sync.
+     * options.preserveSaved: true = keep existing Tab3/PP transfer amounts (update load).
      */
-    function get_transport_cost() {
+    function get_transport_cost(options) {
+        options = options || {};
+        var preserveSaved = options.preserveSaved === true;
         var table = document.getElementById('tbl_package_tour_quotation_dynamic_transport_u');
         if (!table || !table.rows || !table.rows.length) {
             if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
-                quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
+                quotationRefreshPpCostingFromTravelStaySelections({
+                    force: !preserveSaved,
+                    preserveIfEmpty: true
+                });
             }
             return;
         }
@@ -1109,6 +1124,7 @@ if (!function_exists('quotation_excursion_options_html')) {
         var vehicle_count_arr = [];
         var ppackage_id_arr = [];
         var ppackage_name_arr = [];
+        var service_duration_arr = [];
         var rowMeta = [];
 
         for (var i = 0; i < table.rows.length; i++) {
@@ -1124,6 +1140,7 @@ if (!function_exists('quotation_excursion_options_html')) {
             var pkgIdEl = row.querySelector('input[id^="package_id"]');
             var pkgNameEl = row.querySelector('input[id^="package_name"]');
             var costEl = row.querySelector('input[id^="transport_cost"]');
+            var durationEl = row.querySelector('select[id^="duration"]');
 
             var transport_id = vehicleEl ? vehicleEl.value : '';
             var travel_date = dateEl ? dateEl.value : '';
@@ -1151,18 +1168,23 @@ if (!function_exists('quotation_excursion_options_html')) {
             vehicle_count_arr.push(vehicleCountEl ? vehicleCountEl.value : '');
             ppackage_id_arr.push(pkgIdEl ? pkgIdEl.value : '');
             ppackage_name_arr.push(pkgNameEl ? pkgNameEl.value : '');
+            service_duration_arr.push(durationEl ? durationEl.value : '');
         }
 
         var anyRoute = rowMeta.some(function (m) { return m.checked && m.hasRoute; });
         if (!anyRoute) {
-            // Still clear unchecked rows; preserve PP if costs already present
-            for (var u = 0; u < rowMeta.length; u++) {
-                if (!rowMeta[u].checked && rowMeta[u].costEl) {
-                    rowMeta[u].costEl.value = 0;
+            if (!preserveSaved) {
+                for (var u = 0; u < rowMeta.length; u++) {
+                    if (!rowMeta[u].checked && rowMeta[u].costEl) {
+                        rowMeta[u].costEl.value = 0;
+                    }
                 }
             }
             if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
-                quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
+                quotationRefreshPpCostingFromTravelStaySelections({
+                    force: !preserveSaved,
+                    preserveIfEmpty: true
+                });
             }
             return;
         }
@@ -1179,7 +1201,8 @@ if (!function_exists('quotation_excursion_options_html')) {
                 pickup_id_arr: pickup_id_arr,
                 drop_id_arr: drop_id_arr,
                 ppackage_id_arr: ppackage_id_arr,
-                ppackage_name_arr: ppackage_name_arr
+                ppackage_name_arr: ppackage_name_arr,
+                service_duration_arr: service_duration_arr
             },
             success: function (result) {
                 var transport_arr = [];
@@ -1197,8 +1220,15 @@ if (!function_exists('quotation_excursion_options_html')) {
                         continue;
                     }
                     var rowResult = transport_arr[i];
-                    if (rowResult && rowResult['total_cost'] != null && meta.hasRoute) {
-                        meta.costEl.value = rowResult['total_cost'];
+                    var tariffCost = (rowResult && rowResult['total_cost'] != null)
+                        ? (parseFloat(rowResult['total_cost']) || 0)
+                        : 0;
+                    if (tariffCost > 0 && meta.hasRoute) {
+                        var existingCost = parseFloat(meta.costEl.value) || 0;
+                        if (preserveSaved && existingCost > 0) {
+                            continue;
+                        }
+                        meta.costEl.value = tariffCost;
                         appliedTariff = true;
                     }
                     // else keep existing saved cost
@@ -1215,8 +1245,8 @@ if (!function_exists('quotation_excursion_options_html')) {
                 } catch (e2) {}
                 if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
                     quotationRefreshPpCostingFromTravelStaySelections({
-                        force: true,
-                        preserveIfEmpty: !appliedTariff
+                        force: preserveSaved ? false : true,
+                        preserveIfEmpty: preserveSaved || !appliedTariff
                     });
                 }
             }
@@ -1677,10 +1707,10 @@ if (!function_exists('quotation_excursion_options_html')) {
                 if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
                     quotationSyncExcursionDefaultsFromTravel({ forcePax: false, onlyMissing: true });
                 }
-                // Keep DB PP hotel/transfer/activity when tariff/travel-stay is empty
+                // Keep DB/manual PP hotel/transfer/activity — do not overwrite from live tariff
                 get_hotel_cost(null, { forceHotel: false });
-                get_excursion_amount();
-                get_transport_cost();
+                get_excursion_amount({ preserveSaved: true });
+                get_transport_cost({ preserveSaved: true });
             }, 500);
         }
     });
@@ -1694,10 +1724,10 @@ if (!function_exists('quotation_excursion_options_html')) {
             if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
                 quotationSyncExcursionDefaultsFromTravel({ forcePax: false, onlyMissing: true });
             }
-            // Keep DB PP hotel/transfer/activity when tariff/travel-stay is empty
+            // Keep DB/manual PP hotel/transfer/activity — do not overwrite from live tariff
             get_hotel_cost(null, { forceHotel: false });
-            get_excursion_amount();
-            get_transport_cost();
+            get_excursion_amount({ preserveSaved: true });
+            get_transport_cost({ preserveSaved: true });
         }, 300);
     });
 </script>

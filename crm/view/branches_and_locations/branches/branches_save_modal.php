@@ -151,11 +151,19 @@ include "../../../model/model.php";
 
 <script>
 $('#branches_save_modal').modal('show');
-$('#locations_id,#state').select2();
-
-$('#branches_save_modal').on('shown.bs.modal', function() {
-    $('#locations_id').select2('open'); //focus after modal open 
+$('#locations_id,#state').select2({
+    dropdownParent: $('#branches_save_modal')
 });
+
+$('#branches_save_modal').on('shown.bs.modal', function(e) {
+    // Nested logo/QR preview modals also fire this event; only auto-open Location for the parent modal
+    if (e.target !== this) return;
+    $('#locations_id').select2('open');
+});
+
+function close_branch_select2() {
+    $('#locations_id, #state').select2('close');
+}
 
 // Below solution is specifically for this page only because of unncessary tooltip occuring bug
 // $(".select2-container").tooltip({
@@ -248,13 +256,29 @@ function upload_logo_branch() {
     });
 }
 
+function bind_branch_preview_modal($modal) {
+    $modal.on('show.bs.modal shown.bs.modal hide.bs.modal hidden.bs.modal', function(e) {
+        e.stopPropagation();
+    });
+    $modal.on('shown.bs.modal', function() {
+        close_branch_select2();
+    });
+    $modal.on('hidden.bs.modal', function() {
+        $(this).remove();
+        if ($('#branches_save_modal').hasClass('in')) {
+            $('body').addClass('modal-open');
+        }
+    });
+}
+
 function preview_qr_image() {
     var qr_path = $('#qr_upload_url').val();
     if(qr_path) {
+        close_branch_select2();
         var img_url = qr_path.substring(9); // Remove '../../../' from path
         var full_url = $('#base_url').val() + img_url;
         
-        var modalHtml = '<div class="modal fade" id="qr_preview_modal" role="dialog">' +
+        var modalHtml = '<div class="modal fade" id="qr_preview_modal" role="dialog" style="z-index:1065;">' +
             '<div class="modal-dialog modal-lg">' +
             '<div class="modal-content">' +
             '<div class="modal-header">' +
@@ -268,7 +292,9 @@ function preview_qr_image() {
             '</div>' +
             '</div>';
         
-        $('#img_view').html(modalHtml);
+        $('#qr_preview_modal').remove();
+        $('body').append(modalHtml);
+        bind_branch_preview_modal($('#qr_preview_modal'));
         $('#qr_preview_modal').modal('show');
     }
 }
@@ -276,10 +302,11 @@ function preview_qr_image() {
 function preview_logo_image() {
     var logo_path = $('#logo_upload_url').val();
     if(logo_path) {
+        close_branch_select2();
         var img_url = logo_path.substring(9); // Remove '../../../' from path
         var full_url = $('#base_url').val() + img_url;
         
-        var modalHtml = '<div class="modal fade" id="logo_preview_modal" role="dialog">' +
+        var modalHtml = '<div class="modal fade" id="logo_preview_modal" role="dialog" style="z-index:1065;">' +
             '<div class="modal-dialog modal-lg">' +
             '<div class="modal-content">' +
             '<div class="modal-header">' +
@@ -294,7 +321,9 @@ function preview_logo_image() {
             '</div>' +
             '</div>';
         
-        $('#img_view').html(modalHtml);
+        $('#logo_preview_modal').remove();
+        $('body').append(modalHtml);
+        bind_branch_preview_modal($('#logo_preview_modal'));
         $('#logo_preview_modal').modal('show');
     }
 }

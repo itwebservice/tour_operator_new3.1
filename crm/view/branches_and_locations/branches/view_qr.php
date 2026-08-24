@@ -44,13 +44,17 @@ $img = !empty($getUrl['qr_url']) ? BASE_URL.substr($getUrl['qr_url'],9) : '';
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 
 <script>
-    $('#qr_view_modal').modal('show');
-    
-    // Prevent parent modal from closing when this modal closes
-    $('#qr_view_modal').on('hidden.bs.modal', function (e) {
+    $('#qr_view_modal').css('z-index', 1065);
+    $('#qr_view_modal').on('show.bs.modal shown.bs.modal hide.bs.modal hidden.bs.modal', function (e) {
         e.stopPropagation();
-        // Re-show parent modal if it was hidden
-        if(!$('#branch_update_modal').hasClass('in')) {
+    });
+    $('#location_id, #state').select2('close');
+    $('#qr_view_modal').modal('show');
+
+    $('#qr_view_modal').on('hidden.bs.modal', function () {
+        if ($('#branch_update_modal').hasClass('in')) {
+            $('body').addClass('modal-open');
+        } else {
             $('#branch_update_modal').modal('show');
         }
     });

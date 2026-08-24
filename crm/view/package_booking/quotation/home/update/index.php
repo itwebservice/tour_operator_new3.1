@@ -174,9 +174,13 @@ function get_excursion_list(id) {
     });
 }
 
-/**Excursion Amount load**/
-function get_excursion_amount()
+/**Excursion Amount load.
+ * options.preserveSaved: true = keep existing Tab3/PP activity amounts (update load).
+ */
+function get_excursion_amount(options)
 {
+    options = options || {};
+    var preserveSaved = options.preserveSaved === true;
     var base_url = $('#base_url').val();
     var exc_date_arr = [];
     var exc_arr = [];
@@ -231,6 +235,13 @@ function get_excursion_amount()
             var row = table.rows[i];
             var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
             if (checkbox && checkbox.checked) {
+                var existingAmt = (row.cells[10] && row.cells[10].childNodes[0])
+                    ? (parseFloat(row.cells[10].childNodes[0].value) || 0)
+                    : 0;
+                // Update load: keep saved/manual activity amounts; only fill empty rows
+                if (preserveSaved && existingAmt > 0) {
+                    continue;
+                }
                 if (row.cells[10] && row.cells[10].childNodes[0]) {
                     row.cells[10].childNodes[0].value = amount_arr[i]['total_cost'];
                 }
@@ -247,7 +258,7 @@ function get_excursion_amount()
                     row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
                 }
                 row.setAttribute('data-transfer-cost', amount_arr[i]['transfer_cost'] || 0);
-            } else {
+            } else if (!preserveSaved) {
                 if (row.cells[10] && row.cells[10].childNodes[0]) row.cells[10].childNodes[0].value = 0;
                 if (row.cells[11] && row.cells[11].childNodes[0]) row.cells[11].childNodes[0].value = 0;
                 if (row.cells[12] && row.cells[12].childNodes[0]) row.cells[12].childNodes[0].value = 0;
@@ -257,10 +268,13 @@ function get_excursion_amount()
             }
         }
         if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
-            quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
+            quotationRefreshPpCostingFromTravelStaySelections({
+                force: !preserveSaved,
+                preserveIfEmpty: true
+            });
         } else if (typeof quotationRefreshPpActivityFromExcursion === 'function'
             && $('#per_person_costing_tab').is(':visible')) {
-            quotationRefreshPpActivityFromExcursion({ force: true, preserveIfEmpty: true });
+            quotationRefreshPpActivityFromExcursion({ force: !preserveSaved, preserveIfEmpty: true });
             if (typeof calculateCostingCardsUpdate === 'function') {
                 calculateCostingCardsUpdate({ recalcServiceCharge: false });
             }

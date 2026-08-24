@@ -2206,6 +2206,7 @@ function calculateCostingCardsUpdate(options) {
             return;
         }
         $el.val(value);
+        $el.attr('data-default-amount', value);
     }
 
     function calculateBlock(prefix, pax_count, suffix) {
@@ -2510,7 +2511,7 @@ function costing_reflect()
 				calculateCostingCardsUpdate({ recalcServiceCharge: false, fromDefaultCurrencyWrite: false });
 			}
 		} else if (typeof get_excursion_amount === 'function') {
-			get_excursion_amount();
+			get_excursion_amount({ preserveSaved: true });
 		} else if (typeof calculateCostingCardsUpdate === 'function') {
 			calculateCostingCardsUpdate({ recalcServiceCharge: false, fromDefaultCurrencyWrite: false });
 		}

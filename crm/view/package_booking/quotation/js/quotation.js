@@ -2651,8 +2651,9 @@ function quotationApplyTransferPpToFields(transferData, options) {
 			}
 			return;
 		}
-		var cur = $el.val();
-		if (cur === '' || cur === null || typeof cur === 'undefined') {
+		var raw = $el.val();
+		var cur = parseFloat(String(raw == null ? '' : raw).replace(/,/g, ''));
+		if (raw === '' || raw === null || typeof raw === 'undefined' || isNaN(cur) || cur === 0) {
 			if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
 				quotationWritePpDefaultCurrencyAmount($el, value);
 			} else {
@@ -2803,7 +2804,9 @@ function quotationApplyFlightPpFromPlaneSelection(options) {
  * Push checked transport / activity totals into group costing land fields.
  * Totals from travel-stay are in company default currency.
  */
-function quotationRefreshGroupCostingLandFromSelections() {
+function quotationRefreshGroupCostingLandFromSelections(options) {
+	options = options || {};
+	var preserveExisting = options.preserveExisting === true;
 	var transfer = quotationCalcTransferPpFromTransportTables();
 	var activityTotal = 0;
 	var excTable = document.getElementById('tbl_package_tour_quotation_dynamic_excursion');
@@ -2821,6 +2824,18 @@ function quotationRefreshGroupCostingLandFromSelections() {
 	}
 
 	function writeDefaultCurrencyField($el, tariffAmountInCompanyCurrency) {
+		if (!$el || !$el.length) {
+			return;
+		}
+		if (typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($el)) {
+			return;
+		}
+		if (preserveExisting) {
+			var cur = parseFloat(String($el.val() || '').replace(/,/g, '')) || 0;
+			if (cur > 0) {
+				return;
+			}
+		}
 		if (typeof quotationWritePpDefaultCurrencyAmount === 'function') {
 			quotationWritePpDefaultCurrencyAmount($el, tariffAmountInCompanyCurrency);
 			return;
@@ -2887,7 +2902,7 @@ function quotationRefreshPpCostingFromTravelStaySelections(options) {
 	}
 
 	quotationApplyFlightPpFromPlaneSelection({ force: force });
-	quotationRefreshGroupCostingLandFromSelections();
+	quotationRefreshGroupCostingLandFromSelections({ preserveExisting: !force });
 
 	if (typeof calculateCostingCardsUpdate === 'function') {
 		calculateCostingCardsUpdate({
@@ -3648,12 +3663,9 @@ function quotationCollectPpCostingEntries(options) {
 		if (!$el || !$el.length) {
 			return 0;
 		}
-		if (typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($el)) {
-			return parseFloat(String($el.val()).replace(/,/g, '')) || 0;
-		}
-		return (typeof quotationGetFieldDefaultAmount === 'function')
-			? quotationGetFieldDefaultAmount($el)
-			: (+$el.val() || 0);
+		// Always persist the visible quotation-currency value. data-default-amount on
+		// derived fields (tax/TCS/total) can stay stale after costing recalculation.
+		return parseFloat(String($el.val() || '').replace(/,/g, '')) || 0;
 	}
 
 	function readPP($scope, prefix, suffix) {
@@ -4374,6 +4386,9 @@ function quotationRecalcPpDerivedAmountsAfterCurrency(options) {
  */
 function quotationWritePpDefaultCurrencyAmount($el, tariffAmountInCompanyCurrency) {
 	if (!$el || !$el.length) {
+		return;
+	}
+	if (typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($el)) {
 		return;
 	}
 	tariffAmountInCompanyCurrency = parseFloat(tariffAmountInCompanyCurrency);

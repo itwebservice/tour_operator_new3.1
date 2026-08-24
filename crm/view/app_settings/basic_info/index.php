@@ -219,16 +219,10 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 					<input type="hidden" id="qr_upload_url_i" name="qr_upload_url_i" value="<?= $sq_settings['qr_url'] ?>">
 				</div>
 				<button type="button" data-toggle="tooltip" class="btn btn-excel" title="Image Size Should Be Less Than 100KB, Resolution : 900 X 900 and Format: Jpg/JEPG/Png"><i class="fa fa-question-circle"></i></button>
-				<?php
-				if (!empty($sq_settings['qr_url'])) {
-				?>
-
-					<button type="button" data-toggle="tooltip" class="btn btn-info btn-sm" onclick="img_view_modal('QR')" title="View Image"><i class="fa fa-eye"></i></button>
+				<button type="button" id="qr_view_btn" data-toggle="tooltip" class="btn btn-info btn-sm <?= empty($sq_settings['qr_url']) ? 'hidden' : '' ?>" onclick="img_view_modal('QR')" title="View Image"><i class="fa fa-eye"></i></button>
+				<?php if (!empty($sq_settings['qr_url'])) { ?>
 					<button type="button" data-toggle="tooltip" class="btn btn-danger btn-sm" onclick="img_delete('QR')" title="Delete Image"><i class="fa fa-trash"></i></button>
-					<!-- <a href="basic_info/view_img.php?type=QR" class="btn btn-danger">View</a> -->
-				<?php
-				}
-				?>
+				<?php } ?>
 
 
 			</div>
@@ -250,14 +244,10 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 				</div>
 
 				<button type="button" data-toggle="tooltip" class="btn btn-excel" title="Image Size Should Be Less Than 100KB, Resolution : 900 X 900 and Format: Jpg/JEPG/Png"><i class="fa fa-question-circle"></i></button>
-				<?php
-				if (!empty($sq_settings['sign_url'])) {
-				?>
-					<button type="button" data-toggle="tooltip" class="btn btn-info btn-sm" onclick="img_view_modal('sign')" title="View Image"><i class="fa fa-eye"></i></button>
+				<button type="button" id="sign_view_btn" data-toggle="tooltip" class="btn btn-info btn-sm <?= empty($sq_settings['sign_url']) ? 'hidden' : '' ?>" onclick="img_view_modal('sign')" title="View Image"><i class="fa fa-eye"></i></button>
+				<?php if (!empty($sq_settings['sign_url'])) { ?>
 					<button type="button" data-toggle="tooltip" class="btn btn-danger btn-sm" onclick="img_delete('sign')" title="Delete Image"><i class="fa fa-trash"></i></button>
-				<?php
-				}
-				?>
+				<?php } ?>
 			</div>
 			<!-- Signature upload End-->
 
@@ -443,12 +433,10 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 	upload_qr_company();
 
 	function upload_qr_company() {
-
-
 		var btnUpload = $('#qr_upload_btn');
-		$(btnUpload).find('span').text('Image');
+		var existing = $("#qr_upload_url_i").val();
+		$(btnUpload).find('span').text(existing ? 'Uploaded' : 'Image');
 
-		$("#qr_upload_url_i").val('');
 		new AjaxUpload(btnUpload, {
 			action: 'basic_info/upload_qr.php',
 			name: 'uploadfileQR',
@@ -470,15 +458,10 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 						return false;
 					} else {
 						$(btnUpload).find('span').text('Uploaded');
-						$("#qr_upload_url_i").val(response);
+						$("#qr_upload_url_i").val($.trim(response));
+						$('#qr_view_btn').removeClass('hidden');
 					}
-
 				}
-				if (img_array.length > 1) {
-					error_msg_alert("You can upload only 3 images");
-					return false;
-				}
-
 			}
 		});
 	}
@@ -490,12 +473,10 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 	upload_sign_company();
 
 	function upload_sign_company() {
-
-
 		var btnUpload = $('#sign_upload_btn');
-		$(btnUpload).find('span').text('Image');
+		var existing = $("#sign_upload_url_i").val();
+		$(btnUpload).find('span').text(existing ? 'Uploaded' : 'Image');
 
-		$("#sign_upload_url_i").val('');
 		new AjaxUpload(btnUpload, {
 			action: 'basic_info/upload_sign.php',
 			name: 'uploadfileSIGN',
@@ -517,30 +498,47 @@ $sq_settings_g = mysqli_fetch_assoc(mysqlQuery("select * from generic_count_mast
 						return false;
 					} else {
 						$(btnUpload).find('span').text('Uploaded');
-						$("#sign_upload_url_i").val(response);
+						$("#sign_upload_url_i").val($.trim(response));
+						$('#sign_view_btn').removeClass('hidden');
 					}
-
 				}
-				if (img_array.length > 1) {
-					error_msg_alert("You can upload only 1 image");
-					return false;
-				}
-
 			}
 		});
 	}
 
+	function get_upload_preview_url(path) {
+		if (!path) {
+			return '';
+		}
+		path = $.trim(path);
+		if (/^https?:\/\//i.test(path)) {
+			return path;
+		}
+		var relative = path;
+		while (relative.indexOf('../') === 0) {
+			relative = relative.substring(3);
+		}
+		var base = $('#base_url').val() || '';
+		if (base && base.slice(-1) !== '/') {
+			base += '/';
+		}
+		return base + relative.replace(/^\/+/, '');
+	}
 
 	function img_view_modal(type) {
+		var path = (type == 'QR') ? $('#qr_upload_url_i').val() : $('#sign_upload_url_i').val();
+		var preview_url = get_upload_preview_url(path);
+		if (!preview_url) {
+			error_msg_alert('Please upload an image first');
+			return;
+		}
 
 		$.post('basic_info/view_img.php', {
-			type: type
+			type: type,
+			img_url: preview_url
 		}, function(data) {
-
 			$('#img_view').html(data);
-
 		});
-
 	}
 
 	function img_delete(type) {

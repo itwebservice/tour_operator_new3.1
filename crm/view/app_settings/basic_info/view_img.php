@@ -2,9 +2,14 @@
 
 include "../../../model/model.php";
 
-$type = $_REQUEST['type'];
-$getUrl = mysqli_fetch_assoc(mysqlQuery('select qr_url,sign_url from app_settings limit 1'));
-$img = $type == 'QR' ? BASE_URL.substr($getUrl['qr_url'],9) : BASE_URL.substr($getUrl['sign_url'],9);
+$type = isset($_REQUEST['type']) ? $_REQUEST['type'] : '';
+$img = isset($_REQUEST['img_url']) ? $_REQUEST['img_url'] : '';
+if ($img == '') {
+	$getUrl = mysqli_fetch_assoc(mysqlQuery('select qr_url,sign_url from app_settings limit 1'));
+	$db_path = ($type == 'QR') ? $getUrl['qr_url'] : $getUrl['sign_url'];
+	$img = ($db_path != '') ? BASE_URL.substr($db_path, 9) : '';
+}
+$img = htmlspecialchars($img, ENT_QUOTES, 'UTF-8');
 ?>
 
 <div class="modal fade profile_box_modal" id="dmc_view_modal" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
@@ -24,7 +29,11 @@ $img = $type == 'QR' ? BASE_URL.substr($getUrl['qr_url'],9) : BASE_URL.substr($g
 
 </ul>
         <div class="text-center">
-        <img src="<?= $img ?>" alt="" width="300">
+        <?php if ($img != '') { ?>
+        <img src="<?= $img ?>" alt="Preview" style="max-width: 100%; height: auto;">
+        <?php } else { ?>
+        <p>No image uploaded</p>
+        <?php } ?>
         </div>
 
             </div>
