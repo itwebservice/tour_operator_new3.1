@@ -1,6 +1,7 @@
 <?php
 include_once("../../../model/model.php");
 $dest_id = $_POST['dest_id'];
+$status = isset($_POST['status']) ? $_POST['status'] : 'Active';
 ?>
 <div class="row mg_tp_20"> <div class="col-md-12 no-pad"> <div class="table-responsive">
 	
@@ -18,6 +19,9 @@ $dest_id = $_POST['dest_id'];
 		$query = "select * from destination_master where dest_id in(select dest_id from itinerary_master where 1)";
 		if($dest_id!=''){
 			$query = "select * from destination_master where dest_id in(select dest_id from itinerary_master where dest_id='$dest_id')";
+		}
+		if($status != ''){
+			$query .= " and status='$status'";
 		}
 		$sq_iti = mysqlQuery($query);
 		while($row_iti = mysqli_fetch_assoc($sq_iti)){

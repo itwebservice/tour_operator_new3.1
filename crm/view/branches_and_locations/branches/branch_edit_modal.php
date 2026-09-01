@@ -133,7 +133,10 @@ $sq_location = mysqli_fetch_assoc(mysqlQuery("select * from locations where loca
                                         <option value="Current">Current</option>
                                     </select>
                                 </div>
-                                 <div class="col-sm-4 mg_bt_10">
+                                 
+                            </div>
+                            <div class="row">
+                            <div class="col-sm-4 mg_bt_10">
                                     <label for="qr_upload">Upload QR Code:</label>
                                     <div class="div-upload">
                                         <div id="qr_upload_btn" class="upload-button1"><span>Image</span></div>

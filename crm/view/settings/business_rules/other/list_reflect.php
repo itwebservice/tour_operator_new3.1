@@ -16,7 +16,8 @@ $count = 0;
 $sq_taxes = mysqlQuery($query);
 while($row_taxes = mysqli_fetch_assoc($sq_taxes)){
 
-	$bg = ($row_taxes['status']=="Inactive") ? "danger" : "";
+	$bg = (!empty($row_taxes['clone']) && $row_taxes['clone'] == 'yes') ? 'warning' : '';
+	if($row_taxes['status']=="Inactive"){ $bg = "danger"; }
 	$validity = ($row_taxes['validity'] == "Period") ? get_date_user($row_taxes['from_date']).' To '.get_date_user($row_taxes['to_date']): $row_taxes['validity'];
 	$sq_ledger = mysqli_fetch_assoc(mysqlQuery("select * from ledger_master where ledger_id='$row_taxes[ledger_id]'"));
 	$sq_other = mysqli_fetch_assoc(mysqlQuery("select * from other_charges_master where entry_id='$row_taxes[rule_for]'"));

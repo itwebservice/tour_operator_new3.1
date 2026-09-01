@@ -36,9 +36,17 @@ class other_rules_master{
         }
     }
 
+    function ensure_clone_column(){
+        $check = mysqlQuery("SHOW COLUMNS FROM other_master_rules LIKE 'clone'");
+        if ($check && mysqli_num_rows($check) == 0) {
+            mysqlQuery("ALTER TABLE `other_master_rules` ADD `clone` varchar(10) NOT NULL DEFAULT 'no'");
+        }
+    }
+
     function clone_rule(){
         
         $rule_id = $_POST['rule_id'];
+        $this->ensure_clone_column();
         $cols=array();
         $created_at = date('Y-m-d');
 
@@ -61,6 +69,9 @@ class other_rules_master{
                     }
                     else if($col == 'created_at'){
                         $insertSQL .= "'".$created_at."'";
+                    }
+                    else if($col == 'clone'){
+                        $insertSQL .= "'yes'";
                     }
                     else{
                         $insertSQL .= "'".$r[$col]."'";

@@ -14,7 +14,12 @@ include_once("../../../model/model.php");
 	<tbody>
 		<?php 
 		$count = 0;
-		$sq_ref = mysqlQuery("select * from room_category_master");
+		$status = isset($_POST['status']) ? $_POST['status'] : 'Active';
+		$query = "select * from room_category_master";
+		if($status != ''){
+			$query .= " where active_status='$status'";
+		}
+		$sq_ref = mysqlQuery($query);
 		while($row_ref = mysqli_fetch_assoc($sq_ref)){
 			$bg = ($row_ref['active_status']=="Inactive") ? "danger" : "";
 			?>

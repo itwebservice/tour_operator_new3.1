@@ -79,6 +79,20 @@ function reflect_destination(){
   var branch_status = $('#branch_status').val();
   $.post(base_url+'view/checklist/entities/destination_load.php', { entity_for : entity_for, emp_id : emp_id,branch_status : branch_status }, function(data){
     $('#destination').html(data);
+    var $dest = $('#dest_name_s');
+    if ($dest.length) {
+      if ($dest.data('select2')) {
+        $dest.select2('destroy');
+      }
+      if (typeof initAppSelect2Element === 'function') {
+        initAppSelect2Element($dest);
+      } else {
+        $dest.select2({
+          width: '100%',
+          dropdownParent: $('#entity_save_modal')
+        });
+      }
+    }
   });
 }
 function reflect_entity(){

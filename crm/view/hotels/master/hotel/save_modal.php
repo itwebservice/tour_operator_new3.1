@@ -329,8 +329,8 @@ $client_modal_type = isset($_POST['client_modal_type']) ? $_POST['client_modal_t
                                                             <legend>Child Without Bed</legend>
                                                             <div class="col-md-4 col-sm-3 "><label>From Age</label>
                                                                 <select name="cwob_from" id="cwob_from" title="Child Without Bed From Age" class='form-control' data-toggle='tooltip' required>
-                                                                    <option value="1">1</option>
                                                                     <option value=''>*From Age</option>
+                                                                    <option value="1">1</option>
                                                                     <option value="2">2</option>
                                                                     <option value="3">3</option>
                                                                     <option value="4">4</option>

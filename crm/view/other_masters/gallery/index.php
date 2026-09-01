@@ -20,7 +20,7 @@ include "../../../model/model.php";
         <div class="text-left col-md-3 col-sm-6">
 
             <select id="dest_id_filter" name="dest_name" title="Select Destination" class="form-control"
-                onchange="list_reflect(this.value)" style="width:100%">
+                onchange="list_reflect()" style="width:100%">
 
                 <option value="">Destination</option>
 
@@ -36,6 +36,12 @@ include "../../../model/model.php";
 
             </select>
 
+        </div>
+        <div class="text-left col-md-3 col-sm-6">
+            <select id="gallery_status" name="gallery_status" title="Select Status" class="form-control" onchange="list_reflect()" style="width:100%">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
         </div>
 
     </div>
@@ -98,8 +104,10 @@ function list_reflect()
 {
     $('#div_list').append('<div class="loader"></div>');
     var dest_id = $('#dest_id_filter').val();
+    var status = $('#gallery_status').val();
     $.post('gallery/list_reflect.php', {
-        dest_id: dest_id
+        dest_id: dest_id,
+        status: status
     }, function(data) {
         console.log(data);
         $('#div_list').html(data);

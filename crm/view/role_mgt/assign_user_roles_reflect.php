@@ -76,22 +76,54 @@ $role_name = $_POST['role_name'];
 	<button class="btn btn-sm btn-success" id="btn_save" onclick="role_mgt_save()"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
 </div>
 <script>
+	function get_module_checkboxes(custom_package) {
+		var parentBox = null;
+		var children = [];
+		$('.' + custom_package).each(function() {
+			var offset = $(this).attr('data-offset');
+			var itemPriority = String($('#role_priority_' + offset).val());
+			if (itemPriority === '1') {
+				parentBox = $(this);
+			} else {
+				children.push($(this));
+			}
+		});
+		return { parentBox: parentBox, children: children };
+	}
+
+	function sync_parent_module_checkbox(custom_package) {
+		var boxes = get_module_checkboxes(custom_package);
+		if (!boxes.parentBox || !boxes.children.length) {
+			return;
+		}
+		var allChildrenChecked = boxes.children.every(function($chk) {
+			return $chk.is(':checked');
+		});
+		boxes.parentBox.prop('checked', allChildrenChecked);
+	}
+
 	function select_all_child_boxes(id, custom_package, priority) {
 		if (priority == 1) {
 			var checked = $('#' + id).is(':checked');
-			// Select all
-			if (checked) {
-				$('.' + custom_package).each(function() {
-					$(this).prop("checked", true);
-				});
-			} else {
-				// Deselect All
-				$('.' + custom_package).each(function() {
-					$(this).prop("checked", false);
-				});
-			}
+			$('.' + custom_package).each(function() {
+				$(this).prop("checked", checked);
+			});
+		} else {
+			sync_parent_module_checkbox(custom_package);
 		}
 	}
+
+	(function sync_all_parent_module_checkboxes() {
+		var seen = {};
+		$('input[name="chk_role_mgt"]').each(function() {
+			var cls = $(this).attr('class');
+			if (!cls || seen[cls]) {
+				return;
+			}
+			seen[cls] = true;
+			sync_parent_module_checkbox(cls);
+		});
+	})();
 	/////////////***********User roles save start******************************************************
 	function role_mgt_save() {
 		var base_url = $("#base_url").val();

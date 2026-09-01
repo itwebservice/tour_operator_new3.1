@@ -26,11 +26,6 @@ $modal_type = $_POST['modal_type'];
                   <td><input id="chk_tour_group1" type="checkbox" checked></td>
                   <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
                   <td><input placeholder="*City Name" title="City Name" id="other_city"  class="form-control" onchange="validate_city(this.id)"/></td>
-                  <td><select name="active_flag1" id="active_flag1" class="form-control hidden" title="Status">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
-                  </td>
               </tr>                                
           </table>  
 
@@ -69,7 +64,6 @@ function city_master_save()
     if(row.cells[0].childNodes[0].checked)
     {  
       var city_name1 = row.cells[2].childNodes[0].value;
-      var active_flag = row.cells[3].childNodes[0].value;
       
       if(city_name1=="")
       {
@@ -89,7 +83,7 @@ function city_master_save()
       }  
 
       city_name.push(city_name1);
-      active_flag_arr.push(active_flag);
+      active_flag_arr.push('Active');
     }
     
   }

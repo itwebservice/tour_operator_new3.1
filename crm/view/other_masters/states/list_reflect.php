@@ -3,6 +3,10 @@ include "../../../model/model.php";
 $array_s = array();
 $temp_arr = array();
 $query = "select * from state_master where 1 ";
+$status = isset($_POST['status']) ? $_POST['status'] : 'Active';
+if($status != ''){
+  $query .= " and active_flag='$status'";
+}
 $sq = mysqlQuery($query);
 while($row=mysqli_fetch_assoc($sq)){
   $state_id = $row['id'];

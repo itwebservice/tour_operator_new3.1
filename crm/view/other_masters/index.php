@@ -57,6 +57,22 @@ require_once('../layouts/admin_header.php');
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 
 <script>
+function initMasterStatusSelect(selector) {
+	var $el = $(selector);
+	if (!$el.length || typeof $el.select2 !== 'function') {
+		return $el;
+	}
+	if ($el.data('select2')) {
+		$el.select2('destroy');
+	}
+	$el.select2({
+		width: '100%',
+		minimumResultsForSearch: Infinity,
+		dropdownParent: $(document.body)
+	});
+	return $el;
+}
+
 function master_content_reflect()
 {
 	var id = $('input[name="rd_master"]:checked').attr('id');

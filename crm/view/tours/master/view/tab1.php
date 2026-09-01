@@ -151,13 +151,13 @@
 
 		                <tr class="table-heading-row">
 
-							<th>S_No.</th>
+							<th class="text-center">S_No.</th>
 
-	         				<th>From_Date</th>
+	         				<th class="text-center">From_Date</th>
 
-					        <th>To_Date</th>
+					        <th class="text-center">To_Date</th>
 
-					        <th>Seat_Capacity</th>
+					        <th class="text-center">Seat_Capacity</th>
 
 					    </tr>
 
@@ -179,13 +179,13 @@
 
 						<tr>
 
-							<td><?php echo $count++; ?></td>
+							<td class="text-center"><?php echo $count++; ?></td>
 
-							<td><?php echo date('d/m/Y', strtotime($sq_tourgrp['from_date'])); ?></td>
+							<td class="text-center"><?php echo date('d/m/Y', strtotime($sq_tourgrp['from_date'])); ?></td>
 
-							<td><?php echo date('d/m/Y', strtotime($sq_tourgrp['to_date'])); ?></td>
+							<td class="text-center"><?php echo date('d/m/Y', strtotime($sq_tourgrp['to_date'])); ?></td>
 
-							<td><?php echo $sq_tourgrp['capacity']; ?></td>
+							<td class="text-center"><?php echo $sq_tourgrp['capacity']; ?></td>
 
 						</tr>
 

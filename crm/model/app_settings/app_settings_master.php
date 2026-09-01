@@ -244,6 +244,9 @@ class app_settings_master
         $designation = mysqlREString($t['designation'] ?? '');
         $review = mysqlREString($t['review'] ?? '');
         $photo = mysqlREString($t['photo'] ?? '');
+        if ($name === '' && $designation === '' && $review === '' && $photo === '') {
+          continue;
+        }
 
         mysqlQuery("INSERT INTO quotation_testimonial 
       (name, designation, review, photo, active_flag) 

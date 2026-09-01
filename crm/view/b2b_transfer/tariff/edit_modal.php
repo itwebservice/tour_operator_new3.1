@@ -133,10 +133,20 @@ $taxation = json_decode($sq_tariff['taxation']);
                           <td><select name="duration<?= $count ?>-u" id="duration<?= $count ?>-u" style="width:170px;" title="*Service Duration" data-toggle="tooltip" class="form-control app_select2">
                             <?php
                               $row = mysqli_fetch_assoc(mysqlQuery("select entry_id,duration from service_duration_master where entry_id='$row_tariffentries[service_duration]'"));
-                              ?>
-                              <option value="<?= $row['entry_id'] ?>"><?= $row['duration'] ?></option>
+                            ?>
                               <option value="">*Service Duration</option>
-                              <?php echo get_service_duration_dropdown(); ?>
+                              <?php if (!empty($row['entry_id'])) { ?>
+                              <option value="<?= $row['entry_id'] ?>" selected><?= $row['duration'] ?></option>
+                              <?php } ?>
+                              <?php
+                              $sq_duration = mysqlQuery("select entry_id,duration from service_duration_master where status='Active'");
+                              while ($row_duration = mysqli_fetch_assoc($sq_duration)) {
+                                if ($row['entry_id'] != '' && $row_duration['entry_id'] == $row['entry_id']) {
+                                  continue;
+                                }
+                              ?>
+                              <option value="<?= $row_duration['entry_id'] ?>"><?= $row_duration['duration'] ?></option>
+                              <?php } ?>
                               </select></td>
                           <td><input type="text" id="from_date<?= $count ?>-u" class="form-control" name="from_date" placeholder="*Valid From" title="Valid From" value="<?= get_date_user($row_tariffentries['from_date']) ?>"  onchange="get_to_date(this.id,'to_date<?= $count ?>-u')" style="width: 120px;" /></td>
                           <td><input type="text" id="to_date<?= $count ?>-u" class="form-control" name="to_date" placeholder="*Valid To " title="Valid To" onchange="validate_validDate('from_date<?= $count ?>-u' ,'to_date<?= $count ?>-u')" value="<?= get_date_user($row_tariffentries['to_date']) ?>" style="width: 120px;" /></td>
@@ -154,7 +164,28 @@ $taxation = json_decode($sq_tariff['taxation']);
                       </tr>
                       <script>
                       $('#pickup_from<?= $count ?>-u,#drop_to<?= $count ?>-u').select2({minimumInputLength:1});
-                      $('#duration<?= $count ?>-u').select2();
+                      $('#duration<?= $count ?>-u').select2().on('select2:open', function () {
+                          var $select = $(this);
+                          var selectedText = $.trim($select.find('option:selected').text());
+                          var titleText = $.trim($select.attr('title') || '*Service Duration');
+                          setTimeout(function () {
+                              var $results = $('.select2-container--open .select2-results__options');
+                              var $title = $results.children().filter(function () {
+                                  return $.trim($(this).text()) === titleText;
+                              }).first();
+                              var $selected = $results.children().filter(function () {
+                                  return $.trim($(this).text()) === selectedText && selectedText !== titleText;
+                              }).first();
+                              if ($selected.length) {
+                                  if ($title.length) {
+                                      $selected.insertAfter($title);
+                                  } else {
+                                      $results.prepend($selected);
+                                  }
+                                  $results.scrollTop(0);
+                              }
+                          }, 0);
+                      });
                       $('#to_date<?= $count ?>-u,#from_date<?= $count ?>-u').datetimepicker({ timepicker:false, format:'d-m-Y' });
                       </script>
                     <?php } ?>

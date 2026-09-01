@@ -138,8 +138,18 @@ public function vendor_csv_save()
     $base_url=$_POST['base_url'];
     $flag = true;
 
-    $vendor_csv_dir = explode('uploads', $vendor_csv_dir);
-    $vendor_csv_dir = BASE_URL.'uploads'.$vendor_csv_dir[1];
+    $vendor_csv_dir = explode('uploads', str_replace('\\', '/', $vendor_csv_dir));
+    if (!isset($vendor_csv_dir[1]) || $vendor_csv_dir[1] === '') {
+      echo "error--Unable to read the uploaded CSV file.";
+      exit;
+    }
+    $vendor_csv_dir = preg_replace('#/+#', '/', str_replace('\\', '/', CSV_READ_URL.'uploads'.$vendor_csv_dir[1]));
+
+    $handle = @fopen($vendor_csv_dir, "r");
+    if ($handle === false) {
+      echo "error--Unable to read the uploaded CSV file.";
+      exit;
+    }
 
     begin_t();
     $count = 1;
@@ -147,8 +157,7 @@ public function vendor_csv_save()
     $invalidCount=0;
     $unprocessedArray=array();
     $arrResult  = array();
-    $handle = fopen($vendor_csv_dir, "r");
-    if(empty($handle) === false) {
+    if($handle !== false) {
 
         while(($data = fgetcsv($handle,5000, ",")) !== FALSE){
             if($count == 1) { $count++; continue; }

@@ -412,8 +412,8 @@ $email_id2 = $encrypt_decrypt->fnDecrypt($sq_hotel['alternative_email_2'], $secr
                               <legend>Child Without Bed</legend>
                               <div class="col-md-3 col-sm-3 mg_bt_10">
                                 <select name="cwob_from1" id="cwob_from1" title="Child Without Bed From Age">
-                                  <?php if ($sq_hotel['cwob_from'] != '0') { ?><option value='<?= $sq_hotel['cwob_from'] ?>'><?= $sq_hotel['cwob_from'] ?></option><?php } ?>
                                   <option value=''>*From Age</option>
+                                  <?php if ($sq_hotel['cwob_from'] != '0') { ?><option value='<?= $sq_hotel['cwob_from'] ?>'><?= $sq_hotel['cwob_from'] ?></option><?php } ?>
                                   <option value="2">2</option>
                                   <option value="3">3</option>
                                   <option value="4">4</option>

@@ -230,6 +230,45 @@ function validate_email(id) {
 	}
 }
 
+function validate_hotel_alternative_email(id) {
+	var primaryEl = document.getElementById('txt_email_id');
+	var alt1El = document.getElementById('txt_email_id_1');
+	var alt2El = document.getElementById('txt_email_id_2');
+	if (!primaryEl || !alt1El || !alt2El) {
+		return true;
+	}
+
+	var primary = (primaryEl.value || '').trim().toLowerCase();
+	if (primary === '') {
+		return true;
+	}
+
+	var alt1 = (alt1El.value || '').trim().toLowerCase();
+	var alt2 = (alt2El.value || '').trim().toLowerCase();
+	var conflict1 = alt1 !== '' && alt1 === primary;
+	var conflict2 = alt2 !== '' && alt2 === primary;
+	if (!conflict1 && !conflict2) {
+		return true;
+	}
+
+	error_msg_alert('Alternative Email 1 and 2 shouldn\'t accept the same Email address as the main Email');
+	if (conflict1) {
+		$(alt1El).css({ border: '1px solid red' });
+		if (id === 'txt_email_id_1') {
+			alt1El.value = '';
+			$(alt1El).focus();
+		}
+	}
+	if (conflict2) {
+		$(alt2El).css({ border: '1px solid red' });
+		if (id === 'txt_email_id_2') {
+			alt2El.value = '';
+			$(alt2El).focus();
+		}
+	}
+	return false;
+}
+
 //Validation for DOB
 function checkDate(id) {
 	var date = document.getElementById(id).value;

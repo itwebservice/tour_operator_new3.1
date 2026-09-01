@@ -44,20 +44,12 @@ include_once("../../../model/model.php");
 
                   <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
 
-                  <td><select name="city_id" id="city_id1" title="Select City" class="app_select2 city_master_dropdown" style="width:150px">
+                  <td><select name="city_id" id="city_id1" title="Select City" class="app_select2 city_master_dropdown" style="width:150px" data-add-new-option="true">
                   </select></td>
 
                   <td><input type="text" id="airport_name1" name="airport_name" placeholder="*Airport Name" title="Airport Name"></td>
 
                   <td><input type="text" id="airport_code1" name="airport_code" onchange="validate_alphanumeric(this.id)" placeholder="*Airport Code" title="Airport Code" style="text-transform: uppercase;"></td>
-
-                  <td><select name="active_flag" id="active_flag" title="Status" style="width:100px" class="hidden">
-
-                        <option value="Active">Active</option>
-
-                        <option value="Inactive">Inactive</option>
-
-                      </select></td>
 
               </tr>                                
 
@@ -138,8 +130,6 @@ $('#frm_save').validate({
 
               var airport_code = row.cells[4].childNodes[0].value;
 
-              var airport_status = row.cells[5].childNodes[0].value;
-
 
 
               if(city_id==""){ error_msg +="Select city in row : "+(i+1)+"<br>"; }
@@ -153,7 +143,7 @@ $('#frm_save').validate({
 
               airport_code_arr.push(airport_code);
 
-              airport_status_arr.push(airport_status);
+              airport_status_arr.push('Active');
           }
           else{
             if(rowCount == '1'){

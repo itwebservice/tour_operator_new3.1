@@ -19,6 +19,11 @@ background: #ffffff;
 /* font-family: 'Roboto', sans-serif; */
 font-family: 'Poppins', sans-serif !important;
 }
+
+a:focus {
+     outline: none; 
+}
+
 .theme_col{ color:<?= $theme_color ?>; }
 .theme_col_dark{ color:<?= $theme_color ?>; }
 .theme_col_2{ color:<?= $theme_color_2 ?>; }
@@ -556,7 +561,7 @@ width: 1px;
 height: 20px;
 right: 0;
 top: 5px;
-background: #CC0000;
+<!-- background: #CC0000; -->
 opacity: 0.5;
 }
 .btn-danger.ico_left:hover i:after {
@@ -802,6 +807,9 @@ border: 1px solid #ddd;
 border-top: 1px solid <?= $theme_color ?> !important;
 margin: 0 10px !important;
 width: 98% !important;
+overflow: visible !important;
+position: relative;
+z-index: 20;
 }
 .app_panel_content .Filter-panel {
 width: 100% !important;
@@ -1021,6 +1029,7 @@ max-height: 100px;
 .pd_bt_5{ padding-bottom:5px; }
 
 .pd_bt_51{padding-bottom: 51px !important;}
+.pd_bt_10{padding-bottom: 10px !important;}
 
 .col_pad{padding: 0 15px}
 
@@ -2493,8 +2502,20 @@ border-radius: 0 10px 0 0;
 }
 
 .select2-container--default .select2-selection--multiple{
-height: 40px;
+min-height: 40px;
+height: auto !important;
 border: 1px solid #d8d6de;
+overflow: hidden;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered{
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+padding: 2px 5px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice{
+margin-top: 4px;
+margin-bottom: 4px;
 }
 
 
@@ -2824,4 +2845,19 @@ textarea.ai-chat-textarea.form-control:focus,
 .planeairport-select .select2-container,
 .sector-select .select2-container{
 	width: 300px !important;
+}
+
+#default_program_list td.itinerary-row-check{
+	vertical-align: top !important;
+	padding-top: 35px !important;
+	padding-right: 10px !important;
+}
+#default_program_list td.itinerary-row-check .itinerary-chk-wrap{
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+#default_program_list td.itinerary-row-check label{
+	margin: 0 !important;
 }

@@ -47,7 +47,7 @@ $sq_checklist = mysqli_fetch_assoc(mysqlQuery($query));
            <div class="col-sm-4 mg_bt_30 <?= $class ?>">
             <?php if($sq_checklist['destination_name']!=''){  ?>
            
-              <select id="dest_name_s"  name="dest_name_s" title="Select Destination" class="form-control"  style="width:100%" disabled> 
+              <select id="dest_name_s"  name="dest_name_s" title="Select Destination" class="form-control app_select2"  style="width:100%" disabled> 
                   <?php
                     $sq_query1 = mysqli_fetch_assoc(mysqlQuery("select * from destination_master where dest_id = '$sq_checklist[destination_name]'"));
                     ?>

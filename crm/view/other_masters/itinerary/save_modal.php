@@ -40,10 +40,11 @@ textarea.form-control {
           </div>
           <div class="col-sm-6 text-left">
             <button type="button" class="btn btn-info btn-sm ico_left pull-left" style="margin-right:10px" onclick="display_format_modal();"><i class="fa fa-download"></i>&nbsp;&nbsp;CSV Format</button>
-            <div class="div-upload  mg_bt_20" id="div_upload_button">
+            <div class="div-upload  mg_bt_20" id="div_upload_button" role="button" title="Import CSV" style="overflow:hidden;">
                   <div id="itinerary_csv_upload" class="upload-button1"><span  id="vendor_status1">CSV</span></div>
                   <span id="vendor_status"></span>
                   <ul id="files" ></ul>
+                  <input type="file" id="itinerary_csv_file" accept=".csv,text/csv" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;">
                   <input type="hidden" id="txt_itinerary_csv_upload_dir" name="txt_itinerary_csv_upload_dir">
             </div>
             <button type="button" data-toggle="tooltip" class="btn btn-excel" title="Character limit for Special attraction is 85 characters, for Day-wise program is 2000 characters and for Overnight stay is 30 characters."><i class="fa fa-question-circle"></i></button> 
@@ -65,7 +66,12 @@ textarea.form-control {
             <table style="width:100%" id="default_program_list" name="default_program_list" class="table table-bordered table-hover table-striped no-marg pd_bt_51 mg_bt_0">
                 <tbody>
                   <tr>
-                    <td width="27px;" style="padding-right: 10px !important;"><input class="css-checkbox labelauty" id="chk_programd1" type="checkbox" checked style="display: none;"><label for="chk_programd1" style="margin-top:55px;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>
+                    <td width="27px;" class="itinerary-row-check" style="padding-right: 10px !important; vertical-align: top; padding-top: 35px !important;">
+                      <div class="itinerary-chk-wrap" style="height:40px; display:flex; align-items:center; justify-content:center;">
+                        <input class="css-checkbox labelauty" id="chk_programd1" type="checkbox" checked style="display: none;">
+                        <label for="chk_programd1" style="margin:0;"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label>
+                      </div>
+                    </td>
                     <td width="20px;"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled="" style="margin-top:35px;"></td>
                     <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="special_attaraction" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" style="margin-top:35px;"></td>
                     <td class="col-md-5 no-pad" style="padding-left: 5px !important;max-width: 594px;overflow: hidden;position: relative;" ><textarea id="day_program" name="day_program" class="form-control day_program" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"   style="overflow:hidden;resize:none;height:900px;"  
@@ -87,7 +93,7 @@ textarea.form-control {
                                 <img id="preview_img_1" src="" alt="Preview" 
                                      style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
                                 <button type="button" 
-                                        onclick="removeDayImage('1')" 
+                                        onclick="removeDayImage('1', this)" 
                                         title="Remove Image" 
                                         style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                     ×
@@ -106,12 +112,11 @@ textarea.form-control {
         </div>
         <div class="row mg_tp_10">
           <div class="col-xs-12 text-center">
-            <button class="btn btn-sm btn-success" id="btn_save"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
+                        <button class="btn btn-sm btn-success" type="button" id="btn_save"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Save</button>
           </div>
         </div>
-        <div id="itinerary_html">
-        <div>
-      </div>      
+        <div id="itinerary_html"></div>
+      </div> 
 
     </div>
 
@@ -136,11 +141,65 @@ function initializeItineraryTooltips() {
     });
 }
 
+// Keep itinerary checkbox vertically centered with Sr. No. field
+function alignItineraryRowCheckbox(row) {
+    if (!row || !row.cells[0]) {
+        return;
+    }
+    var cell = row.cells[0];
+    var checkbox = cell.querySelector('input[type="checkbox"]');
+    if (!checkbox) {
+        return;
+    }
+    var checked = checkbox.checked;
+    var id = checkbox.id || ('chk_programd' + (row.rowIndex + 1));
+    cell.className = 'itinerary-row-check';
+    cell.style.cssText = 'width:27px; padding-right:10px !important; vertical-align:top; padding-top:35px !important;';
+    cell.innerHTML = '';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'itinerary-chk-wrap';
+    wrap.style.cssText = 'height:40px; display:flex; align-items:center; justify-content:center;';
+
+    var input = document.createElement('input');
+    input.type = 'checkbox';
+    input.className = 'css-checkbox labelauty';
+    input.id = id;
+    input.name = id;
+    input.checked = checked;
+    input.style.display = 'none';
+
+    var label = document.createElement('label');
+    label.setAttribute('for', id);
+    label.style.margin = '0';
+    label.innerHTML = '<span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span>';
+
+    wrap.appendChild(input);
+    wrap.appendChild(label);
+    cell.appendChild(wrap);
+
+    if (typeof $ !== 'undefined' && typeof $.fn.labelauty === 'function') {
+        $(input).labelauty({
+            label: false,
+            maximum_width: '20px'
+        });
+        $(input).next('label').css('margin', '0');
+    }
+}
+window.alignItineraryRowCheckbox = alignItineraryRowCheckbox;
+
 function initializeModal() {
+    window.itineraryImages = {};
     if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
 $('#dest_ids').select2();
 $('#itinerary_save_modal').modal('show');
 initializeItineraryTooltips();
+var firstTable = document.getElementById('default_program_list');
+if (firstTable) {
+    for (var r = 0; r < firstTable.rows.length; r++) {
+        alignItineraryRowCheckbox(firstTable.rows[r]);
+    }
+}
     } else {
         // Fallback - try again after a short delay
         setTimeout(initializeModal, 100);
@@ -152,7 +211,15 @@ initializeModal();
 
 function display_format_modal(){
     var base_url = $('#base_url').val();
-    window.location = base_url+"images/csv_format/itinerary.csv";
+    var url = base_url + 'images/csv_format/itinerary.csv';
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'itinerary.csv';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 function check_dest_validation(dest_id){
@@ -165,38 +232,78 @@ function check_dest_validation(dest_id){
 	});
 }
 
-itinerary_csv_upload();
-function itinerary_csv_upload()
-{   
-    var type="id_proof";
-    var btnUpload=$('#itinerary_csv_upload');
-    var status=$('#vendor_status');
-    new AjaxUpload(btnUpload, {
-      action: 'itinerary/upload_itinerary_csv_file.php',
-      name: 'uploadfile',
-      onSubmit: function(file, ext){
+function itineraryMasterRowChecked(row){
+    if(!row || !row.cells[0]){
+        return false;
+    }
+    var cb = row.cells[0].querySelector('input[type="checkbox"]');
+    return !!(cb && cb.checked);
+}
 
+function itineraryMasterCellValue(row, cellIndex, selector){
+    if(!row || !row.cells[cellIndex]){
+        return '';
+    }
+    var el = row.cells[cellIndex].querySelector(selector);
+    return el ? el.value : '';
+}
+
+function itinerary_csv_upload(){
+    var $file = $('#itinerary_csv_file');
+    var $status = $('#vendor_status1');
+    if(!$file.length){
+        return;
+    }
+    $('body > input[type="file"][name="uploadfile"]').remove();
+    $file.off('change.itineraryCsv').on('change.itineraryCsv', function(){
+        var file = this.files && this.files[0] ? this.files[0] : null;
+        if(!file){
+            return;
+        }
+        var ext = (file.name.split('.').pop() || '').toLowerCase();
+        if(ext !== 'csv'){
+            error_msg_alert('Only CSV files are allowed');
+            this.value = '';
+            return;
+        }
         if(!confirm('Do you want to import this file?')){
-          return false;
+            this.value = '';
+            return;
         }
-        if (! (ext && /^(csv)$/.test(ext))){ 
-          error_msg_alert('Only CSV files are allowed');
-          return false;
-        }
-        status.text('Uploading...');
-      },
-      onComplete: function(file, response){
-        status.text('');
-        response = String(response || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
-        if(response==="error" || response===""){          
-          alert("File is not uploaded.");           
-        } else{
-          document.getElementById("txt_itinerary_csv_upload_dir").value = response;
-          itinerary_form_csv_save();
-        }
-      }
+        var formData = new FormData();
+        formData.append('uploadfile', file);
+        this.value = '';
+        var prevLabel = $status.text() || 'CSV';
+        $status.text('Uploading...');
+        var uploadUrl = ($('#base_url').val() || '') + 'view/other_masters/itinerary/upload_itinerary_csv_file.php';
+        $.ajax({
+            url: uploadUrl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response){
+                $status.text(prevLabel);
+                response = String(response || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+                if(response === 'error' || response === ''){
+                    error_msg_alert('File is not uploaded.');
+                    return;
+                }
+                document.getElementById('txt_itinerary_csv_upload_dir').value = response;
+                itinerary_form_csv_save();
+            },
+            error: function(){
+                $status.text(prevLabel);
+                error_msg_alert('File is not uploaded.');
+            }
+        });
     });
 }
+itinerary_csv_upload();
+$('#itinerary_save_modal').on('shown.bs.modal', function(){
+    itinerary_csv_upload();
+});
+
 function itinerary_form_csv_save(){
   
     var itinerary_csv_dir = document.getElementById("txt_itinerary_csv_upload_dir").value;
@@ -243,6 +350,11 @@ function itinerary_form_csv_save(){
                   if(spaInput){ spaInput.value = spaVal; }
                   if(dwpTextarea){ dwpTextarea.value = dwpVal; }
                   if(osInput){ osInput.value = osVal; }
+                  var cb = row.cells[0] ? row.cells[0].querySelector('input[type="checkbox"]') : null;
+                  if(cb){ cb.checked = true; }
+                  if(typeof alignItineraryRowCheckbox === 'function'){
+                      alignItineraryRowCheckbox(row);
+                  }
               }
               initializeItineraryTooltips();
             }
@@ -254,166 +366,103 @@ $(document).ready(function() {
     console.log("Document ready - initializing itinerary save");
     
     // Handle save button click
-    $(document).on('click', '#btn_save', function(e) {
+    $(document).off('click.itineraryMasterSave', '#btn_save').on('click.itineraryMasterSave', '#btn_save', function(e) {
         e.preventDefault();
-        console.log("Save button clicked");
-        
-        // Get destination ID
+        e.stopImmediatePropagation();
+        if (!$(this).closest('#itinerary_save_modal').length) {
+            return false;
+        }
+
         var dest_id = $('#dest_ids').val();
-        console.log("Destination ID:", dest_id);
-        
         if(!dest_id || dest_id == '') {
             error_msg_alert("Please select a destination!");
             return false;
         }
-        
-        // Get table data
-      var table = document.getElementById("default_program_list");
-      var rowCount = table.rows.length;
-        console.log("Table rows:", rowCount);
-        
-        // Check if at least one row is selected
-      var count = 0;
-      for(var i=0; i<rowCount; i++){
-          var row = table.rows[i];
-          if(row.cells[0].childNodes[0].checked){
-              count++;
-          }
-      }
-        
-      if(parseInt(count) == 0){
-          error_msg_alert("Please select atleast one day itinerary!");
-          return false;
-      }
-        
-        // Collect data from selected rows
-        var sp_arr = [];
-        var dwp_arr = [];
-        var os_arr = [];
-        var img_arr = [];
-        
-        for(var i=0; i<rowCount; i++){
-        var row = table.rows[i];
-        if(row.cells[0].childNodes[0].checked){
-          var sp = row.cells[2].childNodes[0].value;
-                var dwpElem = row.cells[3].querySelector('textarea');
-                var dwp = dwpElem ? dwpElem.value : '';
-          var os = row.cells[4].childNodes[0].value;
-                
-                // Get the actual row ID from the image input to match with stored images
-                var imgInput = row.querySelector('input[id^="day_image_"]');
-                var actualRowId = '';
-                if (imgInput) {
-                    actualRowId = imgInput.id.replace('day_image_', '');
-                }
-                
-                // Image path - check both stored images and hidden input
-                var img = '';
-                if (window.itineraryImages && window.itineraryImages[actualRowId]) {
-                    // If image is stored but not uploaded yet, upload it now
-                    var imageData = window.itineraryImages[actualRowId];
-                    if (imageData.file && !imageData.uploaded) {
-                        // Upload the image immediately
-                        var formData = new FormData();
-                        formData.append('uploadfile', imageData.file);
-                        
-                        $.ajax({
-                            url: 'itinerary/upload_itinerary_image.php',
-                            type: 'POST',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            async: false, // Make it synchronous for data collection
-                            success: function(response) {
-                                try {
-                                    var msg = response.split('--');
-                                    if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
-                                        img = response;
-                                        window.itineraryImages[actualRowId].uploaded = true;
-                                        window.itineraryImages[actualRowId].image_url = response;
-                                    }
-                                } catch(e) {
-                                    console.log('Upload parse error:', e);
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.log("Upload error for row", actualRowId, ":", error);
-                            }
-                        });
-                    } else if (imageData.image_url) {
-                        img = imageData.image_url;
-                    }
-                } else {
-                    // Fallback to hidden input
-                    var hiddenImgInput = row.querySelector('input[id^="itinerary_image_path_"]');
-                    img = hiddenImgInput ? hiddenImgInput.value : '';
-                }
-                console.log("Row " + i + " (ID: " + actualRowId + ") image path:", img);
 
-                console.log("Row " + i + " data:", {sp: sp, dwp: dwp, os: os});
-                
-                if(sp == ""){
-                    error_msg_alert('Special attraction is mandatory in row ' + (i+1));
-              return false;
-          }
-                if(dwp == ""){
-                    error_msg_alert('Daywise program is mandatory in row ' + (i+1));
-              return false;
-          }
-                if(os == ""){
-                    error_msg_alert('Overnight stay is mandatory in row ' + (i+1));
-              return false;
-          }
-                
-          sp_arr.push(sp);
-          dwp_arr.push(dwp);
-          os_arr.push(os);
-                img_arr.push(img);
+        var $btn = $(this);
+        $btn.button('loading');
+        itineraryWhenImagesReady(function() {
+            var table = document.getElementById("default_program_list");
+            if (!table) {
+                $btn.button('reset');
+                return false;
             }
-        }
-        
-        console.log("Final data to send:", {
-            dest_id: dest_id,
-            sp_arr: sp_arr,
-            dwp_arr: dwp_arr,
-            os_arr: os_arr,
-            img_arr: img_arr
-        });
-        
-        // Show loading state
-      $('#btn_save').button('loading');
-        
-        // Send AJAX request
-      $.ajax({
-            type: 'post',
-            url: base_url() + 'controller/other_masters/itinerary/itinerary_save.php',
-            data: { 
-                dest_id: dest_id, 
-                sp_arr: sp_arr, 
-                dwp_arr: dwp_arr, 
-                os_arr: os_arr,
-                img_arr: img_arr
-            },
-            success: function(result) {
-                console.log("Server response:", result);
-                $('#btn_save').button('reset');
-                
-          var msg = result.split('--');
-                if(msg[0] != "error"){
-            $('#itinerary_save_modal').modal('hide');
-            msg_alert(result);
-            list_reflect();
-                } else {
-                    error_msg_alert(msg[1]);
+            var rowCount = table.rows.length;
+            var count = 0;
+            for (var i = 0; i < rowCount; i++) {
+                if (itineraryMasterRowChecked(table.rows[i])) {
+                    count++;
                 }
-            },
-            error: function(xhr, status, error) {
-                console.log("AJAX Error:", error);
-                console.log("Status:", status);
-                console.log("Response:", xhr.responseText);
-            $('#btn_save').button('reset');
-                error_msg_alert("Error saving itinerary: " + error);
             }
+            if (parseInt(count) === 0) {
+                $btn.button('reset');
+                error_msg_alert("Please select atleast one day itinerary!");
+                return false;
+            }
+
+            var sp_arr = [];
+            var dwp_arr = [];
+            var os_arr = [];
+            var img_arr = [];
+
+            for (var i = 0; i < rowCount; i++) {
+                var row = table.rows[i];
+                if (!itineraryMasterRowChecked(row)) {
+                    continue;
+                }
+                var sp = itineraryMasterCellValue(row, 2, 'input');
+                var dwp = itineraryMasterCellValue(row, 3, 'textarea');
+                var os = itineraryMasterCellValue(row, 4, 'input');
+                var img = itineraryCollectRowImagePath(row);
+
+                if (sp == "") {
+                    $btn.button('reset');
+                    error_msg_alert('Special attraction is mandatory in row ' + (i + 1));
+                    return false;
+                }
+                if (dwp == "") {
+                    $btn.button('reset');
+                    error_msg_alert('Daywise program is mandatory in row ' + (i + 1));
+                    return false;
+                }
+                if (os == "") {
+                    $btn.button('reset');
+                    error_msg_alert('Overnight stay is mandatory in row ' + (i + 1));
+                    return false;
+                }
+
+                sp_arr.push(sp);
+                dwp_arr.push(dwp);
+                os_arr.push(os);
+                img_arr.push(img || '');
+            }
+
+            $.ajax({
+                type: 'post',
+                url: base_url() + 'controller/other_masters/itinerary/itinerary_save.php',
+                data: {
+                    dest_id: dest_id,
+                    sp_arr: sp_arr,
+                    dwp_arr: dwp_arr,
+                    os_arr: os_arr,
+                    img_arr: JSON.stringify(img_arr)
+                },
+                success: function(result) {
+                    $btn.button('reset');
+                    var msg = result.split('--');
+                    if (msg[0] != "error") {
+                        $('#itinerary_save_modal').modal('hide');
+                        msg_alert(result);
+                        list_reflect();
+                    } else {
+                        error_msg_alert(msg[1]);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $btn.button('reset');
+                    error_msg_alert("Error saving itinerary: " + error);
+                }
+            });
         });
     });
 
@@ -424,9 +473,9 @@ $(document).ready(function() {
             console.log("Fixing all existing itinerary rows, total rows:", table.rows.length);
             
             // Process ALL rows, not just the last one
-            for (var i = 1; i < table.rows.length; i++) { // Skip header row (index 0)
+            for (var i = 0; i < table.rows.length; i++) {
                 var row = table.rows[i];
-                var rowId = i; // Row 1 gets ID 1, Row 2 gets ID 2, etc.
+                var rowId = i + 1; // Row 0 gets ID 1, Row 1 gets ID 2, etc.
                 
                 console.log("Fixing row", i, "with", row.cells.length, "cells");
                 
@@ -452,7 +501,7 @@ $(document).ready(function() {
                                         <img id="preview_img_${rowId}" src="" alt="Preview" 
                                              style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
                                         <button type="button" 
-                                                onclick="removeDayImage('${rowId}')" 
+                                                onclick="removeDayImage('${rowId}', this)" 
                                                 title="Remove Image" 
                                                 style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                             ×
@@ -482,30 +531,8 @@ $(document).ready(function() {
                         }
                 }
                 
-                // Reinitialize labelauty for the checkbox in cell 0
-                if (row.cells[0]) {
-                    var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
-                    if (checkbox) {
-                        // Remove any existing labelauty classes and reinitialize
-                        $(checkbox).removeClass('labelauty').next('label').remove();
-                        $(checkbox).addClass('css-checkbox labelauty');
-                        
-                        // Create new label
-                        var label = document.createElement('label');
-                        label.setAttribute('for', checkbox.id);
-                        label.style.marginTop = '55px';
-                        label.innerHTML = '<span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span>';
-                        
-                        // Insert label after checkbox
-                        checkbox.parentNode.insertBefore(label, checkbox.nextSibling);
-                        
-                        // Reinitialize labelauty
-                        $(checkbox).labelauty({
-                            checked_label: "Yes",
-                            unchecked_label: "No"
-                        });
-                    }
-                }
+                // Keep checkbox aligned with Sr. No.
+                alignItineraryRowCheckbox(row);
             }
             initializeItineraryTooltips();
         }
@@ -531,10 +558,10 @@ $(document).ready(function() {
                     console.log("  Row", j, ":", j === 0 ? "(HEADER)" : "(DATA ROW " + j + ")");
                 }
                 
-                // Process ALL rows, not just the last one
-                for (var i = 1; i < table.rows.length; i++) { // Skip header row (index 0)
+                // Process ALL data rows
+                for (var i = 0; i < table.rows.length; i++) {
                     var row = table.rows[i];
-                    var rowId = i; // Row 1 gets ID 1, Row 2 gets ID 2, etc.
+                    var rowId = i + 1;
                     
                     console.log("Processing row", i, "with", row.cells.length, "cells");
                     console.log("Row ID will be:", rowId);
@@ -560,7 +587,7 @@ $(document).ready(function() {
                                             <img id="preview_img_${rowId}" src="" alt="Preview" 
                                                  style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
                                             <button type="button" 
-                                                    onclick="removeDayImage('${rowId}')" 
+                                                    onclick="removeDayImage('${rowId}', this)" 
                                                     title="Remove Image" 
                                                     style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                                 ×
@@ -576,26 +603,7 @@ $(document).ready(function() {
                         }
                     }
                     
-                    // Reinitialize labelauty for the checkbox in cell 0
-                    if (row.cells[0]) {
-                        var checkbox = row.cells[0].querySelector('input[type="checkbox"]');
-                        if (checkbox) {
-                            // Remove any existing labelauty classes and reinitialize
-                            $(checkbox).removeClass('labelauty').next('label').remove();
-                            $(checkbox).addClass('css-checkbox labelauty');
-                            
-                            // Create new label
-                            var label = document.createElement('label');
-                            label.setAttribute('for', checkbox.id);
-                            label.style.marginTop = '55px';
-                            label.innerHTML = '<span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span>';
-                            
-                            // Insert label after checkbox
-                            checkbox.parentNode.insertBefore(label, checkbox.nextSibling);
-                            
-                            console.log("Reinitialized labelauty for checkbox", checkbox.id);
-                        }
-                    }
+                    alignItineraryRowCheckbox(row);
                 }
                 initializeItineraryTooltips();
             }, 300);
@@ -603,82 +611,219 @@ $(document).ready(function() {
     };
 });
 
-        // Preview day image function (like quotation form)
-        window.previewDayImage = function(input, rowIndex) {
-            console.log("Preview triggered for row:", rowIndex);
-            console.log("Input element:", input);
-            console.log("Input ID:", input.id);
-            console.log("Expected preview elements - img:", '#preview_img_' + rowIndex, "div:", '#day_image_preview_' + rowIndex);
-            
-            var file = input.files[0];
-            if (!file) {
-                console.log("No file selected");
-                return;
-            }
-            
-            console.log("File selected:", file.name, "Type:", file.type);
-            
-            // Validate file type
-            var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            if (!allowedTypes.includes(file.type)) {
-                error_msg_alert('Only JPG, JPEG, PNG, WEBP files are allowed');
-                input.value = ''; // Clear the input
-                return;
-            }
-            
-            // Check if preview elements exist
-            var previewImg = $('#preview_img_' + rowIndex);
-            var previewDiv = $('#day_image_preview_' + rowIndex);
-            console.log("Preview elements found - img:", previewImg.length, "div:", previewDiv.length);
-            
-            // Show preview immediately
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                console.log("FileReader loaded, setting preview for row:", rowIndex);
-                previewImg.attr('src', e.target.result);
-                previewDiv.show();
-                // Hide the upload button after image selection
-                $('#day_image_' + rowIndex).parent().find('label').hide();
-                console.log("Preview set and shown for row:", rowIndex);
-            };
-            reader.readAsDataURL(file);
-            
-            // Store file for later upload (like quotation form)
-            if (!window.itineraryImages) {
-                window.itineraryImages = {};
-            }
-            window.itineraryImages[rowIndex] = {
-                file: file,
-                uploaded: false
-            };
-            
-            console.log("Image previewed and stored for row:", rowIndex);
-            console.log("Stored images object:", window.itineraryImages);
-        }
+function itineraryImageUploadUrl() {
+    return (($('#base_url').val() || '')) + 'view/other_masters/itinerary/upload_itinerary_image.php';
+}
 
-        // Remove day image function
-        window.removeDayImage = function(rowIndex) {
-            console.log("Removing image for row:", rowIndex);
-            
-            // Clear file input
-            $('#day_image_' + rowIndex).val('');
-            $('#day_image_' + rowIndex).val('');
-            // Hide preview
-            $('#preview_img_' + rowIndex).show();
-            
-            // Show the upload button again
-            $('#day_image_' + rowIndex).parent().find('label').show();
-            
-            // Clear hidden path
-            $('#itinerary_image_path_' + rowIndex).val('');
-            
-            // Clear stored file
-            if (window.itineraryImages && window.itineraryImages[rowIndex]) {
-                delete window.itineraryImages[rowIndex];
-            }
-            
-            console.log("Image removed for row:", rowIndex);
+function itineraryParseImageUploadResponse(response) {
+    response = String(response || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!response || /^error/i.test(response)) {
+        return '';
+    }
+    var match = response.match(/uploads\/itinerary_images\/[A-Za-z0-9._-]+/i);
+    if (match) {
+        return match[0];
+    }
+    if (response.indexOf('uploads/') === 0 && response.indexOf(' ') === -1) {
+        return response;
+    }
+    return '';
+}
+
+function itineraryTableRoot() {
+    return document.getElementById('default_program_list');
+}
+
+function itineraryRowFromControl(el) {
+    if (!el) {
+        return null;
+    }
+    var $row = $(el).closest('tr');
+    return $row.length ? $row[0] : null;
+}
+
+function itineraryFindInRow(row, selector) {
+    return row ? row.querySelector(selector) : null;
+}
+
+function itineraryRowHidden(row) {
+    return itineraryFindInRow(row, 'input[name^="itinerary_image_path_"]');
+}
+
+function itinerarySetRowImagePathOnRow(row, path) {
+    if (!row) {
+        return;
+    }
+    var hidden = itineraryRowHidden(row);
+    if (hidden) {
+        hidden.value = path || '';
+    }
+    if (path) {
+        row.setAttribute('data-itinerary-image', path);
+    } else {
+        row.removeAttribute('data-itinerary-image');
+    }
+}
+
+function itineraryResetFileInputOnRow(row) {
+    var input = itineraryFindInRow(row, 'input[type="file"][id^="day_image_"]');
+    if (!input || !input.parentNode) {
+        return;
+    }
+    var neu = input.cloneNode(true);
+    neu.value = '';
+    input.parentNode.replaceChild(neu, input);
+}
+
+function itineraryShowDayImagePreviewOnRow(row, src) {
+    if (!row) {
+        return;
+    }
+    var previewImg = itineraryFindInRow(row, 'img[id^="preview_img_"]');
+    var previewDiv = itineraryFindInRow(row, 'div[id^="day_image_preview_"]');
+    var fileInput = itineraryFindInRow(row, 'input[type="file"][id^="day_image_"]');
+    if (previewImg && src) {
+        previewImg.src = src;
+        previewImg.style.display = 'block';
+    }
+    if (previewDiv) {
+        previewDiv.style.display = 'block';
+        var btn = previewDiv.querySelector('button');
+        if (btn) {
+            btn.style.display = 'flex';
         }
+    }
+    if (fileInput) {
+        var label = row.querySelector('label[for="' + fileInput.id + '"]');
+        if (label) {
+            label.style.display = 'none';
+        }
+    }
+}
+
+function itineraryHideDayImagePreviewOnRow(row) {
+    if (!row) {
+        return;
+    }
+    var previewImg = itineraryFindInRow(row, 'img[id^="preview_img_"]');
+    var previewDiv = itineraryFindInRow(row, 'div[id^="day_image_preview_"]');
+    var fileInput = itineraryFindInRow(row, 'input[type="file"][id^="day_image_"]');
+    if (previewDiv) {
+        previewDiv.style.display = 'none';
+    }
+    if (previewImg) {
+        previewImg.src = '';
+    }
+    if (fileInput) {
+        var label = row.querySelector('label[for="' + fileInput.id + '"]');
+        if (label) {
+            label.style.display = 'inline-block';
+        }
+    }
+}
+
+function itineraryUploadImageFile(file) {
+    var fd = new FormData();
+    fd.append('uploadfile', file);
+    return $.ajax({
+        url: itineraryImageUploadUrl(),
+        type: 'POST',
+        data: fd,
+        processData: false,
+        contentType: false
+    });
+}
+
+function itineraryCollectRowImagePath(row) {
+    if (!row) {
+        return '';
+    }
+    var hidden = itineraryRowHidden(row);
+    var img = hidden ? String(hidden.value || '').trim() : '';
+    if (!img) {
+        img = String(row.getAttribute('data-itinerary-image') || '').trim();
+    }
+    return img;
+}
+
+function itineraryWhenImagesReady(callback) {
+    var tries = 0;
+    (function tick() {
+        if (!window.itineraryPendingUploads || tries > 40) {
+            callback();
+            return;
+        }
+        tries++;
+        setTimeout(tick, 250);
+    })();
+}
+
+window.previewDayImage = function(input, rowIndex) {
+    var row = itineraryRowFromControl(input);
+    var file = input && input.files ? input.files[0] : null;
+    if (!file || !row) {
+        return;
+    }
+    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (allowedTypes.indexOf(file.type) === -1) {
+        error_msg_alert('Only JPG, JPEG, PNG, WEBP files are allowed');
+        itineraryResetFileInputOnRow(row);
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        itineraryShowDayImagePreviewOnRow(row, e.target.result);
+    };
+    reader.readAsDataURL(file);
+
+    window.itineraryPendingUploads = (window.itineraryPendingUploads || 0) + 1;
+    window.itineraryImageUploadSeq = window.itineraryImageUploadSeq || {};
+    var rowKey = String(rowIndex || (input.id || '').replace('day_image_', '') || 'row');
+    window.itineraryImageUploadSeq[rowKey] = (window.itineraryImageUploadSeq[rowKey] || 0) + 1;
+    var uploadSeq = window.itineraryImageUploadSeq[rowKey];
+    row.setAttribute('data-itinerary-upload-seq', uploadSeq);
+
+    itineraryUploadImageFile(file).always(function() {
+        window.itineraryPendingUploads = Math.max(0, (window.itineraryPendingUploads || 1) - 1);
+    }).done(function(response) {
+        if (String(row.getAttribute('data-itinerary-upload-seq') || '') !== String(uploadSeq)) {
+            return;
+        }
+        var path = itineraryParseImageUploadResponse(response);
+        if (!path) {
+            error_msg_alert('Image upload failed. Please try again.');
+            return;
+        }
+        itinerarySetRowImagePathOnRow(row, path);
+    }).fail(function() {
+        if (String(row.getAttribute('data-itinerary-upload-seq') || '') !== String(uploadSeq)) {
+            return;
+        }
+        error_msg_alert('Image upload failed. Please try again.');
+    });
+};
+
+window.removeDayImage = function(rowIndex, btn) {
+    var row = itineraryRowFromControl(btn) || (function() {
+        var table = itineraryTableRoot();
+        var input = table ? table.querySelector('[id="day_image_' + rowIndex + '"]') : null;
+        return itineraryRowFromControl(input);
+    })();
+    if (!row) {
+        return;
+    }
+    window.itineraryImageUploadSeq = window.itineraryImageUploadSeq || {};
+    var rowKey = String(rowIndex || '');
+    window.itineraryImageUploadSeq[rowKey] = (window.itineraryImageUploadSeq[rowKey] || 0) + 1;
+    row.setAttribute('data-itinerary-upload-seq', window.itineraryImageUploadSeq[rowKey]);
+    itineraryHideDayImagePreviewOnRow(row);
+    itinerarySetRowImagePathOnRow(row, '');
+    itineraryResetFileInputOnRow(row);
+};
+
+if (typeof window.itineraryRowIdCounter === 'undefined') {
+    window.itineraryRowIdCounter = 2;
+}
 
     // Function to debug all row IDs
     window.debugAllRowIds = function() {
@@ -699,25 +844,7 @@ $(document).ready(function() {
         }
     };
 
-    // Initialize the static row counter
-    window.itineraryRowIdCounter = 2; // Start from 2 since row 1 is default
-
-    // Fix all rows when the page loads
-    $(document).ready(function() {
-        setTimeout(function() {
-            if (typeof window.fixAllItineraryRows === 'function') {
-                console.log("Fixing all existing rows on page load...");
-                window.fixAllItineraryRows();
-                
-                // Debug all row IDs after fixing
-                setTimeout(function() {
-                    if (typeof window.debugAllRowIds === 'function') {
-                        window.debugAllRowIds();
-                    }
-                }, 500);
-            }
-        }, 1000);
-    });
+    // Do not rebuild row HTML on load; that wipes a first-row image if the user already selected one.
 
 </script>
 <script src="<?= BASE_URL ?>js/ajaxupload.3.5.js"></script>

@@ -1,9 +1,19 @@
 <?php
 include "../../../model/model.php";
 ?>
-<div class="row text-right mg_tp_20">
+<div class="row text-right mg_tp_20 mg_bt_10">
 	<div class="col-md-12">
 		<button class="btn btn-info btn-sm ico_left" onclick="save_modal()" id="btn_save_modal"><i class="fa fa-plus"></i>&nbsp;&nbsp;Room Category</button>
+	</div>
+</div>
+<div class="app_panel_content Filter-panel">
+	<div class="row">
+		<div class="text-left col-md-3 col-sm-6">
+			<select id="room_category_status" name="room_category_status" title="Select Status" class="form-control" onchange="list_reflect()" style="width:100%">
+				<option value="Active">Active</option>
+				<option value="Inactive">Inactive</option>
+			</select>
+		</div>
 	</div>
 </div>
 
@@ -20,7 +30,8 @@ function save_modal()
 }
 function list_reflect()
 {
-	$.post('room_category/list_reflect.php', {}, function(data){
+	var status = $('#room_category_status').val();
+	$.post('room_category/list_reflect.php', { status : status }, function(data){
 		$('#div_list').html(data);
 	});
 }

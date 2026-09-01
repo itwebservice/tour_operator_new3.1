@@ -122,15 +122,44 @@ $quot_format = $quot_format_labels[$qf_val];
                 // $gqb_config = gqb_get_config();
                 // $testimonials = isset($gqb_config['testimonials']) ? $gqb_config['testimonials'] : array();
 
+                $testimonial_placeholders = array(
+                  array('name' => 'Customer 1', 'designation' => 'Traveller', 'review' => 'Excellent travel experience and smooth arrangements.'),
+                  array('name' => 'Customer 2', 'designation' => 'Traveller', 'review' => 'The trip was well planned and managed professionally.'),
+                  array('name' => 'Customer 3', 'designation' => 'Traveller', 'review' => 'Hotels, transport and itinerary were very well organized.'),
+                  array('name' => 'Customer 4', 'designation' => 'Traveller', 'review' => 'Great support from the team throughout the journey.'),
+                  array('name' => 'Customer 5', 'designation' => 'Traveller', 'review' => 'A memorable holiday with wonderful service.'),
+                  array('name' => 'Customer 6', 'designation' => 'Traveller', 'review' => 'Everything was handled perfectly from start to finish.')
+                );
+
                 if (empty($testimonials)) {
-                  $testimonials = array(
-                    array('name' => 'Customer 1', 'designation' => 'Traveller', 'review' => 'Excellent travel experience and smooth arrangements.', 'photo' => ''),
-                    array('name' => 'Customer 2', 'designation' => 'Traveller', 'review' => 'The trip was well planned and managed professionally.', 'photo' => ''),
-                    array('name' => 'Customer 3', 'designation' => 'Traveller', 'review' => 'Hotels, transport and itinerary were very well organized.', 'photo' => ''),
-                    array('name' => 'Customer 4', 'designation' => 'Traveller', 'review' => 'Great support from the team throughout the journey.', 'photo' => ''),
-                    array('name' => 'Customer 5', 'designation' => 'Traveller', 'review' => 'A memorable holiday with wonderful service.', 'photo' => ''),
-                    array('name' => 'Customer 6', 'designation' => 'Traveller', 'review' => 'Everything was handled perfectly from start to finish.', 'photo' => '')
-                  );
+                  foreach ($testimonial_placeholders as $ph) {
+                    $testimonials[] = array(
+                      'testimonial_id' => '',
+                      'name' => '',
+                      'designation' => '',
+                      'review' => '',
+                      'photo' => '',
+                      'ph_name' => $ph['name'],
+                      'ph_designation' => $ph['designation'],
+                      'ph_review' => $ph['review']
+                    );
+                  }
+                } else {
+                  foreach ($testimonials as $i => &$t) {
+                    $ph = isset($testimonial_placeholders[$i]) ? $testimonial_placeholders[$i] : array('name' => 'Name', 'designation' => 'Designation', 'review' => 'Review');
+                    $is_sample = (($t['name'] ?? '') === ($ph['name'] ?? '')
+                      && ($t['designation'] ?? '') === ($ph['designation'] ?? '')
+                      && ($t['review'] ?? '') === ($ph['review'] ?? ''));
+                    if ($is_sample) {
+                      $t['name'] = '';
+                      $t['designation'] = '';
+                      $t['review'] = '';
+                    }
+                    $t['ph_name'] = $ph['name'];
+                    $t['ph_designation'] = $ph['designation'];
+                    $t['ph_review'] = $ph['review'];
+                  }
+                  unset($t);
                 }
                 ?>
 
@@ -149,19 +178,19 @@ $quot_format = $quot_format_labels[$qf_val];
 
                           <div class="col-md-2">
                             <input type="text" class="form-control testimonial_name"
-                              placeholder="Name"
+                              placeholder="<?= htmlspecialchars($t['ph_name'] ?? 'Name') ?>"
                               value="<?= htmlspecialchars($t['name'] ?? '') ?>">
                           </div>
 
                           <div class="col-md-2">
                             <input type="text" class="form-control testimonial_designation"
-                              placeholder="Designation"
+                              placeholder="<?= htmlspecialchars($t['ph_designation'] ?? 'Designation') ?>"
                               value="<?= htmlspecialchars($t['designation'] ?? '') ?>">
                           </div>
 
                           <div class="col-md-5">
                             <input type="text" class="form-control testimonial_review"
-                              placeholder="Review"
+                              placeholder="<?= htmlspecialchars($t['ph_review'] ?? 'Review') ?>"
                               value="<?= htmlspecialchars($t['review'] ?? '') ?>">
                           </div>
 
@@ -430,11 +459,18 @@ $quot_format = $quot_format_labels[$qf_val];
         var testimonials = [];
 
         $('.testimonial_row').each(function() {
+          var name = $.trim($(this).find('.testimonial_name').val() || '');
+          var designation = $.trim($(this).find('.testimonial_designation').val() || '');
+          var review = $.trim($(this).find('.testimonial_review').val() || '');
+          var photo = $.trim($(this).find('.testimonial_photo').val() || '');
+          if (name === '' && designation === '' && review === '' && photo === '') {
+            return;
+          }
           testimonials.push({
-            name: $(this).find('.testimonial_name').val(),
-            designation: $(this).find('.testimonial_designation').val(),
-            review: $(this).find('.testimonial_review').val(),
-            photo: $.trim($(this).find('.testimonial_photo').val() || '')
+            name: name,
+            designation: designation,
+            review: review,
+            photo: photo
           });
         });
 

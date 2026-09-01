@@ -83,6 +83,10 @@ $role_id = $_SESSION['role_id'];
     city_lzloading('#cmb_city_id1');
     $('#cmb_city_id1').on('change select2:select', function () {
         hotel_name_list_load(this.id);
+        $(this).valid();
+    });
+    $('#hotel_id1, #currency_code1').on('change select2:select', function () {
+        $(this).valid();
     });
 
     function seasonal_csv() {
@@ -198,7 +202,38 @@ $role_id = $_SESSION['role_id'];
         format: 'd-m-Y'
     });
     $('#frm_tab1').validate({
-        rules: {},
+        ignore: [],
+        rules: {
+            cmb_city_id1: { required: true },
+            hotel_id1: { required: true },
+            currency_code: { required: true }
+        },
+        messages: {
+            cmb_city_id1: { required: "Select City Name" },
+            hotel_id1: { required: "Select Hotel Name" },
+            currency_code: { required: "Select Currency" }
+        },
+        errorPlacement: function(error, element) {
+            if (element.next('.select2').length) {
+                error.insertAfter(element.next('.select2'));
+            } else if (element.next('.select2-container').length) {
+                error.insertAfter(element.next('.select2-container'));
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).addClass('error').removeClass('valid');
+            if ($(element).hasClass('select2-hidden-accessible')) {
+                $(element).next('.select2').find('.select2-selection').addClass('error');
+            }
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('error').addClass('valid');
+            if ($(element).hasClass('select2-hidden-accessible')) {
+                $(element).next('.select2').find('.select2-selection').removeClass('error');
+            }
+        },
         submitHandler: function(form) {
             var base_url = $('#base_url').val();
 

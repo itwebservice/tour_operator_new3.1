@@ -4,7 +4,7 @@ include "../../../model/model.php";
 
 ?>
 
-<div class="row text-right mg_tp_20">
+<div class="row text-right mg_tp_20 mg_bt_10">
 
 	<div class="col-md-12">
 		<button class="btn btn-info btn-sm ico_left" onclick="display_modal()" id="btn_display_modal"><i class="fa fa-eye"></i>&nbsp;&nbsp;View</button>
@@ -12,8 +12,16 @@ include "../../../model/model.php";
 	</div>
 
 </div>
-
-
+<div class="app_panel_content Filter-panel">
+	<div class="row">
+		<div class="text-left col-md-3 col-sm-6">
+			<select id="inclusion_status" name="inclusion_status" title="Select Status" class="form-control" onchange="list_reflect()" style="width:100%">
+				<option value="Active">Active</option>
+				<option value="Inactive">Inactive</option>
+			</select>
+		</div>
+	</div>
+</div>
 
 <div id="div_modal"></div>
 <div id="div_modal_d"></div>
@@ -53,7 +61,8 @@ function list_reflect()
 
 {
 
-	$.post('inclusions/list_reflect.php', {}, function(data){
+	var status = $('#inclusion_status').val();
+	$.post('inclusions/list_reflect.php', { status : status }, function(data){
 
 		$('#div_list').html(data);
 

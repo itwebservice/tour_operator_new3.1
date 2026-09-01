@@ -7,7 +7,7 @@
 <div class="app_panel_content Filter-panel">
 	<div class="row">
 		<div class="text-left col-md-3 col-sm-6">
-			<select id="airport_status" name="airport_status" title="Select Status" class="form-control" onchange="list_reflect()" style="width:100%"> 
+			<select id="airport_status" name="airport_status" title="Select Status" class="form-control status_filter_dropdown" onchange="list_reflect()" style="width:180px"> 
 				<option value="Active">Active</option>
 				<option value="Inactive">Inactive</option>
 			</select>
@@ -44,6 +44,11 @@ function list_reflect(){
     }, 1000);
 	});
 }list_reflect();
+if (typeof initMasterStatusSelect === 'function') {
+	initMasterStatusSelect('#airport_status').on('change', list_reflect);
+} else {
+	$('#airport_status').on('change', list_reflect);
+}
 
 function save_modal(){
 	$('#btn_save_modal').button('loading');

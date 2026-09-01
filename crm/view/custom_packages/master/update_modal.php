@@ -1,6 +1,38 @@
 <?php
 include "../../../model/model.php";
 include_once('../../layouts/fullwidth_app_header.php');
+
+if (!function_exists('package_day_image_display')) {
+    function package_day_image_display($day_image)
+    {
+        $raw = trim((string)$day_image);
+        if ($raw === '' || strcasecmp($raw, 'NULL') === 0) {
+            return array('has' => false, 'url' => '', 'rel' => '');
+        }
+        if (strpos($raw, 'http://') === 0 || strpos($raw, 'https://') === 0) {
+            return array('has' => true, 'url' => $raw, 'rel' => $raw);
+        }
+        $rel = ltrim(str_replace('\\', '/', $raw), '/');
+        $project_root = str_replace('\\', '/', dirname(__DIR__, 4));
+        $crm_root = str_replace('\\', '/', dirname(__DIR__, 3));
+        $project_url = rtrim(str_replace('/crm/', '/', BASE_URL), '/');
+        $crm_url = rtrim(BASE_URL, '/');
+
+        $try = array(
+            array('path' => $project_root . '/' . $rel, 'url' => $project_url . '/' . $rel),
+            array('path' => $crm_root . '/' . $rel, 'url' => $crm_url . '/' . $rel),
+            array('path' => $project_root . '/uploads/itinerary_images/' . basename($rel), 'url' => $project_url . '/uploads/itinerary_images/' . basename($rel)),
+            array('path' => $crm_root . '/uploads/itinerary_images/' . basename($rel), 'url' => $crm_url . '/uploads/itinerary_images/' . basename($rel)),
+        );
+        foreach ($try as $item) {
+            if (is_file($item['path'])) {
+                return array('has' => true, 'url' => $item['url'], 'rel' => $rel);
+            }
+        }
+        return array('has' => true, 'url' => $project_url . '/' . $rel, 'rel' => $rel);
+    }
+}
+
 $package_id = $_POST['package_id'];
 $sq_pckg = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id = '$package_id'"));
 $sq_currency = mysqli_fetch_assoc(mysqlQuery("select * from currency_name_master where id='$sq_pckg[currency_id]'"));
@@ -247,10 +279,13 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                             <td class='col-md-1 pad_8'><button type="button" id="itinerary<?php echo $count; ?>" class="btn btn-info btn-iti btn-sm" title="Add Itinerary" style="border: none !important;margin-top:35px;" onClick="add_itinerary('dest_name_u','special_attaraction<?php echo $count; ?>-u','day_program<?php echo $count; ?>-u','overnight_stay<?php echo $count; ?>-u','Day-<?= $count ?>')"><i class="fa fa-plus"></i></button>
                                             </td>
                                             <td class='col-md-1 pad_8' style="width: 120px;">
-                                                <!-- Debug: Image path = <?= $sq_pckg1['day_image'] ?? 'NULL' ?> -->
-                                                <div style="margin-top: 35px;">
-                                                    <label for="day_image_<?php echo $count; ?>" class="btn btn-sm btn-success" 
-                                                           style="margin-bottom: 5px;  font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap; <?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:none;' : '' ?>;">
+                                                <?php
+                                                $day_img = package_day_image_display(isset($sq_pckg1['day_image']) ? $sq_pckg1['day_image'] : '');
+                                                $has_day_img = !empty($day_img['has']) && $day_img['url'] !== '';
+                                                ?>
+                                                <div class="package-day-image-cell" style="margin-top: 35px;">
+                                                    <label for="day_image_<?php echo $count; ?>" class="btn btn-sm btn-success package-day-upload-btn" 
+                                                           style="margin-bottom: 5px; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; align-items: center; gap: 5px; white-space: nowrap; display: <?= $has_day_img ? 'none' : 'flex' ?>;">
                                                  <i class="fa fa-image"></i> 
                                                   <span>Upload Image</span>
                                                     </label>
@@ -258,53 +293,24 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                                            name="day_image_<?php echo $count; ?>" accept="image/*" 
                                                            onchange="previewDayImageUpdate(this, '<?php echo $count; ?>')" 
                                                            style="display: none;">
-                                                </div>
-                                                <div id="day_image_preview_<?php echo $count; ?>" style="<?= (!empty($sq_pckg1['day_image']) && trim($sq_pckg1['day_image']) !== '' && trim($sq_pckg1['day_image']) !== 'NULL') ? 'display:block;' : 'display:none;' ?>; margin-top: 5px;">
+                                                <div id="day_image_preview_<?php echo $count; ?>" style="display:<?= $has_day_img ? 'block' : 'none' ?>; margin-top: 5px;">
                                                     <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                                                        <img id="preview_img_<?php echo $count; ?>" src="<?php 
-                                                            if (!empty($sq_pckg1['day_image'])) {
-                                                                $image_path = trim($sq_pckg1['day_image']);
-                                                                // Debug the actual path
-                                                                error_log("PACKAGE UPDATE: Image path from DB: " . $image_path);
-                                                                
-                                                                // Check if path is valid and not empty
-                                                                if ($image_path && $image_path !== '' && $image_path !== 'NULL') {
-                                                                    // Check if path already starts with http
-                                                                    if (strpos($image_path, 'http') === 0) {
-                                                                        echo $image_path;
-                                                                    } else {
-                                                                        // For package images, use project root URL
-                                                                        $project_base_url = str_replace('/crm/', '/', BASE_URL);
-                                                                        $project_base_url = rtrim($project_base_url, '/');
-                                                                        $image_path = ltrim($image_path, '/');
-                                                                        $final_url = $project_base_url . '/' . $image_path;
-                                                                        error_log("PACKAGE UPDATE: BASE_URL: " . BASE_URL);
-                                                                        error_log("PACKAGE UPDATE: Project base URL: " . $project_base_url);
-                                                                        error_log("PACKAGE UPDATE: Image path: " . $image_path);
-                                                                        error_log("PACKAGE UPDATE: Final image URL: " . $final_url);
-                                                                        echo $final_url;
-                                                                    }
-                                                                } else {
-                                                                    // Empty or invalid path, don't output anything
-                                                                    echo '';
-                                                                }
-                                                            } else {
-                                                                echo '';
-                                                            }
-                                                        ?>" alt="Preview" 
+                                                        <img id="preview_img_<?php echo $count; ?>" src="<?= $has_day_img ? htmlspecialchars($day_img['url'], ENT_QUOTES) : '' ?>" alt="Preview" 
                                                              style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
-                                                             onerror="console.log('PACKAGE UPDATE: Image failed to load:', this.src); this.style.display='none'; this.parentElement.style.display='none'; this.parentElement.parentElement.querySelector('label').style.display='block';"
-                                                             onload="console.log('PACKAGE UPDATE: Image loaded successfully:', this.src); this.style.display='block'; this.parentElement.style.display='block'; this.parentElement.parentElement.querySelector('label').style.display='none';"
-                                                             onabort="console.log('PACKAGE UPDATE: Image load aborted:', this.src);">
+                                                             data-rel-path="<?= htmlspecialchars($day_img['rel'], ENT_QUOTES) ?>"
+                                                             data-day-offset="<?php echo $count; ?>"
+                                                             onerror="packageDayImageOnError(this)"
+                                                             onload="packageDayImageOnLoad(this)">
                                                         <button type="button" 
-                                                            onclick="removeDayImageUpdate('<?php echo $count; ?>')" 
+                                                            onclick="removeDayImageUpdate('<?php echo $count; ?>', this)" 
                                                                 title="Remove Image" 
-                                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($sq_pckg1['day_image']) || trim($sq_pckg1['day_image']) === '' || trim($sq_pckg1['day_image']) === 'NULL') ? 'display:none;' : '' ?>;">
+                                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: <?= $has_day_img ? 'flex' : 'none' ?>; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                                             ×
                                                         </button>
                                                 </div>
                                                 </div>
-                                                <input type="hidden" id="existing_image_path_<?php echo $count; ?>" name="existing_image_path_<?php echo $count; ?>" value="<?= $sq_pckg1['day_image'] ?? '' ?>" />
+                                                <input type="hidden" id="existing_image_path_<?php echo $count; ?>" name="existing_image_path_<?php echo $count; ?>" value="<?= htmlspecialchars(isset($sq_pckg1['day_image']) ? $sq_pckg1['day_image'] : '', ENT_QUOTES) ?>" />
+                                                </div>
                                             </td>
                                             <td class="hidden"><input type="text" value="<?php echo $sq_pckg1['entry_id']; ?>"></td>
                                         </tr>
@@ -622,6 +628,48 @@ if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
     hotelSupplierQuickLoadUrl = packageHotelLoadUrl;
 }
 
+window.packageDayImageShowUpload = function(img) {
+    var $td = $(img).closest('td');
+    if (!$td.length) {
+        return;
+    }
+    $td.find('[id^="day_image_preview_"]').hide();
+    $td.find('.package-day-upload-btn, label[for^="day_image_"]').css({
+        display: 'flex'
+    });
+};
+
+window.packageDayImageOnError = function(img) {
+    if (!img) {
+        return;
+    }
+    var rel = img.getAttribute('data-rel-path') || '';
+    var tried = img.getAttribute('data-fallback-tried') || '';
+    var base = ($('#base_url').val() || '').replace(/\/?$/, '/');
+    if (!tried && rel && rel.indexOf('http') !== 0) {
+        img.setAttribute('data-fallback-tried', '1');
+        img.src = base + rel.replace(/^\//, '');
+        return;
+    }
+    packageDayImageShowUpload(img);
+};
+
+window.packageDayImageOnLoad = function(img) {
+    if (!img) {
+        return;
+    }
+    img.style.display = 'block';
+    var box = img.parentElement;
+    var preview = box ? box.parentElement : null;
+    if (box) {
+        box.style.display = 'block';
+    }
+    if (preview) {
+        preview.style.display = 'block';
+    }
+    $(img).closest('td').find('.package-day-upload-btn, label[for^="day_image_"]').hide();
+};
+
 // Day image preview functions for update modal
 function previewDayImageUpdate(input, offset) {
     console.log("PACKAGE UPDATE: Preview triggered for row:", offset);
@@ -667,7 +715,7 @@ function previewDayImageUpdate(input, offset) {
         previewDiv.find('button[onclick*="removeDayImageUpdate"]').css('display', 'flex');
         
         // Hide the upload button after image selection
-        $('#day_image_' + offset).parent().find('label').hide();
+        $('#day_image_' + offset).closest('td').find('.package-day-upload-btn, label[for="day_image_' + offset + '"]').hide();
         
         console.log("PACKAGE UPDATE: Preview displayed successfully for row:", offset);
     };
@@ -692,32 +740,19 @@ function previewDayImageUpdate(input, offset) {
     console.log("PACKAGE UPDATE: Current packageImages object:", window.packageImages);
 }
 
-function removeDayImageUpdate(offset) {
-    console.log("PACKAGE UPDATE: Removing image for row:", offset);
-    
-    // Clear file input
-    $('#day_image_' + offset).val('');
-    
-    // Hide preview and remove button
-    var previewDiv = $('#day_image_preview_' + offset);
-    previewDiv.hide();
-    previewDiv.find('button[onclick*="removeDayImageUpdate"]').hide();
-    
-    // Clear the image src
-    $('#preview_img_' + offset).attr('src', '');
-    
-    // Show the upload button again
-    $('#day_image_' + offset).parent().find('label').show();
-    
-    // Clear existing image path
-    $('#existing_image_path_' + offset).val('');
-    
-    // Clear stored file
+function removeDayImageUpdate(offset, btn) {
+    var $td = btn ? $(btn).closest('td') : $('#day_image_' + offset).closest('td');
+    if (!$td.length) {
+        $td = $('#day_image_preview_' + offset).closest('td');
+    }
+    $td.find('#day_image_' + offset).val('');
+    $td.find('#day_image_preview_' + offset).hide();
+    $td.find('#preview_img_' + offset).attr('src', '');
+    $td.find('.package-day-upload-btn, label[for="day_image_' + offset + '"]').css({ display: 'flex' });
+    $td.find('#existing_image_path_' + offset).val('');
     if (window.packageImages && window.packageImages[offset]) {
         delete window.packageImages[offset];
     }
-    
-    console.log("PACKAGE UPDATE: Image removed successfully for row:", offset);
 }
 
 // Debug function to test image processing
@@ -836,7 +871,7 @@ function processSelectedItineraryImageUpdate() {
                 previewDiv.find('button[onclick*="removeDayImageUpdate"]').show();
                 
                 // Hide the upload button
-                $('#day_image_' + dayId).parent().find('label').hide();
+                $('#day_image_' + dayId).closest('td').find('.package-day-upload-btn, label[for="day_image_' + dayId + '"]').hide();
                 
                 console.log("PACKAGE UPDATE: Image preview updated for day", dayId);
             } else {
@@ -908,19 +943,19 @@ function addItineraryRowUpdate() {
             </button>
         </td>
         <td class='col-md-1 pad_8' style="width: 120px;">
-            <div style="margin-top: 35px;">
-                <label for="day_image_${count}" class="btn btn-sm btn-success" style="margin-bottom: 5px; padding: 8px 16px; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap;">
-                    <span>Upload Image</span>
+            <div class="package-day-image-cell" style="margin-top: 35px;">
+                <label for="day_image_${count}" class="btn btn-sm btn-success package-day-upload-btn" style="margin-bottom: 5px; padding: 8px 16px; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap;">
+                    <i class="fa fa-image"></i> <span>Upload Image</span>
                 </label>
                 <input type="file" id="day_image_${count}" name="day_image_${count}" accept="image/*" onchange="previewDayImageUpdate(this, '${count}')" style="display: none;">
-            </div>
             <div id="day_image_preview_${count}" style="display: none; margin-top: 5px;">
                 <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                    <img id="preview_img_${count}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
-                    <button type="button" onclick="removeDayImageUpdate('${count}')" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>
+                    <img id="preview_img_${count}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;" onerror="packageDayImageOnError(this)" onload="packageDayImageOnLoad(this)">
+                    <button type="button" onclick="removeDayImageUpdate('${count}', this)" title="Remove Image" style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">×</button>
             </div>
             </div>
             <input type="hidden" id="existing_image_path_${count}" name="existing_image_path_${count}" value="" />
+            </div>
         </td>
         <td class="hidden">
             <input type="text" value="">

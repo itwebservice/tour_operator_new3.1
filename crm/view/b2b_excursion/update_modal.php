@@ -53,23 +53,15 @@ $exc_name = ($sq_exc['excursion_name']);
 														<input type="text" id="rep_time" name="rep_time" placeholder="Reporting Time" title="Reporting Time" value='<?= $sq_exc['rep_time'] ?>'>
 													</div>
 													<div class="col-sm-2">
-														<select name="off_days" id="off_days" data-toggle="tooltip" title="Select Off Days" style="width:100%" multiple>
+														<select name="off_days" id="off_days" title="Select Off Days" style="width:100%" class="form-control app_select2" multiple>
 															<?php
-															$off_days = explode(',', $sq_exc['off_days']);
-															$sel = (in_array("Monday", $off_days)) ? "selected" : "" ?>
-															<option value='Monday' <?= $sel ?>>Monday</option>
-															<?php $sel = (in_array("Tuesday", $off_days)) ? "selected" : "" ?>
-															<option value='Tuesday' <?= $sel ?>>Tuesday</option>
-															<?php $sel = (in_array("Wednesday", $off_days)) ? "selected" : "" ?>
-															<option value='Wednesday' <?= $sel ?>>Wednesday</option>
-															<?php $sel = (in_array("Thursday", $off_days)) ? "selected" : "" ?>
-															<option value='Thursday' <?= $sel ?>>Thursday</option>
-															<?php $sel = (in_array("Friday", $off_days)) ? "selected" : "" ?>
-															<option value='Friday' <?= $sel ?>>Friday</option>
-															<?php $sel = (in_array("Saturday", $off_days)) ? "selected" : "" ?>
-															<option value='Saturday' <?= $sel ?>>Saturday</option>
-															<?php $sel = (in_array("Sunday", $off_days)) ? "selected" : "" ?>
-															<option value='Sunday' <?= $sel ?>>Sunday</option>
+															$off_days = array_map('trim', explode(',', (string)$sq_exc['off_days']));
+															$week_days = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+															foreach ($week_days as $week_day) {
+																$sel = (in_array($week_day, $off_days)) ? 'selected' : '';
+															?>
+															<option value="<?= $week_day ?>" <?= $sel ?>><?= $week_day ?></option>
+															<?php } ?>
 														</select>
 													</div>
 												</div>
@@ -505,8 +497,7 @@ $exc_name = ($sq_exc['excursion_name']);
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="row mg_bt_10">
+						<div class="row mg_bt_10">
 						<div class="col-md-2 col-sm-6 mg_bt_10">
 							<select class="<?= $active_inactive_flag ?>" name="active_flag" id="active_flag" title="Status">
 								<option value="<?= $sq_exc['active_flag'] ?>"><?= $sq_exc['active_flag'] ?></option>
@@ -522,13 +513,18 @@ $exc_name = ($sq_exc['excursion_name']);
 								<span id="photo_status"></span>
 								<ul id="files"></ul>
 								<input type="hidden" id="photo_upload_url_i1" name="photo_upload_url_i1" value="<?= $images_url ?>">
-							</div>(Upload Maximum 3 images)
+							</div> (Upload Maximum 3 images)
 							<button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note: Image size should be less than 100KB,resolution : 900X450."><i class="fa fa-question-circle"></i></button>
 						</div>
 					</div>
 					<div class="row mg_tp_20 mg_bt_20" id="images_list"></div>
 					<input type="hidden" name="hotel_image_path1" id="hotel_image_path1">
 					<input type="hidden" name="exc_entry_id" id="exc_entry_id" value='<?= $entry_id ?>'>
+					
+					</div>
+					
+					
+					
 					<div class="row mg_tp_20 text-center">
 						<div class="col-md-12">
 							<button class="btn btn-sm btn-success" id="btn_update"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
@@ -560,6 +556,17 @@ $exc_name = ($sq_exc['excursion_name']);
 		format: 'd-m-Y'
 	});
 	city_lzloading('#city_id1');
+	if ($('#off_days').data('select2')) {
+		$('#off_days').select2('destroy');
+	}
+	$('#off_days').select2({
+		placeholder: 'Select Off Days',
+		allowClear: true,
+		width: '100%',
+		dropdownParent: $('#update_modal'),
+		closeOnSelect: false,
+		minimumResultsForSearch: 0
+	});
 
 	upload_user_pic_attch1();
 

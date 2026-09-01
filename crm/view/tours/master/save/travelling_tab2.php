@@ -28,7 +28,7 @@
                                         <div class="row mg_bt_10">
                                             <div class="col-md-12">
                                                 <div class="table-responsive">
-                                                    <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table table-bordered no-marg pd_bt_51">
+                                                    <table id="tbl_package_hotel_master" name="tbl_package_hotel_master" class="table table-bordered no-marg pd_bt_10">
                                                         <tr>
                                                             <td><input id="chk_dest" type="checkbox" checked></td>
                                                             <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
@@ -72,21 +72,21 @@
                                         <div class="row mg_bt_10">
                                             <div class="col-md-12">
                                                 <div class="table-responsive">
-                                                    <table id="tbl_group_tour_quotation_dynamic_plane" name="tbl_group_tour_quotation_dynamic_plane" class="table table-bordered no-marg pd_bt_51">
+                                                    <table id="tbl_group_tour_quotation_dynamic_plane" name="tbl_group_tour_quotation_dynamic_plane" class="table table-bordered no-marg pd_bt_10">
                                                         <tr>
-                                                            <td><input class="css-checkbox" id="chk_plan-" type="checkbox"><label class="css-label" for="chk_plan-"> <label></td>
+                                                            <td style="vertical-align: middle; text-align: center;"><input class="css-checkbox" id="chk_plan-" type="checkbox"><label class="css-label" for="chk_plan-"> <label></td>
                                                             <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
                                                            
-                                                            <td><select name="from_sector-1" id="from_sector-1"
+                                                            <td style="width: 300px;" class="sector-select"><select name="from_sector-1" id="from_sector-1" 
                                                                     class="form-control app_select2 plane-airport-select"
-                                                                    data-sector-type="from" title="From Sector"
+                                                                    data-sector-type="from" title="From Sector" style="width:300px;"
                                                                      data-add-new-option="true">
                                                                     <option value="">*From Sector</option>
                                                                 </select>
                                                             </td>
-                                                            <td><select name="to_sector-1" id="to_sector-1"
+                                                            <td style="width: 300px;" class="sector-select"><select name="to_sector-1" id="to_sector-1"
                                                                     class="form-control app_select2 plane-airport-select"
-                                                                    data-sector-type="to" title="To Sector"
+                                                                    data-sector-type="to" title="To Sector" style="width:300px;"
                                                                      data-add-new-option="true">
                                                                     <option value="">*To Sector</option>
                                                                 </select>
@@ -135,10 +135,10 @@
                         <div class="row mg_bt_10">
                             <div class="col-md-12">
                                 <div class="table-responsive">
-                                    <table id="tbl_package_tour_transport" name="tbl_package_tour_transport" class="table table-bordered no-marg pd_bt_51">
+                                    <table id="tbl_package_tour_transport" name="tbl_package_tour_transport" class="table table-bordered no-marg pd_bt_10">
                                         <tbody>
                                             <tr>
-                                                <td class="col-md-1"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
+                                                <td class="col-md-1" style="vertical-align: middle; text-align: center;"><input class="css-checkbox labelauty" id="chk_transport1" type="checkbox" checked="" autocomplete="off"><label for="chk_transport1"></label></td>
                                                 <td class="col-md-1"><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
                                                 <td class="col-md-3"><select name="vehicle_name1" id="vehicle_name1" title="Select Vehicle" style="width:100%" class="form-control app_select2" data-add-new-option="true">
                                                         <option value="">Select Vehicle</option>
@@ -189,7 +189,7 @@
                                         <div class="row mg_bt_10">
                                             <div class="col-md-12">
                                                 <div class="table-responsive">
-                                                    <table id="tbl_group_tour_save_dynamic_train" name="tbl_group_tour_save_dynamic_train" class="table table-bordered no-marg pd_bt_51">
+                                                    <table id="tbl_group_tour_save_dynamic_train" name="tbl_group_tour_save_dynamic_train" class="table table-bordered no-marg pd_bt_10">
                                                         <tr>
                                                             <td><input class="css-checkbox" id="chk_train1" type="checkbox"><label class="css-label" for="chk_train1"><label></td>
                                                             <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
@@ -199,7 +199,7 @@
                                                             <td class="col-md-4"><select id="train_to_location1" class="app_select2 form-control trainto" onchange="validate_location('train_to_location1','train_from_location1')" title="To Location" name="train_to_location1" style="width: 100%;" >
                                                                     <option value="">*To</option>
                                                                 </select></td>
-                                                            <td class="col-md-4"><select name="train_class" id="train_class1" title="Class">
+                                                            <td class="col-md-4"><select name="train_class" id="train_class1" title="Class" class="app_select2 form-control" style="width:100%;">
                                                                     <option value="">*Class</option>
                                                                     <option value="1A">1A</option>
                                                                     <option value="2A">2A</option>
@@ -272,6 +272,9 @@
 
 <script>
 
+$('#train_class1').select2({
+    width: '100%'
+});
         $('#vehicle_name1').select2({            
         });
         if (typeof initAllVehicleSelectAddNew === 'function') {

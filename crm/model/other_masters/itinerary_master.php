@@ -5,40 +5,58 @@ class itinerary_master{
     {
         $itinerary_csv_dir = isset($_POST['itinerary_csv_dir']) ? trim(strip_tags($_POST['itinerary_csv_dir'])) : '';
         $itinerary_arr = array();
+        $file_path = $this->resolve_itinerary_csv_path($itinerary_csv_dir);
 
-        $parts = explode('uploads', $itinerary_csv_dir);
-        if ($itinerary_csv_dir !== '' && isset($parts[1]) && $parts[1] !== '') {
-            // Read from disk. fopen(BASE_URL) hits Apache over HTTP and often fails on local XAMPP.
-            $itinerary_csv_dir = str_replace('\\', '/', CSV_READ_URL.'uploads'.$parts[1]);
-            $itinerary_csv_dir = preg_replace('#/+#', '/', $itinerary_csv_dir);
-
-            $handle = @fopen($itinerary_csv_dir, "r");
+        if ($file_path !== '') {
+            $handle = @fopen($file_path, 'r');
             if ($handle !== false) {
-                $count = 0;
-                while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
-                    $count++;
-                    if (!is_array($data) || empty($data)) {
-                        continue;
+                $first_line = fgets($handle);
+                if ($first_line !== false) {
+                    $first_line = preg_replace('/^\xEF\xBB\xBF/', '', $first_line);
+                    $comma = count(str_getcsv($first_line, ','));
+                    $semi  = count(str_getcsv($first_line, ';'));
+                    $tab   = count(str_getcsv($first_line, "\t"));
+                    $delim = ',';
+                    if ($semi > $comma && $semi >= $tab) {
+                        $delim = ';';
+                    } elseif ($tab > $comma && $tab >= $semi) {
+                        $delim = "\t";
                     }
-                    // Strip UTF-8 BOM from the first cell
-                    if (isset($data[0])) {
-                        $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]);
+
+                    $header = str_getcsv($first_line, $delim);
+                    $idx_spa = 1;
+                    $idx_dwp = 2;
+                    $idx_os  = 3;
+                    $is_header = false;
+                    if (is_array($header)) {
+                        foreach ($header as $i => $col) {
+                            $n = strtolower(trim(str_replace(array('-', '_'), ' ', (string)$col)));
+                            $n = preg_replace('/\s+/', ' ', $n);
+                            if (strpos($n, 'special') !== false) {
+                                $idx_spa = $i;
+                                $is_header = true;
+                            }
+                            if (strpos($n, 'daywise') !== false || strpos($n, 'day wise') !== false || (strpos($n, 'program') !== false && strpos($n, 'special') === false)) {
+                                $idx_dwp = $i;
+                                $is_header = true;
+                            }
+                            if (strpos($n, 'overnight') !== false) {
+                                $idx_os = $i;
+                                $is_header = true;
+                            }
+                            if ($n === 'sr.no' || $n === 'sr no' || $n === 'srno' || $n === 's.no') {
+                                $is_header = true;
+                            }
+                        }
                     }
-                    // Skip header
-                    if ($count === 1) {
-                        continue;
+
+                    if (!$is_header) {
+                        $this->push_itinerary_csv_row($itinerary_arr, $header, $idx_spa, $idx_dwp, $idx_os);
                     }
-                    $spa = isset($data[1]) ? trim($data[1]) : '';
-                    $dwp = isset($data[2]) ? trim($data[2]) : '';
-                    $os  = isset($data[3]) ? trim($data[3]) : '';
-                    if ($spa === '' && $dwp === '' && $os === '') {
-                        continue;
+
+                    while (($data = fgetcsv($handle, 0, $delim)) !== false) {
+                        $this->push_itinerary_csv_row($itinerary_arr, $data, $idx_spa, $idx_dwp, $idx_os);
                     }
-                    $itinerary_arr[] = array(
-                        "spa" => $spa,
-                        "dwp" => $dwp,
-                        "os"  => $os
-                    );
                 }
                 fclose($handle);
             }
@@ -48,8 +66,64 @@ class itinerary_master{
         if ($json === false || $json === '') {
             $json = '[]';
         }
-        // Textarea keeps JSON out of an HTML attribute so quotes/apostrophes cannot truncate the value
         echo '<textarea id="itinerary_arr" name="itinerary_arr" style="display:none">'.$json.'</textarea>';
+    }
+
+    private function resolve_itinerary_csv_path($posted)
+    {
+        if ($posted === '') {
+            return '';
+        }
+        $posted = str_replace('\\', '/', trim($posted));
+        $crm_root = realpath(__DIR__ . '/..');
+        $crm_root = $crm_root ? str_replace('\\', '/', $crm_root) : str_replace('\\', '/', rtrim(CSV_READ_URL, '/\\'));
+
+        $candidates = array();
+        $uploads_pos = stripos($posted, 'uploads/');
+        if ($uploads_pos === false) {
+            $uploads_pos = stripos($posted, 'uploads');
+        }
+        if ($uploads_pos !== false) {
+            $from_uploads = substr($posted, $uploads_pos);
+            $from_uploads = preg_replace('#^uploads(?!/)#i', 'uploads/', $from_uploads);
+            $candidates[] = $crm_root . '/' . ltrim($from_uploads, '/');
+            $candidates[] = str_replace('\\', '/', rtrim(CSV_READ_URL, '/\\')) . '/' . ltrim($from_uploads, '/');
+        }
+        $candidates[] = $posted;
+        $candidates[] = $crm_root . '/' . ltrim($posted, '/');
+
+        foreach ($candidates as $path) {
+            $path = preg_replace('#/+#', '/', $path);
+            $real = @realpath($path);
+            if ($real !== false && is_file($real) && is_readable($real)) {
+                return $real;
+            }
+            if (is_file($path) && is_readable($path)) {
+                return $path;
+            }
+        }
+        return '';
+    }
+
+    private function push_itinerary_csv_row(&$itinerary_arr, $data, $idx_spa, $idx_dwp, $idx_os)
+    {
+        if (!is_array($data) || empty($data)) {
+            return;
+        }
+        if (isset($data[0])) {
+            $data[0] = preg_replace('/^\xEF\xBB\xBF/', '', $data[0]);
+        }
+        $spa = isset($data[$idx_spa]) ? trim($data[$idx_spa]) : '';
+        $dwp = isset($data[$idx_dwp]) ? trim($data[$idx_dwp]) : '';
+        $os  = isset($data[$idx_os]) ? trim($data[$idx_os]) : '';
+        if ($spa === '' && $dwp === '' && $os === '') {
+            return;
+        }
+        $itinerary_arr[] = array(
+            'spa' => $spa,
+            'dwp' => $dwp,
+            'os'  => $os
+        );
     }
     function itinerary_save(){
 
@@ -58,6 +132,13 @@ class itinerary_master{
         $dwp_arr = $_POST['dwp_arr'];
         $os_arr = $_POST['os_arr'];
         $img_arr = isset($_POST['img_arr']) ? $_POST['img_arr'] : array();
+        if (is_string($img_arr)) {
+            $decoded = json_decode($img_arr, true);
+            $img_arr = is_array($decoded) ? $decoded : array();
+        }
+        if (!is_array($img_arr)) {
+            $img_arr = array();
+        }
         
         $sq_repc = mysqli_num_rows(mysqlQuery("select dest_id from itinerary_master where dest_id='$dest_id'"));
         if($sq_repc > 0 ){
@@ -98,7 +179,14 @@ class itinerary_master{
         $os_arr = $_POST['os_arr'];
         $checked_arr = $_POST['checked_arr'];
         $entry_id_arr = $_POST['entry_id_arr'];
-        $img_arr = isset($_POST['img_arr']) && is_array($_POST['img_arr']) ? $_POST['img_arr'] : array();
+        $img_arr = isset($_POST['img_arr']) ? $_POST['img_arr'] : array();
+        if (is_string($img_arr)) {
+            $decoded = json_decode($img_arr, true);
+            $img_arr = is_array($decoded) ? $decoded : array();
+        }
+        if (!is_array($img_arr)) {
+            $img_arr = array();
+        }
 
         for($i=0; $i<sizeof($dwp_arr); $i++){
 

@@ -53,9 +53,7 @@ include "../../model/model.php";
                                                             placeholder="Reporting Time" title="Reporting Time">
                                                     </div>
                                                     <div class="col-sm-2">
-                                                        <select name="off_days" id="off_days" data-toggle="tooltip"
-                                                            title="Select Off Days" style="width:100%" multiple>
-                                                            <option value="">Select Off Days</option>
+                                                        <select name="off_days" id="off_days" title="Select Off Days" style="width:100%" class="form-control app_select2" multiple>
                                                             <option value="Monday">Monday</option>
                                                             <option value="Tuesday">Tuesday</option>
                                                             <option value="Wednesday">Wednesday</option>
@@ -536,7 +534,7 @@ include "../../model/model.php";
                                 <span id="photo_status"></span>
                                 <ul id="files"></ul>
                                 <input type="hidden" id="photo_upload_url_i" name="photo_upload_url_i">
-                            </div>(Upload Maximum 3 images)
+                            </div> (Upload Maximum 3 images)
                             <button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note: Image size should be less than 100KB,resolution : 900X450."><i class="fa fa-question-circle"></i></button>
                         </div>
                     </div>
@@ -575,6 +573,14 @@ include "../../model/model.php";
         format: 'd-m-Y'
     });
     city_lzloading('#city_id');
+    $('#off_days').select2({
+        placeholder: 'Select Off Days',
+        allowClear: true,
+        width: '100%',
+        dropdownParent: $('#save_modal'),
+        closeOnSelect: false,
+        minimumResultsForSearch: 0
+    });
     timing_tariff_csv();
 
     function timing_tariff_csv() {

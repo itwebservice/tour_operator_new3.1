@@ -25,7 +25,7 @@ $sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where 
               <input type="text" id="airline_code" name="airline_code" placeholder="Airline Code" onchange="validate_alphanumeric(this.id)" title="Airline Code" value="<?= $sq_airline['airline_code'] ?>" style="text-transform: uppercase;">
             </div>
             <div class="col-sm-4 mg_bt_10">
-              <select name="active_flag1" id="active_flag1" title="Status" style="width:100%">
+              <select name="active_flag1" id="active_flag1" title="Status" class="form-control app_select2" style="width:100%">
                 <option value="<?= $sq_airline['active_flag'] ?>"><?= $sq_airline['active_flag'] ?></option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>

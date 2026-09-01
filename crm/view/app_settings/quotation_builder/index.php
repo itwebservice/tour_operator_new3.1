@@ -38,8 +38,8 @@ $api_url = BASE_URL . 'model/app_settings/print_html/quotation_html/quotation_da
 
                 <div class="row mg_bt_20">
                     <div class="col-md-6">
-                        <label class="app_dual_button <?= $active ? 'active' : '' ?>" for="qb_active">
-                            <input type="checkbox" id="qb_active" name="qb_active" value="1" <?= $active ? 'checked' : '' ?>>
+                        <label class="app_dual_button <?= $active ? 'active' : '' ?>" for="qb_active" style="color: #ffffff;">
+                            <input type="checkbox" id="qb_active" class="custom_checkbox" style="margin-top: 0px;" name="qb_active" value="1" <?= $active ? 'checked' : '' ?>>
                             &nbsp;&nbsp;Activate Generic Quotation Builder
                         </label>
                         <p class="mg_tp_10">
@@ -67,7 +67,7 @@ $api_url = BASE_URL . 'model/app_settings/print_html/quotation_html/quotation_da
                     ?>
                         <div class="col-md-3 col-sm-4 col-xs-6 mg_bt_10">
                             <label>
-                                <input type="checkbox" class="qb_section" data-key="<?= $key ?>" value="1" <?= $checked ?>>
+                                <input type="checkbox" class="qb_section custom_checkbox" data-key="<?= $key ?>" value="1" <?= $checked ?>>
                                 &nbsp;<?= $label ?>
                             </label>
                         </div>

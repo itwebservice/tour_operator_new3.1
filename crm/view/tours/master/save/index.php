@@ -41,7 +41,7 @@ include_once('../../../layouts/fullwidth_app_header.php');
                 <span class="text">Costing</span>
             </a>
         </li>
-    </ul>
+</ul>
 </div>
 
 <div class="bk_tabs">

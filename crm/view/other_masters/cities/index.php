@@ -9,7 +9,7 @@ include "../../../model/model.php";
 <div class="app_panel_content Filter-panel">
   <div class="row">
     <div class="col-md-6">
-      <select name="city_master_status" onchange="list_reflect()" id="city_master_status" title="Select Status" class="form-control" style="width: 180px;">
+      <select name="city_master_status" onchange="list_reflect()" id="city_master_status" title="Select Status" class="form-control status_filter_dropdown" style="width: 180px;">
         <option value="Active">Active</option>
         <option value="Inactive">Inactive</option>
       </select>
@@ -78,6 +78,11 @@ include "../../../model/model.php";
 
   }
   list_reflect();
+  if (typeof initMasterStatusSelect === 'function') {
+    initMasterStatusSelect('#city_master_status').on('change', list_reflect);
+  } else {
+    $('#city_master_status').on('change', list_reflect);
+  }
 
   function city_master_update_modal(city_id) {
 

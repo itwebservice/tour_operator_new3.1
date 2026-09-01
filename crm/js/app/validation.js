@@ -410,6 +410,29 @@ function dynamic_city(id) {
   });
 }
 
+function hideMasterSaveStatusCell(cell) {
+  if (!cell) {
+    return;
+  }
+  // Theme .hidden uses display:block !important, so it cannot hide this column.
+  cell.classList.remove("hidden");
+  cell.style.setProperty("display", "none", "important");
+  var statusSelect = cell.querySelector ? cell.querySelector("select") : null;
+  if (!statusSelect && cell.childNodes && cell.childNodes[0] && cell.childNodes[0].tagName === "SELECT") {
+    statusSelect = cell.childNodes[0];
+  }
+  if (!statusSelect) {
+    return;
+  }
+  statusSelect.classList.remove("hidden");
+  statusSelect.classList.remove("app_select2");
+  statusSelect.style.setProperty("display", "none", "important");
+  statusSelect.value = "Active";
+  if (window.jQuery && $(statusSelect).data("select2")) {
+    $(statusSelect).select2("destroy");
+  }
+}
+
 function foo(tableID, quot_table_id, rowCounts) {
   if (typeof foo.counter == "undefined") {
     foo.counter = 1;
@@ -1127,14 +1150,20 @@ function foo(tableID, quot_table_id, rowCounts) {
 
   //Sale default Itinerary
   if (tableID == "default_program_list") {
-    row.cells[0].childNodes[0].setAttribute(
-      "id",
-      "chk_programd1" + foo.counter
-    );
-    row.cells[0].childNodes[1].setAttribute(
-      "for",
-      "chk_programd1" + foo.counter
-    );
+    var chkExisting = row.cells[0].querySelector('input[type="checkbox"]');
+    if (chkExisting) {
+      chkExisting.id = "chk_programd1" + foo.counter;
+    }
+    if (typeof window.alignItineraryRowCheckbox === "function") {
+      window.alignItineraryRowCheckbox(row);
+    } else {
+      var chkLabel = row.cells[0].querySelector('label');
+      if (chkLabel) {
+        chkLabel.setAttribute("for", "chk_programd1" + foo.counter);
+      }
+      row.cells[0].style.verticalAlign = "top";
+      row.cells[0].style.paddingTop = "35px";
+    }
 
     row.cells[2].childNodes[0].setAttribute(
       "id",
@@ -1160,7 +1189,10 @@ function foo(tableID, quot_table_id, rowCounts) {
       "chk_tour_group" + foo.counter
     );
     row.cells[2].childNodes[0].setAttribute("id", "cmb_city_" + foo.counter);
-    row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+    if (row.cells[3] && row.cells[3].childNodes[0]) {
+      row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+      hideMasterSaveStatusCell(row.cells[3]);
+    }
   }
 
   if (tableID == "tbl_dynamic_state_name") {
@@ -1175,8 +1207,13 @@ function foo(tableID, quot_table_id, rowCounts) {
   if (tableID == "tbl_airport_master") {
     row.cells[0].childNodes[0].setAttribute("id", "chk_airport" + foo.counter);
     row.cells[2].childNodes[0].setAttribute("id", "city_id" + foo.counter);
+    row.cells[2].childNodes[0].setAttribute("data-add-new-option", "true");
     row.cells[3].childNodes[0].setAttribute("id", "airport_name" + foo.counter);
     row.cells[4].childNodes[0].setAttribute("id", "airport_code" + foo.counter);
+    if (row.cells[5] && row.cells[5].childNodes[0]) {
+      row.cells[5].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+      hideMasterSaveStatusCell(row.cells[5]);
+    }
 
     $(row.cells[2].childNodes[0]).next("span").remove();
     city_lzloading("#city_id" + foo.counter);
@@ -1207,7 +1244,10 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "destination_name" + foo.counter
     );
-    row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+    if (row.cells[3] && row.cells[3].childNodes[0]) {
+      row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+      hideMasterSaveStatusCell(row.cells[3]);
+    }
   }
 
   if (
@@ -2599,6 +2639,15 @@ function foo(tableID, quot_table_id, rowCounts) {
       "train_to_location1" + foo.counter
     );
     row.cells[4].childNodes[0].setAttribute("id", "train_class1" + foo.counter);
+    $(row.cells[2]).addClass("col-md-4");
+    $(row.cells[3]).addClass("col-md-4");
+    $(row.cells[4]).addClass("col-md-4");
+    var $trainClass = $(row.cells[4].childNodes[0]);
+    $trainClass.addClass("app_select2 form-control").css("width", "100%");
+    if ($trainClass.data("select2")) {
+      $trainClass.select2("destroy");
+    }
+    $trainClass.select2({ width: "100%", minimumResultsForSearch: 0 });
     if (row.cells[5]) {
       row.cells[5].innerHTML = "";
       row.cells[5].style.display = "none";
@@ -2718,10 +2767,14 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "from_sector-" + prefix + foo.counter
     );
+    $(row.cells[2]).addClass("sector-select").css("width", "300px");
+    $(row.cells[2].childNodes[0]).css("width", "300px");
     row.cells[3].childNodes[0].setAttribute(
       "id",
       "to_sector-" + prefix + foo.counter
     );
+    $(row.cells[3]).addClass("sector-select").css("width", "300px");
+    $(row.cells[3].childNodes[0]).css("width", "300px");
     row.cells[4].childNodes[0].setAttribute(
       "id",
       "airline_name-" + prefix + foo.counter
@@ -4972,6 +5025,14 @@ function addRow(tableID, quot_table = "", itinerary = "") {
     for (var i = 0; i < colCount; i++) {
         var newcell = row.insertCell(i);
         var oldCell = table.rows[table.rows.length - 2].cells[i]; // copy from last row
+        var oldStatusSelect = oldCell.querySelector('select[id^="active_flag"], select[name^="active_flag"]');
+        if (oldStatusSelect) {
+            newcell.style.setProperty("display", "none", "important");
+            continue;
+        }
+        if (oldCell.classList.contains("hidden")) {
+            newcell.style.setProperty("display", "none", "important");
+        }
         
         // Special handling for checkbox cell (index 0) - copy complete HTML structure
         if (i === 0) {
@@ -5110,8 +5171,16 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                     clonedSelect.name = selectBaseName + rowCount;
                 }
                 clonedSelect.selectedIndex = 0;
-                clonedSelect.classList.add('app_select2');
-                newcell.appendChild(clonedSelect);
+                if (clonedSelect.id && clonedSelect.id.indexOf("active_flag") === 0) {
+                    clonedSelect.classList.add("hidden");
+                    clonedSelect.classList.remove("app_select2");
+                    clonedSelect.value = "Active";
+                    newcell.appendChild(clonedSelect);
+                    hideMasterSaveStatusCell(newcell);
+                } else {
+                    clonedSelect.classList.add('app_select2');
+                    newcell.appendChild(clonedSelect);
+                }
             } else {
                 newcell.innerHTML = oldCell.innerHTML;
             }
@@ -5135,7 +5204,22 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
         // reset values properly
         if (cloned.tagName === "SELECT") {
-            if (tableID === "tbl_package_tour_member") {
+            if (cloned.id && cloned.id.indexOf("active_flag") === 0) {
+                var hasActive = false, hasInactive = false;
+                for (var oi = 0; oi < cloned.options.length; oi++) {
+                    if (cloned.options[oi].value === "Active") hasActive = true;
+                    if (cloned.options[oi].value === "Inactive") hasInactive = true;
+                }
+                if (!hasActive) {
+                    cloned.appendChild(new Option("Active", "Active"));
+                }
+                if (!hasInactive) {
+                    cloned.appendChild(new Option("Inactive", "Inactive"));
+                }
+                cloned.value = "Active";
+                cloned.classList.remove("app_select2");
+                cloned.style.setProperty("display", "none", "important");
+            } else if (tableID === "tbl_package_tour_member") {
                 if (cloned.id && cloned.id.indexOf("txt_m_adolescence") === 0) {
                     cloned.value = "Adult";
                 } else {
@@ -5151,6 +5235,9 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             } else {
                 cloned.value = "";
                 cloned.classList.add("app_select2");
+                if (cloned.selectedIndex < 0 && cloned.options.length) {
+                    cloned.selectedIndex = 0;
+                }
             }
         } else if (["text","number","hidden","textarea"].includes(cloned.type)) {
             cloned.value = "";
@@ -5160,11 +5247,24 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         }
 
         newcell.appendChild(cloned);
+        if (cloned.id && cloned.id.indexOf("active_flag") === 0) {
+            hideMasterSaveStatusCell(newcell);
+        }
+    }
+
+    if (
+        tableID === "tbl_dynamic_city_name" ||
+        tableID === "tbl_destination_master" ||
+        tableID === "tbl_airport_master"
+    ) {
+        $(row).find('select[id^="active_flag"], select[name^="active_flag"]').each(function () {
+            hideMasterSaveStatusCell(this.closest("td") || this.parentNode);
+        });
     }
 
     // ✅ Initialize Select2 only for the new row selects
     if (tableID !== "tbl_package_tour_member") {
-        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"]').each(function () {
+        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"], [id^="active_flag"]').each(function () {
             if (typeof initAppSelect2Element === 'function') {
                 initAppSelect2Element(this);
             } else {
@@ -5400,7 +5500,7 @@ function handleItineraryAddRow(table, row, rowCount) {
                     <img id="preview_img_${dataRowId}" src="" alt="Preview" 
                          style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
                                     <button type="button" 
-                                            onclick="removeDayImage('${dataRowId}')" 
+                                            onclick="removeDayImage('${dataRowId}', this)" 
                                             title="Remove Image" 
                                             style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
                                         ×

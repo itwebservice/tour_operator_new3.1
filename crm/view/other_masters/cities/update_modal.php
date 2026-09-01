@@ -49,6 +49,10 @@ $sq = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$c
 <script>
   $('#city_master_update_modal').modal('show');  
   $('#frm_city_master_update').validate({
+      rules:{
+        txt_city_name : { required : true },
+        active_flag : { required : true }
+      },
       submitHandler:function(form){
         var base_url = $('#base_url').val();
         var city_id = $("#city_id").val();

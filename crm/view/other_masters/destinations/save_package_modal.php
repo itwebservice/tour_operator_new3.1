@@ -37,11 +37,6 @@ include_once("../../../model/model.php");
                   <td><input id="chk_dest1" type="checkbox" checked></td>
                   <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                   <td><input type="text" id="destination_name1" onchange="fname_validate(this.id);" name="destination_name1" placeholder="*Destination Name" title="Destination Name"></td>
-                  <td><select name="active_flag1" id="active_flag1" title="Status" style="width:100%" class="hidden">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
-                  </td>
               </tr>                                
           </table>  
         </div> </div> </div>
@@ -109,15 +104,13 @@ $('#frm_save').validate({
 
               var destination_name = row.cells[2].childNodes[0].value;
 
-              var status = row.cells[3].childNodes[0].value;
-
               if(destination_name==""){ error_msg +="Destination name is required in row : "+(i+1)+"<br>"; }
 
 
 
               destination_name_arr.push(destination_name);
 
-              status_arr.push(status);
+              status_arr.push('Active');
 
           }
           

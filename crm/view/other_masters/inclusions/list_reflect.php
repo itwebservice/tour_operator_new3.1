@@ -17,7 +17,12 @@ include_once("../../../model/model.php");
 	<tbody>
 		<?php 
 		$count = 0;
-		$sq_inc = mysqlQuery("select * from inclusions_exclusions_master");
+		$status = isset($_POST['status']) ? $_POST['status'] : 'Active';
+		$query = "select * from inclusions_exclusions_master";
+		if($status != ''){
+			$query .= " where active_flag='$status'";
+		}
+		$sq_inc = mysqlQuery($query);
 		while($row_inc = mysqli_fetch_assoc($sq_inc)){
 
 			$bg = ($row_inc['active_flag']=="Active") ? "" : "danger";
@@ -50,6 +55,10 @@ include_once("../../../model/model.php");
 
 <script>
 $('#tbl_list').dataTable({
-		"pagingType": "full_numbers"
+		"pagingType": "full_numbers",
+		"columnDefs": [{
+			"orderable": false,
+			"targets": -1
+		}]
 	});
 </script>

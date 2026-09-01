@@ -114,3 +114,13 @@ function generate_app_on(travel_type){
 	}
 }
 </script>
+<style>
+#other_rules_tab tbody tr.warning,
+#other_rules_tab tbody tr.warning td {
+    background-color: #fcf8e3 !important;
+}
+#other_rules_tab.table-hover tbody tr.warning:hover,
+#other_rules_tab.table-hover tbody tr.warning:hover td {
+    background-color: #faf2cc !important;
+}
+</style>

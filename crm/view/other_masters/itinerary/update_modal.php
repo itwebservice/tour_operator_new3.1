@@ -110,10 +110,11 @@ textarea.form-control {
                                         }
                                     ?>" alt="Preview" 
                                        style="width:100%; height:100%; object-fit: cover; border-radius: 6px;"
-                                       onerror="console.log('UPDATE MODAL: Existing image failed to load:', this.src); this.style.display='none'; this.parentElement.parentElement.style.display='none'; this.parentElement.parentElement.parentElement.querySelector('label').style.display='block'; this.parentElement.querySelector('button[onclick*=removeDayImage]').style.display='none';"
-                                       onload="console.log('Image loaded successfully:', this.src);">
+                                       data-rel-path="<?= htmlspecialchars(trim($row_itinerary['itinerary_image'] ?? ''), ENT_QUOTES) ?>"
+                                       onerror="if(typeof itineraryImageOnError==='function'){itineraryImageOnError(this);} else { this.style.display='none'; }"
+                                       onload="this.style.display='block';">
                                   <button type="button" 
-                                          onclick="removeDayImage('<?=$count?>')" 
+                                          onclick="removeDayImage('<?=$count?>', this)" 
                                           title="Remove Image" 
                                           style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); <?= (empty($row_itinerary['itinerary_image']) || trim($row_itinerary['itinerary_image']) === '' || trim($row_itinerary['itinerary_image']) === 'NULL') ? 'display:none;' : '' ?>">
                                       ×
@@ -150,6 +151,7 @@ textarea.form-control {
 </form>
 
 <script>
+window.itineraryImages = {};
 $('#dest_ids1').select2();
 $('#itinerary_update_modal').modal('show');
 
@@ -195,6 +197,7 @@ $('#itinerary_frm_update').validate({
            dest_names1 : { required : true }
     },
     submitHandler:function(form){
+      itineraryWhenImagesReady(function(){
 
       var dest_id = $('#dest_ids1').val();
       var table = document.getElementById("default_program_list");
@@ -263,61 +266,7 @@ $('#itinerary_frm_update').validate({
         os_arr.push(os);
         entry_id_arr.push(entry_id);
         
-        // Get image path - check both stored images and hidden input
-        var img = '';
-        var rowIndex = i + 1; // Convert 0-based index to 1-based for matching PHP count
-        
-        console.log("Processing row", i, "with rowIndex", rowIndex);
-        
-        // First check if we have a new image in window.itineraryImages
-        if (window.itineraryImages && window.itineraryImages[rowIndex]) {
-            var imageData = window.itineraryImages[rowIndex];
-            console.log("Found image data for rowIndex", rowIndex, imageData);
-            
-            if (imageData.file && !imageData.uploaded) {
-                console.log("Uploading new image for rowIndex", rowIndex);
-                // Upload the image immediately
-                var formData = new FormData();
-                formData.append('uploadfile', imageData.file);
-                
-                $.ajax({
-                    url: 'itinerary/upload_itinerary_image.php',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    async: false, // Make it synchronous for data collection
-                    success: function(response) {
-                        try {
-                            var msg = response.split('--');
-                            if (msg[0] !== "error" && !/<\/?(html|body|h1|p|address|hr)/i.test(response)) {
-                                img = response;
-                                window.itineraryImages[rowIndex].uploaded = true;
-                                window.itineraryImages[rowIndex].image_url = response;
-                                console.log("Image uploaded successfully for rowIndex", rowIndex, ":", img);
-                            } else {
-                                console.log("Upload failed for rowIndex", rowIndex, ":", response);
-                            }
-                        } catch(e) {
-                            console.log('Upload parse error for rowIndex', rowIndex, ':', e);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Upload error for rowIndex", rowIndex, ":", error);
-                    }
-                });
-            } else if (imageData.image_url) {
-                img = imageData.image_url;
-                console.log("Using existing image URL for rowIndex", rowIndex, ":", img);
-            }
-        } else {
-            // Fallback to hidden input - use the correct ID pattern
-            var imgInput = row.querySelector('input[id="itinerary_image_path_' + rowIndex + '"]');
-            img = imgInput ? imgInput.value : '';
-            console.log("Using hidden input for rowIndex", rowIndex, ":", img);
-        }
-        
-        console.log("Final image for row", i, ":", img);
+        var img = itineraryCollectRowImagePath(row);
         img_arr.push(img || '');
       }
 
@@ -335,7 +284,7 @@ $('#itinerary_frm_update').validate({
       $.ajax({
       type:'post',
       url:base_url()+'controller/other_masters/itinerary/itinerary_update.php',
-      data:{ dest_id : dest_id, sp_arr : sp_arr, dwp_arr : dwp_arr, os_arr : os_arr,checked_arr:checked_arr,entry_id_arr:entry_id_arr, img_arr : img_arr},
+      data:{ dest_id : dest_id, sp_arr : sp_arr, dwp_arr : dwp_arr, os_arr : os_arr,checked_arr:checked_arr,entry_id_arr:entry_id_arr, img_arr : JSON.stringify(img_arr)},
       success:function(result){
 
           $('#btn_update').button('reset');
@@ -351,108 +300,242 @@ $('#itinerary_frm_update').validate({
           }
       }
       });
+      });
     }
 });
 
-// Image handling functions for edit modal
-window.previewDayImage = function(input, rowIndex) {
-    console.log("UPDATE MODAL: Preview triggered for row:", rowIndex);
-    console.log("UPDATE MODAL: Input file:", input.files[0]);
-    
-    var file = input.files[0];
-    if (!file) {
-        console.log("UPDATE MODAL: No file selected");
-        return;
-    }
-    
-    // Validate file type
-    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-        error_msg_alert('Only JPG, JPEG, PNG, WEBP files are allowed');
-        input.value = ''; // Clear the input
-        return;
-    }
-    
-    console.log("UPDATE MODAL: File validation passed, showing preview for row:", rowIndex);
-    
-    // Show preview immediately
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        console.log("UPDATE MODAL: FileReader loaded, setting image src for row:", rowIndex);
-        var previewImg = $('#preview_img_' + rowIndex);
-        var previewDiv = $('#day_image_preview_' + rowIndex);
-        
-        if (previewImg.length === 0) {
-            console.error("UPDATE MODAL: Preview image element not found for row:", rowIndex);
-            return;
-        }
-        
-        if (previewDiv.length === 0) {
-            console.error("UPDATE MODAL: Preview div element not found for row:", rowIndex);
-            return;
-        }
-        
-      // Set the image source and show preview
-previewImg.attr('src', e.target.result).show();
-previewDiv.show();
-        
-        // Show the remove button when image is selected
-        previewDiv.find('button[onclick*="removeDayImage"]').show();
-        
-        // Hide the upload button after image selection
-        $('#day_image_' + rowIndex).parent().find('label').hide();
-        
-        console.log("UPDATE MODAL: Preview displayed successfully for row:", rowIndex);
-    };
-    
-    reader.onerror = function(e) {
-        console.error("UPDATE MODAL: FileReader error for row:", rowIndex, e);
-        error_msg_alert('Error reading the selected file');
-    };
-    
-    reader.readAsDataURL(file);
-    
-    // Store file for later upload with the correct rowIndex key
-    if (!window.itineraryImages) {
-        window.itineraryImages = {};
-    }
-    window.itineraryImages[rowIndex] = {
-        file: file,
-        uploaded: false
-    };
-    
-    console.log("UPDATE MODAL: Image stored in window.itineraryImages[" + rowIndex + "]");
-    console.log("UPDATE MODAL: Current itineraryImages object:", window.itineraryImages);
+function itineraryImageUploadUrl() {
+    return (($('#base_url').val() || '')) + 'view/other_masters/itinerary/upload_itinerary_image.php';
 }
 
-// Remove day image function
-window.removeDayImage = function(rowIndex) {
-    console.log("UPDATE MODAL: Removing image for row:", rowIndex);
-    
-    // Clear file input
-    $('#day_image_' + rowIndex).val('');
-    
-    // Hide preview and remove button
-    var previewDiv = $('#day_image_preview_' + rowIndex);
-    previewDiv.hide();
-    previewDiv.find('button[onclick*="removeDayImage"]').hide();
-    
-    // Clear the image src
-    $('#preview_img_' + rowIndex).attr('src', '');
-    
-    // Show the upload button again
-    $('#day_image_' + rowIndex).parent().find('label').show();
-    
-    // Clear hidden path
-    $('#itinerary_image_path_' + rowIndex).val('');
-    
-    // Clear stored file
-    if (window.itineraryImages && window.itineraryImages[rowIndex]) {
-        delete window.itineraryImages[rowIndex];
+function itineraryParseImageUploadResponse(response) {
+    response = String(response || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!response || /^error/i.test(response)) {
+        return '';
     }
-    
-    console.log("UPDATE MODAL: Image removed successfully for row:", rowIndex);
+    var match = response.match(/uploads\/itinerary_images\/[A-Za-z0-9._-]+/i);
+    if (match) {
+        return match[0];
+    }
+    if (response.indexOf('uploads/') === 0 && response.indexOf(' ') === -1) {
+        return response;
+    }
+    return '';
 }
+
+function itineraryTableRoot() {
+    return document.getElementById('default_program_list');
+}
+
+function itineraryRowFromControl(el) {
+    if (!el) {
+        return null;
+    }
+    var $row = $(el).closest('tr');
+    return $row.length ? $row[0] : null;
+}
+
+function itineraryFindInRow(row, selector) {
+    return row ? row.querySelector(selector) : null;
+}
+
+function itineraryRowHidden(row) {
+    return itineraryFindInRow(row, 'input[name^="itinerary_image_path_"]');
+}
+
+function itinerarySetRowImagePathOnRow(row, path) {
+    if (!row) {
+        return;
+    }
+    var hidden = itineraryRowHidden(row);
+    if (hidden) {
+        hidden.value = path || '';
+    }
+    if (path) {
+        row.setAttribute('data-itinerary-image', path);
+    } else {
+        row.removeAttribute('data-itinerary-image');
+    }
+}
+
+function itineraryResetFileInputOnRow(row) {
+    var input = itineraryFindInRow(row, 'input[type="file"][id^="day_image_"]');
+    if (!input || !input.parentNode) {
+        return;
+    }
+    var neu = input.cloneNode(true);
+    neu.value = '';
+    input.parentNode.replaceChild(neu, input);
+}
+
+function itineraryShowDayImagePreviewOnRow(row, src) {
+    if (!row) {
+        return;
+    }
+    var previewImg = itineraryFindInRow(row, 'img[id^="preview_img_"]');
+    var previewDiv = itineraryFindInRow(row, 'div[id^="day_image_preview_"]');
+    var fileInput = itineraryFindInRow(row, 'input[type="file"][id^="day_image_"]');
+    if (previewImg && src) {
+        previewImg.src = src;
+        previewImg.style.display = 'block';
+    }
+    if (previewDiv) {
+        previewDiv.style.display = 'block';
+        var btn = previewDiv.querySelector('button');
+        if (btn) {
+            btn.style.display = 'flex';
+        }
+    }
+    if (fileInput) {
+        var label = row.querySelector('label[for="' + fileInput.id + '"]');
+        if (label) {
+            label.style.display = 'none';
+        }
+    }
+}
+
+function itineraryHideDayImagePreviewOnRow(row) {
+    if (!row) {
+        return;
+    }
+    var previewImg = itineraryFindInRow(row, 'img[id^="preview_img_"]');
+    var previewDiv = itineraryFindInRow(row, 'div[id^="day_image_preview_"]');
+    var fileInput = itineraryFindInRow(row, 'input[type="file"][id^="day_image_"]');
+    if (previewDiv) {
+        previewDiv.style.display = 'none';
+    }
+    if (previewImg) {
+        previewImg.src = '';
+    }
+    if (fileInput) {
+        var label = row.querySelector('label[for="' + fileInput.id + '"]');
+        if (label) {
+            label.style.display = 'inline-block';
+        }
+    }
+}
+
+function itineraryUploadImageFile(file) {
+    var fd = new FormData();
+    fd.append('uploadfile', file);
+    return $.ajax({
+        url: itineraryImageUploadUrl(),
+        type: 'POST',
+        data: fd,
+        processData: false,
+        contentType: false
+    });
+}
+
+function itineraryCollectRowImagePath(row) {
+    if (!row) {
+        return '';
+    }
+    var hidden = itineraryRowHidden(row);
+    var img = hidden ? String(hidden.value || '').trim() : '';
+    if (!img) {
+        img = String(row.getAttribute('data-itinerary-image') || '').trim();
+    }
+    return img;
+}
+
+function itineraryWhenImagesReady(callback) {
+    var tries = 0;
+    (function tick() {
+        if (!window.itineraryPendingUploads || tries > 40) {
+            callback();
+            return;
+        }
+        tries++;
+        setTimeout(tick, 250);
+    })();
+}
+
+window.itineraryImageOnError = function(img) {
+    if (!img) {
+        return;
+    }
+    var rel = img.getAttribute('data-rel-path') || '';
+    var tried = img.getAttribute('data-fallback') || '';
+    var base = ($('#base_url').val() || '').replace(/\/?$/, '/');
+    if (!tried && rel) {
+        img.setAttribute('data-fallback', '1');
+        img.src = base + rel.replace(/^\//, '');
+        return;
+    }
+    img.style.display = 'none';
+    var wrap = img.parentElement ? img.parentElement.parentElement : null;
+    if (wrap) {
+        wrap.style.display = 'none';
+    }
+    var label = wrap && wrap.parentElement ? wrap.parentElement.querySelector('label') : null;
+    if (label) {
+        label.style.display = 'block';
+    }
+};
+
+window.previewDayImage = function(input, rowIndex) {
+    var row = itineraryRowFromControl(input);
+    var file = input && input.files ? input.files[0] : null;
+    if (!file || !row) {
+        return;
+    }
+    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (allowedTypes.indexOf(file.type) === -1) {
+        error_msg_alert('Only JPG, JPEG, PNG, WEBP files are allowed');
+        itineraryResetFileInputOnRow(row);
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        itineraryShowDayImagePreviewOnRow(row, e.target.result);
+    };
+    reader.readAsDataURL(file);
+
+    window.itineraryPendingUploads = (window.itineraryPendingUploads || 0) + 1;
+    window.itineraryImageUploadSeq = window.itineraryImageUploadSeq || {};
+    var rowKey = String(rowIndex || (input.id || '').replace('day_image_', '') || 'row');
+    window.itineraryImageUploadSeq[rowKey] = (window.itineraryImageUploadSeq[rowKey] || 0) + 1;
+    var uploadSeq = window.itineraryImageUploadSeq[rowKey];
+    row.setAttribute('data-itinerary-upload-seq', uploadSeq);
+
+    itineraryUploadImageFile(file).always(function() {
+        window.itineraryPendingUploads = Math.max(0, (window.itineraryPendingUploads || 1) - 1);
+    }).done(function(response) {
+        if (String(row.getAttribute('data-itinerary-upload-seq') || '') !== String(uploadSeq)) {
+            return;
+        }
+        var path = itineraryParseImageUploadResponse(response);
+        if (!path) {
+            error_msg_alert('Image upload failed. Please try again.');
+            return;
+        }
+        itinerarySetRowImagePathOnRow(row, path);
+    }).fail(function() {
+        if (String(row.getAttribute('data-itinerary-upload-seq') || '') !== String(uploadSeq)) {
+            return;
+        }
+        error_msg_alert('Image upload failed. Please try again.');
+    });
+};
+
+window.removeDayImage = function(rowIndex, btn) {
+    var row = itineraryRowFromControl(btn) || (function() {
+        var table = itineraryTableRoot();
+        var input = table ? table.querySelector('[id="day_image_' + rowIndex + '"]') : null;
+        return itineraryRowFromControl(input);
+    })();
+    if (!row) {
+        return;
+    }
+    window.itineraryImageUploadSeq = window.itineraryImageUploadSeq || {};
+    var rowKey = String(rowIndex || '');
+    window.itineraryImageUploadSeq[rowKey] = (window.itineraryImageUploadSeq[rowKey] || 0) + 1;
+    row.setAttribute('data-itinerary-upload-seq', window.itineraryImageUploadSeq[rowKey]);
+    itineraryHideDayImagePreviewOnRow(row);
+    itinerarySetRowImagePathOnRow(row, '');
+    itineraryResetFileInputOnRow(row);
+};
 
 // Function to check if image exists and handle accordingly
 window.checkImageExists = function(img) {
@@ -489,14 +572,6 @@ $(document).ready(function() {
             }
         }
         window.itineraryRowIdCounter = maxRowId + 1;
-        console.log("Edit modal: Set itineraryRowIdCounter to", window.itineraryRowIdCounter);
-        
-        // Check all existing images
-        $('img[id^="preview_img_"]').each(function() {
-            if (this.src && this.src !== '' && this.src !== window.location.href) {
-                window.checkImageExists(this);
-            }
-        });
     }
 });
 

@@ -20,7 +20,7 @@ $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_i
 
           <div class="row">
             <div class="col-sm-6 mg_bt_10">
-              <select name="city_id" id="city_id" style="width: 100%" class="form-control">
+              <select name="city_id" id="city_id" style="width: 100%" class="form-control" data-add-new-option="true">
                 <option value="<?= $sq_city['city_id'] ?>" selected="selected"><?= $sq_city['city_name'] ?></option>
               </select>
             </div>
@@ -33,7 +33,7 @@ $sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_i
               <input type="text" id="airport_code" name="airport_code" onchange="validate_alphanumeric(this.id)" placeholder="Airport Code"  title="*Airport Code" value="<?= $sq_airport['airport_code'] ?>" style="text-transform: uppercase;">
             </div>
             <div class="col-sm-6 mg_bt_10">
-              <select name="active_flag1" id="active_flag1" title="Status" style="width:100%">
+              <select name="active_flag1" id="active_flag1" title="Status" class="form-control app_select2" style="width:100%">
                 <option value="<?= $sq_airport['flag'] ?>"><?= $sq_airport['flag'] ?></option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>

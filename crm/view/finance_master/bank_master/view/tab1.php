@@ -39,7 +39,7 @@
 		            </span>
 		            <span class="main_block">
 		                  <i class="fa fa-angle-double-right cost_arrow" aria-hidden="true"></i>
-		                  <?php echo "<label>Mobile No <em>:</em></label> ".$query['mobile_no']; ?>
+		                  <?php echo "<label>UPI ID <em>:</em></label> ".$query['upi_id']; ?>
 		            </span>
 		            <span class="main_block">
 		                  <i class="fa fa-angle-double-right cost_arrow" aria-hidden="true"></i>

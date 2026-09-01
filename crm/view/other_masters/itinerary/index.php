@@ -9,13 +9,19 @@ include "../../../model/model.php";
 <div class="app_panel_content Filter-panel">
 	<div class="row">
 		<div class="text-left col-md-3 col-sm-6">
-			<select id="dest_id1"  name="dest_name1" title="Select Destination" class="form-control" onchange="list_reflect(this.value)" style="width:100%"> 
+			<select id="dest_id1"  name="dest_name1" title="Select Destination" class="form-control" onchange="list_reflect()" style="width:100%"> 
 				<option value="">Destination</option>
 				<?php
 				$sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'"); 
 				while($row_dest = mysqli_fetch_assoc($sq_query)){ ?>
 				<option value="<?php echo $row_dest['dest_id']; ?>"><?php echo $row_dest['dest_name']; ?></option>
 				<?php } ?>
+			</select>
+		</div>
+		<div class="text-left col-md-3 col-sm-6">
+			<select id="itinerary_status" name="itinerary_status" title="Select Status" class="form-control" onchange="list_reflect()" style="width:100%">
+				<option value="Active">Active</option>
+				<option value="Inactive">Inactive</option>
 			</select>
 		</div>
 	</div>
@@ -36,7 +42,8 @@ function save_modal()
 function list_reflect()
 {
 	var dest_id = $('#dest_id1').val();
-	$.post('itinerary/list_reflect.php', {dest_id:dest_id}, function(data){
+	var status = $('#itinerary_status').val();
+	$.post('itinerary/list_reflect.php', {dest_id:dest_id, status:status}, function(data){
 		$('#div_list').html(data);
 	});
 }

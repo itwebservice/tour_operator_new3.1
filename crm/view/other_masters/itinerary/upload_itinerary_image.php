@@ -1,8 +1,8 @@
 <?php
-// Minimal upload handler for itinerary images
 // Returns either: "error--<message>" or a relative path like "uploads/itinerary_images/<filename>"
 
-// Allow only POST with file
+header('Content-Type: text/plain; charset=utf-8');
+
 if (!isset($_FILES['uploadfile'])) {
     echo "error--No file uploaded";
     exit;
@@ -20,9 +20,8 @@ $originalName = $file['name'];
 $tmpPath      = $file['tmp_name'];
 $sizeBytes    = (int)$file['size'];
 
-// Basic validations
 $allowedExts = array('jpg','jpeg','png','webp');
-$maxSize     = 5 * 1024 * 1024; // 5MB
+$maxSize     = 5 * 1024 * 1024;
 
 $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 if (!in_array($ext, $allowedExts, true)) {
@@ -35,24 +34,35 @@ if ($sizeBytes <= 0 || $sizeBytes > $maxSize) {
     exit;
 }
 
-// Destination paths
-$projectRoot = dirname(__DIR__, 4); // /var/www/html/itoursdemo
 $relativeDir = 'uploads/itinerary_images/';
-$targetDir   = rtrim($projectRoot, '/').'/'.$relativeDir;
+$candidateRoots = array();
+$projectRoot = dirname(__DIR__, 4);
+$crmRoot = dirname(__DIR__, 3);
+if ($projectRoot) {
+    $candidateRoots[] = rtrim(str_replace('\\', '/', $projectRoot), '/');
+}
+if ($crmRoot) {
+    $candidateRoots[] = rtrim(str_replace('\\', '/', $crmRoot), '/');
+}
+$candidateRoots = array_values(array_unique($candidateRoots));
 
-if (!is_dir($targetDir)) {
-    if (!mkdir($targetDir, 0755, true)) {
-        echo "error--Failed to create upload directory";
-        exit;
+$targetDir = '';
+foreach ($candidateRoots as $root) {
+    $dir = $root . '/' . $relativeDir;
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0777, true);
+    }
+    if (is_dir($dir) && is_writable($dir)) {
+        $targetDir = $dir;
+        break;
     }
 }
 
-if (!is_writable($targetDir)) {
-    echo "error--Upload directory is not writable";
+if ($targetDir === '') {
+    echo "error--Failed to create upload directory";
     exit;
 }
 
-// Generate unique filename
 $safeBase   = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
 $uniqueName = date('Ymd_His').'_'.bin2hex(random_bytes(4)).'_'.$safeBase.'.'.$ext;
 $destPath   = $targetDir.$uniqueName;
@@ -62,9 +72,6 @@ if (!move_uploaded_file($tmpPath, $destPath)) {
     exit;
 }
 
-// Success: return relative path to be stored in DB
 echo $relativeDir.$uniqueName;
 exit;
 ?>
-
-

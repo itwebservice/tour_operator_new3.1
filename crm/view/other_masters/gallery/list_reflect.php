@@ -3,6 +3,7 @@
 include_once("../../../model/model.php");
 
 $dest_id = $_POST['dest_id'];
+$status = isset($_POST['status']) ? $_POST['status'] : 'Active';
 
 
 
@@ -10,8 +11,12 @@ $query ="select * from gallary_master where 1 ";
 
 if($dest_id != '') {
 
-  $query = "select * from gallary_master where dest_id = '$dest_id'";
+  $query .= " and dest_id = '$dest_id'";
 
+}
+
+if($status != '') {
+  $query .= " and dest_id in (select dest_id from destination_master where status='$status')";
 }
 
 ?>

@@ -20,11 +20,14 @@ $sq_cur = mysqli_fetch_assoc(mysqlQuery("select * from currency_name_master wher
           <div class="row mg_bt_10">
             <div class="col-md-12">
               <select name="currency_code1" id="currency_code1" style='width:100%;' class="app_select2" title="Select Currency" required>
-                <option value="<?= $sq_cur['id'] ?>"><?= $sq_cur['currency_code'] ?></option>
                 <option value="">Select Currency</option>
+                <option value="<?= $sq_cur['id'] ?>" selected><?= $sq_cur['currency_code'] ?></option>
                   <?php
                   $sq_currency = mysqlQuery("select * from currency_name_master order by default_currency desc");
                   while($row_currency = mysqli_fetch_assoc($sq_currency)){
+                    if($row_currency['id'] == $sq_cur['id']){
+                      continue;
+                    }
                   ?>
                     <option value="<?= $row_currency['id'] ?>"><?= $row_currency['currency_code'] ?></option>
                 <?php } ?>
@@ -47,7 +50,22 @@ $sq_cur = mysqli_fetch_assoc(mysqlQuery("select * from currency_name_master wher
 </form>
 <script>
 $('#update_modal').modal('show');
-$('#currency_code1').select2();
+$('#currency_code1').select2({
+    dropdownParent: $('#update_modal'),
+    width: '100%'
+}).on('select2:open', function () {
+    var selectedText = $.trim($('#currency_code1 option:selected').text());
+    setTimeout(function () {
+        var $results = $('#update_modal').find('.select2-results__options');
+        var $selected = $results.children().filter(function () {
+            return $.trim($(this).text()) === selectedText;
+        }).first();
+        if ($selected.length) {
+            $results.prepend($selected);
+            $results.scrollTop(0);
+        }
+    }, 0);
+});
 $('#frm_update').validate({
     rules:{
           

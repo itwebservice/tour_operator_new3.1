@@ -41,13 +41,33 @@ function removeDuplicateSelectOptions(context) {
 	});
 }
 
+function initStatusFilterDropdowns(context) {
+	if (!window.jQuery || !$.fn || !$.fn.select2) {
+		return;
+	}
+	var $root = context ? $(context) : $(document);
+	$root.find('select.status_filter_dropdown').each(function () {
+		var $el = $(this);
+		if ($el.data('select2')) {
+			return;
+		}
+		$el.select2({
+			width: '180px',
+			minimumResultsForSearch: Infinity,
+			dropdownParent: $(document.body)
+		});
+	});
+}
+
 $(function () {
 	removeDuplicateSelectOptions();
+	initStatusFilterDropdowns();
 });
 
 $(document).ajaxSuccess(function () {
 	setTimeout(function () {
 		removeDuplicateSelectOptions();
+		initStatusFilterDropdowns();
 	}, 0);
 });
 

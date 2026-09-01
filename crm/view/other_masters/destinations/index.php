@@ -10,7 +10,7 @@ include "../../../model/model.php";
 <div class="app_panel_content Filter-panel">
 	<div class="row">
 		<div class="text-left col-md-3 col-sm-6">
-			<select id="status" name="status" title="Select Status" class="form-control" onchange="list_reflect()" style="width:100%"> 
+			<select id="status" name="status" title="Select Status" class="form-control status_filter_dropdown" onchange="list_reflect()" style="width:180px"> 
 				<option value="Active">Active</option>
 				<option value="Inactive">Inactive</option>
 			</select>
@@ -39,6 +39,11 @@ function list_reflect()
 	});
 }
 list_reflect();
+if (typeof initMasterStatusSelect === 'function') {
+	initMasterStatusSelect('#status').on('change', list_reflect);
+} else {
+	$('#status').on('change', list_reflect);
+}
 
 function update_modal(dest_id)
 {

@@ -11,10 +11,10 @@ $branch_admin_id = $_SESSION['branch_admin_id'];
 if($entity_for=='Group Tour' || $entity_for=='Package Tour'){
 ?>
 <div class="col-sm-4 mg_bt_30">
-    <select id="dest_name_s"  name="dest_name_s" title="Select Destination" class="form-control"  style="width:100%"> 
+    <select id="dest_name_s"  name="dest_name_s" title="Select Destination" class="form-control app_select2"  style="width:100%"> 
         <option value="">*Destination</option>
         <?php 
-        $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive'"); 
+        $sq_query = mysqlQuery("select * from destination_master where status != 'Inactive' order by dest_name"); 
         while($row_dest = mysqli_fetch_assoc($sq_query)){ ?>
             <option value="<?php echo $row_dest['dest_id']; ?>"><?php echo $row_dest['dest_name']; ?></option>
             <?php } ?>

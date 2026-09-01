@@ -2,7 +2,11 @@
 $count = 0;
 $array_s = array();
 $temp_arr = array();
-$query = "select * from airline_master";
+$query = "select * from airline_master where 1 ";
+$status = isset($_POST['status']) ? $_POST['status'] : 'Active';
+if($status != ''){
+	$query .= " and active_flag='$status'";
+}
 $sq_airline = mysqlQuery($query);
 while($row_airline=mysqli_fetch_assoc($sq_airline)){
 	$count++;

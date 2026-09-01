@@ -9,9 +9,13 @@
  
  function check_dir($current_dir, $type)
 {	 	
+	if(!is_dir($current_dir))
+	{
+		mkdir($current_dir, 0777, true);
+	}
 	if(!is_dir($current_dir."/".$type))
 	{
-		mkdir($current_dir."/".$type);		
+		mkdir($current_dir."/".$type, 0777, true);		
 	}	
 	$current_dir = $current_dir."/".$type."/";
 		return $current_dir;	
