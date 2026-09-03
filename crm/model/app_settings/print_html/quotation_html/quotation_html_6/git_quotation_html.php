@@ -136,7 +136,7 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
       <section class="itinerarySec main_block side_pad mg_tp_30 pageSectionInner">
 
         <ul class="print_itinenary no-pad no-marg">
-          <?php if ($count == 1) { ?>
+          <?php if (false && $count == 1) { ?>
             <div class="mg-bt-30">
               <div class="vitinerary_div">
                 <h6>Destination Guide Video</h6>
@@ -231,8 +231,8 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
                     $sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_plane[airline_name]'"));
                   ?>
                     <tr>
-                      <td><?= $row_plane['from_location'] ?></td>
-                      <td><?= $row_plane['to_location'] ?></td>
+                      <td><?= gq_plane_entry_sector($row_plane, 'from') ?></td>
+                      <td><?= gq_plane_entry_sector($row_plane, 'to') ?></td>
                       <td><?= $sq_airline['airline_name'] . ' (' . $sq_airline['airline_code'] . ')' ?></td>
                       <td><?= get_datetime_user($row_plane['dapart_time']) ?></td>
                       <td><?= get_datetime_user($row_plane['arraval_time']) ?></td>
@@ -603,6 +603,11 @@ $bsmValues = json_decode($sq_quotation['bsm_values'],true);
           $tax_show = '';
         }
         $newBasic1 = currency_conversion($currency, $sq_quotation['currency_code'], $newBasic);
+        $gq_pdf_costing = gq_group_quotation_pdf_costing($currency, $sq_quotation['currency_code'], $newBasic, $service_tax_amount, $tcsvalue);
+        $newBasic1 = $gq_pdf_costing['tour'];
+        $service_tax_amount_show = $gq_pdf_costing['tax'];
+        $tcs_amount_show = $gq_pdf_costing['tcs'];
+        $currency_amount1 = $gq_pdf_costing['total'];
         ?>
         <div class="col-md-8">
           <!-- Costing -->

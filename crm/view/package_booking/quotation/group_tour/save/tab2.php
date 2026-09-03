@@ -152,6 +152,11 @@ $('#frm_tab2').validate({
 		var from_date = $('#from_date').val();
 		var to_date = $('#to_date').val();
 
+		if (typeof gqShouldReloadTravelStay === 'function' && !gqShouldReloadTravelStay(tour_id, group_id)) {
+			$('a[href="#tab3"]').tab('show');
+			return;
+		}
+
 		//Train Info
 		$.ajax({
 			type:'post',
@@ -348,70 +353,49 @@ $('#frm_tab2').validate({
 		data:{ tour_id : tour_id },
 		success:function(result){
 			var table = document.getElementById("tbl_group_tour_quotation_transport");
-			var transport_arr = JSON.parse(result);	   
-			if(jQuery.isEmptyObject(transport_arr)){
+			if (!table) {
+				return;
+			}
+			var transport_arr = [];
+			try {
+				transport_arr = JSON.parse(result) || [];
+			} catch (e) {
+				transport_arr = [];
+			}
+			while (table.rows.length > 1) {
+				table.deleteRow(1);
+			}
+			if (!transport_arr.length) {
 				var f_row = table.rows[0];
-				f_row.cells[0].childNodes[0].removeAttribute('checked');
-			};
-			
-			// Add rows if needed
-			if(table.rows.length < transport_arr.length){
-				for(var i=1; i<transport_arr.length; i++){
-					addRow('tbl_group_tour_quotation_transport');
-				}	
+				var f_chk = $(f_row.cells[0]).find('input[type="checkbox"]')[0];
+				if (f_chk) {
+					f_chk.checked = false;
+				}
+				return;
 			}
 
-			// Get today's date in dd-mm-yyyy format
-			var today = new Date();
-			var dd = String(today.getDate()).padStart(2, '0');
-			var mm = String(today.getMonth() + 1).padStart(2, '0');
-			var yyyy = today.getFullYear();
-			var todayDate = dd + '-' + mm + '-' + yyyy;
-
-			// Wait for rows to be added to DOM
-			setTimeout(function(){
-				for(var i=0; i<transport_arr.length; i++){
-					var row = table.rows[i]; 
-					
-					// Set vehicle
-					row.cells[2].childNodes[0].value = transport_arr[i]['vehicle_id'];
-					
-					// Set start date (default to today's date)
-					row.cells[3].childNodes[0].value = todayDate;
-					
-					// Set end date (default to today's date)
-					row.cells[4].childNodes[0].value = todayDate;
-					
-					// Set pickup location with optgroup structure
-					if(transport_arr[i]['pickup_value'] && transport_arr[i]['pickup_value'] != ''){
-						var $pickupSelect = $('#'+row.cells[5].childNodes[0].id);
-						var pickupHtml = '<optgroup value="' + transport_arr[i]['pickup_type'] + '" label="' + ucfirst(transport_arr[i]['pickup_type']) + '">' +
-							'<option value="' + transport_arr[i]['pickup_value'] + '" selected>' + transport_arr[i]['pickup_location'] + '</option>' +
-							'</optgroup>';
-						$pickupSelect.html(pickupHtml);
-					}
-					
-					// Set drop location with optgroup structure
-					if(transport_arr[i]['drop_value'] && transport_arr[i]['drop_value'] != ''){
-						var $dropSelect = $('#'+row.cells[6].childNodes[0].id);
-						var dropHtml = '<optgroup value="' + transport_arr[i]['drop_type'] + '" label="' + ucfirst(transport_arr[i]['drop_type']) + '">' +
-							'<option value="' + transport_arr[i]['drop_value'] + '" selected>' + transport_arr[i]['drop_location'] + '</option>' +
-							'</optgroup>';
-						$dropSelect.html(dropHtml);
-					}
-
-					// Service duration and vehicle count left blank for user to fill
-					row.cells[7].childNodes[0].value = '';  // service_duration
-					row.cells[8].childNodes[0].value = '';  // no_of_vehicles
-
-					row.cells[0].childNodes[0].setAttribute('disabled', 'disabled');
-					$(row.cells[2].childNodes[0]).trigger('change');
+			var travelDate = from_date || '';
+			for (var r = 1; r < transport_arr.length; r++) {
+				if (typeof gqAddTransportRow === 'function') {
+					gqAddTransportRow('tbl_group_tour_quotation_transport');
+				} else {
+					addRow('tbl_group_tour_quotation_transport');
 				}
-				
-				// Initialize Select2 AJAX for all dropdowns (will preserve existing options)
-				destinationLoading('select[name^=transport_pickup_from]', 'Pickup Location');
-				destinationLoading('select[name^=transport_drop_to]', 'Drop-off Location');
-			}, 300);
+			}
+
+			setTimeout(function(){
+				for (var i = 0; i < transport_arr.length; i++) {
+					if (!table.rows[i]) {
+						continue;
+					}
+					var rowData = transport_arr[i] || {};
+					rowData.start_date = travelDate;
+					rowData.end_date = travelDate;
+					if (typeof gqFillTransportRow === 'function') {
+						gqFillTransportRow(table.rows[i], rowData);
+					}
+				}
+			}, 150);
 		}
 		});
 
@@ -472,6 +456,7 @@ function ucfirst(str) {
 			$('#pck_child_cost').val(parseFloat(cost_arr.children_wb_cost) || 0);
 			$('#pck_infant_cost').val(parseFloat(cost_arr.infant_cost) || 0);
 			$('#pck_single_person_cost').val(parseFloat(cost_arr.single_person_cost) || 0);
+			$('#pck_extra_bed_cost').val(parseFloat(cost_arr.extra_bed_cost) || 0);
 
 			if (typeof cost_reflect === 'function') {
 				cost_reflect();

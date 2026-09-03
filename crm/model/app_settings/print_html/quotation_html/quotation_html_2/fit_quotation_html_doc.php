@@ -1,6 +1,7 @@
 <?php
 //Generic Files
 include "../../../../model.php";
+include_once __DIR__ . '/../generic_quotation_data.php';
 include_once __DIR__ . '/../../../../package_tour/quotation/quotation_rich_text_helpers.php';
 
 include "printFunction.php";
@@ -831,6 +832,13 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
                     $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
                     $quotation_cost = (float)($basic_cost) + (float)($service_charge) + (float)($service_tax_amount) + (float)($sq_quotation['train_cost']) + (float)($sq_quotation['cruise_cost']) + (float)($sq_quotation['flight_cost']) + (float)($sq_quotation['visa_cost']) + (float)($sq_quotation['guide_cost']) + (float)($sq_quotation['misc_cost']) + (float)($tcsvalue);
+                    if (function_exists('gqd_group_costing_breakdown')) {
+                      $doc_grp = gqd_group_costing_breakdown($sq_costing, $sq_quotation);
+                      $quotation_cost = $doc_grp['net_total'];
+                      $tcsvalue = $doc_grp['tcs_value'];
+                      $tour_cost = $doc_grp['basic'] + $doc_grp['service_after'];
+                      $tcs_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $tcsvalue);
+                    }
                     // $quotation_cost = ceil($quotation_cost);
 
                     // $quotation_cost = floor($quotation_cost);

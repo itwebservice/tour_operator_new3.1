@@ -65,19 +65,29 @@ $sq_hotel_count = mysqli_num_rows(mysqlQuery("select id from package_tour_quotat
               <div class="row">
               <div class="col-xs-12">
               <div class="table-responsive">
-                <table id="hotel_req_table<?= $count ?>" class="table mg_bt_0 table-bordered" style="margin-top:0px !important;">
+                <table id="hotel_req_table<?= $count ?>" class="table mg_bt_0 table-bordered hotel-avail-table" style="margin-top:0px !important;width:100%;table-layout:fixed;">
+                  <colgroup>
+                    <col style="width:5%;">
+                    <col style="width:14%;">
+                    <col style="width:30%;">
+                    <col style="width:15%;">
+                    <col style="width:24%;">
+                    <col style="width:12%;">
+                  </colgroup>
                   <thead>
-                      <th></th>
+                    <tr>
+                      <th class="text-center"></th>
                       <th>Availability</th>
                       <th>Hotel_Name(City_Name)</th>
                       <th>Mobile_NO</th>
                       <th>Email_Id</th>
-                      <th>More_Details...</th>
+                      <th class="text-center">More_Details...</th>
+                    </tr>
                   </thead>
                   <tbody>
-                    <tr class="<?= $bg ?>">
-                      <td><input class="css-checkbox" id="chk_plan<?= $count ?>" type="checkbox"><label class="css-label" for="chk_plan<?= $count ?>"></label></td>
-                      <td><select class="form-control" id="avail<?= $count ?>" style="width:150px !important;background-color:<?=$bg_clr?>" onchange="reflect_options('<?= $row_query['id'] ?>','<?= $count ?>')" title="Status" data-toggle="tooltip">
+                    <tr class="<?= $bg ?>" data-hotel-entry-id="<?= $row_query['id'] ?>">
+                      <td class="text-center" style="vertical-align:middle;"><input class="css-checkbox" id="chk_plan<?= $count ?>" type="checkbox"><label class="css-label" for="chk_plan<?= $count ?>"></label></td>
+                      <td style="vertical-align:middle;"><select class="form-control" id="avail<?= $count ?>" style="width:100% !important;background-color:<?=$bg_clr?>" onchange="reflect_options('<?= $row_query['id'] ?>','<?= $count ?>')" title="Status" data-toggle="tooltip">
                         <?php
                         if($h_availability != ''){ ?>
                           <option value="<?= $h_availability ?>"><?= $h_availability ?></option>
@@ -87,11 +97,10 @@ $sq_hotel_count = mysqli_num_rows(mysqlQuery("select id from package_tour_quotat
                         <option value="Not Available">Not Available</option>
                         <option value="NA">NA</option>
                       </select></td>
-                      <td id="hotel<?= $count ?>"><?= $sq_hotel['hotel_name'].'('.$sq_city['city_name'].')' ?></td>
-                      <td><?= $mobile_no ?></td>
-                      <td><input class="form-control" type='text' id="email_id<?= $count ?>" value="<?= $email_id ?>" style="width:200px !important;" placeholder="*Email ID" onchange="validate_email(this.id)" title="Email ID"/></td>
-                      <td class="text-center"><a title="<?= $hotel_desc ?>" class="btn btn-info btn-sm" style="cursor: none !important;"><i class="fa fa-eye"></i></a> </td>
-                      <td><input type="hidden" value="<?= $row_query['id'] ?>"/></td>
+                      <td id="hotel<?= $count ?>" style="vertical-align:middle;word-break:break-word;"><?= $sq_hotel['hotel_name'].'('.$sq_city['city_name'].')' ?></td>
+                      <td style="vertical-align:middle;word-break:break-word;"><?= $mobile_no ?></td>
+                      <td style="vertical-align:middle;"><input class="form-control" type="text" id="email_id<?= $count ?>" value="<?= $email_id ?>" style="width:100% !important;" placeholder="*Email ID" onchange="validate_email(this.id)" title="Email ID"/></td>
+                      <td class="text-center" style="vertical-align:middle;"><a title="<?= $hotel_desc ?>" class="btn btn-info btn-sm" style="cursor: none !important;"><i class="fa fa-eye"></i></a></td>
                     </tr>
                   </tbody>
                 </table>
@@ -292,7 +301,7 @@ function submit_fun(btn_id){
     var checkbox = row.cells[0].childNodes[0].checked;
     var status = row.cells[1].childNodes[0].value;
     var email_id = row.cells[4].childNodes[0].value;
-    var hotel_entry_id = row.cells[6].childNodes[0].value;
+    var hotel_entry_id = row.getAttribute('data-hotel-entry-id');
     
     if(btn_id == 'btn_send' && checkbox){
       if(email_id == ''){

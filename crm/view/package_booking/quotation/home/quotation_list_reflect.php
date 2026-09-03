@@ -1,5 +1,6 @@
 <?php
 include "../../../../model/model.php";
+include_once "../../../../model/app_settings/print_html/quotation_html/generic_quotation_data.php";
 $emp_id = $_SESSION['emp_id'];
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
@@ -296,6 +297,12 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 
 
 	$quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $row_quotation['train_cost'] + $row_quotation['cruise_cost'] + $row_quotation['flight_cost'] + $row_quotation['visa_cost'] + $row_quotation['guide_cost'] + $row_quotation['misc_cost'] + (float)($tcsvalue) - $act_discount;
+	if (function_exists('gqd_group_costing_breakdown')) {
+		$grp_brk = gqd_group_costing_breakdown($sq_cost, $row_quotation);
+		$quotation_cost = $grp_brk['net_total'];
+		$tcsvalue = $grp_brk['tcs_value'];
+		$act_discount = $grp_brk['act_discount'];
+	}
 	// $quotation_cost=$total_tour_cost;
 
 
@@ -320,6 +327,12 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	$travel_cost = $row_quotation['train_cost'] + $row_quotation['flight_cost'] + $row_quotation['cruise_cost'] + $row_quotation['visa_cost'] + $row_quotation['guide_cost'] + $row_quotation['misc_cost'];
 	//Net cost
 	$net_amount = $sq_cost['total_tour_cost'] + $row_quotation['train_cost'] + $row_quotation['flight_cost'] + $row_quotation['visa_cost'] + $row_quotation['guide_cost'] + $row_quotation['misc_cost'] + $row_quotation['cruise_cost'];
+	if (function_exists('gqd_group_costing_breakdown')) {
+		if (!isset($grp_brk) || !is_array($grp_brk)) {
+			$grp_brk = gqd_group_costing_breakdown($sq_cost, $row_quotation);
+		}
+		$net_amount = $grp_brk['net_total'];
+	}
 
 	$quotation_id = $row_quotation['quotation_id'];
 	$p_url = BASE_URL . "model/app_settings/print_html/invoice_html/body/proforma_invoice_html.php?invoice_no=$invoice_no&invoice_date=$invoice_date&customer_id=$customer_id&customer_email=$customer_email&service_name=$service_name&basic_cost=$basic_cost&service_tax=$service_tax&net_amount=$net_amount&travel_cost=$travel_cost&for=$for";

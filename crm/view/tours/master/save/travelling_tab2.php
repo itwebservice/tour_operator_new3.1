@@ -10,11 +10,11 @@
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
                                 <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapse2" id="collapsed2">
+                                    <div class="Normal main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="true" aria-controls="collapse2" id="collapsed2">
                                         <div class="col-md-12"><span>Hotel Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading2">
+                                <div id="collapse2" class="panel-collapse collapse in main_block" role="tabpanel" aria-labelledby="heading2">
                                     <div class="panel-body">
                                         <div class="row mg_bt_10">
                                             <div class="col-md-6">
@@ -58,7 +58,7 @@
                         <div class="col-md-12"><span>Flight Information</span></div>
                     </div>
                 </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading3">
+                                <div id="collapse3" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading3">
                                     <div class="panel-body">
                                         <div class="row mg_bt_10">
                                             <div class="col-md-6">
@@ -171,11 +171,11 @@
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
                                 <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="true" aria-controls="collapse1" id="collapsed1">
+                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="false" aria-controls="collapse1" id="collapsed1">
                                         <div class="col-md-12"><span>Train Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse1" class="panel-collapse collapse in main_block" role="tabpanel" aria-labelledby="heading1">
+                                <div id="collapse1" class="panel-collapse collapse main_block" role="tabpanel" aria-labelledby="heading1">
                                     <div class="panel-body">
                                         <div class="row mg_bt_10">
                                             <div class="col-md-6">
@@ -656,6 +656,9 @@ $('#train_class1').select2({
                 $('#tab3_head').addClass('active');
                 $('.bk_tab').removeClass('active');
                 $('#tab3').addClass('active');
+                if (typeof fill_daywise_from_tour === 'function') {
+                    fill_daywise_from_tour();
+                }
                 $('html, body').animate({
                     scrollTop: $('.bk_tab_head').offset().top
                 }, 200);

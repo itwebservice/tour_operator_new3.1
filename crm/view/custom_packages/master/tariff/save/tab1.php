@@ -192,19 +192,21 @@ function package_tarrif() {
             cust_csv_dir: cust_csv_dir
         },
         success: function(result) {
-
-            var pass_arr = JSON.parse(result);
+            var pass_arr = [];
+            try {
+                pass_arr = JSON.parse(result);
+            } catch (e) {
+                error_msg_alert('Unable to read CSV. Please check the file format.');
+                return false;
+            }
+            if (!pass_arr || !pass_arr.length) {
+                error_msg_alert('No Records in CSV!');
+                return false;
+            }
 
             var table = document.getElementById("tbl_package_tariff");
-            if (table.rows.length == 1) {
-                for (var k = 1; k < table.rows.length; k++) {
-                    document.getElementById("tbl_package_tariff").deleteRow(k);
-                }
-            } else {
-                while (table.rows.length > 1) {
-                    document.getElementById("tbl_package_tariff").deleteRow(k);
-                    table.rows.length--;
-                }
+            while (table.rows.length > 1) {
+                table.deleteRow(table.rows.length - 1);
             }
 
             for (var i = 0; i < pass_arr.length; i++) {

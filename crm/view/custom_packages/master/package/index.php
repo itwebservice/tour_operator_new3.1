@@ -42,13 +42,7 @@ include_once('../../../layouts/fullwidth_app_header.php');
         // Adjust the cursor position after wrapping
         textarea.selectionStart = start;
         textarea.selectionEnd = end + wrapper.length * 2;
-        var text = textarea.value;
-        var content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-
-        // Replace markdown-style underline (__text__) with <u> tags
-        content = content.replace(/__(.*?)__/g, '<u>$1</u>');
-        textarea.value = content;
-        //console.log(content);    
+        // Keep markdown markers in the editor; do not inject raw HTML tags.
     });
 
     function total_cost() {

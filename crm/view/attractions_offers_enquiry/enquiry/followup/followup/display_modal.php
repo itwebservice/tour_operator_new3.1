@@ -197,11 +197,7 @@ $enquiry_type = $sq_enquiry['enquiry_type'];
 								?>
 							</select>
 						</div>
-					</div>
-				<?php }
-				?>
-				<div class="row">
-					<div class="col-md-3 col-sm-6 mg_bt_10">
+						<div class="col-md-3 col-sm-6 mg_bt_10">
 						<input type="text" id="followup_date" name="followup_date" placeholder="Next Followup Date" title="Next Followup Date" value="<?= date('d-m-Y H:i') ?>" style="min-width:136px;" class="form-control">
 					</div>
 					<div class="col-md-3 col-sm-6 mg_bt_10">
@@ -212,7 +208,10 @@ $enquiry_type = $sq_enquiry['enquiry_type'];
 							<option value="<?= "Cold" ?>">Cold</option>
 						</select>
 					</div>
-				</div>
+					</div>
+				<?php }
+				?>
+				
 				<div class="row mg_bt_10">
 					<div class="col-md-12">
 						<textarea id="followup_reply" name="followup_reply" onchange="validate_spaces(this.id);" placeholder="*Followup Description" class="form-control"></textarea>

@@ -57,6 +57,13 @@ $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from tour_master where t
     </div>
 </form>
 <script>
+function fill_daywise_from_tour() {
+    var destVal = $('#dest_name_s').val();
+    if (destVal) {
+        $('#dest_name2').val(destVal).trigger('change');
+    }
+}
+
 function load_images(tour_id) {
     var base_url = $("#base_url").val();
     $.ajax({
@@ -154,6 +161,10 @@ for (var days = 0; days < document.getElementById('dynamic_table_list1').rows.le
     var days_in = days;
     ++days_in;
     var newOption = new Option("Day -" + days_in, days_in, false, false);
-    $('#day_name').append(newOption).trigger('change');
+    $('#day_name').append(newOption);
 }
+$(document).on('change', '#day_name', function() {
+    $('input[name=image_check]').prop('checked', false);
+});
+fill_daywise_from_tour();
 </script>

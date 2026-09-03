@@ -65,8 +65,21 @@ for ($i = 0; $i < sizeof($exc_arr); $i++) {
 	else
 		$child_costwo1 = 0;
 
+	$transfer_option = isset($transfer_arr[$i]) ? trim((string) $transfer_arr[$i]) : '';
+	$vehicle_count = intval(isset($total_vehicles_arr[$i]) ? $total_vehicles_arr[$i] : 0);
+	// Activity tariff transfer is per vehicle. Empty "No.Of Vehicles" was multiplying by 0
+	// and dropping the transfer amount on Save. Default to 1 when a transfer type is selected.
+	if (strcasecmp($transfer_option, 'Without Transfer') === 0 || $transfer_option === '') {
+		$vehicle_count = 0;
+	} elseif ($vehicle_count < 1) {
+		$vehicle_count = 1;
+	}
+
 	$transfer_cost = ($to_currency_rate != 0) ? ($from_currency_rate / $to_currency_rate) * $etransfer_cost : 0;
-	$total_cost = ($adult_cost * $total_adult) + $child_cost1 + $child_costwo1 + ($infant_cost * $total_infant) + ($transfer_cost * intval($total_vehicles_arr[$i]));
+	if ($vehicle_count < 1) {
+		$transfer_cost = 0;
+	}
+	$total_cost = ($adult_cost * $total_adult) + $child_cost1 + $child_costwo1 + ($infant_cost * $total_infant) + ($transfer_cost * $vehicle_count);
 
 	$arr = array(
 		'total_cost' => (float)($total_cost),
@@ -74,7 +87,7 @@ for ($i = 0; $i < sizeof($exc_arr); $i++) {
 		'child_cost' => (float)($child_cost) * intval($children_with_bed),
 		'childwo_cost' => (float)($child_cost) * intval($children_without_bed),
 		'infant_cost' => (float)($infant_cost) * intval($total_infant),
-		'transfer_cost' => (float)($transfer_cost) * intval($total_vehicles_arr[$i])
+		'transfer_cost' => (float)($transfer_cost) * $vehicle_count
 	);
 
 	array_push($amount_arr, $arr);

@@ -7,12 +7,14 @@
 						<div class="col-md-6">
 							<i class="fa fa-angle-double-right"></i>&nbsp;&nbsp;<label>Quotation For <em>:</em></label> <?= $sq_req['quotation_for'] ?>
 						</div>
-						<div class="col-md-6">
-							<i class="fa fa-angle-double-right"></i>&nbsp;&nbsp;<label>City Name <em>:</em></label><?php
+						<div class="col-md-6 ">
+							<div style="display: flex;">
+							<i class="fa fa-angle-double-right"></i>&nbsp;&nbsp;<label style="min-width: 130px;">City Name <em>:</em></label><?php
 							for($i=0;$i<sizeof($city_id_arr);$i++){ 
 								$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$city_id_arr[$i]'"));
 								$sep = ($i<sizeof($city_id_arr)-1) ? ',' : '';
 								echo $sq_city['city_name'].$sep; } ?>
+							</div>
 						</div>
 					</div>
 					<div class="row mg_bt_10">

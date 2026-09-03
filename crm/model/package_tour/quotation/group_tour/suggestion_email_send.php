@@ -37,6 +37,8 @@ $content = '
 ';
 
 $subject = "Suggestion from customer ".$sq_quotation['customer_name'];
+ob_start();
 $model->app_email_master($email_id, $content, $subject);
+ob_end_clean();
 echo "Thank you for your suggestion";
 ?>

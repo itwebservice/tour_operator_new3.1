@@ -93,13 +93,12 @@ class package_master_tariff{
 		$cust_csv_dir = $_POST['cust_csv_dir'];
 		$pass_info_arr = array();
 		$flag = true;
-		$cust_csv_dir = explode('uploads', $cust_csv_dir);
-		$cust_csv_dir = BASE_URL.'uploads'.$cust_csv_dir[1];
+		$cust_csv_dir = resolve_csv_upload_path($cust_csv_dir);
 		begin_t();
 		$count = 1;
 
 		$arrResult  = array();
-		$handle = fopen($cust_csv_dir, "r");
+		$handle = @fopen($cust_csv_dir, "r");
 		if(empty($handle) === false) {
 			while(($data = fgetcsv($handle,3000, ",")) !== FALSE){
 				if($count == 1) { $count++; continue; }

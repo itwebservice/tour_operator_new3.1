@@ -34,13 +34,13 @@ body p{
 
 
 table tr.table-heading-row th, table tfoot tr td{
-    background-color: #f4eeee !important;
+    background-color: #f4eeee;
 }
 table.table-bordered{
     border-collapse: collapse !important;
 }
 table.table-bordered tr td{
-    border: 1px solid #ddd !important;
+    border: 1px solid #ddd ;
 }
 
 .fullHeightLand{

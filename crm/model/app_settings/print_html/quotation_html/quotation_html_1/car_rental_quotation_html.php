@@ -183,16 +183,16 @@ $sq_package_count = mysqli_num_rows($sq_package_program);
                     </ul>
                     <hr class="main_block">
                     <?php if ($sq_quotation['travel_type'] == 'Local') { ?>
-                    <ul class="main_block">
-                        <li class="col-md-6 mg_tp_10 mg_bt_10"><span>FROM DATE :
+                    <ul class="main_block" style="list-style: none; "> 
+                        <li style="list-style: none; " class="col-md-6 mg_tp_10 mg_bt_10"><span>FROM DATE :
                             </span><?= get_date_user($sq_quotation['from_date']) ?></li>
-                        <li class="col-md-6 mg_tp_10 mg_bt_10"><span>TO DATE :
+                        <li style="list-style: none; " class="col-md-6 mg_tp_10 mg_bt_10"><span>TO DATE :
                             </span><?= get_date_user($sq_quotation['to_date']) ?></li>
                     </ul>
                     <?php } else { ?>
-                    <li class="col-md-6 mg_tp_10 mg_bt_10"><span>FROM DATE :
+                    <li style="list-style: none; " class="col-md-6 mg_tp_10 mg_bt_10"><span>FROM DATE :
                         </span><?= get_date_user($sq_quotation['from_date']) ?></li>
-                    <li class="col-md-6 mg_tp_10 mg_bt_10"><span>TO DATE :
+                    <li style="list-style: none; " class="col-md-6 mg_tp_10 mg_bt_10"><span>TO DATE :
                         </span><?= get_date_user($sq_quotation['to_date']) ?></li>
                     <?php } ?>
                     <?php $no_of_car = ceil($sq_quotation['total_pax'] / $sq_quotation['capacity']); ?>
@@ -214,17 +214,13 @@ $sq_package_count = mysqli_num_rows($sq_package_program);
         <div class="row">
             <div class="col-md-12">
                 <div class="print_info_block">
-                    <ul class="main_block no-pad">
-                        <li class="col-md-4 mg_tp_10 mg_bt_10"><span>VEHICLE NAME :
-                            </span><?= $sq_quotation['vehicle_name'] ?></li>
-                        <li class="col-md-6 mg_tp_10 mg_bt_10"><span>NO OF VEHICLE : </span><?= $no_of_car ?></li>
+                    <ul class="print_info_list main_block no-pad" style="display:flex; flex-wrap:nowrap; width:100%; margin:0; padding:0; list-style:none;">
+                        <li class="col-md-3 mg_tp_10 mg_bt_10" style="flex:1 1 25%; max-width:25%;"><span>VEHICLE NAME :</span> <?= $sq_quotation['vehicle_name'] ?></li>
+                        <li class="col-md-3 mg_tp_10 mg_bt_10" style="flex:1 1 25%; max-width:25%;"><span>NO OF VEHICLE :</span> <?= $no_of_car ?></li>
+                        <li class="col-md-3 mg_tp_10 mg_bt_10" style="flex:1 1 25%; max-width:25%;"><span>EXTRA KM COST :</span> <?= $sq_quotation['extra_km_cost'] ?></li>
+                        <li class="col-md-3 mg_tp_10 mg_bt_10" style="flex:1 1 25%; max-width:25%;"><span>EXTRA HR COST :</span> <?= $sq_quotation['extra_hr_cost'] ?></li>
                     </ul>
-                    <ul class="main_block no-pad">
-                        <li class="col-md-4 mg_tp_10 mg_bt_10"><span>EXTRA KM COST :
-                            </span><?= $sq_quotation['extra_km_cost'] ?></li>
-                        <li class="col-md-4 mg_tp_10 mg_bt_10"><span>EXTRA HR COST :
-                            </span><?= $sq_quotation['extra_hr_cost'] ?></li>
-                    </ul>
+                    
                 </div>
             </div>
         </div>

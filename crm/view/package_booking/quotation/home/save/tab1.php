@@ -176,8 +176,19 @@ $role_id = $_SESSION['role_id'];
 
 <script>
 $('#country_code').select2();
+var customerHintSource = [];
+try {
+    var custRaw = $('#cust_data').val() || '[]';
+    customerHintSource = JSON.parse(custRaw);
+    if (!Array.isArray(customerHintSource)) {
+        customerHintSource = [];
+    }
+} catch (e) {
+    customerHintSource = [];
+}
 $("#customer_name").autocomplete({
-    // source: JSON.parse($('#cust_data').val()),
+    source: customerHintSource,
+    minLength: 1,
     select: function(event, ui) {
 
         var base_url = $('#base_url').val();

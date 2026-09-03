@@ -34,7 +34,6 @@ $vendor_type_val = get_vendor_name($sq_req['quotation_for'], $sq_req['supplier_i
 												<i class="fa fa-angle-double-right"></i>&nbsp;&nbsp;<label>SUPPLIER NAME <em>:</em></label> <?= $vendor_type_val ?>
 											</div>
 						    	        </div>
-						    	        <br>
 										<div class="row mg_bt_20">
 											<div class="col-md-6 mg_bt_10">
 												<i class="fa fa-angle-double-right"></i>&nbsp;&nbsp;<label>CURRENCY <em>:</em></label> <?= $sq_currency1['currency_code'] ?>

@@ -523,7 +523,7 @@ function city_ssave_modal() {
 function airport_airline_save_modal() {
 	var base_url = $('#base_url').val();
 	var target = '_blank';
-	window.open(base_url + 'view/other_masters/index.php', target);
+	window.open(base_url + 'view/other_masters/index.php?tab=airport', target);
 }
 function activity_save_modal(){
 	
@@ -2799,6 +2799,13 @@ function initAppSelect2Element(element, extraConfig) {
 		minimumResultsForSearch: 0,
 		dropdownParent: getModalSelect2Parent($select)
 	}, extraConfig);
+	if ($select.prop('multiple')) {
+		config.closeOnSelect = false;
+		if (!config.placeholder) {
+			config.placeholder = $select.attr('title') || $select.attr('placeholder') || 'Select';
+		}
+		config.allowClear = true;
+	}
 
 	$select.select2(config);
 	return $select;
@@ -4648,6 +4655,61 @@ function init_car_rental_itinerary_modal() {
 
 window.init_car_rental_itinerary_modal = init_car_rental_itinerary_modal;
 
+function decodeItineraryB64(b64) {
+	if (!b64) {
+		return '';
+	}
+	try {
+		var bin = atob(b64);
+		if (typeof TextDecoder !== 'undefined') {
+			var bytes = new Uint8Array(bin.length);
+			for (var i = 0; i < bin.length; i++) {
+				bytes[i] = bin.charCodeAt(i);
+			}
+			return new TextDecoder('utf-8').decode(bytes);
+		}
+		return decodeURIComponent(Array.prototype.map.call(bin, function (c) {
+			return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+		}).join(''));
+	} catch (e) {
+		try {
+			return atob(b64);
+		} catch (e2) {
+			return '';
+		}
+	}
+}
+
+function fillItineraryPickerFields(root) {
+	var $root = root ? $(root) : $(document);
+	$root.find('tr[data-itin-spa], tr[data-itin-dwp], tr[data-itin-ovs]').each(function () {
+		var spaEl = this.querySelector('input[name="itin_modal_special_attaraction"]');
+		var dwpEl = this.querySelector('textarea[name="itin_modal_day_program"]');
+		var ovsEl = this.querySelector('input[name="itin_modal_overnight_stay"]');
+		if (spaEl && this.hasAttribute('data-itin-spa')) {
+			spaEl.value = decodeItineraryB64(this.getAttribute('data-itin-spa') || '');
+		}
+		if (dwpEl && this.hasAttribute('data-itin-dwp')) {
+			dwpEl.value = decodeItineraryB64(this.getAttribute('data-itin-dwp') || '');
+		}
+		if (ovsEl && this.hasAttribute('data-itin-ovs')) {
+			ovsEl.value = decodeItineraryB64(this.getAttribute('data-itin-ovs') || '');
+		}
+	});
+}
+
+function getItineraryPickerRowText(row, attr, selector) {
+	if (row && row.hasAttribute(attr)) {
+		return decodeItineraryB64(row.getAttribute(attr) || '');
+	}
+	var el = row ? row.querySelector(selector) : null;
+	return el ? el.value : '';
+}
+
+window.decodeItineraryB64 = decodeItineraryB64;
+window.fillItineraryPickerFields = fillItineraryPickerFields;
+window.getItineraryPickerRowText = getItineraryPickerRowText;
+
 function add_itinerary(dest_id1, spa, dwp, ovs, dayp) {
 
 	var day_id = dayp.split('-');
@@ -4669,6 +4731,9 @@ function add_itinerary(dest_id1, spa, dwp, ovs, dayp) {
 		$('#itinerary'+day_id[1]).button('reset');
 		$('#itinerary'+day_id[1]).prop('disabled',false);
 		$('#div_itinerary_modal').html(data);
+		if (typeof fillItineraryPickerFields === 'function') {
+			fillItineraryPickerFields('#div_itinerary_modal');
+		}
 	});
 }
 function get_dest_itinerary(dest_id1) {
@@ -4682,6 +4747,9 @@ function get_dest_itinerary(dest_id1) {
 	}
 	$.post(base_url + 'view/load_data/get_itinerary_data.php', { dest_id: dest_id }, function (data) {
 		$('#itinerary_data').html(data);
+		if (typeof fillItineraryPickerFields === 'function') {
+			fillItineraryPickerFields('#itinerary_data');
+		}
 	});
 }
 function vehicle_save_modal(vehicle_name1) {

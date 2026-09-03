@@ -2,6 +2,18 @@
 include "../../../model/model.php";
 include_once('../../layouts/fullwidth_app_header.php');
 
+if (!function_exists('itinerary_html_to_editor')) {
+    function itinerary_html_to_editor($text)
+    {
+        $text = (string)$text;
+        $text = preg_replace('/<(b|strong)>\s*<\/\1>/i', '', $text);
+        $text = preg_replace('/<u>\s*<\/u>/i', '', $text);
+        $text = preg_replace('/<(?:b|strong)>(.*?)<\/(?:b|strong)>/is', '**$1**', $text);
+        $text = preg_replace('/<u>(.*?)<\/u>/is', '__$1__', $text);
+        return $text;
+    }
+}
+
 if (!function_exists('package_day_image_display')) {
     function package_day_image_display($day_image)
     {
@@ -263,7 +275,7 @@ $readable = ($sq_pckg['clone'] == 'yes' && $sq_pckg['update_flag'] == '0') ? '' 
                                             </td>
                                             <td style='width:140px'><input type="text" id="special_attaraction<?php echo $count; ?>-u" name="special_attaraction" class="form-control mg_bt_10" placeholder="*Special Attraction" title="Special Attraction" onchange="validate_spaces(this.id);validate_spattration(this.id);" style='width:150px;margin-top:35px;' value="<?php echo htmlspecialchars($sq_pckg1['attraction'], ENT_QUOTES); ?>"></td>
 
-                                            <td class='col-md-7 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style='width:100%;height:900px;'><?php echo htmlspecialchars($sq_pckg1['day_wise_program'], ENT_QUOTES); ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
+                                            <td class='col-md-7 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style='width:100%;height:900px;'><?php echo htmlspecialchars(itinerary_html_to_editor($sq_pckg1['day_wise_program']), ENT_QUOTES); ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                                             </td>
 
                                             <td class='col-md-1/2 pad_8' style='width:100px'><input type="text" id="overnight_stay<?php echo $count; ?>-u" name="overnight_stay" class="form-control mg_bt_10" onchange="validate_spaces(this.id);validate_onstay(this.id);" placeholder="*Overnight Stay" title="Overnight Stay" style='width:150px;margin-top:35px;' value="<?php echo htmlspecialchars($sq_pckg1['stay'], ENT_QUOTES); ?>"></td>
@@ -985,13 +997,7 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
         // Adjust the cursor position after wrapping
         textarea.selectionStart = start;
         textarea.selectionEnd = end + wrapper.length * 2;
-		var text=textarea.value;
-		 var content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-
-		// Replace markdown-style underline (__text__) with <u> tags
-		content = content.replace(/__(.*?)__/g, '<u>$1</u>');
-		textarea.value =content;
-		//console.log(content);    
+        // Keep markdown markers in the editor; do not inject raw HTML tags.
 });
 </script>
 <script>

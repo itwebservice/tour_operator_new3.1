@@ -4,17 +4,18 @@ include "../../model/model.php";
 require_once('../layouts/admin_header.php');
 ?>
 <?= begin_panel('Other Masters',12) ?>
+<?php $master_tab = isset($_GET['tab']) ? $_GET['tab'] : ''; ?>
 <div class="text-center text_left_sm_xs">
-	<label for="rd_city" class="app_dual_button active mg_bt_10">
-        <input type="radio" id="rd_city" name="rd_master" checked onchange="master_content_reflect()">
+	<label for="rd_city" class="app_dual_button <?= ($master_tab === 'airport') ? '' : 'active' ?> mg_bt_10">
+        <input type="radio" id="rd_city" name="rd_master" <?= ($master_tab === 'airport') ? '' : 'checked' ?> onchange="master_content_reflect()">
         &nbsp;City
     </label>  
     <label for="rd_state" class="app_dual_button mg_bt_10">
         <input type="radio" id="rd_state" name="rd_master" onchange="master_content_reflect()">
         &nbsp;State/Country
     </label>    
-    <label for="rd_airport" class="app_dual_button mg_bt_10">
-        <input type="radio" id="rd_airport" name="rd_master" onchange="master_content_reflect()">
+    <label for="rd_airport" class="app_dual_button <?= ($master_tab === 'airport') ? 'active' : '' ?> mg_bt_10">
+        <input type="radio" id="rd_airport" name="rd_master" <?= ($master_tab === 'airport') ? 'checked' : '' ?> onchange="master_content_reflect()">
         &nbsp;Airport
     </label>
     <label for="rd_airline" class="app_dual_button mg_bt_10">

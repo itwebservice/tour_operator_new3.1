@@ -1,3 +1,52 @@
+<style>
+    .quotation-datetime-td {
+        min-width: 165px;
+        max-width: 180px;
+        vertical-align: middle !important;
+    }
+    .quotation-datetime-td .form-control {
+        width: 100% !important;
+        min-width: 0;
+    }
+    #tbl_package_tour_quotation_dynamic_plane .quotation-datetime-td,
+    #tbl_package_tour_quotation_dynamic_train .quotation-datetime-td,
+    #tbl_dynamic_cruise_quotation .quotation-datetime-td {
+        white-space: nowrap;
+    }
+    #tbl_group_tour_quotation_transport .transport-date-td {
+        width: 150px;
+        min-width: 150px;
+    }
+    #tbl_group_tour_quotation_transport .transport-date-td .form-control {
+        width: 100% !important;
+        min-width: 0;
+    }
+    #tbl_group_tour_quotation_transport .transport-vehicle-td {
+        width: 200px;
+        min-width: 200px;
+    }
+    #tbl_group_tour_quotation_transport .transport-location-td {
+        width: 250px;
+        min-width: 250px;
+    }
+    #tbl_group_tour_quotation_transport .transport-duration-td {
+        width: 170px;
+        min-width: 170px;
+    }
+    #tbl_group_tour_quotation_transport .transport-count-td {
+        width: 150px;
+        min-width: 150px;
+    }
+    #tbl_group_tour_quotation_transport .transport-vehicle-td .form-control,
+    #tbl_group_tour_quotation_transport .transport-vehicle-td .select2-container,
+    #tbl_group_tour_quotation_transport .transport-location-td .form-control,
+    #tbl_group_tour_quotation_transport .transport-location-td .select2-container,
+    #tbl_group_tour_quotation_transport .transport-duration-td .form-control,
+    #tbl_group_tour_quotation_transport .transport-duration-td .select2-container {
+        width: 100% !important;
+        min-width: 0;
+    }
+</style>
 <form id="frm_tab3">
 	<div class="row">
 		<div class="col-md-12 app_accordion">
@@ -31,13 +80,12 @@
 										        <tr>
 									                <td><input class="css-checkbox" id="chk_tour_group1" type="checkbox" checked><label class="css-label" for="chk_tour_group1" checked> <label></td>
 									                <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-									                <td class="col-md-3"><select id="train_from_location1" onchange="validate_location('train_to_location1','train_from_location1')" class="app_select2 form-control train_from" name="train_from_location1" title="From Location" style="width: 100%;">
+									                <td class="col-md-3 no-pad"><select id="train_from_location1" onchange="validate_location('train_to_location1','train_from_location1')" class="app_select2 form-control train_from" name="train_from_location1" title="From Location" style="width:100%;">
 											            </select>
-
 									                </td>
-									                <td class="col-md-3"><select id="train_to_location1"  onchange="validate_location('train_from_location1','train_to_location1')" class="app_select2 form-control train_to" title="To Location" name="train_to_location1" style="width: 100%;">
+									                <td class="col-md-3 no-pad"><select id="train_to_location1"  onchange="validate_location('train_from_location1','train_to_location1')" class="app_select2 form-control train_to" title="To Location" name="train_to_location1" style="width:100%;">
 										            </select></td>
-										            <td class="col-md-2"><select name="train_class" id="train_class1" title="Class">
+										            <td class="col-md-2 no-pad"><select name="train_class" id="train_class1" title="Class" class="form-control" style="width:100%;">
 										            	<option value="">Class</option>
 										            	<option value="1A">1A</option>
 													    <option value="2A">2A</option>
@@ -47,8 +95,8 @@
 													    <option value="SL">SL</option>
 													    <option value="2S">2S</option>
 										            </select></td>
-										            <td class="col-md-2"><input type="text" id="train_departure_date" name="train_departure_date" placeholder="Departure Date and time" title="Departure Date and time" class="form-control app_datetimepicker" onchange="get_to_datetime(this.id,'train_arrival_date')" value="<?= date('d-m-Y H:i') ?>" style="width:150px;"></td>
-										            <td class="col-md-2"><input type="text" id="train_arrival_date" name="train_arrival_date" placeholder="Arrival Date and time" title="Arrival Date and time" class="form-control app_datetimepicker" value="<?= date('d-m-Y H:i') ?>" onchange="validate_validDatetime('train_departure_date',this.id);" style="width:150px;"></td>
+										            <td class="col-md-2 no-pad quotation-datetime-td"><input type="text" id="train_departure_date" name="train_departure_date" placeholder="Departure Date and time" title="Departure Date and time" class="form-control app_datetimepicker" onchange="get_to_datetime(this.id,'train_arrival_date')" value="<?= date('d-m-Y H:i') ?>"></td>
+										            <td class="col-md-2 no-pad quotation-datetime-td"><input type="text" id="train_arrival_date" name="train_arrival_date" placeholder="Arrival Date and time" title="Arrival Date and time" class="form-control app_datetimepicker" value="<?= date('d-m-Y H:i') ?>" onchange="validate_validDatetime('train_departure_date',this.id);"></td>
 									            </tr>                   
 									        </table>
 										</div>
@@ -118,9 +166,9 @@
 										<table id="tbl_group_tour_quotation_transport" name="tbl_group_tour_quotation_transport" class="table table-bordered no-marg pd_bt_51">
 										
 										<tr>
-												<td><input class="css-checkbox" id="chk_transport1" type="checkbox" checked><label class="css-label" for="chk_transport1"> </label></td>
+												<td style="vertical-align: middle; "><input class="css-checkbox" id="chk_transport1" type="checkbox" checked><label class="css-label" for="chk_transport1"> </label></td>
 												<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
-												<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
+												<td class="col-md-2 transport-vehicle-td"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" class="form-control app_select2" data-add-new-option="true">
 														<option value="">Select Vehicle</option>
 														<?php
 														$sq_query = mysqlQuery("select * from b2b_transfer_master where status != 'Inactive'");
@@ -129,17 +177,17 @@
 																<?php echo $row_dest['vehicle_name']; ?></option>
 														<?php } ?>
 													</select></td>
-												<td><input type="text" id="transport_start_date1" name="transport_start_date1" placeholder="Start Date" title="Start Date" class="app_datepicker form-control" style="width:150px" value="<?= date('d-m-Y') ?>" onchange="get_to_date(this.id,'transport_end_date1');"></td>
-												<td><input type="text" id="transport_end_date1" name="transport_end_date1" placeholder="End Date" title="End Date" class="app_datepicker form-control" style="width:150px" value="<?= date('d-m-Y') ?>" onchange="validate_validDate('transport_start_date1','transport_end_date1');"></td>
-												<td class="col-md-2"><select name="transport_pickup_from1" id="transport_pickup_from1" style="width:250px;" title="Pickup Location" class="form-control app_minselect2">
+												<td class="transport-date-td"><input type="text" id="transport_start_date1" name="transport_start_date1" placeholder="Start Date" title="Start Date" class="app_datepicker form-control" value="<?= date('d-m-Y') ?>" onchange="get_to_date(this.id,'transport_end_date1');"></td>
+												<td class="transport-date-td"><input type="text" id="transport_end_date1" name="transport_end_date1" placeholder="End Date" title="End Date" class="app_datepicker form-control" value="<?= date('d-m-Y') ?>" onchange="validate_validDate('transport_start_date1','transport_end_date1');"></td>
+												<td class="col-md-2 transport-location-td"><select name="transport_pickup_from1" id="transport_pickup_from1" title="Pickup Location" class="form-control app_minselect2">
 													</select></td>
-												<td class="col-md-2"><select name="transport_drop_to1" id="transport_drop_to1" style="width:250px;" title="Drop-off Location" class="form-control app_minselect2">
+												<td class="col-md-2 transport-location-td"><select name="transport_drop_to1" id="transport_drop_to1" title="Drop-off Location" class="form-control app_minselect2">
 													</select></td>
-												<td><select name="transport_service_duration1" id="transport_service_duration1" style="width:170px;" title="Service Duration" class="form-control app_select2">
+												<td class="transport-duration-td"><select name="transport_service_duration1" id="transport_service_duration1" title="Service Duration" class="form-control app_select2">
 														<option value="">Service Duration</option>
 														<?php echo get_service_duration_dropdown(); ?>
 													</select></td>
-												<td><input type="text" id="transport_no_vehicles1" name="transport_no_vehicles1" placeholder="No.Of vehicles" title="No.Of vehicles" class="form-control" style="width:150px"></td>
+												<td class="transport-count-td"><input type="text" id="transport_no_vehicles1" name="transport_no_vehicles1" placeholder="No.Of vehicles" title="No.Of vehicles" class="form-control"></td>
 											</tr> 
 										</table>
 									</div>
@@ -177,40 +225,29 @@
 											<tr>
 												<td><input class="css-checkbox" id="chk_plan1" checked type="checkbox"><label class="css-label" for="chk_plan1"> <label></td>
 												<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-												
-												<!-- <td><input type="text" name="from_sector-1" id="from_sector-1" placeholder="From Sector" title="From Sector" style="width: 360px;">
-												</td>
-												<td><input type="text" name="to_sector-1" id="to_sector-1" placeholder="To Sector" title="To Sector" style="width: 360px;">
-												</td> -->
-
-												<td >
-													           <select name="from_sector-1" id="from_sector-1"
+												<td style="width: 300px;" class="sector-select"><select name="from_sector-1" id="from_sector-1"
                                                                     class="form-control app_select2 plane-airport-select"
                                                                     data-sector-type="from" title="From Sector"
                                                                      data-add-new-option="true">
                                                                     <option value="">*From Sector</option>
                                                                 </select>
                                                 </td>
-
-                                                <td>
-												      <select name="to_sector-1" id="to_sector-1"
+                                                <td style="width: 300px;" class="sector-select"><select name="to_sector-1" id="to_sector-1"
                                                           class="form-control app_select2 plane-airport-select"
                                                           data-sector-type="to" title="To Sector"
                                                            data-add-new-option="true">
                                                           <option value="">*To Sector</option>
                                                       </select>
                                                 </td>
-
-
-												<td><select id="airline_name1" class="app_select2 form-control"  title="Airline Name" name="airline_name1" style="width: 300px;" data-add-new-option="true">
+												<td><select id="airline_name1" class="app_select2 form-control"  title="Airline Name" name="airline_name1" style="width: 120px;" data-add-new-option="true">
 														<option value="">Airline Name</option>
 														<?php get_airline_name_dropdown(); ?>
 												</select></td>
-												<td><select name="plane_class" id="plane_class1" title="Class" style="width: 180px;">
+												<td><select name="plane_class" id="plane_class1" title="Class" class="form-control" style="width: 170px !important;">
 													<?php get_flight_class_dropdown(); ?>
 												</select></td>	            
-												<td><input type="text" id="txt_dapart1" name="txt_dapart" class="app_datetimepicker" placeholder="Departure Date and time" title="Departure Date and time" onchange="get_to_datetime(this.id,'txt_arrval1')" value="<?= date('d-m-Y H:i') ?>" style="width: 160px;" /></td>
-												<td><input type="text" id="txt_arrval1" name="txt_arrval" class="app_datetimepicker" placeholder="Arrival Date and time" title="Arrival Date and time" style="width: 160px;" value="<?= date('d-m-Y H:i') ?>"/></td>
+												<td class="quotation-datetime-td"><input type="text" id="txt_dapart1" name="txt_dapart" class="form-control app_datetimepicker" placeholder="Departure Date and time" title="Departure Date and time" onchange="get_to_datetime(this.id,'txt_arrval1')" value="<?= date('d-m-Y H:i') ?>" /></td>
+												<td class="quotation-datetime-td"><input type="text" id="txt_arrval1" name="txt_arrval" class="form-control app_datetimepicker" placeholder="Arrival Date and time" title="Arrival Date and time" value="<?= date('d-m-Y H:i') ?>" onchange="validate_validDatetime('txt_dapart1',this.id)" /></td>
 												<td><input type="hidden" id="from_city-1"></td>								
 												<td><input type="hidden" id="to_city-1"></td>
 											</tr>
@@ -310,20 +347,69 @@ city_lzloading('.train_from', '*From', true);
 city_lzloading('.train_to', '*To', true);
 destinationLoading('select[name^="transport_pickup_from"]', 'Pickup Location');
 destinationLoading('select[name^="transport_drop_to"]', 'Drop-off Location');
-$('.app_datepicker').datetimepicker({ timepicker:false, format:'d-m-Y' });
+if (typeof gqInitDatepicker === 'function') {
+	gqInitDatepicker($('#tbl_group_tour_quotation_transport .app_datepicker'), false);
+} else {
+	$('.app_datepicker').datetimepicker({ timepicker:false, format:'d-m-Y' });
+}
+
+function initGroupQuotationDateTimePicker(scope) {
+	var $scope = scope ? $(scope) : $('#tbl_package_tour_quotation_dynamic_plane, #tbl_package_tour_quotation_dynamic_train, #tbl_dynamic_cruise_quotation');
+	if (typeof gqInitDatepicker === 'function') {
+		gqInitDatepicker($scope.find('.app_datetimepicker'), true);
+		return;
+	}
+	var dateTimeOpts = {
+		format: 'd-m-Y H:i',
+		parentID: 'body',
+		fixed: true,
+		scrollInput: false
+	};
+	$scope.find('.app_datetimepicker').each(function () {
+		var $el = $(this);
+		if ($el.data('xdsoft_datetimepicker')) {
+			$el.datetimepicker('destroy');
+		}
+		$el.datetimepicker(dateTimeOpts);
+		if (!$el.hasClass('form-control')) {
+			$el.addClass('form-control');
+		}
+	});
+}
+initGroupQuotationDateTimePicker();
+
+(function () {
+	var tab3DateTimeTableIds = [
+		'tbl_package_tour_quotation_dynamic_plane',
+		'tbl_package_tour_quotation_dynamic_train',
+		'tbl_dynamic_cruise_quotation'
+	];
+	var nativeAddRow = window.addRow;
+	if (typeof nativeAddRow !== 'function') {
+		return;
+	}
+	window.addRow = function (tableID, quot_table, itinerary) {
+		nativeAddRow.apply(this, arguments);
+		if (tab3DateTimeTableIds.indexOf(tableID) === -1) {
+			return;
+		}
+		setTimeout(function () {
+			var table = document.getElementById(tableID);
+			if (!table || !table.rows.length) {
+				return;
+			}
+			initGroupQuotationDateTimePicker(table.rows[table.rows.length - 1]);
+		}, 50);
+	};
+})();
 
 // Function to add transport row with proper initialization
 function addTransportRowSave(){
+	if (typeof gqAddTransportRow === 'function') {
+		gqAddTransportRow('tbl_group_tour_quotation_transport');
+		return;
+	}
 	addRow('tbl_group_tour_quotation_transport');
-	setTimeout(function(){ 
-		destinationLoading('select[name^=transport_pickup_from]', 'Pickup Location');
-		destinationLoading('select[name^=transport_drop_to]', 'Drop-off Location');
-		$('.app_datepicker').datetimepicker({ timepicker:false, format:'d-m-Y' });
-		$('#tbl_group_tour_quotation_transport').find('.app_select2').select2();
-		if (typeof initAllVehicleSelectAddNew === 'function') {
-			initAllVehicleSelectAddNew('#tbl_group_tour_quotation_transport');
-		}
-	}, 100);
 }
 
 $.fn.modal.Constructor.prototype.enforceFocus = function() {};
@@ -379,19 +465,19 @@ $(function(){
 
 		     
 
-		    if(row.cells[0].childNodes[0].checked)
+		    if(typeof gqRowChecked === 'function' ? gqRowChecked(row) : (row.cells[0].childNodes[0] && row.cells[0].childNodes[0].checked))
 
 		    {
 
-		       var train_from_location1 = row.cells[2].childNodes[0].value;         
+		       var train_from_location1 = (typeof gqCellValue === 'function') ? gqCellValue(row.cells[2]) : row.cells[2].childNodes[0].value;         
 
-		       var train_to_location1 = row.cells[3].childNodes[0].value;         
+		       var train_to_location1 = (typeof gqCellValue === 'function') ? gqCellValue(row.cells[3]) : row.cells[3].childNodes[0].value;         
 
-			   var train_class = row.cells[4].childNodes[0].value;         
+			   var train_class = (typeof gqCellValue === 'function') ? gqCellValue(row.cells[4]) : row.cells[4].childNodes[0].value;         
 
-			   var train_arrival_date = row.cells[5].childNodes[0].value;         
+			   var train_arrival_date = (typeof gqCellValue === 'function') ? gqCellValue(row.cells[5]) : row.cells[5].childNodes[0].value;         
 
-			   var train_departure_date = row.cells[6].childNodes[0].value;         
+			   var train_departure_date = (typeof gqCellValue === 'function') ? gqCellValue(row.cells[6]) : row.cells[6].childNodes[0].value;         
 
 
 
@@ -473,18 +559,18 @@ $(function(){
 
 		     
 
-		    if(row.cells[0].childNodes[0].checked)
+		    if(typeof gqRowChecked === 'function' ? gqRowChecked(row) : (row.cells[0].childNodes[0] && row.cells[0].childNodes[0].checked))
 
 		    {
-		       
-		       var plane_from_location1 = row.cells[2].childNodes[0].value;          
-		       var plane_to_location1 = row.cells[3].childNodes[0].value;
-		       var airline_name = row.cells[4].childNodes[0].value;  
-		       var plane_class = row.cells[5].childNodes[0].value;  
-		       var dapart1 = row.cells[6].childNodes[0].value;       
-		       var arraval1 = row.cells[7].childNodes[0].value;
-			   var from_city_id1 = row.cells[8].childNodes[0].value;
-		       var to_city_id1 = row.cells[9].childNodes[0].value; 
+		       var planeRow = (typeof gqCollectPlaneFromRow === 'function') ? gqCollectPlaneFromRow(row) : null;
+		       var plane_from_location1 = planeRow ? planeRow.from_sector : row.cells[2].childNodes[0].value;          
+		       var plane_to_location1 = planeRow ? planeRow.to_sector : row.cells[3].childNodes[0].value;
+		       var airline_name = planeRow ? planeRow.airline : row.cells[4].childNodes[0].value;  
+		       var plane_class = planeRow ? planeRow.plane_class : row.cells[5].childNodes[0].value;  
+		       var dapart1 = planeRow ? planeRow.depart : row.cells[6].childNodes[0].value;       
+		       var arraval1 = planeRow ? planeRow.arrival : row.cells[7].childNodes[0].value;
+			   var from_city_id1 = planeRow ? planeRow.from_city : row.cells[8].childNodes[0].value;
+		       var to_city_id1 = planeRow ? planeRow.to_city : row.cells[9].childNodes[0].value; 
 
 		    if(plane_from_location1=="")
 

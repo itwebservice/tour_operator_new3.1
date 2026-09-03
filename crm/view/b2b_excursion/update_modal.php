@@ -33,12 +33,15 @@ $exc_name = ($sq_exc['excursion_name']);
 											<div class="panel-body">
 												<div class="row mg_bt_10">
 													<div class="col-sm-2">
-														<select name="city_id1" id="city_id1" title="Select City" style="width:100%">
+														<select name="city_id1" id="city_id1" title="Select City" style="width:100%" data-add-new-option="true" data-lazy-city="true">
 															<?php
 															$sq_city = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$sq_exc[city_id]'"));
 															?>
 															<option value='<?= $sq_city['city_id'] ?>' selected="selected"><?= $sq_city['city_name'] ?></option>
 														</select>
+													</div>
+													<div class="col-sm-1" style="width:auto;padding-left:0;">
+														<button type="button" class="btn btn-excel btn-sm" title="Add City" onclick="generic_city_save_modal()"><i class="fa fa-plus"></i></button>
 													</div>
 													<div class="col-sm-2">
 														<input type="text" id="service_name" name="service_name" placeholder="*Activity Name" title="Activity Name" value='<?= $exc_name ?>' onkeypress="return blockSpecialChar(event);">
@@ -53,7 +56,7 @@ $exc_name = ($sq_exc['excursion_name']);
 														<input type="text" id="rep_time" name="rep_time" placeholder="Reporting Time" title="Reporting Time" value='<?= $sq_exc['rep_time'] ?>'>
 													</div>
 													<div class="col-sm-2">
-														<select name="off_days" id="off_days" title="Select Off Days" style="width:100%" class="form-control app_select2" multiple>
+														<select name="off_days" id="off_days" title="Select Off Days" style="width:100%" class="form-control" multiple="multiple">
 															<?php
 															$off_days = array_map('trim', explode(',', (string)$sq_exc['off_days']));
 															$week_days = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');

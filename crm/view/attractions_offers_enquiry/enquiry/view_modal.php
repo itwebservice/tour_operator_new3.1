@@ -103,7 +103,7 @@ $enquiry_content_arr1 = json_decode($enquiry_content, true);
 
 															<i class="fa fa-angle-double-right cost_arrow" aria-hidden="true"></i>
 
-															<?php echo "<label>Mobile No. <em>:</em></label> " . $sq_enq_info['mobile_no']; ?>
+															<?php echo "<label>Mobile No. <em>:</em></label> " . $sq_enq_info['country_code'] . $sq_enq_info['mobile_no']; ?>
 
 														</span>
 
@@ -281,7 +281,7 @@ $enquiry_content_arr1 = json_decode($enquiry_content, true);
 																$name = "Total Passenger";
 															}
 															if ($name == "Tour name") {
-																$name = "Interested Tour";
+																$name = ($sq_enq_info['enquiry_type'] == 'Package Booking' || $sq_enq_info['enquiry_type'] == 'Group Booking') ? "Interested Tour" : "Destination";
 															}
 															if ($name == "Check in date") {
 																$name = "Check in";
@@ -325,7 +325,7 @@ $enquiry_content_arr1 = json_decode($enquiry_content, true);
 																$name = "Accommodation Type";
 															}
 															if ($name == "Hotel requirements") {
-																$name = "Hotel requirements";
+																$name = "Hotel Requirements";
 																$break = '&nbsp;&nbsp;';
 															}
 															if ($name == "Hotel type") {
@@ -352,7 +352,7 @@ $enquiry_content_arr1 = json_decode($enquiry_content, true);
 															if ($name == "Total Passenger") {
 																$name = "Total Guest(s)";
 															}
-															if ($name != 'Hotel requirements') { ?>
+															if ($name != 'Hotel Requirements') { ?>
 																<div class="col-md-6">
 																	<span class="main_block">
 																		<i class="fa fa-angle-double-right cost_arrow" aria-hidden="true"></i>
@@ -360,10 +360,10 @@ $enquiry_content_arr1 = json_decode($enquiry_content, true);
 																	</span>
 																</div>
 															<?php } else { ?>
-																<div class="col-md-6">
+																<div class="col-md-12">
 																	<span class="main_block">
 																		<i class="fa fa-angle-double-right cost_arrow" aria-hidden="true"></i>
-																		<?php echo "<div>" . $name . " <em>:</em></div> " . $enquiry_content_arr2['value']; ?>
+																		<?php echo "<label>" . $name . " <em>:</em></label> " . $enquiry_content_arr2['value']; ?>
 																	</span>
 																</div>
 														<?php

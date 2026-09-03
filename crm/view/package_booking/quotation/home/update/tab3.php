@@ -1027,7 +1027,10 @@ if (!function_exists('quotation_excursion_options_html')) {
         // Unchecked → clear this row cost and refresh PP (allow wipe)
         var chk = document.getElementById("chk_transport-" + trans_id[1]);
         if (chk && chk.checked !== true) {
-            $('#transport_cost-' + trans_id[1]).val(0);
+            var $stayCostOff = $('#transport_cost-' + trans_id[1]);
+            if ($stayCostOff.length && /_u$/.test(String($stayCostOff.attr('id') || ''))) {
+                $stayCostOff.val(0);
+            }
             if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
                 quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: false });
             }
@@ -1074,6 +1077,19 @@ if (!function_exists('quotation_excursion_options_html')) {
                     transport_arr = [];
                 }
                 var $cost = $('#transport_cost-' + trans_id[1]);
+                if (!$cost.length || !/_u$/.test(String($cost.attr('id') || ''))) {
+                    $cost = $('#transport_cost-' + trans_id[1] + '_u');
+                }
+                if (!$cost.length || !/_u$/.test(String($cost.attr('id') || ''))) {
+                    if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+                        quotationRefreshPpCostingFromTravelStaySelections({
+                            force: false,
+                            preserveIfEmpty: true,
+                            forceGroupLand: false
+                        });
+                    }
+                    return;
+                }
                 var existingCost = parseFloat($cost.val()) || 0;
                 var tariffCost = (transport_arr.length && transport_arr[0] && transport_arr[0]['total_cost'] != null)
                     ? (parseFloat(transport_arr[0]['total_cost']) || 0)
@@ -1081,7 +1097,11 @@ if (!function_exists('quotation_excursion_options_html')) {
                 if (tariffCost > 0) {
                     $cost.val(tariffCost);
                     if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
-                        quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: false });
+                        quotationRefreshPpCostingFromTravelStaySelections({
+                            force: true,
+                            preserveIfEmpty: false,
+                            forceGroupLand: false
+                        });
                     }
                 } else {
                     // No matching tariff — keep saved row cost and still fill PP from it

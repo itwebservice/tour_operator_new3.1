@@ -548,6 +548,7 @@ function get_customer_hint($branch_status = 'no')
 function get_customer_hint_1($branch_status = 'no')
 {
   $final_array = array();
+  $seen_emails = array();
   $role = $_SESSION['role'];
   $branch_admin_id = $_SESSION['branch_admin_id'];
 
@@ -567,7 +568,13 @@ function get_customer_hint_1($branch_status = 'no')
     $sq_query = mysqlQuery("select * from customer_master where active_flag!='Inactive' order by customer_id desc");
   }
   while ($row_cust = mysqli_fetch_assoc($sq_query)) {
-    $final_array[] = build_customer_hint_row($row_cust, 'email');
+    $row_hint = build_customer_hint_row($row_cust, 'email');
+    $email_key = strtolower(trim((string)$row_hint['email_id']));
+    if ($email_key === '' || isset($seen_emails[$email_key])) {
+      continue;
+    }
+    $seen_emails[$email_key] = true;
+    $final_array[] = $row_hint;
   }
   echo htmlspecialchars(json_encode($final_array), ENT_QUOTES, 'UTF-8');
 }
@@ -1040,7 +1047,7 @@ function get_country_code()
   ?>
   <option value="">Country Code</option>
   <?php
-  $sq_code = mysqlQuery("SELECT * FROM `country_list_master`");
+  $sq_code = mysqlQuery("SELECT phone_code, MIN(country_code) as country_code FROM `country_list_master` GROUP BY phone_code ORDER BY country_code");
   while ($row = mysqli_fetch_assoc($sq_code)) {
   ?>
     <option value="<?= $row['phone_code'] ?>"><?= $row['country_code'] . ' (' . $row['phone_code'] . ')' ?></option>

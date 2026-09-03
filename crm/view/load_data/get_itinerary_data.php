@@ -13,12 +13,12 @@ if($sq_itinerary_c >0){
         while($row_itinerary = mysqli_fetch_assoc($sq_itinerary)){
             $count++;
             ?>
-            <tr>
+            <tr data-itin-spa="<?= itours_b64_attr($row_itinerary['special_attraction']) ?>" data-itin-dwp="<?= itours_b64_attr($row_itinerary['daywise_program']) ?>" data-itin-ovs="<?= itours_b64_attr($row_itinerary['overnight_stay']) ?>">
             <td width="27px;" style="padding-right: 10px !important;"><input class="css-checkbox labelauty" id="chk_programd1<?=$count?>" type="checkbox" style="display: none;"><label for="chk_programd1<?=$count?>"><span class="labelauty-unchecked-image"></span><span class="labelauty-checked-image"></span></label></td>
             <td width="20px;"><input maxlength="15" value="<?=$count?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled=""></td>
-            <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_special_attaraction<?=$count?>" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="itin_modal_special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?= htmlspecialchars($row_itinerary['special_attraction'], ENT_QUOTES) ?>"></td>
-            <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="itin_modal_day_program<?=$count?>" name="itin_modal_day_program" class="form-control" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?= htmlspecialchars($row_itinerary['daywise_program'], ENT_QUOTES) ?></textarea></td>
-            <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_overnight_stay<?=$count?>" name="itin_modal_overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?= htmlspecialchars($row_itinerary['overnight_stay'], ENT_QUOTES) ?>"></td>
+            <td class="col-md-3 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_special_attaraction<?=$count?>" onchange="validate_spaces(this.id);validate_spattration(this.id);" name="itin_modal_special_attaraction" class="form-control" placeholder="*Special Attraction" title="Special Attraction" value="<?= itours_html($row_itinerary['special_attraction']) ?>"></td>
+            <td class="col-md-5 no-pad" style="padding-left: 5px !important;"><textarea id="itin_modal_day_program<?=$count?>" name="itin_modal_day_program" class="form-control" rows="2" placeholder="*Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" title="Day-wise Program"><?= itours_html($row_itinerary['daywise_program']) ?></textarea></td>
+            <td class="col-md-2 no-pad" style="padding-left: 5px !important;"><input type="text" id="itin_modal_overnight_stay<?=$count?>" name="itin_modal_overnight_stay" onchange="validate_spaces(this.id);validate_onstay(this.id);" class="form-control" placeholder="*Overnight Stay" title="Overnight Stay" value="<?= itours_html($row_itinerary['overnight_stay']) ?>"></td>
             <td class="col-md-1 no-pad" style="padding-left: 5px !important; width: 120px;">
                 <?php if (!empty($row_itinerary['itinerary_image']) && trim($row_itinerary['itinerary_image']) !== '' && trim($row_itinerary['itinerary_image']) !== 'NULL') { ?>
                     <div style="margin-top: 5px;">
@@ -68,5 +68,8 @@ else{
 <script>
 if (typeof $ !== 'undefined') {
     $("input[type='checkbox']", '#itinerary_detail_modal').labelauty({ label: false, maximum_width: '20px' });
+    if (typeof fillItineraryPickerFields === 'function') {
+        fillItineraryPickerFields('#itinerary_data');
+    }
 }
 </script>

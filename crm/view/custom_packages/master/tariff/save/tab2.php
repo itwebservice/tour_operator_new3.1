@@ -79,7 +79,8 @@
 $('#agent_type').select2();
 $('#to_date_h,#from_date_h').datetimepicker({
     timepicker: false,
-    format: 'd-m-Y'
+    format: 'd-m-Y',
+    minDate: 0
 });
 
 function switch_to_tab2() {

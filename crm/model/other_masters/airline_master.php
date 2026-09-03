@@ -22,8 +22,9 @@ class airline_master{
 			}
 			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(airline_id) as max from airline_master"));
 			$airline_id = $sq_max['max'] + 1;
+			$airline_status = ($airline_status_arr[$i] != '') ? $airline_status_arr[$i] : 'Active';
 
-			$sq_airline = mysqlQuery("insert into airline_master (airline_id, airline_code, airline_name, active_flag) values ('$airline_id','$airline_code1', '$airline_name1',  '$airline_status_arr[$i]')");
+			$sq_airline = mysqlQuery("insert into airline_master (airline_id, airline_code, airline_name, active_flag) values ('$airline_id','$airline_code1', '$airline_name1',  '$airline_status')");
 			if(!$sq_airline){
 				$GLOBALS['flag'] = false;
 				echo "error--Some entries not saved";

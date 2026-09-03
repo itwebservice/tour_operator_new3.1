@@ -19,8 +19,9 @@ class destination_master{
 			}
 			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(dest_id) as max from destination_master"));
 			$dest_id = $sq_max['max'] + 1;
+			$dest_status = ($status_arr[$i] != '') ? $status_arr[$i] : 'Active';
 
-			$sq_airline = mysqlQuery("insert into destination_master (dest_id, dest_name, status) values ('$dest_id', '$destination_name1', '$status_arr[$i]')");
+			$sq_airline = mysqlQuery("insert into destination_master (dest_id, dest_name, status) values ('$dest_id', '$destination_name1', '$dest_status')");
 			if(!$sq_airline){
 				$GLOBALS['flag'] = false;
 				echo "error--Some Destination not saved";

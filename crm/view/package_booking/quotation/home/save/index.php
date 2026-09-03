@@ -104,7 +104,10 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
         minDate: 0  // Disable past dates - 0 means today, -1 would allow yesterday
     });
     $('#txt_arrval1,#txt_dapart1,#train_arrival_date,#train_departure_date').datetimepicker({
-        format: 'd-m-Y H:i'
+        format: 'd-m-Y H:i',
+        parentID: 'body',
+        fixed: true,
+        scrollInput: false
     });
     /**Hotel Name load start**/
     if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
@@ -379,6 +382,13 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
             var total_infant = row.cells[9].childNodes[0].value;
             var vehicle_id = row.cells[15] ? ($(row.cells[15].childNodes[0]).val() || row.cells[15].childNodes[0].value || '') : '';
             var total_vehicles = row.cells[16] ? row.cells[16].childNodes[0].value : 0;
+            if (typeof quotationExcursionVehicleCount === 'function') {
+                total_vehicles = quotationExcursionVehicleCount(transfer, total_vehicles);
+                if (row.cells[16] && row.cells[16].childNodes[0] && quotationExcursionNeedsTransfer(transfer)
+                    && (!row.cells[16].childNodes[0].value || parseInt(row.cells[16].childNodes[0].value, 10) < 1)) {
+                    row.cells[16].childNodes[0].value = total_vehicles;
+                }
+            }
 
             total_adult = (total_adult == '') ? 0 : total_adult;
             total_children = (total_children == '') ? 0 : total_children;
@@ -422,13 +432,10 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
                     row.cells[12].childNodes[0].value = amount_arr[i]['child_cost'];
                     row.cells[13].childNodes[0].value = amount_arr[i]['childwo_cost'];
                     row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
-                    row.setAttribute('data-transfer-cost', amount_arr[i]['transfer_cost'] || 0);
-                    if (row.cells[17] && row.cells[17].childNodes[0]) {
-                        var transferEl = row.cells[17].childNodes[0];
-                        var transferKey = String(transferEl.id || transferEl.name || '').toLowerCase();
-                        if (transferKey.indexOf('transfer') >= 0) {
-                            transferEl.value = amount_arr[i]['transfer_cost'];
-                        }
+                    if (typeof quotationSetExcursionRowTransferCost === 'function') {
+                        quotationSetExcursionRowTransferCost(row, amount_arr[i]['transfer_cost'] || 0);
+                    } else {
+                        row.setAttribute('data-transfer-cost', amount_arr[i]['transfer_cost'] || 0);
                     }
                 } else {
                     row.cells[10].childNodes[0].value = 0;
@@ -436,15 +443,15 @@ $branch_status = ($sq_count > 0 && $sq['branch_status'] !== NULL && isset($sq['b
                     row.cells[12].childNodes[0].value = 0;
                     row.cells[13].childNodes[0].value = 0;
                     row.cells[14].childNodes[0].value = 0;
-                    row.setAttribute('data-transfer-cost', 0);
-                    if (row.cells[17] && row.cells[17].childNodes[0]) {
-                        var transferElOff = row.cells[17].childNodes[0];
-                        var transferKeyOff = String(transferElOff.id || transferElOff.name || '').toLowerCase();
-                        if (transferKeyOff.indexOf('transfer') >= 0) {
-                            transferElOff.value = 0;
-                        }
+                    if (typeof quotationSetExcursionRowTransferCost === 'function') {
+                        quotationSetExcursionRowTransferCost(row, 0);
+                    } else {
+                        row.setAttribute('data-transfer-cost', 0);
                     }
                 }
+            }
+            if (typeof quotationRefreshCostingAfterActivityTariff === 'function') {
+                quotationRefreshCostingAfterActivityTariff({ force: true });
             }
         });
     }

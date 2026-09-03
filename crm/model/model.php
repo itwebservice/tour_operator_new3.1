@@ -40,6 +40,38 @@ function excel_prepare_download()
     @ob_end_clean();
   }
 }
+
+/** Convert stored itinerary HTML tags to editor markdown so raw <b> tags are not shown */
+function itinerary_html_to_editor($text)
+{
+  $text = (string)$text;
+  $text = preg_replace('/<(b|strong)>\s*<\/\1>/i', '', $text);
+  $text = preg_replace('/<u>\s*<\/u>/i', '', $text);
+  $text = preg_replace('/<(?:b|strong)>(.*?)<\/(?:b|strong)>/is', '**$1**', $text);
+  $text = preg_replace('/<u>(.*?)<\/u>/is', '__$1__', $text);
+  return $text;
+}
+
+/** Resolve an uploaded CSV relative/URL path to a local file under crm/uploads */
+function resolve_csv_upload_path($cust_csv_dir)
+{
+  $cust_csv_dir = str_replace('\\', '/', (string)$cust_csv_dir);
+  $parts = explode('uploads', $cust_csv_dir, 2);
+  $suffix = isset($parts[1]) ? $parts[1] : '';
+  $crm_root = str_replace('\\', '/', dirname(__DIR__));
+  $project_root = str_replace('\\', '/', dirname($crm_root));
+  $candidates = array(
+    $crm_root . '/uploads' . $suffix,
+    $project_root . '/uploads' . $suffix,
+    $cust_csv_dir,
+  );
+  foreach ($candidates as $path) {
+    if ($path !== '' && is_file($path)) {
+      return $path;
+    }
+  }
+  return $candidates[0];
+}
 $localIP = getHostByName(getHostName());
 
 // Create connection
@@ -60,7 +92,7 @@ if (!$connection) {
 }
 
 
-define('BASE_URL', 'http://localhost/tour_operator_new3.1-24-08-2026/crm/');
+define('BASE_URL', 'http://localhost/tour_operator_new3.1-01-09-2026/crm/');
 
 mysqli_query($conn, "SET SESSION sql_mode = ''");
 $b2b_index_url = BASE_URL . 'Tours_B2B/view/index.php';
@@ -589,11 +621,19 @@ class model extends email_hf
       $mail->AddCC($app_email_id_send, $app_name);
 
       foreach ($arrayAttachment as $attachment) {
+        if ($attachment === '' || $attachment === null) {
+          continue;
+        }
         $dir = dirname(dirname(__FILE__));
-        $att_url =  str_replace("'/'", "'\'", $dir);
-        $temp = explode('/', $attachment);
-        $length = sizeof($temp) - 1;
-        $mail->AddAttachment($att_url . '/' . $attachment, $temp[$length]);
+        $att_url = str_replace("'/'", "'\'", $dir);
+        $full_path = $attachment;
+        if (!is_file($full_path)) {
+          $full_path = $att_url . '/' . ltrim(str_replace('\\', '/', $attachment), '/');
+        }
+        if (!is_file($full_path)) {
+          continue;
+        }
+        $mail->AddAttachment($full_path, basename($full_path));
       }
       //keep accountant in cc
       if ($acc_status == '' && !empty($accountant_email)) {
@@ -610,8 +650,6 @@ class model extends email_hf
       $mail->IsHTML(true);
       if (!$mail->Send()) {
         // echo "Please enter valid email credentials!";
-      } else {
-        unlink($arrayAttachment[0]);
       }
     }
   }

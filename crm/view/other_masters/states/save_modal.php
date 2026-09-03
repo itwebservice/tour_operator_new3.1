@@ -22,16 +22,26 @@ include_once("../../../model/model.php");
         <div class="row"> <div class="col-md-12"> <div class="table-responsive">
         
           <table id="tbl_dynamic_state_name" name="tbl_dynamic_state_name" class="table border_0 table-hover no-marg"  cellspacing="0">
+              <thead>
+                <tr class="table-heading-row">
+                  <th></th>
+                  <th></th>
+                  <th>State/Country Name</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
               <tr>
                   <td><input id="chk_tour_group1" type="checkbox" checked></td>
                   <td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
                   <td><input type="text" id="cmb_state1" name="cmb_state" onchange="validate_state(this.id)"  placeholder="*State/Country Name" title="State/Country Name" class="form-control" /></td>
-                  <td><select name="active_flag1" id="active_flag1" class="form-control hidden" title="Status">
+                  <td><select name="active_flag1" id="active_flag1" class="form-control" title="*Status" style="width:130px">
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                       </select>
                   </td>
-              </tr>                                
+              </tr>
+              </tbody>
           </table>  
 
         </div> </div> </div>
@@ -66,10 +76,11 @@ function state_master_save()
   var active_flag_arr = new Array();
 
   var table = document.getElementById("tbl_dynamic_state_name");
-  var rowCount = table.rows.length;
+  var tbody = table.tBodies[0] || table;
+  var rowCount = tbody.rows.length;
   for(var i=0; i<rowCount; i++)
   {
-    var row = table.rows[i];
+    var row = tbody.rows[i];
     if(row.cells[0].childNodes[0].checked)
     {  
       var state_name1 = row.cells[2].childNodes[0].value;
@@ -78,6 +89,11 @@ function state_master_save()
       if(state_name1=="")
       {
         error_msg_alert("Enter State/Country name in row"+(i+1));
+        return false;
+      }
+      if(active_flag=="")
+      {
+        error_msg_alert("Select Status in row"+(i+1));
         return false;
       }  
 

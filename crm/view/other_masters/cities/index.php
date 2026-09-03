@@ -10,6 +10,7 @@ include "../../../model/model.php";
   <div class="row">
     <div class="col-md-6">
       <select name="city_master_status" onchange="list_reflect()" id="city_master_status" title="Select Status" class="form-control status_filter_dropdown" style="width: 180px;">
+        <option value="">All</option>
         <option value="Active">Active</option>
         <option value="Inactive">Inactive</option>
       </select>

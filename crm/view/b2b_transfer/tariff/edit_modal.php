@@ -256,18 +256,17 @@ function hotel_tarrif1(){
         url: base_url+'controller/b2b_transfer/tariff_csv_save.php',
         data:{cust_csv_dir : cust_csv_dir },
         success:function(result){
-            var pass_arr = JSON.parse(result);
-            if(pass_arr[0]['room_cat']!=''){
+            var pass_arr = [];
+            try {
+                pass_arr = JSON.parse(result);
+            } catch (e) {
+                error_msg_alert('Unable to read CSV. Please check the file format.');
+                return false;
+            }
+            if(pass_arr.length && pass_arr[0]['pickup_type']!=''){
                 var table = document.getElementById("table_transfer_tarrif");
-                if(table.rows.length == 1){
-                    for(var k=1; k<table.rows.length; k++){
-                            document.getElementById("table_transfer_tarrif").deleteRow(k);
-                    }
-                }else{
-                    while(table.rows.length > 1){
-                            document.getElementById("table_transfer_tarrif").deleteRow(k);
-                            table.rows.length--;
-                    }
+                while(table.rows.length > 1){
+                    table.deleteRow(table.rows.length - 1);
                 }
                 for(var i=0; i<pass_arr.length; i++){
                     var row = table.rows[i];

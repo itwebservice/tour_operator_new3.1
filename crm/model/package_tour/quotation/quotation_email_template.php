@@ -1,5 +1,6 @@
 <?php
 include_once('../../model.php');
+include_once('../../app_settings/print_html/quotation_html/generic_quotation_data.php');
 global $app_name, $app_contact_no, $app_email_id, $app_landline_no, $app_address, $app_website, $similar_text, $currency;
 
 $quotation_id1 = $_GET['quotation_id'];
@@ -70,6 +71,11 @@ if ($bsmValues[0]->tcsvalue != '') {
 }
 
 $quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $sq_quotation['train_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'] + $tcsvalue;
+                if (function_exists('gqd_group_costing_breakdown')) {
+                  $email_grp = gqd_group_costing_breakdown(isset($sq_costing) ? $sq_costing : $sq_cost, $sq_quotation);
+                  $quotation_cost = $email_grp['net_total'];
+                  $tcsvalue = $email_grp['tcs_value'];
+                }
 // $quotation_cost = ceil($quotation_cost);
 $quotation_cost1 = currency_conversion($currency, $sq_quotation['currency_code'], $quotation_cost);
 
@@ -338,6 +344,11 @@ $sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotat
 
                 $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
                 $quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $sq_quotation['train_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'] + $tcsvalue;
+                if (function_exists('gqd_group_costing_breakdown')) {
+                  $email_grp = gqd_group_costing_breakdown(isset($sq_costing) ? $sq_costing : $sq_cost, $sq_quotation);
+                  $quotation_cost = $email_grp['net_total'];
+                  $tcsvalue = $email_grp['tcs_value'];
+                }
                 // $quotation_cost = ceil($quotation_cost);
                 ////////////////Currency conversion ////////////
                 $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'], $quotation_cost);

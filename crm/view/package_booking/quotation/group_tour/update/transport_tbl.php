@@ -17,7 +17,7 @@
         	if($sq_transport_count==0){
         		?>
 				<tr>
-					<td><input class="css-checkbox" id="chk_transport1" type="checkbox"><label class="css-label" for="chk_transport1"> </label></td>
+					<td style="vertical-align: middle; "><input class="css-checkbox" id="chk_transport1" type="checkbox"><label class="css-label" for="chk_transport1"> </label></td>
 					<td><input maxlength="15" value="1" type="text" name="username" placeholder="Sr No." class="form-control" disabled="" autocomplete="off"></td>
 					<td class="col-md-2"><select name="transport_vehicle_name1" id="transport_vehicle_name1" title="Select Vehicle" style="width:200px" class="form-control app_select2" data-add-new-option="true">
 							<option value="">Select Vehicle</option>
@@ -139,19 +139,20 @@
 // Initialize destination loading for pickup and drop locations
 destinationLoading('.transport_pickup_u', "Pickup Location");
 destinationLoading('.transport_drop_u', "Drop-off Location");
-$('.app_datepicker').datetimepicker({ timepicker:false, format:'d-m-Y' });
+if (typeof gqInitDatepicker === 'function') {
+	gqInitDatepicker($('#tbl_group_tour_quotation_transport_u .app_datepicker'), false);
+} else {
+	$('.app_datepicker').datetimepicker({ timepicker:false, format:'d-m-Y' });
+}
 
-// Function to add transport row with proper initialization
 function addTransportRow(){
+	if (typeof gqAddTransportRow === 'function') {
+		gqAddTransportRow('tbl_group_tour_quotation_transport_u');
+		return;
+	}
 	addRow('tbl_group_tour_quotation_transport_u');
-	setTimeout(function(){ 
-		destinationLoading('select[name^=transport_pickup_from]', 'Pickup Location');
-		destinationLoading('select[name^=transport_drop_to]', 'Drop-off Location');
-		$('.app_datepicker').datetimepicker({ timepicker:false, format:'d-m-Y' });
-		$('#tbl_group_tour_quotation_transport_u').find('.app_select2').select2();
-	}, 100);
 }
 $('#transport_vehicle_name1').select2();
-$('#transport_vehicle_name<?= $count ?>_u').select2();
+$('#tbl_group_tour_quotation_transport_u').find('select[id^="transport_vehicle_name"], select[id^="transport_service_duration"]').select2();
 </script>
 

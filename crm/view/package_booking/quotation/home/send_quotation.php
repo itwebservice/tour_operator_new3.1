@@ -1,16 +1,19 @@
-<?php include "../../../../model/model.php"; ?>
+<?php
+include "../../../../model/model.php";
+include_once "../../../../model/app_settings/print_html/quotation_html/generic_quotation_data.php";
+?>
 <style>
     
      
     .action-icon-btn {
-        padding: 4px 8px;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
+        padding: 4px 8px !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 4px !important;
         background: #fff;
         color: #495057;
-        font-size: 12px;
+        font-size: 12px !important;
         transition: all 0.2s ease;
-        display: inline-flex;
+        display: inline-flex !important;
         align-items: center;
         gap: 4px;
         min-width: auto;
@@ -453,6 +456,10 @@ $quotation_count = mysqli_num_rows($sq_query);
 
 									// Group costing (or PP legacy fallback when pp rows missing)
 									if (!$pp_cost_applied) {
+										if (function_exists('gqd_group_costing_breakdown')) {
+											$send_grp = gqd_group_costing_breakdown($sq_cost, $row_tours);
+											$quotation_cost = $send_grp['net_total'];
+										} else {
 										$basic_cost = (float) (isset($sq_cost['basic_amount']) ? $sq_cost['basic_amount'] : 0);
 										$service_charge = (float) (isset($sq_cost['service_charge']) ? $sq_cost['service_charge'] : 0);
 										$service_tax_amount = 0;
@@ -481,6 +488,7 @@ $quotation_count = mysqli_num_rows($sq_query);
 											+ (float) $row_tours['train_cost'] + (float) $row_tours['cruise_cost'] + (float) $row_tours['flight_cost']
 											+ (float) $row_tours['visa_cost'] + (float) $row_tours['guide_cost'] + (float) $row_tours['misc_cost']
 											+ (float) $tcsvalue - (float) $act_discount;
+										}
 									}
 
 									$quotation_cost_1 = format_quotation_total_display(
@@ -2417,8 +2425,8 @@ $(document).on('click', function () {
     #emailWhatsappModal .email-preview-wrapper .copyBtn,
     #emailWhatsappModal .whatsapp-preview-wrapper .copyBtn {
         position: absolute;
-        right: 30px;
-        top: 15px;
+        right: 35px;
+        top: 25px;
     }
 
     #emailWhatsappModal .copy-subject-btn {

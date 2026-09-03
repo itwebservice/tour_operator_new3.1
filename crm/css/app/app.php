@@ -180,7 +180,7 @@ box-shadow: none;
 color: <?= $theme_color ?>;
 font-size: 16px;
 }
-.table button i, .table .btn-info i, .table .btn-danger i, .table .btn-warning i{
+.table button i, .table .btn-info i, .table .btn-danger i, .table .btn-warning i, .action-icon-btn i {
 padding: 8px;
 border-radius: 50%;
 transition: 0.5s;
@@ -990,6 +990,10 @@ width: 32px;
 display: flex;
 align-items: center;
 justify-content: center;
+pointer-events: none;
+}
+.div-upload:before {
+pointer-events: none;
 }
 .div-upload:after {
 position: absolute;

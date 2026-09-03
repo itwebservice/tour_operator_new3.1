@@ -54,10 +54,9 @@ if($quotation_for=="DMC"){
         <?php
         }
         ?>
-        </optgroup>
+	</optgroup>
 	<?php
-}
+    }
 }
 ?>
-<script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
 

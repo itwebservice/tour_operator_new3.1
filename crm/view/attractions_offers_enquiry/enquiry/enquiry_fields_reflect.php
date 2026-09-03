@@ -3,13 +3,41 @@ include "../../../model/model.php";
 $enquiry_type = isset($_POST['enquiry_type']) ? $_POST['enquiry_type'] : 'Package Booking';
 
 $enq_save=$_POST['enq_save'];
+$sq_c = array();
+
+if (!function_exists('enq_destination_field_html')) {
+	function enq_destination_field_html($value = '', $placeholder = '*Destination') {
+		?>
+	<div class="col-md-4 col-sm-6 mg_bt_10">
+		<input type="text" id="tour_name" name="tour_name" onchange="validate_spaces(this.id)" placeholder="<?= htmlspecialchars($placeholder) ?>" title="Destination" value="<?= htmlspecialchars($value) ?>" class="form-control">
+	</div>
+		<?php
+	}
+}
+if (!function_exists('enq_city_location_select')) {
+	function enq_city_location_select($id, $value, $placeholder) {
+		$value = ($value === null) ? '' : $value;
+		?>
+		<select id="<?= $id ?>" name="<?= $id ?>" class="form-control" title="<?= htmlspecialchars($placeholder) ?>" style="width:100%">
+			<?php if ($value != '') { ?>
+			<option value="<?= htmlspecialchars($value) ?>"><?= htmlspecialchars($value) ?></option>
+			<?php } ?>
+			<option value=""><?= htmlspecialchars($placeholder) ?></option>
+		</select>
+		<?php
+	}
+}
 
 if(isset($_POST['enquiry_id'])){
 
 	$enquiry_id = $_POST['enquiry_id'];
 	$sq_enquiry = mysqli_fetch_assoc(mysqlQuery("select * from enquiry_master where enquiry_id='$enquiry_id'"));
 	$enquiry_content = $sq_enquiry['enquiry_content'];
-	$enquiry_content_arr1 = json_decode($enquiry_content, true);	
+	$enquiry_content_arr1 = json_decode($enquiry_content, true);
+	if (!is_array($enquiry_content_arr1)) {
+		$enquiry_content_arr1 = array();
+	}
+	$sq_c['tour_name'] = isset($sq_enquiry['tour_name']) ? $sq_enquiry['tour_name'] : '';
 }
 if($enquiry_type=="Group Booking" || $enquiry_type=="Package Booking"){
 
@@ -40,10 +68,10 @@ if($enquiry_type=="Group Booking" || $enquiry_type=="Package Booking"){
 		}
 	}
 	else{
-		$sq_c['tour_name'] = $sq_c['budget'] = $sq_c['total_members'] = $sq_c['total_adult'] = $sq_c['total_infant'] = $sq_c['children_without_bed'] = $sq_c['children_with_bed'] = $sq_c['travel_from_date'] = $sq_c['travel_to_date']  = $sq_c['hotel_type'] = "";
-		$sq_c['total_single_person'] = 0;
+		$sq_c['tour_name'] = $sq_c['budget'] = $sq_c['total_members'] = $sq_c['travel_from_date'] = $sq_c['travel_to_date']  = $sq_c['hotel_type'] = "";
+		$sq_c['total_adult'] = $sq_c['total_infant'] = $sq_c['children_without_bed'] = $sq_c['children_with_bed'] = $sq_c['total_single_person'] = 0;
 	}
-	$total_single_person = isset($sq_c['total_single_person']) ? intval($sq_c['total_single_person']) : 0;
+	$total_single_person = isset($sq_c['total_single_person']) && $sq_c['total_single_person'] !== '' ? intval($sq_c['total_single_person']) : 0;
 ?>
 
 <div class="row">
@@ -141,6 +169,7 @@ function total_members_calculate()
 	var total_members = parseFloat(total_adult) + parseFloat(total_infant) + parseFloat(cwb) + parseFloat(cwob) + parseFloat(total_single_person);
 	$('#total_members').val(total_members);
 }
+total_members_calculate();
 </script>
 <?php
 
@@ -163,11 +192,14 @@ if($enquiry_type=="Visa")
 			if($enquiry_content_arr2['name']=="total_infant"){ $sq_c['total_infant'] = $enquiry_content_arr2['value']; }
 			if($enquiry_content_arr2['name']=="total_members"){	$sq_c['total_members'] = $enquiry_content_arr2['value']; }
 			if($enquiry_content_arr2['name']=="budget"){ $sq_c['budget'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="tour_name"){ $sq_c['tour_name'] = $enquiry_content_arr2['value']; }
 		}
 	}
 	else
 	{
-		$sq_c['visa_country_name'] = $sq_c['budget'] = $sq_c['visa_type'] = $sq_c['total_members'] = $sq_c['total_adult'] = $sq_c['total_children'] = $sq_c['total_infant'] = $sq_c['total_members'] = "";
+		$sq_c['visa_country_name'] = $sq_c['budget'] = $sq_c['visa_type'] = $sq_c['total_members'] = "";
+		$sq_c['total_adult'] = $sq_c['total_children'] = $sq_c['total_infant'] = 0;
+		if(!isset($sq_c['tour_name'])){ $sq_c['tour_name'] = ""; }
 	}
 ?>
 
@@ -253,6 +285,7 @@ if($enquiry_type=="Visa")
 	    <input type="text" id="budget" name="budget" onchange="validate_balance(this.id)" placeholder="Budget" title="Budget" value="<?= $sq_c['budget'] ?>" class="form-control">
 
 	</div>
+	<?php enq_destination_field_html(isset($sq_c['tour_name']) ? $sq_c['tour_name'] : '', '*Destination'); ?>
 
 </div>
 
@@ -322,7 +355,8 @@ if($enquiry_type=="Flight Ticket"){
 
 	else{
 
-		$sq_c['budget'] = $sq_c['sector_from'] = $sq_c['sector_to'] = $sq_c['preffered_airline'] = $sq_c['class_type'] = $sq_c['total_adults_flight'] = $sq_c['total_child_flight'] = $sq_c['total_infant_flight'] = $sq_c['total_seats'] = $sq_c['to_city_id_flight'] = $sq_c['from_city_id_flight'] = "";
+		$sq_c['budget'] = $sq_c['sector_from'] = $sq_c['sector_to'] = $sq_c['preffered_airline'] = $sq_c['class_type'] = $sq_c['total_seats'] = $sq_c['to_city_id_flight'] = $sq_c['from_city_id_flight'] = "";
+		$sq_c['total_adults_flight'] = $sq_c['total_child_flight'] = $sq_c['total_infant_flight'] = 0;
 		$sq_c['travel_datetime'] = date('d-m-Y');
 		array_push($sq_f, $sq_c);
 	}
@@ -330,6 +364,9 @@ if($enquiry_type=="Flight Ticket"){
 
 
 ?>
+<div class="row mg_bt_10">
+	<?php enq_destination_field_html(isset($sq_c['tour_name']) ? $sq_c['tour_name'] : '', '*Destination'); ?>
+</div>
 <input type="hidden" id="flight_table_rows" name="flight_table_rows" value='1'>
 <div class="row" style="margin-top: 5px">
 	<div class="col-md-6">
@@ -460,14 +497,16 @@ if($enquiry_type=="Train Ticket"){
 			if($enquiry_content_arr2['name']=="travel_type"){ $sq_c['travel_type'] = $enquiry_content_arr2['value']; }
 
 			if($enquiry_content_arr2['name']=="budget"){ $sq_c['budget'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="tour_name"){ $sq_c['tour_name'] = $enquiry_content_arr2['value']; }
 		}
 
 	}
 
 	else{
 
-		$sq_c['travel_datetime'] = $sq_c['budget'] = $sq_c['location_from'] =  $sq_c['location_to'] =  $sq_c['class_type'] =  $sq_c['trip_type'] = $sq_c['total_adult'] = $sq_c['total_children'] = $sq_c['total_infant'] =  $sq_c['total_seats'] = $sq_c['travel_type'] = "";	
-
+		$sq_c['travel_datetime'] = $sq_c['budget'] = $sq_c['location_from'] =  $sq_c['location_to'] =  $sq_c['class_type'] =  $sq_c['trip_type'] = $sq_c['total_seats'] = $sq_c['travel_type'] = "";
+		$sq_c['total_adult'] = $sq_c['total_children'] = $sq_c['total_infant'] = 0;
+		if(!isset($sq_c['tour_name'])){ $sq_c['tour_name'] = ""; }
 	}
 
 ?>
@@ -481,15 +520,11 @@ if($enquiry_type=="Train Ticket"){
 	</div>
 
 	<div class="col-md-4">
-
-		<input type="text" id="location_from" name="location_from" onchange="validate_specialChar(this.id);" placeholder="*Location From" title="Location From" value="<?= $sq_c['location_from'] ?>" class="form-control">
-
+		<?php enq_city_location_select('location_from', $sq_c['location_from'], '*Location From'); ?>
 	</div>
 
 	<div class="col-md-4">
-
-		<input type="text" id="location_to" name="location_to" onchange="validate_specialChar(this.id);" placeholder="*Location To" title="Location To" value="<?= $sq_c['location_to'] ?>" class="form-control">
-
+		<?php enq_city_location_select('location_to', $sq_c['location_to'], '*Location To'); ?>
 	</div>
 
 </div>
@@ -623,14 +658,16 @@ if($enquiry_type=="Train Ticket"){
 	    <input type="text" id="budget" name="budget" onchange="validate_balance(this.id)" placeholder="Budget" title="Budget" value="<?= $sq_c['budget'] ?>" class="form-control">
 
 	</div>
+	<?php enq_destination_field_html(isset($sq_c['tour_name']) ? $sq_c['tour_name'] : '', '*Destination'); ?>
 
 </div>
 
 <script>
-
 $('#travel_datetime').datetimepicker({ format:'d-m-Y H:i' });
-
-
+if(typeof city_lzloading === 'function'){
+	city_lzloading('#location_from', '*Location From', true);
+	city_lzloading('#location_to', '*Location To', true);
+}
 
 function total_members_calculate()
 
@@ -681,6 +718,7 @@ if($enquiry_type=="Hotel"){
 			if($enquiry_content_arr2['name']=="total_infant"){ $sq_c['total_infant'] = $enquiry_content_arr2['value']; }
 			if($enquiry_content_arr2['name']=="total_members"){ $sq_c['total_members'] = $enquiry_content_arr2['value']; }
 			if($enquiry_content_arr2['name']=="budget"){ $sq_c['budget'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="tour_name"){ $sq_c['tour_name'] = $enquiry_content_arr2['value']; }
 
 		}
 
@@ -688,11 +726,13 @@ if($enquiry_type=="Hotel"){
 
 	else{
 
-		$sq_c['hotel_requirements'] = $sq_c['total_adult'] = $sq_c['total_cwb'] = $sq_c['total_cwob'] = $sq_c['total_infant'] = $sq_c['total_members'] = $sq_c['budget'] =  "";		
-
+		$sq_c['hotel_requirements'] = $sq_c['total_members'] = $sq_c['budget'] =  "";
+		$sq_c['total_adult'] = $sq_c['total_cwb'] = $sq_c['total_cwob'] = $sq_c['total_infant'] = 0;
+		if(!isset($sq_c['tour_name'])){ $sq_c['tour_name'] = ""; }
 	}
 ?>
 <div class="row mg_bt_10">
+	<?php enq_destination_field_html(isset($sq_c['tour_name']) ? $sq_c['tour_name'] : '', '*Destination'); ?>
 	<div class="col-md-12 col-sm-6 mg_bt_10_sm_xs">
 		<h3 class="editor_title">Hotel Requirements</h3>
 		<textarea name="hotel_requirements" id="hotel_requirements" class="feature_editor form_control" cols="30" rows="10"><?= $sq_c['hotel_requirements']?></textarea>
@@ -741,6 +781,7 @@ function total_members_calculate(){
 	$('#total_members').val(total_members);
 
 }
+total_members_calculate();
 
 </script>
 
@@ -762,6 +803,7 @@ if($enquiry_type=="Miscellaneous"){
 			if($enquiry_content_arr2['name']=="total_infant"){ $sq_c['total_infant'] = $enquiry_content_arr2['value']; }
 			if($enquiry_content_arr2['name']=="total_members"){ $sq_c['total_members'] = $enquiry_content_arr2['value']; }
 			if($enquiry_content_arr2['name']=="budget"){ $sq_c['budget'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="tour_name"){ $sq_c['tour_name'] = $enquiry_content_arr2['value']; }
 
 		}
 
@@ -769,11 +811,13 @@ if($enquiry_type=="Miscellaneous"){
 
 	else{
 
-		$sq_c['hotel_requirements'] = $sq_c['total_adult'] = $sq_c['total_cwb'] = $sq_c['total_cwob'] = $sq_c['total_infant'] = $sq_c['total_members'] = $sq_c['budget'] =  "";
-
+		$sq_c['hotel_requirements'] = $sq_c['total_members'] = $sq_c['budget'] =  "";
+		$sq_c['total_adult'] = $sq_c['total_cwb'] = $sq_c['total_cwob'] = $sq_c['total_infant'] = 0;
+		if(!isset($sq_c['tour_name'])){ $sq_c['tour_name'] = ""; }
 	}
 ?>
 <div class="row mg_bt_10">
+	<?php enq_destination_field_html(isset($sq_c['tour_name']) ? $sq_c['tour_name'] : '', '*Destination'); ?>
 	<div class="col-md-12 col-sm-6 mg_bt_10_sm_xs">
 		<h3 class="editor_title">Miscellaneous Requirements</h3>
 		<textarea name="hotel_requirements" id="hotel_requirements" class="feature_editor form_control" cols="30" rows="10"><?= $sq_c['hotel_requirements']?></textarea>
@@ -851,6 +895,7 @@ if($enquiry_type=="Car Rental"){
 			if($enquiry_content_arr2['name']=="places_to_visit"){ $sq_c['places_to_visit'] = $enquiry_content_arr2['value']; }
 
 			if($enquiry_content_arr2['name']=="budget"){ $sq_c['budget'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="tour_name"){ $sq_c['tour_name'] = $enquiry_content_arr2['value']; }
 
 		}
 
@@ -861,7 +906,7 @@ if($enquiry_type=="Car Rental"){
 		$sq_c['total_pax'] = $sq_c['budget'] = $sq_c['days_of_traveling'] = $sq_c['vehicle_type'] = $sq_c['travel_type'] = $sq_c['places_to_visit'] = "";
 
 		$sq_c['traveling_date'] = date('d-m-Y H:i');
-
+		if(!isset($sq_c['tour_name'])){ $sq_c['tour_name'] = ""; }
 	}
 
 
@@ -869,6 +914,7 @@ if($enquiry_type=="Car Rental"){
 ?>
 
 <div class="row mg_bt_10">
+	<?php enq_destination_field_html(isset($sq_c['tour_name']) ? $sq_c['tour_name'] : '', '*Destination'); ?>
 
 	<div class="col-md-4">
 
@@ -975,6 +1021,7 @@ if($enquiry_type=="Bus"){
 			if($enquiry_content_arr2['name']=="bus_name_and_type"){ $sq_c['bus_name_and_type'] = $enquiry_content_arr2['value']; }
 
 			if($enquiry_content_arr2['name']=="budget"){ $sq_c['budget'] = $enquiry_content_arr2['value']; }
+			if($enquiry_content_arr2['name']=="tour_name"){ $sq_c['tour_name'] = $enquiry_content_arr2['value']; }
 
 		}
 
@@ -982,8 +1029,8 @@ if($enquiry_type=="Bus"){
 
 	else{
 
-		$sq_c['travel_datetime'] = $sq_c['budget'] = $sq_c['location_from'] = $sq_c['location_to'] = $sq_c['seat_type'] = $sq_c['total_seats'] = $sq_c['bus_name_and_type'] = "";	
-
+		$sq_c['travel_datetime'] = $sq_c['budget'] = $sq_c['location_from'] = $sq_c['location_to'] = $sq_c['seat_type'] = $sq_c['total_seats'] = $sq_c['bus_name_and_type'] = "";
+		if(!isset($sq_c['tour_name'])){ $sq_c['tour_name'] = ""; }
 	}
 
 
@@ -999,15 +1046,11 @@ if($enquiry_type=="Bus"){
 	</div>
 
 	<div class="col-md-4">
-
-		<input type="text" id="location_from" name="location_from" onchange="validate_specialChar(this.id)" placeholder="*Location From" title="Location From" value="<?= $sq_c['location_from'] ?>" class="form-control">
-
+		<?php enq_city_location_select('location_from', $sq_c['location_from'], '*Location From'); ?>
 	</div>
 
 	<div class="col-md-4">
-
-		<input type="text" id="location_to" name="location_to" placeholder="*Location To" onchange="validate_specialChar(this.id)" title="Location To" value="<?= $sq_c['location_to'] ?>" class="form-control">
-
+		<?php enq_city_location_select('location_to', $sq_c['location_to'], '*Location To'); ?>
 	</div>
 
 </div>
@@ -1061,12 +1104,17 @@ if($enquiry_type=="Bus"){
 	    <input type="text" id="budget" name="budget" onchange="number_validate(this.id)" placeholder="Budget" title="Budget" value="<?= $sq_c['budget'] ?>" class="form-control">
 
 	</div>
+	<?php enq_destination_field_html(isset($sq_c['tour_name']) ? $sq_c['tour_name'] : '', '*Destination'); ?>
 
 </div>
 
 <script>
 
 $('#travel_datetime').datetimepicker({ format:'d-m-Y H:i' });
+if(typeof city_lzloading === 'function'){
+	city_lzloading('#location_from', '*Location From', true);
+	city_lzloading('#location_to', '*Location To', true);
+}
 
 </script>
 
@@ -1114,10 +1162,12 @@ if($enquiry_type=="Passport"){
 <script>
 $('.loader').remove();
 
-if("<?= $enquiry_type ?>" =="Group Booking" || "<?= $enquiry_type ?>" == "Package Booking"){
+if($("#tour_name").length && $('#destinations').length){
+	var destSource = [];
+	try { destSource = JSON.parse($('#destinations').val()); } catch(e) { destSource = []; }
 	$("#tour_name").autocomplete({
 
-		source: JSON.parse($('#destinations').val()),
+		source: destSource,
 		select: function (event, ui) {
 			$("#tour_name").val(ui.item.label);
 			return false;

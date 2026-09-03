@@ -304,6 +304,9 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
             error_msg_alert('Atleast add one Tour');
             return false;
         }
+        if (table_nights_match_validate() == false) {
+            return false;
+        }
 
 
         //Special attraction table
@@ -329,6 +332,40 @@ $b2c_clag = $sq_app_settings['b2c_flag'];
         }
     }
     /////////////********** Tour Master Information Save end**********/////////////
+
+    function table_nights_match_validate() {
+        var table = document.getElementById("tbl_dynamic_tour_group");
+        if (!table) {
+            return true;
+        }
+        var expectedNights = null;
+        var expectedDays = null;
+        for (var i = 0; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            if (!row.cells[0].childNodes[0].checked) {
+                continue;
+            }
+            var from_date1 = row.cells[2].childNodes[0].value;
+            var to_date1 = row.cells[3].childNodes[0].value;
+            if (from_date1 == "" || to_date1 == "") {
+                continue;
+            }
+            var f = from_date1.split('-');
+            var t = to_date1.split('-');
+            var fromDate = new Date(f[2], f[1] - 1, f[0]);
+            var toDate = new Date(t[2], t[1] - 1, t[0]);
+            var nights = Math.round((toDate - fromDate) / (1000 * 60 * 60 * 24));
+            var days = nights + 1;
+            if (expectedNights === null) {
+                expectedNights = nights;
+                expectedDays = days;
+            } else if (nights !== expectedNights) {
+                error_msg_alert('All tour date rows must have the same number of nights (' + expectedNights + ') and days (' + expectedDays + '). Row ' + (i + 1) + ' has ' + nights + ' night(s) and ' + days + ' day(s).');
+                return false;
+            }
+        }
+        return true;
+    }
 
     function table_date_validate() {
         g_validate_status = true;

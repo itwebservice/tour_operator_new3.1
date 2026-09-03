@@ -61,6 +61,11 @@ else if($bsmValues[0]->tax_apply_on == '3') {
 			<input type="hidden" id="pck_single_person_cost" name="pck_single_person_cost" value="<?= $row_cost['single_person_cost'] ?>">
 			<input type="text" id="single_person_cost2" name="single_person_cost2" placeholder="Single Person Cost" title="Single Person Cost"  onchange="group_quotation_cost_calculate1(this.id);validate_balance(this.id)"  value="<?php echo $sq_quotation['single_person_cost']; ?>">  
 		</div>
+		<div class="col-md-2"> 
+            <small>&nbsp;</small>
+			<input type="hidden" id="pck_extra_bed_cost" name="pck_extra_bed_cost" value="<?= isset($row_cost['with_bed_cost']) ? $row_cost['with_bed_cost'] : 0 ?>">
+			<input type="text" id="extra_bed_cost2" name="extra_bed_cost2" placeholder="Extra Bed Cost" title="Extra Bed Cost"  onchange="group_quotation_cost_calculate1(this.id);validate_balance(this.id)"  value="<?php echo isset($sq_quotation['extra_bed_cost']) ? $sq_quotation['extra_bed_cost'] : 0; ?>">  
+		</div>
 		
 		<div class="col-md-2">
             <small id="basic_show" style="color:#000000"><?= ($inclusive_b == '') ? '&nbsp;' : 'Inclusive Amount : <span>'.$inclusive_b ?></span></small>
@@ -170,24 +175,28 @@ function cost_reflect(){
 	var total_wb_children = $('#children_without_bed1').val();
 	var child_with_bed = $('#children_with_bed1').val();
 	var single_person = $('#single_person1').val();
+	var extra_bed = $('#extra_bed1').val();
 
 	if(total_adult=="" || isNaN(total_adult)){ total_adult = 0;}
 	if(total_infant=="" || isNaN(total_infant)){total_infant = 0;}
 	if(total_wb_children=="" || isNaN(total_wb_children)){ total_wb_children = 0;}
 	if(child_with_bed=="" || isNaN(child_with_bed)){ child_with_bed = 0;}
 	if(single_person=="" || isNaN(single_person)){ single_person = 0;}
+	if(extra_bed=="" || isNaN(extra_bed)){ extra_bed = 0;}
 
 	var pck_adult_cost = parseFloat($('#pck_adult_cost').val()) || 0;
 	var pck_child_cost = parseFloat($('#pck_child_cost').val()) || 0;
 	var pck_infant_cost = parseFloat($('#pck_infant_cost').val()) || 0;
 	var pck_single_person_cost = parseFloat($('#pck_single_person_cost').val()) || 0;
 	var pck_with_bed_cost = parseFloat($('#pck_with_bed_cost').val()) || 0;
+	var pck_extra_bed_cost = parseFloat($('#pck_extra_bed_cost').val()) || 0;
 
 	$("#adult_cost2").val((parseInt(total_adult, 10) * pck_adult_cost).toFixed(2));
 	$("#children_cost2").val((parseInt(total_wb_children, 10) * pck_child_cost).toFixed(2));
 	$("#infant_cost2").val((parseInt(total_infant, 10) * pck_infant_cost).toFixed(2));
 	$("#single_person_cost2").val((parseInt(single_person, 10) * pck_single_person_cost).toFixed(2));
 	$("#with_bed_cost2").val((parseInt(child_with_bed, 10) * pck_with_bed_cost).toFixed(2));
+	$("#extra_bed_cost2").val((parseInt(extra_bed, 10) * pck_extra_bed_cost).toFixed(2));
 
 	group_quotation_cost_calculate1('');
 }
@@ -199,14 +208,16 @@ function group_quotation_cost_calculate1(id){
 	var children_cost1 = $('#children_cost2').val();
 	var with_bed_cost1 = $('#with_bed_cost2').val();
 	var single_person_cost1 = $('#single_person_cost2').val();
+	var extra_bed_cost1 = $('#extra_bed_cost2').val();
 
 	if(adult_cost1=="" || isNaN(adult_cost1)){ adult_cost1 = 0;}
 	if(infant_cost1=="" || isNaN(infant_cost1)){ infant_cost1 = 0;}
 	if(children_cost1=="" || isNaN(children_cost1)){ children_cost1 = 0;}
 	if(with_bed_cost1=="" || isNaN(with_bed_cost1)){ with_bed_cost1 = 0;}
 	if(single_person_cost1=="" || isNaN(single_person_cost1)){ single_person_cost1 = 0;}
+	if(extra_bed_cost1=="" || isNaN(extra_bed_cost1)){ extra_bed_cost1 = 0;}
 
-	var total2 = parseFloat(adult_cost1) + parseFloat(children_cost1) + parseFloat(infant_cost1) + parseFloat(with_bed_cost1) + parseFloat(single_person_cost1);
+	var total2 = parseFloat(adult_cost1) + parseFloat(children_cost1) + parseFloat(infant_cost1) + parseFloat(with_bed_cost1) + parseFloat(single_person_cost1) + parseFloat(extra_bed_cost1);
 
 	$('#tour_cost2').val(total2.toFixed(2));
 	if (id != 'tour_cost2') {
@@ -268,6 +279,7 @@ $('#frm_tab4_u').validate({
 		var total_children = parseFloat($('#children_with_bed1').val())+parseFloat($('#children_without_bed1').val());
 		var total_infant = $('#total_infant1').val();
 		var single_person = $('#single_person1').val();
+		var extra_bed = $('#extra_bed1').val();
 		var total_passangers = $('#total_passangers1').val();
 		var children_without_bed = $('#children_without_bed1').val();
 		var children_with_bed = $('#children_with_bed1').val();		
@@ -278,6 +290,7 @@ $('#frm_tab4_u').validate({
 		var infant_cost = $('#infant_cost2').val();
 		var single_person_cost = $('#single_person_cost2').val();
 		var with_bed_cost = $('#with_bed_cost2').val();
+		var extra_bed_cost = $('#extra_bed_cost2').val();
 		var tour_cost = $('#tour_cost2').val();
 		var markup_cost = $('#markup_cost2').val();
 		var service_charge = $('#service_charge').val();
@@ -473,6 +486,19 @@ $('#frm_tab4_u').validate({
 
 		var table = document.getElementById("tbl_group_tour_quotation_transport_u");
 		if(table && table.rows && table.rows.length > 0){
+			if (typeof gqCollectTransportRows === 'function') {
+				var gqT = gqCollectTransportRows('tbl_group_tour_quotation_transport_u');
+				transport_vehicle_arr = gqT.vehicle;
+				transport_start_date_arr = gqT.start;
+				transport_end_date_arr = gqT.end;
+				transport_pickup_arr = gqT.pickup;
+				transport_pickup_type_arr = gqT.pickup_type;
+				transport_drop_arr = gqT.drop;
+				transport_drop_type_arr = gqT.drop_type;
+				transport_service_duration_arr = gqT.duration;
+				transport_no_vehicles_arr = gqT.vehicles;
+				transport_entry_id_arr = gqT.entry_id;
+			} else {
 			var rowCount = table.rows.length;
 			
 			for(var i=0; i<rowCount; i++)
@@ -525,6 +551,7 @@ $('#frm_tab4_u').validate({
 					transport_entry_id_arr.push(transport_entry_id);
 				}      
 			}
+			}
 		}
 
 		var tax_apply_on = $('#atax_apply_on').val();
@@ -549,7 +576,7 @@ $('#frm_tab4_u').validate({
 		$.ajax({
 			type:'post',
 			url: base_url+'controller/package_tour/quotation/group_tour/quotation_update.php',
-			data:{ quotation_id : quotation_id,tour_name : tour_name, from_date : from_date, to_date : to_date, total_days : total_days, customer_name : customer_name, mobile_number : mobile_number,country_code:country_code,email_id : email_id, total_adult : total_adult, total_children : total_children, total_infant : total_infant, total_passangers : total_passangers, children_without_bed : children_without_bed, children_with_bed : children_with_bed, quotation_date : quotation_date, booking_type : booking_type,adult_cost : adult_cost,children_cost : children_cost, infant_cost : infant_cost,single_person : single_person,single_person_cost:single_person_cost,with_bed_cost : with_bed_cost,tour_cost : tour_cost,markup_cost: markup_cost,service_charge : service_charge,taxation_id : taxation_id,service_tax : service_tax,service_tax_subtotal : service_tax_subtotal,total_tour_cost : total_tour_cost, train_from_location_arr : train_from_location_arr, train_to_location_arr : train_to_location_arr, train_class_arr : train_class_arr, train_arrival_date_arr : train_arrival_date_arr, train_departure_date_arr : train_departure_date_arr, train_id_arr : train_id_arr, plane_from_location_arr : plane_from_location_arr, plane_to_location_arr : plane_to_location_arr, plane_id_arr : plane_id_arr, plane_class_arr : plane_class_arr,airline_name_arr : airline_name_arr, arraval_arr : arraval_arr, dapart_arr : dapart_arr,dept_datetime_arr : dept_datetime_arr,arrival_datetime_arr : arrival_datetime_arr,route_arr : route_arr,cabin_arr : cabin_arr,sharing_arr : sharing_arr,c_entry_id_arr : c_entry_id_arr, transport_vehicle_arr : transport_vehicle_arr, transport_start_date_arr : transport_start_date_arr, transport_end_date_arr : transport_end_date_arr, transport_pickup_arr : transport_pickup_arr, transport_pickup_type_arr : transport_pickup_type_arr, transport_drop_arr : transport_drop_arr, transport_drop_type_arr : transport_drop_type_arr, transport_service_duration_arr : transport_service_duration_arr, transport_no_vehicles_arr : transport_no_vehicles_arr, transport_entry_id_arr : transport_entry_id_arr, enquiry_id : enquiry_id,incl:incl,excl : excl,terms :terms, from_city_id_arr : from_city_id_arr, to_city_id_arr : to_city_id_arr,bsmValues:bsmValues,currency_code:currency_code,active_flag:active_flag},
+			data:{ quotation_id : quotation_id,tour_name : tour_name, from_date : from_date, to_date : to_date, total_days : total_days, customer_name : customer_name, mobile_number : mobile_number,country_code:country_code,email_id : email_id, total_adult : total_adult, total_children : total_children, total_infant : total_infant, total_passangers : total_passangers, children_without_bed : children_without_bed, children_with_bed : children_with_bed, extra_bed : extra_bed, quotation_date : quotation_date, booking_type : booking_type,adult_cost : adult_cost,children_cost : children_cost, infant_cost : infant_cost,single_person : single_person,single_person_cost:single_person_cost,with_bed_cost : with_bed_cost,extra_bed_cost:extra_bed_cost,tour_cost : tour_cost,markup_cost: markup_cost,service_charge : service_charge,taxation_id : taxation_id,service_tax : service_tax,service_tax_subtotal : service_tax_subtotal,total_tour_cost : total_tour_cost, train_from_location_arr : train_from_location_arr, train_to_location_arr : train_to_location_arr, train_class_arr : train_class_arr, train_arrival_date_arr : train_arrival_date_arr, train_departure_date_arr : train_departure_date_arr, train_id_arr : train_id_arr, plane_from_location_arr : plane_from_location_arr, plane_to_location_arr : plane_to_location_arr, plane_id_arr : plane_id_arr, plane_class_arr : plane_class_arr,airline_name_arr : airline_name_arr, arraval_arr : arraval_arr, dapart_arr : dapart_arr,dept_datetime_arr : dept_datetime_arr,arrival_datetime_arr : arrival_datetime_arr,route_arr : route_arr,cabin_arr : cabin_arr,sharing_arr : sharing_arr,c_entry_id_arr : c_entry_id_arr, transport_vehicle_arr : transport_vehicle_arr, transport_start_date_arr : transport_start_date_arr, transport_end_date_arr : transport_end_date_arr, transport_pickup_arr : transport_pickup_arr, transport_pickup_type_arr : transport_pickup_type_arr, transport_drop_arr : transport_drop_arr, transport_drop_type_arr : transport_drop_type_arr, transport_service_duration_arr : transport_service_duration_arr, transport_no_vehicles_arr : transport_no_vehicles_arr, transport_entry_id_arr : transport_entry_id_arr, enquiry_id : enquiry_id,incl:incl,excl : excl,terms :terms, from_city_id_arr : from_city_id_arr, to_city_id_arr : to_city_id_arr,bsmValues:bsmValues,currency_code:currency_code,active_flag:active_flag},
 			success: function(message){			
                 	$('#btn_quotation_update').button('reset');
                 	var msg = message.split('--');

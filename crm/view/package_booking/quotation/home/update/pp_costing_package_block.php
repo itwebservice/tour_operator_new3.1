@@ -61,29 +61,6 @@ $pax_defs = array(
 				placeholder="Package Type" title="Package Type"
 				value="<?= htmlspecialchars($package_type) ?>" readonly>
 		</div>
-		<div class="col-md-3">
-			
-			<span>Currency</span>
-			
-			<select name="currency_code_pp<?= $suffix ?>" id="currency_code_pp<?= $suffix ?>" title="Currency" style="width:100%" data-toggle="tooltip" class="app_select2 form-control">
-				<option value="">*Select Currency</option>
-				<?php
-				$sq_currency_pp = mysqlQuery("select * from currency_name_master order by currency_code");
-				while ($row_currency_pp = mysqli_fetch_assoc($sq_currency_pp)) {
-					$sel = ((string)$currency_code_selected === (string)$row_currency_pp['id']) ? 'selected' : '';
-					echo '<option value="' . htmlspecialchars($row_currency_pp['id']) . '" ' . $sel . '>' . htmlspecialchars($row_currency_pp['currency_code']) . '</option>';
-				}
-				?>
-			</select>
-			<script>
-			(function () {
-				var $currencyPp = $('#currency_code_pp<?= $suffix ?>');
-				if ($currencyPp.length && !$currencyPp.data('select2')) {
-					$currencyPp.select2({ width: '100%' });
-				}
-			})();
-			</script>
-		</div>
 		<input type="hidden" id="pp_entry_id<?= $suffix ?>" name="pp_entry_id<?= $suffix ?>" value="<?= htmlspecialchars($entry_id) ?>">
 		<input type="hidden" id="adult_cost<?= $suffix ?>" value="<?= htmlspecialchars(pp_update_field_val($pp_pkg,'adult','hotel_cost')) ?>">
 		<input type="hidden" id="child_with<?= $suffix ?>" value="<?= htmlspecialchars(pp_update_field_val($pp_pkg,'cweb','hotel_cost')) ?>">

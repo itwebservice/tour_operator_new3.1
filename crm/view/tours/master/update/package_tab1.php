@@ -131,7 +131,7 @@
                                     ?>
                                     <tr>
                                         <td><input class="css-checkbox" id="chk_tour_group<?php echo $count . "m" ?>"
-                                                type="checkbox" disabled checked><label class="css-label"
+                                                type="checkbox" checked><label class="css-label"
                                                 for="chk_tour_group<?php echo $count . "m" ?>"> <label></td>
                                         <td><input class="form-control" maxlength="15" value="<?php echo $count ?>"
                                                 type="text" name="username" placeholder="Sr. No." disabled /></td>
@@ -207,7 +207,7 @@
                                                 onchange="validate_spaces(this.id);validate_dayprogram(this.id);"
                                                 value="<?php echo $sq_pckg1['day_wise_program']; ?>"><?php echo $sq_pckg1['day_wise_program']; ?></textarea>
                                         </td> -->
-                                        <td class='col-md-6 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day<?php echo $count + 1; ?> Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" value="<?php echo $sq_pckg1['day_wise_program']; ?>" style='width:100%;height:900px;'><?php echo $sq_pckg1['day_wise_program']; ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
+                                        <td class='col-md-6 pad_8' style="max-width: 594px;overflow: hidden;position: relative;"><textarea id="day_program<?php echo $count; ?>-u" name="day_program" class="form-control mg_bt_10 day_program" placeholder="*Day<?php echo $count + 1; ?> Program" title="Day-wise Program" onchange="validate_spaces(this.id);validate_dayprogram(this.id);" rows="3" style='width:100%;height:900px;'><?php echo htmlspecialchars(itinerary_html_to_editor($sq_pckg1['day_wise_program']), ENT_QUOTES); ?></textarea><span class="style_text"><span class="style_text_b" data-wrapper="**" style="font-weight: bold; cursor: pointer;" title="Bold text">B</span><span class="style_text_u" data-wrapper="__" style="cursor: pointer;" title="Underline text"><u>U</u></span></span>
                                         </td>
                                         <td class='col-md-2 pad_8' style='width:100px'><input type="text"
                                                 id="overnight_stay<?php echo $count; ?>-u" name="overnight_stay"
@@ -274,13 +274,10 @@ $(document).on("click", ".style_text_b, .style_text_u", function() {
         // Adjust the cursor position after wrapping
         textarea.selectionStart = start;
         textarea.selectionEnd = end + wrapper.length * 2;
-		var text=textarea.value;
-		 var content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-
-		// Replace markdown-style underline (__text__) with <u> tags
-		content = content.replace(/__(.*?)__/g, '<u>$1</u>');
-		textarea.value =content;
-		//console.log(content);    
+        var text = textarea.value;
+        // Keep markdown markers in the editor; do not inject raw HTML tags.
+        textarea.value = text;
+        //console.log(content);    
 });
 
 
@@ -433,9 +430,46 @@ function table_info_validate() {
             tour_group_id.push(tour_group_id1);
         }
     }
+    if (table_nights_match_validate() == false) {
+        return false;
+    }
 
 }
 /////////////********** Tour Master Information Update end ***********************************
+
+function table_nights_match_validate() {
+    var table = document.getElementById("tbl_dynamic_tour_group");
+    if (!table) {
+        return true;
+    }
+    var expectedNights = null;
+    var expectedDays = null;
+    for (var i = 0; i < table.rows.length; i++) {
+        var row = table.rows[i];
+        if (!row.cells[0].childNodes[0].checked) {
+            continue;
+        }
+        var from_date1 = row.cells[2].childNodes[0].value;
+        var to_date1 = row.cells[3].childNodes[0].value;
+        if (from_date1 == "" || to_date1 == "") {
+            continue;
+        }
+        var f = from_date1.split('-');
+        var t = to_date1.split('-');
+        var fromDate = new Date(f[2], f[1] - 1, f[0]);
+        var toDate = new Date(t[2], t[1] - 1, t[0]);
+        var nights = Math.round((toDate - fromDate) / (1000 * 60 * 60 * 24));
+        var days = nights + 1;
+        if (expectedNights === null) {
+            expectedNights = nights;
+            expectedDays = days;
+        } else if (nights !== expectedNights) {
+            error_msg_alert('All tour date rows must have the same number of nights (' + expectedNights + ') and days (' + expectedDays + '). Row ' + (i + 1) + ' has ' + nights + ' night(s) and ' + days + ' day(s).');
+            return false;
+        }
+    }
+    return true;
+}
 
 function tour_date_generate() {
     var count = $("#txt_tour_date_generate").val();

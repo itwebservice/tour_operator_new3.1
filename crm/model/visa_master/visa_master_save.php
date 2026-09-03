@@ -162,51 +162,12 @@ class visa_master
     $email_id = $_POST['email_id'];
     $sq_visa = mysqli_fetch_assoc(mysqlQuery("select * from visa_crm_master where entry_id='$entry_id'"));
 
-    $email_id_arr = explode(',', $email_id);
-    for ($i = 0; $i < sizeof($email_id_arr); $i++) {
-      ///////////////////Send Mail as attachment start/////////////////////////////
-      $arrayAttachment = array();
-
-      $fileUploadForm = $sq_visa['upload_url'];
-      $newDir = explode('..', $fileUploadForm);
-      $newDir1 = preg_replace('/(\/+)/', '/', $newDir[2]);
-      $UploadURL = substr($newDir1, 1);
-
-      $fileCover = $sq_visa['upload_url2'];
-      $getMain = explode('..', $fileCover);
-      $CoverURL = '';
-      if (isset($getMain[2])) {
-        $getSub = preg_replace('/(\/+)/', '/', $getMain[2]);
-        $CoverURL = substr($getSub, 1);
+    $email_id_arr = array_filter(array_map('trim', explode(',', $email_id)));
+    $arrayAttachment = $this->visa_form_attachment_paths($sq_visa);
+    foreach ($email_id_arr as $to_email) {
+      if ($to_email === '') {
+        continue;
       }
-
-      $fileCover = isset($sq_visa['upload_url3']) ? $sq_visa['upload_url3'] : '';
-      $getMain = explode('..', $fileCover);
-      $CoverURL3 = '';
-      if (isset($getMain[2])) {
-        $getSub = preg_replace('/(\/+)/', '/', $getMain[2]);
-        $CoverURL3 = substr($getSub, 1);
-      }
-
-      $fileCover = isset($sq_visa['upload_url4']) ? $sq_visa['upload_url4'] : '';
-      $getMain = explode('..', $fileCover);
-      $CoverURL4 = '';
-      if (isset($getMain[2])) {
-        $getSub = preg_replace('/(\/+)/', '/', $getMain[2]);
-        $CoverURL4 = substr($getSub, 1);
-      }
-
-      $fileCover = $sq_visa['upload_url5'];
-      $getMain = explode('..', $fileCover);
-      $CoverURL5 = '';
-      if (isset($getMain[2])) {
-        $getSub = preg_replace('/(\/+)/', '/', $getMain[2]);
-        $CoverURL5 = substr($getSub, 1);
-      }
-
-      array_push($arrayAttachment, $UploadURL, $CoverURL, $CoverURL3, $CoverURL4, $CoverURL5);
-
-      //////////////Send Mail as attachment End////////
       $content = '
           <tr>
               <table width="85%" cellspacing="0" cellpadding="5" style="color: #888888;border: 1px solid #888888;margin: 0px auto;margin-top:20px; min-width: 100%;" role="presentation">
@@ -221,9 +182,44 @@ class visa_master
     ';
 
       $subject = 'Visa Enquiry Details : (' . $sq_visa['country_id'] . ' , ' . $sq_visa['visa_type'] . ' )';
-      $model->new_app_email_send('12', $email_id_arr[$i], $subject, $arrayAttachment, $content, '1');
+      $model->new_app_email_send('12', $to_email, $subject, $arrayAttachment, $content, '1');
     }
     echo "Mail sent successfully!";
+  }
+
+  private function visa_form_local_path($stored)
+  {
+    $stored = str_replace('\\', '/', trim((string)$stored));
+    if ($stored === '' || strcasecmp($stored, 'NULL') === 0) {
+      return '';
+    }
+    $crm_root = str_replace('\\', '/', dirname(__DIR__, 2));
+    $parts = explode('uploads', $stored, 2);
+    $candidates = array();
+    if (isset($parts[1])) {
+      $candidates[] = $crm_root . '/uploads' . $parts[1];
+    }
+    $candidates[] = $stored;
+    $candidates[] = $crm_root . '/' . ltrim(str_replace('../', '', $stored), '/');
+    foreach ($candidates as $path) {
+      if ($path !== '' && is_file($path)) {
+        return $path;
+      }
+    }
+    return '';
+  }
+
+  private function visa_form_attachment_paths($sq_visa)
+  {
+    $keys = array('upload_url', 'upload_url2', 'upload_url3', 'upload_url4', 'upload_url5');
+    $paths = array();
+    foreach ($keys as $key) {
+      $local = $this->visa_form_local_path(isset($sq_visa[$key]) ? $sq_visa[$key] : '');
+      if ($local !== '') {
+        $paths[] = $local;
+      }
+    }
+    return $paths;
   }
 
   function visa_whatsapp()

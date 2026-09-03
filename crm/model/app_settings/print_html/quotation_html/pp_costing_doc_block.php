@@ -106,8 +106,9 @@ if (!function_exists('gqd_render_pp_costing_whatsapp_text')) {
    * Example:
    *   *Adult PP (2) :* INR 15000.00
    *   *Discount :* 5%
-   *   *Tax :* INR 2700.00
+   *   *Tcs :* INR 500.00
    *   *Total Price :* INR 45000.00
+   * Per-person amounts already include tax, so Tax is not listed again.
    *
    * @param int|string $quotation_id
    * @param array $opts optional: first_only (bool, default false)
@@ -185,12 +186,6 @@ if (!function_exists('gqd_render_pp_costing_whatsapp_text')) {
       }
       if ($disc_val > 0 && $disc_disp !== '') {
         $text .= '*Discount :* ' . $disc_disp . "\n";
-      }
-
-      $tax_total = isset($pkg['tax_total']) ? (float) $pkg['tax_total'] : 0.0;
-      if ($tax_total > 0) {
-        $tax_disp = isset($pkg['tax_display']) ? $pkg['tax_display'] : '0.00';
-        $text .= '*Tax :* ' . $tax_disp . "\n";
       }
 
       $tcs_total = isset($pkg['tcs_total']) ? (float) $pkg['tcs_total'] : 0.0;

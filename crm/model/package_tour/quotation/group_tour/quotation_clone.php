@@ -48,6 +48,7 @@ public function quotation_master_clone()
   $this->clone_train_entries($quotation_id, $quotation_max);
   $this->clone_plane_entries($quotation_id, $quotation_max);
   $this->clone_cruise_entries($quotation_id, $quotation_max);
+  $this->clone_transport_entries($quotation_id, $quotation_max);
   $sq_update  = mysqlQuery("update group_tour_quotation_master set clone='yes',status='1' where quotation_id='$quotation_max'");
   echo "Quotation has been successfully copied.";
 
@@ -154,6 +155,44 @@ public function clone_cruise_entries($quotation_id, $quotation_max){
 
 		      if($col=='id'){
 		      	$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from group_tour_quotation_cruise_entries"));
+				$id = $sq_max['max']+1;
+				$insertSQL .= "'".$id."'";	
+		      }
+ 			  elseif($col=='quotation_id'){
+ 			  	$insertSQL .= "'".$quotation_max."'";		
+ 			  }
+		      else{
+		      	$insertSQL .= "'".$r[$col]."'";	
+		      }
+		      
+			  if ($counter<$count - 1) {$insertSQL .= ", ";}
+
+			}
+			  $insertSQL .= ")";
+			  mysqlQuery($insertSQL);
+
+	  }
+}
+
+public function clone_transport_entries($quotation_id, $quotation_max){
+
+	$cols=array();
+
+	$result = mysqlQuery("SHOW COLUMNS FROM group_tour_quotation_transport_entries");
+	 while ($r=mysqli_fetch_assoc($result)) {
+	   $cols[]= $r["Field"];
+	}
+
+	  $result = mysqlQuery("SELECT * FROM group_tour_quotation_transport_entries WHERE quotation_id='$quotation_id'");
+	  while($r=mysqli_fetch_array($result)) {
+
+		    $insertSQL = "INSERT INTO group_tour_quotation_transport_entries (".implode(", ",$cols).") VALUES (";
+		    $count=count($cols);
+
+		    foreach($cols as $counter=>$col) {
+
+		      if($col=='id'){
+		      	$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from group_tour_quotation_transport_entries"));
 				$id = $sq_max['max']+1;
 				$insertSQL .= "'".$id."'";	
 		      }

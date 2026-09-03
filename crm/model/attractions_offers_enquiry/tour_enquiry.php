@@ -208,38 +208,31 @@ $(function(){
 		]
 		//End
 		$('#form_send').button('loading');
-		
-			$.ajax({
-			type:'post',
-			url: 'admin_tour_enquiry.php',
-			data:{name : name,mobile_no : mobile_no,landline_no : landline_no,country_code:country_code, email_id : email_id,tour_name : tour_name,travel_from_date : travel_from_date,travel_to_date : travel_to_date,budget : budget,total_adult : total_adult,total_infant : total_infant,reference_id: reference_id,enquiry_specification : enquiry_spec,hotel_type : hotel_type,user_id:user_id},
-			success: function(message){
-				$('#form_send').button('reset');
+		$.post( "<?= BASE_URL ?>controller/attractions_offers_enquiry/enquiry_master_save_c.php",{name : name,mobile_no : mobile_no,landline_no : landline_no,country_code:country_code, email_id : email_id,tour_name : tour_name,travel_from_date : travel_from_date,travel_to_date : travel_to_date,budget : budget,total_adult : total_adult,total_infant : total_infant,reference_id: reference_id,enquiry_specification : enquiry_spec,hotel_type : hotel_type,enquiry_content : enquiry_content,customer_fill:true, enquiry_type : "Package Booking", login_id : login_id,by:"cust",user_id:user_id, destination_name: tour_name}, function(data){
+			$('#form_send').button('reset');
+			var isError = (data || '').indexOf('error') === 0;
+			if(!isError){
+				$.ajax({
+					type:'post',
+					url: 'admin_tour_enquiry.php',
+					data:{name : name,mobile_no : mobile_no,landline_no : landline_no,country_code:country_code, email_id : email_id,tour_name : tour_name,travel_from_date : travel_from_date,travel_to_date : travel_to_date,budget : budget,total_adult : total_adult,total_infant : total_infant,reference_id: reference_id,enquiry_specification : enquiry_spec,hotel_type : hotel_type,user_id:user_id}
+				});
 			}
-		});
-		$.post("<?= BASE_URL ?>controller/attractions_offers_enquiry/enquiry_master_save_v.php", {mobile_no:mobile_no,email_id:email_id}, function(data){
-			if(data == '')
-				data = "Details have been sent"
+			if(!isError && (data || '').indexOf('successfully') !== -1){
+				data = "Package Booking Enquiry has been successfully sent.";
+			}
+			if(!data){
+				data = isError ? "Unable to send enquiry." : "Package Booking Enquiry has been successfully sent.";
+			}
 			$('#vi_confirm_box').vi_confirm_box({
-			message : data,
-			callback: function(data1){
-		        if(data1=="yes"){
-					$('#form_send').button('loading');
-					$.post( "<?= BASE_URL ?>controller/attractions_offers_enquiry/enquiry_master_save_c.php",{name : name,mobile_no : mobile_no,landline_no : landline_no,country_code:country_code, email_id : email_id,tour_name : tour_name,travel_from_date : travel_from_date,travel_to_date : travel_to_date,budget : budget,total_adult : total_adult,total_infant : total_infant,reference_id: reference_id,enquiry_specification : enquiry_spec,hotel_type : hotel_type,enquiry_content : enquiry_content,customer_fill:true, enquiry_type : "Package Booking", login_id : login_id,by:"cust",user_id:user_id}, function(data){
-						
-						if(data == "Package Booking Enquiry has been successfully saved."){
-							data = "Package Booking Enquiry has been successfully sent.";
-						}
-						$('#form_send').button('reset');
-						setTimeout(() => {
-							window.history.back();
-						}, 1000);
+				message : data,
+				callback: function(){
+					if(!isError){
+						window.location.reload();
 					}
-				);
-		        }
 				}
-			});	
 			});
+		});
 		}
 	});
 });

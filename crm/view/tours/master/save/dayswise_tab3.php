@@ -53,6 +53,44 @@
     </div>
 </form>
 <script>
+function fill_daywise_from_tour() {
+    var destVal = $('#dest_name_s').val();
+    if (destVal) {
+        $('#dest_name2').val(destVal).trigger('change');
+    }
+    var fromStr = '';
+    var toStr = '';
+    var table = document.getElementById('tbl_dynamic_tour_group');
+    if (table) {
+        for (var i = 0; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            if (row.cells[0].childNodes[0].checked) {
+                fromStr = row.cells[2].childNodes[0].value;
+                toStr = row.cells[3].childNodes[0].value;
+                break;
+            }
+        }
+    }
+    if (!fromStr) {
+        fromStr = $('#txt_from_date1').val();
+        toStr = $('#txt_to_date1').val();
+    }
+    if (!fromStr || !toStr) {
+        return;
+    }
+    var dateParts = fromStr.split("-");
+    var dateParts1 = toStr.split("-");
+    var f_date = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+    var t_date = new Date(+dateParts1[2], dateParts1[1] - 1, +dateParts1[0]);
+    var total_days = Math.ceil(Math.abs(t_date - f_date) / (1000 * 60 * 60 * 24));
+    $('#day_name').empty();
+    for (var days = 0; days <= total_days; days++) {
+        var days_in = days + 1;
+        var newOption = new Option("Day -" + days_in, days_in, days === 0, days === 0);
+        $('#day_name').append(newOption);
+    }
+}
+
 function daywise_image_prepare() {
 
     $('#btn_image_save').button('loading');
@@ -73,19 +111,11 @@ function daywise_image_prepare() {
     return false;
 }
 $('.next_btn').click(function() {
-    var dateParts = $('#txt_from_date1').val().split("-");
-    var dateParts1 = $('#txt_to_date1').val().split("-");
-    const f_date = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
-    const t_date = new Date(+dateParts1[2], dateParts1[1] - 1, +dateParts1[0]);
-    const diffTime = Math.abs(t_date - f_date);
-    const total_days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    $('#day_name').empty();
-    for (var days = 0; days <= total_days; days++) {
-        var days_in = days;
-        ++days_in;
-        var newOption = new Option("Day -" + days_in, days_in, false, false);
-        $('#day_name').append(newOption).trigger('change');
-    }
+    fill_daywise_from_tour();
+});
+
+$(document).on('change', '#day_name', function() {
+    $('input[name=image_check]').prop('checked', false);
 });
 
 function image_list_reflect(dest_name2)

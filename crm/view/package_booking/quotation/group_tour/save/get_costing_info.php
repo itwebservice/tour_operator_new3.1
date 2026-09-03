@@ -13,6 +13,7 @@ $costing_info_arr['children_wb_cost'] = isset($row_cost['child_without_cost']) ?
 $costing_info_arr['infant_cost'] = isset($row_cost['infant_cost']) ? $row_cost['infant_cost'] : 0;
 $costing_info_arr['with_bed_cost'] = isset($row_cost['child_with_cost']) ? $row_cost['child_with_cost'] : 0;
 $costing_info_arr['single_person_cost'] = isset($row_cost['single_person_cost']) ? $row_cost['single_person_cost'] : 0;
+$costing_info_arr['extra_bed_cost'] = isset($row_cost['with_bed_cost']) ? $row_cost['with_bed_cost'] : 0;
 
 
 

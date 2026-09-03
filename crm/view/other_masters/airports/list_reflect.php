@@ -1,6 +1,6 @@
 <?php include_once("../../../model/model.php");
 $count = 0;
-$status = $_POST['status'];
+$status = isset($_POST['status']) ? $_POST['status'] : '';
 
 $array_s = array();
 $temp_arr = array();

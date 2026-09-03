@@ -289,8 +289,10 @@ if (!function_exists('currency_conversion_amount')) {
 }
 
 /**
- * Package quotation list/modal total: INR (company default) first, quotation currency in brackets.
- * Costing totals are stored in the selected quotation currency.
+ * Package quotation list/modal total.
+ * Costing is entered and stored in company default currency (INR).
+ * Primary figure stays in that currency; brackets use the same
+ * company-currency → quotation-currency conversion as the PDF.
  */
 if (!function_exists('format_quotation_total_display')) {
 	function format_quotation_total_display($amount, $quotation_currency_id = null)
@@ -306,14 +308,91 @@ if (!function_exists('format_quotation_total_display')) {
 			? $quotation_currency_id
 			: $currency;
 
-		$inr_amount = currency_conversion_amount($q_currency, $currency, $amount);
-		$display = number_format($inr_amount, 2);
+		// Stored total is company default currency. Only label + convert when
+		// the quotation currency differs (same ROE formula as the PDF).
+		$display = number_format($amount, 2);
 
-		if ($q_currency !== '' && $q_currency !== '0' && $currency != $q_currency) {
-			$display .= ' (' . currency_conversion($q_currency, $q_currency, $amount) . ')';
+		if ($q_currency !== '' && $q_currency !== '0' && (string) $currency !== (string) $q_currency) {
+			$inr_display = currency_conversion($currency, $currency, $amount);
+			$converted = currency_conversion($currency, $q_currency, $amount);
+			$display = $inr_display . ' (' . $converted . ')';
 		}
 
 		return $display;
+	}
+}
+
+if (!function_exists('gq_plane_sector_label')) {
+	function gq_plane_sector_label($city_name, $location)
+	{
+		$city_name = trim((string) $city_name);
+		$location = trim((string) $location);
+		if ($location === '' && $city_name === '') {
+			return '';
+		}
+		if ($location === '') {
+			return $city_name;
+		}
+		if ($city_name === '') {
+			return $location;
+		}
+		if (stripos($location, $city_name) === 0) {
+			return $location;
+		}
+		return $city_name . ' - ' . $location;
+	}
+}
+
+if (!function_exists('gq_plane_location_from_sector')) {
+	function gq_plane_location_from_sector($sector)
+	{
+		$sector = trim((string) $sector);
+		if ($sector === '') {
+			return '';
+		}
+		$parts = explode(' - ', $sector, 2);
+		if (isset($parts[1]) && trim($parts[1]) !== '') {
+			return trim($parts[1]);
+		}
+		return $sector;
+	}
+}
+
+if (!function_exists('gq_plane_entry_sector')) {
+	function gq_plane_entry_sector($row_plane, $which = 'from')
+	{
+		$city_id = ($which === 'from') ? (isset($row_plane['from_city']) ? $row_plane['from_city'] : 0) : (isset($row_plane['to_city']) ? $row_plane['to_city'] : 0);
+		$location = ($which === 'from') ? (isset($row_plane['from_location']) ? $row_plane['from_location'] : '') : (isset($row_plane['to_location']) ? $row_plane['to_location'] : '');
+		$city_name = '';
+		$city_id = intval($city_id);
+		if ($city_id > 0) {
+			$sq_city = mysqli_fetch_assoc(mysqlQuery("select city_name from city_master where city_id='$city_id'"));
+			$city_name = isset($sq_city['city_name']) ? $sq_city['city_name'] : '';
+		}
+		return gq_plane_sector_label($city_name, $location);
+	}
+}
+
+if (!function_exists('gq_group_quotation_pdf_costing')) {
+	function gq_group_quotation_pdf_costing($from_currency, $to_currency, $tour_inr, $tax_inr, $tcs_inr)
+	{
+		$tour = round(currency_conversion_amount($from_currency, $to_currency, $tour_inr), 2);
+		$tax = round(currency_conversion_amount($from_currency, $to_currency, $tax_inr), 2);
+		$tcs = round(currency_conversion_amount($from_currency, $to_currency, $tcs_inr), 2);
+		$total = round($tour + $tax + $tcs, 2);
+		$logo_id = ($to_currency !== '' && $to_currency !== '0' && ctype_digit((string) $to_currency)) ? intval($to_currency) : intval($from_currency);
+		$sq_logo = mysqli_fetch_assoc(mysqlQuery("SELECT currency_code FROM currency_name_master WHERE id='$logo_id'"));
+		$logo = isset($sq_logo['currency_code']) ? $sq_logo['currency_code'] : '';
+		$fmt = function ($amt) use ($logo) {
+			$num = number_format($amt, 2);
+			return ($logo !== '') ? ($logo . ' ' . $num) : $num;
+		};
+		return array(
+			'tour' => $fmt($tour),
+			'tax' => $fmt($tax),
+			'tcs' => $fmt($tcs),
+			'total' => $fmt($total),
+		);
 	}
 }
 

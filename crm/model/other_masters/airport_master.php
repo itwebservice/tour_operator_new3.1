@@ -34,8 +34,9 @@ class airport_master{
 
 			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(airport_id) as max from airport_master"));
 			$airport_id = $sq_max['max'] + 1;
+			$airport_status = ($airport_status_arr[$i] != '') ? $airport_status_arr[$i] : 'Active';
 
-			$sq_airport = mysqlQuery("insert into airport_master (airport_id, city_id, airport_name, airport_code,flag, created_at) values ('$airport_id', '$city_id_arr[$i]', '$airport_name1', '$airport_code1','$airport_status_arr[$i]', '$created_at')");
+			$sq_airport = mysqlQuery("insert into airport_master (airport_id, city_id, airport_name, airport_code,flag, created_at) values ('$airport_id', '$city_id_arr[$i]', '$airport_name1', '$airport_code1','$airport_status', '$created_at')");
 			if(!$sq_airport){
 				$GLOBALS['flag'] = false;
 				echo "error--Some entries not saved";

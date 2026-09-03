@@ -65,7 +65,8 @@ $sq_count5 = mysqli_num_rows(mysqlQuery("select * from custom_package_offers whe
                                     $('#agent_type').select2();
                                     $('#to_date_h1,#from_date_h1').datetimepicker({
                                         timepicker: false,
-                                        format: 'd-m-Y'
+                                        format: 'd-m-Y',
+                                        minDate: 0
                                     });
                                     </script>
                                 </table>
@@ -148,7 +149,8 @@ $sq_count5 = mysqli_num_rows(mysqlQuery("select * from custom_package_offers whe
                                     $('#agent_type<?= $count ?>-u').select2();
                                     $('#to_date_h<?= $count ?>-u,#from_date_h<?= $count ?>-u').datetimepicker({
                                         timepicker: false,
-                                        format: 'd-m-Y'
+                                        format: 'd-m-Y',
+                                        minDate: 0
                                     });
                                     </script>
                                     <?php $count++;
@@ -176,7 +178,8 @@ $sq_count5 = mysqli_num_rows(mysqlQuery("select * from custom_package_offers whe
 <script>
 $('#to_date_h,#from_date_h').datetimepicker({
     timepicker: false,
-    format: 'd-m-Y'
+    format: 'd-m-Y',
+    minDate: 0
 });
 
 function switch_to_tab2() {

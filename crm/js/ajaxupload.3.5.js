@@ -331,12 +331,32 @@ AjaxUpload.prototype = {
 	},
 	_rerouteClicks : function (){
 		var self = this;
-	
-		// IE displays 'access denied' error when using this method
-		// other browsers just ignore click()
-		// addEvent(this._button, 'click', function(e){
-		//   self._input.click();
-		// });
+
+		function openFileDialog(e){
+			if (self._disabled || !self._input) return;
+			if (e) {
+				if (e.preventDefault) e.preventDefault();
+				if (e.stopPropagation) e.stopPropagation();
+			}
+			self.justClicked = true;
+			self._input.style.display = 'block';
+			try {
+				self._input.click();
+			} catch (err) {}
+			setTimeout(function(){
+				self.justClicked = false;
+			}, 3000);
+		}
+
+		var clickTarget = this._button;
+		if (this._button && this._button.parentNode) {
+			var wrap = this._button.parentNode;
+			var wrapClass = ' ' + (wrap.className || '') + ' ';
+			if (wrapClass.indexOf(' div-upload ') !== -1) {
+				clickTarget = wrap;
+			}
+		}
+		addEvent(clickTarget, 'click', openFileDialog);
 				
 		var box, dialogOffset = {top:0, left:0}, over = false;							
 		addEvent(self._button, 'mouseover', function(e){

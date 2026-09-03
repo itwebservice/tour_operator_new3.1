@@ -20,6 +20,7 @@ public function quotation_master_save()
 	$total_children =  $_POST['total_children'];
 	$total_infant =  $_POST['total_infant'];
 	$single_person = $_POST['single_person'];
+	$extra_bed = isset($_POST['extra_bed']) ? $_POST['extra_bed'] : 0;
 	$total_passangers =  $_POST['total_passangers'];
 	$children_without_bed =  $_POST['children_without_bed'];
 	$children_with_bed =  $_POST['children_with_bed'];		
@@ -30,6 +31,7 @@ public function quotation_master_save()
 	$infant_cost =  $_POST['infant_cost'];
 	$with_bed_cost =  $_POST['with_bed_cost'];
 	$single_person_cost = $_POST['single_person_cost'];
+	$extra_bed_cost = isset($_POST['extra_bed_cost']) ? $_POST['extra_bed_cost'] : 0;
 	$tour_cost =  $_POST['tour_cost'];
 	$service_charge =  $_POST['service_charge'];
 	$currency_code = $_POST['currency_code'];
@@ -102,7 +104,7 @@ public function quotation_master_save()
 	$terms = addslashes($terms);
 	$bsmValues = json_encode($bsmValues);
 	$whatsapp_no = $country_code.$mobile_no;
-	$sq_quotation = mysqlQuery("insert into group_tour_quotation_master ( quotation_id, branch_admin_id,financial_year_id, tour_name, from_date, to_date, total_days, customer_name, mobile_number,country_code,whatsapp_no,email_id, total_adult, total_children, total_infant, total_passangers, children_without_bed, children_with_bed, quotation_date, booking_type,  adult_cost, children_cost , infant_cost, with_bed_cost, tour_cost,service_charge, service_tax_subtotal, quotation_cost, incl, excl, terms, tour_group_id, created_at, login_id, enquiry_id, tour_group,emp_id,bsm_values,currency_code,status,single_person,single_person_cost ) values ( '$quotation_id', '$branch_admin_id','$financial_year_id', '$tour_name', '$from_date', '$to_date', '$total_days', '$customer_name', '$whatsapp_no','$country_code','$mobile_no','$email_id', '$total_adult', '$total_children', '$total_infant', '$total_passangers', '$children_without_bed', '$children_with_bed', '$quotation_date', '$booking_type', '$adult_cost','$children_cost','$infant_cost','$with_bed_cost','$tour_cost','$service_charge', '$service_tax_subtotal', '$total_tour_cost','$incl','$excl','$terms', '$tour_group_id', '$created_at', '$login_id', '$enquiry_id', '$tour_group','$emp_id','$bsmValues','$currency_code','1','$single_person','$single_person_cost' )");
+	$sq_quotation = mysqlQuery("insert into group_tour_quotation_master ( quotation_id, branch_admin_id,financial_year_id, tour_name, from_date, to_date, total_days, customer_name, mobile_number,country_code,whatsapp_no,email_id, total_adult, total_children, total_infant, total_passangers, children_without_bed, children_with_bed, quotation_date, booking_type,  adult_cost, children_cost , infant_cost, with_bed_cost, tour_cost,service_charge, service_tax_subtotal, quotation_cost, incl, excl, terms, tour_group_id, created_at, login_id, enquiry_id, tour_group,emp_id,bsm_values,currency_code,status,single_person,single_person_cost,extra_bed,extra_bed_cost ) values ( '$quotation_id', '$branch_admin_id','$financial_year_id', '$tour_name', '$from_date', '$to_date', '$total_days', '$customer_name', '$whatsapp_no','$country_code','$mobile_no','$email_id', '$total_adult', '$total_children', '$total_infant', '$total_passangers', '$children_without_bed', '$children_with_bed', '$quotation_date', '$booking_type', '$adult_cost','$children_cost','$infant_cost','$with_bed_cost','$tour_cost','$service_charge', '$service_tax_subtotal', '$total_tour_cost','$incl','$excl','$terms', '$tour_group_id', '$created_at', '$login_id', '$enquiry_id', '$tour_group','$emp_id','$bsmValues','$currency_code','1','$single_person','$single_person_cost','$extra_bed','$extra_bed_cost' )");
 
 	if($sq_quotation){
 		////////////Enquiry Save///////////
@@ -161,10 +163,8 @@ public function plane_entries_save($quotation_id, $from_city_id_arr, $plane_from
          //$arraval_arr = get_datetime_db($arraval_arr);
 		$arraval_arr[$i] = date('Y-m-d H:i', strtotime($arraval_arr[$i]));
 		$dapart_arr[$i] = date('Y-m-d H:i', strtotime($dapart_arr[$i]));
-		$from_location = array_slice(explode(' - ', $plane_from_location_arr[$i]), 1);
-		$from_location = implode(' - ',$from_location);
-		$to_location = array_slice(explode(' - ', $plane_to_location_arr[$i]), 1);
-		$to_location = implode(' - ',$to_location);
+		$from_location = gq_plane_location_from_sector($plane_from_location_arr[$i]);
+		$to_location = gq_plane_location_from_sector($plane_to_location_arr[$i]);
 
 		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from group_tour_quotation_plane_entries"));
 		$id = $sq_max['max']+1;

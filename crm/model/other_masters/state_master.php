@@ -32,7 +32,8 @@ class state_master{
 
 			$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from state_master"));
 			$state_id = $sq_max['max'] + 1;
-			$sq_state = mysqlQuery("insert into state_master (id, state_name, active_flag) values ('$state_id','$state_name[$i]', '$active_flag_arr[$i]')");
+			$active_flag = ($active_flag_arr[$i] != '') ? $active_flag_arr[$i] : 'Active';
+			$sq_state = mysqlQuery("insert into state_master (id, state_name, active_flag) values ('$state_id','$state_name[$i]', '$active_flag')");
 
 			if(!$sq_state){
 				$GLOBALS['flag'] = false;

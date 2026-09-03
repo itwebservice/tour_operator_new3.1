@@ -3,7 +3,7 @@ include "../../../model/model.php";
 $array_s = array();
 $temp_arr = array();
 $query = "select * from state_master where 1 ";
-$status = isset($_POST['status']) ? $_POST['status'] : 'Active';
+$status = isset($_POST['status']) ? $_POST['status'] : '';
 if($status != ''){
   $query .= " and active_flag='$status'";
 }

@@ -392,8 +392,17 @@ function dynamic_birthdate(id) {
 }
 function dynamic_datetime(id) {
   id = id.trim();
-  jQuery("#" + id).datetimepicker({ format: "d-m-Y H:i" });
-  jQuery("#" + id).addClass("form-control");
+  var $el = jQuery("#" + id);
+  if ($el.data("xdsoft_datetimepicker")) {
+    $el.datetimepicker("destroy");
+  }
+  $el.datetimepicker({
+    format: "d-m-Y H:i",
+    parentID: "body",
+    fixed: true,
+    scrollInput: false,
+  });
+  $el.addClass("form-control");
 }
 
 function dynamic_datetime_ws(id) {
@@ -410,13 +419,39 @@ function dynamic_city(id) {
   });
 }
 
-function hideMasterSaveStatusCell(cell) {
+function getDynamicTableBody(table) {
+  if (!table) {
+    return table;
+  }
+  if (table.tBodies && table.tBodies.length) {
+    return table.tBodies[0];
+  }
+  return table;
+}
+
+function ensureMasterStatusOptions(select) {
+  if (!select) {
+    return;
+  }
+  var hasActive = false, hasInactive = false;
+  for (var oi = 0; oi < select.options.length; oi++) {
+    if (select.options[oi].value === "Active") hasActive = true;
+    if (select.options[oi].value === "Inactive") hasInactive = true;
+  }
+  if (!hasActive) {
+    select.appendChild(new Option("Active", "Active"));
+  }
+  if (!hasInactive) {
+    select.appendChild(new Option("Inactive", "Inactive"));
+  }
+}
+
+function showMasterSaveStatusCell(cell, rowIndex) {
   if (!cell) {
     return;
   }
-  // Theme .hidden uses display:block !important, so it cannot hide this column.
   cell.classList.remove("hidden");
-  cell.style.setProperty("display", "none", "important");
+  cell.style.removeProperty("display");
   var statusSelect = cell.querySelector ? cell.querySelector("select") : null;
   if (!statusSelect && cell.childNodes && cell.childNodes[0] && cell.childNodes[0].tagName === "SELECT") {
     statusSelect = cell.childNodes[0];
@@ -426,11 +461,24 @@ function hideMasterSaveStatusCell(cell) {
   }
   statusSelect.classList.remove("hidden");
   statusSelect.classList.remove("app_select2");
-  statusSelect.style.setProperty("display", "none", "important");
+  statusSelect.classList.add("form-control");
+  statusSelect.style.removeProperty("display");
+  if (rowIndex !== undefined && statusSelect.id) {
+    var baseId = statusSelect.id.replace(/[0-9]+$/, "") || "active_flag";
+    statusSelect.id = baseId + rowIndex;
+  }
+  if (!statusSelect.title) {
+    statusSelect.title = "Status";
+  }
+  ensureMasterStatusOptions(statusSelect);
   statusSelect.value = "Active";
   if (window.jQuery && $(statusSelect).data("select2")) {
     $(statusSelect).select2("destroy");
   }
+}
+
+function hideMasterSaveStatusCell(cell) {
+  showMasterSaveStatusCell(cell);
 }
 
 function foo(tableID, quot_table_id, rowCounts) {
@@ -439,16 +487,19 @@ function foo(tableID, quot_table_id, rowCounts) {
   }
   foo.counter++;
   var table = document.getElementById(tableID);
+  var tbody = getDynamicTableBody(table);
 
-  var rowCount = table.rows.length;
+  var rowCount = tbody.rows.length;
 
   var sr_no_count = 0;
 
   for (var i = 0; i < rowCount; i++) {
     sr_no_count++;
-    var row = table.rows[i];
+    var row = tbody.rows[i];
     //document.write(foo.counter+"<br />");
-    row.cells[1].childNodes[0].value = sr_no_count;
+    if (row.cells[1] && row.cells[1].childNodes[0]) {
+      row.cells[1].childNodes[0].value = sr_no_count;
+    }
   }
   //row.cells[1].childNodes[0].value = foo.counter;
 
@@ -1191,7 +1242,7 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[2].childNodes[0].setAttribute("id", "cmb_city_" + foo.counter);
     if (row.cells[3] && row.cells[3].childNodes[0]) {
       row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
-      hideMasterSaveStatusCell(row.cells[3]);
+      showMasterSaveStatusCell(row.cells[3], foo.counter);
     }
   }
 
@@ -1201,7 +1252,10 @@ function foo(tableID, quot_table_id, rowCounts) {
       "chk_tour_group" + foo.counter
     );
     row.cells[2].childNodes[0].setAttribute("id", "cmb_state_" + foo.counter);
-    row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+    if (row.cells[3] && row.cells[3].childNodes[0]) {
+      row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+      showMasterSaveStatusCell(row.cells[3], foo.counter);
+    }
   }
 
   if (tableID == "tbl_airport_master") {
@@ -1212,7 +1266,7 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[4].childNodes[0].setAttribute("id", "airport_code" + foo.counter);
     if (row.cells[5] && row.cells[5].childNodes[0]) {
       row.cells[5].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
-      hideMasterSaveStatusCell(row.cells[5]);
+      showMasterSaveStatusCell(row.cells[5], foo.counter);
     }
 
     $(row.cells[2].childNodes[0]).next("span").remove();
@@ -1224,6 +1278,10 @@ function foo(tableID, quot_table_id, rowCounts) {
     row.cells[0].childNodes[0].setAttribute("id", "chk_airport" + foo.counter);
     row.cells[2].childNodes[0].setAttribute("id", "airline_name" + foo.counter);
     row.cells[3].childNodes[0].setAttribute("id", "airline_code" + foo.counter);
+    if (row.cells[4] && row.cells[4].childNodes[0]) {
+      row.cells[4].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
+      showMasterSaveStatusCell(row.cells[4], foo.counter);
+    }
   }
 
   if (tableID == "tbl_roe_master") {
@@ -1246,7 +1304,7 @@ function foo(tableID, quot_table_id, rowCounts) {
     );
     if (row.cells[3] && row.cells[3].childNodes[0]) {
       row.cells[3].childNodes[0].setAttribute("id", "active_flag" + foo.counter);
-      hideMasterSaveStatusCell(row.cells[3]);
+      showMasterSaveStatusCell(row.cells[3], foo.counter);
     }
   }
 
@@ -1884,10 +1942,13 @@ function foo(tableID, quot_table_id, rowCounts) {
       "id",
       "chk_hotel" + foo.counter
     );
-    row.cells[2].childNodes[0].setAttribute(
-      "id",
-      "package_type" + prefix + foo.counter
-    );
+    var pkgSelectEl = row.cells[2].querySelector("select") || row.cells[2].childNodes[0];
+    if (pkgSelectEl) {
+      pkgSelectEl.setAttribute(
+        "id",
+        "package_type" + prefix + foo.counter
+      );
+    }
 
     row.cells[3].childNodes[0].setAttribute(
       "id",
@@ -2042,6 +2103,8 @@ function foo(tableID, quot_table_id, rowCounts) {
       "pickup_type-" + foo.counter + transportIdSuffix
     );
     row.cells[13].childNodes[0].setAttribute("id", "drop_type-" + foo.counter + transportIdSuffix);
+    row.cells[12].style.display = "none";
+    row.cells[13].style.display = "none";
 
     row.cells[5].childNodes[0].setAttribute("title", "Pickup Location");
     row.cells[6].childNodes[0].setAttribute("title", "Drop-off Location");
@@ -2899,7 +2962,7 @@ function foo(tableID, quot_table_id, rowCounts) {
       );
     row.cells[7].childNodes[0].setAttribute(
       "id",
-      "train_arrival_date-" + foo.counter
+      "txt_arrval-" + foo.counter
     );
     row.cells[7].childNodes[0].placeholder = "Arrival Date & Time";
     row.cells[7].childNodes[0].title = "Arrival Date & Time";
@@ -2926,14 +2989,8 @@ function foo(tableID, quot_table_id, rowCounts) {
       "onchange",
       "validate_validDatetime('" + row.cells[6].childNodes[0].id + "',id)"
     );
-    jQuery(row.cells[6].childNodes[0])
-      .addClass("form-control")
-      .datetimepicker({ format: "d-m-Y H:i" });
-    jQuery(row.cells[7].childNodes[0])
-      .addClass("form-control")
-      .datetimepicker({ format: "d-m-Y H:i" });
-    $(row.cells[6].childNodes[0]).css("width", "150px");
-    $(row.cells[7].childNodes[0]).css("width", "150px");
+    jQuery(row.cells[6].childNodes[0]).addClass("form-control app_datetimepicker").css("width", "100%");
+    jQuery(row.cells[7].childNodes[0]).addClass("form-control app_datetimepicker").css("width", "100%");
 
     row.cells[8].childNodes[0].setAttribute(
       "id",
@@ -4640,6 +4697,11 @@ function foo(tableID, quot_table_id, rowCounts) {
       "onchange",
       'validate_validDate("from_date_h"+foo.counter,"to_date_h"+foo.counter)'
     );
+    jQuery("#from_date_h" + foo.counter + ", #to_date_h" + foo.counter).datetimepicker({
+      timepicker: false,
+      format: "d-m-Y",
+      minDate: 0,
+    });
 
     $(row.cells[8].childNodes[0]).select2();
     jQuery(row.cells[8].childNodes[0]).addClass("form-control");
@@ -4970,9 +5032,10 @@ function foo(tableID, quot_table_id, rowCounts) {
 function deleteRow(tableID) {
   try {
     var table = document.getElementById(tableID);
-    var rowCount = table.rows.length;
+    var tbody = getDynamicTableBody(table);
+    var rowCount = tbody.rows.length;
     for (var i = 0; i < rowCount; i++) {
-      var row = table.rows[i];
+      var row = tbody.rows[i];
       var chkbox = row.cells[0].childNodes[0];
 
       if (null != chkbox && true == chkbox.checked) {
@@ -4980,7 +5043,7 @@ function deleteRow(tableID) {
           error_msg_alert("Cannot delete all the rows.");
           break;
         }
-        table.deleteRow(i);
+        tbody.deleteRow(i);
         rowCount--;
         i--;
       }
@@ -5008,30 +5071,57 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         alert("Error: Table not found. Please refresh the page and try again.");
         return;
     }
+    var tbody = getDynamicTableBody(table);
     
-    var rowCount = table.rows.length; // index for new row
+    var rowCount = tbody.rows.length; // index for new row
     console.log("DEBUG: Current row count:", rowCount);
     console.log("DEBUG: Table structure before adding row:");
-    for (var debugI = 0; debugI < table.rows.length; debugI++) {
+    for (var debugI = 0; debugI < tbody.rows.length; debugI++) {
         console.log("  Row", debugI, ":", debugI === 0 ? "(HEADER)" : "(DATA ROW, should have ID " + debugI + ")");
     }
     
-    var row = table.insertRow(rowCount);
+    var row = tbody.insertRow(rowCount);
     console.log("DEBUG: New row created at index", rowCount);
 
-    var colCount = table.rows[0].cells.length;
+    var colCount = tbody.rows[0].cells.length;
     console.log("DEBUG: Column count:", colCount);
 
     for (var i = 0; i < colCount; i++) {
         var newcell = row.insertCell(i);
-        var oldCell = table.rows[table.rows.length - 2].cells[i]; // copy from last row
+        var oldCell = tbody.rows[tbody.rows.length - 2].cells[i]; // copy from last row
         var oldStatusSelect = oldCell.querySelector('select[id^="active_flag"], select[name^="active_flag"]');
         if (oldStatusSelect) {
-            newcell.style.setProperty("display", "none", "important");
+            var clonedStatus = oldStatusSelect.cloneNode(true);
+            if (typeof cleanClonedSelectElement === "function") {
+                clonedStatus = cleanClonedSelectElement(clonedStatus);
+            }
+            var statusBaseId = (clonedStatus.id || "active_flag").replace(/[0-9]+$/, "") || "active_flag";
+            clonedStatus.id = statusBaseId + (rowCount + 1);
+            if (clonedStatus.name) {
+                clonedStatus.name = clonedStatus.name.replace(/[0-9]+$/, "") + (rowCount + 1);
+            }
+            clonedStatus.classList.remove("hidden");
+            clonedStatus.classList.remove("app_select2");
+            clonedStatus.classList.add("form-control");
+            clonedStatus.style.removeProperty("display");
+            clonedStatus.title = clonedStatus.title || "Status";
+            ensureMasterStatusOptions(clonedStatus);
+            clonedStatus.value = "Active";
+            newcell.classList.remove("hidden");
+            newcell.style.removeProperty("display");
+            newcell.appendChild(clonedStatus);
             continue;
         }
         if (oldCell.classList.contains("hidden")) {
             newcell.style.setProperty("display", "none", "important");
+        }
+
+        // Preserve column layout from the source row
+        if (oldCell.className) {
+            newcell.className = oldCell.className;
+        }
+        if (oldCell.getAttribute("style")) {
+            newcell.setAttribute("style", oldCell.getAttribute("style"));
         }
         
         // Special handling for checkbox cell (index 0) - copy complete HTML structure
@@ -5172,11 +5262,14 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                 }
                 clonedSelect.selectedIndex = 0;
                 if (clonedSelect.id && clonedSelect.id.indexOf("active_flag") === 0) {
-                    clonedSelect.classList.add("hidden");
+                    clonedSelect.classList.remove("hidden");
                     clonedSelect.classList.remove("app_select2");
+                    clonedSelect.classList.add("form-control");
+                    clonedSelect.style.removeProperty("display");
+                    ensureMasterStatusOptions(clonedSelect);
                     clonedSelect.value = "Active";
                     newcell.appendChild(clonedSelect);
-                    hideMasterSaveStatusCell(newcell);
+                    showMasterSaveStatusCell(newcell, rowCount + 1);
                 } else {
                     clonedSelect.classList.add('app_select2');
                     newcell.appendChild(clonedSelect);
@@ -5218,7 +5311,10 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                 }
                 cloned.value = "Active";
                 cloned.classList.remove("app_select2");
-                cloned.style.setProperty("display", "none", "important");
+                cloned.classList.remove("hidden");
+                cloned.classList.add("form-control");
+                cloned.style.removeProperty("display");
+                ensureMasterStatusOptions(cloned);
             } else if (tableID === "tbl_package_tour_member") {
                 if (cloned.id && cloned.id.indexOf("txt_m_adolescence") === 0) {
                     cloned.value = "Adult";
@@ -5232,6 +5328,14 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                  cloned.id.indexOf("cmb_meal_plan") === 0)
             ) {
                 cloned.selectedIndex = 0;
+            } else if (
+                (tableID === "tbl_package_tour_quotation_dynamic_hotel" ||
+                 tableID === "tbl_package_tour_quotation_dynamic_hotel_update") &&
+                cloned.id &&
+                cloned.id.toLowerCase().indexOf("package_type") !== -1
+            ) {
+                cloned.classList.add("app_select2");
+                cloned.classList.add("package_type_select");
             } else {
                 cloned.value = "";
                 cloned.classList.add("app_select2");
@@ -5248,17 +5352,19 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
         newcell.appendChild(cloned);
         if (cloned.id && cloned.id.indexOf("active_flag") === 0) {
-            hideMasterSaveStatusCell(newcell);
+            showMasterSaveStatusCell(newcell, rowCount + 1);
         }
     }
 
     if (
         tableID === "tbl_dynamic_city_name" ||
+        tableID === "tbl_dynamic_state_name" ||
         tableID === "tbl_destination_master" ||
+        tableID === "tbl_airline_master" ||
         tableID === "tbl_airport_master"
     ) {
         $(row).find('select[id^="active_flag"], select[name^="active_flag"]').each(function () {
-            hideMasterSaveStatusCell(this.closest("td") || this.parentNode);
+            showMasterSaveStatusCell(this.closest("td") || this.parentNode, rowCount + 1);
         });
     }
 
@@ -5330,7 +5436,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             $planeClassSelect.css('width', '170px');
             $planeClassSelect.select2({ width: '170px' });
         }
-        $(row).find('input[id^="txt_dapart"], input[id^="txt_arrval"], input[id^="train_arrival_date"]').css('width', '150px');
+        $(row).find('input[id^="txt_dapart"], input[id^="txt_arrval"]').css('width', '100%');
     }
 
     if (tableID === "tbl_package_hotel_infomration") {
@@ -5396,7 +5502,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             } else {
                 city_lzloading($(row.cells[3].childNodes[0]));
             }
-        } else if (previousRow && previousRow.cells[3] && previousRow.cells[3].childNodes[0]) {
+        } else if (!window.quotationAddingSingleHotelRow && previousRow && previousRow.cells[3] && previousRow.cells[3].childNodes[0]) {
             var previousCitySelect = previousRow.cells[3].childNodes[0];
             var newCitySelect = row.cells[3].childNodes[0];
             var selectedCityValue = $(previousCitySelect).val();

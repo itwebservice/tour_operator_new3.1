@@ -1,5 +1,6 @@
 <?php
 include "../../../../model/model.php";
+include_once "../../../../model/app_settings/print_html/quotation_html/generic_quotation_data.php";
 /*======******Header******=======*/
 include_once('../../../layouts/fullwidth_app_header.php');
 global $similar_text;
@@ -645,6 +646,16 @@ $count = 0;
 				$tour_cost = $sq_cost['tour_cost'] + $sq_cost['transport_cost'] + $sq_cost['excursion_cost'];
 				$basic_costing = $sq_cost['tour_cost'] + $sq_cost['transport_cost'] +  $sq_cost['excursion_cost'];
 				$bsmValues=json_decode($sq_cost['bsmValues'],true);
+				$grp_brk = function_exists('gqd_group_costing_breakdown')
+					? gqd_group_costing_breakdown($sq_cost, $sq_quotation)
+					: array(
+						'tour_total' => (float) $sq_cost['total_tour_cost'],
+						'net_total' => (float) $sq_cost['total_tour_cost'] + (float) $sq_quotation['visa_cost'] + (float) $sq_quotation['guide_cost'] + (float) $sq_quotation['misc_cost'] + (float) $sq_quotation['train_cost'] + (float) $sq_quotation['flight_cost'] + (float) $sq_quotation['cruise_cost'],
+						'tcs_percent' => isset($bsmValues[0]['tcsper']) ? $bsmValues[0]['tcsper'] : '',
+						'tcs_value' => isset($bsmValues[0]['tcsvalue']) ? $bsmValues[0]['tcsvalue'] : '',
+					);
+				$tcs_pct = isset($grp_brk['tcs_percent']) ? $grp_brk['tcs_percent'] : (isset($bsmValues[0]['tcsper']) ? $bsmValues[0]['tcsper'] : '');
+				$tcs_val = isset($grp_brk['tcs_value']) ? $grp_brk['tcs_value'] : (isset($bsmValues[0]['tcsvalue']) ? $bsmValues[0]['tcsvalue'] : '');
 				?>
 				<tr>
 					<td><?= $sq_cost['package_type'] ?></td>
@@ -660,8 +671,8 @@ $count = 0;
 					<td><?= $sq_cost['discount_in'] ?></td>
 					<td><?= number_format($sq_cost['discount'],2) ?></td>
 					<td><?= $sq_cost['service_tax_subtotal'] ?></td>
-					<td>Tcs:(<?=$bsmValues[0]['tcsper']?>%):<?=$bsmValues[0]['tcsvalue']?></td>
-					<td><b><?= number_format($sq_cost['total_tour_cost'],2) ?></b></td>
+					<td>Tcs:(<?= $tcs_pct ?>%):<?= $tcs_val ?></td>
+					<td><b><?= number_format($grp_brk['tour_total'],2) ?></b></td>
 					<td><?= number_format($sq_quotation['train_cost'],2)  ?></td>
 					<td><?= number_format($sq_quotation['flight_cost'],2)  ?></td>
 					<td><?= number_format($sq_quotation['cruise_cost'],2)  ?></td>
@@ -669,7 +680,7 @@ $count = 0;
 					<td><b><?= number_format($sq_quotation['visa_cost'],2)  ?></b></td>
 					<td><b><?= number_format($sq_quotation['guide_cost'],2)  ?></b></td>
 					<td><b><?= number_format($sq_quotation['misc_cost'],2)  ?></b></td>
-					<td><b><?= number_format($sq_cost['total_tour_cost']+$sq_quotation['visa_cost']+$sq_quotation['guide_cost']+$sq_quotation['misc_cost']+$sq_quotation['train_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['cruise_cost'],2)  ?></b></td>
+					<td><b><?= number_format($grp_brk['net_total'],2)  ?></b></td>
 				</tr>
 				<?php } ?>
 		</tbody>

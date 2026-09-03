@@ -151,6 +151,9 @@ background-color:<?= $theme_color ?>;
                                                                                placeholder="Transport Cost" title="Transport Cost"
                                                                                onchange="validate_balance(this.id);quotation_cost_calculate1(this.id)"
                                                                                value="<?php echo $row_q_costing['transport_cost']; ?>"
+                                                                               data-saved-amount="<?php echo $row_q_costing['transport_cost']; ?>"
+                                                                               data-default-amount="<?php echo $row_q_costing['transport_cost']; ?>"
+                                                                               data-amount-source="manual"
                                                                                ></div>
 
                                                                        <div ><small>&nbsp;</small><span>Activity Cost</span><input type="text"
@@ -158,6 +161,9 @@ background-color:<?= $theme_color ?>;
                                                                                onchange="quotation_cost_calculate1(this.id); validate_balance(this.id)"
                                                                                placeholder="Activity Cost" title="Activity Cost"
                                                                                value="<?= $row_q_costing['excursion_cost'] ?>"
+                                                                               data-saved-amount="<?= $row_q_costing['excursion_cost'] ?>"
+                                                                               data-default-amount="<?= $row_q_costing['excursion_cost'] ?>"
+                                                                               data-amount-source="manual"
                                                                                ></div>
 
                                                                        <div ><small id="basic_show-"
@@ -392,6 +398,22 @@ background-color:<?= $theme_color ?>;
                                             <div class="col-xs-12">
                                                 <div class="panel panel-default panel-body app_panel_style">
                                                     <legend>Land Cost</legend>
+                                                    <div class="row mg_bt_10">
+                                                        <div class="col-md-3 col-sm-6 col-xs-12">
+                                                            <span>Currency</span>
+                                                            <select name="currency_code_pp" id="currency_code_pp" title="Currency" style="width:100%" data-toggle="tooltip" class="app_select2 form-control"
+                                                                data-company-currency="<?php echo htmlspecialchars((string)(isset($currency) ? $currency : ''), ENT_QUOTES); ?>">
+                                                                <option value="">*Select Currency</option>
+                                                                <?php
+                                                                $sq_currency_pp_one = mysqlQuery("select * from currency_name_master order by currency_code");
+                                                                while ($row_currency_pp_one = mysqli_fetch_assoc($sq_currency_pp_one)) {
+                                                                    $sel_one = ((string)$currency_code_selected === (string)$row_currency_pp_one['id']) ? 'selected' : '';
+                                                                    echo '<option value="' . htmlspecialchars($row_currency_pp_one['id']) . '" ' . $sel_one . '>' . htmlspecialchars($row_currency_pp_one['currency_code']) . '</option>';
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                     <input type="hidden" id="sq_ppcost_count" value="<?= $sq_cost_count ?>" />
                                                     <div id="quotation_pp_costing_container">
                                                     <?php
@@ -641,7 +663,11 @@ function quotation_cost_calculate1(id) {
 	}
 
     var sub_total = parseFloat(tour_cost) + parseFloat(transport_cost) + parseFloat(excursion_cost);
-    $('#basic_amount-' + offset[1]).val(sub_total.toFixed(2));
+    if (typeof quotationSyncDerivedCostingAmount === 'function') {
+        quotationSyncDerivedCostingAmount($('#basic_amount-' + offset[1]), sub_total);
+    } else {
+        $('#basic_amount-' + offset[1]).val(sub_total.toFixed(2));
+    }
 
     if (id != 'basic_amount-' + offset[1]) {
         $('#basic_amount-' + offset[1]).trigger('change');
@@ -677,12 +703,20 @@ function quotation_cost_calculate1(id) {
     }
 
     var total_amt = parseFloat(sub_total) + parseFloat(service_tax_amount) + parseFloat(after_discount_amt) + parseFloat(tcs_amt);
-    $('#total_tour_cost-' + offset[1]).val(total_amt.toFixed(2));
+    if (typeof quotationSyncDerivedCostingAmount === 'function') {
+        quotationSyncDerivedCostingAmount($('#total_tour_cost-' + offset[1]), total_amt);
+        quotationSyncDerivedCostingAmount($('#tcs1-' + offset[1]), tcs_amt);
+    } else {
+        $('#total_tour_cost-' + offset[1]).val(total_amt.toFixed(2));
+    }
 }
 
 function initQuotationUpdateForm() {
     if ($('#currency_code1').length && !$('#currency_code1').data('select2')) {
         $('#currency_code1').select2();
+    }
+    if ($('#currency_code_pp').length && !$('#currency_code_pp').data('select2')) {
+        $('#currency_code_pp').select2({ width: '100%' });
     }
     upload_price_struct();
 
@@ -767,14 +801,14 @@ $('#frm_tab4').validate({
                         tour_cost: readCostAmt('#tour_cost-' + suffix),
                         transport_cost: readCostAmt('#transport_cost-' + suffix),
                         excursion_cost: readCostAmt('#excursion_cost-' + suffix),
-                        basic_amount: readCostAmt('#basic_amount-' + suffix),
+                        basic_amount: $('#basic_amount-' + suffix).val() || '',
                         service_charge: readCostAmt('#service_charge-' + suffix),
                         discount_in: discountIn,
                         discount: discountAmt,
                         tax_apply_on: $('#atax_apply_on-' + suffix).val() || '',
                         tax_value: $('#tax_value1-' + suffix).val() || '',
                         service_tax_subtotal: $('#service_tax_subtotal-' + suffix).val() || '',
-                        total_tour_cost: readCostAmt('#total_tour_cost-' + suffix),
+                        total_tour_cost: $('#total_tour_cost-' + suffix).val() || '',
                         package_name3: $('#package_name1-' + suffix).val() || '',
                         costing_id: $('#costing_entry_id-' + suffix).val() || ''
                     });
@@ -821,9 +855,12 @@ $('#frm_tab4').validate({
                     if (checkbox && !checkbox.checked) {
                         return;
                     }
+                    var inc = (typeof quotationGroupInclusiveShowAmount === 'function')
+                        ? quotationGroupInclusiveShowAmount('-' + suffix)
+                        : { basic: '', service: '' };
                     bsmValues.push([{
-                        "basic": 'basic',
-                        "service": 'service',
+                        "basic": inc.basic,
+                        "service": inc.service,
                         'tax_apply_on': $('#atax_apply_on-' + suffix).val() || '',
                         'tax_value': $('#tax_value1-' + suffix).val() || '',
                         'tcsper': $('#tcs_tax-' + suffix).val() || '',
@@ -2222,20 +2259,17 @@ function calculateCostingCardsUpdate(options) {
         var serviceFocused = ($active.length && $serviceEl.length && $serviceEl[0] === $active[0]);
 
         // ===== BASIC (empty string stays empty in the field; treat as 0 for math only) =====
-        // Always sum land even when enquiry pax count is 0 (DB/manual amounts still need land_cost).
         let hotel = numFrom($(sid(prefix + '_hotel_pp_update')));
         let transfer = numFrom($(sid(prefix + '_transfer_pp_update')));
         let activity = numFrom($(sid(prefix + '_activity_pp_update')));
 
-        let land_cost = hotel + transfer + activity;
+        // No Adult / CWEB / CWNB / Infant count → Land Cost stays 0 even if hotel/transfer/activity are filled.
+        let land_cost = (parseInt(pax_count, 10) > 0) ? (hotel + transfer + activity) : 0;
         writeIfNotFocused($(sid(prefix + '_land_cost_pp_update')), land_cost.toFixed(2));
 
         let service_charge;
-        // Only auto-fill SC from business rules when hotel/transfer change (not activity),
-        // and never while the user is editing the service charge field itself.
-        // Scoped so one card edit does not wipe SC on other cards.
-        // Skip auto SC markup when this pax type has 0 count (keep saved SC).
-        // Manual SC is never overwritten on currency change / recalc.
+        // Auto-fill SC from business rules on full land (hotel+transfer+activity),
+        // same basis as Group costing. Never while editing SC itself. Manual SC is kept.
         if (recalcServiceCharge && !serviceFocused && pax_count > 0
             && !(typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($serviceEl))) {
             var landForRules = land_cost;
@@ -2360,9 +2394,11 @@ function calculateCostingCardsUpdate(options) {
 $(document).on('input change keyup', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
     var id = (this.id || '');
     // Service charge must NOT be overwritten when typing in the SC field.
-    // Hotel/transfer may refresh SC from business rules — only on the edited card.
-    // Activity must NOT rewrite SC (clearing activity was wiping SC on every pax/package card).
-    var recalcSc = /_(hotel|transfer)_pp_update/.test(id);
+    // Hotel/transfer/activity refresh SC from full land cost (same as Group costing).
+    var recalcSc = /_(hotel|transfer|activity)_pp_update/.test(id);
+    if (/_service_charge_pp_update/.test(id)) {
+        recalcSc = false;
+    }
     if (/(transfer|activity)_pp_update/.test(id) && typeof quotationMarkFieldAsManualAmount === 'function') {
         quotationMarkFieldAsManualAmount($(this));
     }
@@ -2435,9 +2471,15 @@ $(document).ready(function () {
 
     // Saved amounts are already in quotation currency — show as-is (no ROE rewrite).
     // Load ROE factor only so later tariff refreshes can convert company→quotation once.
+    if (typeof quotationMarkSavedGroupLandAsManual === 'function') {
+        quotationMarkSavedGroupLandAsManual();
+    }
     quotationRestoreUpdatePpSavedAmounts();
     calculateCostingCardsUpdate({ recalcServiceCharge: false });
     quotationRestoreUpdatePpSavedAmounts();
+    if (typeof quotationRestoreSavedGroupLandAmounts === 'function') {
+        quotationRestoreSavedGroupLandAmounts();
+    }
     if (typeof quotationSnapshotDefaultCostingAmounts === 'function') {
         quotationSnapshotDefaultCostingAmounts(true, 'pp');
     }
@@ -2446,6 +2488,9 @@ $(document).ready(function () {
     }
     setTimeout(function () {
         quotationRestoreUpdatePpSavedAmounts();
+        if (typeof quotationRestoreSavedGroupLandAmounts === 'function') {
+            quotationRestoreSavedGroupLandAmounts();
+        }
         if (typeof calculateCostingCardsUpdate === 'function') {
             calculateCostingCardsUpdate({ recalcServiceCharge: false });
         }
@@ -2467,6 +2512,12 @@ function costing_reflect()
 	if(id=="group_costing"){
 		$('#group_costing_tab').show();
 		$('#per_person_costing_tab').hide();
+		if (typeof quotationMarkSavedGroupLandAsManual === 'function') {
+			quotationMarkSavedGroupLandAsManual();
+		}
+		if (typeof quotationRestoreSavedGroupLandAmounts === 'function') {
+			quotationRestoreSavedGroupLandAmounts();
+		}
 		if (typeof quotationRepairStaleZeroDefaultAmounts === 'function') {
 			quotationRepairStaleZeroDefaultAmounts('group');
 		}

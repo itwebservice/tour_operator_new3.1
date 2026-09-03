@@ -77,6 +77,7 @@ $role_id = $_SESSION['role_id'];
 
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
+            <input type="hidden" id="destinations" name="destinations" value='<?= get_destinations() ?>'>
             <input type="text" id="tour_name" name="tour_name" onchange="validate_spaces(this.id);"
                 placeholder="*Tour Name" title="Tour Name">
 
@@ -157,6 +158,12 @@ $role_id = $_SESSION['role_id'];
                 title="Total Single Person" onchange="total_passangers_calculate();cost_reflect();">
 
         </div>
+        <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+
+            <input type="number" id="extra_bed" name="extra_bed" placeholder="Extra Bed"
+                title="Extra Bed" onchange="validate_balance(this.id);cost_reflect();">
+
+        </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
@@ -230,7 +237,14 @@ $(document).ready(function() {
     }
 });
 $("#customer_name").autocomplete({
-    // source: JSON.parse($('#cust_data').val()),
+    source: (function() {
+        try {
+            var parsed = JSON.parse($('#cust_data').val() || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    })(),
     select: function(event, ui) {
         $("#customer_name").val(ui.item.label);
         $('#mobile_no').val(ui.item.contact_no);
@@ -248,6 +262,37 @@ $("#customer_name").autocomplete({
         .append("<a>" + item.label + "</a>")
         .appendTo(ul);
 };
+(function () {
+    var destSource = [];
+    try {
+        destSource = JSON.parse($('#destinations').val() || '[]');
+        if (!Array.isArray(destSource)) {
+            destSource = [];
+        }
+    } catch (e) {
+        destSource = [];
+    }
+    if (!$('#tour_name').length || typeof $('#tour_name').autocomplete !== 'function') {
+        return;
+    }
+    $("#tour_name").autocomplete({
+        source: destSource,
+        minLength: 1,
+        select: function (event, ui) {
+            $("#tour_name").val(ui.item.label);
+            return false;
+        },
+        open: function () {
+            $(this).autocomplete("widget").css({
+                "width": document.getElementById("tour_name").offsetWidth
+            });
+        }
+    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+        return $("<li>")
+            .append("<a>" + item.label + "</a>")
+            .appendTo(ul);
+    };
+})();
 // New Customization ----end
 function mobile_number() {
     if ($('#enquiry_id').val() == '0') {

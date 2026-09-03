@@ -412,6 +412,12 @@ $(function() {
 
             var err_msg = "";
 
+            if ($('#tour_name').length && !destination_name) {
+                var destLabel = ($('#tour_name').attr('placeholder') || 'Destination').replace('*', '');
+                error_msg_alert(destLabel + " is required!");
+                return false;
+            }
+
             if (reference == 3) {
                 if (customer_dropdown == '') {
                     error_msg_alert('Select Customer!');
@@ -430,7 +436,10 @@ $(function() {
                 if (field_val == "") {
                     var placeholder = $('#' + field).attr('name');
                     if (placeholder != 'Child Without Bed' && placeholder != 'Child With Bed' &&
-                        placeholder != 'budget' && placeholder != 'total_single_person') {
+                        placeholder != 'budget' && placeholder != 'total_single_person' &&
+                        placeholder != 'children_with_bed' && placeholder != 'children_without_bed' &&
+                        placeholder != 'total_cwb' && placeholder != 'total_cwob' &&
+                        placeholder != 'total_child_flight' && placeholder != 'total_infant_flight') {
                         if (placeholder == "places_to_visit") {
                             placeholder = "route";
                         } else if (placeholder == "hotel_type") {

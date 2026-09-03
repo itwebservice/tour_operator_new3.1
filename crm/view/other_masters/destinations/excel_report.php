@@ -141,7 +141,7 @@ $objPHPExcel->getProperties()->setCreator("Maarten Balliauw")
 //////////////////////////****************Content start**************////////////////////////////////
 $row_count = 1;
 
-$status = $_GET['status'];
+$status = isset($_GET['status']) ? $_GET['status'] : '';
 $role = $_SESSION['role'];
 $branch_admin_id = $_SESSION['branch_admin_id'];
 
@@ -150,7 +150,7 @@ $objPHPExcel->setActiveSheetIndex(0)
             ->setCellValue('A2', 'Report Name')
             ->setCellValue('B2', 'Destinations')
             ->setCellValue('A3', 'Status')
-            ->setCellValue('B3', $status);
+            ->setCellValue('B3', ($status != '' ? $status : 'All'));
 
 $objPHPExcel->getActiveSheet()->getStyle('A2:B2')->applyFromArray($header_style_Array);
 $objPHPExcel->getActiveSheet()->getStyle('A2:B2')->applyFromArray($borderArray);
@@ -163,23 +163,23 @@ $objPHPExcel->setActiveSheetIndex(0)
 
         ->setCellValue('A'.$row_count, "Dest ID")
 
-        ->setCellValue('B'.$row_count, "Destination");
+        ->setCellValue('B'.$row_count, "Destination")
+
+        ->setCellValue('C'.$row_count, "Status");
 
 
 
-$objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':B'.$row_count)->applyFromArray($header_style_Array);
+$objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':C'.$row_count)->applyFromArray($header_style_Array);
 
-$objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':B'.$row_count)->applyFromArray($borderArray);    
+$objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':C'.$row_count)->applyFromArray($borderArray);    
 
 
 
 $row_count++;
 
+$query = "select * from destination_master where 1";
 if($status != ''){
-    $query = "select * from destination_master where 1 and status='$status'";
-}else{
-    
-    $query = "select * from destination_master where 1 and status='Active'";
+    $query .= " and status='$status'";
 }
 $sq_mobile_no = mysqlQuery($query);
 
@@ -191,12 +191,14 @@ while($row_mobile_no = mysqli_fetch_assoc($sq_mobile_no)){
 
         ->setCellValue('A'.$row_count, $row_mobile_no['dest_id'])
 
-        ->setCellValue('B'.$row_count, $row_mobile_no['dest_name']);
+        ->setCellValue('B'.$row_count, $row_mobile_no['dest_name'])
+
+        ->setCellValue('C'.$row_count, $row_mobile_no['status']);
 
 
-    $objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':B'.$row_count)->applyFromArray($content_style_Array);
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':C'.$row_count)->applyFromArray($content_style_Array);
 
-	$objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':B'.$row_count)->applyFromArray($borderArray);    
+	$objPHPExcel->getActiveSheet()->getStyle('A'.$row_count.':C'.$row_count)->applyFromArray($borderArray);    
 
 
 

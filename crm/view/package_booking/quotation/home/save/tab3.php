@@ -2,6 +2,24 @@
     #ui-datepicker-div {
         display: none !important;
     }
+    .quotation-datetime-td {
+        min-width: 165px;
+        max-width: 180px;
+        vertical-align: middle !important;
+    }
+    .quotation-datetime-td .form-control {
+        width: 100% !important;
+        min-width: 0;
+    }
+    #tbl_package_tour_quotation_dynamic_plane .quotation-datetime-td,
+    #tbl_package_tour_quotation_dynamic_train .quotation-datetime-td,
+    #tbl_dynamic_cruise_quotation .quotation-datetime-td,
+    #tbl_package_tour_quotation_dynamic_excursion .quotation-datetime-td {
+        white-space: nowrap;
+    }
+    .xdsoft_datetimepicker {
+        z-index: 10050 !important;
+    }
 </style>
 <form id="frm_tab3">
     <div class="app_panel" style="overflow:hidden;">
@@ -229,13 +247,13 @@
                                                                     class="form-control app_select2 drop_to"
                                                                     onchange="get_transport_cost();">
                                                                 </select></td>
-                                                            <td><select name="duration-" id="duration-" style="width:170px;" title="*Service Duration" data-toggle="tooltip" class="form-control app_select2" onchange="get_transport_cost();">
+                                                            <td><select name="duration-" id="duration-" style="width:180px;" title="*Service Duration" data-toggle="tooltip" class="form-control app_select2" onchange="get_transport_cost();">
                                                                     <option value="">*Service Duration</option>
                                                                     <?php echo get_service_duration_dropdown(); ?>
                                                                 </select></td>
                                                             <td><input type="text" id="no_vehicles-" name="no_vehicles-"
                                                                     placeholder="*No.Of vehicles" title="No.Of vehicles"
-                                                                    style="width:150px"
+                                                                    style="width:180px"
                                                                     onchange="get_transport_cost();"></td>
                                                             <td style="display:none;"><input type="text"
                                                                     id="transport_cost-" name="transport_cost-"
@@ -246,13 +264,13 @@
                                                                     placeholder="Package Name" title="Package Name"
                                                                     style="width:200px" style="display:none;" readonly>
                                                             </td>
-                                                            <td><input type="text" id="package_id-" name="package_id-"
+                                                            <td style="display:none;"><input type="text" id="package_id-" name="package_id-"
                                                                     placeholder="Package ID" title="Package ID"
-                                                                    style="display:none;"></td>
-                                                            <td><input type="hidden" id="pickup_type-"
-                                                                    name="pickup_type-" style="display:none;"></td>
-                                                            <td><input type="hidden" id="drop_type" name="drop_type"
-                                                                    style="display:none;"></td>
+                                                                    ></td>
+                                                            <td style="display:none;"><input type="hidden" id="pickup_type-"
+                                                                    name="pickup_type-" ></td>
+                                                            <td style="display:none;"><input type="hidden" id="drop_type" name="drop_type"
+                                                                    ></td>
                                                         </tr>
                                                     </table>
                                                 </div>
@@ -330,21 +348,18 @@
                                                                     title="Class" style="width: 170px !important;">
                                                                     <?php get_flight_class_dropdown(); ?>
                                                                 </select></td>
-                                                            <td><input type="text" id="txt_dapart1" name="txt_dapart"
-                                                                    class="app_datetimepicker"
+                                                            <td class="quotation-datetime-td"><input type="text" id="txt_dapart1" name="txt_dapart"
+                                                                    class="form-control app_datetimepicker"
                                                                     placeholder="*Departure Date and time"
                                                                     title="Departure Date and time"
                                                                     onchange="get_to_datetime(this.id,'txt_arrval1')"
-                                                                    value="<?= date('d-m-Y H:i') ?>"
-                                                                    style="width: 150px;" /></td>
-                                                            <td><input type="text" id="txt_arrval1" name="txt_arrval"
-                                                                    class="app_datetimepicker"
+                                                                    value="<?= date('d-m-Y H:i') ?>" /></td>
+                                                            <td class="quotation-datetime-td"><input type="text" id="txt_arrval1" name="txt_arrval"
+                                                                    class="form-control app_datetimepicker"
                                                                     placeholder="*Arrival Date and time"
                                                                     title="Arrival Date and time"
                                                                     value="<?= date('d-m-Y H:i') ?>"
-                                                                    style="width: 150px;"
-                                                                    onchange="validate_validDatetime('txt_dapart1',this.id)" />
-                                                            </td>
+                                                                    onchange="validate_validDatetime('txt_dapart1',this.id)" /></td>
                                                             <td><input type="hidden" id="from_city-1"></td>
                                                             <td><input type="hidden" id="to_city-1"></td>
                                                         </tr>
@@ -398,11 +413,11 @@
                                                             <td style="width:10%"><input maxlength="15" value="1"
                                                                     type="text" name="username1" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td><input type="text" id="exc_date-1" name="exc_date-1"
+                                                            <td class="quotation-datetime-td"><input type="text" id="exc_date-1" name="exc_date-1"
                                                                     placeholder="Activity Date & Time"
                                                                     title="Activity Date & Time"
-                                                                    class="app_datetimepicker"
-                                                                    value="" style="width:150px"
+                                                                    class="form-control app_datetimepicker"
+                                                                    value=""
                                                                     onchange="get_excursion_amount();"></td>
                                                             <td><select id="city_name-1" class="form-control exc_city"
                                                                     name="city_name-1" title="City Name"
@@ -560,21 +575,21 @@
                                                                     <option value="SL">SL</option>
                                                                     <option value="2S">2S</option>
                                                                 </select></td>
-                                                            <td class="col-md-2 no-pad"><input type="text"
+                                                            <td class="col-md-2 no-pad quotation-datetime-td"><input type="text"
                                                                     id="train_departure_date"
                                                                     name="train_departure_date"
                                                                     placeholder="Departure Date and time"
                                                                     title="Departure Date and time"
-                                                                    class="app_datetimepicker" style="width:100% !important;"
+                                                                    class="form-control app_datetimepicker"
                                                                     onchange="get_to_datetime(this.id,'train_arrival_date')"
                                                                     value="<?= date('d-m-Y H:i') ?>">
                                                             </td>
-                                                            <td class="col-md-2 no-pad"><input type="text"
+                                                            <td class="col-md-2 no-pad quotation-datetime-td"><input type="text"
                                                                     id="train_arrival_date" name="train_arrival_date"
                                                                     placeholder="Arrival Date and time"
                                                                     title="Arrival Date and time"
-                                                                    class="app_datetimepicker"
-                                                                    value="<?= date('d-m-Y H:i') ?>" style="width:100% !important;"
+                                                                    class="form-control app_datetimepicker"
+                                                                    value="<?= date('d-m-Y H:i') ?>"
                                                                     onchange="validate_validDatetime('train_departure_date',this.id)">
                                                             </td>
                                                         </tr>
@@ -625,18 +640,18 @@
                                                             <td><input maxlength="15" value="1" type="text"
                                                                     name="username" placeholder="Sr. No."
                                                                     class="form-control" disabled /></td>
-                                                            <td><input type="text" id="cruise_departure_date"
+                                                            <td class="quotation-datetime-td"><input type="text" id="cruise_departure_date"
                                                                     name="cruise_departure_date"
                                                                     placeholder="Departure Date and time"
                                                                     title="Departure Date and time"
-                                                                    class="app_datetimepicker"
+                                                                    class="form-control app_datetimepicker"
                                                                     onchange="get_to_datetime(this.id,'cruise_arrival_date')"
                                                                     value="<?= date('d-m-Y H:i') ?>"></td>
-                                                            <td><input type="text" id="cruise_arrival_date"
+                                                            <td class="quotation-datetime-td"><input type="text" id="cruise_arrival_date"
                                                                     name="cruise_arrival_date"
                                                                     placeholder="Arrival Date and time"
                                                                     title="Arrival Date and time"
-                                                                    class="app_datetimepicker"
+                                                                    class="form-control app_datetimepicker"
                                                                     value="<?= date('d-m-Y H:i') ?>"
                                                                     onchange="validate_validDatetime('cruise_departure_date',this.id)">
                                                             </td>
@@ -694,9 +709,63 @@
     if (typeof initAllAirlineSelectAddNew === 'function') {
         initAllAirlineSelectAddNew('#tbl_package_tour_quotation_dynamic_plane');
     }
-    $('#cruise_departure_date,#cruise_arrival_date,#exc_date-1').datetimepicker({
-        format: "d-m-Y H:i"
-    });
+
+    var quotationTab3DateTimeTables = [
+        '#tbl_package_tour_quotation_dynamic_plane',
+        '#tbl_package_tour_quotation_dynamic_train',
+        '#tbl_dynamic_cruise_quotation',
+        '#tbl_package_tour_quotation_dynamic_excursion'
+    ].join(', ');
+
+    function initPackageQuotationDateTimePicker(scope) {
+        var dateTimeOpts = {
+            format: 'd-m-Y H:i',
+            parentID: 'body',
+            fixed: true,
+            scrollInput: false
+        };
+        var $scope = scope ? $(scope) : $(quotationTab3DateTimeTables);
+        $scope.find('.app_datetimepicker').each(function () {
+            var $el = $(this);
+            if ($el.data('xdsoft_datetimepicker')) {
+                $el.datetimepicker('destroy');
+            }
+            $el.datetimepicker(dateTimeOpts);
+            if (!$el.hasClass('form-control')) {
+                $el.addClass('form-control');
+            }
+        });
+    }
+    window.initPackageQuotationDateTimePicker = initPackageQuotationDateTimePicker;
+
+    initPackageQuotationDateTimePicker();
+
+    (function () {
+        var tab3DateTimeTableIds = [
+            'tbl_package_tour_quotation_dynamic_plane',
+            'tbl_package_tour_quotation_dynamic_train',
+            'tbl_dynamic_cruise_quotation',
+            'tbl_package_tour_quotation_dynamic_excursion'
+        ];
+        var nativeAddRow = window.addRow;
+        if (typeof nativeAddRow !== 'function') {
+            return;
+        }
+        window.addRow = function (tableID, quot_table, itinerary) {
+            nativeAddRow.apply(this, arguments);
+            if (tab3DateTimeTableIds.indexOf(tableID) === -1) {
+                return;
+            }
+            setTimeout(function () {
+                var table = document.getElementById(tableID);
+                if (!table || !table.rows.length) {
+                    return;
+                }
+                initPackageQuotationDateTimePicker(table.rows[table.rows.length - 1]);
+            }, 50);
+        };
+    })();
+
     $('#check_in-1, #check_out-1,#transport_start_date-,#transport_end_date-').datetimepicker({
         format: 'd-m-Y',
         timepicker: false
@@ -977,12 +1046,18 @@
 
     // Event handlers for city and hotel dropdowns
     $('#tbl_package_tour_quotation_dynamic_hotel').on('change select2:select', 'select[id^="city_name"], select[name^="city_name"]', function() {
+        if (window.quotationSkipCityHotelAutoLoad) {
+            return;
+        }
         console.log("City dropdown changed:", this.id, "Value:", $(this).val());
         hotel_name_list_load(this.id);
     });
 
     // Additional event handler for manual trigger
     $(document).on('change', 'select[name^="city_name"]', function() {
+        if (window.quotationSkipCityHotelAutoLoad) {
+            return;
+        }
         if ($(this).closest('#tbl_package_tour_quotation_dynamic_hotel').length > 0) {
             console.log("Manual city dropdown change detected:", this.id, "Value:", $(this).val());
             hotel_name_list_load(this.id);
@@ -990,6 +1065,9 @@
     });
 
     $('#tbl_package_tour_quotation_dynamic_hotel').on('change', 'select[name^="hotel_name"]', function() {
+        if (window.quotationSkipHotelTypeAutoLoad) {
+            return;
+        }
         hotel_type_load(this.id);
     });
     //Get Transport Cost
@@ -1234,8 +1312,10 @@
             var row = table.rows[i];
             if (row.cells[0].childNodes[0].checked) {
                 bsmValues.push([{
-                    "basic": 'basic',
-                    "service": 'service',
+                    "basic": (typeof quotationGroupInclusiveShowAmount === 'function'
+                        ? quotationGroupInclusiveShowAmount('-').basic : ''),
+                    "service": (typeof quotationGroupInclusiveShowAmount === 'function'
+                        ? quotationGroupInclusiveShowAmount('-').service : ''),
                     'tax_apply_on': row.cells[10].childNodes[3].value,
                     'tax_value': row.cells[11].childNodes[3].value,
                     'tcsper': row.cells[13].childNodes[3].value,
@@ -2716,12 +2796,6 @@
             return false;
         }
 
-        var selectedPackageType = $('#package_type').val();
-        if (!selectedPackageType || selectedPackageType === '*Package Type') {
-            error_msg_alert('Please select Package Type!');
-            return false;
-        }
-
         var table = document.getElementById(tableID);
         if (!table) {
             return false;
@@ -2729,6 +2803,26 @@
 
         var rowCountBefore = table.rows.length;
         var prevRow = rowCountBefore > 0 ? table.rows[rowCountBefore - 1] : null;
+        var prevRef = (prevRow && typeof quotationGetHotelRowReference === 'function')
+            ? quotationGetHotelRowReference(prevRow)
+            : null;
+        var selectedPackageType = (prevRef && prevRef.package_type) ? prevRef.package_type : '';
+        if (!selectedPackageType && prevRow && typeof quotationGetHotelRowPackageType === 'function') {
+            selectedPackageType = quotationGetHotelRowPackageType(prevRow);
+        }
+        if (!selectedPackageType && prevRow && prevRow.cells[2]) {
+            var prevPkgSelect = prevRow.cells[2].querySelector('select');
+            if (prevPkgSelect) {
+                selectedPackageType = $(prevPkgSelect).val() || prevPkgSelect.value || '';
+            }
+        }
+        if (!selectedPackageType || selectedPackageType === '*Package Type') {
+            selectedPackageType = $('#package_type').val();
+        }
+        if (!selectedPackageType || selectedPackageType === '*Package Type') {
+            error_msg_alert('Please select Package Type!');
+            return false;
+        }
         var $btn = $('#addHotelInfoSingleRowbtnsubmit');
 
         window.quotationAddingSingleHotelRow = true;
@@ -2751,13 +2845,18 @@
             return false;
         }
 
-        if (typeof quotationResetHotelRowFields === 'function') {
-            quotationResetHotelRowFields(newRow, { packageType: selectedPackageType });
+        if (prevRef && typeof quotationApplyHotelRowReference === 'function') {
+            if (!prevRef.package_type) {
+                prevRef.package_type = selectedPackageType;
+            }
+            quotationApplyHotelRowReference(newRow, prevRef, { chainDates: true });
         }
-        if (typeof quotationInitEditablePackageTypeSelect === 'function') {
+        if (typeof quotationSetHotelRowPackageType === 'function') {
+            quotationSetHotelRowPackageType(newRow, selectedPackageType);
+        } else if (typeof quotationInitEditablePackageTypeSelect === 'function') {
             quotationInitEditablePackageTypeSelect(newRow, selectedPackageType);
         } else {
-            var $pkgSelect = $(newRow.cells[2].childNodes[0]);
+            var $pkgSelect = $(newRow.cells[2].querySelector('select') || newRow.cells[2].childNodes[0]);
             $pkgSelect.prop('disabled', false)
                 .attr('data-editable-package-type', '1')
                 .val(selectedPackageType)
@@ -2772,13 +2871,6 @@
             newRow.cells[1].childNodes[0].value = newSrNo;
         }
 
-        if (prevRow && typeof quotationGetHotelRowReference === 'function') {
-            var ref = quotationGetHotelRowReference(prevRow);
-            if (ref && ref.check_out && newRow.cells[6] && newRow.cells[6].childNodes[0]) {
-                newRow.cells[6].childNodes[0].value = ref.check_out;
-            }
-        }
-
         if (typeof initAllHotelSelectAddNew === 'function') {
             initAllHotelSelectAddNew(newRow);
         }
@@ -2787,6 +2879,9 @@
         }
         if (typeof initPackageQuotationMealPlanSelect === 'function') {
             initPackageQuotationMealPlanSelect(newRow);
+            if (prevRef && prevRef.meal_plan && newRow.cells[16] && newRow.cells[16].childNodes[0]) {
+                $(newRow.cells[16].childNodes[0]).val(prevRef.meal_plan).trigger('change');
+            }
         }
 
         if (typeof saveHotelTableState === 'function') {

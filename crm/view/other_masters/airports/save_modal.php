@@ -37,7 +37,17 @@ include_once("../../../model/model.php");
         
 
           <table id="tbl_airport_master" name="tbl_airport_master" class="table border_0 table-hover no-marg pd_bt_51">
-
+              <thead>
+                <tr class="table-heading-row">
+                  <th></th>
+                  <th></th>
+                  <th>City</th>
+                  <th>Airport Name</th>
+                  <th>Airport Code</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
               <tr>
 
                   <td><input id="chk_airport1" type="checkbox" checked></td>
@@ -51,8 +61,13 @@ include_once("../../../model/model.php");
 
                   <td><input type="text" id="airport_code1" name="airport_code" onchange="validate_alphanumeric(this.id)" placeholder="*Airport Code" title="Airport Code" style="text-transform: uppercase;"></td>
 
-              </tr>                                
+                  <td><select name="active_flag1" id="active_flag1" class="form-control" title="*Status" style="width:130px">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select></td>
 
+              </tr>
+              </tbody>
           </table>  
 
 
@@ -115,11 +130,13 @@ $('#frm_save').validate({
 
         var table = document.getElementById("tbl_airport_master");
 
-        var rowCount = table.rows.length;
+        var tbody = table.tBodies[0] || table;
+
+        var rowCount = tbody.rows.length;
         for(var i=0; i<rowCount; i++)
         {
 
-          var row = table.rows[i];
+          var row = tbody.rows[i];
 
           if(row.cells[0].childNodes[0].checked)
           {  
@@ -130,12 +147,15 @@ $('#frm_save').validate({
 
               var airport_code = row.cells[4].childNodes[0].value;
 
+              var airport_status = row.cells[5] && row.cells[5].childNodes[0] ? row.cells[5].childNodes[0].value : '';
+
 
 
               if(city_id==""){ error_msg +="Select city in row : "+(i+1)+"<br>"; }
 
               if(airport_name==""){ error_msg +="Airport name is required in row : "+(i+1)+"<br>"; }
               if(airport_code==""){ error_msg +="Airport code is required in row : "+(i+1)+"<br>"; }
+              if(airport_status==""){ error_msg +="Status is required in row : "+(i+1)+"<br>"; }
 
               city_id_arr.push(city_id);
 
@@ -143,7 +163,7 @@ $('#frm_save').validate({
 
               airport_code_arr.push(airport_code);
 
-              airport_status_arr.push('Active');
+              airport_status_arr.push(airport_status);
           }
           else{
             if(rowCount == '1'){

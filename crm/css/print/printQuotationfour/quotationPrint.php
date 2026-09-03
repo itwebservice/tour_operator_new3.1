@@ -120,8 +120,11 @@ line-height: 16px;
 .travsportInfoBlock {
 border: 1px solid <?= $theme_color ?>;
 position: relative;
-width: 90%;
-margin-left: 10%;
+width: 100%;
+margin-left: 0;
+padding: 8px 6px;
+box-sizing: border-box;
+overflow: hidden;
 }
 .transportIcon {
 background-color: <?= $theme_color ?> !important;
@@ -140,11 +143,86 @@ top: calc(50% - 50px);
 left: calc(50% - 50px);
 }
 .transportDetails {
-width: 86%;
-margin-left: 14%;
+width: 100%;
+margin-left: 0;
 position: relative;
-min-height: 130px;
-display : inline-block;
+min-height: auto;
+display: block;
+padding: 0;
+box-sizing: border-box;
+}
+.transportDetailsPanel .table-responsive {
+width: 100%;
+max-width: 100%;
+overflow: hidden;
+margin: 0;
+}
+.transportDetailsPanel .quotation-table-wrap {
+width: 100%;
+max-width: 100%;
+overflow: hidden;
+margin: 0;
+}
+.transportDetailsPanel {
+width: 100%;
+max-width: 100%;
+box-sizing: border-box;
+overflow: hidden;
+}
+.transportDetailsPanel table.tableTrnasp,
+.transportDetailsPanel table.quotation-doc-table {
+width: 100% !important;
+max-width: 100% !important;
+table-layout: fixed !important;
+border-collapse: collapse !important;
+border-spacing: 0 !important;
+margin: 0 !important;
+}
+.transportDetailsPanel table.tableTrnasp th,
+.transportDetailsPanel table.tableTrnasp td,
+.transportDetailsPanel table.quotation-doc-table th,
+.transportDetailsPanel table.quotation-doc-table td {
+padding: 4px 2px !important;
+padding-left: 2px !important;
+text-align: left !important;
+vertical-align: top !important;
+word-wrap: break-word !important;
+overflow-wrap: anywhere !important;
+word-break: break-word !important;
+white-space: normal !important;
+font-size: 9px !important;
+font-weight: 400 !important;
+color: #22262E !important;
+border: 0 !important;
+border-top: 0 !important;
+border-bottom: 0 !important;
+box-sizing: border-box !important;
+max-width: 0 !important;
+min-width: 0 !important;
+overflow: hidden;
+}
+.transportDetailsPanel table.tableTrnasp tr.table-heading-row th,
+.transportDetailsPanel table.quotation-doc-table tr.table-heading-row th {
+font-size: 7px !important;
+font-weight: 600 !important;
+text-transform: uppercase;
+background-color: #f4eeee !important;
+-webkit-print-color-adjust: exact;
+}
+.transportDetailsPanel table.tableTrnasp th:after,
+.transportDetailsPanel table.tableTrnasp th:before,
+.transportDetailsPanel table.quotation-doc-table th:after,
+.transportDetailsPanel table.quotation-doc-table th:before {
+display: none !important;
+content: none !important;
+width: 0 !important;
+height: 0 !important;
+}
+.pageSectionInner {
+position: relative !important;
+width: 100% !important;
+left: auto !important;
+top: auto !important;
 }
 .transportDetails .transportDetailsHalf {
 display: table;
@@ -396,21 +474,16 @@ font-size: 36px;
 
 .table td, .modal table.dataTable td {
 border: 0 !important;
-font-size: 10px !important;
+<!-- font-size: 10px ; -->
 font-weight: 400;
 color: #22262E;
 padding: 15px 8px 10px 28px !important;
 }
-table th, .modal table.dataTable th{
-font-size: 12px !important;
-padding-left: 28px !important;
-text-transform: uppercase;
-font-weight: 600 !important;
-border: 0 !important;
-border-bottom: 1px solid #ddd !important;
-border-top: 1px solid #ddd !important;
-color:<?= $theme_color ?> !important;
+.transportDetailsPanel .table td,
+.transportDetailsPanel .table th {
+padding: 8px 6px !important;
 }
+
 
 .transportDetails_costing {
 width: 100%;
@@ -437,4 +510,71 @@ text-decoration:underline !important;
 table tr.table-heading-row th, table tfoot tr td{
 -webkit-print-color-adjust: exact;
 }
+}
+
+/* FIT quotation doc tables - must be last to override bootstrap/app.php */
+.transportDetailsPanel .quot-table-wrap {
+width: 100% !important;
+max-width: 100% !important;
+overflow: hidden !important;
+margin: 0 !important;
+padding: 0 !important;
+}
+.transportDetailsPanel table.quot-fit-doc-table {
+width: 100% !important;
+max-width: 100% !important;
+table-layout: fixed !important;
+border-collapse: collapse !important;
+margin: 0 !important;
+}
+.transportDetailsPanel table.quot-fit-doc-table thead tr.table-heading-row {
+background-color: #f4eeee !important;
+-webkit-print-color-adjust: exact;
+}
+.transportDetailsPanel table.quot-fit-doc-table th,
+.transportDetailsPanel table.quot-fit-doc-table td {
+padding: 4px 3px !important;
+padding-left: 3px !important;
+padding-right: 3px !important;
+font-size: 10px !important;
+font-family: Poppins, sans-serif !important;
+word-wrap: break-word !important;
+overflow-wrap: anywhere !important;
+word-break: break-word !important;
+white-space: normal !important;
+border: 0 !important;
+border-top: 0 !important;
+border-bottom: 0 !important;
+box-sizing: border-box !important;
+max-width: 0 !important;
+min-width: 0 !important;
+overflow: hidden !important;
+vertical-align: middle !important;
+line-height: 1.3 !important;
+margin: 0 !important;
+text-indent: 0 !important;
+}
+body .transportDetailsPanel table.quot-fit-doc-table > thead > tr > th,
+body .transportDetailsPanel table.quot-fit-doc-table > tbody > tr > td {
+padding-left: 3px !important;
+padding-right: 3px !important;
+}
+.transportDetailsPanel table.quot-fit-doc-table tr.table-heading-row th {
+font-size: 10px !important;
+font-family: Poppins, sans-serif !important;
+font-weight: 600 !important;
+text-transform: uppercase;
+background-color: #f4eeee !important;
+-webkit-print-color-adjust: exact;
+}
+.transportDetailsPanel table.quot-fit-doc-table th:after,
+.transportDetailsPanel table.quot-fit-doc-table th:before {
+display: none !important;
+content: none !important;
+width: 0 !important;
+height: 0 !important;
+padding: 0 !important;
+margin: 0 !important;
+left: 0 !important;
+position: static !important;
 }

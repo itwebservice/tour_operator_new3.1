@@ -106,33 +106,19 @@ $year = date('Y');
                                     <option value="Transport">Transport</option>
                                 </select>
                             </div>
-                            <!-- <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
-                                <select name="city_name" id="city_name" title="Supplier Name" class="form-control"
-                                    style="width:100%;height: auto; overflow-y: auto; max-height: 100px;" multiple="true">
-                                    <?php //get_cities_dropdown(); 
-                  ?>
-                                    <optgroup label="Select Supplier">
-                                        <option value="">Select Supplier</option>
-                                    </optgroup>
-                                </select>
-                            </div> -->
                             <div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_xs">
                                 <input type="text" id="quotation_date" name="quotation_date"
                                     placeholder="Quotation Date" title="Quotation Date" value="<?= date('d-m-Y') ?>">
                             </div>
                         </div>
                         <div class="row" style="margin-top: 20px;">
-    <div class="col-md-6 col-sm-6 col-xs-12 mg_bt_10_xs" 
-         style="height: auto; overflow-y: auto; max-height: 150px;">
-        <select name="city_name" id="city_name" title="Supplier Name" class="form-control"
-            style="width: 100%; height: auto; overflow-y: auto; max-height: 100px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;" multiple="true">
-            <?php //get_cities_dropdown(); ?>
-            <optgroup label="Select Supplier">
-                <option value="">Select Supplier</option>
-            </optgroup>
-        </select>
-    </div>
-</div>
+                            <div class="col-md-6 col-sm-6 col-xs-12 mg_bt_10_xs">
+                                <select name="city_name" id="city_name" title="Supplier Name" class="form-control"
+                                    data-placeholder="*Supplier Name" multiple="multiple" style="width: 100%;">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="panel panel-default panel-body app_panel_style feildset-panel">
@@ -206,13 +192,7 @@ $(document).ready(function() {
     $('#enquiry_id, #service_id1').select2({
         dropdownParent: $("#save_modal")});
 
-        $('#city_name').select2({
-    dropdownParent: $("#save_modal"),
-    maximumSelectionLength: 5, // Optional: Limit maximum selections
-    width: '100%',
-    dropdownCssClass: "select2-dropdown",
-    containerCssClass: "select2-container"
-});
+        init_supplier_select();
 
     $('#quotation_date,#from_date,#to_date').datetimepicker({
         timepicker: false,
@@ -221,12 +201,25 @@ $(document).ready(function() {
 });
 
 $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+function init_supplier_select() {
+    if ($('#city_name').hasClass('select2-hidden-accessible')) {
+        $('#city_name').select2('destroy');
+    }
+    $('#city_name').select2({
+        dropdownParent: $("#save_modal"),
+        placeholder: '*Supplier Name',
+        allowClear: true,
+        maximumSelectionLength: 5,
+        width: '100%'
+    });
+}
 function load_supplier() {
     var quotation_for = $('#quotation_for').val();
     $.post('request/inc/load_supplier.php', {
         quotation_for: quotation_for
     }, function(data) {
-        $('#city_name').html(data);
+        $('#city_name').html('<option value=""></option>' + data);
+        init_supplier_select();
     });
 }
 ///////////////////////***Hotel Master Save start*********//////////////
@@ -422,8 +415,8 @@ $('#frm_hotel_save').validate({
         });
         var emp_id = $('#emp_id').val();
         var err_msg = "";
-        if (city_name == '') {
-            err_msg += "*City name required!<br>";
+        if (!city_name || city_name.length === 0) {
+            err_msg += "*Supplier Name is required!<br>";
         }
         if (quotation_for != "DMC") {
             for (arr1 in dynamic_fields) {

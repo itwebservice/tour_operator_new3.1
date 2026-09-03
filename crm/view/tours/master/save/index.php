@@ -86,11 +86,8 @@ include_once('../../../layouts/fullwidth_app_header.php');
             textarea.selectionStart = start;
             textarea.selectionEnd = end + wrapper.length * 2;
             var text = textarea.value;
-            var content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-
-            // Replace markdown-style underline (__text__) with <u> tags
-            content = content.replace(/__(.*?)__/g, '<u>$1</u>');
-            textarea.value = content;
+            // Keep markdown markers in the editor; do not inject raw HTML tags.
+            textarea.value = text;
             //console.log(content);    
         });
 

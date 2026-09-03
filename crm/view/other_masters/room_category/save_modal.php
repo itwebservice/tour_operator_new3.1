@@ -26,15 +26,15 @@ include "../../../model/model.php";
 
           <div class="row">
 
-            <div class="col-sm-8 col-sm-offset-2 mg_bt_10">
-
+            <div class="col-sm-6 mg_bt_10">
+              <label for="room_category">Room Category</label>
               <input type="text" id="room_category" name="room_category" onchange="fname_validate(this.id);" placeholder="*Room Category" title="Room Category">
 
             </div>
 
-             <div class="col-sm-4 mg_bt_10_sm_xs">
-
-              <select name="active_flag" id="active_flag" title="Status" style="width:100%" class="hidden">
+             <div class="col-sm-6 mg_bt_10">
+              <label for="active_flag">Status</label>
+              <select name="active_flag" id="active_flag" title="*Status" class="form-control" style="width:100%" required>
 
                 <option value="Active">Active</option>
 
@@ -72,7 +72,8 @@ $('#frm_save').validate({
 
     rules:{
 
-            room_category : { required : true }
+            room_category : { required : true },
+            active_flag : { required : true }
 
     },
 

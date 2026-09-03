@@ -536,8 +536,7 @@ Email ID : ".$ass_email_id
       $login_id = $_SESSION['login_id'];
       $flag = true;
 
-      $enq_csv_dir = explode('uploads', $enq_csv_dir);
-      $enq_csv_dir = CSV_READ_URL.'uploads'.$enq_csv_dir[1];
+      $enq_csv_dir = resolve_csv_upload_path($enq_csv_dir);
 
       begin_t();
       $unprocessedArray=array();
@@ -547,7 +546,11 @@ Email ID : ".$ass_email_id
       $count = 1;
       $created_at = date('Y-m-d');
 
-      $handle = fopen($enq_csv_dir, "r");
+      $handle = @fopen($enq_csv_dir, "r");
+      if($handle === false) {
+          echo "error--Unable to read CSV file.";
+          exit;
+      }
       if(empty($handle) === false) {
           while(($data = fgetcsv($handle,0 , ",")) !== FALSE){
             if($count == 1) { $count++; continue; }
@@ -592,7 +595,7 @@ Email ID : ".$ass_email_id
                     if(preg_match('/^[0-9]*$/', $assigned_emp_id) && !empty($enquiry)  && !empty($assigned_emp_id) && !empty($reference_id) && !empty($name) && !empty($data[4]) && !empty($followup_date) && !empty($data[5])){
 
                         $validCount++;
-                        $query = "insert into enquiry_master (enquiry_id, login_id, branch_admin_id,financial_year_id, enquiry_type, enquiry, name, mobile_no,landline_no, email_id,location, assigned_emp_id, enquiry_specification, enquiry_date, followup_date, reference_id, enquiry_content) values ('$enquiry_id', '$login_id', '$branch_admin_id','$financial_year_id', '$enquiry_type', '$enquiry', '$name', '$mobile_no', '$landline_no', '$email_id','$location', '$assigned_emp_id', '$enquiry_specification', '$enquiry_date1', '$followup_date1', '$reference_id', '$enquiry_content')";
+                        $query = "insert into enquiry_master (enquiry_id, login_id, branch_admin_id,financial_year_id, enquiry_type, enquiry, name, mobile_no,landline_no, email_id,location, assigned_emp_id, enquiry_specification, enquiry_date, followup_date, reference_id, enquiry_content, tour_name) values ('$enquiry_id', '$login_id', '$branch_admin_id','$financial_year_id', '$enquiry_type', '$enquiry', '$name', '$mobile_no', '$landline_no', '$email_id','$location', '$assigned_emp_id', '$enquiry_specification', '$enquiry_date1', '$followup_date1', '$reference_id', '$enquiry_content', '".addslashes($data[4])."')";
                         $sq_enquiry = mysqlQuery($query);
 
                         $sq_max = mysqli_fetch_assoc(mysqlQuery("select max(entry_id) as max from enquiry_master_entries"));

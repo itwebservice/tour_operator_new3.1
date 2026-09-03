@@ -61,4 +61,5 @@ setTimeout(function(){
 </script>
 <script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/quotation.js"></script>
 <script src="<?php echo BASE_URL ?>view/package_booking/quotation/group_tour/js/calculation.js"></script>
+<script src="<?php echo BASE_URL ?>view/package_booking/quotation/group_tour/js/group_quotation.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

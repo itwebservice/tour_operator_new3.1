@@ -54,7 +54,6 @@ $entry_id = $_POST['entry_id'];
             <div class="col-md-12 col-sm-12 mg_bt_10">
               <input type="text" name="email_id" class="form-control" title="Email ID" placeholder="Email ID" id="email_id" data-role="tagsinput" onchange="validate_email(this.id)"  style="width:100%; min-height:40px; padding:6px; display:flex; flex-wrap:wrap; 1px solid rgb(204, 204, 204); background-color:#fff; line-height:1.4; overflow-y:auto; border-radius:4px;">
               <input type="hidden" id="cust_data" name="cust_data" value='<?= get_customer_hint_1('enq', 'yes') ?>'>
-              <div id="email-suggestions" style="position: absolute;background: rgb(255 255 255);border: 1px solid rgb(204, 204, 204);top: 39px;width: 520px;height: 32px;z-index: 999; display: none;"></div>
             </div>
           </div>
           <div class="row mg_bt_10">
@@ -202,75 +201,31 @@ $entry_id = $_POST['entry_id'];
     $('.bootstrap-tagsinput input').attr('id', 'targetInput');
     $('#targetInput').attr('size', '100');
     $("#targetInput").autocomplete({
-        source: JSON.parse($('#cust_data').val()),
+        source: (function() {
+            var raw = [];
+            try { raw = JSON.parse($('#cust_data').val() || '[]'); } catch (e) { raw = []; }
+            var seen = {};
+            var unique = [];
+            $.each(raw, function(_, item) {
+                var key = (item.email_id || item.value || '').toString().toLowerCase();
+                if (!key || seen[key]) { return; }
+                seen[key] = true;
+                unique.push(item);
+            });
+            return unique;
+        })(),
         select: function(event, ui) {
-            var base_url = $('#base_url').val();
-
             $('#cust_contact_no').val(ui.item.contact_no);
-            var country_code = ui.item.country_code;
-            $('#country_code').prepend($('<option value=' + ui.item.country_id + '>' + country_code +
-                '</option>'));
-            document.getElementById('country_code').selectedIndex = "0";
-            $('#country_code').trigger('change');
-
+            var phoneCode = ui.item.country_id;
+            if (phoneCode && $('#country_code option[value="' + phoneCode + '"]').length) {
+                $('#country_code').val(phoneCode).trigger('change');
+            }
         }
     });
     $("#cust_contact_no").autocomplete({
-        source: JSON.parse($('#mobile_data').val())
-    });
-    const $suggestionsBox = $('#email-suggestions');
-    $input.on('input', function() {
-      let inputVal = $(this).val().split(',').pop().trim();
-      if (inputVal.length < 2) {
-        $suggestionsBox.hide();
-        return;
-      }
-      var base_url = $('#base_url').val();
-      $.ajax({
-        url: base_url + 'controller/visa_master/visa_email_suggestions.php',
-        method: 'GET',
-        data: {
-          q: inputVal
-        },
-        success: function(data) {
-          let suggestions = JSON.parse(data);
-          let suggestionsHtml = '';
-
-          if (suggestions.length > 0) {
-            suggestions.forEach(item => {
-              suggestionsHtml += `<div class="suggestion-item" style="padding: 5px; cursor: pointer;">${item.email_id}</div>`;
-            });
-
-            let offset = $input.offset();
-            $suggestionsBox.css({
-              top: offset.top + $input.outerHeight(),
-              left: offset.left,
-              width: $input.outerWidth()
-            }).html(suggestionsHtml).show();
-          } else {
-            $suggestionsBox.hide();
-          }
-        }
-      });
-    });
-
-    // On clicking a suggestion
-    $(document).on('click', '.suggestion-item', function() {
-      let email = $(this).text();
-      $('#email_id').tagsinput('add', email);
-      $('#email-suggestions').hide();
-      $('#email_id').val(''); // clear input part
-    });
-
-    // Hide suggestions if clicked outside
-    $(document).on('click', function(e) {
-      if (!$(e.target).closest('#email_id, #email-suggestions').length) {
-        $suggestionsBox.hide();
-      }
+        source: JSON.parse($('#mobile_data').val() || '[]')
     });
   });
   
     
 </script>
-<script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>
-<script src="<?= BASE_URL ?>js/app/field_validation.js"></script>

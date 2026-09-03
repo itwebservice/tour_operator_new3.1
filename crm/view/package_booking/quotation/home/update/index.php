@@ -207,6 +207,13 @@ function get_excursion_amount(options)
         var total_infant = row.cells[9].childNodes[0].value;
         var vehicle_id = row.cells[15] ? ($(row.cells[15].childNodes[0]).val() || row.cells[15].childNodes[0].value || '') : '';
         var total_vehicles = row.cells[16] ? row.cells[16].childNodes[0].value : 0;
+        if (typeof quotationExcursionVehicleCount === 'function') {
+            total_vehicles = quotationExcursionVehicleCount(transfer, total_vehicles);
+            if (row.cells[16] && row.cells[16].childNodes[0] && quotationExcursionNeedsTransfer(transfer)
+                && (!row.cells[16].childNodes[0].value || parseInt(row.cells[16].childNodes[0].value, 10) < 1)) {
+                row.cells[16].childNodes[0].value = total_vehicles;
+            }
+        }
 
         exc_date_arr.push(exc_date);
         exc_arr.push(exc || '');
@@ -257,17 +264,27 @@ function get_excursion_amount(options)
                 if (row.cells[14] && row.cells[14].childNodes[0]) {
                     row.cells[14].childNodes[0].value = amount_arr[i]['infant_cost'];
                 }
-                row.setAttribute('data-transfer-cost', amount_arr[i]['transfer_cost'] || 0);
+                if (typeof quotationSetExcursionRowTransferCost === 'function') {
+                    quotationSetExcursionRowTransferCost(row, amount_arr[i]['transfer_cost'] || 0);
+                } else {
+                    row.setAttribute('data-transfer-cost', amount_arr[i]['transfer_cost'] || 0);
+                }
             } else if (!preserveSaved) {
                 if (row.cells[10] && row.cells[10].childNodes[0]) row.cells[10].childNodes[0].value = 0;
                 if (row.cells[11] && row.cells[11].childNodes[0]) row.cells[11].childNodes[0].value = 0;
                 if (row.cells[12] && row.cells[12].childNodes[0]) row.cells[12].childNodes[0].value = 0;
                 if (row.cells[13] && row.cells[13].childNodes[0]) row.cells[13].childNodes[0].value = 0;
                 if (row.cells[14] && row.cells[14].childNodes[0]) row.cells[14].childNodes[0].value = 0;
-                row.setAttribute('data-transfer-cost', 0);
+                if (typeof quotationSetExcursionRowTransferCost === 'function') {
+                    quotationSetExcursionRowTransferCost(row, 0);
+                } else {
+                    row.setAttribute('data-transfer-cost', 0);
+                }
             }
         }
-        if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+        if (typeof quotationRefreshCostingAfterActivityTariff === 'function') {
+            quotationRefreshCostingAfterActivityTariff({ force: !preserveSaved });
+        } else if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
             quotationRefreshPpCostingFromTravelStaySelections({
                 force: !preserveSaved,
                 preserveIfEmpty: true
@@ -276,7 +293,7 @@ function get_excursion_amount(options)
             && $('#per_person_costing_tab').is(':visible')) {
             quotationRefreshPpActivityFromExcursion({ force: !preserveSaved, preserveIfEmpty: true });
             if (typeof calculateCostingCardsUpdate === 'function') {
-                calculateCostingCardsUpdate({ recalcServiceCharge: false });
+                calculateCostingCardsUpdate({ recalcServiceCharge: true });
             }
         }
     });
@@ -304,12 +321,14 @@ function get_excursion_amount_update(eleid) {
         row.setAttribute('data-transfer-cost', 0);
         var rowSuffixOff = eleid.replace(/^[^-]+-/, '');
         $('#excursion_amount-' + rowSuffixOff).val(0);
-        if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+        if (typeof quotationRefreshCostingAfterActivityTariff === 'function') {
+            quotationRefreshCostingAfterActivityTariff({ force: true });
+        } else if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
             quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
         } else if (typeof quotationRefreshPpActivityFromExcursion === 'function') {
             quotationRefreshPpActivityFromExcursion({ force: true });
             if (typeof calculateCostingCardsUpdate === 'function') {
-                calculateCostingCardsUpdate({ recalcServiceCharge: false });
+                calculateCostingCardsUpdate({ recalcServiceCharge: true });
             }
         }
         return;
@@ -324,6 +343,13 @@ function get_excursion_amount_update(eleid) {
     var total_infant = row.cells[9].childNodes[0].value || 0;
     var vehicle_id = row.cells[15] ? ($(row.cells[15].childNodes[0]).val() || row.cells[15].childNodes[0].value || '') : '';
     var total_vehicles = row.cells[16] ? (row.cells[16].childNodes[0].value || 0) : 0;
+    if (typeof quotationExcursionVehicleCount === 'function') {
+        total_vehicles = quotationExcursionVehicleCount(transfer, total_vehicles);
+        if (row.cells[16] && row.cells[16].childNodes[0] && quotationExcursionNeedsTransfer(transfer)
+            && (!row.cells[16].childNodes[0].value || parseInt(row.cells[16].childNodes[0].value, 10) < 1)) {
+            row.cells[16].childNodes[0].value = total_vehicles;
+        }
+    }
     var rowSuffix = eleid.replace(/^[^-]+-/, '');
 
     $.post(base_url + "view/package_booking/quotation/home/excursion_amount_load.php", {
@@ -354,15 +380,21 @@ function get_excursion_amount_update(eleid) {
         if (row.cells[14] && row.cells[14].childNodes[0]) {
             row.cells[14].childNodes[0].value = amount_arr[0]['infant_cost'];
         }
-        row.setAttribute('data-transfer-cost', amount_arr[0]['transfer_cost'] || 0);
+        if (typeof quotationSetExcursionRowTransferCost === 'function') {
+            quotationSetExcursionRowTransferCost(row, amount_arr[0]['transfer_cost'] || 0);
+        } else {
+            row.setAttribute('data-transfer-cost', amount_arr[0]['transfer_cost'] || 0);
+        }
         $('#excursion_amount-' + rowSuffix).val(amount_arr[0]['total_cost']);
 
-        if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
+        if (typeof quotationRefreshCostingAfterActivityTariff === 'function') {
+            quotationRefreshCostingAfterActivityTariff({ force: true });
+        } else if (typeof quotationRefreshPpCostingFromTravelStaySelections === 'function') {
             quotationRefreshPpCostingFromTravelStaySelections({ force: true, preserveIfEmpty: true });
         } else if (typeof quotationRefreshPpActivityFromExcursion === 'function') {
             quotationRefreshPpActivityFromExcursion({ force: true });
             if (typeof calculateCostingCardsUpdate === 'function') {
-                calculateCostingCardsUpdate({ recalcServiceCharge: false });
+                calculateCostingCardsUpdate({ recalcServiceCharge: true });
             }
         }
     });

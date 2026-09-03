@@ -189,7 +189,7 @@
 				<select name="destination_filter" id="destination_filter" title="Select Destination" class="form-control">
                     <option value="">Select Destination</option>
                     <?php
-                    $query = mysqlQuery("SELECT enquiry_content FROM `enquiry_master` 
+                    $query = mysqlQuery("SELECT enquiry_content, tour_name FROM `enquiry_master` 
                         LEFT JOIN enquiry_master_entries AS ef ON enquiry_master.entry_id = ef.entry_id 
                         WHERE enquiry_master.status != 'Disabled'");
 
@@ -201,15 +201,26 @@
 
                         if (is_array($enquiry_content_arr)) {
                             foreach ($enquiry_content_arr as $item) {
-                                if (isset($item['name']) && $item['name'] == 'tour_name') {
-                                    $tour_name = trim($item['value']);
-                                    $key = strtolower($tour_name); // Normalize key for uniqueness
-
-                                    if ($tour_name !== '' && !isset($tour_names[$key])) {
-                                        $tour_names[$key] = $tour_name;
-                                    }
-                                    break; // Stop after finding tour_name
+                                if (!is_array($item)) { continue; }
+                                $candidate = '';
+                                if (isset($item['name']) && in_array($item['name'], array('tour_name','visa_country_name','location_to')) && isset($item['value'])) {
+                                    $candidate = trim($item['value']);
+                                } elseif (isset($item['sector_to'])) {
+                                    $candidate = trim($item['sector_to']);
                                 }
+                                if ($candidate !== '') {
+                                    $key = strtolower($candidate);
+                                    if (!isset($tour_names[$key])) {
+                                        $tour_names[$key] = $candidate;
+                                    }
+                                }
+                            }
+                        }
+                        $col_dest = isset($row['tour_name']) ? trim($row['tour_name']) : '';
+                        if ($col_dest !== '') {
+                            $key = strtolower($col_dest);
+                            if (!isset($tour_names[$key])) {
+                                $tour_names[$key] = $col_dest;
                             }
                         }
                     }
@@ -225,18 +236,19 @@
                 <select name="landline_no_filter" id="landline_no_filter" title="Select Whatsapp No" class="form-control">
                     <option value="">Select Whatsapp No</option>
                     <?php
-                    $query = mysqlQuery("SELECT landline_no FROM `enquiry_master` WHERE status != 'Disabled' AND financial_year_id = '$financial_year_id'");
+                    $query = mysqlQuery("SELECT country_code, landline_no FROM `enquiry_master` WHERE status != 'Disabled' AND financial_year_id = '$financial_year_id'");
                     $unique_landlines = [];
 
                     while ($row = mysqli_fetch_assoc($query)) {
                         $landline_no = trim($row['landline_no']);
-                        
-                        if ($landline_no === '') continue; // Skip empty values
+                        if ($landline_no === '') continue;
 
-                        $key = strtolower($landline_no); // Normalize for case-insensitive comparison
-                        if (isset($unique_landlines[$key])) continue; // Skip duplicates
+                        $country_code = isset($row['country_code']) ? trim($row['country_code']) : '';
+                        $display = ($country_code !== '' && strpos($landline_no, $country_code) !== 0) ? ($country_code . $landline_no) : $landline_no;
+                        $key = strtolower($display);
+                        if (isset($unique_landlines[$key])) continue;
 
-                        $unique_landlines[$key] = $landline_no; // Store original for display
+                        $unique_landlines[$key] = $display;
                     }
 
                     // Optional: sort the numbers alphabetically
@@ -568,6 +580,11 @@
 	const enquiryTableConfig = {
 	         processing: true,
 	         serverSide: true,
+	         ordering: true,
+	         order: [[1, 'desc']],
+	         columnDefs: [
+	            { orderable: false, targets: -1 }
+	         ],
 	         dom: 'lrtip',
 	         ajax: function(data, callback, settings) {
 	

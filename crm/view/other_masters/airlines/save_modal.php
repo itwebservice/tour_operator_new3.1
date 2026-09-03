@@ -42,7 +42,16 @@ include_once("../../../model/model.php");
         
 
           <table id="tbl_airline_master" name="tbl_airline_master" class="table border_0 table-hover no-marg">
-
+              <thead>
+                <tr class="table-heading-row">
+                  <th></th>
+                  <th></th>
+                  <th>Airline Name</th>
+                  <th>Code</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
               <tr>
 
                   <td><input id="chk_airport1" type="checkbox" checked></td>
@@ -53,7 +62,7 @@ include_once("../../../model/model.php");
 
                   <td><input type="text" id="airline_code1" name="airline_code" onchange="validate_alphanumeric(this.id)" style="text-transform: uppercase;" placeholder="*Airline Code" title="Airline Code"></td>
 
-                  <td><select name="active_flag" id="active_flag" title="Status" style="width:100%" class="hidden">
+                  <td><select name="active_flag1" id="active_flag1" title="*Status" class="form-control" style="width:130px">
 
                         <option value="Active">Active</option>
 
@@ -63,8 +72,8 @@ include_once("../../../model/model.php");
 
                   </td>
 
-              </tr>                                
-
+              </tr>
+              </tbody>
           </table>  
 
 
@@ -127,13 +136,15 @@ $('#frm_save').validate({
 
         var table = document.getElementById("tbl_airline_master");
 
-        var rowCount = table.rows.length;
+        var tbody = table.tBodies[0] || table;
+
+        var rowCount = tbody.rows.length;
 
         for(var i=0; i<rowCount; i++)
 
         {
 
-          var row = table.rows[i];
+          var row = tbody.rows[i];
 
           if(row.cells[0].childNodes[0].checked)
 
@@ -149,6 +160,7 @@ $('#frm_save').validate({
 
               if(airline_name==""){ error_msg +="Airline name is required in row : "+(i+1)+"<br>"; }
               if(airline_code==""){ error_msg +="Airline code is required in row : "+(i+1)+"<br>"; }
+              if(airline_status==""){ error_msg +="Status is required in row : "+(i+1)+"<br>"; }
 
 
               airline_name_arr.push(airline_name);

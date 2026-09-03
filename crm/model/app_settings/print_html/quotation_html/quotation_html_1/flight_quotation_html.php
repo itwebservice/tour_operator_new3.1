@@ -284,26 +284,37 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
         </div>
         <div class="print_info_block">
           <div class="row">
-            <div class="col-md-6">
-              <ul class="main_block">
-                <li class="col-md-12 mg_tp_10 mg_bt_10"><span>BANK NAME :
-                  </span><?= ($sq_bank_count > 0 || $sq_bank_branch['bank_name'] != '') ? $sq_bank_branch['bank_name'] : $bank_name_setting ?></li>
-                <li class="col-md-12 mg_tp_10 mg_bt_10"><span>A/C TYPE :
-                  </span><?= ($sq_bank_count > 0 || $sq_bank_branch['account_type'] != '') ? $sq_bank_branch['account_type'] : $acc_name ?></li>
-                <li class="col-md-12 mg_tp_10 mg_bt_10"><span>BRANCH :
-                  </span><?= ($sq_bank_count > 0 || $sq_bank_branch['branch_name'] != '') ? $sq_bank_branch['branch_name'] : $bank_branch_name ?>
-                </li>
-                <li class="col-md-12 mg_tp_10 mg_bt_10"><span>A/C NO :
-                  </span><?= ($sq_bank_count > 0 || $sq_bank_branch['account_no'] != '') ? $sq_bank_branch['account_no'] : $bank_acc_no  ?></li>
-                <li class="col-md-12 mg_tp_10 mg_bt_10"><span>BANK ACCOUNT NAME :
-                  </span><?= ($sq_bank_count > 0 || $sq_bank_branch['account_name'] != '') ? $sq_bank_branch['account_name'] : $bank_account_name ?></li>
-                <li class="col-md-12 mg_tp_10 mg_bt_10"><span>SWIFT CODE :
-                  </span><?= ($sq_bank_count > 0 || $sq_bank_branch['swift_code'] != '') ? strtoupper($sq_bank_branch['swift_code']) :  strtoupper($bank_swift_code) ?></li>
-              </ul>
+            <div class="<?= check_qr($branch_admin_id) ? 'col-md-7' : 'col-md-12' ?>">
+              <table style="width:100%; border-collapse:collapse; margin:0;">
+                <tr>
+                  <td style="font-weight:500; white-space:nowrap; padding:6px 12px 6px 0; width:42%; vertical-align:top;">BANK NAME :</td>
+                  <td style="padding:6px 0; vertical-align:top;"><?= ($sq_bank_count > 0 || $sq_bank_branch['bank_name'] != '') ? $sq_bank_branch['bank_name'] : $bank_name_setting ?></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500; white-space:nowrap; padding:6px 12px 6px 0; vertical-align:top;">A/C TYPE :</td>
+                  <td style="padding:6px 0; vertical-align:top;"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_type'] != '') ? $sq_bank_branch['account_type'] : $acc_name ?></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500; white-space:nowrap; padding:6px 12px 6px 0; vertical-align:top;">BRANCH :</td>
+                  <td style="padding:6px 0; vertical-align:top;"><?= ($sq_bank_count > 0 || $sq_bank_branch['branch_name'] != '') ? $sq_bank_branch['branch_name'] : $bank_branch_name ?></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500; white-space:nowrap; padding:6px 12px 6px 0; vertical-align:top;">A/C NO :</td>
+                  <td style="padding:6px 0; vertical-align:top;"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_no'] != '') ? $sq_bank_branch['account_no'] : $bank_acc_no ?></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500; white-space:nowrap; padding:6px 12px 6px 0; vertical-align:top;">BANK ACCOUNT NAME :</td>
+                  <td style="padding:6px 0; vertical-align:top;"><?= ($sq_bank_count > 0 || $sq_bank_branch['account_name'] != '') ? $sq_bank_branch['account_name'] : $bank_account_name ?></td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500; white-space:nowrap; padding:6px 12px 6px 0; vertical-align:top;">SWIFT CODE :</td>
+                  <td style="padding:6px 0; vertical-align:top;"><?= ($sq_bank_count > 0 || $sq_bank_branch['swift_code'] != '') ? strtoupper($sq_bank_branch['swift_code']) : strtoupper($bank_swift_code) ?></td>
+                </tr>
+              </table>
             </div>
             <?php
             if (check_qr($branch_admin_id)) { ?>
-              <div class="col-md-6 text-center">
+              <div class="col-md-5 text-center">
                 <?= get_qr('Protrait Standard', $branch_admin_id) ?>
                 <br>
                 <h4 class="no-marg">Scan & Pay </h4>

@@ -11,6 +11,7 @@ include "../../../model/model.php";
 	<div class="row">
 		<div class="text-left col-md-3 col-sm-6">
 			<select id="status" name="status" title="Select Status" class="form-control status_filter_dropdown" onchange="list_reflect()" style="width:180px"> 
+				<option value="">All</option>
 				<option value="Active">Active</option>
 				<option value="Inactive">Inactive</option>
 			</select>

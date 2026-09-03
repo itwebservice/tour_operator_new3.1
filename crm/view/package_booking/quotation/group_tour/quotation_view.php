@@ -262,8 +262,8 @@ if($sq_f_count != '0'){
 			?>
 			<tr>
 				<td><?= ++$count ?></td>
-				<td><?= $row_train['from_location'] ?></td>
-				<td><?= $row_train['to_location'] ?></td>
+				<td><?= gq_plane_entry_sector($row_train, 'from') ?></td>
+				<td><?= gq_plane_entry_sector($row_train, 'to') ?></td>
 				<td><?= $sq_airline['airline_name'].' ('.$sq_airline['airline_code'].')' ?></td>
 				<td><?= $row_train['class'] ?></td>
 				<td><?= get_datetime_user($row_train['dapart_time']) ?></td>
@@ -363,6 +363,7 @@ if($sq_c_count != '0'){
 			<th>Child With Bed</th>
 			<th>Child Without Bed</th>
 			<th>Infant</th>
+			<th>Extra Bed</th>
 			<th>Single Person</th>
 			<th>Total_Tour </th>
 			<th>Service_Charge</th>
@@ -383,6 +384,7 @@ if($sq_c_count != '0'){
 				<td><?= $sq_quotation['with_bed_cost'] ?></td>
 				<td><?= $sq_quotation['children_cost'] ?></td>
 				<td><?= $sq_quotation['infant_cost'] ?></td>
+				<td><?= isset($sq_quotation['extra_bed_cost']) ? $sq_quotation['extra_bed_cost'] : 0 ?></td>
 				<td><?= $sq_quotation['single_person_cost'] ?></td>
 				<td><?= $sq_quotation['tour_cost'] ?></td>
 				<td><?= $sq_quotation['service_charge'] ?></td>

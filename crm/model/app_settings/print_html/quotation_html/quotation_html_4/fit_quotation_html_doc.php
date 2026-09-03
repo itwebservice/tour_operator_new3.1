@@ -1,6 +1,7 @@
 <?php
 //Generic Files
 include "../../../../model.php";
+include_once __DIR__ . '/../generic_quotation_data.php';
 include_once __DIR__ . '/../../../../package_tour/quotation/quotation_rich_text_helpers.php';
 
 include "printFunction.php";
@@ -53,6 +54,21 @@ if ($sq_emp_info['first_name'] == '') {
 } else {
   $emp_name = $sq_emp_info['first_name'] . ' ' . $sq_emp_info['last_name'];
 }
+
+$quot_tbl_style = 'width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;margin:0!important;font-family:Poppins,sans-serif;font-size:10px;';
+$quot_th_base = 'font-family:Poppins,sans-serif!important;font-size:10px!important;font-weight:600!important;padding:4px 3px!important;padding-left:3px!important;padding-right:3px!important;word-break:break-word;overflow-wrap:anywhere;white-space:normal!important;border:0!important;vertical-align:middle!important;line-height:1.3;text-transform:uppercase;background-color:#f4eeee!important;color:#22262E!important;margin:0!important;text-indent:0!important;';
+$quot_td_base = 'font-family:Poppins,sans-serif!important;font-size:10px!important;font-weight:400!important;padding:4px 3px!important;padding-left:3px!important;padding-right:3px!important;word-break:break-word;overflow-wrap:anywhere;white-space:normal!important;border:0!important;vertical-align:middle!important;line-height:1.3;color:#22262E!important;margin:0!important;text-indent:0!important;';
+function quot_fit_cell($role, $width, $align = 'left') {
+  global $quot_th_base, $quot_td_base;
+  $style = ($role === 'th') ? $quot_th_base : $quot_td_base;
+  $align_css = ($align === 'center') ? 'text-align:center!important;' : 'text-align:left!important;';
+  return $style . $align_css . 'width:' . $width . ';';
+}
+// Legacy aliases
+$quot_th_style = $quot_th_base . 'text-align:left!important;';
+$quot_td_style = $quot_td_base . 'text-align:left!important;';
+$quot_th_center = $quot_th_base . 'text-align:center!important;';
+$quot_td_center = $quot_td_base . 'text-align:center!important;';
 ?>
 <style>
   .package_costing table tr:nth-child(even) {
@@ -66,7 +82,126 @@ if ($sq_emp_info['first_name'] == '') {
 
   .value {
     color: #007BFF;
-    /* Optional: change color */
+  }
+
+  .pageSectionInner {
+    position: relative !important;
+    width: 100% !important;
+    left: auto !important;
+    top: auto !important;
+    box-sizing: border-box;
+  }
+
+  .transportDetailsPanel {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    float: none !important;
+  }
+
+  .transportDetailsPanel .travsportInfoBlock {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    padding: 8px 5px !important;
+  }
+
+  .transportDetailsPanel .transportDetails,
+  .transportDetailsPanel .quot-table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .transportDetailsPanel table.quot-fit-doc-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin: 0 !important;
+    font-family: Poppins, sans-serif !important;
+  }
+
+  .transportDetailsPanel table.quot-fit-doc-table thead tr.table-heading-row {
+    background-color: #f4eeee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .transportDetailsPanel table.quot-fit-doc-table th,
+  .transportDetailsPanel table.quot-fit-doc-table td {
+    padding: 4px 3px !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+    margin: 0 !important;
+    text-indent: 0 !important;
+    vertical-align: middle !important;
+    word-wrap: break-word !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    font-size: 10px !important;
+    font-family: Poppins, sans-serif !important;
+    font-weight: 400 !important;
+    color: #22262E !important;
+    border: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 1.3 !important;
+    max-width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .transportDetailsPanel table.quot-fit-doc-table tr.table-heading-row th {
+    font-size: 10px !important;
+    font-family: Poppins, sans-serif !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    background-color: #f4eeee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .transportDetailsPanel table.quot-fit-doc-table .quot-col-center {
+    text-align: center !important;
+  }
+
+  .transportDetailsPanel table.quot-fit-doc-table th:after,
+  .transportDetailsPanel table.quot-fit-doc-table th:before {
+    display: none !important;
+    content: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    left: 0 !important;
+  }
+
+  /* Override global app.php table th (13px / 28px padding-left) */
+  body .transportDetailsPanel table.quot-fit-doc-table > thead > tr > th,
+  body .transportDetailsPanel table.quot-fit-doc-table > tbody > tr > td {
+    font-size: 10px !important;
+    font-family: Poppins, sans-serif !important;
+    padding: 4px 3px !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+    margin: 0 !important;
+    text-indent: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+  }
+  body .transportDetailsPanel table.quot-fit-doc-table > thead > tr > th {
+    font-weight: 600 !important;
+    background-color: #f4eeee !important;
+  }
+  body .transportDetailsPanel table.quot-fit-doc-table > tbody > tr > td {
+    font-weight: 400 !important;
   }
 </style>
 <!-- landingPage -->
@@ -182,17 +317,19 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                 <img src="<?= BASE_URL ?>images/quotation/p4/TI_hotel.png" class="img-responsive">
               </div>-->
               <div class="transportDetails">
-                <div class="col-md-12 no-pad">
-                  <div class="">
-                    <table class="table tableTrnasp no-marg" id="tbl_emp_list" width="100%">
+                <div class="quot-table-wrap" style="overflow:hidden;">
+                    <table class="quot-fit-doc-table no-marg" cellspacing="0" cellpadding="0" width="100%" style="<?= $quot_tbl_style ?>">
+                      <colgroup>
+                        <col style="width:12%"><col style="width:20%"><col style="width:14%"><col style="width:10%"><col style="width:22%"><col style="width:22%">
+                      </colgroup>
                       <thead>
                         <tr class="table-heading-row">
-                          <th style="text-align: left;">City</th>
-                          <th style="text-align: left;">Hotel Name</th>
-                          <th style="text-align: left;">Room Category</th>
-                          <th style="text-align: left;">Meal Plan</th>
-                          <th style="text-align: left;">Check_IN</th>
-                          <th style="text-align: left;">Check_OUT</th>
+                          <th style="<?= quot_fit_cell('th', '12%') ?>">City</th>
+                          <th style="<?= quot_fit_cell('th', '20%') ?>">Hotel Name</th>
+                          <th style="<?= quot_fit_cell('th', '14%') ?>">Room Category</th>
+                          <th style="<?= quot_fit_cell('th', '10%') ?>">Meal Plan</th>
+                          <th style="<?= quot_fit_cell('th', '22%', 'center') ?>">Check_IN</th>
+                          <th style="<?= quot_fit_cell('th', '22%', 'center') ?>">Check_OUT</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -203,17 +340,16 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                           $city_name = mysqli_fetch_assoc(mysqlQuery("select * from city_master where city_id='$row_hotel[city_name]'"));
                         ?>
                           <tr>
-                            <td><?php echo $city_name['city_name']; ?></td>
-                            <td><?php echo $hotel_name['hotel_name'] . $similar_text; ?></td>
-                            <td><?php echo $row_hotel['room_category']; ?></td>
-                            <td><?php echo !empty($row_hotel['meal_plan']) ? $row_hotel['meal_plan'] : ''; ?></td>
-                            <td><?= get_date_user($row_hotel['check_in']) ?></td>
-                            <td><?= get_date_user($row_hotel['check_out']) ?></td>
+                            <td style="<?= quot_fit_cell('td', '12%') ?>"><?php echo $city_name['city_name']; ?></td>
+                            <td style="<?= quot_fit_cell('td', '20%') ?>"><?php echo $hotel_name['hotel_name'] . $similar_text; ?></td>
+                            <td style="<?= quot_fit_cell('td', '14%') ?>"><?php echo $row_hotel['room_category']; ?></td>
+                            <td style="<?= quot_fit_cell('td', '10%') ?>"><?php echo !empty($row_hotel['meal_plan']) ? $row_hotel['meal_plan'] : ''; ?></td>
+                            <td style="<?= quot_fit_cell('td', '22%', 'center') ?>"><?= get_date_user($row_hotel['check_in']) ?></td>
+                            <td style="<?= quot_fit_cell('td', '22%', 'center') ?>"><?= get_date_user($row_hotel['check_out']) ?></td>
                           </tr>
                         <?php } ?>
                       </tbody>
                     </table>
-                  </div>
                 </div>
               </div>
             </div>
@@ -236,16 +372,19 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
             <div class="transportDetails">
               <h4 class="text-center" style="text-align:center;font-size:22px;font-weight:600;">FLIGHT INFORMATION</h4>
               <br>
-              <div class="">
-                <table class="table tableTrnasp no-marg" id="tbl_emp_list" width="100%">
+              <div class="quot-table-wrap" style="overflow:hidden;">
+                <table class="quot-fit-doc-table no-marg" cellspacing="0" cellpadding="0" width="100%" style="<?= $quot_tbl_style ?>">
+                  <colgroup>
+                    <col style="width:13%"><col style="width:13%"><col style="width:20%"><col style="width:10%"><col style="width:22%"><col style="width:22%">
+                  </colgroup>
                   <thead>
                     <tr class="table-heading-row">
-                      <th style="text-align: left;">From_Sector</th>
-                      <th style="text-align: left;">To_Sector</th>
-                      <th style="text-align: left;">Airline</th>
-                      <th style="text-align: left;">Class</th>
-                      <th style="text-align: left;">Departure_D/T</th>
-                      <th style="text-align: left;">Arrival_D/T</th>
+                      <th style="<?= quot_fit_cell('th', '13%') ?>">From_Sector</th>
+                      <th style="<?= quot_fit_cell('th', '13%') ?>">To_Sector</th>
+                      <th style="<?= quot_fit_cell('th', '20%') ?>">Airline</th>
+                      <th style="<?= quot_fit_cell('th', '10%', 'center') ?>">Class</th>
+                      <th style="<?= quot_fit_cell('th', '22%', 'center') ?>">Departure_D/T</th>
+                      <th style="<?= quot_fit_cell('th', '22%', 'center') ?>">Arrival_D/T</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -256,12 +395,12 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                       $airline = ($row_plane['airline_name'] != '') ? $sq_airline['airline_name'] . ' (' . $sq_airline['airline_code'] . ')' : 'NA';
                     ?>
                       <tr>
-                        <td><?= $row_plane['from_location'] ?></td>
-                        <td><?= $row_plane['to_location'] ?></td>
-                        <td><?= $airline ?></td>
-                        <td><?= $row_plane['class'] ?></td>
-                        <td><?= get_datetime_user($row_plane['dapart_time']) ?></td>
-                        <td><?= get_datetime_user($row_plane['arraval_time']) ?></td>
+                        <td style="<?= quot_fit_cell('td', '13%') ?>"><?= $row_plane['from_location'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '13%') ?>"><?= $row_plane['to_location'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '20%') ?>"><?= $airline ?></td>
+                        <td style="<?= quot_fit_cell('td', '10%', 'center') ?>"><?= $row_plane['class'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '22%', 'center') ?>"><?= get_datetime_user($row_plane['dapart_time']) ?></td>
+                        <td style="<?= quot_fit_cell('td', '22%', 'center') ?>"><?= get_datetime_user($row_plane['arraval_time']) ?></td>
                       </tr>
                     <?php } ?>
                   </tbody>
@@ -283,17 +422,20 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
             <div class="transportDetails">
               <h4 class="text-center" style="text-align:center;font-size:22px;font-weight:600;">TRANSPORT INFORMATION</h4>
               <br>
-              <div class="">
-                <table class="table no-marg tableTrnasp" width="100%">
+              <div class="quot-table-wrap" style="overflow:hidden;">
+                <table class="quot-fit-doc-table no-marg" cellspacing="0" cellpadding="0" width="100%" style="<?= $quot_tbl_style ?>">
+                  <colgroup>
+                    <col style="width:10%"><col style="width:8%"><col style="width:8%"><col style="width:26%"><col style="width:26%"><col style="width:14%"><col style="width:8%">
+                  </colgroup>
                   <thead>
                     <tr class="table-heading-row">
-                      <th style="text-align: left;">VEHICLE</th>
-                      <th style="text-align: left;">START_DATE</th>
-                      <th style="text-align: left;">END_DATE</th>
-                      <th style="text-align: left;">PICKUP</th>
-                      <th style="text-align: left;">DROP</th>
-                      <th style="text-align: left;">S_duration</th>
-                      <th style="text-align: left;">VEHICLES</th>
+                      <th style="<?= quot_fit_cell('th', '10%') ?>">VEHICLE</th>
+                      <th style="<?= quot_fit_cell('th', '8%', 'center') ?>">START</th>
+                      <th style="<?= quot_fit_cell('th', '8%', 'center') ?>">END</th>
+                      <th style="<?= quot_fit_cell('th', '26%') ?>">PICKUP</th>
+                      <th style="<?= quot_fit_cell('th', '26%') ?>">DROP</th>
+                      <th style="<?= quot_fit_cell('th', '14%', 'center') ?>">DURATION</th>
+                      <th style="<?= quot_fit_cell('th', '8%', 'center') ?>">VEH.</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -330,13 +472,13 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                       }
                     ?>
                       <tr>
-                        <td><?= $transport_name['vehicle_name'] . $similar_text ?></td>
-                        <td><?= date('d-m-Y', strtotime($row_hotel['start_date'])) ?></td>
-                        <td><?= date('d-m-Y', strtotime($row_hotel['end_date'])) ?></td>
-                        <td><?= $pickup ?></td>
-                        <td><?= $drop ?></td>
-                        <td><?= $row_hotel['service_duration'] ?></td>
-                        <td><?= $row_hotel['vehicle_count'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '10%') ?>"><?= $transport_name['vehicle_name'] . $similar_text ?></td>
+                        <td style="<?= quot_fit_cell('td', '8%', 'center') ?>"><?= date('d-m-Y', strtotime($row_hotel['start_date'])) ?></td>
+                        <td style="<?= quot_fit_cell('td', '8%', 'center') ?>"><?= date('d-m-Y', strtotime($row_hotel['end_date'])) ?></td>
+                        <td style="<?= quot_fit_cell('td', '26%') ?>"><?= $pickup ?></td>
+                        <td style="<?= quot_fit_cell('td', '26%') ?>"><?= $drop ?></td>
+                        <td style="<?= quot_fit_cell('td', '14%', 'center') ?>"><?= $row_hotel['service_duration'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '8%', 'center') ?>"><?= $row_hotel['vehicle_count'] ?></td>
                       </tr>
                     <?php } ?>
                   </tbody>
@@ -368,15 +510,18 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
             <div class="transportDetails">
               <h4 class="text-center" style="text-align:center;font-size:22px;font-weight:600;">TRAIN INFORMATION</h4>
               <br>
-              <div class="">
-                <table class="table tableTrnasp no-marg" id="tbl_emp_list" width="100%">
+              <div class="quot-table-wrap" style="overflow:hidden;">
+                <table class="quot-fit-doc-table no-marg" cellspacing="0" cellpadding="0" width="100%" style="<?= $quot_tbl_style ?>">
+                  <colgroup>
+                    <col style="width:18%"><col style="width:18%"><col style="width:10%"><col style="width:27%"><col style="width:27%">
+                  </colgroup>
                   <thead>
                     <tr class="table-heading-row">
-                      <th style="text-align: left;">From_Location</th>
-                      <th style="text-align: left;">To_Location</th>
-                      <th style="text-align: left;">Class</th>
-                      <th style="text-align: left;">Departure_D/T</th>
-                      <th style="text-align: left;">Arrival_D/T</th>
+                      <th style="<?= quot_fit_cell('th', '18%') ?>">From_Location</th>
+                      <th style="<?= quot_fit_cell('th', '18%') ?>">To_Location</th>
+                      <th style="<?= quot_fit_cell('th', '10%', 'center') ?>">Class</th>
+                      <th style="<?= quot_fit_cell('th', '27%', 'center') ?>">Departure_D/T</th>
+                      <th style="<?= quot_fit_cell('th', '27%', 'center') ?>">Arrival_D/T</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -385,11 +530,11 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                     while ($row_train = mysqli_fetch_assoc($sq_train)) {
                     ?>
                       <tr>
-                        <td><?= $row_train['from_location'] ?></td>
-                        <td><?= $row_train['to_location'] ?></td>
-                        <td><?php echo ($row_train['class'] != '') ? $row_train['class'] : 'NA'; ?></td>
-                        <td><?= get_datetime_user($row_train['departure_date']) ?></td>
-                        <td><?= get_datetime_user($row_train['arrival_date']) ?></td>
+                        <td style="<?= quot_fit_cell('td', '18%') ?>"><?= $row_train['from_location'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '18%') ?>"><?= $row_train['to_location'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '10%', 'center') ?>"><?php echo ($row_train['class'] != '') ? $row_train['class'] : 'NA'; ?></td>
+                        <td style="<?= quot_fit_cell('td', '27%', 'center') ?>"><?= get_datetime_user($row_train['departure_date']) ?></td>
+                        <td style="<?= quot_fit_cell('td', '27%', 'center') ?>"><?= get_datetime_user($row_train['arrival_date']) ?></td>
                       </tr>
                     <?php } ?>
                   </tbody>
@@ -411,15 +556,18 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
             <div class="transportDetails">
               <h4 class="text-center" style="text-align:center;font-size:22px;font-weight:600;">CRUISE INFORMATION</h4>
               <br>
-              <div class="">
-                <table class="table tableTrnasp no-marg" id="tbl_emp_list" width="100%">
+              <div class="quot-table-wrap" style="overflow:hidden;">
+                <table class="quot-fit-doc-table no-marg" cellspacing="0" cellpadding="0" width="100%" style="<?= $quot_tbl_style ?>">
+                  <colgroup>
+                    <col style="width:20%"><col style="width:20%"><col style="width:24%"><col style="width:18%"><col style="width:18%">
+                  </colgroup>
                   <thead>
                     <tr class="table-heading-row">
-                      <th style="text-align: left;">Departure_D/T</th>
-                      <th style="text-align: left;">Arrival_D/T</th>
-                      <th style="text-align: left;">Route</th>
-                      <th style="text-align: left;">Cabin</th>
-                      <th style="text-align: left;">Sharing</th>
+                      <th style="<?= quot_fit_cell('th', '20%', 'center') ?>">Departure_D/T</th>
+                      <th style="<?= quot_fit_cell('th', '20%', 'center') ?>">Arrival_D/T</th>
+                      <th style="<?= quot_fit_cell('th', '24%') ?>">Route</th>
+                      <th style="<?= quot_fit_cell('th', '18%') ?>">Cabin</th>
+                      <th style="<?= quot_fit_cell('th', '18%') ?>">Sharing</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -428,11 +576,11 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                     while ($row_cruise = mysqli_fetch_assoc($sq_cruise)) {
                     ?>
                       <tr>
-                        <td><?= get_datetime_user($row_cruise['dept_datetime']) ?></td>
-                        <td><?= get_datetime_user($row_cruise['arrival_datetime']) ?></td>
-                        <td><?= $row_cruise['route'] ?></td>
-                        <td><?= $row_cruise['cabin'] ?></td>
-                        <td><?= $row_cruise['sharing'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '20%', 'center') ?>"><?= get_datetime_user($row_cruise['dept_datetime']) ?></td>
+                        <td style="<?= quot_fit_cell('td', '20%', 'center') ?>"><?= get_datetime_user($row_cruise['arrival_datetime']) ?></td>
+                        <td style="<?= quot_fit_cell('td', '24%') ?>"><?= $row_cruise['route'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '18%') ?>"><?= $row_cruise['cabin'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '18%') ?>"><?= $row_cruise['sharing'] ?></td>
                       </tr>
                     <?php } ?>
                   </tbody>
@@ -454,19 +602,19 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
             <div class="transportDetails">
               <h4 class="text-center" style="text-align:center;font-size:22px;font-weight:600;">ACTIVITY INFORMATION</h4>
               <br>
-              <div class="">
-                <table class="table no-marg tableTrnasp" style="width:100%">
+              <div class="quot-table-wrap" style="overflow:hidden;">
+                <table class="quot-fit-doc-table no-marg" cellspacing="0" cellpadding="0" width="100%" style="<?= $quot_tbl_style ?>">
+                  <colgroup>
+                    <col style="width:11%"><col style="width:14%"><col style="width:24%"><col style="width:15%"><col style="width:15%"><col style="width:21%">
+                  </colgroup>
                   <thead>
                     <tr class="table-heading-row">
-                      <th style="text-align: left;padding: 8px  12px !important;">City </th>
-                      <th style="text-align: left;padding: 8px 12px !important;">Activity Date/Time</th>
-                      <th style="text-align: left;padding: 8px  12px !important;">Activity Name</th>
-                      <th style="text-align: left;padding: 8px  12px !important;">Transfer Option</th>
-                      <th style="text-align: left;padding: 8px  12px !important;">Vehicle Name</th>
-                      <th style="text-align: left; padding: 8px  10px !important;">Adult</th>
-                      <th style="text-align: left;padding: 8px  10px !important;">CWB</th>
-                      <th style="text-align: left;padding: 8px  10px !important;">CWOB</th>
-                      <th style="text-align: left;padding: 8px  10px !important;">Infant</th>
+                      <th style="<?= quot_fit_cell('th', '11%') ?>">City</th>
+                      <th style="<?= quot_fit_cell('th', '14%', 'center') ?>">Act.Date/Time</th>
+                      <th style="<?= quot_fit_cell('th', '24%') ?>">Activity Name</th>
+                      <th style="<?= quot_fit_cell('th', '15%') ?>">Transfer</th>
+                      <th style="<?= quot_fit_cell('th', '15%') ?>">Vehicle</th>
+                      <th style="<?= quot_fit_cell('th', '21%', 'center') ?>">Pax (A/CWB/CWOB/Inf)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -484,17 +632,15 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
                               $vehicle_display = $sq_vehicle['vehicle_name'];
                           }
                       }
+                      $pax_display = $row_ex['adult'] . ' / ' . $row_ex['chwb'] . ' / ' . $row_ex['chwob'] . ' / ' . $row_ex['infant'];
                     ?>
                       <tr>
-                        <td><?= $sq_city['city_name'] ?></td>
-                        <td><?= get_datetime_user($row_ex['exc_date']) ?></td>
-                        <td><?= $sq_ex_name['excursion_name'] ?></td>
-                        <td><?= $row_ex['transfer_option'] ?></td>
-                        <td><?= $vehicle_display ?></td>
-                        <td><?= $row_ex['adult'] ?></td>
-                        <td><?= $row_ex['chwb'] ?></td>
-                        <td><?= $row_ex['chwob'] ?></td>
-                        <td><?= $row_ex['infant'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '11%') ?>"><?= $sq_city['city_name'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '14%', 'center') ?>"><?= get_datetime_user($row_ex['exc_date']) ?></td>
+                        <td style="<?= quot_fit_cell('td', '24%') ?>"><?= $sq_ex_name['excursion_name'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '15%') ?>"><?= $row_ex['transfer_option'] ?></td>
+                        <td style="<?= quot_fit_cell('td', '15%') ?>"><?= $vehicle_display ?></td>
+                        <td style="<?= quot_fit_cell('td', '21%', 'center') ?>"><?= $pax_display ?></td>
                       </tr>
                     <?php }  ?>
                   </tbody>
@@ -828,6 +974,13 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
                     $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
                     $quotation_cost = (float)($basic_cost) + (float)($service_charge) + (float)($service_tax_amount) + (float)($sq_quotation['train_cost']) + (float)($sq_quotation['cruise_cost']) + (float)($sq_quotation['flight_cost']) + (float)($sq_quotation['visa_cost']) + (float)($sq_quotation['guide_cost']) + (float)($sq_quotation['misc_cost']) + (float)($tcsvalue);
+                    if (function_exists('gqd_group_costing_breakdown')) {
+                      $doc_grp = gqd_group_costing_breakdown($sq_costing, $sq_quotation);
+                      $quotation_cost = $doc_grp['net_total'];
+                      $tcsvalue = $doc_grp['tcs_value'];
+                      $tour_cost = $doc_grp['basic'] + $doc_grp['service_after'];
+                      $tcs_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $tcsvalue);
+                    }
                     // $quotation_cost = ceil($quotation_cost);
                     // $quotation_cost = floor($quotation_cost);
                     ////////////////Currency conversion ////////////
@@ -977,6 +1130,53 @@ while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
   </section>
 </section>
 
+<style>
+  /* Final override — beats global app.php table th (28px padding-left) */
+  body .transportDetailsPanel table.quot-fit-doc-table > thead > tr > th,
+  body .transportDetailsPanel table.quot-fit-doc-table > tbody > tr > td {
+    font-size: 10px !important;
+    font-family: Poppins, sans-serif !important;
+    padding: 4px 3px !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+    margin: 0 !important;
+    text-indent: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+    box-sizing: border-box !important;
+    vertical-align: middle !important;
+    max-width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+  }
+  body .transportDetailsPanel table.quot-fit-doc-table > thead > tr > th {
+    font-weight: 600 !important;
+    background-color: #f4eeee !important;
+    text-transform: uppercase;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body .transportDetailsPanel table.quot-fit-doc-table > tbody > tr > td {
+    font-weight: 400 !important;
+  }
+  body .transportDetailsPanel table.quot-fit-doc-table > thead > tr > th:after,
+  body .transportDetailsPanel table.quot-fit-doc-table > thead > tr > th:before,
+  table.quot-fit-doc-table th:after,
+  table.quot-fit-doc-table th:before {
+    display: none !important;
+    content: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    left: 0 !important;
+    position: static !important;
+  }
+</style>
 </body>
 
 </html>

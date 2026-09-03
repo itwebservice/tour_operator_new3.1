@@ -8,6 +8,7 @@ include "../../../model/model.php";
   <div class="row">
     <div class="text-left col-md-3 col-sm-6">
       <select id="state_master_status" name="state_master_status" title="Select Status" class="form-control" onchange="list_reflect()" style="width:100%">
+        <option value="">All</option>
         <option value="Active">Active</option>
         <option value="Inactive">Inactive</option>
       </select>

@@ -184,6 +184,11 @@ $branch_status = $_POST['branch_status'];
 </div>
 
 <script>
+    $("#enquiry_type").select2({
+        dropdownParent: $("#enquiry_save_modal"),
+        width: '100%'
+    });
+
     $.fn.modal.Constructor.prototype.enforceFocus = function() {};
     $('#enquiry_save_modal').modal('show');
     $('#reference_id,#assigned_emp_id,#country_code,#enquiry').select2({
@@ -364,6 +369,15 @@ $branch_status = $_POST['branch_status'];
                     enquiry_content = $('#div_enquiry_fields').find('select, input, textarea')
                     .serializeArray();
 
+                if ($('#tour_name').length && $('#tour_name').val() == '') {
+                    var destLabel = ($('#tour_name').attr('placeholder') || 'Destination').replace('*', '');
+                    error_msg_alert(destLabel + " is required!");
+                    return false;
+                }
+                if (enquiry_type == 'Flight Ticket' && $('#tour_name').length) {
+                    destination_name = $('#tour_name').val();
+                }
+
                 var err_msg = "";
 
                 if (landline_no != '' && country_code == '') {
@@ -379,7 +393,10 @@ $branch_status = $_POST['branch_status'];
 
                         var placeholder = $('#' + field).attr('name');
                         if (placeholder != 'Child Without Bed' && placeholder != 'Child With Bed' &&
-                            placeholder != 'budget' && placeholder != 'total_single_person') {
+                            placeholder != 'budget' && placeholder != 'total_single_person' &&
+                            placeholder != 'children_with_bed' && placeholder != 'children_without_bed' &&
+                            placeholder != 'total_cwb' && placeholder != 'total_cwob' &&
+                            placeholder != 'total_child_flight' && placeholder != 'total_infant_flight') {
 
                             if (placeholder == "places_to_visit") {
                                 placeholder = "route";

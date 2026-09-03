@@ -64,6 +64,7 @@ $role_id = $_SESSION['role_id'];
 
 		<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
+			<input type="hidden" id="destinations12" name="destinations12" value='<?= get_destinations() ?>'>
 			<input type="text" id="tour_name1" name="tour_name1" onchange="validate_spaces(this.id)" placeholder="*Tour Name" title="Tour Name" value="<?= $sq_quotation['tour_name'] ?>">
 
 		</div>	
@@ -137,6 +138,11 @@ $role_id = $_SESSION['role_id'];
 	    	<input type="number" id="single_person1" name="single_person1" placeholder="Total Single Person" title="Total Single Person" onchange="total_passangers_calculate('1');cost_reflect(); validate_balance(this.id)" value="<?= $sq_quotation['single_person'] ?>">
 
 	    </div>
+		<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
+
+	    	<input type="number" id="extra_bed1" name="extra_bed1" placeholder="Extra Bed" title="Extra Bed" onchange="validate_balance(this.id);cost_reflect();" value="<?= isset($sq_quotation['extra_bed']) ? $sq_quotation['extra_bed'] : 0 ?>">
+
+	    </div>
 
 		<div class="col-md-3 col-sm-6 col-xs-12 mg_bt_10">
 
@@ -198,6 +204,36 @@ $role_id = $_SESSION['role_id'];
 
 <script>
 $('#country_code1').val($('#cc_value').val()).select2();
+(function () {
+    var destSource = [];
+    try {
+        destSource = JSON.parse($('#destinations12').val() || '[]');
+        if (!Array.isArray(destSource)) {
+            destSource = [];
+        }
+    } catch (e) {
+        destSource = [];
+    }
+    if ($('#tour_name1').length && typeof $('#tour_name1').autocomplete === 'function') {
+        $("#tour_name1").autocomplete({
+            source: destSource,
+            minLength: 1,
+            select: function (event, ui) {
+                $("#tour_name1").val(ui.item.label);
+                return false;
+            },
+            open: function () {
+                $(this).autocomplete("widget").css({
+                    "width": document.getElementById("tour_name1").offsetWidth
+                });
+            }
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+            return $("<li>")
+                .append("<a>" + item.label + "</a>")
+                .appendTo(ul);
+        };
+    }
+})();
 $('#frm_tab1_u').validate({
 	rules:{
 		enquiry_id1 : { required : true },

@@ -33,11 +33,25 @@ include_once("../../../model/model.php");
 
         <div class="row"> <div class="col-md-12"> <div class="table-responsive">
           <table id="tbl_destination_master" name="tbl_destination_master" class="table border_0 table-hover no-marg">
+              <thead>
+                <tr class="table-heading-row">
+                  <th></th>
+                  <th></th>
+                  <th>Destination Name</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
               <tr>
                   <td><input id="chk_dest1" type="checkbox" checked></td>
                   <td><input maxlength="15" value="1" type="text" name="no" placeholder="Sr. No." class="form-control" disabled /></td>
                   <td><input type="text" id="destination_name1" onchange="fname_validate(this.id);" name="destination_name1" placeholder="*Destination Name" title="Destination Name"></td>
-              </tr>                                
+                  <td><select name="active_flag1" id="active_flag1" class="form-control" title="*Status" style="width:130px">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select></td>
+              </tr>
+              </tbody>
           </table>  
         </div> </div> </div>
 
@@ -83,13 +97,15 @@ $('#frm_save').validate({
 
         var table = document.getElementById("tbl_destination_master");
 
-        var rowCount = table.rows.length;
+        var tbody = table.tBodies[0] || table;
+
+        var rowCount = tbody.rows.length;
 
         for(var i=0; i<rowCount; i++)
 
         {
 
-          var row = table.rows[i];
+          var row = tbody.rows[i];
 
           if(rowCount == '1'){
             if(!row.cells[0].childNodes[0].checked)
@@ -103,14 +119,16 @@ $('#frm_save').validate({
           {  
 
               var destination_name = row.cells[2].childNodes[0].value;
+              var dest_status = row.cells[3] && row.cells[3].childNodes[0] ? row.cells[3].childNodes[0].value : '';
 
               if(destination_name==""){ error_msg +="Destination name is required in row : "+(i+1)+"<br>"; }
+              if(dest_status==""){ error_msg +="Status is required in row : "+(i+1)+"<br>"; }
 
 
 
               destination_name_arr.push(destination_name);
 
-              status_arr.push('Active');
+              status_arr.push(dest_status);
 
           }
           

@@ -32,8 +32,11 @@ include "../../model/model.php";
                                                 <div class="row mg_bt_10">
                                                     <div class="col-sm-2">
                                                         <select name="city_id" id="city_id" title="Select City"
-                                                            style="width:100%">
+                                                            style="width:100%" data-add-new-option="true" data-lazy-city="true">
                                                         </select>
+                                                    </div>
+                                                    <div class="col-sm-1" style="width:auto;padding-left:0;">
+                                                        <button type="button" class="btn btn-excel btn-sm" title="Add City" onclick="generic_city_save_modal()"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                     <div class="col-sm-2">
                                                         <input type="text" id="service_name" name="service_name"
@@ -53,7 +56,7 @@ include "../../model/model.php";
                                                             placeholder="Reporting Time" title="Reporting Time">
                                                     </div>
                                                     <div class="col-sm-2">
-                                                        <select name="off_days" id="off_days" title="Select Off Days" style="width:100%" class="form-control app_select2" multiple>
+                                                        <select name="off_days" id="off_days" title="Select Off Days" style="width:100%" class="form-control" multiple="multiple">
                                                             <option value="Monday">Monday</option>
                                                             <option value="Tuesday">Tuesday</option>
                                                             <option value="Wednesday">Wednesday</option>
@@ -657,6 +660,10 @@ include "../../model/model.php";
             action: 'upload_image_proof.php',
             name: 'uploadfile',
             onSubmit: function(file, ext) {
+                if (img_array.length >= 3) {
+                    error_msg_alert("Sorry, you can upload only 3 images");
+                    return false;
+                }
                 if (!(ext && /^(jpg|png|jpeg)$/.test(ext))) {
                     error_msg_alert('Only JPG, PNG files are allowed');
                     return false;
@@ -673,17 +680,13 @@ include "../../model/model.php";
                         error_msg_alert('Maximum size exceeds');
                         return false;
                     } else {
+                        img_array.push(response);
                         $(btnUpload).find('span').text('Uploaded');
                         $("#photo_upload_url_i").val(response);
-                        success_msg_alert('Activity Image Uploaded!');
+                        $("#hotel_image_path").val(img_array);
+                        success_msg_alert(img_array.length + ' of 3 images uploaded successfully.');
                     }
-                    img_array.push(response);
                 }
-                if (img_array.length > 3) {
-                    error_msg_alert("Sorry, you can upload only 3 images");
-                    return false;
-                }
-                $("#hotel_image_path").val(img_array);
             }
         });
     }

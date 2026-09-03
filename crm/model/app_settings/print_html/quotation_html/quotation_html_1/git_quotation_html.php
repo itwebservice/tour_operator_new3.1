@@ -249,6 +249,7 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
     $tax_show = '';
   }
   $newBasic1 = currency_conversion($currency, $sq_quotation['currency_code'], $newBasic);
+  $gq_pdf_costing = gq_group_quotation_pdf_costing($currency, $sq_quotation['currency_code'], $newBasic, $service_tax_amount, $tcsvalue);
   ?>
   <!-- Costing -->
   <section class="print_sec main_block side_pad mg_tp_30">
@@ -262,11 +263,11 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
         </div>
         <div class="print_info_block">
           <ul class="main_block">
-            <li class="col-md-12 mg_tp_10 mg_bt_10"><span>TOUR COST : </span><?= $newBasic1 ?></li>
-            <li class="col-md-12 mg_tp_10 mg_bt_10"><span>TAX : </span><?= str_replace(',', '', $name) . $service_tax_amount_show ?></li>
+            <li class="col-md-12 mg_tp_10 mg_bt_10"><span>TOUR COST : </span><?= $gq_pdf_costing['tour'] ?></li>
+            <li class="col-md-12 mg_tp_10 mg_bt_10"><span>TAX : </span><?= str_replace(',', '', $name) . $gq_pdf_costing['tax'] ?></li>
             <li class="col-md-12 mg_tp_10 mg_bt_10"><span>TCS<?php if($tcsper>=1){ echo "(".$tcsper."%)"; } ?>:</span>
-              <?=  $tcs_amount_show?></li>
-            <li class="col-md-12 mg_tp_10 mg_bt_10"><span>QUOTATION COST : </span><?= $currency_amount1 ?></li>
+              <?=  $gq_pdf_costing['tcs']?></li>
+            <li class="col-md-12 mg_tp_10 mg_bt_10"><span>QUOTATION COST : </span><?= $gq_pdf_costing['total'] ?></li>
         </div>
       </div>
 
@@ -351,8 +352,8 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
                     $sq_airline = mysqli_fetch_assoc(mysqlQuery("select * from airline_master where airline_id='$row_plane[airline_name]'"));
                   ?>
                     <tr>
-                      <td><?= $row_plane['from_location'] ?></td>
-                      <td><?= $row_plane['to_location'] ?></td>
+                      <td><?= gq_plane_entry_sector($row_plane, 'from') ?></td>
+                      <td><?= gq_plane_entry_sector($row_plane, 'to') ?></td>
                       <td><?= $sq_airline['airline_name'] . ' (' . $sq_airline['airline_code'] . ')' ?></td>
                       <td><?= $row_plane['class'] ?></td>
                       <td><?= get_datetime_user($row_plane['dapart_time']) ?></td>
@@ -517,11 +518,6 @@ $currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'
 
   <!-- Tour Itinenary -->
   <section class="print_sec main_block side_pad mg_tp_30">
-    <div class="vitinerary_div">
-      <h6>Destination Guide Video</h6>
-      <img src="<?php echo BASE_URL . 'images/quotation/youtube-icon.png'; ?>" class="itinerary-img img-responsive"><br />
-      <a href="<?= $sq_dest['link'] ?>" class="no-marg" target="_blank"></a>
-    </div>
     <div class="section_heding">
       <h2>TOUR ITINERARY</h2>
       <div class="section_heding_img">

@@ -256,7 +256,7 @@ function image_update(){
 			echo "error--Sorry, Activity Image not uploaded!";
 			exit;
 		}else{
-			echo "Activity Image uploaded!";
+			echo "Activity Image uploaded! (" . ($sq_count + 1) . " of 3 images uploaded)";
 			exit;
 		}
 	}else

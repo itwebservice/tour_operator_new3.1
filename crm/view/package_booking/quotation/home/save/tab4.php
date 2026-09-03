@@ -212,17 +212,29 @@
                                             <div class="col-xs-12">
                                                 <div class="panel panel-default panel-body app_panel_style">
                                                     <legend>Land Cost</legend>
+                                                    <div class="row mg_bt_10">
+                                                        <div class="col-md-3 col-sm-6 col-xs-12">
+                                                            <span>Currency</span>
+                                                            <select name="currency_code_pp" id="currency_code_pp" title="Currency" style="width:100%" data-toggle="tooltip"
+                                                              data-company-currency="<?php
+                                                              $sq_app_setting_pp = mysqli_fetch_assoc(mysqlQuery("select currency from app_settings"));
+                                                              echo htmlspecialchars((string)(isset($sq_app_setting_pp['currency']) ? $sq_app_setting_pp['currency'] : ''), ENT_QUOTES);
+                                                              ?>">
+                                                              <option value="">*Select Currency</option>
+                                                              <?php
+                                                              $company_currency_id_pp = (isset($sq_app_setting_pp['currency']) && $sq_app_setting_pp['currency'] != '0')
+                                                                  ? (string)$sq_app_setting_pp['currency'] : '';
+                                                              $sq_currency_pp = mysqlQuery("select * from currency_name_master order by currency_code");
+                                                              while ($row_currency_pp = mysqli_fetch_assoc($sq_currency_pp)) {
+                                                                  $sel_pp = ($company_currency_id_pp !== '' && (string)$row_currency_pp['id'] === $company_currency_id_pp) ? 'selected' : '';
+                                                              ?>
+                                                              <option value="<?= htmlspecialchars($row_currency_pp['id']) ?>" <?= $sel_pp ?>><?= htmlspecialchars($row_currency_pp['currency_code']) ?></option>
+                                                              <?php } ?>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                     <div class="row">
                                                         <div class="col-xs-12">
-                                                            <div class="table-responsive">
-                                                                <table id="tbl_adult_child_head" name="tbl_adult_child_head" class="table border_0 no-marg">
-                                                                    <tr>
-                                                                        <td class="col-md-1 " style="padding-left: 0 !important;"><span>Package Type</span></th>
-                                                                        <td class="col-md-3 " style="padding-left: 0 !important;"><span>Currency</span></th>
-                                                                    </tr>
-                                                                    
-                                                                </table>
-                                                            </div>
                                                             <div id="quotation_pp_costing_container">
                                                             <div class="quotation-pp-costing-row mg_bt_20" data-pp-suffix="">
                                                             <!-- Adult & child cost -->
@@ -231,25 +243,7 @@
                                                                     <div class="table-responsive">
                                                                        <table id="tbl_package_tour_quotation_adult_child" name="tbl_package_tour_quotation_adult_child" class="table border_0 no-marg">
                                                                             <tr>
-                                                                                <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;"><input type="text" id="ppackage_type1" name="ppackage_type1" placeholder="Package Type" title="Package Type" readonly></td>
-                                                                                <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;">
-                                                                                         <select name="currency_code_pp" id="currency_code_pp" title="Currency" style="width:100%" data-toggle="tooltip"
-                                                                                          data-company-currency="<?php
-                                                                                          $sq_app_setting_pp = mysqli_fetch_assoc(mysqlQuery("select currency from app_settings"));
-                                                                                          echo htmlspecialchars((string)(isset($sq_app_setting_pp['currency']) ? $sq_app_setting_pp['currency'] : ''), ENT_QUOTES);
-                                                                                          ?>">
-                                                                                          <option value="">*Select Currency</option>
-                                                                                          <?php
-                                                                                          $company_currency_id_pp = (isset($sq_app_setting_pp['currency']) && $sq_app_setting_pp['currency'] != '0')
-                                                                                              ? (string)$sq_app_setting_pp['currency'] : '';
-                                                                                          $sq_currency_pp = mysqlQuery("select * from currency_name_master order by currency_code");
-                                                                                          while ($row_currency_pp = mysqli_fetch_assoc($sq_currency_pp)) {
-                                                                                              $sel_pp = ($company_currency_id_pp !== '' && (string)$row_currency_pp['id'] === $company_currency_id_pp) ? 'selected' : '';
-                                                                                          ?>
-                                                                                          <option value="<?= htmlspecialchars($row_currency_pp['id']) ?>" <?= $sel_pp ?>><?= htmlspecialchars($row_currency_pp['currency_code']) ?></option>
-                                                                                          <?php } ?>
-                                                                                         </select>
-                                                                                </td>
+                                                                                <td class="col-md-3" style="padding-left: 0 !important; padding-top: 0 !important;"><span>Package Type</span><input type="text" id="ppackage_type1" name="ppackage_type1" placeholder="Package Type" title="Package Type" readonly></td>
                                                                                 
                                                                                 <td><input type="text" onchange=";" id="adult_cost" name="adult_cost" placeholder="Adult Cost" title="Adult Cost" style="display:none;"></td>
                                                                                 <td><input type="text" onchange=";" id="child_with" name="child_with" placeholder="Child with Bed Cost" title="Child with Bed Cost" style="display:none;"></td>
@@ -2402,10 +2396,10 @@ function calculateCostingCards(forceHotelFromTariff, options) {
     let travelData = $("#travel_pp_costing").val();
 
     // ===== PAX COUNT =====
-    let adult_count  = +$('#total_adult').val() || 0;
-    let cwnb_count   = +$('#children_without_bed').val() || 0;
-    let cweb_count   = +$('#children_with_bed').val() || 0;
-    let infant_count = +$('#total_infant').val() || 0;
+    let adult_count  = +$('#total_adult').val() || +$('#total_adult12').val() || 0;
+    let cwnb_count   = +$('#children_without_bed').val() || +$('#children_without_bed12').val() || 0;
+    let cweb_count   = +$('#children_with_bed').val() || +$('#children_with_bed12').val() || 0;
+    let infant_count = +$('#total_infant').val() || +$('#total_infant12').val() || 0;
 
     // Transfer passengers = adult + cweb + cwnb (infants excluded)
     let transfer_passengers = adult_count + cwnb_count + cweb_count;
@@ -2493,19 +2487,17 @@ function calculateCostingCards(forceHotelFromTariff, options) {
             return $el.length ? $el : $(sid(base));
         };
 
-        // Always sum land even when enquiry pax count is 0 (DB/manual amounts still need land_cost).
         let hotel    = +$find(type + '_hotel_pp').val() || 0;
         let transfer = +$find(type + '_transfer_pp').val() || 0;
         let activity = +$find(type + '_activity_pp').val() || 0;
 
-        let land_cost = hotel + transfer + activity;
+        // No Adult / CWEB / CWNB / Infant count → Land Cost stays 0 even if hotel/transfer/activity are filled.
+        let land_cost = (parseInt(count, 10) > 0) ? (hotel + transfer + activity) : 0;
         $find(type + '_land_cost_pp').val(land_cost.toFixed(2));
 
         let service_charge;
-        // Only auto-apply business-rule service charge when seeding/forcing or hotel/transfer change
-        // (scoped so editing one card does not wipe SC on other cards; activity never rewrites SC)
-        // Skip auto SC markup when this pax type has 0 count (keep saved/manual SC).
-        // Manual SC is never overwritten on currency change / recalc.
+        // Auto-apply business-rule service charge from full land (hotel+transfer+activity),
+        // same basis as Group costing Basic Amount. Manual SC is never overwritten.
         var $scEl = $find(type + '_service_charge_pp');
         if (recalcServiceCharge && count > 0
             && !(typeof quotationIsManualAmountField === 'function' && quotationIsManualAmountField($scEl))) {
@@ -2653,9 +2645,8 @@ function calculateCostingCards(forceHotelFromTariff, options) {
 
 $(document).on('input change', '#quotation_pp_costing_container .costing-table input, #quotation_pp_costing_container .costing-table select', function () {
     var id = (this.id || '');
-    // Hotel/transfer can refresh SC from business rules — but only on the edited card.
-    // Activity must NOT rewrite SC (clearing activity was wiping SC on every pax/package card).
-    var recalcSc = /_hotel_pp|_transfer_pp/.test(id) && !/_land_cost_pp/.test(id) && !/_activity_pp/.test(id);
+    // Hotel/transfer/activity refresh SC from full land cost (same as Group costing).
+    var recalcSc = /_hotel_pp|_transfer_pp|_activity_pp/.test(id) && !/_land_cost_pp/.test(id);
     var parsed = typeof quotationParsePpCostingFieldId === 'function' ? quotationParsePpCostingFieldId(id) : null;
     var $row = $(this).closest('.quotation-pp-costing-row');
     var scopeSuffix = $row.length ? ($row.attr('data-pp-suffix') || '') : (parsed ? parsed.suffix : null);

@@ -50,14 +50,14 @@ $sq_location = mysqli_fetch_assoc(mysqlQuery("select * from b2b_transfer_master 
                     <div class="row mg_tp_10">
                         <div id="images_list"></div>
                         <div class="col-sm-6">
-                            <div class="div-upload" role="button" title="Upload Vehicle Image" data-toggle="tooltip">
+                            <div class="div-upload" role="button">
                                 <div id="image_upload_btn1" class="upload-button1"><span>Vehicle Image</span></div>
                                 <span id="photo_status"></span>
                                 <ul id="files"></ul>
                                 <input type="hidden" id="image_upload_url1" name="image_upload_url1"
                                     value="<?= $sq_location['image_url'] ?>" required>
                             </div>
-		                    <button type="button" data-toggle="tooltip" class="btn btn-excel hidden" title="Note : Upload Image size below 100KB, resolution : 900X450."><i class="fa fa-question-circle"></i></button>
+		                    <small class="text-muted" style="display:block;margin-top:6px;">Note : Upload Image size below 100KB, resolution : 900X450.</small>
                         </div>
                     </div>
                     <div class="row mg_tp_20">
@@ -116,6 +116,8 @@ function upload_vehicle_image1() {
 
                     $(btnUpload).find('span').text('Uploaded');
                     $("#image_upload_url1").val(response);
+                    $('.div-upload').tooltip('hide');
+                    $('.tooltip').remove();
                 }
             }
         }

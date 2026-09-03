@@ -462,10 +462,76 @@ if (!function_exists('gqd_tcs')) {
   function gqd_tcs($bsm_json)
   {
     $d = json_decode($bsm_json, true);
-    if (isset($d[0]['tcsper']) && $d[0]['tcsper'] != 'NaN') {
-      return array($d[0]['tcsper'], isset($d[0]['tcsvalue']) ? $d[0]['tcsvalue'] : 0);
+    if (!is_array($d) || !isset($d[0])) {
+      return array(0, 0);
+    }
+    $row = $d[0];
+    // Collectors sometimes wrap each costing row as [[{...}]]
+    if (isset($row[0]) && is_array($row[0])) {
+      $row = $row[0];
+    }
+    if (isset($row['tcsper']) && $row['tcsper'] != 'NaN' && $row['tcsper'] !== '') {
+      return array($row['tcsper'], isset($row['tcsvalue']) ? $row['tcsvalue'] : 0);
     }
     return array(0, 0);
+  }
+}
+
+if (!function_exists('gqd_group_costing_breakdown')) {
+  /**
+   * Group costing totals used by quotation view, PDFs, email, and list.
+   * Land is hotel + transport + activity (tariff-applied amounts), not a stale basic_amount.
+   * Net = land + service after discount + tax + TCS + travel extras.
+   */
+  function gqd_group_costing_breakdown($ce, $master = array())
+  {
+    $ce = is_array($ce) ? $ce : array();
+    $master = is_array($master) ? $master : array();
+
+    $hotel = (float) (isset($ce['tour_cost']) ? $ce['tour_cost'] : 0);
+    $transport = (float) (isset($ce['transport_cost']) ? $ce['transport_cost'] : 0);
+    $activity = (float) (isset($ce['excursion_cost']) ? $ce['excursion_cost'] : 0);
+    $land = $hotel + $transport + $activity;
+    $stored_basic = (float) (isset($ce['basic_amount']) ? $ce['basic_amount'] : 0);
+    $basic = ($land > 0) ? $land : $stored_basic;
+
+    $service = (float) (isset($ce['service_charge']) ? $ce['service_charge'] : 0);
+    $discount_in = isset($ce['discount_in']) ? $ce['discount_in'] : '';
+    $discount = (float) (isset($ce['discount']) ? $ce['discount'] : 0);
+    $act_discount = ($discount_in == 'Percentage')
+      ? ($service * $discount / 100)
+      : (($service != 0) ? $discount : 0);
+    $service_after = $service - $act_discount;
+
+    list($tax_amount, $tax_label) = gqd_parse_service_tax(isset($ce['service_tax_subtotal']) ? $ce['service_tax_subtotal'] : '');
+    list($tcs_per, $tcs_value) = gqd_tcs(isset($ce['bsmValues']) ? $ce['bsmValues'] : '');
+    $tcs_value = (float) $tcs_value;
+
+    $train = (float) (isset($master['train_cost']) ? $master['train_cost'] : 0);
+    $flight = (float) (isset($master['flight_cost']) ? $master['flight_cost'] : 0);
+    $cruise = (float) (isset($master['cruise_cost']) ? $master['cruise_cost'] : 0);
+    $visa = (float) (isset($master['visa_cost']) ? $master['visa_cost'] : 0);
+    $guide = (float) (isset($master['guide_cost']) ? $master['guide_cost'] : 0);
+    $misc = (float) (isset($master['misc_cost']) ? $master['misc_cost'] : 0);
+    $travel = $train + $flight + $cruise;
+    $other = $visa + $guide + $misc;
+
+    $tour_total = $basic + $service_after + (float) $tax_amount + $tcs_value;
+    $net_total = $tour_total + $travel + $other;
+
+    return array(
+      'basic' => $basic,
+      'service' => $service,
+      'act_discount' => $act_discount,
+      'service_after' => $service_after,
+      'tax_amount' => (float) $tax_amount,
+      'tax_label' => $tax_label,
+      'tcs_percent' => $tcs_per,
+      'tcs_value' => $tcs_value,
+      'tour_total' => $tour_total,
+      'travel' => $travel + $other,
+      'net_total' => $net_total,
+    );
   }
 }
 
@@ -1132,23 +1198,21 @@ if (!function_exists('get_generic_quotation_data')) {
     $grand_total_numeric = 0;
 
     foreach ($costing_entries as $ce) {
-      $basic       = (float) (isset($ce['basic_amount']) ? $ce['basic_amount'] : 0);
-      $service     = (float) (isset($ce['service_charge']) ? $ce['service_charge'] : 0);
-      $discount_in = isset($ce['discount_in']) ? $ce['discount_in'] : '';
-      $discount    = (float) (isset($ce['discount']) ? $ce['discount'] : 0);
-      $act_discount = ($discount_in == 'Percentage')
-        ? ($service * $discount / 100)
-        : (($service != 0) ? $discount : 0);
-      $service_after = $service - $act_discount;
-
-      list($tax_amount, $tax_label) = gqd_parse_service_tax(isset($ce['service_tax_subtotal']) ? $ce['service_tax_subtotal'] : '');
-      list($tcs_per, $tcs_value)     = gqd_tcs(isset($ce['bsmValues']) ? $ce['bsmValues'] : '');
-      $tcs_value = (float) $tcs_value;
+      $brk = gqd_group_costing_breakdown($ce, $master);
+      $basic          = $brk['basic'];
+      $service        = $brk['service'];
+      $discount       = (float) (isset($ce['discount']) ? $ce['discount'] : 0);
+      $act_discount   = $brk['act_discount'];
+      $service_after  = $brk['service_after'];
+      $tax_amount     = $brk['tax_amount'];
+      $tax_label      = $brk['tax_label'];
+      $tcs_per        = $brk['tcs_percent'];
+      $tcs_value      = $brk['tcs_value'];
 
       // ---- Group view ----
       $tour_cost  = $basic + $service_after;
-      $g_travel   = $train_cost_total + $flight_cost_total + $cruise_cost_total + $visa_cost + $guide_cost + $misc_cost;
-      $g_total    = $basic + $service_after + $tax_amount + $train_cost_total + $cruise_cost_total + $flight_cost_total + $visa_cost + $guide_cost + $misc_cost + $tcs_value;
+      $g_travel   = $brk['travel'];
+      $g_total    = $brk['net_total'];
 
       $group_computed[] = array(
         'package_type'       => isset($ce['package_type']) ? $ce['package_type'] : '',

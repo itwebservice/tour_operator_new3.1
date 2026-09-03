@@ -45,6 +45,11 @@ if ($sq_quotation['service_tax_subtotal'] !== 0.00 && ($sq_quotation['service_ta
     }
 }
 $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
+$tour_inr_for_total = floatval($sq_quotation['tour_cost']) + floatval($sq_quotation['service_charge']);
+$gq_html_costing = gq_group_quotation_pdf_costing($currency, $sq_quotation['currency_code'], $tour_inr_for_total, $service_tax_amount, $tcsvalue);
+$service_tax_amount_show = $gq_html_costing['tax'];
+$tcs_amount_show = $gq_html_costing['tcs'];
+$quotation_cost1 = $gq_html_costing['total'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -203,6 +208,8 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
                                 </span><?= $sq_quotation['children_without_bed']; ?></li>
                             <li class="col-md-2 col-sm-4 col-xs-12"><span>Single Person :
                                 </span><?= $sq_quotation['single_person']; ?></li>
+                            <li class="col-md-2 col-sm-4 col-xs-12"><span>Extra Bed :
+                                </span><?= isset($sq_quotation['extra_bed']) ? $sq_quotation['extra_bed'] : 0; ?></li>
                             <li class="col-md-2 col-sm-4 col-xs-12 mg_bt_10_sm_xs"><span>Total :
                                 </span><?= $sq_quotation['total_passangers']; ?></li>
 
@@ -247,8 +254,9 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
                                 $single_person_cost1 = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['single_person_cost']);
                                 $with_bed_cost1 = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['with_bed_cost']);
                                 $children_cost1 = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['children_cost']);
-                                $quotation_cost1 = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['quotation_cost']);
+                                $quotation_cost1 = isset($quotation_cost1) ? $quotation_cost1 : currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['quotation_cost']);
                                 $service_charge = currency_conversion($currency, $sq_quotation['currency_code'], $sq_quotation['service_charge']);
+                                $extra_bed_cost1 = currency_conversion($currency, $sq_quotation['currency_code'], isset($sq_quotation['extra_bed_cost']) ? $sq_quotation['extra_bed_cost'] : 0);
                                 ?>
                                 <?php if ($sq_quotation['adult_cost'] != '0') { ?><li
                                         class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_sm_xs"><span>Adult Cost :
@@ -266,6 +274,9 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
                                 <?php if ($sq_quotation['single_person_cost'] != '0') { ?><li
                                         class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_sm_xs"><span>Single Person Cost :
                                         </span><?= $single_person_cost1 ?></li> <?php } ?>
+                                <?php if (!empty($sq_quotation['extra_bed_cost']) && $sq_quotation['extra_bed_cost'] != '0') { ?><li
+                                        class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_sm_xs"><span>Extra Bed Cost :
+                                        </span><?= $extra_bed_cost1 ?></li> <?php } ?>
                                 <li class="col-md-3 col-sm-6 col-xs-12 mg_bt_10_sm_xs"><span>Other Charges :
                                     </span><?= $service_charge ?></li>
                                 <li class="col-md-3 col-sm-6 col-xs-12 mg_bt_10 sm_r_brd_r8"><span>Tax :
@@ -357,18 +368,7 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
             <div class="sec_heding">
                 <h2>Tour Itinerary</h2>
             </div>
-            <div class="row mg_bt_30">
-                <div class="col-md-12">
-                    <div class="adolence_info mg_tp_15">
-                        <ul class="main_block">
-                            <li class="col-md-12 col-sm-4 col-xs-12 mg_bt_10_xs"><img
-                                    src="<?php echo BASE_URL . 'images/quotation/youtube-icon.png'; ?>"
-                                    class="itinerary-img img-responsive">
-                                &nbsp;Destination Guide Video :&nbsp;<a href="<?= $sq_dest['link'] ?>"
-                                    class="no-marg itinerary-link" target="_blank"><?= $sq_dest['link'] ?> </a></li>
-                        </ul>
-                    </div>
-                </div>
+            <div class="row">
             </div>
             <div class="row">
                 <div class="col-xs-12 Itinenary_detail app_accordion">
@@ -663,9 +663,9 @@ $service_tax_amount_show = currency_conversion($currency, $sq_quotation['currenc
                                             ?>
                                                 <tr>
 
-                                                    <td><?= $row_plane['from_location']; ?></td>
+                                                    <td><?= gq_plane_entry_sector($row_plane, 'from'); ?></td>
 
-                                                    <td><?= $row_plane['to_location']; ?></td>
+                                                    <td><?= gq_plane_entry_sector($row_plane, 'to'); ?></td>
 
                                                     <td><?= $sq_airline['airline_name'] . ' (' . $sq_airline['airline_code'] . ')'; ?>
                                                     </td>

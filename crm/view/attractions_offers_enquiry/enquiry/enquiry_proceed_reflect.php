@@ -12,14 +12,102 @@ $financial_year_id = $_POST['financial_year_id'];
 $enquiry_type = $_POST['enquiry_type'];
 $enquiry = $_POST['enquiry'];
 $enquiry_status_filter = $_POST['enquiry_status'];
-$from_date = $_POST['from_date'];
-$to_date = $_POST['to_date'];
-$emp_id_filter = isset($_POST['emp_id_filter']) ? $_POST['emp_id_filter'] : '';;
+$from_date = isset($_POST['from_date']) ? $_POST['from_date'] : '';
+$to_date = isset($_POST['to_date']) ? $_POST['to_date'] : '';
+$emp_id_filter = isset($_POST['emp_id_filter']) ? $_POST['emp_id_filter'] : '';
 $branch_status = $_POST['branch_status'];
 $reference_id_filter=$_POST['reference_id_filter'];
 $destination_filter = $_POST['destination_filter'];
 
 $landline_no_filter = $_POST['landline_no_filter'];
+
+if (!function_exists('enquiry_dmy_to_ymd')) {
+	function enquiry_dmy_to_ymd($date) {
+		$date = trim((string)$date);
+		if ($date === '' || strtolower($date) === 'undefined') {
+			return '';
+		}
+		if (preg_match('/^(\d{1,2})-(\d{1,2})-(\d{4})$/', $date, $m)) {
+			return sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+		}
+		$ts = strtotime($date);
+		return $ts ? date('Y-m-d', $ts) : '';
+	}
+}
+if (!function_exists('enquiry_list_destination')) {
+	function enquiry_list_destination($row) {
+		$found = array();
+		$arr = json_decode(isset($row['enquiry_content']) ? $row['enquiry_content'] : '', true);
+		if (is_array($arr)) {
+			foreach ($arr as $item) {
+				if (!is_array($item)) {
+					continue;
+				}
+				if (isset($item['name']) && isset($item['value']) && trim($item['value']) !== '') {
+					$found[$item['name']] = trim($item['value']);
+				}
+				if (isset($item['sector_to']) && trim($item['sector_to']) !== '') {
+					$found['sector_to'] = trim($item['sector_to']);
+				}
+			}
+		}
+		foreach (array('tour_name', 'visa_country_name', 'location_to', 'location_from', 'sector_to') as $key) {
+			if (!empty($found[$key])) {
+				return $found[$key];
+			}
+		}
+		return isset($row['tour_name']) ? trim($row['tour_name']) : '';
+	}
+}
+if (!function_exists('enquiry_phone_display')) {
+	function enquiry_phone_display($country_code, $number) {
+		$country_code = trim((string)$country_code);
+		$number = trim((string)$number);
+		if ($number === '') {
+			return '';
+		}
+		if ($country_code !== '' && strpos($number, $country_code) !== 0) {
+			return $country_code . $number;
+		}
+		return $number;
+	}
+}
+
+$from_date_db = enquiry_dmy_to_ymd($from_date);
+$to_date_db = enquiry_dmy_to_ymd($to_date);
+$date_filter_sql = '';
+if ($from_date_db !== '' && $to_date_db !== '') {
+	$travel_from_sql = "STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(enquiry_master.enquiry_content,'\"name\":\"travel_from_date\",\"value\":\"',-1),'\"',1),'%d-%m-%Y')";
+	$travel_to_sql = "STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(enquiry_master.enquiry_content,'\"name\":\"travel_to_date\",\"value\":\"',-1),'\"',1),'%d-%m-%Y')";
+	$date_filter_sql = " and (
+		($travel_from_sql IS NOT NULL AND $travel_from_sql BETWEEN '$from_date_db' AND '$to_date_db')
+		OR ($travel_to_sql IS NOT NULL AND $travel_to_sql BETWEEN '$from_date_db' AND '$to_date_db')
+		OR ($travel_from_sql IS NOT NULL AND $travel_to_sql IS NOT NULL AND $travel_from_sql <= '$to_date_db' AND $travel_to_sql >= '$from_date_db')
+		OR (
+			($travel_from_sql IS NULL)
+			AND enquiry_master.enquiry_date BETWEEN '$from_date_db' AND '$to_date_db'
+		)
+	)";
+}
+$dest_filter_sql = '';
+if ($destination_filter != '' && $destination_filter !== 'undefined') {
+	$dest_esc = addslashes($destination_filter);
+	$dest_filter_sql = " and (
+		enquiry_master.tour_name='$dest_esc'
+		OR enquiry_master.enquiry_content LIKE '%\"name\":\"tour_name\",\"value\":\"$dest_esc\"%'
+		OR enquiry_master.enquiry_content LIKE '%\"name\":\"visa_country_name\",\"value\":\"$dest_esc\"%'
+		OR enquiry_master.enquiry_content LIKE '%\"name\":\"location_to\",\"value\":\"$dest_esc\"%'
+		OR enquiry_master.enquiry_content LIKE '%\"sector_to\":\"$dest_esc\"%'
+	)";
+}
+$whatsapp_filter_sql = '';
+if ($landline_no_filter != '') {
+	$wa_esc = addslashes($landline_no_filter);
+	$whatsapp_filter_sql = " and (
+		CONCAT(IFNULL(enquiry_master.country_code,''), enquiry_master.landline_no)='$wa_esc'
+		OR enquiry_master.landline_no='$wa_esc'
+	)";
+}
 
 $cust_name_filter = $_POST['cust_name_filter'];
 
@@ -58,10 +146,8 @@ if($enquiry_type!=""){
 if($reference_id_filter!=""){
 	$enq_count .=" and reference_id='$reference_id_filter' ";
 }
-if($from_date!='' && $from_date!='undefined' && $to_date!="" && $to_date!='undefined'){
-	$from_date = get_date_db($from_date);
-	$to_date = get_date_db($to_date);
-	$enq_count .=" and (enquiry_date between '$from_date' and '$to_date')";
+if($from_date_db !== '' && $to_date_db !== ''){
+	$enq_count .= $date_filter_sql;
 }
 
 
@@ -87,10 +173,8 @@ if($role!='Admin' && $role!='Branch Admin' && $role_id!='7' && $role_id<'7'){
 		if($reference_id_filter!=""){
 			$enq_count .=" and reference_id='$reference_id_filter' ";
 		}
-		if($from_date!='' && $from_date!='undefined' && $to_date!="" && $to_date!='undefined'){
-			$from_date = get_date_db($from_date);
-			$to_date = get_date_db($to_date);
-			$enq_count .=" and (enquiry_date between '$from_date' and '$to_date')";
+		if($from_date_db !== '' && $to_date_db !== ''){
+			$enq_count .= $date_filter_sql;
 		}
 		if($enquiry!=""){
 			$enq_count .=" and enquiry='$enquiry' ";
@@ -108,13 +192,16 @@ $enq_count .= " and enquiry_master.name ='$cust_name_filter'";
 }
 
 if($landline_no_filter !=""){
-	$enq_count .="and enquiry_master.landline_no ='$landline_no_filter'";
+	$enq_count .= $whatsapp_filter_sql;
 }
 
 
 if($followup_status_type_filter !=""){
 $enq_count .= "and ef.followup_type ='$followup_status_type_filter'";
 
+}
+if($dest_filter_sql != ''){
+	$enq_count .= $dest_filter_sql;
 }
 
 $enq_count .= " ORDER BY enquiry_master.enquiry_id DESC ";
@@ -147,14 +234,12 @@ if($enquiry_type!=""){
 if($reference_id_filter!=""){
 	$query .=" and reference_id='$reference_id_filter' ";
 }
-if($from_date!='' && $to_date!=""){
-	$from_date = get_date_db($from_date);
-	$to_date = get_date_db($to_date);
-	$query .=" and (enquiry_date between '$from_date' and '$to_date')";
+if($from_date_db !== '' && $to_date_db !== ''){
+	$query .= $date_filter_sql;
 }
 
-if ($destination_filter != '' && strtolower($destination_filter) != strtolower($tour_name)) {
-	$query .= " and tour_name ='$destination_filter'";
+if ($dest_filter_sql != '') {
+	$query .= $dest_filter_sql;
 }
 
 
@@ -180,10 +265,8 @@ if($role!='Admin' && $role!='Branch Admin' && $role_id!='7' && $role_id<'7'){
 	if($reference_id_filter!=""){
 		$query .=" and reference_id='$reference_id_filter' ";
 	}
-	if($from_date!='' && $from_date!='undefined' && $to_date!="" && $to_date!='undefined'){
-		$from_date = get_date_db($from_date);
-		$to_date = get_date_db($to_date);
-		$query .=" and (enquiry_date between '$from_date' and '$to_date')";
+	if($from_date_db !== '' && $to_date_db !== ''){
+		$query .= $date_filter_sql;
 	}
 	if($enquiry!=""){
 		$query .=" and enquiry='$enquiry' ";
@@ -202,15 +285,31 @@ if($cust_name_filter !=''){
 
 
 	if($landline_no_filter !=""){
-		$query .="and enquiry_master.landline_no ='$landline_no_filter'";
+		$query .= $whatsapp_filter_sql;
 	}
 
 	if($followup_status_type_filter !=""){
 		$query.= "and ef.followup_type ='$followup_status_type_filter'";
 		
 		}
-// echo $query;
-$query .= " ORDER BY enquiry_master.enquiry_id DESC";
+$order_columns = array(
+	0 => 'enquiry_master.enquiry_id',
+	1 => 'enquiry_master.enquiry_id',
+	2 => 'enquiry_master.name',
+	3 => 'enquiry_master.mobile_no',
+	4 => 'enquiry_master.enquiry_type',
+	5 => 'enquiry_master.tour_name',
+	6 => "(SELECT CONCAT(IFNULL(first_name,''),' ',IFNULL(last_name,'')) FROM emp_master WHERE emp_id = enquiry_master.assigned_emp_id)"
+);
+$order_by = 'enquiry_master.enquiry_id DESC';
+if (isset($_POST['order'][0]['column'])) {
+	$order_col = intval($_POST['order'][0]['column']);
+	$order_dir = (isset($_POST['order'][0]['dir']) && strtolower($_POST['order'][0]['dir']) === 'asc') ? 'ASC' : 'DESC';
+	if (isset($order_columns[$order_col])) {
+		$order_by = $order_columns[$order_col] . ' ' . $order_dir;
+	}
+}
+$query .= " ORDER BY " . $order_by;
 
 
 
@@ -257,15 +356,7 @@ while($row = mysqli_fetch_assoc($sq_enquiries)){
 
 	$enquiry_content = $row['enquiry_content'];
 	$enquiry_content_arr1 = json_decode($enquiry_content, true);
-	// pkg and group tour interested tour name
-
-$tour_name = "";
-foreach ($enquiry_content_arr1 as $item) {
-    if ($item['name'] == 'tour_name') {
-        $tour_name = trim($item['value']);
-        break;
-    }
-}
+	$tour_name = enquiry_list_destination($row);
 // destination filter
 
 
@@ -299,7 +390,7 @@ $temp_arr = array();
 $temp_arr["s_no"] = $count++;
 $temp_arr["enquiry_no"] = get_enquiry_id($row['enquiry_id'],$year);
 $temp_arr["customer"] = $row['name'].$cust_user_name;
-$temp_arr["mobile_no"] = $row['mobile_no'];
+$temp_arr["mobile_no"] = enquiry_phone_display(isset($row['country_code']) ? $row['country_code'] : '', $row['mobile_no']);
 $temp_arr["tour_type"] = $row['enquiry_type'];
 $temp_arr["destination"] = $tour_name;
 $temp_arr["enquiry_date"] = get_date_user($row['enquiry_date']);

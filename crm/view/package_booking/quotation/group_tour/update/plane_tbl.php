@@ -180,7 +180,11 @@ $travel_to_dt = (!empty($sq_quotation['to_date']) && $sq_quotation['to_date'] !=
 			if (!document.getElementById(tableId)) {
 				return;
 			}
-			$('#tbl_package_tour_quotation_dynamic_plane_update .app_datetimepicker').datetimepicker({ format: 'd-m-Y H:i' });
+			if (typeof gqInitDatepicker === 'function') {
+				gqInitDatepicker($('#tbl_package_tour_quotation_dynamic_plane_update .app_datetimepicker'), true);
+			} else {
+				$('#tbl_package_tour_quotation_dynamic_plane_update .app_datetimepicker').datetimepicker({ format: 'd-m-Y H:i' });
+			}
 			if (typeof event_airport === 'function') {
 				event_airport(tableId);
 			}

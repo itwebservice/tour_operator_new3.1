@@ -22,7 +22,6 @@ if($from_date!="" && $to_date!=""){
 }
 include "../../../../model/app_settings/branchwise_filteration.php";
 $query .= "order by request_id desc";
-$count = 0;
 $sq_req = mysqlQuery($query);
 while($row_req = mysqli_fetch_assoc($sq_req)){
 
@@ -36,7 +35,7 @@ while($row_req = mysqli_fetch_assoc($sq_req)){
 	$bg = ($row_req['bid_status']=="Close") ? "danger" : "";
 
 	$temp_arr = array( "data" => array(
-		(int)(++$count),
+		(int)$row_req['request_id'],
 		date('d-m-Y', strtotime($row_req['quotation_date'])),
 		ge_vendor_request_id($row_req['request_id'],$year),
 		$sq_enq['name'],

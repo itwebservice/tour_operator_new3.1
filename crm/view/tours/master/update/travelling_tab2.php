@@ -15,7 +15,7 @@
                                         <div class="col-md-12"><span>Hotel Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse2" class="panel-collapse collapse main_block" role="tabpanel"
+                                <div id="collapse2" class="panel-collapse collapse in main_block" role="tabpanel"
                                     aria-labelledby="heading2">
                                     <div class="panel-body">
                                         <?php include_once('hotel_tbl.php'); ?>
@@ -66,13 +66,13 @@
                         <div class="accordion_content main_block mg_bt_10">
                             <div class="panel panel-default main_block">
                                 <div class="panel-heading main_block" role="tab" id="heading_<?= $count ?>">
-                                    <div class="Normal main_block" role="button" data-toggle="collapse"
-                                        data-parent="#accordion" href="#collapse1" aria-expanded="true"
+                                    <div class="Normal collapsed main_block" role="button" data-toggle="collapse"
+                                        data-parent="#accordion" href="#collapse1" aria-expanded="false"
                                         aria-controls="collapse1" id="collapsed1">
                                         <div class="col-md-12"><span>Train Information</span></div>
                                     </div>
                                 </div>
-                                <div id="collapse1" class="panel-collapse collapse in main_block" role="tabpanel"
+                                <div id="collapse1" class="panel-collapse collapse main_block" role="tabpanel"
                                     aria-labelledby="heading1">
                                     <div class="panel-body" style="overflow:hidden;">
                                         <?php include_once('train_tbl.php'); ?>
@@ -359,11 +359,14 @@ $('#frm_tab2').validate({
         }
         $('.accordion_content').removeClass("indicator");
         $('.collapse').removeClass("in");
-        $('#collapse1').addClass("in");
+        $('#collapse2').addClass("in");
         $('#tab2_head').addClass('done');
         $('#tab3_head').addClass('active');
         $('.bk_tab').removeClass('active');
         $('#tab3').addClass('active');
+        if (typeof fill_daywise_from_tour === 'function') {
+            fill_daywise_from_tour();
+        }
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);

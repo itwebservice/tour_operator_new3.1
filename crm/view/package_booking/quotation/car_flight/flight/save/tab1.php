@@ -126,7 +126,14 @@ $('#country_code').select2();
 $('#travel_datetime').datetimepicker({format:'d-m-Y H:i' });
 $('#quotation_date').datetimepicker({timepicker:false, format:'d-m-Y', minDate: 0 });
 $("#customer_name").autocomplete({
-    // source: JSON.parse($('#cust_data').val()),
+    source: (function() {
+        try {
+            var parsed = JSON.parse($('#cust_data').val() || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    })(),
     select: function(event, ui) {
         $("#customer_name").val(ui.item.label);
         $('#mobile_no').val(ui.item.contact_no);

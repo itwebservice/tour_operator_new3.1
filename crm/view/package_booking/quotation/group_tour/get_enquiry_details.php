@@ -6,7 +6,7 @@ $sq_enq = mysqli_fetch_assoc(mysqlQuery("select * from enquiry_master where enqu
 $enquiry_content_arr1 = isset($sq_enq['enquiry_content']) ? json_decode($sq_enq['enquiry_content'], true) : [];
 if($enquiry_content_arr1 !== null){
 	foreach($enquiry_content_arr1 as $enquiry_content_arr2){
-		if($enquiry_content_arr2['name']=="tour_name"){ $sq_enq['tour_name'] = 'hi'; }
+		if($enquiry_content_arr2['name']=="tour_name"){ $sq_enq['tour_name'] = $enquiry_content_arr2['value']; }
 		if($enquiry_content_arr2['name']=="budget"){ $sq_enq['budget'] = $enquiry_content_arr2['value']; }
 		if($enquiry_content_arr2['name']=="total_members"){ $sq_enq['total_members'] = $enquiry_content_arr2['value']; }
 		if($enquiry_content_arr2['name']=="total_adult"){ $sq_enq['total_adult'] = $enquiry_content_arr2['value']; }
