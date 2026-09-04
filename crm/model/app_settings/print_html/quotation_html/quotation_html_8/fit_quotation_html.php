@@ -23,6 +23,7 @@ $ov           = $q['tour_overview'];
 $hotels       = $q['hotels'];
 $flights      = $q['flights'];
 $trains       = isset($q['trains']) ? $q['trains'] : array();
+$cruises      = isset($q['cruises']) ? $q['cruises'] : array();
 $acts         = isset($q['activities']) ? $q['activities'] : array();
 $vehs         = $q['vehicles'];
 $itin         = $q['itinerary'];
@@ -252,8 +253,8 @@ $o8_book_policy = o8_split_lines(
   )
 );
 $o8_term_lines = o8_split_lines(isset($terms['terms_and_conditions']) ? $terms['terms_and_conditions'] : '', array());
-$o8_show_flights = !empty($present['flights']) && !empty($flights);
-$o8_show_vehs    = !empty($present['vehicles']) && !empty($vehs);
+$o8_show_flights = !empty($flights);
+$o8_show_vehs    = !empty($vehs);
 $o8_is_per_person = (isset($cost['costing_type']) && (string) $cost['costing_type'] === '2')
   || (isset($cost['costing_type_label']) && strtolower(trim($cost['costing_type_label'])) === 'per person');
 
@@ -639,6 +640,46 @@ $o8_cost_note = o8nv(isset($incx['note']) ? $incx['note'] : '', 'All prices are 
                   <div class="info-block"><label>TO</label><strong><?= o8e($to_loc) ?></strong></div>
                   <div class="info-block"><label>CLASS</label><strong><?= o8e($train_class) ?></strong></div>
                   <div class="info-block"><label>DATE</label><strong><?= o8e($from_date) ?></strong></div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      </section>
+    </div>
+  <?php endif; ?>
+
+  <?php if (!empty($cruises)) : ?>
+    <div class="page">
+      <section class="flight-section">
+        <div class="container">
+          <h2 class="flight-title">Cruise Details</h2>
+          <div class="flight-grid">
+            <?php foreach ($cruises as $cr) :
+              $route = o8nv($cr['route'], 'Cruise');
+              $cabin = o8nv($cr['cabin'], 'NA');
+              $share = o8nv($cr['sharing_type'], '');
+              $from_date = o8nv($cr['from_date'], 'NA');
+              $to_date = o8nv($cr['to_date'], 'NA');
+            ?>
+              <div class="flight-card">
+                <div class="flight-route">
+                  <div class="route-point"><span>Departure</span>
+                    <h3>DEP</h3>
+                  </div>
+                  <div class="route-plane">🚢</div>
+                  <div class="route-point text-right"><span>Arrival</span>
+                    <h3>ARR</h3>
+                  </div>
+                </div>
+                <div class="flight-info">
+                  <div class="info-block"><label>ROUTE</label><strong><?= o8e($route) ?></strong></div>
+                  <div class="info-block"><label>CABIN</label><strong><?= o8e($cabin) ?></strong></div>
+                  <div class="info-block"><label>DEPARTURE</label><strong><?= o8e($from_date) ?></strong></div>
+                  <div class="info-block"><label>ARRIVAL</label><strong><?= o8e($to_date) ?></strong></div>
+                  <?php if ($share !== '') : ?>
+                    <div class="info-block"><label>SHARING</label><strong><?= o8e($share) ?></strong></div>
+                  <?php endif; ?>
                 </div>
               </div>
             <?php endforeach; ?>

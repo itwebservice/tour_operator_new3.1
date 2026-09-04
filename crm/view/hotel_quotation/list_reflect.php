@@ -80,7 +80,26 @@ $array_s = array();
 		}
 		$enq_details = json_decode($row_quotation['enquiry_details'], true);
 		$cost_details = json_decode($row_quotation['costing_details'], true);
-		
+		$amount_parts = array();
+		if (is_array($cost_details)) {
+			$opt_count = count($cost_details);
+			foreach ($cost_details as $cost_row) {
+				$data = isset($cost_row['costing']) ? $cost_row['costing'] : array();
+				$option_no = isset($cost_row['option']) ? $cost_row['option'] : '';
+				$total_amount = isset($data['total_amount']) ? $data['total_amount'] : 0;
+				$formatted_amount = htmlspecialchars(format_quotation_total_display(
+					$total_amount,
+					isset($row_quotation['currency_code']) ? $row_quotation['currency_code'] : $currency
+				), ENT_QUOTES, 'UTF-8');
+				if ($opt_count > 1 && $option_no !== '') {
+					$amount_parts[] = 'Option-'.$option_no.': '.$formatted_amount;
+				} else {
+					$amount_parts[] = $formatted_amount;
+				}
+			}
+		}
+		$quotation_cost_display = count($amount_parts) ? implode(', ', $amount_parts) : format_quotation_total_display(0, isset($row_quotation['currency_code']) ? $row_quotation['currency_code'] : $currency);
+
 		$copy_btn = ($row_quotation['status'] == '1') ? '<button class="btn btn-warning btn-sm" onclick="quotation_clone('.$row_quotation['quotation_id'].')" title="Create Copy of this Quotation" data-toggle="tooltip"><i class="fa fa-files-o"></i></button>' : '';
 
 		$pdf_btn = ($row_quotation['status'] == '1') ? '<a data-toggle="tooltip" onclick="loadOtherPage(\''.$url1.'\')" class="btn btn-info btn-sm" title="Download Quotation PDF"><i class="fa fa-print"></i></a> <button class="btn btn-info btn-sm" onclick="send_mail(\''.trim($enq_details['email_id']).'\',\''.$row_quotation['quotation_id'].'\')" id="email-'.$row_quotation['quotation_id'].'" title="Email Quotation to Customer" data-toggle="tooltip"><i class="fa fa-envelope-o"></i></button>' : '';
@@ -92,6 +111,7 @@ $array_s = array();
 			get_quotation_id($row_quotation['quotation_id'],$year),
 			get_date_user($row_quotation['quotation_date']),
 			$enq_details['customer_name'],
+			$quotation_cost_display,
 			$emp_name,
 			$pdf_btn.'<form  style="display:inline-block" action="update/index.php" id="frm_booking_'.$count.'" method="POST">
 			<input  style="display:inline-block" type="hidden" id="quotation_id" name="quotation_id" value="'.$row_quotation['quotation_id'].'">

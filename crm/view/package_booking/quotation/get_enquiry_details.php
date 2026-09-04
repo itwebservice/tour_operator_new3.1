@@ -8,7 +8,7 @@ $enquiry_content_arr1 = isset($sq_enq['enquiry_content']) ? json_decode($sq_enq[
 if($enquiry_content_arr1 !== null){
 	foreach($enquiry_content_arr1 as $enquiry_content_arr2)
 	{
-		if($enquiry_content_arr2['name']=="tour_name"){ $sq_enq1['tour_name'] = $enquiry_content_arr2['value']; }
+		if($enquiry_content_arr2['name']=="tour_name"){ $sq_enq1['tour_name'] = trim((string) $enquiry_content_arr2['value']); }
 		if($enquiry_content_arr2['name']=="budget"){ $sq_enq1['budget'] = $enquiry_content_arr2['value']; }
 		if($enquiry_content_arr2['name']=="total_members"){ $sq_enq1['total_members'] = $enquiry_content_arr2['value']; }
 		if($enquiry_content_arr2['name']=="total_adult"){ $sq_enq1['total_adult'] = $enquiry_content_arr2['value']; }

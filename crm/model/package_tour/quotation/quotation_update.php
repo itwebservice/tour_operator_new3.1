@@ -755,8 +755,45 @@ public function costing_entries_update($tour_cost_arr,$transport_cost_arr, $basi
 				}
 		}
 		$bsmvaluesEach = json_encode($bsmValues[$i]);
-		
-		$sq_plane = mysqlQuery("update package_tour_quotation_costing_entries set tour_cost='$tour_cost_arr[$i]',excursion_cost ='$excursion_cost_arr[$i]', basic_amount='$basic_amount_arr[$i]',service_charge = ' $service_charge_arr[$i]',service_tax_subtotal = '$service_tax_subtotal_arr[$i]',total_tour_cost = '$total_tour_cost_arr[$i]',transport_cost='$transport_cost_arr[$i]', bsmValues='$bsmvaluesEach',discount_in = '$discount_in_arr[$i]' ,discount = '$discount_arr[$i]'  where id='$costing_id_arr[$i]'");
+		if (!function_exists('gqd_applied_tax')) {
+			include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/generic_quotation_data.php';
+		}
+		$tax_subtotal = isset($service_tax_subtotal_arr[$i]) ? $service_tax_subtotal_arr[$i] : '';
+		if (function_exists('gqd_applied_tax')) {
+			$computed_tax = gqd_applied_tax(array(
+				'service_tax_subtotal' => $tax_subtotal,
+				'bsmValues' => $bsmvaluesEach,
+				'tour_cost' => isset($tour_cost_arr[$i]) ? $tour_cost_arr[$i] : 0,
+				'transport_cost' => isset($transport_cost_arr[$i]) ? $transport_cost_arr[$i] : 0,
+				'excursion_cost' => isset($excursion_cost_arr[$i]) ? $excursion_cost_arr[$i] : 0,
+				'basic_amount' => isset($basic_amount_arr[$i]) ? $basic_amount_arr[$i] : 0,
+				'service_charge' => isset($service_charge_arr[$i]) ? $service_charge_arr[$i] : 0,
+				'discount_in' => isset($discount_in_arr[$i]) ? $discount_in_arr[$i] : '',
+				'discount' => isset($discount_arr[$i]) ? $discount_arr[$i] : 0,
+			));
+			if (!empty($computed_tax['applied'])) {
+				$tax_subtotal = $computed_tax['applied'];
+			}
+		}
+		$tax_subtotal = addslashes($tax_subtotal);
+		$row_total = isset($total_tour_cost_arr[$i]) ? $total_tour_cost_arr[$i] : 0;
+		if (function_exists('gqd_group_costing_breakdown')) {
+			$brk = gqd_group_costing_breakdown(array(
+				'tour_cost' => isset($tour_cost_arr[$i]) ? $tour_cost_arr[$i] : 0,
+				'transport_cost' => isset($transport_cost_arr[$i]) ? $transport_cost_arr[$i] : 0,
+				'excursion_cost' => isset($excursion_cost_arr[$i]) ? $excursion_cost_arr[$i] : 0,
+				'basic_amount' => isset($basic_amount_arr[$i]) ? $basic_amount_arr[$i] : 0,
+				'service_charge' => isset($service_charge_arr[$i]) ? $service_charge_arr[$i] : 0,
+				'discount_in' => isset($discount_in_arr[$i]) ? $discount_in_arr[$i] : '',
+				'discount' => isset($discount_arr[$i]) ? $discount_arr[$i] : 0,
+				'service_tax_subtotal' => $tax_subtotal,
+				'bsmValues' => $bsmvaluesEach,
+				'total_tour_cost' => $row_total,
+			));
+			$row_total = $brk['tour_total'];
+		}
+
+		$sq_plane = mysqlQuery("update package_tour_quotation_costing_entries set tour_cost='$tour_cost_arr[$i]',excursion_cost ='$excursion_cost_arr[$i]', basic_amount='$basic_amount_arr[$i]',service_charge = ' $service_charge_arr[$i]',service_tax_subtotal = '$tax_subtotal',total_tour_cost = '$row_total',transport_cost='$transport_cost_arr[$i]', bsmValues='$bsmvaluesEach',discount_in = '$discount_in_arr[$i]' ,discount = '$discount_arr[$i]'  where id='$costing_id_arr[$i]'");
 
 		if(!$sq_plane){
 			echo "error--Costing information not updated!";
@@ -924,6 +961,36 @@ function quotation_daywiseimages_update(){
 			
 			// Save the itinerary data
 			$this->program_entries_save($quotation_id, $attraction_arr, $program_arr, $stay_arr, $meal_plan_arr, $day_image_arr, $package_p_id_arr, $checked_programe_arr1, $package_id, $day_count_arr, $quotation_refer_id);
+
+			$inclusions = isset($_POST['inclusions']) ? $_POST['inclusions'] : null;
+			$exclusions = isset($_POST['exclusions']) ? $_POST['exclusions'] : null;
+			if (is_array($inclusions)) {
+				$picked = '';
+				foreach ($inclusions as $chunk) {
+					if (is_string($chunk) && trim(strip_tags($chunk)) !== '') {
+						$picked = $chunk;
+					}
+				}
+				$inclusions = $picked !== '' ? $picked : (string) end($inclusions);
+			}
+			if (is_array($exclusions)) {
+				$picked = '';
+				foreach ($exclusions as $chunk) {
+					if (is_string($chunk) && trim(strip_tags($chunk)) !== '') {
+						$picked = $chunk;
+					}
+				}
+				$exclusions = $picked !== '' ? $picked : (string) end($exclusions);
+			}
+			if ($inclusions !== null && $exclusions !== null) {
+				$incl_plain = trim(strip_tags((string) $inclusions));
+				$excl_plain = trim(strip_tags((string) $exclusions));
+				if ($incl_plain !== '' || $excl_plain !== '') {
+					$incl_sql = addslashes((string) $inclusions);
+					$excl_sql = addslashes((string) $exclusions);
+					mysqlQuery("update package_tour_quotation_master set inclusions='$incl_sql', exclusions='$excl_sql' where quotation_id='$quotation_id'");
+				}
+			}
 			
 			error_log("QUOTATION UPDATE: Itinerary data saved successfully");
 			

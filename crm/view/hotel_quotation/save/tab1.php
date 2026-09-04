@@ -123,8 +123,9 @@ $role_id = $_SESSION['role_id'];
             </div>
             <div class="row mg_tp_10">
                 <div class="col-md-4 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" id="quotation_date" name="quotation_date"
-                        placeholder="Quotation Date" title="Quotation Date" value="<?= date('d-m-Y') ?>">
+                    <input type="text" class="form-control app_datepicker" id="quotation_date" name="quotation_date"
+                        placeholder="Quotation Date" title="Quotation Date" value="<?= date('d-m-Y') ?>" readonly
+                        onchange="if(typeof hqValidateNotPast==='function'){hqValidateNotPast(this.id);}">
                 </div>
             </div>
             <div class="row  mg_tp_10">
@@ -147,26 +148,9 @@ $role_id = $_SESSION['role_id'];
 
 <script>
 $('#country_code').select2();
-
-$("#customer_name").autocomplete({
-    // source: JSON.parse($('#cust_data').val()),
-    select: function(event, ui) {
-        $("#customer_name").val(ui.item.label);
-        var newOption = $("<option selected='selected'></option>").val(ui.item.country_id).text(ui.item.country_code);
-        $('#country_code').append(newOption).trigger('change.select2');
-        $('#whatsapp_no').val(ui.item.contact_no);
-        $('#email_id').val(ui.item.email_id);
-    },
-    open: function(event, ui) {
-        $(this).autocomplete("widget").css({
-            "width": document.getElementById("customer_name").offsetWidth
-        });
-    }
-}).data("ui-autocomplete")._renderItem = function(ul, item) {
-    return $("<li disabled>")
-        .append("<a>" + item.label + "</a>")
-        .appendTo(ul);
-};
+if (typeof hqInitCustomerAutocomplete === 'function') {
+    hqInitCustomerAutocomplete('customer_name');
+}
 // New Customization ----start
 $(document).ready(function() {
     let searchParams = new URLSearchParams(window.location.search);
@@ -189,6 +173,9 @@ $('#frm_tab1').validate({
         }
     },
     submitHandler: function(form) {
+        if (typeof hqValidateNotPast === 'function' && !hqValidateNotPast('quotation_date')) {
+            return false;
+        }
         $('#tab1_head').addClass('done');
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');

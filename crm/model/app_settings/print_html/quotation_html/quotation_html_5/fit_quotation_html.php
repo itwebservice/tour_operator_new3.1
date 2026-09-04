@@ -21,8 +21,13 @@ if (empty($q['found'])) {
 $hero         = $q['hero'];
 $ov           = $q['tour_overview'];
 $hotels       = $q['hotels'];
+$o5_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels_by_package_type']))
+  ? $q['hotels_by_package_type']
+  : (function_exists('gqd_hotels_by_package_type') ? gqd_hotels_by_package_type($hotels) : array());
+$o5_multi_pkg = count($o5_hotels_by_pkg) > 1;
 $flights      = $q['flights'];
 $trains  = isset($q['trains']) ? $q['trains'] : array();
+$cruises = isset($q['cruises']) ? $q['cruises'] : array();
 $acts    = isset($q['activities']) ? $q['activities'] : array();
 $vehs         = $q['vehicles'];
 $itin         = $q['itinerary'];
@@ -539,7 +544,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
 
     <hr class="page-divider" />
 
-    <?php o5_render_page_header_strip($hero, $o5_pkg_badge !== '' ? $o5_pkg_badge : $o5_pkg_ov, true); ?>
+    <?php o5_render_page_header_strip($hero, $o5_multi_pkg ? 'Hotels by Package Type' : ($o5_pkg_badge !== '' ? $o5_pkg_badge : $o5_pkg_ov), true); ?>
 
     <!-- ACCOMMODATION -->
     <div class="page-section print-section">
@@ -547,17 +552,29 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
         <div class="sec-head" style="margin-bottom:0;">
           <h2>Accommodation Details</h2>
         </div>
-        <?php if ($o5_pkg_badge !== '') : ?>
+        <?php if ($o5_multi_pkg) : ?>
+          <div class="pkg-badge-gold">HOTELS BY PACKAGE TYPE</div>
+        <?php elseif ($o5_pkg_badge !== '') : ?>
           <div class="pkg-badge-gold"><?= o5e(strtoupper($o5_pkg_badge)) ?> PACKAGE</div>
         <?php endif; ?>
       </div>
 
       <?php
+      if (empty($o5_hotels_by_pkg) && !empty($hotels)) {
+        $o5_hotels_by_pkg = array('Package' => $hotels);
+      }
       $o5_hi = 0;
-      if (!empty($hotels)) :
-        foreach ($hotels as $h) :
+      if (!empty($o5_hotels_by_pkg)) :
+        foreach ($o5_hotels_by_pkg as $o5_pkg_heading => $o5_pkg_hotels) :
+          if ($o5_multi_pkg) :
+      ?>
+          <div class="sec-head" style="margin:18px 0 12px;">
+            <h2 style="font-size:18px;">Package Type — <?= o5e($o5_pkg_heading) ?></h2>
+          </div>
+      <?php
+          endif;
+          foreach ($o5_pkg_hotels as $h) :
           $o5_hi++;
-          // $hphoto = o5img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . (($o5_hi - 1) % 3 + 1) . '.jpg');
           $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
           $o5_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
@@ -573,6 +590,9 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
             <div class="hotel-inner">
               <div class="hotel-img"><img src="<?= o5e($hphoto) ?>" alt="<?= o5e(o5nv($h['hotel_name'], 'Hotel')) ?>" /></div>
               <div class="hotel-body">
+                <?php if ($o5_multi_pkg) : ?>
+                  <div class="hotel-loc" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;">🏷️ <?= o5e($o5_pkg_heading) ?></div>
+                <?php endif; ?>
                 <div class="hotel-loc">📍 <?= o5e(o5nv($h['hotel_city'], '')) ?></div>
                 <div class="hotel-name"><?= o5e(o5nv($h['hotel_name'], 'Hotel')) ?></div>
                 <div class="hotel-room-badge"><span class="star"><?= o5e(o5_stars(o5nv($h['rating'], ''))) ?></span> <?= o5e($room_label) ?></div>
@@ -601,6 +621,7 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
             </div>
           </div>
         <?php
+          endforeach;
         endforeach;
       else :
         ?>
@@ -631,14 +652,16 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
 
     <div class="pdf-page">
       <?php
-      $o5_show_flights = !empty($present['flights']) && !empty($flights);
-      $o5_show_vehs = !empty($present['vehicles']) && !empty($vehs);
-      if ($o5_show_flights || $o5_show_vehs) {
-        o5_render_page_header_strip($hero, $o5_show_flights ? 'Flight Details' : 'Transportation');
+      $o5_show_flights = !empty($flights);
+      $o5_show_vehs = !empty($vehs);
+      $o5_show_trains = !empty($trains);
+      $o5_show_cruises = !empty($cruises);
+      if ($o5_show_flights || $o5_show_vehs || $o5_show_trains || $o5_show_cruises) {
+        o5_render_page_header_strip($hero, $o5_show_flights ? 'Flight Details' : ($o5_show_trains ? 'Train Details' : ($o5_show_cruises ? 'Cruise Details' : 'Transportation')));
       }
       ?>
       <!-- FLIGHTS & TRANSPORT -->
-      <?php if ($o5_show_flights || $o5_show_vehs) : ?>
+      <?php if ($o5_show_flights || $o5_show_vehs || $o5_show_trains || $o5_show_cruises) : ?>
         <div class="page-section">
           <?php if ($o5_show_flights) : ?>
             <div class="sec-head">
@@ -759,6 +782,41 @@ $o5_traveller_cnt = o5nv(isset($o5_cfg['traveller_count']) ? $o5_cfg['traveller_
                 </div>
               </div>
 
+            <?php endforeach; ?>
+          <?php endif; ?>
+
+          <?php if (!empty($cruises)) : ?>
+            <div class="sec-head" style="margin-top:24px;">
+              <h2>Cruise Details</h2>
+            </div>
+            <?php foreach ($cruises as $cr) :
+              $route = isset($cr['route']) ? $cr['route'] : '';
+              $cabin = isset($cr['cabin']) ? $cr['cabin'] : '';
+              $share = isset($cr['sharing_type']) ? $cr['sharing_type'] : '';
+              $from_date = isset($cr['from_date']) ? $cr['from_date'] : '';
+              $to_date = isset($cr['to_date']) ? $cr['to_date'] : '';
+            ?>
+              <div class="flight-card">
+                <div class="flight-header">
+                  <div class="flight-header-left">
+                    <div class="flight-icon-box">🚢</div>
+                    <div>
+                      <span class="flight-airline"><?= o5e(o5nv($route, 'Cruise')) ?></span>
+                    </div>
+                  </div>
+                  <div class="flight-class-badge"><?= o5e(o5nv($cabin, 'Cabin')) ?></div>
+                </div>
+                <div class="flight-body">
+                  <div class="flight-footer">
+                    <span class="ff-text">Dep:</span>
+                    <span class="ff-val"><?= o5e(o5nv($from_date, 'NA')) ?></span>
+                    <span class="ff-text">Arr:</span>
+                    <span class="ff-val"><?= o5e(o5nv($to_date, 'NA')) ?></span>
+                    <span class="ff-text">Sharing:</span>
+                    <span class="ff-val"><?= o5e(o5nv($share, 'NA')) ?></span>
+                  </div>
+                </div>
+              </div>
             <?php endforeach; ?>
           <?php endif; ?>
 

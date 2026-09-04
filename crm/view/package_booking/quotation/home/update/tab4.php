@@ -541,8 +541,9 @@ function getInclusionsExclusionsForQuotation() {
     // Do NOT prefer #inclusions1 — that lives in a display:none block on update/tab2.php.
     var pairs = [];
     var seen = {};
+    var hasLiveEditors = false;
 
-    function addPair(inclId, exclId) {
+    function addPair(inclId, exclId, isLive) {
         if (!inclId || seen[inclId]) {
             return;
         }
@@ -550,39 +551,45 @@ function getInclusionsExclusionsForQuotation() {
             return;
         }
         seen[inclId] = true;
-        pairs.push([inclId, exclId || inclId.replace(/^inclusions/, 'exclusions')]);
+        if (isLive) {
+            hasLiveEditors = true;
+        }
+        pairs.push({
+            inclId: inclId,
+            exclId: exclId || inclId.replace(/^inclusions/, 'exclusions'),
+            live: !!isLive
+        });
     }
 
-    // Visible AI editors
-    addPair('inclusions_ai', 'exclusions_ai');
+    // Live editors (AI + packages) — these are the ones the user edits
+    addPair('inclusions_ai', 'exclusions_ai', true);
 
-    // Checked package editors first, then any package inclusions{digits}
     $('input[name="custom_package"]:checked').each(function () {
         var pid = $(this).val();
         if (pid) {
-            addPair('inclusions' + pid, 'exclusions' + pid);
+            addPair('inclusions' + pid, 'exclusions' + pid, true);
         }
     });
     $('textarea[id^="inclusions"]').each(function () {
-        if (/^inclusions\d+$/.test(this.id)) {
-            addPair(this.id, this.id.replace(/^inclusions/, 'exclusions'));
+        if (/^inclusions\d+$/.test(this.id) && this.id !== 'inclusions1' && this.id !== 'inclusions33') {
+            addPair(this.id, this.id.replace(/^inclusions/, 'exclusions'), true);
         }
     });
 
-    // Fallbacks (may be hidden on update)
-    addPair('inclusions33', 'exclusions33');
-    addPair('inclusions1', 'exclusions1');
+    // Hidden tab2 copies only if no live editors exist
+    if (!hasLiveEditors) {
+        addPair('inclusions33', 'exclusions33', false);
+        addPair('inclusions1', 'exclusions1', false);
+    }
 
     var best = { inclusions: '', exclusions: '', score: -1 };
     for (var i = 0; i < pairs.length; i++) {
-        var inclId = pairs[i][0];
-        var exclId = pairs[i][1];
+        var inclId = pairs[i].inclId;
+        var exclId = pairs[i].exclId;
         var incl = getQuotationEditorContent(inclId);
         var excl = getQuotationEditorContent(exclId);
-        var onScreen = isQuotationEditorOnScreen(inclId) || isQuotationEditorOnScreen(exclId);
         var textLen = quotationInclExclPlainLength(incl) + quotationInclExclPlainLength(excl);
-        // Prefer on-screen editors heavily; then richer content
-        var score = (onScreen ? 1000000 : 0) + textLen;
+        var score = (pairs[i].live ? 1000000 : 0) + textLen;
         if (score > best.score) {
             best = { inclusions: incl, exclusions: excl, score: score };
         }
@@ -590,8 +597,22 @@ function getInclusionsExclusionsForQuotation() {
     return { inclusions: best.inclusions || '', exclusions: best.exclusions || '' };
 }
 function get_business(id, flag, change = false) {
-    var offset = id.split('-');
-    get_auto_values('quotation_date', 'basic_amount-' + offset[1], 'payment_mode', 'service_charge-' + offset[1],'markup', 'update', flag, 'markup', 'discount_amt-'+ offset[1], offset[1], change);
+    var offset = '';
+    if (typeof quotationCostingFieldSuffix === 'function') {
+        offset = String(quotationCostingFieldSuffix(id) || '').replace(/^-/, '');
+    } else if (id && String(id).indexOf('-') !== -1) {
+        offset = String(id).split('-').slice(1).join('-');
+    }
+    if (typeof get_auto_values !== 'function') {
+        return;
+    }
+    try {
+        get_auto_values('quotation_date', 'basic_amount-' + offset, 'payment_mode', 'service_charge-' + offset,'markup', 'update', flag, 'markup', 'discount_amt-'+ offset, offset, change);
+    } catch (err) {
+        if (typeof console !== 'undefined' && console.warn) {
+            console.warn('get_auto_values skipped', err);
+        }
+    }
 }
 
 function switch_to_tab3() {
@@ -783,12 +804,12 @@ $('#frm_tab4').validate({
             }
             if (el.tagName === 'DIV') {
                 var entries = [];
-                $(el).find('[id^="tour_cost-"]').each(function() {
-                    var suffix = this.id.replace('tour_cost-', '');
-                    if (!suffix) {
-                        return;
-                    }
-                    var checkbox = document.getElementById('chk_costing' + suffix);
+                $(el).find('input').filter(function() {
+                    var id = this.id || '';
+                    return id === 'tour_cost-' || id === 'tour_cost' || /^tour_cost-\d+$/.test(id);
+                }).each(function() {
+                    var suffix = String(this.id || '').replace(/^tour_cost-?/, '');
+                    var checkbox = document.getElementById('chk_costing' + (suffix || '1'));
                     if (checkbox && !checkbox.checked) {
                         return;
                     }
@@ -807,7 +828,9 @@ $('#frm_tab4').validate({
                         discount: discountAmt,
                         tax_apply_on: $('#atax_apply_on-' + suffix).val() || '',
                         tax_value: $('#tax_value1-' + suffix).val() || '',
-                        service_tax_subtotal: $('#service_tax_subtotal-' + suffix).val() || '',
+                        service_tax_subtotal: (typeof quotationResolveGroupTaxSubtotal === 'function')
+                            ? quotationResolveGroupTaxSubtotal('-' + suffix)
+                            : ($('#service_tax_subtotal-' + suffix).val() || ''),
                         total_tour_cost: $('#total_tour_cost-' + suffix).val() || '',
                         package_name3: $('#package_name1-' + suffix).val() || '',
                         costing_id: $('#costing_entry_id-' + suffix).val() || ''
@@ -846,12 +869,12 @@ $('#frm_tab4').validate({
             }
             if (el.tagName === 'DIV') {
                 var bsmValues = [];
-                $(el).find('[id^="tour_cost-"]').each(function() {
-                    var suffix = this.id.replace('tour_cost-', '');
-                    if (!suffix) {
-                        return;
-                    }
-                    var checkbox = document.getElementById('chk_costing' + suffix);
+                $(el).find('input').filter(function() {
+                    var id = this.id || '';
+                    return id === 'tour_cost-' || id === 'tour_cost' || /^tour_cost-\d+$/.test(id);
+                }).each(function() {
+                    var suffix = String(this.id || '').replace(/^tour_cost-?/, '');
+                    var checkbox = document.getElementById('chk_costing' + (suffix || '1'));
                     if (checkbox && !checkbox.checked) {
                         return;
                     }
@@ -1549,9 +1572,20 @@ $('#frm_tab4').validate({
             callback: function(result) {
                 if (result == "yes") {
                     // Read inclusions/exclusions at submit time from the VISIBLE editors
-                    var inclExclData = getInclusionsExclusionsForQuotation();
+                    var inclExclData = (typeof quotationCaptureInclExclFromEditors === 'function')
+                        ? quotationCaptureInclExclFromEditors()
+                        : getInclusionsExclusionsForQuotation();
                     var inclusions = inclExclData.inclusions || '';
                     var exclusions = inclExclData.exclusions || '';
+                    if ((!inclusions && !exclusions)) {
+                        try {
+                            var storedInclExcl = JSON.parse(sessionStorage.getItem('quotation_incl_excl') || 'null');
+                            if (storedInclExcl) {
+                                inclusions = storedInclExcl.inclusions || inclusions;
+                                exclusions = storedInclExcl.exclusions || exclusions;
+                            }
+                        } catch (eIncl) {}
+                    }
                     console.log('Incl/Excl save lengths:', inclusions.length, exclusions.length);
 
                     $('#btn_quotation_update').button('loading');

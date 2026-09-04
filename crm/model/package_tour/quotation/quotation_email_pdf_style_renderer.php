@@ -211,20 +211,24 @@ if (!function_exists('render_quotation_email_pdf_style')) {
 			. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">TCS</td>'
 			. '<td align="right" style="padding:10px 8px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Travel</td>'
 			. '<td align="right" style="padding:10px 12px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:' . $gold . ';">Grand Total</td></tr>';
+		$money = function ($disp) {
+			return function_exists('gqd_format_money_html')
+				? gqd_format_money_html($disp, '&#8377;', 'qes_esc')
+				: qes_esc($disp);
+		};
 		$i = 0;
 		foreach ($rows as $row) {
 			$bg = ($i % 2 === 1) ? '#faf6ee' : '#ffffff';
-			$tax = '0.00';
-			if (!empty($row['tax_display']) && preg_match('/INR\s*([\d,\.]+)/i', $row['tax_display'], $m)) {
-				$tax = $m[1];
-			}
+			$tax = function_exists('gqd_tax_display_amount')
+				? gqd_tax_display_amount($row)
+				: qes_nv(isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '', '0.00');
 			$html .= '<tr style="background:' . $bg . ';border-top:1px solid rgba(229,172,76,0.2);">'
 				. '<td style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;color:' . $navy . ';font-size:14px;">' . qes_esc(qes_nv($row['package_type'], 'Package')) . '</td>'
-				. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['tour_cost_display'], '0')) . '</td>'
-				. '<td align="right" style="padding:12px 8px;font-size:13px;">INR ' . qes_esc($tax) . '</td>'
-				. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['tcs_display'], '0')) . '</td>'
-				. '<td align="right" style="padding:12px 8px;font-size:13px;">&#8377; ' . qes_esc(qes_nv($row['travel_display'], '0')) . '</td>'
-				. '<td align="right" style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;font-size:16px;color:' . $navy . ';font-weight:700;">&#8377; ' . qes_esc(qes_nv($row['total_display'], '0')) . '</td></tr>';
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">' . $money(qes_nv($row['tour_cost_display'], '0')) . '</td>'
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">' . $money($tax) . '</td>'
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">' . $money(qes_nv($row['tcs_display'], '0')) . '</td>'
+				. '<td align="right" style="padding:12px 8px;font-size:13px;">' . $money(qes_nv($row['travel_display'], '0')) . '</td>'
+				. '<td align="right" style="padding:12px;font-family:\'Playfair Display\',Georgia,serif;font-size:16px;color:' . $navy . ';font-weight:700;">' . $money(qes_nv($row['total_display'], '0')) . '</td></tr>';
 			$i++;
 		}
 		$html .= '</table>';
@@ -249,6 +253,35 @@ if (!function_exists('render_quotation_email_pdf_style')) {
 					. '</div>';
 			}
 			$html .= qes_card_close();
+		}
+
+		$travel_lines = function_exists('gqd_travel_preview_lines') ? gqd_travel_preview_lines($q) : array('flights' => array(), 'trains' => array(), 'cruises' => array());
+
+		if (!empty($travel_lines['flights'])) {
+			$html .= qes_section_bar('Flight Details');
+			$html .= qes_card_open() . '<ul style="margin:0;padding-left:18px;color:#555;">';
+			foreach ($travel_lines['flights'] as $line) {
+				$html .= '<li style="margin-bottom:8px;font-size:13px;">' . qes_esc($line) . '</li>';
+			}
+			$html .= '</ul>' . qes_card_close();
+		}
+
+		if (!empty($travel_lines['trains'])) {
+			$html .= qes_section_bar('Train Details');
+			$html .= qes_card_open() . '<ul style="margin:0;padding-left:18px;color:#555;">';
+			foreach ($travel_lines['trains'] as $line) {
+				$html .= '<li style="margin-bottom:8px;font-size:13px;">' . qes_esc($line) . '</li>';
+			}
+			$html .= '</ul>' . qes_card_close();
+		}
+
+		if (!empty($travel_lines['cruises'])) {
+			$html .= qes_section_bar('Cruise Details');
+			$html .= qes_card_open() . '<ul style="margin:0;padding-left:18px;color:#555;">';
+			foreach ($travel_lines['cruises'] as $line) {
+				$html .= '<li style="margin-bottom:8px;font-size:13px;">' . qes_esc($line) . '</li>';
+			}
+			$html .= '</ul>' . qes_card_close();
 		}
 
 		if (!empty($q['itinerary'])) {

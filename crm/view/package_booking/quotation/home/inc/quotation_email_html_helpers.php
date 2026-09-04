@@ -77,10 +77,14 @@ if (!function_exists('qeh_wrap_preview_section')) {
 }
 
 if (!function_exists('qeh_greeting_block')) {
-	function qeh_greeting_block($app_name)
+	function qeh_greeting_block($app_name, $guest_name = 'Guest')
 	{
+		$guest_name = trim((string) $guest_name);
+		if ($guest_name === '') {
+			$guest_name = 'Guest';
+		}
 		return '<div style="color:#444;line-height:1.65;margin-bottom:4px;font-size:14px;">'
-			. '<p style="margin:0 0 8px;">Hi Guest,</p>'
+			. '<p style="margin:0 0 8px;">Hi ' . qeh_esc($guest_name) . ',</p>'
 			. '<p style="margin:0 0 8px;">Greetings from <strong>' . qeh_esc($app_name) . '</strong></p>'
 			. '<p style="margin:0 0 4px;">Thank you for your query with us. As per your requirements, following are the package details.</p>'
 			. '</div>';

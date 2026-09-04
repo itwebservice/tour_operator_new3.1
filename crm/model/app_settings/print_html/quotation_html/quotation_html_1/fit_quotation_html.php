@@ -1160,6 +1160,41 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
         <?php } ?>
         <!-- ================================= -->
 
+        <!-- ======================== Cruise Details  -->
+        <?php if (!empty($cruises)) { ?>
+          <div class="mt-6">
+            <div class="flex items-center justify-between">
+              <h2 class="font-display text-2xl text-[color:var(--navy)] flex items-center gap-2">
+                Cruise Details
+              </h2>
+              <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">Sailing</span>
+            </div>
+            <hr class="gold-rule mt-2" />
+            <div class="grid grid-cols-2 gap-3 mt-4">
+              <?php foreach ((array)$cruises as $cr) {
+                $route = isset($cr['route']) ? $cr['route'] : '';
+                $cabin = isset($cr['cabin']) ? $cr['cabin'] : '';
+                $share = isset($cr['sharing_type']) ? $cr['sharing_type'] : '';
+                $from_date = isset($cr['from_date']) ? $cr['from_date'] : '';
+                $to_date = isset($cr['to_date']) ? $cr['to_date'] : '';
+              ?>
+                <div class="rounded-xl bg-white overflow-hidden border border-[color:var(--gold)]/25" style="box-shadow:var(--shadow-card)">
+                  <div class="px-4 py-2 text-cream" style="background:var(--gradient-navy)">
+                    <div class="text-[10px] uppercase tracking-[0.22em] text-[color:var(--gold)]">Cruise</div>
+                    <h3 class="font-display text-lg"><?= o1e(o1nv($route, 'Cruise Route')) ?></h3>
+                  </div>
+                  <div class="p-4 text-[12px] text-[color:var(--navy)] space-y-1">
+                    <div><span class="uppercase tracking-[0.16em] text-[color:var(--navy)]/60">Departure</span> <?= o1e(o1nv($from_date, 'NA')) ?></div>
+                    <div><span class="uppercase tracking-[0.16em] text-[color:var(--navy)]/60">Arrival</span> <?= o1e(o1nv($to_date, 'NA')) ?></div>
+                    <div><span class="uppercase tracking-[0.16em] text-[color:var(--navy)]/60">Cabin</span> <?= o1e(o1nv($cabin, 'NA')) ?></div>
+                    <div><span class="uppercase tracking-[0.16em] text-[color:var(--navy)]/60">Sharing</span> <?= o1e(o1nv($share, 'NA')) ?></div>
+                  </div>
+                </div>
+              <?php } ?>
+            </div>
+          </div>
+        <?php } ?>
+
         <!-- ======================== Activity Details -->
         <?php if (!empty($acts)) { ?>
           <div class="mt-6">
@@ -1719,12 +1754,15 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
           $o1_costing_type = isset($cost['costing_type_label']) ? strtolower(trim($cost['costing_type_label'])) : '';
           $o1_costing_raw = isset($cost['costing_type']) ? (string) $cost['costing_type'] : '';
           $is_per_person = ($o1_costing_type == 'per person' || ($o1_costing_raw !== '' && $o1_costing_raw !== '1'));
+          $o1_cur_label = isset($cost['currency_label']) && $cost['currency_label'] !== ''
+            ? $cost['currency_label']
+            : (function_exists('gqd_currency_code_label') ? gqd_currency_code_label(isset($cost['currency_code']) ? $cost['currency_code'] : null) : 'INR');
           ?>
           <div class="flex items-end justify-between">
           <h3 class="font-display text-2xl text-[color:var(--navy)]">Costing Details</h3>
           <!-- <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">All values in INR · per package</span> -->
           <span class="text-[10px] uppercase tracking-[0.3em] text-[color:var(--gold)]">
-            All values in INR · <?= $is_per_person ? 'Per Person' : 'Per Package' ?>
+            All values in <?= o1e($o1_cur_label) ?> · <?= $is_per_person ? 'Per Person' : 'Per Package' ?>
           </span>
         </div>
         <hr class="gold-rule mt-2" />
@@ -1752,20 +1790,20 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
                 <div class="col-span-1 flex items-center gap-2">
                   <span class="font-display text-base text-[color:var(--navy)]"><?= o1e(o1nv($o1_row['package_type'], 'Package')) ?></span>
                 </div>
-                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tour_cost_display']) ?></div>
-                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e(function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($o1_row) : o1nv(isset($o1_row['tax_amount_display']) ? $o1_row['tax_amount_display'] : '', '0.00')) ?></div>
-                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['tcs_display']) ?></div>
-                <div class="text-right text-[color:var(--ink)]/85">&#8377; <?= o1e($o1_row['travel_display']) ?></div>
+                <div class="text-right text-[color:var(--ink)]/85"><?= gqd_format_money_html($o1_row['tour_cost_display'], '&#8377;', 'o1e') ?></div>
+                <div class="text-right text-[color:var(--ink)]/85"><?= gqd_format_money_html(function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($o1_row) : o1nv(isset($o1_row['tax_amount_display']) ? $o1_row['tax_amount_display'] : '', '0.00'), '&#8377;', 'o1e') ?></div>
+                <div class="text-right text-[color:var(--ink)]/85"><?= gqd_format_money_html($o1_row['tcs_display'], '&#8377;', 'o1e') ?></div>
+                <div class="text-right text-[color:var(--ink)]/85"><?= gqd_format_money_html($o1_row['travel_display'], '&#8377;', 'o1e') ?></div>
                <?php
                 $o1_gt_total = isset($o1_row['total_display']) ? (string) $o1_row['total_display'] : '';
                 $o1_gt_before = isset($o1_row['before_discount_display']) ? (string) $o1_row['before_discount_display'] : '';
                 ?>
                 <div class="text-right font-display text-[color:var(--navy)]" style="line-height:1.25;">
                   <?php if ($o1_gt_before !== ''): ?>
-                    <div style="font-size:12px;font-weight:600;white-space:nowrap;">&#8377;&nbsp;<?= o1e($o1_gt_total) ?></div>
-                    <div style="font-size:10px;margin-top:2px;text-decoration:line-through;opacity:0.55;white-space:nowrap;">&#8377;&nbsp;<?= o1e($o1_gt_before) ?></div>
+                    <div style="font-size:12px;font-weight:600;white-space:nowrap;"><?= gqd_format_money_html($o1_gt_total, '&#8377;', 'o1e') ?></div>
+                    <div style="font-size:10px;margin-top:2px;text-decoration:line-through;opacity:0.55;white-space:nowrap;"><?= gqd_format_money_html($o1_gt_before, '&#8377;', 'o1e') ?></div>
                   <?php else: ?>
-                    <div class="text-lg">&#8377; <?= o1e($o1_gt_total) ?></div>
+                    <div class="text-lg"><?= gqd_format_money_html($o1_gt_total, '&#8377;', 'o1e') ?></div>
                   <?php endif; ?>
                 </div>
               </div>
@@ -1851,39 +1889,39 @@ $o1_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_adult_display']) ?>
+                        <?= gqd_format_money_html($pp['pp_adult_display'], '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_cwb_display']) ?>
+                        <?= gqd_format_money_html($pp['pp_cwb_display'], '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_cwnb_display']) ?>
+                        <?= gqd_format_money_html($pp['pp_cwnb_display'], '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['pp_infant_display']) ?>
+                        <?= gqd_format_money_html($pp['pp_infant_display'], '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($tax_amount) ?>
+                        <?= gqd_format_money_html($tax_amount, '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['tcs_display']) ?>
+                        <?= gqd_format_money_html($pp['tcs_display'], '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['visa_display']) ?>
+                        <?= gqd_format_money_html($pp['visa_display'], '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['guide_display']) ?>
+                        <?= gqd_format_money_html($pp['guide_display'], '&#8377;', 'o1e') ?>
                       </td>
 
                       <td style="padding:32px 8px;text-align:center;font-size:13px;font-family:Arial, Helvetica, sans-serif;">
-                        &#8377; <?= o1e($pp['misc_display']) ?>
+                        <?= gqd_format_money_html($pp['misc_display'], '&#8377;', 'o1e') ?>
                       </td>
                     </tr>
                   <?php } ?>

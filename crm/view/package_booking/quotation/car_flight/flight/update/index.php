@@ -61,5 +61,5 @@ $('#from_date1, #to_date1,#quotation_date1').datetimepicker({
 });
 $('#quotation_update_modal').modal('show');
 </script>
-<script src="<?php echo BASE_URL ?>view/package_booking/quotation/car_flight/js/quotation.js"></script>
+<script src="<?php echo BASE_URL ?>view/package_booking/quotation/car_flight/js/quotation.js?v=<?php echo @filemtime(__DIR__ . '/../../js/quotation.js') ?: time(); ?>"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

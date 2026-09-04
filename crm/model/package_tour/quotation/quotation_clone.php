@@ -35,6 +35,15 @@ public function quotation_master_clone()
 					$incl_excl = addslashes($r[$col]);
 					$insertSQL .= "'".$incl_excl."'";
 				}
+				else if($col=='quotation_id_display'){
+					$insertSQL .= "''";
+				}
+				else if($col=='is_sub_quotation'){
+					$insertSQL .= "'0'";
+				}
+				else if($col=='parent_quotation_id'){
+					$insertSQL .= "'0'";
+				}
 				else if($col=='created_at' || $col=='quotation_date'){
 					$insertSQL .= "'".date('Y-m-d')."'";
 				}
@@ -69,6 +78,9 @@ public function quotation_master_clone()
 			$this->clone_images_entries($quotation_id, $quotation_max);
 			
 			$sq_update  = mysqlQuery("update package_tour_quotation_master set clone='yes' where quotation_id='$quotation_max'");
+			$clone_year = date('Y');
+			$clone_display = get_quotation_id($quotation_max, $clone_year);
+			mysqlQuery("update package_tour_quotation_master set quotation_id_display='$clone_display' where quotation_id='$quotation_max'");
 			
   		echo "Quotation has been successfully copied.";
 		}

@@ -12,6 +12,7 @@ $branch_status = $sq['branch_status'];
 <div id="site_alert"></div>
 <div id="vi_confirm_box"></div>
 <div id="markup_confirm"></div>
+<input type="hidden" id="branch_status" name="branch_status" value="<?= htmlspecialchars($branch_status) ?>">
 <div class="bk_tab_head bg_light">
     <ul>
         <li>
@@ -46,12 +47,25 @@ $branch_status = $sq['branch_status'];
         <?php include_once("tab3.php"); ?>
     </div>
 </div>
+<style>
+.xdsoft_datetimepicker { z-index: 100000 !important; }
+.select2-dropdown { z-index: 100000 !important; }
+.ui-autocomplete { z-index: 100000 !important; }
+#tab2 table select[id^="tour_type"] { width: 145px !important; min-width: 145px !important; }
+#tab2 .table-responsive { position: relative; }
+</style>
 <script>
 $('#enquiry_id, #currency_code').select2();
 
 $('#from_date, #to_date, #quotation_date1').datetimepicker({
     timepicker: false,
-    format: 'd-m-Y'
+    format: 'd-m-Y',
+    formatDate: 'd-m-Y',
+    minDate: new Date(),
+    parentID: 'body',
+    scrollInput: false,
+    scrollMonth: false,
+    validateOnBlur: false
 });
 $('#txt_arrval1,#txt_dapart1,#train_arrival_date,#train_departure_date').datetimepicker({
     format: 'd-m-Y H:i'
@@ -80,7 +94,7 @@ function hotel_name_list_load(id) {
             $hotel.select2('destroy');
         }
         $hotel.html(data);
-        $hotel.select2({ width: '160px', minimumResultsForSearch: 0 });
+        $hotel.select2({ width: '160px', minimumResultsForSearch: 0, dropdownParent: $(document.body) });
         if (typeof captureHotelSelect2Config === 'function') {
             captureHotelSelect2Config($hotel);
         }
@@ -89,6 +103,14 @@ function hotel_name_list_load(id) {
 }
 </script>
 <script src="<?php echo BASE_URL ?>view/hotel_quotation/js/quotation.js"></script>
+<script>
+if (typeof hqInitHotelDatepicker === 'function') {
+    hqInitHotelDatepicker($('#quotation_date1'));
+}
+if (typeof hqInitHotelRowWidgets === 'function') {
+    hqInitHotelRowWidgets('#frm_tab2');
+}
+</script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 <script src="<?php echo BASE_URL ?>js/app/field_validation.js"></script>
 <script src="<?php echo BASE_URL ?>view/hotel_quotation/js/business_rule.js"></script>

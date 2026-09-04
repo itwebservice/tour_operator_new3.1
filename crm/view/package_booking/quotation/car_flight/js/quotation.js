@@ -263,7 +263,136 @@ function reflect_feilds1(){
 	}
 }
 
-function get_flight_enquiry_details(offset = '') {
+function flightQuotationPlaneTable() {
+	return document.getElementById('tbl_flight_quotation_dynamic_plane')
+		|| document.getElementById('tbl_flight_quotation_dynamic_plane_update');
+}
+
+function flightQuotationResetPlaneRows() {
+	var table = flightQuotationPlaneTable();
+	if (!table) {
+		return;
+	}
+	while (table.rows.length > 1) {
+		table.deleteRow(table.rows.length - 1);
+	}
+}
+
+function flightQuotationRowSuffix(row) {
+	if (!row) {
+		return '1';
+	}
+	var fromSel = row.querySelector('select[id^="from_sector-"], input[id^="from_sector-"]');
+	if (fromSel && fromSel.id) {
+		return fromSel.id.replace(/^from_sector-/, '');
+	}
+	var chk = row.querySelector('input[type="checkbox"]');
+	if (chk && chk.id && chk.id.indexOf('-') > -1) {
+		return chk.id.substring(chk.id.lastIndexOf('-') + 1);
+	}
+	return '1';
+}
+
+function flightQuotationSetSector(selectId, value, cityId) {
+	var $sel = $('#' + selectId);
+	if (!$sel.length) {
+		return;
+	}
+	value = String(value || '').trim();
+	if (!value) {
+		return;
+	}
+	if (typeof selectAirportInSector === 'function') {
+		selectAirportInSector($sel, value, cityId);
+		return;
+	}
+	if ($sel.find('option').filter(function () { return String(this.value) === value; }).length === 0) {
+		$sel.append(new Option(value, value, true, true));
+	}
+	$sel.val(value).trigger('change');
+	if (cityId && typeof syncSectorCityHidden === 'function') {
+		syncSectorCityHidden(selectId, cityId);
+	}
+}
+
+function flightQuotationSetAirline($air, airlineId, airlineLabel) {
+	if (!$air || !$air.length) {
+		return;
+	}
+	airlineId = String(airlineId || '').trim();
+	airlineLabel = String(airlineLabel || '').trim();
+	if (airlineId && $air.find('option[value="' + airlineId.replace(/"/g, '\\"') + '"]').length) {
+		$air.val(airlineId).trigger('change');
+		return;
+	}
+	if (airlineLabel) {
+		var matched = '';
+		$air.find('option').each(function () {
+			if (!matched && $.trim($(this).text()).toLowerCase().indexOf(airlineLabel.toLowerCase()) !== -1) {
+				matched = this.value;
+			}
+		});
+		if (matched) {
+			$air.val(matched).trigger('change');
+			return;
+		}
+		$air.append(new Option(airlineLabel, airlineId || airlineLabel, true, true)).trigger('change');
+	}
+}
+
+function flightQuotationFillRow(row, flight) {
+	if (!row || !flight) {
+		return;
+	}
+	var suffix = flightQuotationRowSuffix(row);
+	var $chk = $(row).find('input[type="checkbox"]').first();
+	if ($chk.length) {
+		$chk.prop('checked', true);
+	}
+	flightQuotationSetSector('from_sector-' + suffix, flight.sector_from, flight.from_city_id_flight);
+	flightQuotationSetSector('to_sector-' + suffix, flight.sector_to, flight.to_city_id_flight);
+	flightQuotationSetAirline($('#airline_name-' + suffix), flight.preffered_airline, flight.airline_label);
+	if (flight.class_type) {
+		var $cls = $('#plane_class-' + suffix);
+		if ($cls.length && !$cls.find('option[value="' + String(flight.class_type).replace(/"/g, '\\"') + '"]').length) {
+			$cls.append(new Option(flight.class_type, flight.class_type, true, true));
+		}
+		$cls.val(flight.class_type).trigger('change');
+	}
+	$('#txt_dapart-' + suffix).val(flight.travel_datetime || '');
+	$('#txt_arrval-' + suffix).val(flight.travel_datetime || '');
+	$('#adult-' + suffix).val(flight.total_adults_flight || '');
+	$('#child-' + suffix).val(flight.total_child_flight || '');
+	$('#infant-' + suffix).val(flight.total_infant_flight || '');
+	$('#from_city-' + suffix).val(flight.from_city_id_flight || '');
+	$('#to_city-' + suffix).val(flight.to_city_id_flight || '');
+}
+
+function flightQuotationParseFlights(result) {
+	if (result && $.isArray(result.flights) && result.flights.length) {
+		return result.flights;
+	}
+	var raw = result && result.enquiry_content;
+	if (!raw) {
+		return [];
+	}
+	if (typeof raw === 'string') {
+		try {
+			raw = JSON.parse(raw);
+		} catch (e) {
+			return [];
+		}
+	}
+	if (!$.isArray(raw)) {
+		return [];
+	}
+	return raw.filter(function (row) {
+		return row && (row.sector_from || row.sector_to || row.travel_datetime);
+	});
+}
+
+function get_flight_enquiry_details(offset) {
+	offset = offset || '';
 	var enquiry_id = $('#enquiry_id' + offset).val();
 	var base_url = $('#base_url').val();
 	if (enquiry_id != '' && enquiry_id != 0) {
@@ -273,34 +402,39 @@ function get_flight_enquiry_details(offset = '') {
 			dataType: 'json',
 			data: { enquiry_id: enquiry_id },
 			success: function (result) {
-				$('#customer_name' + offset).val(result.name);
-				$('#email_id' + offset).val(result.email_id);
-				$('#mobile_no' + offset).val(result.landline_no);
-				$('#country_code' + offset).val(result.country_code);
-				$('#country_code'+ offset).trigger('change');
-				var enquiry_content = JSON.parse(result.enquiry_content);
-				var count_td = 1;
-				var table = document.getElementById('tbl_flight_quotation_dynamic_plane');
-				$("#tbl_flight_quotation_dynamic_plane").find("tr:gt(0)").remove();
-				$.each(enquiry_content, function (index, value) {
-
-					var rows = table.rows;
-					var table_offset = rows[rows.length - 1].cells[0].childNodes[0].getAttribute('id').split('-')[1];
-					$('#from_sector-' + table_offset).val(value.sector_from);
-					$('#to_sector-' + table_offset).val(value.sector_to);
-					$('#plane_class-' + table_offset).val(value.class_type);
-					$('#airline_name-' + table_offset).val(value.preffered_airline);
-					$('#airline_name-'+table_offset).trigger('change');
-					$('#txt_dapart-' + table_offset).val(value.travel_datetime);
-					$('#txt_arrval-' + table_offset).val(value.travel_datetime);
-					$('#adult-' + table_offset).val(value.total_adults_flight);
-					$('#child-' + table_offset).val(value.total_child_flight);
-					$('#infant-' + table_offset).val(value.total_infant_flight);
-					$('#from_city-' + table_offset).val(value.from_city_id_flight);
-					$('#to_city-' + table_offset).val(value.to_city_id_flight);
-					if (enquiry_content.length > count_td++)
-						addRow('tbl_flight_quotation_dynamic_plane');
-				});
+				if (!result) {
+					return;
+				}
+				$('#customer_name' + offset).val(result.name || '');
+				$('#email_id' + offset).val(result.email_id || '');
+				$('#mobile_no' + offset).val(result.landline_no || result.mobile_no || '');
+				if (result.country_code) {
+					$('#country_code' + offset).val(result.country_code).trigger('change');
+				}
+				var flights = flightQuotationParseFlights(result);
+				window._flightEnquiryFlights = flights;
+				var table = flightQuotationPlaneTable();
+				if (!table) {
+					return;
+				}
+				flightQuotationResetPlaneRows();
+				if (!flights.length) {
+					return;
+				}
+				function fillNext(index) {
+					if (index >= flights.length) {
+						if (typeof refreshPlaneAirportSelect2In === 'function') {
+							refreshPlaneAirportSelect2In('#' + table.id);
+						}
+						return;
+					}
+					if (index > 0) {
+						addRow(table.id);
+					}
+					flightQuotationFillRow(table.rows[table.rows.length - 1], flights[index]);
+					fillNext(index + 1);
+				}
+				fillNext(0);
 			},
 			error: function (result) {
 				console.log(result.responseText);
@@ -308,31 +442,53 @@ function get_flight_enquiry_details(offset = '') {
 		});
 	}
 	else {
+		window._flightEnquiryFlights = [];
 		$('#customer_name' + offset).val('');
 		$('#email_id' + offset).val('');
 		$('#mobile_no' + offset).val('');
-		var table = document.getElementById('tbl_flight_quotation_dynamic_plane');
-		if (table.rows.length == 1) {
-			for (var k = 1; k < table.rows.length; k++) {
-				document.getElementById("tbl_flight_quotation_dynamic_plane").deleteRow(k);
-			}
-		} else {
-			while (table.rows.length > 1) {
-				document.getElementById("tbl_flight_quotation_dynamic_plane").deleteRow(k);
-				table.rows.length--;
-			}
+		flightQuotationResetPlaneRows();
+		var table = flightQuotationPlaneTable();
+		if (!table || !table.rows.length) {
+			return;
 		}
 		var row = table.rows[0];
-		row.cells[1].childNodes[0].value = '1';
-		row.cells[2].childNodes[0].value = '';
-		row.cells[3].childNodes[0].value = '';
-		row.cells[4].childNodes[0].value = '';
-		row.cells[5].childNodes[0].value = '';
-		row.cells[6].childNodes[0].value = '';
-		row.cells[7].childNodes[0].value = '';
-		row.cells[8].childNodes[0].value = '';
+		var suffix = flightQuotationRowSuffix(row);
+		$('#from_sector-' + suffix).val('').trigger('change');
+		$('#to_sector-' + suffix).val('').trigger('change');
+		$('#airline_name-' + suffix).val('').trigger('change');
+		$('#plane_class-' + suffix).val('');
+		$('#txt_dapart-' + suffix).val('');
+		$('#txt_arrval-' + suffix).val('');
+		$('#adult-' + suffix).val('');
+		$('#child-' + suffix).val('');
+		$('#infant-' + suffix).val('');
+		$('#from_city-' + suffix).val('');
+		$('#to_city-' + suffix).val('');
 	}
 }
+
+$(document).off('shown.bs.tab.flightEnquiry').on('shown.bs.tab.flightEnquiry', 'a[href="#tab2"]', function () {
+	var table = flightQuotationPlaneTable();
+	if (!table) {
+		return;
+	}
+	var flights = window._flightEnquiryFlights || [];
+	if (flights.length) {
+		var fromVal = $(table.rows[0]).find('select[id^="from_sector-"]').val();
+		if (!fromVal) {
+			flightQuotationResetPlaneRows();
+			for (var i = 0; i < flights.length; i++) {
+				if (i > 0) {
+					addRow(table.id);
+				}
+				flightQuotationFillRow(table.rows[table.rows.length - 1], flights[i]);
+			}
+		}
+	}
+	if (typeof refreshPlaneAirportSelect2In === 'function') {
+		refreshPlaneAirportSelect2In('#' + table.id);
+	}
+});
 
 function get_capacity(){
 	var vehicle_name = $('#vehicle_name').val();

@@ -1,3 +1,373 @@
+function hqPad(n) {
+	return (n < 10 ? '0' : '') + n;
+}
+function hqTodayStr() {
+	var d = new Date();
+	return hqPad(d.getDate()) + '-' + hqPad(d.getMonth() + 1) + '-' + d.getFullYear();
+}
+function hqTomorrowStr() {
+	var d = new Date();
+	d.setDate(d.getDate() + 1);
+	return hqPad(d.getDate()) + '-' + hqPad(d.getMonth() + 1) + '-' + d.getFullYear();
+}
+function hqParseDmy(val) {
+	if (!val) {
+		return null;
+	}
+	var parts = String(val).split(' ')[0].split('-');
+	if (parts.length < 3) {
+		return null;
+	}
+	var d = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+	d.setHours(0, 0, 0, 0);
+	return isNaN(d.getTime()) ? null : d;
+}
+function hqValidateNotPast(id) {
+	var $el = $('#' + id);
+	var val = $el.val();
+	if (!val) {
+		return true;
+	}
+	var picked = hqParseDmy(val);
+	if (!picked) {
+		return true;
+	}
+	var today = new Date();
+	today.setHours(0, 0, 0, 0);
+	if (picked < today) {
+		error_msg_alert('Date cannot be past date');
+		$el.val('');
+		$el.css({ border: '1px solid red' });
+		return false;
+	}
+	$el.css({ border: '1px solid #ddd' });
+	return true;
+}
+function hqInitHotelDatepicker($els) {
+	if (!$els || !$els.length || typeof $els.datetimepicker !== 'function') {
+		return;
+	}
+	$els.each(function () {
+		var $el = $(this);
+		if ($el.data('datepicker')) {
+			try { $el.datepicker('destroy'); } catch (e) {}
+		}
+		if ($el.data('xdsoft_datetimepicker')) {
+			try { $el.datetimepicker('destroy'); } catch (e) {}
+		}
+		$el.datetimepicker({
+			timepicker: false,
+			format: 'd-m-Y',
+			formatDate: 'd-m-Y',
+			minDate: new Date(),
+			parentID: 'body',
+			scrollInput: false,
+			scrollMonth: false,
+			validateOnBlur: false
+		});
+		$el.prop('readonly', true);
+	});
+}
+function hqSelect2Body($el, width) {
+	if (!$el || !$el.length) {
+		return;
+	}
+	if ($el.data('select2')) {
+		$el.select2('destroy');
+	}
+	$el.select2({
+		width: width || '160px',
+		minimumResultsForSearch: 0,
+		dropdownParent: $(document.body)
+	});
+}
+function hqCitySelectBody($el) {
+	if (!$el || !$el.length) {
+		return;
+	}
+	var selectedVal = $el.val();
+	var selectedText = $el.find('option:selected').text();
+	var base_url = ($("#base_url").val() || '').replace(/\/?$/, '/');
+	var url = base_url + 'view/load_data/generic_city_loading.php';
+	if ($el.data('select2')) {
+		$el.select2('destroy');
+	}
+	if (!$el.find('option[value=""]').length) {
+		$el.prepend($("<option></option>").attr("value", "").text("City Name"));
+	}
+	$el.attr('data-lazy-city', 'true');
+	$el.attr('data-lazy-select', 'true');
+	$el.select2({
+		placeholder: 'City Name',
+		allowClear: true,
+		minimumInputLength: 0,
+		width: '160px',
+		dropdownParent: $(document.body),
+		ajax: {
+			url: url,
+			dataType: 'json',
+			delay: 250,
+			type: 'GET',
+			data: function (params) {
+				return {
+					term: params.term || '',
+					page: params.page || 0,
+					valueasText: false
+				};
+			},
+			processResults: function (data) {
+				data = data || {};
+				var pagination = data.pagination || { more: false };
+				return {
+					results: data.results || [],
+					pagination: { more: !!pagination.more }
+				};
+			},
+			cache: true
+		}
+	});
+	if (selectedVal) {
+		if (!$el.find('option[value="' + selectedVal + '"]').length) {
+			$el.append(new Option(selectedText, selectedVal, true, true));
+		} else {
+			$el.val(selectedVal);
+		}
+	}
+	if ($el.attr('data-add-new-option') === 'true' && typeof initCityAddNewInline === 'function') {
+		initCityAddNewInline($el);
+	}
+}
+function hqInitHotelRowWidgets(scope) {
+	var $scope = scope ? $(scope) : $(document);
+	$scope.find('select.city_master_dropdown').each(function () {
+		hqCitySelectBody($(this));
+	});
+	$scope.find('select[id^="tour_type"]').each(function () {
+		hqSelect2Body($(this), '145px');
+	});
+	$scope.find('select[id^="hotel_name"]').each(function () {
+		hqSelect2Body($(this), '160px');
+		if (typeof initHotelSelectAddNew === 'function') {
+			initHotelSelectAddNew(this);
+		}
+	});
+	$scope.find('select[id^="room_cat"]').each(function () {
+		hqSelect2Body($(this), '162px');
+		if (typeof initRoomCategoryAddNewInline === 'function') {
+			initRoomCategoryAddNewInline(this);
+		}
+	});
+	$scope.find('select[id^="meal_plan"]').each(function () {
+		hqSelect2Body($(this), '145px');
+	});
+	hqInitHotelDatepicker($scope.find('.app_datepicker'));
+}
+function hqAddHotelRow(tableID, optionIndex) {
+	var table = document.getElementById(tableID);
+	if (!table) {
+		return;
+	}
+	var tbody = table.tBodies.length ? table.tBodies[0] : table;
+	var src = tbody.rows[tbody.rows.length - 1];
+	if (!src) {
+		return;
+	}
+	var row = src.cloneNode(false);
+	var rowNum = tbody.rows.length + 1;
+	var option = optionIndex || '1';
+	var offset = option + '-' + rowNum;
+	var tableIdAttr = tableID;
+	var srcHotel = src.querySelector('select[id^="hotel_name"]');
+	var hotelOnchange = (srcHotel && String(srcHotel.id).indexOf('-u_') !== -1)
+		? "hotel_type_load1(this.id);hotel_type_load_cate1(this.id);get_hotel_cost('" + tableIdAttr + "');"
+		: "hotel_type_load(this.id);get_hotel_cost('" + tableIdAttr + "');";
+
+	for (var c = 0; c < src.cells.length; c++) {
+		var newcell = row.insertCell(c);
+		var oldCell = src.cells[c];
+		if (oldCell.getAttribute('style')) {
+			newcell.setAttribute('style', oldCell.getAttribute('style'));
+		}
+		if (oldCell.className) {
+			newcell.className = oldCell.className;
+		}
+		if (c === 0) {
+			newcell.innerHTML = '<input class="css-checkbox mg_bt_10" id="chk_program-' + offset + '" type="checkbox" onclick="get_hotel_cost(\'' + tableIdAttr + '\');" checked><label class="css-label" for="chk_program-' + offset + '"></label>';
+			continue;
+		}
+		if (c === 1) {
+			newcell.innerHTML = '<input maxlength="15" value="' + rowNum + '" type="text" name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled />';
+			continue;
+		}
+		if (c === 2) {
+			newcell.innerHTML = '<select name="tour_type-' + offset + '" id="tour_type-' + offset + '" style="width:145px;" title="Tour Type" class="form-control app_select2">' +
+				'<option value="Domestic" selected>Domestic</option>' +
+				'<option value="International">International</option></select>';
+			continue;
+		}
+		if (c === 3) {
+			newcell.innerHTML = '<select id="city_name-' + offset + '" name="city_name-' + offset + '" class="city_master_dropdown form-control" style="width:160px" onchange="hotel_name_list_load(this.id);" title="Select City Name" data-add-new-option="true"></select>';
+			continue;
+		}
+		if (c === 4) {
+			newcell.innerHTML = '<select id="hotel_name-' + offset + '" name="hotel_name-' + offset + '" onchange="' + hotelOnchange + '" class="form-control app_select2" style="width:160px" title="Select Hotel Name" data-add-new-option="true"><option value="">Hotel Name</option></select>';
+			continue;
+		}
+		if (c === 5) {
+			var srcRoom = oldCell.querySelector('select');
+			var roomHtml = srcRoom ? srcRoom.innerHTML : '<option value="">Room Category</option>';
+			newcell.innerHTML = '<select name="room_cat-' + offset + '" id="room_cat-' + offset + '" style="width:162px;" title="Room Category" class="form-control app_select2" onchange="get_hotel_cost(\'' + tableIdAttr + '\');" data-add-new-option="true">' + roomHtml + '</select>';
+			var roomSel = newcell.querySelector('select');
+			if (roomSel) {
+				roomSel.selectedIndex = 0;
+			}
+			continue;
+		}
+		if (c === 6) {
+			var srcMeal = oldCell.querySelector('select');
+			var mealHtml = srcMeal ? srcMeal.innerHTML : '<option value="">Meal Plan</option>';
+			newcell.innerHTML = '<select name="meal_plan-' + offset + '" id="meal_plan-' + offset + '" style="width:145px;" title="Meal Plan" class="form-control app_select2" onchange="get_hotel_cost(\'' + tableIdAttr + '\');">' + mealHtml + '</select>';
+			var mealSel = newcell.querySelector('select');
+			if (mealSel) {
+				mealSel.selectedIndex = 0;
+			}
+			continue;
+		}
+		if (c === 7) {
+            newcell.innerHTML = '<input type="text" style="width:150px;" class="app_datepicker" readonly id="check_in-' + offset + '" name="check_in-' + offset + '" placeholder="Check-In Date" title="Check-In Date" value="' + hqTodayStr() + '" onchange="hqValidateNotPast(this.id);get_auto_to_date(this.id);get_hotel_cost(\'' + tableIdAttr + '\');">';
+			continue;
+		}
+		if (c === 8) {
+			newcell.innerHTML = '<input type="text" style="width:150px;" class="app_datepicker" readonly id="check_out-' + offset + '" name="check_out-' + offset + '" placeholder="Check-Out Date" title="Check-Out Date" value="' + hqTomorrowStr() + '" onchange="hqValidateNotPast(this.id);calculate_total_nights(this.id);validate_validDates(this.id);get_hotel_cost(\'' + tableIdAttr + '\');">';
+			continue;
+		}
+		if (c === 9) {
+			newcell.innerHTML = '<input type="text" id="hotel_type-' + offset + '" name="hotel_type-' + offset + '" placeholder="Hotel Category" title="Hotel Category" style="width:150px" readonly>';
+			continue;
+		}
+		if (c === 10) {
+			newcell.innerHTML = '<input type="text" id="hotel_stay_days-' + offset + '" title="Total Nights" name="hotel_stay_days-' + offset + '" placeholder="Total Nights" onchange="validate_balance(this.id);" style="width:150px;" value="1" readonly>';
+			continue;
+		}
+		if (c === 11) {
+			newcell.innerHTML = '<input type="text" id="no_of_rooms-' + offset + '" title="Total Rooms" name="no_of_rooms-' + offset + '" placeholder="*Total Rooms" onchange="validate_balance(this.id);get_hotel_cost(\'' + tableIdAttr + '\');" style="width:120px">';
+			continue;
+		}
+		if (c === 12) {
+			newcell.innerHTML = '<input type="text" id="extra_bed-' + offset + '" name="extra_bed-' + offset + '" title="Extra Bed" placeholder="Extra Bed" onchange="validate_balance(this.id);get_hotel_cost(\'' + tableIdAttr + '\');" style="width:100px">';
+			continue;
+		}
+		if (c === 13) {
+			newcell.innerHTML = '<input type="number" id="hotel_cost-' + offset + '" name="hotel_cost-' + offset + '" placeholder="Hotel Cost" title="Hotel Cost" onchange="validate_balance(this.id)" style="width:100px;">';
+			continue;
+		}
+		newcell.innerHTML = '';
+	}
+
+	tbody.appendChild(row);
+	hqSelect2Body($('#tour_type-' + offset), '145px');
+	hqCitySelectBody($('#city_name-' + offset));
+	hqSelect2Body($('#hotel_name-' + offset), '160px');
+	if (typeof initHotelSelectAddNew === 'function') {
+		initHotelSelectAddNew('#hotel_name-' + offset);
+	}
+	hqSelect2Body($('#room_cat-' + offset), '162px');
+	if (typeof initRoomCategoryAddNewInline === 'function') {
+		initRoomCategoryAddNewInline($('#room_cat-' + offset)[0]);
+	}
+	hqSelect2Body($('#meal_plan-' + offset), '145px');
+	hqInitHotelDatepicker($(row).find('.app_datepicker'));
+}
+
+function hqParseCustData() {
+	var raw = $('#cust_data').val() || '[]';
+	if (raw.indexOf('&quot;') !== -1 || raw.indexOf('&#039;') !== -1 || raw.indexOf('&amp;') !== -1) {
+		raw = $('<textarea/>').html(raw).text();
+	}
+	try {
+		var parsed = JSON.parse(raw);
+		return Array.isArray(parsed) ? parsed : [];
+	} catch (e) {
+		return [];
+	}
+}
+function hqFilterCustomerHints(list, term) {
+	var q = String(term || '').toLowerCase();
+	var out = [];
+	if (!list || !list.length) {
+		return out;
+	}
+	for (var i = 0; i < list.length && out.length < 25; i++) {
+		var label = String(list[i].label || list[i].value || '');
+		if (!q || label.toLowerCase().indexOf(q) !== -1) {
+			out.push(list[i]);
+		}
+	}
+	return out;
+}
+function hqInitCustomerAutocomplete(inputId, countryId, whatsappId, emailId) {
+	var $input = $('#' + (inputId || 'customer_name'));
+	if (!$input.length || typeof $input.autocomplete !== 'function') {
+		return;
+	}
+	if ($input.data('ui-autocomplete')) {
+		$input.autocomplete('destroy');
+	}
+	var countrySel = countryId || (inputId === 'customer_name1' ? 'country_code1' : 'country_code');
+	var whatsappSel = whatsappId || (inputId === 'customer_name1' ? 'whatsapp_no1' : 'whatsapp_no');
+	var emailSel = emailId || (inputId === 'customer_name1' ? 'email_id1' : 'email_id');
+	if (!window.hqCustomerHints) {
+		window.hqCustomerHints = hqParseCustData();
+	}
+	$input.autocomplete({
+		appendTo: 'body',
+		minLength: 1,
+		source: function (request, response) {
+			var local = window.hqCustomerHints || [];
+			if (local.length) {
+				response(hqFilterCustomerHints(local, request.term));
+				return;
+			}
+			var base_url = ($('#base_url').val() || '').replace(/\/?$/, '/');
+			$.getJSON(base_url + 'view/hotel_quotation/customer_hint.php', {
+				branch_status: $('#branch_status').val() || ''
+			}, function (data) {
+				window.hqCustomerHints = Array.isArray(data) ? data : [];
+				response(hqFilterCustomerHints(window.hqCustomerHints, request.term));
+			}).fail(function () {
+				response([]);
+			});
+		},
+		select: function (event, ui) {
+			$input.val(ui.item.label);
+			if (ui.item.country_id) {
+				var newOption = $("<option selected='selected'></option>").val(ui.item.country_id).text(ui.item.country_code || ui.item.country_id);
+				$('#' + countrySel).append(newOption).trigger('change.select2');
+			}
+			$('#' + whatsappSel).val(ui.item.contact_no);
+			$('#' + emailSel).val(ui.item.email_id);
+			return false;
+		},
+		open: function () {
+			$(this).autocomplete('widget').css({
+				width: this.offsetWidth,
+				'z-index': 100000
+			});
+		}
+	});
+	if ($input.data('ui-autocomplete')) {
+		$input.data('ui-autocomplete')._renderItem = function (ul, item) {
+			return $('<li>')
+				.append($('<div>').text(item.label))
+				.appendTo(ul);
+		};
+	}
+}
+$(function () {
+	hqInitCustomerAutocomplete('customer_name');
+	hqInitCustomerAutocomplete('customer_name1');
+});
+
 function total_passangers_calculate(offset = '') {
 	var total_adult = $('#total_adult' + offset).val();
 	var children_with_bed = $('#children_with_bed' + offset).val();
@@ -122,7 +492,7 @@ function hotel_name_list_load(id){
             $hotel.select2('destroy');
         }
         $hotel.html( data );
-        $hotel.select2({ width: '160px', minimumResultsForSearch: 0 });
+        $hotel.select2({ width: '160px', minimumResultsForSearch: 0, dropdownParent: $(document.body) });
         if (typeof captureHotelSelect2Config === 'function') {
             captureHotelSelect2Config($hotel);
         }
@@ -131,6 +501,9 @@ function hotel_name_list_load(id){
 }
 
 function get_auto_to_date(from_date) {
+	if (typeof hqValidateNotPast === 'function' && !hqValidateNotPast(from_date)) {
+		return;
+	}
 	var from_date1 = $('#' + from_date).val();
 	var offset = from_date.substring(8);
 	if (from_date1 != '') {

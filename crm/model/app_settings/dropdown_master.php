@@ -431,7 +431,7 @@ function get_destinations()
   while ($row_query = mysqli_fetch_assoc($sq_query)) {
     $to_be_push = [
       "dest_id" => $row_query['dest_id'],
-      "label" => $row_query['dest_name']
+      "label" => trim((string) $row_query['dest_name'])
     ];
     array_push($final_array, $to_be_push);
   }

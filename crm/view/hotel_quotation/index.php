@@ -137,6 +137,9 @@ var columns = [{
         title: "customer_name"
     },
     {
+        title: "Amount"
+    },
+    {
         title: "Created_by"
     },
     {

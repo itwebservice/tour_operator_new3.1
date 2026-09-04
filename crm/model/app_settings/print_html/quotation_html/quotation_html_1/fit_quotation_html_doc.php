@@ -350,7 +350,7 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
     </section>
   </section>
 <?php } ?>
-<?php if ($sq_cruise_count || $sq_exc_count) { ?>
+<?php if ($sq_train_count || $sq_cruise_count || $sq_exc_count) { ?>
   <!-- traveling Information -->
   <section class="pageSection main_block">
     <!-- background Image -->
@@ -520,15 +520,9 @@ $checkPageEnd = 0;
 while ($row_itinarary = mysqli_fetch_assoc($sq_package_program)) {
 
   $date_format = isset($dates[$i]) ? $dates[$i] : 'NA';
-  $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_images where quotation_id='$row_itinarary[quotation_id]'"));
-  $day_url1 = explode(',', $sq_day_image['image_url']);
-  $daywise_image = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
-  for ($count1 = 0; $count1 < sizeof($day_url1); $count1++) {
-    $day_url2 = explode('=', $day_url1[$count1]);
-    if (isset($day_url2[1]) && $day_url2[1] == $row_itinarary['day_count'] && isset($day_url2[0]) && $day_url2[0] == $row_itinarary['package_id']) {
-      $daywise_image = $day_url2[2];
-    }
-  }
+  $daywise_image = function_exists('gqd_program_day_image_url')
+    ? gqd_program_day_image_url($row_itinarary)
+    : 'http://itourscloud.com/quotation_format_images/dummy-image.jpg';
   if ($checkPageEnd % 2 == 0 || $checkPageEnd == 0) {
     $go = $checkPageEnd + 2;
     $flag = 0;

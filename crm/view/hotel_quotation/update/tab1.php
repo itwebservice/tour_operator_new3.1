@@ -84,6 +84,7 @@ $nofquotation = sizeof($hotelDetails);
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <input type="text" id="customer_name1" name="customer_name" placeholder="Customer Name"
                         value="<?= $enquiryDetails['customer_name'] ?>" title="Customer Name">
+                    <input type="hidden" id="cust_data" name="cust_data" value='<?= get_customer_hint($branch_status) ?>'>
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <div class="col-md-4" style="padding-left:0px;">
@@ -136,9 +137,10 @@ $nofquotation = sizeof($hotelDetails);
             </div>
             <div class="row mg_tp_10">
                 <div class="col-md-4 col-sm-6 col-xs-12">
-                    <input type="text" class="form-control" id="quotation_date1" name="quotation_date"
+                    <input type="text" class="form-control app_datepicker" id="quotation_date1" name="quotation_date"
                         placeholder="Quotation Date" title="Quotation Date"
-                        value="<?= date('d-m-Y', strtotime($sq_quotation['quotation_date'])) ?>">
+                        value="<?= date('d-m-Y', strtotime($sq_quotation['quotation_date'])) ?>" readonly
+                        onchange="if(typeof hqValidateNotPast==='function'){hqValidateNotPast(this.id);}">
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <?php
@@ -173,6 +175,9 @@ $nofquotation = sizeof($hotelDetails);
 $(document).ready(function() {
     $('#enquiry_id1').val($('#enquiry_value').val()).select2();
     $('#country_code1').val($('#cc_value').val()).select2();
+    if (typeof hqInitCustomerAutocomplete === 'function') {
+        hqInitCustomerAutocomplete('customer_name1');
+    }
 });
 $('#frm_tab1').validate({
     rules: {
@@ -187,6 +192,9 @@ $('#frm_tab1').validate({
         }
     },
     submitHandler: function(form) {
+        if (typeof hqValidateNotPast === 'function' && !hqValidateNotPast('quotation_date1')) {
+            return false;
+        }
         $('#tab1_head').addClass('done');
         $('#tab2_head').addClass('active');
         $('.bk_tab').removeClass('active');

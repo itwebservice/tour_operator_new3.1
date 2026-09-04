@@ -66,5 +66,5 @@ $('#txt_arrval1,#txt_dapart1, #train_arrival_date,#train_departure_date').dateti
 });
 $('#quotation_save_modal').modal('show');
 </script>
-<script src="<?php echo BASE_URL ?>view/package_booking/quotation/car_flight/js/quotation.js"></script>
+<script src="<?php echo BASE_URL ?>view/package_booking/quotation/car_flight/js/quotation.js?v=<?php echo @filemtime(__DIR__ . '/../../js/quotation.js') ?: time(); ?>"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>

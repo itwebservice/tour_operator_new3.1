@@ -125,32 +125,90 @@
 $('#country_code').select2();
 $('#travel_datetime').datetimepicker({format:'d-m-Y H:i' });
 $('#quotation_date').datetimepicker({timepicker:false, format:'d-m-Y', minDate: 0 });
-$("#customer_name").autocomplete({
-    source: (function() {
-        try {
-            var parsed = JSON.parse($('#cust_data').val() || '[]');
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (e) {
-            return [];
-        }
-    })(),
-    select: function(event, ui) {
-        $("#customer_name").val(ui.item.label);
-        $('#mobile_no').val(ui.item.contact_no);
-        $('#country_code').val(ui.item.country_id);
-		$('#country_code').trigger('change');
-        $('#email_id').val(ui.item.email_id);
-    },
-    open: function(event, ui) {
-        $(this).autocomplete("widget").css({
-            "width": document.getElementById("customer_name").offsetWidth
-        });
+function fqParseCustomerHints() {
+    var raw = $('#cust_data').val() || '[]';
+    if (raw.indexOf('&quot;') !== -1 || raw.indexOf('&#039;') !== -1 || raw.indexOf('&amp;') !== -1) {
+        raw = $('<textarea/>').html(raw).text();
     }
-}).data("ui-autocomplete")._renderItem = function(ul, item) {
-    return $("<li disabled>")
-        .append("<a>" + item.label + "</a>")
-        .appendTo(ul);
-};
+    try {
+        var parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
+}
+function fqFilterCustomerHints(list, term) {
+    var q = String(term || '').toLowerCase();
+    var out = [];
+    if (!list || !list.length) {
+        return out;
+    }
+    for (var i = 0; i < list.length && out.length < 25; i++) {
+        var label = String(list[i].label || list[i].value || '');
+        if (!q || label.toLowerCase().indexOf(q) !== -1) {
+            out.push(list[i]);
+        }
+    }
+    return out;
+}
+function fqInitCustomerAutocomplete() {
+    var $input = $('#customer_name');
+    if (!$input.length || typeof $input.autocomplete !== 'function') {
+        return;
+    }
+    if ($input.data('ui-autocomplete')) {
+        $input.autocomplete('destroy');
+    }
+    if (!window.fqCustomerHints) {
+        window.fqCustomerHints = fqParseCustomerHints();
+    }
+    var $modal = $input.closest('.modal');
+    $input.autocomplete({
+        appendTo: $modal.length ? $modal : 'body',
+        minLength: 1,
+        source: function (request, response) {
+            var local = window.fqCustomerHints || [];
+            if (local.length) {
+                response(fqFilterCustomerHints(local, request.term));
+                return;
+            }
+            var base_url = ($('#base_url').val() || '').replace(/\/?$/, '/');
+            $.getJSON(base_url + 'view/package_booking/quotation/home/customer_hint.php', {
+                branch_status: $('#branch_status').val() || ''
+            }, function (data) {
+                window.fqCustomerHints = Array.isArray(data) ? data : [];
+                response(fqFilterCustomerHints(window.fqCustomerHints, request.term));
+            }).fail(function () {
+                response([]);
+            });
+        },
+        select: function (event, ui) {
+            $input.val(ui.item.label);
+            $('#mobile_no').val(ui.item.contact_no);
+            if (ui.item.country_id) {
+                $('#country_code').val(ui.item.country_id).trigger('change');
+            }
+            $('#email_id').val(ui.item.email_id);
+            return false;
+        },
+        open: function () {
+            $(this).autocomplete('widget').css({
+                width: this.offsetWidth,
+                'z-index': 200000
+            });
+        }
+    });
+    if ($input.data('ui-autocomplete')) {
+        $input.data('ui-autocomplete')._renderItem = function (ul, item) {
+            return $('<li>')
+                .append($('<div>').text(item.label))
+                .appendTo(ul);
+        };
+    }
+}
+$(function () {
+    fqInitCustomerAutocomplete();
+});
 // New Customization ----start
 $(document).ready(function(){
 	let searchParams = new URLSearchParams(window.location.search);

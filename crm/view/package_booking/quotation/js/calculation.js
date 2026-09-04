@@ -105,6 +105,25 @@ function get_auto_values(
 		/////////////////Markup End///////////////////////
 	}
 	/////////////////Tax Start///////////////////////
+	if (offset === undefined || offset === null) {
+		offset = '';
+	}
+	var quotationReadTaxField = function (selId) {
+		var $el = $('#' + selId);
+		if (!$el.length) {
+			return '';
+		}
+		var v = $el.val();
+		if (v == null || typeof v === 'undefined') {
+			return '';
+		}
+		if (Array.isArray(v)) {
+			return v.filter(function (x) {
+				return x != null && String(x) !== '';
+			}).join('+');
+		}
+		return String(v);
+	};
 	if (type === 'save') {
 		var service_tax_subtotal = 'service_tax_subtotal-' + offset;
 		var tax_apply_on1 = 'tax_apply_on-' + offset;
@@ -125,8 +144,15 @@ function get_auto_values(
 	var service_tax_amount = 0;
 	var applied_taxes = '';
 	var ledger_posting = '';
-	var tax_apply_on = $('#'+tax_apply_on1).val();
-	var tax_value = $('#'+tax_value1).val();
+	var tax_apply_on = quotationReadTaxField(tax_apply_on1);
+	var tax_value = quotationReadTaxField(tax_value1);
+	// Save vs update use different select IDs; fall back so populate-from-hotels never crashes.
+	if (tax_apply_on === '') {
+		tax_apply_on = quotationReadTaxField((type === 'save' ? 'atax_apply_on-' : 'tax_apply_on-') + offset);
+	}
+	if (tax_value === '') {
+		tax_value = quotationReadTaxField((type === 'save' ? 'tax_value1-' : 'tax_value-') + offset);
+	}
 	var service_charge1 = $('#'+service_charge).val();
 	
 	var discountable_amt = parseFloat(service_charge1);
@@ -147,18 +173,23 @@ function get_auto_values(
 	else if(tax_apply_on == 3){
 		tax_on_amount = (parseFloat(basic_amount) || 0) + (parseFloat(new_service_charge1) || 0);
 	}
-	if(tax_apply_on!="" && tax_value!=""){
-		var service_tax_subtotal1 = tax_value.split("+");
+	if(tax_apply_on !== '' && tax_value !== ''){
+		var service_tax_subtotal1 = String(tax_value || '').split("+");
 		for(var i=0;i<service_tax_subtotal1.length;i++){
-			var service_tax_string = service_tax_subtotal1[i].split(':');
-			if(parseInt(service_tax_string.length) > 0){
-				var service_tax_string1 = service_tax_string[1] && service_tax_string[1].split('%');
-				service_tax_string1[0] = service_tax_string1[0] && service_tax_string1[0].replace('(','');
-				service_tax = service_tax_string1[0];
+			var service_tax_string = String(service_tax_subtotal1[i] || '').split(':');
+			if(service_tax_string.length < 2 || !service_tax_string[1]){
+				continue;
 			}
+			var service_tax_string1 = service_tax_string[1].split('%');
+			service_tax_string1[0] = service_tax_string1[0] && service_tax_string1[0].replace('(','');
+			service_tax = service_tax_string1[0];
 
-			service_tax_string[2] = service_tax_string[2].replace('(','');
-			service_tax_string[2] = service_tax_string[2].replace(')','');
+			if (typeof service_tax_string[2] === 'undefined') {
+				service_tax_string[2] = '';
+			} else {
+				service_tax_string[2] = String(service_tax_string[2]).replace('(','');
+				service_tax_string[2] = service_tax_string[2].replace(')','');
+			}
 			service_tax_amount = (( parseFloat(tax_on_amount) * parseFloat(service_tax) ) / 100).toFixed(2);
 			if(applied_taxes==''){
 				applied_taxes = service_tax_string[0] +':'+ service_tax_string[1] + ':' + service_tax_amount;
@@ -171,7 +202,9 @@ function get_auto_values(
 		$('#'+service_tax_subtotal).val(applied_taxes);
 		$('#hotel_taxes').val(ledger_posting);
 	}else{
-		$('#'+service_tax_subtotal).val('');
+		if ($('#'+service_tax_subtotal).length) {
+			$('#'+service_tax_subtotal).val('');
+		}
 		$('#hotel_taxes').val('');
 	}
 	/////////////////Tax End///////////////////////

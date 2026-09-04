@@ -5254,11 +5254,11 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                 }
                 if (clonedSelect.id) {
                     var selectBaseId = clonedSelect.id.replace(/[0-9]+$/, "");
-                    clonedSelect.id = selectBaseId + rowCount;
+                    clonedSelect.id = selectBaseId + (rowCount + 1);
                 }
                 if (clonedSelect.name) {
                     var selectBaseName = clonedSelect.name.replace(/[0-9]+$/, "");
-                    clonedSelect.name = selectBaseName + rowCount;
+                    clonedSelect.name = selectBaseName + (rowCount + 1);
                 }
                 clonedSelect.selectedIndex = 0;
                 if (clonedSelect.id && clonedSelect.id.indexOf("active_flag") === 0) {
@@ -5285,14 +5285,15 @@ function addRow(tableID, quot_table = "", itinerary = "") {
             cloned = cleanClonedSelectElement(cloned);
         }
 
-        // 🔹 Generate unique ID/Name for new row
+        // First row IDs are already 1-based (field-1). New row must use rowCount+1
+        // or the clone keeps a duplicate ID and Select2/datepicker bind to row 1.
         if (cloned.id) {
             var baseId = cloned.id.replace(/[0-9]+$/, "");
-            cloned.id = baseId + rowCount;
+            cloned.id = baseId + (rowCount + 1);
         }
         if (cloned.name) {
             var baseName = cloned.name.replace(/[0-9]+$/, "");
-            cloned.name = baseName + rowCount;
+            cloned.name = baseName + (rowCount + 1);
         }
 
         // reset values properly
@@ -5325,9 +5326,11 @@ function addRow(tableID, quot_table = "", itinerary = "") {
                 cloned.id &&
                 (cloned.id.indexOf("plane_class-") === 0 ||
                  cloned.id.indexOf("txt_m_adolescence") === 0 ||
-                 cloned.id.indexOf("cmb_meal_plan") === 0)
+                 cloned.id.indexOf("cmb_meal_plan") === 0 ||
+                 cloned.id.toLowerCase().indexOf("transfer_option") !== -1)
             ) {
                 cloned.selectedIndex = 0;
+                cloned.classList.add("app_select2");
             } else if (
                 (tableID === "tbl_package_tour_quotation_dynamic_hotel" ||
                  tableID === "tbl_package_tour_quotation_dynamic_hotel_update") &&
@@ -5370,7 +5373,7 @@ function addRow(tableID, quot_table = "", itinerary = "") {
 
     // ✅ Initialize Select2 only for the new row selects
     if (tableID !== "tbl_package_tour_member") {
-        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"], [id^="active_flag"]').each(function () {
+        $(row).find('select.app_select2').not('[id^="plane_class"], [id^="hotel_name"], [id^="txt_catagory"], [id^="airline_name"], [id^="meal_plan"], [id^="cmb_meal_plan"], [id^="active_flag"], [id*="package_type"], [id^="transfer_option"]').each(function () {
             if (typeof initAppSelect2Element === 'function') {
                 initAppSelect2Element(this);
             } else {
@@ -5390,8 +5393,10 @@ function addRow(tableID, quot_table = "", itinerary = "") {
         });
     }
 
-    // ✅ Initialize datepicker for new row
-    $(row).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
+    // Hotel quotation uses datetimepicker on body; jQuery UI datepicker overlaps from row 2.
+    if (String(tableID).indexOf("dynamic_table_list_h_") !== 0 && tableID !== "hotel_quotation_update") {
+        $(row).find('.app_datepicker').datepicker({ dateFormat: "dd-mm-yy" });
+    }
 
     // Special handling for costing table
     if (tableID === "tbl_package_tour_quotation_dynamic_costing") {

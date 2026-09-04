@@ -6,6 +6,9 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="table-responsive">
+        <select id="package_type" name="package_type" class="hidden" style="display:none;" aria-hidden="true">
+            <?php echo get_package_type_dropdown(); ?>
+        </select>
         <table id="tbl_package_tour_quotation_dynamic_hotel_update" name="tbl_package_tour_quotation_dynamic_hotel_update" class="table table-bordered pd_bt_51">
             <?php 
             $sq_hotel_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation_hotel_entries where quotation_id='$quotation_id'"));
@@ -68,14 +71,13 @@
                     <tr>
                         <td><input class="css-checkbox" id="chk_hotel<?= $count ?>_1" type="checkbox" checked><label class="css-label" for="chk_hotel<?= $count ?>_1"> <label></td>
                         <td><input maxlength="15" value="<?= $count ?>" type="text" name="username" placeholder="Sr. No." class="form-control" disabled /></td>
-                        <td><select id="package_type-1<?= $count ?>" name="package_type-1<?= $count ?>" class="form-control app_select2" style="width:160px" title="Select Package Type">
-                            <option value="<?php echo $row_q_hotel['package_type']; ?>"><?php echo $row_q_hotel['package_type']; ?></option>
+                        <td><select id="package_type-1<?= $count ?>" name="package_type-1<?= $count ?>" class="form-control app_select2 package_type_select" style="width:160px" title="Select Package Type">
                             <?php
-                            if($package_type_options == ''){
-                                echo get_package_type_dropdown();
-                            }else{
+                            echo get_package_type_dropdown();
+                            if ($package_type_options != '') {
                                 echo $package_type_options;
-                            } ?>
+                            }
+                            ?>
                         </select></td>
                         <td><select id="city_name<?= $count ?>" name="city_name<?= $count ?>" class="city_name1" onchange="hotel_name_list_load(this.id);" class="city_master_dropdown" style="width:100%" title="Select City Name" data-add-new-option="true">
                             <option value="<?php echo $sq_city['city_id']; ?>"><?php echo $sq_city['city_name']; ?></option>
@@ -106,7 +108,17 @@
                         <td class="hidden"><input type="text" value="<?= $row_q_hotel['id'] ?>"></td>    
                     </tr>
                     <script>
-                    $('#package_type-1<?= $count ?>').select2();
+                    (function () {
+                        var pkgVal = <?= json_encode((string)$row_q_hotel['package_type']) ?>;
+                        var $pkg = $('#package_type-1<?= $count ?>');
+                        if (pkgVal && !$pkg.find('option[value="' + pkgVal.replace(/"/g, '\\"') + '"]').length) {
+                            $pkg.append(new Option(pkgVal, pkgVal, true, true));
+                        }
+                        if (pkgVal) {
+                            $pkg.val(pkgVal);
+                        }
+                        $pkg.select2();
+                    })();
                     $('#hotel_name-<?= $count ?>').select2({ width: '160px', minimumResultsForSearch: 0 });
                     $('#check_in-<?= $count ?>_u, #check_out-<?= $count ?>_u').datetimepicker({ format:'d-m-Y',timepicker:false });
                     </script>

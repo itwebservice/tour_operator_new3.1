@@ -1,6 +1,7 @@
 <?php
 include "../../../../model/model.php";
 include_once "../../../../model/app_settings/print_html/quotation_html/generic_quotation_data.php";
+include_once __DIR__ . '/../../../app_settings/app_format/quot_format_config.php';
 ?>
 <style>
     
@@ -173,33 +174,11 @@ global $currency;
 // Function to get quotation URLs for a given quotation_id
 function getQuotationUrls($quotation_id) {
     global $app_quot_format;
-    
-    if ($app_quot_format == 2) {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_2/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_2/fit_quotation_html_doc.php?quotation_id=$quotation_id";
-    } else if ($app_quot_format == 3) {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_3/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_3/fit_quotation_html_doc.php?quotation_id=$quotation_id";
-    } else if ($app_quot_format == 4) {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_4/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_4/fit_quotation_html_doc.php?quotation_id=$quotation_id";
-    } else if ($app_quot_format == 5) {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_5/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_5/fit_quotation_html_doc.php?quotation_id=$quotation_id";
-    } else if ($app_quot_format == 6) {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_6/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_6/fit_quotation_html_doc.php?quotation_id=$quotation_id";
-    } else if ($app_quot_format == 7) {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_7/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_7/fit_quotation_html.php?quotation_id=$quotation_id";
-    } else if ($app_quot_format == 8) {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_8/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_8/fit_quotation_html.php?quotation_id=$quotation_id";
-    } else {
-        $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_1/fit_quotation_html.php?quotation_id=$quotation_id";
-        $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_1/fit_quotation_html_doc.php?quotation_id=$quotation_id";
+    if (function_exists('quot_format_get_print_urls')) {
+        return quot_format_get_print_urls($quotation_id, $app_quot_format);
     }
-    
+    $url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_1/fit_quotation_html.php?quotation_id=$quotation_id";
+    $urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_1/fit_quotation_html_doc.php?quotation_id=$quotation_id";
     return array('pdf_url' => $url1, 'word_url' => $urldoc);
 }
 
@@ -366,7 +345,6 @@ $quotation_count = mysqli_num_rows($sq_query);
 						<div class="table-responsive">
 							<table class="table table-hover table-bordered no-marg" id="tbl_tour_list">
 								<tr class="table-heading-row">
-									<th></th>
 									<th>Sr No.</th>
 									<th>Quotation ID</th>
 									<th>Quotation Cost</th>
@@ -535,7 +513,6 @@ $quotation_count = mysqli_num_rows($sq_query);
 									}
 								?>
 									<tr <?php echo $is_sub_quotation ? 'class="sub-quotation-row"' : ''; ?>>
-										<td><input type="checkbox" value="<?php echo $row_tours['quotation_id']; ?>" id="<?php echo $row_tours['quotation_id']; ?>" name="custom_package" class="custom_package" /></td>
 										<td><?php echo $count; ?></td>
 										<td><?php echo $quotation_id_display_formatted; ?></td>
 										<td><?= $quotation_cost_1 ?></td>
@@ -848,7 +825,7 @@ $quotation_count = mysqli_num_rows($sq_query);
                                 </div>
 
                                 <div class="email-send-row">
-                                    <button type="button" class="btn" style="background-color: #009898; color: #fff;" id="sendEmailBtn">
+                                    <button type="button" class="btn" style="background-color: #009898; color: #fff;" id="sendEmailBtn" data-loading-text="Sending...">
                                         <i class="fa fa-paper-plane"></i> Send Email
                                     </button>
                                 </div>
@@ -878,7 +855,7 @@ $quotation_count = mysqli_num_rows($sq_query);
                                         </div>
                                     </div>
                                     <div class="whatsapp-send-row">
-                                        <button type="button" class="btn btn-teal" id="sendWhatsappBtn">
+                                        <button type="button" class="btn btn-teal" id="sendWhatsappBtn" data-loading-text="Sending...">
                                             <i class="fa fa-paper-plane-o"></i> Send WhatsApp
                                         </button>
                                     </div>
@@ -1092,7 +1069,7 @@ $(document).on('click', function () {
 		var emailOption = 'Email Body';
 		var allOptions = ['price_structure', 'inclusion_exclusion', 'terms_conditions', 'itinerary'];
 
-		$.post('get_email_body_content.php', {
+		$.post('get_email_body_content.php?_=' + Date.now(), {
 			quotation_id: quotation_id,
 			email_option: emailOption,
 			options: allOptions,
@@ -1120,7 +1097,7 @@ $(document).on('click', function () {
 
 		var allOptions = ['price_structure', 'inclusion_exclusion', 'terms_conditions', 'itinerary'];
 
-		$.post('get_email_body_content.php', {
+		$.post('get_email_body_content.php?_=' + Date.now(), {
 			quotation_id: quotation_id,
 			email_option: 'WhatsApp',
 			options: allOptions,
@@ -1321,7 +1298,7 @@ $(document).on('click', function () {
 			var emailOption = 'Email Body';
 			var format = 'body';
 			
-			$.post('get_email_body_content.php', {
+			$.post('get_email_body_content.php?_=' + Date.now(), {
 				quotation_id: window.currentQuotationData.quotation_id,
 				email_option: type === 'email' ? emailOption : 'WhatsApp',
 				options: selectedOptions,
@@ -1350,23 +1327,21 @@ $(document).on('click', function () {
 
 	// Event handlers for the new modal
 	$(document).ready(function() {
-	// Send Email button - use event delegation
-	$(document).on('click', '#sendEmailBtn', function() {
+	// Send Email — unbind first so AJAX reloads of this modal do not stack handlers
+	$(document).off('click', '#sendEmailBtn');
+	$(document).off('click.quotationSendEmail', '#sendEmailBtn');
+	$(document).on('click.quotationSendEmail', '#sendEmailBtn', function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
 		var selectedOptions = [];
 		$('input[name="emailOptions[]"]:checked').each(function() {
 			selectedOptions.push($(this).val());
 		});
 
-		
-		// Always use Email Body format (HTML format removed)
-		var emailFormat = 'body';
 		var emailOption = 'Email Body';
-		
-		
-		// Call individual email send function
-		if (window.currentQuotationData) {
 
-			sendIndividualQuotationEmail(window.currentQuotationData.quotation_id, 
+		if (window.currentQuotationData) {
+			sendIndividualQuotationEmail(window.currentQuotationData.quotation_id,
 				window.currentQuotationData.email_id, selectedOptions, emailOption);
 		}
 	});
@@ -1390,8 +1365,12 @@ $(document).on('click', function () {
 			}
 		});
 
-	// Send WhatsApp button
-	$(document).on('click', '#sendWhatsappBtn', function() {
+	// Send WhatsApp — unbind first so AJAX reloads do not stack handlers
+	$(document).off('click', '#sendWhatsappBtn');
+	$(document).off('click.quotationSendWhatsapp', '#sendWhatsappBtn');
+	$(document).on('click.quotationSendWhatsapp', '#sendWhatsappBtn', function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
 		var selectedOptions = [];
 		$('input[name="whatsappOptions[]"]:checked').each(function() {
 			selectedOptions.push($(this).val());
@@ -1494,12 +1473,16 @@ $(document).on('click', function () {
 			}
 		});
 
-		$(document).on('change', '.email-option', function(e) {
+		$(document).off('change', '.email-option');
+		$(document).off('change.quotationEmailOption', '.email-option');
+		$(document).on('change.quotationEmailOption', '.email-option', function(e) {
 			e.stopPropagation();
 			updateContentPreview('email');
 		});
 
-		$(document).on('change', '.whatsapp-option', function(e) {
+		$(document).off('change', '.whatsapp-option');
+		$(document).off('change.quotationWhatsappOption', '.whatsapp-option');
+		$(document).on('change.quotationWhatsappOption', '.whatsapp-option', function(e) {
 			e.stopPropagation();
 			updateContentPreview('whatsapp');
 		});
@@ -1519,44 +1502,65 @@ $(document).on('click', function () {
 
 	// Function to send individual quotation email
 	function sendIndividualQuotationEmail(quotation_id, email_id, selectedOptions, emailOption) {
+		window.quotationEmailSending = window.quotationEmailSending || {};
+		var sendKey = String(quotation_id);
+		if (window.quotationEmailSending[sendKey]) {
+			return;
+		}
+		var $btn = $('#sendEmailBtn');
 		var base_url = $('#base_url').val();
 		if (!base_url) {
 			base_url = window.location.origin + '/itoursdemo/';
 		}
-		$('#sendEmailBtn').button('loading');
-		
-		// Prepare form data
+		window.quotationEmailSending[sendKey] = true;
+		$btn.data('sending', true);
+		$btn.button('loading');
+
 		var formData = {
 			quotation_id: quotation_id,
 			email_id: email_id,
 			email_option: emailOption || 'Email Body',
-            'options[]': selectedOptions
+			'options[]': selectedOptions
 		};
-		
+
 		$.ajax({
 			type: 'post',
 			url: base_url + 'controller/package_tour/quotation/quotation_email_send_individual.php',
 			data: formData,
 			processData: true,
 			contentType: 'application/x-www-form-urlencoded',
+			timeout: 120000,
 			success: function(message) {
 				msg_alert(message);
-				$('#sendEmailBtn').button('reset');
 				$('#emailWhatsappModal').modal('hide');
 			},
-			error: function(xhr, status, error) {
-				error_msg_alert('Error sending email. Please try again.');
-				$('#sendEmailBtn').button('reset');
+			error: function(xhr, status) {
+				if (status === 'timeout') {
+					error_msg_alert('Email is taking too long. Please try again.');
+				} else {
+					error_msg_alert('Error sending email. Please try again.');
+				}
+			},
+			complete: function() {
+				window.quotationEmailSending[sendKey] = false;
+				$('#sendEmailBtn').data('sending', false).button('reset');
 			}
 		});
 	}
 
 	// Function to send individual quotation WhatsApp
 	function sendIndividualQuotationWhatsApp(quotation_id, mobile_no, selectedOptions) {
+		window.quotationWhatsappSending = window.quotationWhatsappSending || {};
+		var sendKey = String(quotation_id);
+		if (window.quotationWhatsappSending[sendKey]) {
+			return;
+		}
+		var $btn = $('#sendWhatsappBtn');
 		var base_url = $('#base_url').val();
-		$('#sendWhatsappBtn').button('loading');
-		
-		
+		window.quotationWhatsappSending[sendKey] = true;
+		$btn.data('sending', true);
+		$btn.button('loading');
+
 		$.ajax({
 			type: 'post',
 			url: base_url + 'controller/package_tour/quotation/quotation_whatsapp_individual.php',
@@ -1565,14 +1569,21 @@ $(document).on('click', function () {
 				mobile_no: mobile_no,
 				options: selectedOptions
 			},
+			timeout: 120000,
 			success: function(link) {
-				$('#sendWhatsappBtn').button('reset');
 				window.open(link, '_blank');
 				$('#emailWhatsappModal').modal('hide');
 			},
-			error: function() {
-				error_msg_alert('Error sending WhatsApp. Please try again.');
-				$('#sendWhatsappBtn').button('reset');
+			error: function(xhr, status) {
+				if (status === 'timeout') {
+					error_msg_alert('WhatsApp is taking too long. Please try again.');
+				} else {
+					error_msg_alert('Error sending WhatsApp. Please try again.');
+				}
+			},
+			complete: function() {
+				window.quotationWhatsappSending[sendKey] = false;
+				$('#sendWhatsappBtn').data('sending', false).button('reset');
 			}
 		});
 	}
@@ -1663,32 +1674,61 @@ $(document).on('click', function () {
 		var email_id = $('#modal_email_id').val();
 		var mobile_no = $('#modal_mobile_no').val();
 		var quotation_id = $('#modal_quotation_id').val();
-		
-		
-		// Show loading indicator in the div_quotation_form
-		$('#div_quotation_form').html('<div class="text-center"><i class="fa fa-spinner fa-spin"></i> Refreshing...</div>');
-		
-		// Add timestamp to prevent caching
 		var timestamp = new Date().getTime();
-		
-		$.ajax({
-			type: 'post',
-			url: base_url + 'view/package_booking/quotation/home/send_quotation.php',
-			data: {
-				email_id: email_id,
-				mobile_no: mobile_no,
-				quotation_id: quotation_id,
-				_t: timestamp
-			},
-			success: function(result) {
-				$('#div_quotation_form').html(result);
-				// Show the modal again after refresh
-				$('#quotation_send_modal').modal('show');
-			},
-			error: function(xhr, status, error) {
-				$('#div_quotation_form').html('<div class="alert alert-danger">Error refreshing content. Please try again.</div>');
+
+		var loadRefreshedModal = function() {
+			if (typeof quotationCleanupModalOverlays === 'function') {
+				quotationCleanupModalOverlays();
+			} else {
+				$('.modal-backdrop').remove();
+				$('body').removeClass('modal-open').css({ overflow: '', 'padding-right': '' });
 			}
-		});
+			$('#div_quotation_form').html('<div class="text-center"><i class="fa fa-spinner fa-spin"></i> Refreshing...</div>');
+			$.ajax({
+				type: 'post',
+				url: base_url + 'view/package_booking/quotation/home/send_quotation.php',
+				data: {
+					email_id: email_id,
+					mobile_no: mobile_no,
+					quotation_id: quotation_id,
+					_t: timestamp
+				},
+				success: function(result) {
+					$('#div_quotation_form').html(result);
+					if (typeof quotationCleanupModalOverlays === 'function') {
+						quotationCleanupModalOverlays();
+					} else {
+						$('.modal-backdrop').remove();
+						$('body').removeClass('modal-open').css({ overflow: '', 'padding-right': '' });
+					}
+					$('#quotation_send_modal').modal('show');
+				},
+				error: function() {
+					$('#div_quotation_form').html('<div class="alert alert-danger">Error refreshing content. Please try again.</div>');
+					if (typeof quotationCleanupModalOverlays === 'function') {
+						quotationCleanupModalOverlays();
+					}
+				}
+			});
+		};
+
+		var refreshStarted = false;
+		var startRefresh = function() {
+			if (refreshStarted) {
+				return;
+			}
+			refreshStarted = true;
+			loadRefreshedModal();
+		};
+
+		var $modal = $('#quotation_send_modal');
+		if ($modal.length && ($modal.hasClass('in') || $modal.hasClass('show') || $modal.is(':visible'))) {
+			$modal.one('hidden.bs.modal', startRefresh);
+			$modal.modal('hide');
+			setTimeout(startRefresh, 450);
+		} else {
+			startRefresh();
+		}
 	}
 
 	// Function to create sub-quotation copy

@@ -2215,229 +2215,55 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
     // Make function globally available - Updated to handle both old and new calling patterns
     window.removeDayImage = function(packageIdOrOffset, offset) {
-        // Handle both old (single parameter) and new (two parameters) calling patterns
-        if (arguments.length === 1) {
-            // Old calling pattern: removeDayImage(offset)
-            console.log("QUOTATION: REMOVING image for offset (old pattern):", packageIdOrOffset);
-            var offset = packageIdOrOffset;
-            var uniqueId = offset; // For old system, use offset as uniqueId
+        var uniqueId;
+        if (arguments.length < 2 || offset === undefined || offset === null || offset === '') {
+            uniqueId = String(packageIdOrOffset);
         } else {
-            // New calling pattern: removeDayImage(packageId, offset)
-            console.log("QUOTATION: REMOVING image for packageId:", packageIdOrOffset, "offset:", offset);
-            var uniqueId = packageIdOrOffset + "_" + offset;
+            uniqueId = String(packageIdOrOffset) + '_' + String(offset);
         }
-
-        // Prevent multiple calls
         if (window.removingImage && window.removingImage[uniqueId]) {
-            console.log("QUOTATION: Already removing image for uniqueId:", uniqueId);
             return;
         }
-
-        if (!window.removingImage) {
-            window.removingImage = {};
-        }
+        window.removingImage = window.removingImage || {};
         window.removingImage[uniqueId] = true;
 
-        // Get elements using uniqueId
-        var fileInput = $('#day_image_' + uniqueId);
-        var previewDiv = $('#day_image_preview_' + uniqueId);
-        var previewImg = $('#preview_img_' + uniqueId);
-        var uploadLabel = $('label[for="day_image_' + uniqueId + '"]');
-        var uploadContainer = $('#upload_btn_container_' + uniqueId);
-
-        // Clear file input completely
-        fileInput.val('');
-        fileInput.prop('value', '');
-        if (fileInput[0]) {
-            fileInput[0].value = '';
+        var fileInput = document.getElementById('day_image_' + uniqueId);
+        if (fileInput && fileInput.parentNode) {
+            var fresh = fileInput.cloneNode(true);
+            fresh.value = '';
+            fileInput.parentNode.replaceChild(fresh, fileInput);
+            fresh.addEventListener('change', function () {
+                if (this.files && this.files.length && typeof window.previewDayImage === 'function') {
+                    window.previewDayImage(this, uniqueId);
+                }
+            });
         }
 
-        // Clear the image src completely
-        previewImg.attr('src', '');
-        previewImg.removeAttr('src');
-        if (previewImg[0]) {
-            previewImg[0].src = '';
-        }
-
-        // Clear existing image path
+        $('#preview_img_' + uniqueId).attr('src', '').hide();
+        $('#day_image_preview_' + uniqueId).hide().attr('style', 'display:none;margin-top:5px;');
         $('#existing_image_path_' + uniqueId).val('');
-
-        // Clear stored file
         if (window.quotationImages && window.quotationImages[uniqueId]) {
             delete window.quotationImages[uniqueId];
         }
 
-        // Update the has_image state to false
-        console.log("QUOTATION: Setting has_image to false for uniqueId:", uniqueId);
-
-        // AGGRESSIVELY hide preview div and clear image
-        previewDiv.hide();
-        previewDiv.css({
-            'display': 'none !important',
-            'visibility': 'hidden !important',
-            'opacity': '0 !important',
-            'position': 'absolute !important',
-            'left': '-9999px !important',
-            'width': '0 !important',
-            'height': '0 !important',
-            'overflow': 'hidden !important'
-        });
-        previewDiv.attr('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
-
-        // Clear the image src completely
-        previewImg.attr('src', '');
-        previewImg.removeAttr('src');
-        previewImg.hide();
-        previewImg.css('display', 'none !important');
-
-        // NUCLEAR OPTION - Force show BOTH container and label
-        console.log("QUOTATION: NUCLEAR OPTION - Showing both container and label for uniqueId:", uniqueId);
-        
-        // Force show upload container
-        if (uploadContainer.length > 0) {
-            uploadContainer.show();
-            uploadContainer.css({
-                'display': 'flex !important',
-                'visibility': 'visible !important',
-                'opacity': '1 !important',
-                'position': 'relative !important',
-                'left': 'auto !important',
-                'top': 'auto !important',
-                'width': 'auto !important',
-                'height': 'auto !important',
-                'overflow': 'visible !important',
-                'z-index': '9999 !important'
+        var uploadContainer = document.getElementById('upload_btn_container_' + uniqueId);
+        if (uploadContainer) {
+            uploadContainer.style.cssText = 'margin-top:35px;display:flex;align-items:center;justify-content:center;height:100%;';
+        } else {
+            $('label[for="day_image_' + uniqueId + '"]').show().css({
+                display: 'inline-block',
+                visibility: 'visible',
+                opacity: '1'
             });
-            uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important;');
-            console.log("QUOTATION: Upload container shown for uniqueId:", uniqueId);
-        }
-        
-        // Force show upload label (fallback)
-        if (uploadLabel.length > 0) {
-            uploadLabel.show();
-            uploadLabel.css({
-                'display': 'inline-block !important',
-                'visibility': 'visible !important',
-                'opacity': '1 !important',
-                'position': 'relative !important',
-                'left': 'auto !important',
-                'top': 'auto !important',
-                'width': 'auto !important',
-                'height': 'auto !important',
-                'overflow': 'visible !important',
-                'z-index': '9999 !important'
-            });
-            uploadLabel.attr('style', 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; top: auto !important; width: auto !important; height: auto !important; overflow: visible !important; z-index: 9999 !important;');
-            console.log("QUOTATION: Upload label shown for uniqueId:", uniqueId);
-        }
-        
-        // If still nothing visible, create a new button
-        if ((uploadContainer.length === 0 || !uploadContainer.is(':visible')) && 
-            (uploadLabel.length === 0 || !uploadLabel.is(':visible'))) {
-            console.log("QUOTATION: Creating emergency upload button for uniqueId:", uniqueId);
-            
-            // Find the parent cell
-            var parentCell = $('td:has(div[id="day_image_preview_' + uniqueId + '"])');
-            if (parentCell.length > 0) {
-                // Create emergency upload button
-                var emergencyButton = $('<div style="display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 9999 !important; margin-top: 35px; align-items: center; justify-content: center; height: 100%;"><label for="day_image_' + uniqueId + '" class="btn btn-sm btn-success" style="margin-bottom: 5px;font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500;"><i class="fa fa-image"></i> Upload Image</label></div>');
-                parentCell.append(emergencyButton);
-                console.log("QUOTATION: Emergency button created for uniqueId:", uniqueId);
-            }
         }
 
-        // Show the requirements tooltip when upload button is shown
-        $('.image-requirements-tooltip').show();
-
-        // Reset the file input's change event handler
-        fileInput.off('change').on('change', function() {
-            console.log("QUOTATION: File input change event triggered for uniqueId:", uniqueId);
-            if (this.files && this.files.length > 0) {
-                if (typeof window.previewDayImage === 'function') {
-                    // For old system, we need to extract package ID from uniqueId or use a default
-                    if (uniqueId.includes('_')) {
-                        var parts = uniqueId.split('_');
-                        window.previewDayImage(this, parts[0], parts[1]);
-                    } else {
-                        // Fallback for old system
-                        window.previewDayImage(this, 'pkg0', uniqueId);
-                    }
-                } else {
-                    console.error('QUOTATION: previewDayImage function not available in fallback');
-                }
+        setTimeout(function () {
+            if (window.removingImage) {
+                delete window.removingImage[uniqueId];
             }
-        });
+        }, 300);
+    };
 
-        // Clean up after a short delay
-        setTimeout(function() {
-            previewDiv.hide();
-            previewDiv.css('display', 'none');
-
-            // Force show the upload button container with maximum CSS override
-            if (uploadContainer.length > 0) {
-                uploadContainer.show();
-                uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important; margin-top: 35px;');
-                uploadContainer.css({
-                    'display': 'flex !important',
-                    'visibility': 'visible !important',
-                    'opacity': '1 !important',
-                    'position': 'relative !important',
-                    'left': 'auto !important',
-                    'width': 'auto !important',
-                    'height': 'auto !important',
-                    'overflow': 'visible !important'
-                });
-                console.log("QUOTATION: Upload container shown for uniqueId:", uniqueId);
-            } else {
-                // Fallback for old system with maximum CSS override
-                uploadLabel.show();
-                uploadLabel.attr('style', 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
-                uploadLabel.css({
-                    'display': 'inline-block !important',
-                    'visibility': 'visible !important',
-                    'opacity': '1 !important',
-                    'position': 'relative !important',
-                    'left': 'auto !important',
-                    'width': 'auto !important',
-                    'height': 'auto !important',
-                    'overflow': 'visible !important'
-                });
-                console.log("QUOTATION: Upload label shown (fallback) for uniqueId:", uniqueId);
-            }
-
-            $('.image-requirements-tooltip').show();
-            delete window.removingImage[uniqueId];
-            console.log("QUOTATION: Image removal completed for uniqueId:", uniqueId);
-            
-            // Check visibility based on which system we're using
-            var isVisible = false;
-            if (uploadContainer.length > 0) {
-                isVisible = uploadContainer.is(':visible');
-                console.log("QUOTATION: Upload container visible after cleanup:", isVisible);
-            } else {
-                isVisible = uploadLabel.is(':visible');
-                console.log("QUOTATION: Upload label visible after cleanup:", isVisible);
-            }
-
-            // If upload button is still not visible, try to show it using the new system
-            if (!isVisible) {
-                console.log("QUOTATION: Upload button not visible after cleanup, trying to show using new system...");
-                if (uploadContainer.length > 0) {
-                    uploadContainer.show();
-                    uploadContainer.attr('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;    margin-top: 35px;');
-                    uploadContainer.css('display', 'flex !important');  
-                    console.log("QUOTATION: Force showed upload container");
-                } else {
-                    uploadLabel.show();
-                    uploadLabel.attr('style', 'display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;');
-                    uploadLabel.css('display', 'inline-block !important');
-                    console.log("QUOTATION: Force showed upload label");
-                }
-            }
-        }, 100);
-
-        console.log("QUOTATION: Image removed for uniqueId:", uniqueId);
-    }
 
     // Function to get package ID for a specific offset
     function getPackageIdForOffset(offset) {
@@ -2573,200 +2399,36 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
                 processSelectedItineraryImageQuotation();
             }, 100);
         });
-        $(document).on('change', 'input[id^="day_image_"]', function() {
-            var offset = $(this).attr('id').replace('day_image_', '');
-
-
-            // Only process if there are actually files selected
+        $(document).off('change.quotationDayImage', 'input[id^="day_image_"]').on('change.quotationDayImage', 'input[id^="day_image_"]', function() {
+            var uniqueId = $(this).attr('id').replace('day_image_', '');
             if (this.files && this.files.length > 0) {
-
-                // Small delay to ensure DOM is ready
+                var inputEl = this;
                 setTimeout(function() {
                     if (typeof window.previewDayImage === 'function') {
-                        window.previewDayImage(this, offset);
-                    } else {
-                        console.error('QUOTATION: previewDayImage function not available in event listener');
+                        window.previewDayImage(inputEl, uniqueId);
                     }
-                }.bind(this), 10);
-            } else {}
+                }, 10);
+            }
         });
 
-        // Also add direct onclick handlers to the file inputs
-        $(document).on('click', 'input[id^="day_image_"]', function() {
-            var offset = $(this).attr('id').replace('day_image_', '');
-            console.log('QUOTATION: File input clicked for offset:', offset);
-        });
-
-        // Add click event listener for remove buttons
-        $(document).on('click', 'button[onclick*="removeDayImage"]', function(e) {
+        $(document).off('click.quotationRemoveDayImage', 'button[onclick*="removeDayImage"]').on('click.quotationRemoveDayImage', 'button[onclick*="removeDayImage"]', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            e.stopImmediatePropagation();
-            var onclickAttr = $(this).attr('onclick');
-            var offset = onclickAttr.match(/removeDayImage\('(\d+)'\)/);
-            if (offset && offset[1]) {
-                console.log('QUOTATION: Remove button clicked for offset:', offset[1]);
-                // Force immediate removal - NUCLEAR OPTION
-                var offsetNum = offset[1];
-                console.log('QUOTATION: NUCLEAR REMOVAL for offset:', offsetNum);
-
-                // Remove the entire preview div
-                $('#day_image_preview_' + offsetNum).remove();
-
-                // Clear file input
-                $('#day_image_' + offsetNum).val('');
-                $('#existing_image_path_' + offsetNum).val('');
-
-                // Create a fresh upload button container with preview div
-                var container = $('#day_image_' + offsetNum).parent();
-
-                // Check if previewDayImage function is available
-                console.log("QUOTATION: Checking if previewDayImage is available:", typeof window.previewDayImage);
-                console.log("QUOTATION: Checking if previewDayImage is available (direct):", typeof previewDayImage);
-
-                container.html(`
-                <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
-                    <label for="day_image_${offsetNum}" class="btn btn-sm btn-success upload-btn-${offsetNum}" 
-                           style="margin-bottom: 5px;  font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
-                        <i class="fa fa-image"></i> Upload Image
-                    </label>
-
-                    <input type="file" id="day_image_${offsetNum}" 
-                           name="day_image_${offsetNum}" accept="image/*" 
-                           onchange="console.log('QUOTATION: File input changed for offset ${offsetNum}'); if(typeof window.previewDayImage === 'function') { window.previewDayImage(this, '${offsetNum}'); } else { console.error('QUOTATION: previewDayImage function not available'); }" 
-                           style="display: none;">
-                </div>
-            
-                <div id="day_image_preview_${offsetNum}" style="display: none; margin-top: 5px;">
-                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                        <img id="preview_img_${offsetNum}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
-                        <button type="button" 
-                                onclick="removeDayImage('${offsetNum}')" 
-                                title="Remove Image" 
-                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                            ×
-                        </button>
-                    </div>
-                </div>
-                <input type="hidden" id="existing_image_path_${offsetNum}" name="existing_image_path_${offsetNum}" value="" />
-            `);
-
-                console.log("QUOTATION: Fresh upload button created and shown for offset:", offsetNum);
-
-                // Force show the upload button and ensure it's visible
-                setTimeout(function() {
-                    console.log("QUOTATION: Starting force visibility for offset:", offsetNum);
-
-                    var uploadLabel = $('label[for="day_image_' + offsetNum + '"]');
-                    var uploadContainer = uploadLabel.parent();
-                    var fileInput = $('#day_image_' + offsetNum);
-
-                    console.log("QUOTATION: Elements found - label:", uploadLabel.length, "container:", uploadContainer.length, "input:", fileInput.length);
-                    console.log("QUOTATION: Container HTML:", uploadContainer.html());
-
-                    if (uploadLabel.length === 0) {
-                        console.error("QUOTATION: Upload label not found, trying to recreate...");
-                        // Try to find the container and recreate the label
-                        var container = $('#day_image_' + offsetNum).parent();
-                        if (container.length > 0) {
-                            container.html(`
-                                <div style="margin-top: 35px; display: flex; align-items: center; justify-content: center; height: 100%; visibility: visible !important; opacity: 1 !important;">
-                                    <label for="day_image_${offsetNum}" class="btn btn-sm btn-success upload-btn-${offsetNum}" 
-                                           style="margin-bottom: 5px; font-size: 12px; cursor: pointer; border-radius: 4px; border: none; background-color: #28a745; color: white; font-weight: 500; display: inline-block !important; visibility: visible !important; opacity: 1 !important;">
-                                        <i class="fa fa-image"></i> Upload Image
-                                    </label>
-                                    <input type="file" id="day_image_${offsetNum}" 
-                                           name="day_image_${offsetNum}" accept="image/*" 
-                                           onchange="console.log('QUOTATION: File input changed for offset ${offsetNum}'); if(typeof window.previewDayImage === 'function') { window.previewDayImage(this, '${offsetNum}'); } else { console.error('QUOTATION: previewDayImage function not available'); }" 
-                                           style="display: none;">
-                                </div>
-                                <div id="day_image_preview_${offsetNum}" style="display: none; margin-top: 5px;">
-                                    <div style="height:100px; max-height: 100px; overflow:hidden; position: relative; width: 100px; border: 2px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
-                                        <img id="preview_img_${offsetNum}" src="" alt="Preview" style="width:100%; height:100%; object-fit: cover; border-radius: 6px;">
-                                        <button type="button" 
-                                                onclick="removeDayImage('${offsetNum}')" 
-                                                title="Remove Image" 
-                                                style="position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border: none; border-radius: 50%; background-color: #dc3545; color: white; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                                            ×
-                                        </button>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="existing_image_path_${offsetNum}" name="existing_image_path_${offsetNum}" value="" />
-                            `);
-
-                            // Update references after recreation
-                            uploadLabel = $('label[for="day_image_' + offsetNum + '"]');
-                            uploadContainer = uploadLabel.parent();
-                            fileInput = $('#day_image_' + offsetNum);
-
-                            console.log("QUOTATION: After recreation - label:", uploadLabel.length, "container:", uploadContainer.length, "input:", fileInput.length);
-                        }
-                    }
-
-                    // Force show the container and label
-                    if (uploadContainer.length > 0) {
-                        uploadContainer.css({
-                            'display': 'flex !important',
-                            'visibility': 'visible !important',
-                            'opacity': '1 !important'
-                        });
-                    }
-
-                    if (uploadLabel.length > 0) {
-                        uploadLabel.css({
-                            'display': 'inline-block !important',
-                            'visibility': 'visible !important',
-                            'opacity': '1 !important'
-                        });
-                    }
-
-                    console.log("QUOTATION: Forced upload button visibility for offset:", offsetNum);
-                    console.log("QUOTATION: Upload button visible after force:", uploadLabel.is(':visible'));
-                    console.log("QUOTATION: Upload button computed style display:", uploadLabel.css('display'));
-
-                    // If still not visible, the new system should handle this
-                    if (!uploadLabel.is(':visible') || uploadLabel.length === 0) {
-                        console.log("QUOTATION: Upload button still not visible, new unique ID system should handle this");
-                        // The new system should handle this automatically
-                    }
-                }, 100);
-
-                // Add direct event listener to the new file input
-                var newFileInput = $('#day_image_' + offsetNum);
-                console.log("QUOTATION: New file input found:", newFileInput.length > 0);
-
-                if (newFileInput.length > 0) {
-                    newFileInput.off('change').on('change', function() {
-                        console.log('QUOTATION: DIRECT File input changed for offset:', offsetNum);
-                        console.log('QUOTATION: DIRECT File input files:', this.files);
-                        console.log('QUOTATION: DIRECT File input files length:', this.files ? this.files.length : 'no files property');
-                        console.log('QUOTATION: DIRECT File input files[0]:', this.files ? this.files[0] : 'no files');
-                        console.log('QUOTATION: DIRECT File input value:', this.value);
-
-                        if (this.files && this.files.length > 0) {
-                            console.log('QUOTATION: DIRECT Files selected, calling previewDayImage');
-                            console.log('QUOTATION: DIRECT previewDayImage function available:', typeof window.previewDayImage);
-                            if (typeof window.previewDayImage === 'function') {
-                                console.log('QUOTATION: DIRECT Calling previewDayImage with file:', this.files[0]);
-                                window.previewDayImage(this, offsetNum);
-                            } else {
-                                console.error('QUOTATION: DIRECT previewDayImage function not available');
-                            }
-                        } else {
-                            console.log('QUOTATION: DIRECT No files selected or files.length is 0');
-                        }
-                    });
-                    console.log("QUOTATION: Direct event listener attached to new file input");
-                }
-
-                // Clear stored data
-                if (window.quotationImages && window.quotationImages[offsetNum]) {
-                    delete window.quotationImages[offsetNum];
-                }
-
-                console.log('QUOTATION: NUCLEAR REMOVAL completed for offset:', offsetNum);
+            var onclickAttr = $(this).attr('onclick') || '';
+            var parsed = onclickAttr.match(/removeDayImage\(([^)]*)\)/);
+            if (!parsed) {
+                return;
             }
-            return false;
+            var args = parsed[1].split(',').map(function(s) {
+                return s.trim().replace(/^['"]|['"]$/g, '');
+            });
+            if (typeof window.removeDayImage === 'function') {
+                if (args.length >= 2) {
+                    window.removeDayImage(args[0], args[1]);
+                } else if (args.length === 1) {
+                    window.removeDayImage(args[0]);
+                }
+            }
         });
     });
 
@@ -3142,70 +2804,62 @@ echo "<!-- Debug: Result count = " . $result_count . " -->";
 
 
     function previewDayImage(input, packageId, offset) {
-    console.log("QUOTATION: previewDayImage called with packageId:", packageId, "offset:", offset);
-    const uniqueId = packageId + "_" + offset;
-    console.log("QUOTATION: Generated uniqueId:", uniqueId);
-
+    var uniqueId;
+    if (offset === undefined || offset === null || offset === '') {
+        uniqueId = String(packageId || '');
+    } else {
+        uniqueId = String(packageId) + '_' + String(offset);
+    }
     if (input.files && input.files[0]) {
-        console.log("QUOTATION: File selected, starting file reader");
         const file = input.files[0];
         const reader = new FileReader();
 
         reader.onload = function (e) {
-            console.log("QUOTATION: Image loaded for uniqueId:", uniqueId);
-            
-            // Show preview
             $('#preview_img_' + uniqueId).attr('src', e.target.result).show();
             $('#day_image_preview_' + uniqueId).show().css({
-                'display': 'block !important',
-                'visibility': 'visible !important',
-                'opacity': '1 !important',
-                'position': 'relative !important',
-                'left': 'auto !important',
-                'width': 'auto !important',
-                'height': 'auto !important',
-                'overflow': 'visible !important'
+                display: 'block',
+                visibility: 'visible',
+                opacity: '1'
             });
-            
-            // AGGRESSIVE APPROACH - Use the working method
-            setTimeout(function() {
-                console.log("QUOTATION: Using aggressive hide for uniqueId:", uniqueId);
-                
-                var element = document.getElementById('upload_btn_container_' + uniqueId);
+            $('#day_image_preview_' + uniqueId).find('button[onclick*="removeDayImage"]').css('display', 'flex');
 
-                console.log(element,'helllooo')
-                if (element) {
-                    // Remove the element completely and recreate it hidden
-                    var parent = element.parentNode;
-                    var hiddenElement = element.cloneNode(true);
-                    hiddenElement.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;';
-                    hiddenElement.setAttribute('style', 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: absolute !important; left: -9999px !important; width: 0 !important; height: 0 !important; overflow: hidden !important;');
-                    
-                    parent.replaceChild(hiddenElement, element);
-                    
-                    console.log("QUOTATION: Aggressive hide completed for uniqueId:", uniqueId);
-                } else {
-                    console.log("QUOTATION: ERROR - Upload container element not found for uniqueId:", uniqueId);
-                }
-            }, 50);
+            var uploadEl = document.getElementById('upload_btn_container_' + uniqueId);
+            if (uploadEl) {
+                uploadEl.style.display = 'none';
+            }
+            $('label[for="day_image_' + uniqueId + '"]').hide();
 
+            var pkgId = uniqueId;
+            var dayOffset = '';
+            var splitAt = uniqueId.lastIndexOf('_');
+            if (splitAt !== -1) {
+                pkgId = uniqueId.substring(0, splitAt);
+                dayOffset = uniqueId.substring(splitAt + 1);
+            }
             if (!window.quotationImages) window.quotationImages = {};
-            window.quotationImages[uniqueId] = { file, package_id: packageId, offset, preview_url: e.target.result };
+            window.quotationImages[uniqueId] = { file: file, package_id: pkgId, offset: dayOffset, preview_url: e.target.result };
         };
 
         reader.readAsDataURL(file);
     }
 }
+window.previewDayImage = previewDayImage;
 
 function removeDayImage(packageId, offset) {
-    const uniqueId = packageId + "_" + offset;
-
+    if (typeof window.removeDayImage === 'function' && window.removeDayImage !== removeDayImage) {
+        return window.removeDayImage(packageId, offset);
+    }
+    var uniqueId = (offset === undefined || offset === null || offset === '')
+        ? String(packageId)
+        : String(packageId) + '_' + String(offset);
     $('#day_image_' + uniqueId).val('');
     $('#preview_img_' + uniqueId).attr('src', '').hide();
     $('#day_image_preview_' + uniqueId).hide();
-    $('#upload_btn_container_' + uniqueId).show();
+    var uploadEl = document.getElementById('upload_btn_container_' + uniqueId);
+    if (uploadEl) {
+        uploadEl.style.cssText = 'margin-top:35px;display:flex;align-items:center;justify-content:center;height:100%;';
+    }
     $('#existing_image_path_' + uniqueId).val('');
-
     if (window.quotationImages && window.quotationImages[uniqueId]) {
         delete window.quotationImages[uniqueId];
     }
@@ -3815,6 +3469,25 @@ window.testPreviewDayImage = function(packageId, offset) {
         }
     }, 50);
 };
+
+if (typeof quotationInitFeatureEditors === 'function') {
+    quotationInitFeatureEditors('#package_name_div');
+} else if (typeof $ !== 'undefined' && typeof $.fn.wysiwyg === 'function') {
+    $('#package_name_div textarea.feature_editor').each(function () {
+        var $el = $(this);
+        if ($el.data('wysiwyg')) {
+            return;
+        }
+        var existing = $el.val() || '';
+        $el.wysiwyg({
+            controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
+            initialContent: ''
+        });
+        if (existing && $el.data('wysiwyg')) {
+            try { $el.wysiwyg('setContent', existing); } catch (e) {}
+        }
+    });
+}
 
 </script>
 <script src="<?= BASE_URL ?>js/app/footer_scripts.js"></script>

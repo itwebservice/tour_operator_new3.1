@@ -21,9 +21,14 @@ if (empty($q['found'])) {
 $hero         = $q['hero'];
 $ov           = $q['tour_overview'];
 $hotels       = $q['hotels'];
+$o4_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels_by_package_type']))
+  ? $q['hotels_by_package_type']
+  : (function_exists('gqd_hotels_by_package_type') ? gqd_hotels_by_package_type($hotels) : array());
+$o4_multi_pkg = count($o4_hotels_by_pkg) > 1;
 $flights      = $q['flights'];
 $vehs         = $q['vehicles'];
 $trains       = isset($q['trains']) ? $q['trains'] : array();
+$cruises      = isset($q['cruises']) ? $q['cruises'] : array();
 $acts         = isset($q['activities']) ? $q['activities'] : array();
 $itin         = $q['itinerary'];
 $incx         = $q['inclusion_exclusion'];
@@ -437,7 +442,9 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     <div class="pdf-page">
       <div class="page-header">
         <?php o4_render_vl_logo($hero, false); ?>
-        <?php if ($o4_pkg_badge !== '') : ?>
+        <?php if ($o4_multi_pkg) : ?>
+          <div class="pkg-pill">Hotels by Package Type</div>
+        <?php elseif ($o4_pkg_badge !== '') : ?>
           <div class="pkg-pill"><?= o4e($o4_pkg_badge) ?></div>
         <?php else : ?>
           <div class="page-header-right"><?= o4e($o4_pkg_ov) ?></div>
@@ -449,9 +456,18 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
         <div class="sec-heading">Accommodation Details</div>
 
         <?php
+        if (empty($o4_hotels_by_pkg) && !empty($hotels)) {
+          $o4_hotels_by_pkg = array('Package' => $hotels);
+        }
         $o4_hi = 0;
-        if (!empty($hotels)) :
-          foreach ($hotels as $h) :
+        if (!empty($o4_hotels_by_pkg)) :
+          foreach ($o4_hotels_by_pkg as $o4_pkg_heading => $o4_pkg_hotels) :
+            if ($o4_multi_pkg) :
+        ?>
+            <div class="sec-eyebrow" style="margin-top:18px;">Package Type — <?= o4e($o4_pkg_heading) ?></div>
+        <?php
+            endif;
+            foreach ($o4_pkg_hotels as $h) :
             $o4_hi++;
             $hphoto = !empty($h['hotel_photo'])
               ? o4img($h['hotel_photo'], '')
@@ -472,6 +488,9 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
                       <div class="nights-badge">⏱ <?= o4e($nights) ?> Night<?= ((int) $nights > 1 ? 's' : '') ?></div>
                     <?php endif; ?>
                   </div>
+                  <?php if ($o4_multi_pkg) : ?>
+                    <div class="hotel-room" style="font-weight:600;">🏷️ <?= o4e($o4_pkg_heading) ?></div>
+                  <?php endif; ?>
                   <?php if ($room_label !== '') : ?>
                     <div class="hotel-room">🛏️ <?= o4e($room_label) ?></div>
                   <?php endif; ?>
@@ -492,14 +511,12 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
                     <?php if (!empty($h['rating'])) : ?>
                       <div class="amenity"><span class="a-icon">⭐</span> <?= o4e($h['rating']) ?> Star</div>
                     <?php endif; ?>
-                    <?php if (!empty($h['package_type'])) : ?>
-                      <div class="amenity"><span class="a-icon">🏷️</span> <?= o4e($h['package_type']) ?></div>
-                    <?php endif; ?>
                   </div>
                 </div>
               </div>
             </div>
           <?php
+            endforeach;
           endforeach;
         else :
           ?>
@@ -519,9 +536,11 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
     <!-- PAGE 4 – FLIGHTS -->
     <div class="pdf-page">
       <?php
-      $o4_show_flights = !empty($present['flights']) && !empty($flights);
-      $o4_show_vehs = !empty($present['vehicles']) && !empty($vehs);
-      if ($o4_show_flights || $o4_show_vehs) :
+      $o4_show_flights = !empty($flights);
+      $o4_show_vehs = !empty($vehs);
+      $o4_show_trains = !empty($trains);
+      $o4_show_cruises = !empty($cruises);
+      if ($o4_show_flights || $o4_show_vehs || $o4_show_trains || $o4_show_cruises) :
         o4_render_page_header($hero, 'Flights');
       ?>
         <div class="page-section">
@@ -682,6 +701,61 @@ $o4_cover_img  = o4img(o4nv($hero['cover_image'], ''), !empty($gallery[0]) ? o4_
                         <div>
                           <div class="ff-lbl">Class</div>
                           <div class="ff-val"><?= o4e($train_class) ?></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+
+          <?php if (!empty($cruises)) : ?>
+            <div class="sec-eyebrow" style="margin-top:24px;">Your Journey by Sea</div>
+            <div class="sec-heading">Cruise Details</div>
+            <?php foreach ($cruises as $cr) :
+              $route = isset($cr['route']) ? $cr['route'] : '';
+              $cabin = isset($cr['cabin']) ? $cr['cabin'] : '';
+              $share = isset($cr['sharing_type']) ? $cr['sharing_type'] : '';
+              $from_date = isset($cr['from_date']) ? $cr['from_date'] : '';
+              $to_date = isset($cr['to_date']) ? $cr['to_date'] : '';
+            ?>
+              <div class="flight-card">
+                <div class="flight-card-inner">
+                  <div class="flight-left">
+                    <div class="flight-boarding">🚢 Boarding</div>
+                    <div>
+                      <div class="flight-num">CRUISE</div>
+                      <div class="flight-class"><?= o4e(o4nv($cabin, 'Cabin')) ?></div>
+                    </div>
+                  </div>
+                  <div class="flight-right">
+                    <div class="flight-airline-row">
+                      <div class="flight-airline"><?= o4e(o4nv($route, 'Cruise')) ?></div>
+                      <div class="flight-num-badge"><?= o4e(o4nv($share, '')) ?></div>
+                    </div>
+                    <div class="flight-footer">
+                      <div class="ff-item">
+                        <span class="ff-icon">📅</span>
+                        <div>
+                          <div class="ff-lbl">Departure</div>
+                          <div class="ff-val"><?= o4e(o4nv($from_date, 'NA')) ?></div>
+                        </div>
+                      </div>
+                      <div class="ff-div"></div>
+                      <div class="ff-item">
+                        <span class="ff-icon">📅</span>
+                        <div>
+                          <div class="ff-lbl">Arrival</div>
+                          <div class="ff-val"><?= o4e(o4nv($to_date, 'NA')) ?></div>
+                        </div>
+                      </div>
+                      <div class="ff-div"></div>
+                      <div class="ff-item">
+                        <span class="ff-icon">🎫</span>
+                        <div>
+                          <div class="ff-lbl">Cabin</div>
+                          <div class="ff-val"><?= o4e(o4nv($cabin, 'NA')) ?></div>
                         </div>
                       </div>
                     </div>

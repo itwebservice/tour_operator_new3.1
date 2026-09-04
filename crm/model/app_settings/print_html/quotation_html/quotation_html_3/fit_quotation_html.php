@@ -21,8 +21,13 @@ if (empty($q['found'])) {
 $hero         = $q['hero'];
 $ov           = $q['tour_overview'];
 $hotels       = $q['hotels'];
+$o3_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels_by_package_type']))
+  ? $q['hotels_by_package_type']
+  : (function_exists('gqd_hotels_by_package_type') ? gqd_hotels_by_package_type($hotels) : array());
+$o3_multi_pkg = count($o3_hotels_by_pkg) > 1;
 $flights      = $q['flights'];
 $trains       = isset($q['trains']) ? $q['trains'] : array();
+$cruises      = isset($q['cruises']) ? $q['cruises'] : array();
 $acts         = isset($q['activities']) ? $q['activities'] : array();
 $vehs         = $q['vehicles'];
 $itin         = $q['itinerary'];
@@ -503,16 +508,24 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
     <div class="accom-section page-flow-section">
       <h2>Accommodation Details</h2>
       <div class="accom-subtitle">Your handpicked stays for an unforgettable <?= o3e($o3_dest) ?> experience</div>
-      <?php if ($o3_pkg_badge !== '') : ?>
+      <?php if (!$o3_multi_pkg && $o3_pkg_badge !== '') : ?>
         <div class="pkg-badge">⭐ Package Type: <?= o3e($o3_pkg_badge) ?></div>
       <?php endif; ?>
 
       <?php
+      if (empty($o3_hotels_by_pkg) && !empty($hotels)) {
+        $o3_hotels_by_pkg = array('Package' => $hotels);
+      }
       $o3_hi = 0;
-      if (!empty($hotels)) :
-        foreach ($hotels as $h) :
+      if (!empty($o3_hotels_by_pkg)) :
+        foreach ($o3_hotels_by_pkg as $o3_pkg_heading => $o3_pkg_hotels) :
+          if ($o3_multi_pkg) :
+      ?>
+          <div class="pkg-badge" style="margin:18px 0 12px;">⭐ Package Type: <?= o3e($o3_pkg_heading) ?></div>
+      <?php
+          endif;
+          foreach ($o3_pkg_hotels as $h) :
           $o3_hi++;
-          // $hphoto = o3img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . (($o3_hi - 1) % 3 + 1) . '.jpg');
           $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
           $o3_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
@@ -531,6 +544,9 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
             <div class="hotel-divider"></div>
             <div class="hotel-info">
               <div class="hotel-info-top">
+                <?php if ($o3_multi_pkg) : ?>
+                  <div class="hotel-loc" style="margin-bottom:6px;letter-spacing:.12em;text-transform:uppercase;font-size:11px;"><?= o3e($o3_pkg_heading) ?></div>
+                <?php endif; ?>
                 <div class="hotel-loc"><span class="pin">📍</span> <?= o3e(o3nv($h['hotel_city'], '')) ?></div>
                 <div class="hotel-name"><?= o3e(o3nv($h['hotel_name'], 'Hotel')) ?></div>
                 <div class="hotel-meta-row">
@@ -561,6 +577,7 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
             </div>
           </div>
         <?php
+          endforeach;
         endforeach;
       else :
         ?>
@@ -712,6 +729,53 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
             </div>
           </div>
 
+          <div class="ticket-stripe"></div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+
+    <?php if (!empty($cruises)) : ?>
+      <div class="section-sub-heading" style="margin-top:28px;">
+        <div class="badge-letter">C</div>CRUISE DETAILS
+      </div>
+      <?php foreach ($cruises as $cr) :
+        $route = isset($cr['route']) ? $cr['route'] : '';
+        $cabin = isset($cr['cabin']) ? $cr['cabin'] : '';
+        $share = isset($cr['sharing_type']) ? $cr['sharing_type'] : '';
+        $from_date = isset($cr['from_date']) ? $cr['from_date'] : '';
+        $to_date = isset($cr['to_date']) ? $cr['to_date'] : '';
+      ?>
+        <div class="flight-card" style="padding-right:40px;">
+          <div>
+            <div class="airline-logo">CRUISE</div>
+            <div class="flight-route">
+              <div class="route-airport">
+                <div class="code">DEP</div>
+                <div class="city"><?= o3e(o3nv($from_date, 'NA')) ?></div>
+              </div>
+              <div class="route-arrow">→</div>
+              <div class="route-airport">
+                <div class="code">ARR</div>
+                <div class="city"><?= o3e(o3nv($to_date, 'NA')) ?></div>
+              </div>
+            </div>
+          </div>
+          <div></div>
+          <div class="flight-num-class" style="text-align:right;">
+            <div class="flight-num"><?= o3e(o3nv($route, 'Cruise')) ?></div>
+            <div class="flight-class-label">Cabin</div>
+            <div class="flight-class"><?= o3e(o3nv($cabin, 'NA')) ?></div>
+          </div>
+          <div class="flight-footer">
+            <div class="ff-item">
+              <div class="ff-label">Route</div>
+              <div class="ff-value"><?= o3e(o3nv($route, 'NA')) ?></div>
+            </div>
+            <div class="ff-item">
+              <div class="ff-label">Sharing</div>
+              <div class="ff-value"><?= o3e(o3nv($share, 'NA')) ?></div>
+            </div>
+          </div>
           <div class="ticket-stripe"></div>
         </div>
       <?php endforeach; ?>
@@ -954,11 +1018,16 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
           <thead>
             <tr>
               <th>Package Type</th>
-              <th>Tour Cost (INR)</th>
-              <th>Tax (INR)</th>
-              <th>TCS (INR)</th>
-              <th>Travel Cost (INR)</th>
-              <th>Grand Total (INR)</th>
+              <?php
+              $o3_cur_label = isset($cost['currency_label']) && $cost['currency_label'] !== ''
+                ? $cost['currency_label']
+                : (function_exists('gqd_currency_code_label') ? gqd_currency_code_label(isset($cost['currency_code']) ? $cost['currency_code'] : null) : 'INR');
+              ?>
+              <th>Tour Cost (<?= o3e($o3_cur_label) ?>)</th>
+              <th>Tax (<?= o3e($o3_cur_label) ?>)</th>
+              <th>TCS (<?= o3e($o3_cur_label) ?>)</th>
+              <th>Travel Cost (<?= o3e($o3_cur_label) ?>)</th>
+              <th>Grand Total (<?= o3e($o3_cur_label) ?>)</th>
             </tr>
           </thead>
           <tbody>
@@ -970,11 +1039,11 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
                 $tax_amount = function_exists('gqd_tax_display_amount') ? gqd_tax_display_amount($row) : (isset($row['tax_amount_display']) ? $row['tax_amount_display'] : '0.00');
                 ?>
                 <td class="pkg-name"><?php if ($is_royal) : ?><span class="royal-star">★</span> <?php endif; ?><?= o3e(o3nv($row['package_type'], 'Package')) ?></td>
-                <td>&#8377;<?= o3e(o3nv($row['tour_cost_display'], '0')) ?></td>
-                <td>&#8377; <?= o3e($tax_amount) ?></td>
-                <td>&#8377;<?= o3e(o3nv($row['tcs_display'], '0')) ?></td>
-                <td>&#8377;<?= o3e(o3nv($row['travel_display'], '0')) ?></td>
-                <td class="grand-total">&#8377;<?= function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o3e') : o3e(o3nv($row['total_display'], '0')) ?></td>
+                <td><?= gqd_format_money_html(o3nv($row['tour_cost_display'], '0'), '&#8377;', 'o3e') ?></td>
+                <td><?= gqd_format_money_html($tax_amount, '&#8377;', 'o3e') ?></td>
+                <td><?= gqd_format_money_html(o3nv($row['tcs_display'], '0'), '&#8377;', 'o3e') ?></td>
+                <td><?= gqd_format_money_html(o3nv($row['travel_display'], '0'), '&#8377;', 'o3e') ?></td>
+                <td class="grand-total"><?= gqd_prefix_money_html(function_exists('gqd_total_with_before_discount') ? gqd_total_with_before_discount($row, 'total_display', 'before_discount_display', 'o3e') : o3e(o3nv($row['total_display'], '0')), isset($row['total_display']) ? $row['total_display'] : '', '&#8377;') ?></td>
                 </tr>
               <?php endforeach; ?>
           </tbody>
@@ -1008,15 +1077,15 @@ $o3_term_classes = array('ti-gold', 'ti-red', 'ti-blue', 'ti-navy', 'ti-teal', '
 
                 <tr>
                   <td class="pkg-name"><?= o3e(o3nv($pp['package_type'], 'Package')) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['pp_adult_display'], '0')) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['pp_cwb_display'], '0')) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['pp_cwnb_display'], '0')) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['pp_infant_display'], '0')) ?></td>
-                  <td>&#8377; <?= o3e($tax_amount) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['tcs_display'], '0')) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['visa_display'], '0')) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['guide_display'], '0')) ?></td>
-                  <td>&#8377; <?= o3e(o3nv($pp['misc_display'], '0')) ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['pp_adult_display'], '0'), '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['pp_cwb_display'], '0'), '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['pp_cwnb_display'], '0'), '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['pp_infant_display'], '0'), '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html($tax_amount, '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['tcs_display'], '0'), '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['visa_display'], '0'), '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['guide_display'], '0'), '&#8377;', 'o3e') ?></td>
+                  <td><?= gqd_format_money_html(o3nv($pp['misc_display'], '0'), '&#8377;', 'o3e') ?></td>
                 </tr>
               <?php } ?>
             </tbody>

@@ -27,7 +27,7 @@ $nofquotation = $_REQUEST['nofquotation'];
                                     <button type="button" class="btn btn-excel btn-sm hidden" onclick="hotel_save_modal()"><i class="fa fa-plus" title="Add Hotel"></i></button>
                                 </div>
                                 <div class="col-xs-6 text-right text_center_xs">
-                                    <button type="button" class="btn btn-excel btn-sm" onClick="addRow('dynamic_table_list_h_<?= $i ?>','<?= $i ?>');city_lzloading('.city_master_dropdown');if(typeof initAllHotelSelectAddNew==='function'){initAllHotelSelectAddNew('#dynamic_table_list_h_<?= $i ?>');}if(typeof initAllRoomCategorySelectAddNew==='function'){initAllRoomCategorySelectAddNew('#dynamic_table_list_h_<?= $i ?>');}"><i class="fa fa-plus"></i></button>
+                                    <button type="button" class="btn btn-excel btn-sm" onClick="hqAddHotelRow('dynamic_table_list_h_<?= $i ?>','<?= $i ?>');"><i class="fa fa-plus"></i></button>
                                     <button type="button" class="btn btn-pdf btn-sm" onClick="deleteRow('dynamic_table_list_h_<?= $i ?>')"><i class="fa fa-trash"></i></button>
                                 </div>
                             </div>
@@ -44,8 +44,8 @@ $nofquotation = $_REQUEST['nofquotation'];
                                                 name="username" placeholder="Sr. No." class="form-control mg_bt_10"
                                                 disabled />
                                         </td>
-                                        <td><select name="tour_type-<?= $i ?>-1" id="tour_type-<?= $i ?>-1" style="width:145px;" title="Tour Type" class="form-control">
-                                                <option value="Domestic">Domestic</option>
+                                        <td><select name="tour_type-<?= $i ?>-1" id="tour_type-<?= $i ?>-1" style="width:145px;" title="Tour Type" class="form-control app_select2">
+                                                <option value="Domestic" selected>Domestic</option>
                                                 <option value="International">International</option>
                                             </select>
                                         </td>
@@ -78,15 +78,15 @@ $nofquotation = $_REQUEST['nofquotation'];
                                                 style="width:145px;" title="Meal Plan"
                                                 class="form-control app_select2" onchange="get_hotel_cost('dynamic_table_list_h_<?= $i ?>');"><?php get_mealplan_dropdown(); ?></select>
                                         </td>
-                                        <td><input type="text" style="width:150px;" class="app_datepicker"
+                                        <td><input type="text" style="width:150px;" class="app_datepicker" readonly
                                                 id="check_in-<?= $i ?>-1" name="check_in-<?= $i ?>-1"
                                                 placeholder="Check-In Date" title="Check-In Date" value="<?= date('d-m-Y') ?>"
-                                                onchange="get_auto_to_date(this.id);get_hotel_cost('dynamic_table_list_h_<?= $i ?>');">
+                                                onchange="hqValidateNotPast(this.id);get_auto_to_date(this.id);get_hotel_cost('dynamic_table_list_h_<?= $i ?>');">
                                         </td>
-                                        <td><input type="text" style="width:150px;" class="app_datepicker"
+                                        <td><input type="text" style="width:150px;" class="app_datepicker" readonly
                                                 id="check_out-<?= $i ?>-1" name="check_out-<?= $i ?>-1"
                                                 placeholder="Check-Out Date" title="Check-Out Date" value="<?= date('d-m-Y', strtotime('+1 days', strtotime(date('d-m-Y')))) ?>"
-                                                onchange="calculate_total_nights(this.id);validate_validDates(this.id);get_hotel_cost('dynamic_table_list_h_<?= $i ?>');">
+                                                onchange="hqValidateNotPast(this.id);calculate_total_nights(this.id);validate_validDates(this.id);get_hotel_cost('dynamic_table_list_h_<?= $i ?>');">
                                         </td>
                                         <td><input type="text" id="hotel_type-<?= $i ?>-1" name="hotel_type-1"
                                                 placeholder="Hotel Category" title="Hotel Category" style="width:150px"
@@ -125,25 +125,32 @@ if (typeof hotelSupplierQuickLoadUrl === 'undefined') {
     hotelSupplierQuickLoadUrl = $('#base_url').val() + 'view/package_booking/quotation/home/hotel/hotel_name_load.php';
 }
 city_lzloading('.city_master_dropdown');
-$('.app_datepicker').datetimepicker({
-    format: 'd-m-Y',
-    timepicker: false
-});
-
-
-$('select[id^="room_cat-"]').each(function() {
-    $(this).select2();
-    if (typeof initRoomCategoryAddNewInline === 'function') {
-        initRoomCategoryAddNewInline(this);
-    }
-});
-
-$('select[id^="hotel_name-"]').each(function() {
-    if (!$(this).data('select2')) {
-        $(this).select2({ width: '160px', minimumResultsForSearch: 0 });
-    }
-    if (typeof initHotelSelectAddNew === 'function') {
-        initHotelSelectAddNew(this);
-    }
-});
+if (typeof hqInitHotelRowWidgets === 'function') {
+    hqInitHotelRowWidgets('#options_div');
+} else {
+    $('.app_datepicker').datetimepicker({
+        format: 'd-m-Y',
+        formatDate: 'd-m-Y',
+        timepicker: false,
+        minDate: new Date(),
+        parentID: 'body',
+        scrollInput: false,
+        scrollMonth: false,
+        validateOnBlur: false
+    });
+    $('select[id^="room_cat-"]').each(function() {
+        $(this).select2({ width: '162px', minimumResultsForSearch: 0, dropdownParent: $(document.body) });
+        if (typeof initRoomCategoryAddNewInline === 'function') {
+            initRoomCategoryAddNewInline(this);
+        }
+    });
+    $('select[id^="hotel_name-"]').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({ width: '160px', minimumResultsForSearch: 0, dropdownParent: $(document.body) });
+        }
+        if (typeof initHotelSelectAddNew === 'function') {
+            initHotelSelectAddNew(this);
+        }
+    });
+}
 </script>

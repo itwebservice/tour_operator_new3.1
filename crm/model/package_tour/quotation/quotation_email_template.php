@@ -33,6 +33,9 @@ if ($sq_emp_info['first_name'] == '') {
 }
 
 $sq_costing = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id'"));
+if (function_exists('gqd_hydrate_costing_tax')) {
+  $sq_costing = gqd_hydrate_costing_tax($sq_costing);
+}
 $basic_cost = $sq_costing['basic_amount'];
 $service_charge = $sq_costing['service_charge'];
 $tour_cost = $basic_cost + $service_charge;
@@ -309,6 +312,9 @@ $sq_cruise_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotat
               <?php
               $sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order");
               while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
+                if (function_exists('gqd_hydrate_costing_tax')) {
+                  $sq_costing = gqd_hydrate_costing_tax($sq_costing);
+                }
 
                 $basic_cost = $sq_costing['basic_amount'];
                 $service_charge = $sq_costing['service_charge'];

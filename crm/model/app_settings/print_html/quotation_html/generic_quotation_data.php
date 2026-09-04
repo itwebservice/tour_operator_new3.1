@@ -131,20 +131,304 @@ if (!function_exists('gqd_parse_service_tax')) {
   {
     $amount = 0;
     $label  = '';
-    if ($subtotal !== null && $subtotal !== '' && $subtotal !== 0.00 && $subtotal !== '0.00') {
-      $parts = explode(',', $subtotal);
-      foreach ($parts as $part) {
-        if (trim($part) === '') {
-          continue;
-        }
-        $seg = explode(':', $part);
-        // Amount is always the last colon-separated segment (handles "CGST:(9.00%):2227.50")
-        $seg_amount = (count($seg) > 0) ? (float) str_replace(',', '', trim(end($seg))) : 0;
-        $amount += $seg_amount;
-        $label  .= (isset($seg[0]) ? trim($seg[0]) : '') . (isset($seg[1]) ? trim($seg[1]) : '') . ', ';
+    $raw = is_string($subtotal) ? trim($subtotal) : $subtotal;
+    if ($raw === null || $raw === '' || $raw === 0 || $raw === 0.00 || $raw === '0' || $raw === '0.0' || $raw === '0.00') {
+      return array(0, '');
+    }
+    $parts = explode(',', (string) $raw);
+    foreach ($parts as $part) {
+      if (trim($part) === '') {
+        continue;
       }
+      $seg = explode(':', $part);
+      // Amount is always the last colon-separated segment (handles "CGST:(9.00%):2227.50")
+      $seg_amount = (count($seg) > 0) ? (float) str_replace(',', '', trim(end($seg))) : 0;
+      $amount += $seg_amount;
+      $label  .= (isset($seg[0]) ? trim($seg[0]) : '') . (isset($seg[1]) ? trim($seg[1]) : '') . ', ';
     }
     return array($amount, trim(rtrim(trim($label), ',')));
+  }
+}
+
+if (!function_exists('gqd_bsm_row')) {
+  /**
+   * Unwrap costing bsmValues JSON. Collectors sometimes wrap a row as [[{...}]].
+   *
+   * @param mixed $bsm_json JSON string, array, or object
+   * @return array
+   */
+  function gqd_bsm_row($bsm_json)
+  {
+    if (is_array($bsm_json)) {
+      $d = $bsm_json;
+    } elseif (is_object($bsm_json)) {
+      $d = json_decode(json_encode($bsm_json), true);
+    } else {
+      $d = json_decode((string) $bsm_json, true);
+    }
+    if (!is_array($d) || !isset($d[0])) {
+      return array();
+    }
+    $row = $d[0];
+    if (isset($row[0]) && is_array($row[0])) {
+      $row = $row[0];
+    }
+    if (is_object($row)) {
+      $row = (array) $row;
+    }
+    return is_array($row) ? $row : array();
+  }
+}
+
+if (!function_exists('gqd_tax_from_rules')) {
+  /**
+   * Compute GST the same way calculation.js get_auto_values does.
+   * tax_apply_on: 1/basic, 2/service, 3/total
+   * tax_value: "CGST:(9.00%):(21)+SGST:(9.00%):(119)"
+   *
+   * @return array{amount:float,label:string,applied:string}
+   */
+  function gqd_tax_from_rules($tax_apply_on, $tax_value, $basic, $service_after)
+  {
+    $empty = array('amount' => 0.0, 'label' => '', 'applied' => '');
+    $tax_value = trim((string) $tax_value);
+    $apply_key = strtolower(trim((string) $tax_apply_on));
+    if ($tax_value === '' || $apply_key === '') {
+      return $empty;
+    }
+
+    $basic = (float) $basic;
+    $service_after = (float) $service_after;
+    $tax_on = 0.0;
+    if ($apply_key === '1' || $apply_key === 'basic') {
+      $tax_on = $basic;
+    } elseif ($apply_key === '2' || $apply_key === 'service') {
+      $tax_on = $service_after;
+    } elseif ($apply_key === '3' || $apply_key === 'total') {
+      $tax_on = $basic + $service_after;
+    } else {
+      return $empty;
+    }
+
+    $chunks = preg_split('/\s*\+\s*/', $tax_value);
+    $amount = 0.0;
+    $label_parts = array();
+    $applied_parts = array();
+    foreach ($chunks as $chunk) {
+      $chunk = trim($chunk);
+      if ($chunk === '') {
+        continue;
+      }
+      $seg = explode(':', $chunk);
+      $name = isset($seg[0]) ? trim($seg[0]) : '';
+      $pct_raw = isset($seg[1]) ? trim($seg[1]) : '';
+      $pct = (float) str_replace(array('(', ')', '%'), '', $pct_raw);
+      $seg_amount = round(($tax_on * $pct) / 100, 2);
+      $amount += $seg_amount;
+      $label_parts[] = $name . $pct_raw;
+      $applied_parts[] = $name . ':' . $pct_raw . ':' . number_format($seg_amount, 2, '.', '');
+    }
+
+    return array(
+      'amount' => (float) $amount,
+      'label' => implode(', ', $label_parts),
+      'applied' => implode(', ', $applied_parts),
+    );
+  }
+}
+
+if (!function_exists('gqd_costing_service_after')) {
+  /** Service charge after discount (Percentage vs Flat), matching group costing JS. */
+  function gqd_costing_service_after($ce)
+  {
+    $ce = is_array($ce) ? $ce : array();
+    $service = (float) (isset($ce['service_charge']) ? $ce['service_charge'] : 0);
+    $discount_in = isset($ce['discount_in']) ? $ce['discount_in'] : '';
+    $discount = (float) (isset($ce['discount']) ? $ce['discount'] : (isset($ce['discount_amount']) ? $ce['discount_amount'] : 0));
+    $act_discount = ($discount_in == 'Percentage' || $discount_in === '1')
+      ? ($service * $discount / 100)
+      : (($service != 0) ? $discount : 0);
+    return array($service - $act_discount, $act_discount, $service);
+  }
+}
+
+if (!function_exists('gqd_applied_tax')) {
+  /**
+   * Group costing GST: prefer stored service_tax_subtotal, else compute from bsmValues.
+   * Existing quotations often persist tax rules in bsmValues while service_tax_subtotal is 0.
+   *
+   * @return array{amount:float,label:string,applied:string}
+   */
+  function gqd_applied_tax($ce)
+  {
+    $ce = is_array($ce) ? $ce : array();
+    $stored = isset($ce['service_tax_subtotal']) ? $ce['service_tax_subtotal'] : '';
+    list($parsed_amount, $parsed_label) = gqd_parse_service_tax($stored);
+    if ($parsed_amount > 0) {
+      return array(
+        'amount' => (float) $parsed_amount,
+        'label' => $parsed_label,
+        'applied' => trim((string) $stored),
+      );
+    }
+
+    $bsm = gqd_bsm_row(isset($ce['bsmValues']) ? $ce['bsmValues'] : '');
+    $hotel = (float) (isset($ce['tour_cost']) ? $ce['tour_cost'] : 0);
+    $transport = (float) (isset($ce['transport_cost']) ? $ce['transport_cost'] : 0);
+    $activity = (float) (isset($ce['excursion_cost']) ? $ce['excursion_cost'] : 0);
+    $land = $hotel + $transport + $activity;
+    $stored_basic = (float) (isset($ce['basic_amount']) ? $ce['basic_amount'] : 0);
+    // JS get_auto_values taxes the Basic Amount field, not a recomputed land total.
+    $tax_basic = ($stored_basic > 0) ? $stored_basic : $land;
+    list($service_after) = gqd_costing_service_after($ce);
+
+    return gqd_tax_from_rules(
+      isset($bsm['tax_apply_on']) ? $bsm['tax_apply_on'] : '',
+      isset($bsm['tax_value']) ? $bsm['tax_value'] : '',
+      $tax_basic,
+      $service_after
+    );
+  }
+}
+
+if (!function_exists('gqd_hydrate_costing_tax')) {
+  /**
+   * Fill service_tax_subtotal from bsmValues when it was saved as 0/empty,
+   * so legacy explode("Name:Pct:Amount") parsers in email/WhatsApp keep working.
+   */
+  function gqd_hydrate_costing_tax($ce)
+  {
+    if (!is_array($ce)) {
+      return $ce;
+    }
+    $tax = gqd_applied_tax($ce);
+    if (!empty($tax['applied'])) {
+      $ce['service_tax_subtotal'] = $tax['applied'];
+    }
+    return $ce;
+  }
+}
+
+if (!function_exists('gqd_pp_row_land_with_service')) {
+  /**
+   * Document Land Cost = hotel + transfer + activity + service charge.
+   * UI stores land_cost as hotel+transfer+activity and service_charge separately.
+   */
+  function gqd_pp_row_land_with_service($pax_row)
+  {
+    $pax_row = is_array($pax_row) ? $pax_row : array();
+    $land = (float) (isset($pax_row['land_cost']) ? $pax_row['land_cost'] : 0);
+    if ($land <= 0) {
+      $land = (float) (isset($pax_row['hotel_cost']) ? $pax_row['hotel_cost'] : 0)
+        + (float) (isset($pax_row['transfer_cost']) ? $pax_row['transfer_cost'] : 0)
+        + (float) (isset($pax_row['activity_cost']) ? $pax_row['activity_cost'] : 0);
+    }
+    $service = (float) (isset($pax_row['service_charge']) ? $pax_row['service_charge'] : 0);
+    return $land + $service;
+  }
+}
+
+if (!function_exists('gqd_pp_row_tax_amount')) {
+  /**
+   * Per-person tax: stored tax_amount, else compute from tax_apply_on + tax_value.
+   */
+  function gqd_pp_row_tax_amount($pax_row)
+  {
+    $pax_row = is_array($pax_row) ? $pax_row : array();
+    $stored = (float) (isset($pax_row['tax_amount']) ? $pax_row['tax_amount'] : 0);
+    if ($stored > 0) {
+      return $stored;
+    }
+    $land = (float) (isset($pax_row['land_cost']) ? $pax_row['land_cost'] : 0);
+    if ($land <= 0) {
+      $land = (float) (isset($pax_row['hotel_cost']) ? $pax_row['hotel_cost'] : 0)
+        + (float) (isset($pax_row['transfer_cost']) ? $pax_row['transfer_cost'] : 0)
+        + (float) (isset($pax_row['activity_cost']) ? $pax_row['activity_cost'] : 0);
+    }
+    $service = (float) (isset($pax_row['service_charge']) ? $pax_row['service_charge'] : 0);
+    $discount_in = isset($pax_row['discount_in']) ? $pax_row['discount_in'] : '';
+    $discount = (float) (isset($pax_row['discount_amount']) ? $pax_row['discount_amount'] : 0);
+    $is_pct = ($discount_in === '1' || strcasecmp((string) $discount_in, 'Percentage') === 0);
+    $act_discount = $is_pct ? ($service * $discount / 100) : $discount;
+    $service_after = $service - $act_discount;
+    $tax = gqd_tax_from_rules(
+      isset($pax_row['tax_apply_on']) ? $pax_row['tax_apply_on'] : '',
+      isset($pax_row['tax_value']) ? $pax_row['tax_value'] : '',
+      $land,
+      $service_after
+    );
+    return (float) $tax['amount'];
+  }
+}
+
+if (!function_exists('gqd_currency_code_label')) {
+  /**
+   * ISO currency code for a currency_name_master id (AED, INR, USD).
+   */
+  function gqd_currency_code_label($currency_id = null)
+  {
+    global $currency;
+    $id = ($currency_id !== null && $currency_id !== '' && $currency_id !== '0')
+      ? $currency_id
+      : $currency;
+    $id = intval($id);
+    if ($id <= 0) {
+      return 'INR';
+    }
+    $row = mysqli_fetch_assoc(mysqlQuery("SELECT currency_code FROM currency_name_master WHERE id='$id'"));
+    return (isset($row['currency_code']) && $row['currency_code'] !== '') ? $row['currency_code'] : 'INR';
+  }
+}
+
+if (!function_exists('gqd_amount_has_currency_label')) {
+  /**
+   * True when a display string already has a currency code or symbol
+   * (e.g. "AED 940.99", "INR 1,200.00", "₹ 100").
+   */
+  function gqd_amount_has_currency_label($text)
+  {
+    $text = html_entity_decode(trim((string) $text), ENT_QUOTES, 'UTF-8');
+    if ($text === '') {
+      return false;
+    }
+    if (preg_match('/^[A-Za-z]{3}\b/', $text)) {
+      return true;
+    }
+    // Currency symbol (₹ $ € £ ¥ …) — anything that is not a digit / sign / percent
+    if (preg_match('/^[^\d\s.,+\-%]/u', $text)) {
+      return true;
+    }
+    return false;
+  }
+}
+
+if (!function_exists('gqd_format_money_html')) {
+  /**
+   * Prefix ₹ only when the amount is a bare number.
+   * currency_conversion() already returns "AED 940.99" after ROE.
+   */
+  function gqd_format_money_html($display, $symbol = '&#8377;', $escape = null)
+  {
+    $display = (string) $display;
+    $out = is_callable($escape) ? call_user_func($escape, $display) : $display;
+    if ($symbol === '' || $symbol === null || gqd_amount_has_currency_label($display)) {
+      return $out;
+    }
+    return $symbol . ' ' . $out;
+  }
+}
+
+if (!function_exists('gqd_prefix_money_html')) {
+  /**
+   * Prefix a (possibly already-escaped) money HTML blob only when $sample_display
+   * has no currency code — used for totals that include <s> strikethrough.
+   */
+  function gqd_prefix_money_html($inner_html, $sample_display, $symbol = '&#8377;')
+  {
+    if ($symbol === '' || $symbol === null || gqd_amount_has_currency_label($sample_display)) {
+      return $inner_html;
+    }
+    return $symbol . $inner_html;
   }
 }
 
@@ -197,7 +481,8 @@ if (!function_exists('gqd_total_with_before_discount')) {
 if (!function_exists('gqd_render_pp_entries_table')) {
   /**
    * Render Per Person costing entries PDF table.
-   * Package name is a section heading; first cost row is "Land Cost".
+   * Package name is a section heading; first cost row is "Land Cost"
+   * (hotel + transfer + activity + service charge).
    * Columns: Adult PP | CWB PP | CWNB PP | Infant PP (only when pax count > 0).
    * Total Amount shown below each package block (after discount, with
    * strikethrough before-discount like group costing). No Total row/column.
@@ -249,7 +534,7 @@ if (!function_exists('gqd_render_pp_entries_table')) {
       if (is_array($triplet) && !empty($triplet[$plain_key])) {
         return call_user_func($escape, $disp);
       }
-      return $symbol . ' ' . call_user_func($escape, $disp);
+      return gqd_format_money_html($disp, $symbol, $escape);
     };
 
     $has_cost = function ($triplet) {
@@ -362,13 +647,15 @@ if (!function_exists('gqd_render_pp_entries_table')) {
       $total_disp = isset($pkg['total_amount_display']) ? (string) $pkg['total_amount_display'] : '';
       $before_disp = isset($pkg['before_discount_display']) ? (string) $pkg['before_discount_display'] : '';
       if ($total_disp !== '') {
+        $amt_prefix = (gqd_amount_has_currency_label($total_disp) || $symbol === '') ? '' : ($symbol . '&nbsp;');
+        $before_prefix = (gqd_amount_has_currency_label($before_disp) || $symbol === '') ? '' : ($symbol . '&nbsp;');
         if (function_exists('gqd_total_with_before_discount')) {
-          $total_amt_html = $symbol . '&nbsp;' . gqd_total_with_before_discount($pkg, 'total_amount_display', 'before_discount_display', $escape);
+          $total_amt_html = $amt_prefix . gqd_total_with_before_discount($pkg, 'total_amount_display', 'before_discount_display', $escape);
         } elseif ($before_disp !== '') {
-          $total_amt_html = $symbol . '&nbsp;' . call_user_func($escape, $total_disp)
-            . ' <s style="opacity:0.55;">' . $symbol . '&nbsp;' . call_user_func($escape, $before_disp) . '</s>';
+          $total_amt_html = $amt_prefix . call_user_func($escape, $total_disp)
+            . ' <s style="opacity:0.55;">' . $before_prefix . call_user_func($escape, $before_disp) . '</s>';
         } else {
-          $total_amt_html = $symbol . '&nbsp;' . call_user_func($escape, $total_disp);
+          $total_amt_html = $amt_prefix . call_user_func($escape, $total_disp);
         }
       }
       if ($total_amt_html !== '') {
@@ -461,15 +748,7 @@ if (!function_exists('gqd_tcs')) {
    */
   function gqd_tcs($bsm_json)
   {
-    $d = json_decode($bsm_json, true);
-    if (!is_array($d) || !isset($d[0])) {
-      return array(0, 0);
-    }
-    $row = $d[0];
-    // Collectors sometimes wrap each costing row as [[{...}]]
-    if (isset($row[0]) && is_array($row[0])) {
-      $row = $row[0];
-    }
+    $row = function_exists('gqd_bsm_row') ? gqd_bsm_row($bsm_json) : array();
     if (isset($row['tcsper']) && $row['tcsper'] != 'NaN' && $row['tcsper'] !== '') {
       return array($row['tcsper'], isset($row['tcsvalue']) ? $row['tcsvalue'] : 0);
     }
@@ -495,15 +774,11 @@ if (!function_exists('gqd_group_costing_breakdown')) {
     $stored_basic = (float) (isset($ce['basic_amount']) ? $ce['basic_amount'] : 0);
     $basic = ($land > 0) ? $land : $stored_basic;
 
-    $service = (float) (isset($ce['service_charge']) ? $ce['service_charge'] : 0);
-    $discount_in = isset($ce['discount_in']) ? $ce['discount_in'] : '';
-    $discount = (float) (isset($ce['discount']) ? $ce['discount'] : 0);
-    $act_discount = ($discount_in == 'Percentage')
-      ? ($service * $discount / 100)
-      : (($service != 0) ? $discount : 0);
-    $service_after = $service - $act_discount;
+    list($service_after, $act_discount, $service) = gqd_costing_service_after($ce);
 
-    list($tax_amount, $tax_label) = gqd_parse_service_tax(isset($ce['service_tax_subtotal']) ? $ce['service_tax_subtotal'] : '');
+    $tax = gqd_applied_tax($ce);
+    $tax_amount = $tax['amount'];
+    $tax_label = $tax['label'];
     list($tcs_per, $tcs_value) = gqd_tcs(isset($ce['bsmValues']) ? $ce['bsmValues'] : '');
     $tcs_value = (float) $tcs_value;
 
@@ -516,7 +791,13 @@ if (!function_exists('gqd_group_costing_breakdown')) {
     $travel = $train + $flight + $cruise;
     $other = $visa + $guide + $misc;
 
-    $tour_total = $basic + $service_after + (float) $tax_amount + $tcs_value;
+    $computed_tour = $basic + $service_after + (float) $tax_amount + $tcs_value;
+    $stored_total = (float) (isset($ce['total_tour_cost']) ? $ce['total_tour_cost'] : 0);
+    // First costing row is sometimes saved as hotel-only. Trust stored only when
+    // it already covers land + service + tax + TCS; otherwise recompute.
+    $tour_total = ($stored_total > 0 && $stored_total + 0.01 >= $computed_tour)
+      ? $stored_total
+      : $computed_tour;
     $net_total = $tour_total + $travel + $other;
 
     return array(
@@ -526,6 +807,7 @@ if (!function_exists('gqd_group_costing_breakdown')) {
       'service_after' => $service_after,
       'tax_amount' => (float) $tax_amount,
       'tax_label' => $tax_label,
+      'tax_applied' => isset($tax['applied']) ? $tax['applied'] : '',
       'tcs_percent' => $tcs_per,
       'tcs_value' => $tcs_value,
       'tour_total' => $tour_total,
@@ -588,6 +870,55 @@ if (!function_exists('gqd_media_url')) {
     }
 
     return $base . '/' . $url;
+  }
+}
+
+if (!function_exists('gqd_program_day_image_url')) {
+  /**
+   * Absolute itinerary image URL for Word/PDF docs.
+   * Prefers package_quotation_program.day_image, then the legacy image_url map.
+   */
+  function gqd_program_day_image_url($row_itinerary, $dummy = 'http://itourscloud.com/quotation_format_images/dummy-image.jpg')
+  {
+    if (!is_array($row_itinerary)) {
+      return $dummy;
+    }
+    if (!empty($row_itinerary['day_image'])) {
+      $resolved = gqd_media_url($row_itinerary['day_image']);
+      if ($resolved !== '') {
+        return $resolved;
+      }
+    }
+    $quotation_id = isset($row_itinerary['quotation_id']) ? $row_itinerary['quotation_id'] : '';
+    if ($quotation_id === '') {
+      return $dummy;
+    }
+    $sq_day_image = mysqli_fetch_assoc(mysqlQuery("select image_url from package_tour_quotation_images where quotation_id='$quotation_id'"));
+    $chunks = array();
+    if (!empty($sq_day_image['image_url'])) {
+      $chunks = explode(',', $sq_day_image['image_url']);
+    }
+    $day_count = isset($row_itinerary['day_count']) ? $row_itinerary['day_count'] : '';
+    $package_id = isset($row_itinerary['package_id']) ? $row_itinerary['package_id'] : '';
+    foreach ($chunks as $chunk) {
+      $parts = explode('=', $chunk);
+      if (!isset($parts[1], $parts[2]) || trim($parts[2]) === '') {
+        continue;
+      }
+      $map_day = $parts[1];
+      $map_pkg = $parts[0];
+      if ((string) $map_day !== (string) $day_count) {
+        continue;
+      }
+      if ($package_id !== '' && (string) $map_pkg !== (string) $package_id && (string) $map_pkg !== '0') {
+        continue;
+      }
+      $resolved = gqd_media_url($parts[2]);
+      if ($resolved !== '') {
+        return $resolved;
+      }
+    }
+    return $dummy;
   }
 }
 
@@ -880,14 +1211,7 @@ if (!function_exists('get_generic_quotation_data')) {
 
       //==============================Dipti
       if (!empty($photo)) {
-        $photo = str_replace('\\', '/', $photo);
-
-        $photo = str_replace('../../../../', '', $photo);
-        $photo = str_replace('../../../', '', $photo);
-        $photo = str_replace('../../', '', $photo);
-        $photo = str_replace('../', '', $photo);
-
-        $photo = BASE_URL . $photo;
+        $photo = function_exists('gqd_media_url') ? gqd_media_url($photo) : $photo;
       }
       //-===================================
       $hotels[] = array(
@@ -1147,6 +1471,9 @@ if (!function_exists('get_generic_quotation_data')) {
     // 11. COSTING (group + per person + travel + other)
     // =====================================================================
     $costing_entries = gqd_rows("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order");
+    foreach ($costing_entries as $ce_idx => $ce_row) {
+      $costing_entries[$ce_idx] = gqd_hydrate_costing_tax($ce_row);
+    }
 
     $group_cost = array();
     $per_person_cost = array();
@@ -1220,6 +1547,7 @@ if (!function_exists('get_generic_quotation_data')) {
         'tour_cost_display'  => $conv($tour_cost),
         'tax_amount'         => $tax_amount,
         'tax_label'          => $tax_label,
+        'tax_applied'        => isset($brk['tax_applied']) ? $brk['tax_applied'] : '',
         'tax_amount_display' => $conv($tax_amount),
         'tax_display'        => trim($tax_label . ' ' . $conv($tax_amount)),
         'tcs_percent'        => $tcs_per,
@@ -1337,6 +1665,7 @@ if (!function_exists('get_generic_quotation_data')) {
           'infant' => array(),
         );
       }
+      $pp_row['tax_amount'] = gqd_pp_row_tax_amount($pp_row);
       $pp_by_pkg[$pkg_key][$pax_key] = $pp_row;
     }
 
@@ -1459,7 +1788,7 @@ if (!function_exists('get_generic_quotation_data')) {
         );
       };
 
-      $land_t = $pp_triplet($pkg_block, 'land_cost');
+      $land_raw_t = $pp_triplet($pkg_block, 'land_cost');
       $flight_t = $pp_triplet($pkg_block, 'flight_cost');
       $train_t = $pp_triplet($pkg_block, 'train_cost');
       $cruise_t = $pp_triplet($pkg_block, 'cruise_cost');
@@ -1470,6 +1799,27 @@ if (!function_exists('get_generic_quotation_data')) {
       $tcs_t = $pp_tcs_triplet($pkg_block);
       $svc_t = $pp_triplet($pkg_block, 'service_charge');
 
+      // PDF / DOC / view: Land Cost includes service charge (converted with the same $conv).
+      $pp_land_cell = function ($pax_row) {
+        return function_exists('gqd_pp_row_land_with_service')
+          ? gqd_pp_row_land_with_service($pax_row)
+          : 0;
+      };
+      $la = $pp_land_cell(isset($pkg_block['adult']) ? $pkg_block['adult'] : array());
+      $lb = $pp_land_cell(isset($pkg_block['cweb']) ? $pkg_block['cweb'] : array());
+      $lc = $pp_land_cell(isset($pkg_block['cwnb']) ? $pkg_block['cwnb'] : array());
+      $li = $pp_land_cell(isset($pkg_block['infant']) ? $pkg_block['infant'] : array());
+      $land_t = array(
+        'adult' => $la,
+        'cwb' => $lb,
+        'cwnb' => $lc,
+        'infant' => $li,
+        'adult_display' => $conv($la),
+        'cwb_display' => $conv($lb),
+        'cwnb_display' => $conv($lc),
+        'infant_display' => $conv($li),
+      );
+
       $sum_pax = function ($triplet) use ($adults, $cwb, $cwob, $infants) {
         return ((float) $triplet['adult'] * $adults)
           + ((float) $triplet['cwb'] * $cwb)
@@ -1477,7 +1827,7 @@ if (!function_exists('get_generic_quotation_data')) {
           + ((float) $triplet['infant'] * $infants);
       };
 
-      $land_total = $sum_pax($land_t);
+      $land_total = $sum_pax($land_raw_t);
       $svc_total = $sum_pax($svc_t);
       $tax_total = $sum_pax($tax_t);
       $tcs_total = $sum_pax($tcs_t);
@@ -1525,11 +1875,16 @@ if (!function_exists('get_generic_quotation_data')) {
       );
     }
 
+    $currency_label = function_exists('gqd_currency_code_label')
+      ? gqd_currency_code_label($currency_code)
+      : 'INR';
+
     $costing = array(
       'costing_type'       => isset($master['costing_type']) ? $master['costing_type'] : '',
       'costing_type_label' => (isset($master['costing_type']) && $master['costing_type'] == 1) ? 'Group' : 'Per Person',
       'currency'           => isset($currency) ? $currency : '',
       'currency_code'      => $currency_code,
+      'currency_label'     => $currency_label,
       'entries_raw'        => $costing_entries,
       'group'              => $group_cost,
       'per_person'         => $per_person_cost,
@@ -1677,6 +2032,7 @@ if (!function_exists('get_generic_quotation_data')) {
       'quotation_code' => $display_id,
       'currency'     => isset($currency) ? $currency : '',
       'currency_code' => $currency_code,
+      'currency_label' => isset($currency_label) ? $currency_label : (function_exists('gqd_currency_code_label') ? gqd_currency_code_label($currency_code) : 'INR'),
       'testimonials' => $testimonials,
       'package_types' => $package_type_names,
       'package_types_label' => $package_types_label,
@@ -1720,5 +2076,90 @@ if (!function_exists('get_generic_quotation_data')) {
       // raw master row for any field not explicitly surfaced above
       'raw_master'           => $master,
     );
+  }
+}
+
+if (!function_exists('gqd_travel_preview_lines')) {
+  /**
+   * Plain-text lines for Flight / Train / Cruise, used by email and WhatsApp previews.
+   * Returns only sections that have saved entries.
+   */
+  function gqd_travel_preview_lines($q)
+  {
+    $out = array(
+      'flights' => array(),
+      'trains'  => array(),
+      'cruises' => array(),
+    );
+    if (!is_array($q)) {
+      return $out;
+    }
+    if (!empty($q['flights']) && is_array($q['flights'])) {
+      foreach ($q['flights'] as $f) {
+        $airline = !empty($f['airline_display']) ? $f['airline_display'] : (!empty($f['airline_name']) ? $f['airline_name'] : 'NA');
+        $from = isset($f['from_city']) ? $f['from_city'] : '';
+        $to = isset($f['to_city']) ? $f['to_city'] : '';
+        $dep = isset($f['departure_datetime']) ? $f['departure_datetime'] : '';
+        $arr = isset($f['arrival_datetime']) ? $f['arrival_datetime'] : '';
+        $cls = isset($f['class']) ? $f['class'] : '';
+        $parts = array_filter(array($from . ' to ' . $to, $airline, $cls, $dep, $arr), 'strlen');
+        $out['flights'][] = implode(' | ', $parts);
+      }
+    }
+    if (!empty($q['trains']) && is_array($q['trains'])) {
+      foreach ($q['trains'] as $t) {
+        $from = isset($t['from_location']) ? $t['from_location'] : '';
+        $to = isset($t['to_location']) ? $t['to_location'] : '';
+        $dep = isset($t['from_date']) ? $t['from_date'] : '';
+        $arr = isset($t['to_date']) ? $t['to_date'] : '';
+        $cls = isset($t['class']) ? $t['class'] : '';
+        $parts = array_filter(array($from . ' to ' . $to, $cls, $dep, $arr), 'strlen');
+        $out['trains'][] = implode(' | ', $parts);
+      }
+    }
+    if (!empty($q['cruises']) && is_array($q['cruises'])) {
+      foreach ($q['cruises'] as $c) {
+        $route = isset($c['route']) ? $c['route'] : '';
+        $dep = isset($c['from_date']) ? $c['from_date'] : '';
+        $arr = isset($c['to_date']) ? $c['to_date'] : '';
+        $cabin = isset($c['cabin']) ? $c['cabin'] : '';
+        $share = isset($c['sharing_type']) ? $c['sharing_type'] : '';
+        $cabin_lbl = ($cabin !== '') ? 'Cabin: ' . $cabin : '';
+        $parts = array_filter(array($route, $dep, $arr, $cabin_lbl, $share), 'strlen');
+        $out['cruises'][] = implode(' | ', $parts);
+      }
+    }
+    return $out;
+  }
+}
+
+if (!function_exists('gqd_render_travel_whatsapp_text')) {
+  /** WhatsApp text blocks for Flight / Train / Cruise. Empty string when none saved. */
+  function gqd_render_travel_whatsapp_text($q)
+  {
+    $lines = gqd_travel_preview_lines($q);
+    $out = '';
+    if (!empty($lines['flights'])) {
+      $out .= "✈️ *Flight*\n-----------\n";
+      foreach ($lines['flights'] as $line) {
+        $out .= '*' . $line . "*\n";
+      }
+      $out .= "\n";
+    }
+    if (!empty($lines['trains'])) {
+      $out .= "🚆 *Train*\n-----------\n";
+      foreach ($lines['trains'] as $line) {
+        $out .= '*' . $line . "*\n";
+      }
+      $out .= "\n";
+    }
+    if (!empty($lines['cruises'])) {
+      $out .= "🚢  *Cruise*\n-----------\n";
+      foreach ($lines['cruises'] as $line) {
+        $out .= '*' . $line . "*\n";
+      }
+      $out .= "\n";
+    }
+    return $out;
   }
 }

@@ -41,6 +41,9 @@ class quotation_email_send_backoffice
 			if (!is_array($sq_cost)) {
 				$sq_cost = array();
 			}
+			if (function_exists('gqd_hydrate_costing_tax')) {
+				$sq_cost = gqd_hydrate_costing_tax($sq_cost);
+			}
 			$basic_cost = (float) (isset($sq_cost['basic_amount']) ? $sq_cost['basic_amount'] : 0);
 			$service_charge = (float) (isset($sq_cost['service_charge']) ? $sq_cost['service_charge'] : 0);
 			$service_tax_amount = 0.0;

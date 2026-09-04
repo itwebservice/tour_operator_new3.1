@@ -510,6 +510,25 @@ $(document).on('click', '#tab2_head', function() {
                 $('.package_content').removeClass('loading');
                 isLoadingPackages = false;
 
+                if (typeof quotationInitFeatureEditors === 'function') {
+                    quotationInitFeatureEditors('#package_name_div');
+                } else if (typeof $().wysiwyg === 'function') {
+                    $('#package_name_div textarea.feature_editor').each(function () {
+                        var $el = $(this);
+                        if ($el.data('wysiwyg')) {
+                            return;
+                        }
+                        var existing = $el.val() || '';
+                        $el.wysiwyg({
+                            controls: 'bold,italic,|,undo,redo,image|h1,h2,h3,decreaseFontSize,highlight',
+                            initialContent: ''
+                        });
+                        if (existing && $el.data('wysiwyg')) {
+                            try { $el.wysiwyg('setContent', existing); } catch (e) {}
+                        }
+                    });
+                }
+
                 // Track loaded data to prevent reloading same data
                 lastLoadedDestId = dest_id;
                 lastLoadedNights = total_nights;
@@ -1224,7 +1243,50 @@ $(document).on('click', '#tab2_head', function() {
             var total_days = $('#total_days').val();
 
 
+            var keepExistingStay = typeof quotationShouldKeepExistingStayData === 'function'
+                && quotationShouldKeepExistingStayData(package_id_arr);
+
             sessionStorage.setItem('selected_packages_tab3', JSON.stringify(package_id_arr));
+            if (typeof quotationRememberLoadedPackages === 'function') {
+                quotationRememberLoadedPackages(package_id_arr);
+            }
+
+            if (keepExistingStay) {
+                if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
+                    quotationSyncExcursionDefaultsFromTravel({ forcePax: true });
+                } else {
+                    var keepExcTable = document.getElementById("tbl_package_tour_quotation_dynamic_excursion");
+                    var keepExcRows = keepExcTable ? keepExcTable.rows.length : 0;
+                    var keepCwb = $('#children_with_bed').val();
+                    var keepCwnb = $('#children_without_bed').val();
+                    var keepInfant = $('#total_infant').val();
+                    for (var ke = 0; ke < keepExcRows; ke++) {
+                        var keepRow = keepExcTable.rows[ke];
+                        keepRow.cells[6].childNodes[0].value = total_adult;
+                        keepRow.cells[7].childNodes[0].value = keepCwb;
+                        keepRow.cells[8].childNodes[0].value = keepCwnb;
+                        keepRow.cells[9].childNodes[0].value = keepInfant;
+                    }
+                }
+                var dest_id_keep = $('#dest_name').val();
+                $.ajax({
+                    type: 'post',
+                    url: '../../inc/get_packages_days.php',
+                    data: {
+                        dest_id: dest_id_keep,
+                        day_count_arr: day_count_arr,
+                        package_id_arr: package_id_arr
+                    },
+                    success: function(result) {
+                        $('#daywise_image_select').html(result);
+                    }
+                });
+                if (typeof quotationGoToTab3AfterPackage === 'function') {
+                    quotationGoToTab3AfterPackage();
+                }
+                return;
+            }
+
             sessionStorage.removeItem('hotel_table_state_tab3');
             window.quotationTab2LoadState = { hotelDone: false, transportDone: false };
 
@@ -1458,13 +1520,7 @@ $(document).on('click', '#tab2_head', function() {
 
     });
 
-    function quotationFinishTab2ToTab3() {
-        var state = window.quotationTab2LoadState;
-        if (!state || !state.hotelDone || !state.transportDone) {
-            return;
-        }
-        window.quotationTab2LoadState = null;
-
+    function quotationGoToTab3AfterPackage() {
         if (typeof get_hotel_cost === 'function') {
             get_hotel_cost();
         }
@@ -1478,7 +1534,7 @@ $(document).on('click', '#tab2_head', function() {
             saveItineraryData();
         }
         if (typeof syncQuotationTravelStayDates === 'function') {
-            syncQuotationTravelStayDates();
+            syncQuotationTravelStayDates({ preserveHotelDates: true });
         }
         if (typeof quotationSyncExcursionDefaultsFromTravel === 'function') {
             quotationSyncExcursionDefaultsFromTravel({ forcePax: true });
@@ -1491,6 +1547,15 @@ $(document).on('click', '#tab2_head', function() {
         $('html, body').animate({
             scrollTop: $('.bk_tab_head').offset().top
         }, 200);
+    }
+
+    function quotationFinishTab2ToTab3() {
+        var state = window.quotationTab2LoadState;
+        if (!state || !state.hotelDone || !state.transportDone) {
+            return;
+        }
+        window.quotationTab2LoadState = null;
+        quotationGoToTab3AfterPackage();
     }
 
         // Load stored values from Tab 1 when Tab 2 loads

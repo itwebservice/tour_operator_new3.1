@@ -1,6 +1,7 @@
 <?php
 include "../../../../model/model.php";
 include_once "../../../../model/app_settings/print_html/quotation_html/generic_quotation_data.php";
+include_once __DIR__ . '/../../../app_settings/app_format/quot_format_config.php';
 $emp_id = $_SESSION['emp_id'];
 $role = $_SESSION['role'];
 $role_id = $_SESSION['role_id'];
@@ -44,15 +45,17 @@ if ($package_id != '') {
 if ($quotation_id != '') {
 	$query .= " and quotation_id='$quotation_id'";
 }
-// if ($quotation_source_type === 'ai') {
-// 	$query .= " and quotation_refer_id > 0";
-// } else {
-// 	$query .= " and package_id > 0";
-// }
+if ($role == 'Admin') {
+	// Admin sees quotations from every user / branch
+} elseif ($role == 'Branch Admin' || ($branch_status == 'yes' && ($role == 'Accountant' || intval($role_id) > 7))) {
+	$branch_admin_id_esc = addslashes((string) $branch_admin_id);
+	$query .= " and (branch_admin_id='$branch_admin_id_esc' OR emp_id IN (SELECT emp_id FROM emp_master WHERE branch_id='$branch_admin_id_esc'))";
+} else {
+	include "../../../../model/app_settings/branchwise_filteration.php";
+}
 if ($branch_id != "") {
 	$query .= " and branch_admin_id = '$branch_id'";
 }
-include "../../../../model/app_settings/branchwise_filteration.php";
 $query .= " order by quotation_id desc ";
 
 $count = 0;
@@ -339,7 +342,11 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 
 
 
-	if ($app_quot_format == 2) {
+	if (function_exists('quot_format_get_print_urls')) {
+		$print_urls = quot_format_get_print_urls($quotation_id, $app_quot_format);
+		$url1 = $print_urls['pdf_url'];
+		$urldoc = $print_urls['word_url'];
+	} else if ($app_quot_format == 2) {
 		$url1 = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_2/fit_quotation_html.php?quotation_id=$quotation_id";
 
 		$urldoc = BASE_URL . "model/app_settings/print_html/quotation_html/quotation_html_2/fit_quotation_html_doc.php?quotation_id=$quotation_id";
@@ -483,4 +490,12 @@ while ($row_quotation = mysqli_fetch_assoc($row_quotation1)) {
 	), "bg" => $bg);
 	array_push($array_s, $temp_arr);
 }
-echo json_encode($array_s);
+$json_flags = 0;
+if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+	$json_flags |= JSON_INVALID_UTF8_SUBSTITUTE;
+}
+if (defined('JSON_PARTIAL_OUTPUT_ON_ERROR')) {
+	$json_flags |= JSON_PARTIAL_OUTPUT_ON_ERROR;
+}
+$json = $json_flags ? json_encode($array_s, $json_flags) : json_encode($array_s);
+echo ($json === false || $json === null) ? '[]' : $json;

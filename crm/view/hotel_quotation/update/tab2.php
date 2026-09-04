@@ -25,7 +25,7 @@
                                             <button type="button" class="btn btn-excel btn-sm hidden" onclick="hotel_save_modal()"><i class="fa fa-plus" title="Add Hotel"></i></button>
                                         </div>
                                         <div class="col-xs-6 text-right text_center_xs">
-                                            <button type="button" class="btn btn-excel btn-sm" onClick="addRow('dynamic_table_list_h_<?= $option ?>','<?= $option ?>');city_lzloading('.city_master_dropdown')"><i class="fa fa-plus"></i></button>
+                                            <button type="button" class="btn btn-excel btn-sm" onClick="hqAddHotelRow('dynamic_table_list_h_<?= $option ?>','<?= $option ?>');"><i class="fa fa-plus"></i></button>
                                         </div>
                                     </div>
                                     <div class="table-responsive">
@@ -45,14 +45,9 @@
                                                     <td style="width: 50px;"><input maxlength="15" value="<?= $i+1 ?>" type="text"
                                                             name="username" placeholder="Sr. No." class="form-control mg_bt_10" disabled />
                                                     </td>
-                                                    <td><select name="tour_type-u_<?= $count.$i ?>" id="tour_type-u_<?= $count.$i ?>" style="width:145px;" title="Tour Type" class="form-control">
-                                                            <option value="<?= $data[$i]['tour_type'] ?>" selected><?= $data[$i]['tour_type'] ?>
-                                                            <?php if($data[$i]['tour_type'] != 'Domestic'){ ?>
-                                                            <option value="Domestic">Domestic</option>
-                                                            <?php }
-                                                            if($data[$i]['tour_type'] != 'International'){ ?>
-                                                            <option value="International">International</option>
-                                                            <?php } ?>
+                                                    <td><select name="tour_type-u_<?= $count.$i ?>" id="tour_type-u_<?= $count.$i ?>" style="width:145px;" title="Tour Type" class="form-control app_select2">
+                                                            <option value="Domestic" <?= ($data[$i]['tour_type'] == 'International') ? '' : 'selected' ?>>Domestic</option>
+                                                            <option value="International" <?= ($data[$i]['tour_type'] == 'International') ? 'selected' : '' ?>>International</option>
                                                         </select>
                                                     </td>
                                                     <td><select id="city_name-u_<?= $count.$i ?>" name="city_name-u_<?= $count.$i ?>"
@@ -97,15 +92,15 @@
                                                             <?php } ?>
                                                         </select>
                                                     </td>
-                                                    <td><input type="text" style="width:150px;" class="app_datepicker"
+                                                    <td><input type="text" style="width:150px;" class="app_datepicker" readonly
                                                             id="check_in-u_<?= $count.$i ?>" name="check_in-u_<?= $count.$i ?>"
                                                             placeholder="Check-In Date" title="Check-In Date"
-                                                            onchange="get_auto_to_date(this.id);" value="<?= $data[$i]['checkin'] ?>">
+                                                            onchange="hqValidateNotPast(this.id);get_auto_to_date(this.id);" value="<?= $data[$i]['checkin'] ?>">
                                                     </td>
-                                                    <td><input type="text" style="width:150px;" class="app_datepicker"
+                                                    <td><input type="text" style="width:150px;" class="app_datepicker" readonly
                                                             id="check_out-u_<?= $count.$i ?>" name="check_out-u_<?= $count.$i?>"
                                                             placeholder="Check-Out Date" title="Check-Out Date"
-                                                            onchange="calculate_total_nights(this.id);validate_validDates(this.id);"
+                                                            onchange="hqValidateNotPast(this.id);calculate_total_nights(this.id);validate_validDates(this.id);"
                                                             value="<?= $data[$i]['checkout'] ?>">
                                                     </td>
                                                     <td><input type="text" id="hotel_type-u_<?= $count.$i ?>" name="hotel_type-1"
@@ -154,26 +149,33 @@
 
 
 <script>
-$('.app_datepicker').datetimepicker({
-    format: 'd-m-Y',
-    timepicker: false
-});
-city_lzloading('.city_master_dropdown');
+if (typeof hqInitHotelRowWidgets === 'function') {
+    hqInitHotelRowWidgets('#frm_tab2');
+} else {
+    $('.app_datepicker').datetimepicker({
+        format: 'd-m-Y',
+        formatDate: 'd-m-Y',
+        timepicker: false,
+        minDate: new Date(),
+        parentID: 'body',
+        scrollInput: false,
+        scrollMonth: false,
+        validateOnBlur: false
+    });
+    city_lzloading('.city_master_dropdown');
+    $('#frm_tab2 select[id^="hotel_name-"]').each(function() {
+        if (!$(this).data('select2')) {
+            $(this).select2({ width: '160px', minimumResultsForSearch: 0, dropdownParent: $(document.body) });
+        }
+    });
+    $('select[id^="room_cat-1"]').each(function() {
+        $(this).select2({ dropdownParent: $(document.body) });
+    });
+    $('select[id^="room_cat-u_"]').each(function() {
+        $(this).select2({ dropdownParent: $(document.body) });
+    });
+}
 $('#dest_name').select2();
-
-$('#frm_tab2 select[id^="hotel_name-"]').each(function() {
-    if (!$(this).data('select2')) {
-        $(this).select2({ width: '160px', minimumResultsForSearch: 0 });
-    }
-});
-
-$('select[id^="room_cat-1"]').each(function() {
-    $(this).select2();
-});
-
-$('select[id^="room_cat-u_"]').each(function() {
-    $(this).select2();
-});
 
 function switch_to_tab1() {
     $('#tab2_head').addClass('done');

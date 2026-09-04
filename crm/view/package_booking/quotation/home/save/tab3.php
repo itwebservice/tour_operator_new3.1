@@ -2030,8 +2030,8 @@
     });
 
     function switch_to_tab2() {
-        // Discard saved Tab 3/4 state so Tab 2 Next reloads fresh package data.
-        sessionStorage.removeItem('hotel_table_state_tab3');
+        // Keep hotel/transport rows. Only reset Tab 4 costing so it
+        // recalculates from the preserved stay data and updated pax.
         sessionStorage.removeItem('quotation_tab4_costing_state');
         sessionStorage.removeItem('quotation_tab4_travel_cost_state');
         sessionStorage.removeItem('quotation_tab4_costing_visited');

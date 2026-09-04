@@ -23,6 +23,7 @@ $ov           = $q['tour_overview'];
 $hotels       = $q['hotels'];
 $flights      = $q['flights'];
 $trains = isset($q['trains']) ? $q['trains'] : array();
+$cruises = isset($q['cruises']) ? $q['cruises'] : array();
 $acts   = isset($q['activities']) ? $q['activities'] : array();
 $vehs         = $q['vehicles'];
 $itin         = $q['itinerary'];
@@ -393,8 +394,8 @@ if (preg_match('/^(\S+)/', $o7_client, $o7_sal_m)) {
 $o7_brand_parts = preg_split('/\s+/', trim($o7_company), 2);
 $o7_brand_line1 = isset($o7_brand_parts[0]) ? strtoupper($o7_brand_parts[0]) : 'TRAVEL';
 $o7_brand_line2 = isset($o7_brand_parts[1]) ? strtoupper($o7_brand_parts[1]) : 'PARTNER';
-$o7_show_flights = !empty($present['flights']) && !empty($flights);
-$o7_show_vehs = !empty($present['vehicles']) && !empty($vehs);
+$o7_show_flights = !empty($flights);
+$o7_show_vehs = !empty($vehs);
 $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o7_cover_bg);
 ?>
 <!DOCTYPE html>
@@ -866,6 +867,58 @@ $o7_transport_img = o7img('', !empty($o7_cover_imgs[2]) ? $o7_cover_imgs[2] : $o
           <?php endforeach; ?>
         <?php endif; ?>
         <!-- ============ -->
+
+        <!-- ============= Cruise Details -->
+        <?php if (!empty($cruises)) : ?>
+          <div class="journey-section-head" style="margin-top:26px;">
+            <span class="jsh-icon">🚢</span>
+            <span class="jsh-title">Cruise Details</span>
+          </div>
+          <?php foreach ($cruises as $cr) :
+            $route = isset($cr['route']) ? $cr['route'] : '';
+            $cabin = isset($cr['cabin']) ? $cr['cabin'] : '';
+            $share = isset($cr['sharing_type']) ? $cr['sharing_type'] : '';
+            $from_date = isset($cr['from_date']) ? $cr['from_date'] : '';
+            $to_date = isset($cr['to_date']) ? $cr['to_date'] : '';
+          ?>
+            <div class="flight-ticket">
+              <div class="ft-inner">
+                <div class="ft-left-strip"></div>
+                <div class="ft-airline-col">
+                  <div class="ft-airline-logo">CRUISE<br />JOURNEY</div>
+                  <div class="ft-class-badge"><?= o7e(o7nv($cabin, 'Cabin')) ?></div>
+                </div>
+                <div class="ft-route">
+                  <div class="ft-route-row">
+                    <div>
+                      <div class="ft-code">DEP</div>
+                      <div class="ft-city"><?= o7e(o7nv($from_date, 'NA')) ?></div>
+                    </div>
+                    <div class="ft-mid">
+                      <div class="ft-mid-line"></div>
+                      <div class="ft-mid-arrow">🚢</div>
+                      <div class="ft-mid-line"></div>
+                    </div>
+                    <div style="text-align:right;">
+                      <div class="ft-code">ARR</div>
+                      <div class="ft-city"><?= o7e(o7nv($to_date, 'NA')) ?></div>
+                    </div>
+                  </div>
+                  <div class="ft-details-row">
+                    <div class="ft-detail">
+                      <div class="fdl">Route</div>
+                      <div class="fdv"><?= o7e(o7nv($route, 'NA')) ?></div>
+                    </div>
+                    <div class="ft-detail">
+                      <div class="fdl">Sharing</div>
+                      <div class="fdv"><?= o7e(o7nv($share, 'NA')) ?></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
 
         <!-- ============= Activity Details -->
         <?php if (!empty($acts)) : ?>

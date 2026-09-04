@@ -307,7 +307,7 @@ $sq_exc_count = mysqli_num_rows(mysqlQuery("select * from package_tour_quotation
     </section>
   </section>
 <?php } ?>
-<?php if ($sq_cruise_count || $sq_exc_count) { ?>
+<?php if ($sq_train_count || $sq_cruise_count || $sq_exc_count) { ?>
   <!-- traveling Information -->
   <section class="pageSection main_block">
     <!-- background Image -->

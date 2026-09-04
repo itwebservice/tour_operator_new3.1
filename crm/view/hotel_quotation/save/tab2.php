@@ -107,6 +107,20 @@ $('#frm_tab2').validate({
                             '.accordion_content').addClass("indicator");
                         return false;
                     }
+                    if (typeof hqParseDmy === 'function') {
+                        var today0 = new Date();
+                        today0.setHours(0, 0, 0, 0);
+                        var inDate = hqParseDmy(check_in);
+                        var outDate = hqParseDmy(checkout);
+                        if (inDate && inDate < today0) {
+                            error_msg_alert('Check-In date cannot be a past date in Row ' + (i + 1) + ' in Option ' + quot);
+                            return false;
+                        }
+                        if (outDate && outDate < today0) {
+                            error_msg_alert('Check-Out date cannot be a past date in Row ' + (i + 1) + ' in Option ' + quot);
+                            return false;
+                        }
+                    }
 
                     if (checkout == "") {
                         error_msg_alert('Select Check-Out date in Row ' + (i + 1) + ' in Option ' + quot);

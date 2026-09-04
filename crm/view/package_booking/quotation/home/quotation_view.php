@@ -106,6 +106,7 @@ $year = $yr[0];
 $sq_cost1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id = '$sq_quotation[quotation_id]'");
 while($sq_cost = mysqli_fetch_assoc($sq_cost1)){
 
+	$sq_cost = gqd_hydrate_costing_tax($sq_cost);
 	$basic_cost = $sq_cost['basic_amount'];
 	$service_charge = $sq_cost['service_charge'];
 	$tour_cost= $basic_cost + $service_charge;
@@ -551,7 +552,6 @@ if($sq_c_count != '0'){
 			<th>Day-wise_Program</th>
 			<th>Overnight_Stay</th>
 			<th>Meal_Plan</th>
-			<th>Day Image</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -572,30 +572,6 @@ if($sq_c_count != '0'){
 				<td  style="max-width: 400px; word-wrap: break-word; white-space: normal;"><pre class="real_text" tyle="white-space: pre-wrap; word-wrap: break-word; max-width: 400px; overflow-wrap: break-word;"><?= $row_itinarary['day_wise_program'] ?></pre></td>
 				<td><?= $row_itinarary['stay'] ?></td>
 				<td><?= $row_itinarary['meal_plan'] ?></td>
-				<td>
-					<?php
-					// Display day image from package_quotation_program
-					$daywise_image = '';
-					if (!empty($row_itinarary['day_image']) && trim($row_itinarary['day_image']) !== '' && trim($row_itinarary['day_image']) !== 'NULL') {
-						$image_path = trim($row_itinarary['day_image']);
-						$daywise_image = findImageUrl($image_path, false); // quotation_view is always for existing quotations
-					}
-					
-					if ($daywise_image) {
-						?>
-						<div style="width: 100px; height: 80px; overflow: hidden; border: 1px solid #ddd; border-radius: 4px;">
-							<img src="<?= $daywise_image ?>" 
-								 style="width: 100%; height: 100%; object-fit: cover;" 
-								 alt="Day <?= $count ?> Image"
-								 onerror="console.log('Quotation view image failed to load:', this.src); this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding: 20px; text-align: center; color: #999;\'>No Image</div>';"
-								 onload="console.log('Quotation view image loaded successfully:', this.src);">
-						</div>
-						<?php
-					} else {
-						echo '<div style="padding: 20px; text-align: center; color: #999;">No Image</div>';
-					}
-					?>
-				</td>
 			</tr>
 			<?php
 		}	
@@ -670,7 +646,17 @@ $count = 0;
 					<td><?= number_format($sq_cost['service_charge'],2) ?></td>
 					<td><?= $sq_cost['discount_in'] ?></td>
 					<td><?= number_format($sq_cost['discount'],2) ?></td>
-					<td><?= $sq_cost['service_tax_subtotal'] ?></td>
+					<td><?php
+					$tax_cell = '';
+					if (!empty($grp_brk['tax_applied'])) {
+						$tax_cell = $grp_brk['tax_applied'];
+					} elseif (!empty($grp_brk['tax_amount'])) {
+						$tax_cell = number_format($grp_brk['tax_amount'], 2);
+					} else {
+						$tax_cell = $sq_cost['service_tax_subtotal'];
+					}
+					echo $tax_cell;
+					?></td>
 					<td>Tcs:(<?= $tcs_pct ?>%):<?= $tcs_val ?></td>
 					<td><b><?= number_format($grp_brk['tour_total'],2) ?></b></td>
 					<td><?= number_format($sq_quotation['train_cost'],2)  ?></td>

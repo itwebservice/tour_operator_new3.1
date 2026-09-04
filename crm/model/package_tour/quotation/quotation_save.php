@@ -5,8 +5,8 @@ public function quotation_master_save()
 {
 	ensure_quotation_refer_id_column();
 	ensure_excursion_vehicle_id_column();
-	$login_id = $_POST['login_id'];
-	$emp_id = $_POST['emp_id'];
+	$login_id = isset($_POST['login_id']) && $_POST['login_id'] !== '' ? $_POST['login_id'] : (isset($_SESSION['login_id']) ? $_SESSION['login_id'] : '');
+	$emp_id = isset($_POST['emp_id']) && $_POST['emp_id'] !== '' ? $_POST['emp_id'] : (isset($_SESSION['emp_id']) ? $_SESSION['emp_id'] : '');
 	$enquiry_id = $_POST['enquiry_id'];
 	$tour_name = $_POST['tour_name'];
 	$from_date = $_POST['from_date'];
@@ -30,8 +30,19 @@ public function quotation_master_save()
 	$visa_cost = $_POST['visa_cost'];
 	$guide_cost = $_POST['guide_cost'];
 	$misc_cost = $_POST['misc_cost'];
-	$branch_admin_id = $_POST['branch_admin_id'];
-	$financial_year_id = $_POST['financial_year_id'];
+	$branch_admin_id = isset($_POST['branch_admin_id']) ? $_POST['branch_admin_id'] : '';
+	if ($branch_admin_id === '' || $branch_admin_id === null) {
+		$branch_admin_id = isset($_SESSION['branch_admin_id']) ? $_SESSION['branch_admin_id'] : '';
+	}
+	if (($branch_admin_id === '' || $branch_admin_id === '0' || $branch_admin_id === 0) && $emp_id !== '' && $emp_id !== '0') {
+		$sq_emp_branch = mysqli_fetch_assoc(mysqlQuery("select branch_id from emp_master where emp_id='$emp_id'"));
+		if ($sq_emp_branch && !empty($sq_emp_branch['branch_id'])) {
+			$branch_admin_id = $sq_emp_branch['branch_id'];
+		}
+	}
+	$financial_year_id = isset($_POST['financial_year_id']) && $_POST['financial_year_id'] !== ''
+		? $_POST['financial_year_id']
+		: (isset($_SESSION['financial_year_id']) ? $_SESSION['financial_year_id'] : '');
 	$price_str_url = $_POST['price_str_url']; 
 	$incl_arr = $_POST['incl_arr']; 
 	$excl_arr = $_POST['excl_arr'];
@@ -648,7 +659,44 @@ private function pp_costing_insert_row($quotation_id, $package_type, $row)
     		$sq_max = mysqli_fetch_assoc(mysqlQuery("select max(id) as max from package_tour_quotation_costing_entries"));
     		$id = $sq_max['max']+1;
     		$bsmvaluesEach = json_encode($bsmValues[$i]);
-    		$sq_plane = mysqlQuery("insert into package_tour_quotation_costing_entries ( id, quotation_id, tour_cost,excursion_cost,basic_amount, service_charge, service_tax_subtotal, total_tour_cost, package_id, transport_cost,adult_cost,infant_cost,child_with,child_without,bsmValues,package_type,discount_in,discount,sort_order) values ( '$id', '$quotation_id', '$tour_cost_arr[$i]','$excursion_cost_arr[$i]', '$basic_amount_arr[$i]', ' $service_charge_arr[$i]', '$service_tax_subtotal_arr[$i]', '$total_tour_cost_arr[$i]','0','$transport_cost_arr[$i]','$adult_cost_arr[$i]','$infant_cost_arr[$i]','$child_with_arr[$i]','$child_without_arr[$i]','$bsmvaluesEach','$package_type_c_arr[$i]','$discount_in_arr[$i]','$discount_arr[$i]','$current_sort_order')");
+    		if (!function_exists('gqd_applied_tax')) {
+    			include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/generic_quotation_data.php';
+    		}
+    		$tax_subtotal = isset($service_tax_subtotal_arr[$i]) ? $service_tax_subtotal_arr[$i] : '';
+    		if (function_exists('gqd_applied_tax')) {
+    			$computed_tax = gqd_applied_tax(array(
+    				'service_tax_subtotal' => $tax_subtotal,
+    				'bsmValues' => $bsmvaluesEach,
+    				'tour_cost' => isset($tour_cost_arr[$i]) ? $tour_cost_arr[$i] : 0,
+    				'transport_cost' => isset($transport_cost_arr[$i]) ? $transport_cost_arr[$i] : 0,
+    				'excursion_cost' => isset($excursion_cost_arr[$i]) ? $excursion_cost_arr[$i] : 0,
+    				'basic_amount' => isset($basic_amount_arr[$i]) ? $basic_amount_arr[$i] : 0,
+    				'service_charge' => isset($service_charge_arr[$i]) ? $service_charge_arr[$i] : 0,
+    				'discount_in' => isset($discount_in_arr[$i]) ? $discount_in_arr[$i] : '',
+    				'discount' => isset($discount_arr[$i]) ? $discount_arr[$i] : 0,
+    			));
+    			if (!empty($computed_tax['applied'])) {
+    				$tax_subtotal = $computed_tax['applied'];
+    			}
+    		}
+    		$tax_subtotal = addslashes($tax_subtotal);
+    		$row_total = isset($total_tour_cost_arr[$i]) ? $total_tour_cost_arr[$i] : 0;
+    		if (function_exists('gqd_group_costing_breakdown')) {
+    			$brk = gqd_group_costing_breakdown(array(
+    				'tour_cost' => isset($tour_cost_arr[$i]) ? $tour_cost_arr[$i] : 0,
+    				'transport_cost' => isset($transport_cost_arr[$i]) ? $transport_cost_arr[$i] : 0,
+    				'excursion_cost' => isset($excursion_cost_arr[$i]) ? $excursion_cost_arr[$i] : 0,
+    				'basic_amount' => isset($basic_amount_arr[$i]) ? $basic_amount_arr[$i] : 0,
+    				'service_charge' => isset($service_charge_arr[$i]) ? $service_charge_arr[$i] : 0,
+    				'discount_in' => isset($discount_in_arr[$i]) ? $discount_in_arr[$i] : '',
+    				'discount' => isset($discount_arr[$i]) ? $discount_arr[$i] : 0,
+    				'service_tax_subtotal' => $tax_subtotal,
+    				'bsmValues' => $bsmvaluesEach,
+    				'total_tour_cost' => $row_total,
+    			));
+    			$row_total = $brk['tour_total'];
+    		}
+    		$sq_plane = mysqlQuery("insert into package_tour_quotation_costing_entries ( id, quotation_id, tour_cost,excursion_cost,basic_amount, service_charge, service_tax_subtotal, total_tour_cost, package_id, transport_cost,adult_cost,infant_cost,child_with,child_without,bsmValues,package_type,discount_in,discount,sort_order) values ( '$id', '$quotation_id', '$tour_cost_arr[$i]','$excursion_cost_arr[$i]', '$basic_amount_arr[$i]', ' $service_charge_arr[$i]', '$tax_subtotal', '$row_total','0','$transport_cost_arr[$i]','$adult_cost_arr[$i]','$infant_cost_arr[$i]','$child_with_arr[$i]','$child_without_arr[$i]','$bsmvaluesEach','$package_type_c_arr[$i]','$discount_in_arr[$i]','$discount_arr[$i]','$current_sort_order')");
     		if(!$sq_plane){
     			echo "error--Costing information not saved!";
     			exit;

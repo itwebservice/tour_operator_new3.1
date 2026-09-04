@@ -176,58 +176,108 @@ $role_id = $_SESSION['role_id'];
 
 <script>
 $('#country_code').select2();
-var customerHintSource = [];
-try {
-    var custRaw = $('#cust_data').val() || '[]';
-    customerHintSource = JSON.parse(custRaw);
-    if (!Array.isArray(customerHintSource)) {
-        customerHintSource = [];
+function pqParseCustomerHints() {
+    var raw = $('#cust_data').val() || '[]';
+    if (raw.indexOf('&quot;') !== -1 || raw.indexOf('&#039;') !== -1 || raw.indexOf('&amp;') !== -1) {
+        raw = $('<textarea/>').html(raw).text();
     }
-} catch (e) {
-    customerHintSource = [];
+    try {
+        var parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
 }
-$("#customer_name").autocomplete({
-    source: customerHintSource,
-    minLength: 1,
-    select: function(event, ui) {
-
-        var base_url = $('#base_url').val();
-        $("#customer_name").val(ui.item.label);
-        $('#mobile_no').val(ui.item.contact_no);
-        $('#country_code').val(ui.item.country_id);
-		$('#country_code').trigger('change');
-        $('#email_id').val(ui.item.email_id);
-        
-        if(ui.item.type == 'B2B' || ui.item.type == 'Corporate'){
-
-            $.post(base_url+'view/load_data/customer_users_reflect.php', {
-                customer_id: ui.item.customer_id
-            }, function(data) {
-                $('#user_dropdown').removeClass('hidden');
-                $('#user_dropdown').html(data);
-            });
-        } else {
-            $('#user_dropdown').html('');
-            $('#user_dropdown').addClass('hidden');
-        }
-
-    },
-    open: function(event, ui) {
-        $(this).autocomplete("widget").css({
-            "width": document.getElementById("customer_name").offsetWidth
-        });
+function pqFilterCustomerHints(list, term) {
+    var q = String(term || '').toLowerCase();
+    var out = [];
+    if (!list || !list.length) {
+        return out;
     }
-}).data("ui-autocomplete")._renderItem = function(ul, item) {
-    return $("<li disabled>")
-        .append("<a>" + item.label + "</a>")
-        .appendTo(ul);
-};
+    for (var i = 0; i < list.length && out.length < 25; i++) {
+        var label = String(list[i].label || list[i].value || '');
+        if (!q || label.toLowerCase().indexOf(q) !== -1) {
+            out.push(list[i]);
+        }
+    }
+    return out;
+}
+function pqInitCustomerAutocomplete() {
+    var $input = $('#customer_name');
+    if (!$input.length || typeof $input.autocomplete !== 'function') {
+        return;
+    }
+    if ($input.data('ui-autocomplete')) {
+        $input.autocomplete('destroy');
+    }
+    if (!window.pqCustomerHints) {
+        window.pqCustomerHints = pqParseCustomerHints();
+    }
+    $input.autocomplete({
+        appendTo: 'body',
+        minLength: 1,
+        source: function (request, response) {
+            var local = window.pqCustomerHints || [];
+            if (local.length) {
+                response(pqFilterCustomerHints(local, request.term));
+                return;
+            }
+            var base_url = ($('#base_url').val() || '').replace(/\/?$/, '/');
+            $.getJSON(base_url + 'view/package_booking/quotation/home/customer_hint.php', {
+                branch_status: $('#branch_status').val() || ''
+            }, function (data) {
+                window.pqCustomerHints = Array.isArray(data) ? data : [];
+                response(pqFilterCustomerHints(window.pqCustomerHints, request.term));
+            }).fail(function () {
+                response([]);
+            });
+        },
+        select: function (event, ui) {
+            var base_url = $('#base_url').val();
+            $input.val(ui.item.label);
+            $('#mobile_no').val(ui.item.contact_no);
+            if (ui.item.country_id) {
+                $('#country_code').val(ui.item.country_id).trigger('change');
+            }
+            $('#email_id').val(ui.item.email_id);
+            if (ui.item.type == 'B2B' || ui.item.type == 'Corporate') {
+                $.post(base_url + 'view/load_data/customer_users_reflect.php', {
+                    customer_id: ui.item.customer_id
+                }, function (data) {
+                    $('#user_dropdown').removeClass('hidden');
+                    $('#user_dropdown').html(data);
+                });
+            } else {
+                $('#user_dropdown').html('');
+                $('#user_dropdown').addClass('hidden');
+            }
+            return false;
+        },
+        open: function () {
+            $(this).autocomplete('widget').css({
+                width: this.offsetWidth,
+                'z-index': 100000
+            });
+        }
+    });
+    if ($input.data('ui-autocomplete')) {
+        $input.data('ui-autocomplete')._renderItem = function (ul, item) {
+            return $('<li>')
+                .append($('<div>').text(item.label))
+                .appendTo(ul);
+        };
+    }
+}
+$(function () {
+    pqInitCustomerAutocomplete();
+});
 $("#tour_name").autocomplete({
 
     source: JSON.parse($('#destinations').val()),
     select: function (event, ui) {
-		$("#tour_name").val(ui.item.label);
-        var newOption = $("<option selected='selected'></option>").val(ui.item.dest_id).text(ui.item.label);
+		var label = String(ui.item.label || '').replace(/\s+/g, ' ').trim();
+		$("#tour_name").val(label);
+        var newOption = $("<option selected='selected'></option>").val(ui.item.dest_id).text(label);
         
         if (typeof quotationResetPackageLoadCache === 'function') {
             quotationResetPackageLoadCache();
@@ -238,17 +288,12 @@ $("#tour_name").autocomplete({
 
         // Store selected destination for package filtering
         sessionStorage.setItem('selected_destination_id', ui.item.dest_id);
-        sessionStorage.setItem('selected_destination_name', ui.item.label);
-        console.log('Tab1 - Stored destination - ID:', ui.item.dest_id, 'Name:', ui.item.label);
-        
-        // Debug: Verify storage
-        console.log('Tab1 - Verification - stored ID:', sessionStorage.getItem('selected_destination_id'));
-        console.log('Tab1 - Verification - stored Name:', sessionStorage.getItem('selected_destination_name'));
+        sessionStorage.setItem('selected_destination_name', label);
+        console.log('Tab1 - Stored destination - ID:', ui.item.dest_id, 'Name:', label);
         
         $('#dest_name').append(newOption).trigger('change.select2');
-        // $('#dest_name').prepend('<option value="' + ui.item.dest_id + '">' +ui.item.label +'</option>');
-        // $('#dest_name').select2().trigger("change");
         package_dynamic_reflect('dest_name');
+        return false;
     },
     open: function(event, ui) {
 		$(this).autocomplete("widget").css({
@@ -261,6 +306,12 @@ $("#tour_name").autocomplete({
         .appendTo(ul);
 	
 };
+$("#tour_name").on('focus change blur', function () {
+    var trimmed = String(this.value || '').replace(/\s+/g, ' ').trim();
+    if (this.value !== trimmed) {
+        this.value = trimmed;
+    }
+});
 
 // New Customization ----start
 $(document).ready(function() {

@@ -228,6 +228,49 @@ function get_forex_booking_payment_id($payment_id,$year = ''){ global $app_versi
 function get_quotation_id($quotation_id,$year = ''){ global $app_version;
   $year = ($year == '') ? $app_version : $year; return 'QTN/'.$year.'/'.$quotation_id; }
 
+/**
+ * Display ID for emails / WhatsApp / lists.
+ * Prefers quotation_id_display (e.g. QTN/2026/63.1 after clone) over the numeric PK.
+ */
+if (!function_exists('get_quotation_display_id_from_row')) {
+  function get_quotation_display_id_from_row($sq_quotation)
+  {
+    if (!is_array($sq_quotation)) {
+      return '';
+    }
+    $quotation_id = isset($sq_quotation['quotation_id']) ? $sq_quotation['quotation_id'] : '';
+    $quotation_date = isset($sq_quotation['quotation_date']) ? $sq_quotation['quotation_date'] : '';
+    $year = '';
+    if ($quotation_date !== '') {
+      $parts = explode('-', $quotation_date);
+      $year = isset($parts[0]) ? $parts[0] : '';
+    }
+    $display = '';
+    if (!empty($sq_quotation['quotation_display_id'])) {
+      $display = $sq_quotation['quotation_display_id'];
+    } elseif (!empty($sq_quotation['quotation_id_display'])) {
+      $display = $sq_quotation['quotation_id_display'];
+    }
+    if ($display === '') {
+      $display = get_quotation_id($quotation_id, $year);
+    }
+    $is_sub = isset($sq_quotation['is_sub_quotation']) && (string) $sq_quotation['is_sub_quotation'] === '1';
+    if ($is_sub && strpos($display, '.') === false) {
+      $parent_quotation_id = isset($sq_quotation['parent_quotation_id']) ? $sq_quotation['parent_quotation_id'] : null;
+      if ($parent_quotation_id && $parent_quotation_id != '0') {
+        $parent_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_date FROM package_tour_quotation_master WHERE quotation_id='$parent_quotation_id'"));
+        if ($parent_quotation) {
+          $parent_year = explode('-', $parent_quotation['quotation_date'])[0];
+          $parent_id_display = get_quotation_id($parent_quotation_id, $parent_year);
+          $sub_count = mysqli_num_rows(mysqlQuery("SELECT quotation_id FROM package_tour_quotation_master WHERE parent_quotation_id='$parent_quotation_id' AND quotation_id <= '$quotation_id'"));
+          $display = $parent_id_display . '.' . $sub_count;
+        }
+      }
+    }
+    return $display;
+  }
+}
+
 
 
 //Get Enquiries ID

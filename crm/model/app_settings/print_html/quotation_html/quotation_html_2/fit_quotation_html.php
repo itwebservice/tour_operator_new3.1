@@ -25,9 +25,14 @@ if (empty($q['found'])) {
 $hero    = $q['hero'];
 $ov      = $q['tour_overview'];
 $hotels  = $q['hotels'];
+$o2_hotels_by_pkg = (!empty($q['hotels_by_package_type']) && is_array($q['hotels_by_package_type']))
+  ? $q['hotels_by_package_type']
+  : (function_exists('gqd_hotels_by_package_type') ? gqd_hotels_by_package_type($hotels) : array());
+$o2_multi_pkg = count($o2_hotels_by_pkg) > 1;
 $flights = $q['flights'];
 // ========= Dipti
 $trains  = isset($q['trains']) ? $q['trains'] : array();
+$cruises = isset($q['cruises']) ? $q['cruises'] : array();
 $acts    = isset($q['activities']) ? $q['activities'] : array();
 // ================
 $vehs    = $q['vehicles'];
@@ -524,7 +529,7 @@ $o2_round = o2img(
       <?php o2_strip(
         'Where You\'ll Stay',
         'Accommodation',
-        o2e(strtoupper($o2_pkg)) . ' <b>PACKAGE</b>'
+        ($o2_multi_pkg ? 'Package <b>Options</b>' : o2e(strtoupper($o2_pkg)) . ' <b>PACKAGE</b>')
       ); ?>
       <div class="page__wm"></div>
       <div class="page__body">
@@ -533,14 +538,26 @@ $o2_round = o2img(
             <span class="gold-rule" style="display:block;margin-bottom:7px"></span>
             <span class="t">Handpicked Stays Across <?= o2e($o2_dest) ?></span>
           </div>
-          <span class="sec-tag"><?= o2e($o2_pkg) ?> Package</span>
+          <span class="sec-tag"><?= $o2_multi_pkg ? 'Hotels by Package Type' : o2e($o2_pkg) . ' Package' ?></span>
         </div>
         <div class="hotel-grid">
           <?php
+          if (empty($o2_hotels_by_pkg) && !empty($hotels)) {
+            $o2_hotels_by_pkg = array('Package' => $hotels);
+          }
           $o2_hi = 0;
-          foreach ((array) $hotels as $h):
+          if (!empty($o2_hotels_by_pkg)):
+            foreach ($o2_hotels_by_pkg as $o2_pkg_heading => $o2_pkg_hotels):
+              if ($o2_multi_pkg):
+          ?>
+            <div class="card" style="grid-column:1/-1;padding:8px 14px;background:var(--navy,#0d1e3b);color:#fff;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;">Package Type — <?= o2e($o2_pkg_heading) ?></span>
+              <span style="font-size:10px;opacity:.85;"><?= (int) count($o2_pkg_hotels) ?> hotel<?= count($o2_pkg_hotels) === 1 ? '' : 's' ?></span>
+            </div>
+          <?php
+              endif;
+              foreach ((array) $o2_pkg_hotels as $h):
             $o2_hi++;
-            // $o2_himg = o2img(isset($h['hotel_photo']) ? $h['hotel_photo'] : '', $assets . 'hotel-' . ((($o2_hi - 1) % 3) + 1) . '.jpg');
             $dummy_hotel_img = BASE_URL . 'images/hotel.png';
 
             $o2_hotel_photo = isset($h['hotel_photo']) ? trim($h['hotel_photo']) : '';
@@ -554,6 +571,9 @@ $o2_round = o2img(
             <div class="card hotel">
               <img class="hotel__img" src="<?= o2e($o2_himg) ?>" alt="Hotel">
               <div class="hotel__b">
+                <?php if ($o2_multi_pkg): ?>
+                  <div class="hotel__city" style="color:var(--gold-deep);letter-spacing:.12em;text-transform:uppercase;font-size:10px;margin-bottom:4px;"><?= o2e($o2_pkg_heading) ?></div>
+                <?php endif; ?>
                 <div class="hotel__city"><i class="fa-solid fa-location-dot"></i> <?= o2e(o2nv($h['hotel_city'], '')) ?></div>
                 <div class="hotel__name"><?= o2e(o2nv($h['hotel_name'], 'Hotel')) ?></div>
                 <div class="hotel__cat"><?= o2e(o2nv($h['room_category'], o2nv($h['room_type'], o2nv($h['meal_plan'], '')))) ?></div>
@@ -575,8 +595,12 @@ $o2_round = o2img(
                 <?php endif; ?>
               </div>
             </div>
-          <?php endforeach; ?>
-          <?php if (empty($hotels)): ?>
+          <?php
+              endforeach;
+            endforeach;
+          endif;
+          ?>
+          <?php if (empty($hotels) && empty($o2_hotels_by_pkg)): ?>
             <div class="card" style="padding:14px 15px;grid-column:1/-1;text-align:center;color:var(--muted)">No accommodation details available.</div>
           <?php else: ?>
             <div class="card" style="padding:14px 15px;display:flex;flex-direction:column;justify-content:center">
@@ -740,6 +764,50 @@ $o2_round = o2img(
                   <div class="bv">As per schedule</div>
                   <div class="bl" style="margin-top:5px">Class</div>
                   <div class="bv"><?= o2e($train_class) ?></div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <?php if (!empty($cruises)): ?>
+          <p class="kicker kicker-heading" style="margin-top:6mm">Cruise Details</p>
+          <div style="display:flex;flex-direction:column;gap:11px;margin-top:12px">
+            <?php foreach ((array)$cruises as $cr):
+              $route = isset($cr['route']) ? $cr['route'] : '';
+              $cabin = isset($cr['cabin']) ? $cr['cabin'] : '';
+              $share = isset($cr['sharing_type']) ? $cr['sharing_type'] : '';
+              $from_date = isset($cr['from_date']) ? $cr['from_date'] : '';
+              $to_date = isset($cr['to_date']) ? $cr['to_date'] : '';
+            ?>
+              <div class="boarding">
+                <div class="boarding__main">
+                  <div class="boarding__top">
+                    <div class="airline">
+                      <div>
+                        <div class="airline__name"><?= o2e(o2nv($route, 'Cruise')) ?></div>
+                        <div class="airline__cls"><?= o2e(o2nv($cabin, '')) ?></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="boarding__times">
+                    <div class="x">
+                      <div class="l">Departure</div>
+                      <div class="v"><?= o2e(o2nv($from_date, 'NA')) ?></div>
+                    </div>
+                    <div class="x">
+                      <div class="l">Arrival</div>
+                      <div class="v"><?= o2e(o2nv($to_date, 'NA')) ?></div>
+                    </div>
+                    <div class="x">
+                      <div class="l">Sharing</div>
+                      <div class="v"><?= o2e(o2nv($share, 'NA')) ?></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="boarding__stub">
+                  <div class="bl">Cruise</div>
+                  <div class="bv"><?= o2e(o2nv($cabin, 'Cabin')) ?></div>
                 </div>
               </div>
             <?php endforeach; ?>
@@ -1119,15 +1187,15 @@ $o2_round = o2img(
                         <?php endif; ?>
                       </td>
 
-                      <td>&#8377;<?= o2e(o2nv($pp['pp_adult_display'], 'INR 0.00')) ?></td>
-                      <td>&#8377;<?= o2e(o2nv($pp['pp_cwb_display'], 'INR 0.00')) ?></td>
-                      <td>&#8377;<?= o2e(o2nv($pp['pp_cwnb_display'], 'INR 0.00')) ?></td>
-                      <td>&#8377;<?= o2e(o2nv($pp['pp_infant_display'], 'INR 0.00')) ?></td>
-                      <td>&#8377;<?= o2e($tax_amount) ?></td>
-                      <td>&#8377;<?= o2e(o2nv($pp['tcs_display'], 'INR 0.00')) ?></td>
-                      <td>&#8377;<?= o2e(o2nv($pp['visa_display'], 'INR 0.00')) ?></td>
-                      <td>&#8377;<?= o2e(o2nv($pp['guide_display'], 'INR 0.00')) ?></td>
-                      <td>&#8377;<?= o2e(o2nv($pp['misc_display'], 'INR 0.00')) ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['pp_adult_display'], '0.00'), '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['pp_cwb_display'], '0.00'), '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['pp_cwnb_display'], '0.00'), '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['pp_infant_display'], '0.00'), '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html($tax_amount, '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['tcs_display'], '0.00'), '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['visa_display'], '0.00'), '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['guide_display'], '0.00'), '&#8377;', 'o2e') ?></td>
+                      <td><?= gqd_format_money_html(o2nv($pp['misc_display'], '0.00'), '&#8377;', 'o2e') ?></td>
                       </tr>
                     <?php endforeach; ?>
                 </tbody>

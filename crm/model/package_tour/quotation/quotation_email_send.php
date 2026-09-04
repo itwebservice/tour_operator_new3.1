@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 // include_once('../../model.php');
 include_once dirname(__FILE__) . '/quotation_email_pdf_style_renderer.php';
 include_once dirname(__FILE__) . '/quotation_rich_text_helpers.php';
+include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/generic_quotation_data.php';
 
 class quotation_email_send
 {
@@ -46,6 +47,9 @@ class quotation_email_send
 
 				$sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id_arr[$i]'  order by sort_order limit 1");
 				while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
+					if (function_exists('gqd_hydrate_costing_tax')) {
+						$sq_costing = gqd_hydrate_costing_tax($sq_costing);
+					}
 
 					$service_charge = $sq_costing['service_charge'];
 					$discount_in = $sq_costing['discount_in'];
@@ -902,6 +906,9 @@ class quotation_email_send
 
 			    	$sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order");
 				while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
+					if (function_exists('gqd_hydrate_costing_tax')) {
+						$sq_costing = gqd_hydrate_costing_tax($sq_costing);
+					}
 
 					$service_charge = $sq_costing['service_charge'];
 					$discount_in = $sq_costing['discount_in'];
@@ -1109,6 +1116,9 @@ class quotation_email_send
 			} else {
 				$sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order limit 1");
 				while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
+					if (function_exists('gqd_hydrate_costing_tax')) {
+						$sq_costing = gqd_hydrate_costing_tax($sq_costing);
+					}
 
 					$basic_cost = $sq_costing['basic_amount'];
 					$service_charge = $sq_costing['service_charge'];
@@ -1277,11 +1287,10 @@ class quotation_email_send
 
 				$maindetail .= "\n";
 
-				// Per Person: simple WhatsApp lines (Adult PP / Discount / Tax / Total)
 				include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/pp_costing_doc_block.php';
 				$pp_price = '';
-				if (function_exists('gqd_render_pp_costing_whatsapp_text')) {
-					$pp_price = gqd_render_pp_costing_whatsapp_text($quotation_id, array('first_only' => true));
+				if (function_exists('gqd_render_quotation_whatsapp_costing')) {
+					$pp_price = gqd_render_quotation_whatsapp_costing($quotation_id);
 				}
 				if ($pp_price !== '') {
 					$maindetail .= $pp_price;
@@ -1291,66 +1300,11 @@ class quotation_email_send
 			} else {
 
 
-				$sq_costing1 = mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id='$quotation_id' order by sort_order limit 1");
-				$tour_cost = 0;
-				while ($sq_costing = mysqli_fetch_assoc($sq_costing1)) {
-					$basic_cost = $sq_costing['basic_amount'];
-					$service_charge = $sq_costing['service_charge'];
-					$service_tax_amount = 0;
-					$tax_show = '';
-					$bsmValues = json_decode($sq_costing['bsmValues']);
-					$discount_in = $sq_costing['discount_in'];
-					$discount = $sq_costing['discount'];
-					if ($discount_in == 'Percentage') {
-						$act_discount = (float)($service_charge) * (float)($discount) / 100;
-					} else {
-						$act_discount = ($service_charge != 0) ? $discount : 0;
-					}
-					$service_charge = $service_charge - (float)($act_discount);
-					$tour_cost = $basic_cost + $service_charge;
-					$name = '';
-					if ($sq_costing['service_tax_subtotal'] !== 0.00 && ($sq_costing['service_tax_subtotal']) !== '') {
-						$service_tax_subtotal1 = explode(',', $sq_costing['service_tax_subtotal']);
-						for ($i = 0; $i < sizeof($service_tax_subtotal1); $i++) {
-							$service_tax = explode(':', $service_tax_subtotal1[$i]);
-							$service_tax_amount = (float)($service_tax_amount) + (float)($service_tax[2]);
-							$name .= $service_tax[0] . $service_tax[1] . ', ';
-						}
-					}
-
-					$bsmValues = json_decode($sq_costing['bsmValues'], true);
-					if (isset($bsmValues[0]['tcsper']) && $bsmValues[0]['tcsper'] != 'NaN') {
-						$tcsper = $bsmValues[0]['tcsper'];
-						$tcsvalue = $bsmValues[0]['tcsvalue'];
-					} else {
-						$tcsper = 0;
-						$tcsvalue = 0;
-					}
-					$tcs_amount_show  = currency_conversion($currency, $sq_quotation['currency_code'], $tcsvalue);
-					$service_tax_amount_show = currency_conversion($currency, $sq_quotation['currency_code'], $service_tax_amount);
-					$quotation_cost = $basic_cost + $service_charge + $service_tax_amount + $sq_quotation['train_cost'] + $sq_quotation['cruise_cost'] + $sq_quotation['flight_cost'] + $sq_quotation['visa_cost'] + $sq_quotation['guide_cost'] + $sq_quotation['misc_cost'] + $tcsvalue;
-					// $quotation_cost = ceil($quotation_cost);
-					////////////////Currency conversion ////////////
-					$currency_amount1 = currency_conversion($currency, $sq_quotation['currency_code'], $quotation_cost);
-					$act_tour_cost = (float)($quotation_cost) - (float)($service_charge) + (float)($sq_costing['service_charge']);
-					$act_tour_cost = ceil($act_tour_cost);
-					$act_tour_cost_camount = ($discount != 0) ? currency_conversion($currency, $sq_quotation['currency_code'], $act_tour_cost) : '';
-
-					$newBasic = currency_conversion($currency, $sq_quotation['currency_code'], $tour_cost);
-					$travel_cost = (float)($sq_quotation['train_cost']) + (float)($sq_quotation['flight_cost']) + (float)($sq_quotation['cruise_cost']) + (float)($sq_quotation['visa_cost']) + (float)($sq_quotation['guide_cost']) + (float)($sq_quotation['misc_cost']);
-					$travel_cost = currency_conversion($currency, $sq_quotation['currency_code'], $travel_cost);
-
-
-
-
-
-
 				$maindetail = "*Quotation ID :* $quoatationid 
 
 *$tourname*
 * $from_date for $duration
 ";
-				// Show passenger counts only if non-zero
 				if ($adults > 0) {
 					$maindetail .= "* $adults Adults\n";
 				}
@@ -1360,20 +1314,13 @@ class quotation_email_send
 				if ($infants > 0) {
 					$maindetail .= "* $infants Infant\n";
 				}
-				
-				$maindetail .= "			   
-*Tour Amount :* $newBasic
-*Travel Amount :* $travel_cost
-";
-				// Show taxes only if non-zero
-				if (extract_numeric($service_tax_amount_show) > 0) {
-					$maindetail .= "*Tax :* $service_tax_amount_show\n";
-				}
-				if (extract_numeric($tcs_amount_show) > 0) {
-					$maindetail .= "*Tcs :* $tcs_amount_show\n";
-				}
-				
-				$maindetail .= "*Total Price :*  $currency_amount1 " . "\n";
+				$maindetail .= "\n";
+				include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+				$group_price = function_exists('gqd_render_quotation_whatsapp_costing')
+					? gqd_render_quotation_whatsapp_costing($quotation_id)
+					: '';
+				if ($group_price !== '') {
+					$maindetail .= $group_price;
 				}
 			}
 
@@ -1606,7 +1553,11 @@ class quotation_email_send
 			$quotation_no = base64_encode($quotation_id);
 
 
-			$whatsapp_msg = rawurlencode('Dear Guest,
+			$guest_name = trim((string) (isset($sq_quotation['customer_name']) ? $sq_quotation['customer_name'] : ''));
+			if ($guest_name === '') {
+				$guest_name = 'Guest';
+			}
+			$whatsapp_msg = rawurlencode('Dear ' . $guest_name . ',
 
 Greetings from ' . $app_name . '
 
@@ -1669,6 +1620,9 @@ Thank you.');
 		$sq_quotation = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_master where quotation_id='$quotation_id'"));
 		$sq_package = mysqli_fetch_assoc(mysqlQuery("select * from custom_package_master where package_id='$sq_quotation[package_id]'"));
 		$sq_cost = mysqli_fetch_assoc(mysqlQuery("select * from package_tour_quotation_costing_entries where quotation_id = '$quotation_id'"));
+		if (function_exists('gqd_hydrate_costing_tax')) {
+			$sq_cost = gqd_hydrate_costing_tax($sq_cost);
+		}
 
 		// Calculate costs
 		$basic_cost = $sq_cost['basic_amount'];
@@ -1713,10 +1667,16 @@ Thank you.');
 		$contact = '+919168425999';
 
 		// Generate quotation ID display
-		$quotation_id_display = "QTN/" . date('Y') . "/" . $quotation_id;
+		$quotation_id_display = function_exists('get_quotation_display_id_from_row')
+			? get_quotation_display_id_from_row($sq_quotation)
+			: ("QTN/" . date('Y') . "/" . $quotation_id);
 
 		// Start building email content
-		$email_content = "Hi Guest,\n\n";
+		$guest_name = trim((string) (isset($sq_quotation['customer_name']) ? $sq_quotation['customer_name'] : ''));
+		if ($guest_name === '') {
+			$guest_name = 'Guest';
+		}
+		$email_content = "Hi " . $guest_name . ",\n\n";
 		$email_content .= "Greetings from ITOURS LLP PVT LTDS\n\n";
 		$email_content .= "Thank you for your query with us. As per your requirements, following are the package details.\n";
 		$email_content .= "*Quotation ID :* " . $quotation_id_display . " \n\n";
@@ -1729,11 +1689,13 @@ Thank you.');
 
 		// Price Structure
 		if (in_array('price_structure', $options)) {
-			$email_content .= "*Tour Amount :* INR " . number_format((float)($quotation_cost - $travel_cost), 2) . "\n";
-			$email_content .= "*Travel Amount :* INR " . number_format((float)$travel_cost, 2) . "\n";
-			$email_content .= "*Tax :* INR " . number_format((float)$service_tax_amount, 2) . "\n";
-			$email_content .= "*Tcs :* INR " . number_format((float)$tcsvalue, 2) . "\n";
-			$email_content .= "*Total Price :*  INR " . number_format((float)$quotation_cost, 2) . " \n\n";
+			include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+			$price_text = function_exists('gqd_render_quotation_whatsapp_costing')
+				? gqd_render_quotation_whatsapp_costing($quotation_id)
+				: '';
+			if ($price_text !== '') {
+				$email_content .= $price_text;
+			}
 		}
 		// Hotels
 		if (!empty($hotel_details)) {
@@ -1829,6 +1791,9 @@ Thank you.');
 
 		// Get costing details
 		$sq_cost = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM package_tour_quotation_costing_entries WHERE quotation_id = '$quotation_id' ORDER BY sort_order LIMIT 1"));
+		if (function_exists('gqd_hydrate_costing_tax')) {
+			$sq_cost = gqd_hydrate_costing_tax($sq_cost);
+		}
 
 		// Calculate costs
 		$basic_cost = $sq_cost['basic_amount'];
@@ -1973,7 +1938,11 @@ Thank you.');
 		$quotation_no = base64_encode($quotation_id);
 		$quotation_link = BASE_URL . "model/package_tour/quotation/single_quotation.php?quotation=" . $quotation_no;
 
-		$whatsapp_msg = "Hi Guest,\n\n";
+		$guest_name = trim((string) (isset($sq_quotation['customer_name']) ? $sq_quotation['customer_name'] : ''));
+		if ($guest_name === '') {
+			$guest_name = 'Guest';
+		}
+		$whatsapp_msg = "Hi " . $guest_name . ",\n\n";
 		$whatsapp_msg .= "Greetings from " . $app_name . "\n\n";
 		$whatsapp_msg .= "Thank you for your query with us. As per your requirements, following are the package details.\n";
 		$whatsapp_msg .= "*Quotation ID :* " . $quoatationid . "\n\n";
@@ -1986,21 +1955,12 @@ Thank you.');
 
 		// Price Structure - only show if selected
 		if (in_array('price_structure', $options)) {
-			$pp_price = '';
-			if (isset($sq_quotation['costing_type']) && (int) $sq_quotation['costing_type'] === 2) {
-				include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/pp_costing_doc_block.php';
-				if (function_exists('gqd_render_pp_costing_whatsapp_text')) {
-					$pp_price = gqd_render_pp_costing_whatsapp_text($quotation_id, array('first_only' => true));
-				}
-			}
-			if ($pp_price !== '') {
-				$whatsapp_msg .= $pp_price;
-			} else {
-				$whatsapp_msg .= "*Tour Amount :* INR " . number_format((float)($quotation_cost - $travel_cost), 2) . "\n";
-				$whatsapp_msg .= "*Travel Amount :* INR " . number_format((float)$travel_cost, 2) . "\n";
-				$whatsapp_msg .= "*Tax :* INR " . number_format((float)$service_tax_amount, 2) . "\n";
-				$whatsapp_msg .= "*Tcs :* INR " . number_format((float)$tcsvalue, 2) . "\n";
-				$whatsapp_msg .= "*Total Price :*  INR " . number_format((float)$quotation_cost, 2) . " \n\n";
+			include_once dirname(__FILE__) . '/../../app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+			$price_text = function_exists('gqd_render_quotation_whatsapp_costing')
+				? gqd_render_quotation_whatsapp_costing($quotation_id)
+				: '';
+			if ($price_text !== '') {
+				$whatsapp_msg .= $price_text;
 			}
 		}
 
@@ -2054,6 +2014,12 @@ Thank you.');
 			$whatsapp_msg .= "🚖  *Transportation*\n";
 			$whatsapp_msg .= "-----------\n";
 			$whatsapp_msg .= $transport_details . "\n";
+		}
+
+		$q_preview = function_exists('get_generic_quotation_data') ? get_generic_quotation_data($quotation_id) : array();
+		$travel_wa = function_exists('gqd_render_travel_whatsapp_text') ? gqd_render_travel_whatsapp_text($q_preview) : '';
+		if ($travel_wa !== '') {
+			$whatsapp_msg .= $travel_wa;
 		}
 
 		// Terms & Conditions - only show if selected

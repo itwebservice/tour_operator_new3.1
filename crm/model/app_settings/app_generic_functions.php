@@ -952,6 +952,12 @@ if (!function_exists('gq_group_quotation_pdf_costing')) {
                                                                                           case 6:
                                                                                             $formatMain = "Landscape-Advanced";
                                                                                             break;
+                                                                                          case 9:
+                                                                                            $formatMain = "Portrait-Standard";
+                                                                                            break;
+                                                                                          case 10:
+                                                                                            $formatMain = "Portrait-Advanced";
+                                                                                            break;
 
 
                                                                                           default:
@@ -991,6 +997,19 @@ if (!function_exists('gq_group_quotation_pdf_costing')) {
                                                                                         if ($imgUrl == '' && !empty($app_quot_img)) {
                                                                                           $imgUrl = $app_quot_img;
                                                                                         }
-                                                                                        return $imgUrl;
+                                                                                        $imgUrl = trim(str_replace('\\', '/', (string) $imgUrl));
+                                                                                        if ($imgUrl !== '' && !preg_match('#^https?://#i', $imgUrl) && defined('BASE_URL')) {
+                                                                                          $base = rtrim(BASE_URL, '/');
+                                                                                          $project_base = rtrim(str_replace('/crm/', '/', BASE_URL), '/');
+                                                                                          $imgUrl = ltrim($imgUrl, '/');
+                                                                                          if (strpos($imgUrl, 'crm/') === 0) {
+                                                                                            $imgUrl = $base . '/' . substr($imgUrl, 4);
+                                                                                          } elseif (strpos($imgUrl, 'uploads/') === 0) {
+                                                                                            $imgUrl = $project_base . '/' . $imgUrl;
+                                                                                          } else {
+                                                                                            $imgUrl = $base . '/' . $imgUrl;
+                                                                                          }
+                                                                                        }
+                                                                                        return str_replace(' ', '%20', $imgUrl);
                                                                                       }
 ?>

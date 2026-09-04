@@ -785,6 +785,7 @@
                     </div>
                 </div>
                 <input type="hidden" id="login_id" name="login_id" value="<?= $login_id ?>">
+                <input type="hidden" id="emp_id_session" name="emp_id_session" value="<?= $emp_id ?>">
                 <input type="hidden" id="upload_url" name="upload_url" value="">
             </div>
         </div>
@@ -1016,11 +1017,23 @@ if (input) {
     }
 
     function get_business(id, flag, change = false) {
-
-        var offset = id.split('-');
-        // console.log("offset" + offset[1]);
-        get_auto_values('quotation_date', 'basic_amount-' + offset[1], 'payment_mode', 'service_charge-' + offset[1],
-            'markup', 'save', flag, 'markup', 'discount_amt-'+ offset[1], offset[1], change);
+        var offset = '';
+        if (typeof quotationCostingFieldSuffix === 'function') {
+            offset = String(quotationCostingFieldSuffix(id) || '').replace(/^-/, '');
+        } else if (id && String(id).indexOf('-') !== -1) {
+            offset = String(id).split('-').slice(1).join('-');
+        }
+        if (typeof get_auto_values !== 'function') {
+            return;
+        }
+        try {
+            get_auto_values('quotation_date', 'basic_amount-' + offset, 'payment_mode', 'service_charge-' + offset,
+                'markup', 'save', flag, 'markup', 'discount_amt-'+ offset, offset, change);
+        } catch (err) {
+            if (typeof console !== 'undefined' && console.warn) {
+                console.warn('get_auto_values skipped', err);
+            }
+        }
     }
 
     function switch_to_tab3() {
@@ -1108,7 +1121,7 @@ if (input) {
             $('#btn_quotation_save').prop('disabled', true);
             var login_id = $("#login_id").val();
 
-            var emp_id = $("#emp_id").val();
+            var emp_id = $("#emp_id").val() || $('#emp_id_session').val() || '';
 
             var enquiry_id = $("#enquiry_id").val();
 
@@ -1152,8 +1165,8 @@ if (input) {
             var cruise_cost = (typeof quotationGetFieldDefaultAmount === 'function') ? quotationGetFieldDefaultAmount($('#cruise_cost')) : $('#cruise_cost').val();
 
             var visa_cost = (typeof quotationGetFieldDefaultAmount === 'function') ? quotationGetFieldDefaultAmount($('#visa_cost')) : $('#visa_cost').val();
-            var branch_admin_id = $('#branch_admin_id1').val();
-            var financial_year_id = $('#financial_year_id').val();
+            var branch_admin_id = $('#branch_admin_id1').val() || $('#branch_admin_id').val() || '';
+            var financial_year_id = $('#financial_year_id').val() || '';
             //Per person travel costing
             var flight_acost = $('#flight_acost').val();
             var flight_ccost = $('#flight_ccost').val();
@@ -1665,6 +1678,19 @@ if (input) {
                     : []);
 
             if (!costingEntries || !costingEntries.length) {
+                if (typeof populateTab4CostingTable === 'function') {
+                    try {
+                        populateTab4CostingTable();
+                    } catch (ePop) {}
+                }
+                costingEntries = (typeof collectGroupCostingEntries === 'function')
+                    ? collectGroupCostingEntries()
+                    : ((typeof quotationCollectGroupCostingEntries === 'function')
+                        ? quotationCollectGroupCostingEntries()
+                        : []);
+            }
+
+            if (!costingEntries || !costingEntries.length) {
                 error_msg_alert('Please enter land costing details before saving.');
                 resetQuotationSaveState();
                 return false;
@@ -1732,7 +1758,7 @@ if (input) {
                 var package_name3 = entry.package_name3;
                 var pkg_id = entry.pkg_id;
 
-                if (tour_cost == "") {
+                if (tour_cost === '' || tour_cost === null || typeof tour_cost === 'undefined') {
                     error_msg_alert('Select Hotel cost in row' + (i + 1));
                     resetQuotationSaveState();
                     return false;
@@ -1790,21 +1816,15 @@ if (input) {
 
                 package_id_arr1.push($(this).val());
                 var package_id = $(this).val();
-                //Incl & Excl
-                var table = document.getElementById("dynamic_table_incl" + package_id);
-                var rowCount = table.rows.length;
-                for (var i = 0; i < rowCount; i++) {
-                    var row = table.rows[i];
-                    var inclusion = (typeof getQuotationEditorContent === 'function')
-                        ? getQuotationEditorContent('inclusions' + package_id)
-                        : ($('#inclusions' + package_id).val() || '');
-                    var exclusion = (typeof getQuotationEditorContent === 'function')
-                        ? getQuotationEditorContent('exclusions' + package_id)
-                        : ($('#exclusions' + package_id).val() || '');
+                var inclusion = (typeof getQuotationEditorContent === 'function')
+                    ? getQuotationEditorContent('inclusions' + package_id)
+                    : ($('#inclusions' + package_id).val() || '');
+                var exclusion = (typeof getQuotationEditorContent === 'function')
+                    ? getQuotationEditorContent('exclusions' + package_id)
+                    : ($('#exclusions' + package_id).val() || '');
 
-                    incl_arr.push(inclusion);
-                    excl_arr.push(exclusion);
-                }
+                incl_arr.push(inclusion);
+                excl_arr.push(exclusion);
             });
 
             var is_ai_quotation = sessionStorage.getItem('is_ai_quotation') === '1' ? '1' : ($('#is_ai_quotation').val() || '0');
@@ -1898,6 +1918,13 @@ if (input) {
                 }
                 incl_arr = [inclContent];
                 excl_arr = [exclContent];
+            } else if (incl_arr.length && (!incl_arr[0] || !String(incl_arr[0]).replace(/<[^>]*>/g, '').trim())) {
+                var aiIncl = (typeof getQuotationEditorContent === 'function') ? getQuotationEditorContent('inclusions_ai') : ($('#inclusions_ai').val() || '');
+                var aiExcl = (typeof getQuotationEditorContent === 'function') ? getQuotationEditorContent('exclusions_ai') : ($('#exclusions_ai').val() || '');
+                if (aiIncl || aiExcl) {
+                    incl_arr = [aiIncl];
+                    excl_arr = [aiExcl];
+                }
             }
 
             console.log("Final itinerary arrays:", {
@@ -2220,69 +2247,71 @@ $(document).on("change", "[id^=tcs_tax-]", function() {
 
 function customTcsTax(id)
 {
-
-    var suffix = (typeof quotationCostingFieldSuffix === 'function')
-        ? quotationCostingFieldSuffix(id)
-        : ('-' + (id.split('-')[1] || ''));
-    if (suffix === '-') {
+    var suffix = '-';
+    if (typeof quotationCostingFieldSuffix === 'function') {
+        suffix = quotationCostingFieldSuffix(id) || '-';
+    } else if (id) {
+        var idStr = String(id);
+        var dashAt = idStr.indexOf('-');
+        suffix = dashAt >= 0 ? idStr.slice(dashAt) : '-';
+    }
+    if (!suffix) {
         suffix = '-';
     }
 
-    var tcs_tax=$("#tcs_tax" + suffix).val();
-    //alert(tcs_tax);
-    //console.log(tcs_tax);
-    if(tcs_tax!=='')
-    {
-       var  subtotal=$("#basic_amount" + suffix).val();
-       var  servicecharge=$("#service_charge" + suffix).val();
-       var txt_actual_tour_cost1=$("#total_tour_cost" + suffix).val();
-       var discount1=$('#discount_amt' + suffix).val() || 0;
-      
-
-
-          // Get the discount type
-          var discountIn = $("#discount_in" + suffix).val();
-        
-        // Calculate discount if it's in percentage
-        if (discountIn === "Percentage") {
-            discount1 = (discount1 / 100) * servicecharge;
-        }
-        // alert( discount1);
-       var  service_tax_amount=0;
-       var  tax_subtotal=$("#service_tax_subtotal" + suffix).val();
-       var service_tax_subtotal1 = tax_subtotal.split(',');
-	   for (var i = 0; i < service_tax_subtotal1.length; i++) {
-		    var service_tax = service_tax_subtotal1[i].split(':');
-		    service_tax_amount = parseFloat(service_tax_amount) + parseFloat(service_tax[2]);
-            service_tax_amount1=parseFloat(service_tax_amount ) - parseFloat(discount1);
-	   }
-       var tcsamount=parseFloat(parseFloat(service_tax_amount1)+parseFloat(subtotal)+parseFloat(servicecharge))*parseFloat(tcs_tax)/100;
-
-    //    var tcsamount=parseFloat(txt_actual_tour_cost1)*parseFloat(tcs_tax)/100;
-       var totalTcs=$("#tcs1" + suffix).val();
-       if(totalTcs=='')
-       {
-        totalTcs=0;   
-       }
-       $("#tcs1" + suffix).val(tcsamount.toFixed(2));
-       txt_actual_tour_cost1=parseFloat(txt_actual_tour_cost1)-parseFloat(totalTcs);
-       var txt_actual_tour_cost1total=parseFloat(tcsamount)+parseFloat(txt_actual_tour_cost1);
-    //    $("#total_tour_cost" + suffix).val(Math.round(txt_actual_tour_cost1total).toFixed(2));
-
-     $("#total_tour_cost" + suffix).val(txt_actual_tour_cost1total.toFixed(2));
+    var $tcsTax = $("#tcs_tax" + suffix);
+    var $tcsAmt = $("#tcs1" + suffix);
+    var $total = $("#total_tour_cost" + suffix);
+    if (!$tcsTax.length || !$tcsAmt.length || !$total.length) {
+        return;
     }
-    else
-    {
-        var totalTcs=$("#tcs1" + suffix).val();
-        $("#tcs1" + suffix).val(0.00);
-        var txt_actual_tour_cost1=$("#total_tour_cost" + suffix).val();
-        var txt_actual_tour_cost1total=parseFloat(txt_actual_tour_cost1)-parseFloat(totalTcs);
-        // $("#total_tour_cost" + suffix).val(Math.round(txt_actual_tour_cost1total).toFixed(2));
 
+    var tcs_tax = $tcsTax.val();
+    var tcsPct = parseFloat(tcs_tax);
+    var totalTcs = parseFloat($tcsAmt.val());
+    if (isNaN(totalTcs)) {
+        totalTcs = 0;
+    }
+    var txt_actual_tour_cost1 = parseFloat($total.val());
+    if (isNaN(txt_actual_tour_cost1)) {
+        txt_actual_tour_cost1 = 0;
+    }
 
-         $("#total_tour_cost" + suffix).val(txt_actual_tour_cost1total.toFixed(2));
-    }    
+    // Default option is "0"; tax amount is often empty until tax is selected.
+    if (tcs_tax === '' || tcs_tax == null || isNaN(tcsPct) || tcsPct <= 0) {
+        $tcsAmt.val('0.00');
+        var clearedTotal = txt_actual_tour_cost1 - totalTcs;
+        $total.val((isNaN(clearedTotal) ? 0 : clearedTotal).toFixed(2));
+        return;
+    }
 
+    var subtotal = parseFloat($("#basic_amount" + suffix).val()) || 0;
+    var servicecharge = parseFloat($("#service_charge" + suffix).val()) || 0;
+    var discount1 = parseFloat($('#discount_amt' + suffix).val()) || 0;
+    var discountIn = $("#discount_in" + suffix).val();
+    if (discountIn === "Percentage") {
+        discount1 = (discount1 / 100) * servicecharge;
+    }
+
+    var service_tax_amount = 0;
+    var service_tax_amount1 = 0 - discount1;
+    var tax_subtotal = $("#service_tax_subtotal" + suffix).val();
+    if (tax_subtotal != null && tax_subtotal !== '') {
+        var service_tax_subtotal1 = String(tax_subtotal).split(',');
+        for (var i = 0; i < service_tax_subtotal1.length; i++) {
+            var service_tax = String(service_tax_subtotal1[i] || '').split(':');
+            service_tax_amount = parseFloat(service_tax_amount) + (parseFloat(service_tax[2]) || 0);
+            service_tax_amount1 = parseFloat(service_tax_amount) - parseFloat(discount1);
+        }
+    }
+
+    var tcsamount = (parseFloat(service_tax_amount1) + subtotal + servicecharge) * tcsPct / 100;
+    if (isNaN(tcsamount)) {
+        tcsamount = 0;
+    }
+    $tcsAmt.val(tcsamount.toFixed(2));
+    var txt_actual_tour_cost1total = tcsamount + (txt_actual_tour_cost1 - totalTcs);
+    $total.val((isNaN(txt_actual_tour_cost1total) ? 0 : txt_actual_tour_cost1total).toFixed(2));
 }
 
 // Function to collect all stored images from itinerary interface

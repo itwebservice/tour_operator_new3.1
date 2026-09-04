@@ -1028,6 +1028,12 @@ function findImageUrl($image_path, $is_new_quotation = false)
         window.tab2FormData = formData;
         console.log("Form data stored in sessionStorage:", formData);
 
+        var inclExclData = (typeof quotationCaptureInclExclFromEditors === 'function')
+            ? quotationCaptureInclExclFromEditors()
+            : (typeof getInclusionsExclusionsForQuotation === 'function' ? getInclusionsExclusionsForQuotation() : { inclusions: '', exclusions: '' });
+        var inclusions = inclExclData.inclusions || '';
+        var exclusions = inclExclData.exclusions || '';
+
         var dest_id = $('#dest_name').val() || $('#quotation_dest_id').val();
         var is_ai_quotation = $('#is_ai_quotation').val() || '0';
         var package_id = is_ai_quotation === '1' ? '0' : (selected_package_id || $('#img_package_id').val());
@@ -1075,6 +1081,8 @@ function findImageUrl($image_path, $is_new_quotation = false)
                 dest_id: dest_id,
                 is_ai_quotation: is_ai_quotation,
                 nights_filter: $('#nights_filter').val(),
+                inclusions: inclusions,
+                exclusions: exclusions,
                 action: 'save_itinerary_only'
             },
             success: function(result) {

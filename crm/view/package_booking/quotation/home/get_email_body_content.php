@@ -1,6 +1,11 @@
 <?php
 include "../../../../model/model.php";
 include_once __DIR__ . '/../../../../model/package_tour/quotation/quotation_rich_text_helpers.php';
+include_once __DIR__ . '/../../../../model/app_settings/print_html/quotation_html/generic_quotation_data.php';
+if (!headers_sent()) {
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+}
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -26,6 +31,9 @@ $sq_package = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM custom_package_master
 $sq_cost = mysqli_fetch_assoc(mysqlQuery("SELECT * FROM package_tour_quotation_costing_entries WHERE quotation_id = '$quotation_id' ORDER BY sort_order LIMIT 1"));
 if (!is_array($sq_cost)) {
     $sq_cost = array();
+}
+if (function_exists('gqd_hydrate_costing_tax')) {
+    $sq_cost = gqd_hydrate_costing_tax($sq_cost);
 }
 
 // Calculate costs (cast empty strings to 0 for PHP 8+ number_format)
@@ -85,35 +93,9 @@ $yr = explode("-", $quotation_date);
 $year = $yr[0];
 
 // Get quotation display ID (prefer quotation_display_id if available)
-$quotation_id_display = '';
-if (isset($sq_quotation['quotation_display_id']) && !empty($sq_quotation['quotation_display_id'])) {
-    $quotation_id_display = $sq_quotation['quotation_display_id'];
-} else {
-    // Fallback to generating from quotation_id
-    $quotation_id_display = get_quotation_id($sq_quotation['quotation_id'], $year);
-}
-
-// Check if this is a sub-quotation and format accordingly
-$is_sub_quotation = isset($sq_quotation['is_sub_quotation']) && $sq_quotation['is_sub_quotation'] == '1';
-if ($is_sub_quotation) {
-    // For sub-quotations, ensure proper version numbering
-    if (strpos($quotation_id_display, '.') === false) {
-        // If no version number exists, add it
-        $parent_quotation_id = isset($sq_quotation['parent_quotation_id']) ? $sq_quotation['parent_quotation_id'] : null;
-        if ($parent_quotation_id && $parent_quotation_id != '0') {
-            // Get parent quotation details
-            $parent_quotation = mysqli_fetch_assoc(mysqlQuery("SELECT quotation_date FROM package_tour_quotation_master WHERE quotation_id='$parent_quotation_id'"));
-            if ($parent_quotation) {
-                $parent_year = explode("-", $parent_quotation['quotation_date'])[0];
-                $parent_id_display = get_quotation_id($parent_quotation_id, $parent_year);
-                
-                // Count existing sub-quotations for this parent
-                $sub_count = mysqli_num_rows(mysqlQuery("SELECT quotation_id FROM package_tour_quotation_master WHERE parent_quotation_id='$parent_quotation_id' AND quotation_id <= '{$sq_quotation['quotation_id']}'"));
-                $quotation_id_display = $parent_id_display . '.' . $sub_count;
-            }
-        }
-    }
-}
+$quotation_id_display = function_exists('get_quotation_display_id_from_row')
+    ? get_quotation_display_id_from_row($sq_quotation)
+    : get_quotation_id($sq_quotation['quotation_id'], $year);
 
 $from_date = get_date_user($sq_quotation['from_date']);
 $to_date = get_date_user($sq_quotation['to_date']);
@@ -135,11 +117,11 @@ $duration = $from_date_obj->diff($to_date_obj)->days;
 // Get hotel details (resolve IDs to names)
 global $similar_text, $app_name, $theme_color, $app_contact_no;
 $hotel_details = '';
-$hotel_html_lines = array();
-$sq_hotel = mysqlQuery("SELECT * FROM package_tour_quotation_hotel_entries WHERE quotation_id = '$quotation_id'");
+$hotel_html_groups = array();
+$sq_hotel = mysqlQuery("SELECT * FROM package_tour_quotation_hotel_entries WHERE quotation_id = '$quotation_id' ORDER BY package_type");
 $hotel_count = 0;
+$similar_label = isset($similar_text) ? $similar_text : ' / Similar';
 while ($row_hotel = mysqli_fetch_assoc($sq_hotel)) {
-    // Handle possible column name differences (city_name vs city_id, hotel_name vs hotel_id storing IDs)
     $city_id_for_lookup = isset($row_hotel['city_name']) && $row_hotel['city_name'] !== '' ? $row_hotel['city_name'] : (isset($row_hotel['city_id']) ? $row_hotel['city_id'] : '');
     $hotel_id_for_lookup = isset($row_hotel['hotel_name']) && $row_hotel['hotel_name'] !== '' ? $row_hotel['hotel_name'] : (isset($row_hotel['hotel_id']) ? $row_hotel['hotel_id'] : '');
 
@@ -151,13 +133,24 @@ while ($row_hotel = mysqli_fetch_assoc($sq_hotel)) {
 
     $room_category_display = isset($row_hotel['room_category']) ? $row_hotel['room_category'] : (isset($row_hotel['hotel_type']) ? $row_hotel['hotel_type'] : '');
     $meal_plan_display = isset($row_hotel['meal_plan']) ? $row_hotel['meal_plan'] : '';
-    $similar_label = isset($similar_text) ? $similar_text : ' / Similar';
-
-    $hotel_details .= trim($city_display) . ' -' . trim($hotel_display) . $similar_label
-      . ' - ' . trim($room_category_display) . ' -' . trim($meal_plan_display) . "\n";
-    $hotel_html_lines[] = trim($city_display) . ' - ' . trim($hotel_display) . $similar_label
+    $pkg_type = isset($row_hotel['package_type']) ? trim((string) $row_hotel['package_type']) : '';
+    if ($pkg_type === '') {
+        $pkg_type = 'Package';
+    }
+    $hotel_line = trim($city_display) . ' - ' . trim($hotel_display) . $similar_label
       . ' - ' . trim($room_category_display) . ' - ' . trim($meal_plan_display);
+    if (!isset($hotel_html_groups[$pkg_type])) {
+        $hotel_html_groups[$pkg_type] = array();
+    }
+    $hotel_html_groups[$pkg_type][] = $hotel_line;
     $hotel_count++;
+}
+foreach ($hotel_html_groups as $pkg_type => $pkg_lines) {
+    $hotel_details .= "*" . $pkg_type . "*\n";
+    foreach ($pkg_lines as $pkg_line) {
+        $hotel_details .= $pkg_line . "\n";
+    }
+    $hotel_details .= "\n";
 }
 
 error_log("Hotel count: " . $hotel_count);
@@ -262,7 +255,11 @@ if ($sq_terms_and_conditions && mysqli_num_rows($sq_terms_and_conditions) > 0) {
 }
 
 // Generate email body content - header (always included)
-$header_content = "Hi Guest,\n\n";
+$guest_name = trim((string) (isset($sq_quotation['customer_name']) ? $sq_quotation['customer_name'] : ''));
+if ($guest_name === '') {
+    $guest_name = 'Guest';
+}
+$header_content = "Hi {$guest_name},\n\n";
 $header_content .= "Greetings from ITOURS LLP PVT LTDS\n\n";
 $header_content .= "Thank you for your query with us. As per your requirements, following are the package details.\n";
 $header_content .= "*Quotation ID :* {$quotation_id_display} \n\n";
@@ -274,19 +271,24 @@ $header_content .= "* {$sq_quotation['total_infant']} Infant\n";
 $header_content .= "               \n";
 
 // Price Structure section (Group = Tour/Travel/Tax/Total; PP = Adult PP / Discount / Tax / Total)
+global $currency;
+$q_cur = isset($sq_quotation['currency_code']) ? $sq_quotation['currency_code'] : $currency;
+$fmt_qamt = function ($amt) use ($currency, $q_cur) {
+    return function_exists('currency_conversion')
+        ? currency_conversion($currency, $q_cur, $amt)
+        : number_format((float) $amt, 2);
+};
 $price_section = '';
-if (isset($sq_quotation['costing_type']) && (int) $sq_quotation['costing_type'] === 2) {
-    include_once __DIR__ . '/../../../../model/app_settings/print_html/quotation_html/pp_costing_doc_block.php';
-    if (function_exists('gqd_render_pp_costing_whatsapp_text')) {
-        $price_section = gqd_render_pp_costing_whatsapp_text($quotation_id, array('first_only' => true));
-    }
+include_once __DIR__ . '/../../../../model/app_settings/print_html/quotation_html/pp_costing_doc_block.php';
+if (function_exists('gqd_render_quotation_whatsapp_costing')) {
+    $price_section = gqd_render_quotation_whatsapp_costing($quotation_id);
 }
 if ($price_section === '') {
-    $price_section = "*Tour Amount :* INR " . number_format($quotation_cost - $travel_cost, 2) . "\n";
-    $price_section .= "*Travel Amount :* INR " . number_format($travel_cost, 2) . "\n";
-    $price_section .= "*Tax :* INR " . number_format($service_tax_amount, 2) . "\n";
-    $price_section .= "*Tcs :* INR " . number_format($tcsvalue, 2) . "\n";
-    $price_section .= "*Total Price :*  INR " . number_format($quotation_cost, 2) . " \n\n";
+    $price_section = "*Tour Amount :* " . $fmt_qamt($quotation_cost - $travel_cost) . "\n";
+    $price_section .= "*Travel Amount :* " . $fmt_qamt($travel_cost) . "\n";
+    $price_section .= "*Tax :* " . $fmt_qamt($service_tax_amount) . "\n";
+    $price_section .= "*Tcs :* " . $fmt_qamt($tcsvalue) . "\n";
+    $price_section .= "*Total Price :*  " . $fmt_qamt($quotation_cost) . " \n\n";
 }
 
 // Hotels + Itinerary + Transportation section
@@ -317,6 +319,12 @@ if ($transport_count > 0) {
     $itinerary_section .= "🚖  *Transportation*\n";
     $itinerary_section .= "-----------\n";
     $itinerary_section .= $transport_details . "\n";
+}
+
+$q_preview = function_exists('get_generic_quotation_data') ? get_generic_quotation_data($quotation_id) : array();
+$travel_wa = function_exists('gqd_render_travel_whatsapp_text') ? gqd_render_travel_whatsapp_text($q_preview) : '';
+if ($travel_wa !== '') {
+    $itinerary_section .= $travel_wa;
 }
 
 // Inclusion/Exclusion section
@@ -382,7 +390,7 @@ if ($use_styled_html) {
     $display_contact = !empty($app_contact_no) ? $app_contact_no : '+919168425999';
     $accent = qeh_accent_color();
 
-    $header_html = qeh_greeting_block($display_app_name);
+    $header_html = qeh_greeting_block($display_app_name, $guest_name);
     $header_html .= qeh_section_heading('Package Tour Details');
     $header_html .= qeh_kv_table(array(
         array('Package Name', qeh_esc($sq_package['package_name'])),
@@ -401,20 +409,24 @@ if ($use_styled_html) {
 
     $price_html = qeh_section_heading('Costing Details');
     $price_html .= qeh_kv_table(array(
-        array('Tour Amount', 'INR ' . number_format($quotation_cost - $travel_cost, 2)),
-        array('Travel Amount', 'INR ' . number_format($travel_cost, 2)),
-        array('Tax', 'INR ' . number_format($service_tax_amount, 2)),
-        array('TCS', 'INR ' . number_format($tcsvalue, 2)),
-        array('Total Price', '<strong style="color:' . $accent . ';">INR ' . number_format($quotation_cost, 2) . '</strong>'),
+        array('Tour Amount', $fmt_qamt($quotation_cost - $travel_cost)),
+        array('Travel Amount', $fmt_qamt($travel_cost)),
+        array('Tax', $fmt_qamt($service_tax_amount)),
+        array('TCS', $fmt_qamt($tcsvalue)),
+        array('Total Price', '<strong style="color:' . $accent . ';">' . $fmt_qamt($quotation_cost) . '</strong>'),
     ));
 
     $itinerary_html = '';
     if ($hotel_count > 0) {
-        $hotel_list = '<ul style="margin:0;padding:8px 8px 8px 24px;color:#555;">';
-        foreach ($hotel_html_lines as $hotel_line) {
-            $hotel_list .= '<li style="margin-bottom:6px;">' . qeh_esc($hotel_line) . '</li>';
+        $hotel_list = '';
+        foreach ($hotel_html_groups as $pkg_type => $pkg_lines) {
+            $hotel_list .= '<p style="margin:10px 0 4px;font-weight:700;color:#333;">' . qeh_esc($pkg_type) . '</p>';
+            $hotel_list .= '<ul style="margin:0;padding:4px 8px 8px 24px;color:#555;">';
+            foreach ($pkg_lines as $hotel_line) {
+                $hotel_list .= '<li style="margin-bottom:6px;">' . qeh_esc($hotel_line) . '</li>';
+            }
+            $hotel_list .= '</ul>';
         }
-        $hotel_list .= '</ul>';
         $itinerary_html .= qeh_section_heading('Accommodation Details') . qeh_kv_table(array(array('full' => $hotel_list)));
     }
 
@@ -439,6 +451,24 @@ if ($use_styled_html) {
         }
         $transport_list .= '</ul>';
         $itinerary_html .= qeh_section_heading('Transportation') . qeh_kv_table(array(array('full' => $transport_list)));
+    }
+
+    $travel_lines = function_exists('gqd_travel_preview_lines') ? gqd_travel_preview_lines($q_preview) : array();
+    $travel_sections = array(
+        'flights' => 'Flight Details',
+        'trains'  => 'Train Details',
+        'cruises' => 'Cruise Details',
+    );
+    foreach ($travel_sections as $travel_key => $travel_title) {
+        if (empty($travel_lines[$travel_key])) {
+            continue;
+        }
+        $travel_list = '<ul style="margin:0;padding:8px 8px 8px 24px;color:#555;">';
+        foreach ($travel_lines[$travel_key] as $travel_line) {
+            $travel_list .= '<li style="margin-bottom:6px;">' . qeh_esc($travel_line) . '</li>';
+        }
+        $travel_list .= '</ul>';
+        $itinerary_html .= qeh_section_heading($travel_title) . qeh_kv_table(array(array('full' => $travel_list)));
     }
 
     $inclusion_html = qeh_rich_block('Inclusions', !empty($sq_quotation['inclusions']) ? $sq_quotation['inclusions'] : '<span style="color:#777;">Inclusions will be provided upon confirmation.</span>');

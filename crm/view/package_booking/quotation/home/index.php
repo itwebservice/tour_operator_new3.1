@@ -89,14 +89,19 @@ $financial_year_id = $_SESSION['financial_year_id'];
                             <option value="">Select Quotation</option>
                             <?php
                             $query = "select * from package_tour_quotation_master where 1 and financial_year_id='$financial_year_id' and status='1' ";
-                            if ($role == 'B2b' || $role == 'Sales' || $role == 'Backoffice') {
+                            if ($role == 'Admin') {
+                                // Admin sees all quotations
+                            } elseif ($role == 'Branch Admin' || ($branch_status == 'yes' && ($role == 'Accountant' || intval($role_id) > 7))) {
+                                $query .= " and (branch_admin_id='$branch_admin_id' OR emp_id IN (SELECT emp_id FROM emp_master WHERE branch_id='$branch_admin_id'))";
+                            } elseif ($role == 'B2b' || $role == 'Sales' || $role == 'Backoffice') {
                                 $query .= " and emp_id='$emp_id'";
-                            }
-                            if ($branch_status == 'yes' && $role != 'Admin') {
-                                $query .= " and branch_admin_id = '$branch_admin_id'";
-                            }
-                            if ($branch_status == 'yes' && $role == 'Branch Admin') {
-                                $query .= " and branch_admin_id='$branch_admin_id'";
+                                if ($branch_status == 'yes') {
+                                    $query .= " and branch_admin_id = '$branch_admin_id'";
+                                }
+                            } else {
+                                if ($branch_status == 'yes' && $role != 'Admin') {
+                                    $query .= " and branch_admin_id = '$branch_admin_id'";
+                                }
                             }
                             $query .= " order by quotation_id desc";
                             $sq_quotation = mysqlQuery($query);
@@ -300,6 +305,27 @@ $financial_year_id = $_SESSION['financial_year_id'];
 <?= end_panel() ?>
 <script src="<?= BASE_URL ?>js/app/field_validation.js"></script>
 <script>
+    function quotationCleanupModalOverlays() {
+        var visibleModals = $('.modal').filter(function() {
+            return $(this).hasClass('in') || $(this).hasClass('show');
+        });
+        $('.modal-backdrop').remove();
+        $('.vi_confirm_box').removeClass('active').empty();
+        if (visibleModals.length === 0) {
+            $('body').removeClass('modal-open').css({
+                overflow: '',
+                'padding-right': ''
+            });
+        } else if (!$('.modal-backdrop').length) {
+            $('body').addClass('modal-open').append('<div class="modal-backdrop fade in"></div>');
+        }
+    }
+
+    $(document).off('hidden.bs.modal.quotationOverlay', '.modal');
+    $(document).on('hidden.bs.modal.quotationOverlay', '.modal', function() {
+        setTimeout(quotationCleanupModalOverlays, 20);
+    });
+
     $('#quotation_id,#tour_name_filter').select2();
     $('#from_date_filter, #to_date_filter').datetimepicker({
         timepicker: false,

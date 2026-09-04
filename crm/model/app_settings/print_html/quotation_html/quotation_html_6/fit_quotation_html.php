@@ -23,6 +23,7 @@ $ov           = $q['tour_overview'];
 $hotels       = $q['hotels'];
 $flights      = $q['flights'];
 $trains = isset($q['trains']) ? $q['trains'] : array();
+$cruises = isset($q['cruises']) ? $q['cruises'] : array();
 $acts   = isset($q['activities']) ? $q['activities'] : array();
 $vehs         = $q['vehicles'];
 $itin         = $q['itinerary'];
@@ -286,10 +287,11 @@ $o6_term_lines = o6_split_lines(isset($terms['terms_and_conditions']) ? $terms['
 // $o6_show_vehs = !empty($present['vehicles']) && !empty($vehs);
 
 // ============ Dipti
-$o6_show_flights = !empty($present['flights']) && !empty($flights);
-$o6_show_vehs    = !empty($present['vehicles']) && !empty($vehs);
-$o6_show_trains  = !empty($present['trains']) && !empty($trains);
-$o6_show_acts    = !empty($present['activities']) && !empty($acts);
+$o6_show_flights = !empty($flights);
+$o6_show_vehs    = !empty($vehs);
+$o6_show_trains  = !empty($trains);
+$o6_show_cruises = !empty($cruises);
+$o6_show_acts    = !empty($acts);
 // =========================
 
 $o6_itin_p5 = array();
@@ -313,10 +315,11 @@ if (!empty($itin)) {
 // }
 
 // ============== Dipti
-$o6_total_pages = 11;
+$o6_total_pages = 12;
 
 if (!$o6_show_flights) $o6_total_pages--;
 if (!$o6_show_trains)  $o6_total_pages--;
+if (!$o6_show_cruises) $o6_total_pages--;
 if (!$o6_show_acts)    $o6_total_pages--;
 if (!$o6_show_vehs)    $o6_total_pages--;
 if (empty($o6_itin_p6)) $o6_total_pages--;
@@ -946,6 +949,55 @@ if (is_array($brand_parts) && count($brand_parts) >= 2) {
     <?php $o6_pg++; ?>
   <?php endif; ?>
   <!-- ============== -->
+
+  <!-- Cruise Details -->
+  <?php if ($o6_show_cruises) : ?>
+    <div class="page">
+      <?php o6_render_page_header($hero, $o6_dest_up . ' TOUR PACKAGE'); ?>
+      <div class="section-intro" style="margin-top:28px;">
+        <h2 class="main-section-title">Cruise Details</h2>
+        <p class="section-desc">Confirmed cruise journey details for your tour.</p>
+      </div>
+      <div class="flight-itinerary-stack">
+        <?php foreach ($cruises as $cr) :
+          $route = isset($cr['route']) ? $cr['route'] : '';
+          $cabin = isset($cr['cabin']) ? $cr['cabin'] : '';
+          $share = isset($cr['sharing_type']) ? $cr['sharing_type'] : '';
+          $from_date = isset($cr['from_date']) ? $cr['from_date'] : '';
+          $to_date = isset($cr['to_date']) ? $cr['to_date'] : '';
+        ?>
+          <div class="boarding-pass-container">
+            <div class="pass-left-main">
+              <div class="pass-header-row">
+                <span class="pass-sector-route">CRUISE · <?= o6e(strtoupper(o6nv($route, 'ROUTE'))) ?></span>
+              </div>
+              <div class="pass-footer-metrics">
+                <div class="metric-column">
+                  <span class="lbl">DEPARTURE</span>
+                  <span class="val"><strong><?= o6e(o6nv($from_date, 'NA')) ?></strong></span>
+                </div>
+                <div class="metric-column">
+                  <span class="lbl">ARRIVAL</span>
+                  <span class="val"><strong><?= o6e(o6nv($to_date, 'NA')) ?></strong></span>
+                </div>
+                <div class="metric-column static-allowance">
+                  <span>CABIN: <?= o6e(strtoupper(o6nv($cabin, 'NA'))) ?> · <?= o6e(o6nv($share, '')) ?></span>
+                </div>
+              </div>
+            </div>
+            <div class="pass-right-stub">
+              <div class="stub-content-wrapper">
+                <div class="stub-data-node"><span class="stub-lbl">TYPE</span><span class="stub-val">CRUISE</span></div>
+                <div class="stub-data-node"><span class="stub-lbl">CABIN</span><span class="stub-val"><?= o6e(o6nv($cabin, 'NA')) ?></span></div>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+      <?php o6_render_footer($ty, $hero, $o6_pg, $o6_total_pages); ?>
+    </div>
+    <?php $o6_pg++; ?>
+  <?php endif; ?>
 
   <!-- Activity Details -->
   <?php if ($o6_show_acts) : ?>

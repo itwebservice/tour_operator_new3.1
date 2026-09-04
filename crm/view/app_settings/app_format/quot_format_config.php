@@ -102,3 +102,54 @@ if (!function_exists('quot_format_resolve_type')) {
 		return $format;
 	}
 }
+
+if (!function_exists('quot_format_get_html_folder')) {
+	/**
+	 * Map app_settings.quot_format to quotation_html_{N} folder.
+	 * Portrait Standard (9) → Option-6 layout; Portrait Advanced (10) → Option-7.
+	 */
+	function quot_format_get_html_folder($quot_format)
+	{
+		switch ((int) $quot_format) {
+			case 2:
+				return 2;
+			case 3:
+				return 3;
+			case 4:
+				return 4;
+			case 5:
+				return 5;
+			case 6:
+			case 9:
+				return 6;
+			case 7:
+			case 10:
+				return 7;
+			case 8:
+				return 8;
+			default:
+				return 1;
+		}
+	}
+}
+
+if (!function_exists('quot_format_get_print_urls')) {
+	/**
+	 * PDF and Word URLs for a package quotation.
+	 * html_7 / html_8 have no _doc.php — Word uses the HTML template.
+	 */
+	function quot_format_get_print_urls($quotation_id, $quot_format = null)
+	{
+		global $app_quot_format;
+		$fmt = $quot_format !== null ? $quot_format : $app_quot_format;
+		$folder = quot_format_get_html_folder($fmt);
+		$base = rtrim(BASE_URL, '/') . '/model/app_settings/print_html/quotation_html/quotation_html_' . $folder . '/';
+		$qid = rawurlencode((string) $quotation_id);
+		$pdf = $base . 'fit_quotation_html.php?quotation_id=' . $qid;
+		$doc_file = ($folder === 7 || $folder === 8) ? 'fit_quotation_html.php' : 'fit_quotation_html_doc.php';
+		return array(
+			'pdf_url' => $pdf,
+			'word_url' => $base . $doc_file . '?quotation_id=' . $qid,
+		);
+	}
+}

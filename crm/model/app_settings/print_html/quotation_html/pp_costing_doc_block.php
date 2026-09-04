@@ -202,6 +202,88 @@ if (!function_exists('gqd_render_pp_costing_whatsapp_text')) {
   }
 }
 
+if (!function_exists('gqd_render_group_costing_whatsapp_text')) {
+  /**
+   * WhatsApp lines for Group costing — one block per package type.
+   * Tour = land + service after discount; Total includes tax, TCS, and travel.
+   */
+  function gqd_render_group_costing_whatsapp_text($quotation_id, $opts = array())
+  {
+    $quotation_id = (int) $quotation_id;
+    if ($quotation_id <= 0) {
+      return '';
+    }
+
+    $q = get_generic_quotation_data($quotation_id);
+    $rows = (is_array($q) && isset($q['costing']['computed']['group']) && is_array($q['costing']['computed']['group']))
+      ? $q['costing']['computed']['group'] : array();
+
+    if (empty($rows)) {
+      return '';
+    }
+
+    $text = '';
+    $multi = (count($rows) > 1);
+
+    foreach ($rows as $row) {
+      if ($multi) {
+        $pkg_name = isset($row['package_type']) ? trim((string) $row['package_type']) : 'Package';
+        if ($pkg_name === '') {
+          $pkg_name = 'Package';
+        }
+        $text .= '*' . $pkg_name . "*\n";
+      }
+
+      $tour_disp = isset($row['tour_cost_display']) ? $row['tour_cost_display'] : '0.00';
+      $tax_amt = isset($row['tax_amount']) ? (float) $row['tax_amount'] : 0;
+      $tax_disp = isset($row['tax_amount_display']) ? $row['tax_amount_display'] : (isset($row['tax_display']) ? $row['tax_display'] : '0.00');
+      $tcs_amt = isset($row['tcs_value']) ? (float) $row['tcs_value'] : 0;
+      $tcs_disp = isset($row['tcs_display']) ? $row['tcs_display'] : '0.00';
+      $travel_disp = isset($row['travel_display']) ? $row['travel_display'] : '0.00';
+      $total_disp = isset($row['total_display']) ? $row['total_display'] : '0.00';
+
+      $text .= '*Tour Amount :* ' . $tour_disp . "\n";
+      $text .= '*Travel Amount :* ' . $travel_disp . "\n";
+      if ($tax_amt > 0) {
+        $text .= '*Tax :* ' . $tax_disp . "\n";
+      }
+      if ($tcs_amt > 0) {
+        $text .= '*Tcs :* ' . $tcs_disp . "\n";
+      }
+      $text .= '*Total Price :* ' . $total_disp . "\n\n";
+    }
+
+    return $text;
+  }
+}
+
+if (!function_exists('gqd_render_quotation_whatsapp_costing')) {
+  /**
+   * Group or Per Person WhatsApp costing for every package type.
+   */
+  function gqd_render_quotation_whatsapp_costing($quotation_id)
+  {
+    $quotation_id = (int) $quotation_id;
+    if ($quotation_id <= 0) {
+      return '';
+    }
+    $q = get_generic_quotation_data($quotation_id);
+    $costing_type = (is_array($q) && isset($q['costing']['costing_type'])) ? $q['costing']['costing_type'] : '';
+    $is_pp = ((string) $costing_type !== '1');
+
+    if ($is_pp && function_exists('gqd_render_pp_costing_whatsapp_text')) {
+      $text = gqd_render_pp_costing_whatsapp_text($quotation_id);
+      if ($text !== '') {
+        return $text;
+      }
+    }
+    if (function_exists('gqd_render_group_costing_whatsapp_text')) {
+      return gqd_render_group_costing_whatsapp_text($quotation_id);
+    }
+    return '';
+  }
+}
+
 if (!function_exists('gqd_render_pp_costing_for_doc')) {
   /**
    * Word/Document PP costing: same visual design as Group costing table,

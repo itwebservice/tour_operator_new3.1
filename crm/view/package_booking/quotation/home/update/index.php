@@ -96,8 +96,8 @@ if ($package_id === '' || $package_id === null) {
 <!-- Itinerary Modal Container -->
 <div id="div_itinerary_modal"></div>
 
-<script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/quotation.js"></script>
-<script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/calculation.js"></script>
+<script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/quotation.js?v=<?php echo @filemtime(__DIR__ . '/../../js/quotation.js') ?: time(); ?>"></script>
+<script src="<?php echo BASE_URL ?>view/package_booking/quotation/js/calculation.js?v=<?php echo @filemtime(__DIR__ . '/../../js/calculation.js') ?: time(); ?>"></script>
 <script src="<?php echo BASE_URL ?>js/app/footer_scripts.js"></script>
 
 <script>
