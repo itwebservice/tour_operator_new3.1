@@ -5421,38 +5421,6 @@ function quotationFillNewHotelRowPackageType(table, row) {
 	}
 }
 
-function quotationHideTravelStayRowCheckboxes() {
-	if (document.getElementById('quotation-hide-row-checkboxes')) {
-		return;
-	}
-	var css = document.createElement('style');
-	css.id = 'quotation-hide-row-checkboxes';
-	css.type = 'text/css';
-	css.appendChild(document.createTextNode(
-		'#tbl_package_tour_quotation_dynamic_hotel td:first-child,' +
-		'#tbl_package_tour_quotation_dynamic_hotel_update td:first-child,' +
-		'#tbl_package_tour_quotation_dynamic_plane td:first-child,' +
-		'#tbl_package_tour_quotation_dynamic_plane_update td:first-child,' +
-		'#tbl_package_tour_quotation_dynamic_excursion td:first-child,' +
-		'#tbl_package_tour_quotation_dynamic_train td:first-child,' +
-		'#tbl_dynamic_cruise_quotation td:first-child,' +
-		'#tbl_package_tour_quotation_dynamic_transport td:first-child,' +
-		'#tbl_package_tour_quotation_dynamic_transport_u td:first-child' +
-		'{display:none !important;}'
-	));
-	document.head.appendChild(css);
-	jQuery(
-		'#tbl_package_tour_quotation_dynamic_hotel input[type="checkbox"],' +
-		'#tbl_package_tour_quotation_dynamic_hotel_update input[type="checkbox"],' +
-		'#tbl_package_tour_quotation_dynamic_plane input[type="checkbox"],' +
-		'#tbl_package_tour_quotation_dynamic_excursion input[type="checkbox"],' +
-		'#tbl_package_tour_quotation_dynamic_train input[type="checkbox"],' +
-		'#tbl_dynamic_cruise_quotation input[type="checkbox"],' +
-		'#tbl_package_tour_quotation_dynamic_transport input[type="checkbox"],' +
-		'#tbl_package_tour_quotation_dynamic_transport_u input[type="checkbox"]'
-	).prop('checked', true);
-}
-
 function quotationAfterDynamicRowAdd(tableID) {
 	var table = document.getElementById(tableID);
 	if (!table || !table.rows.length) {
@@ -5502,7 +5470,6 @@ function quotationAfterDynamicRowAdd(tableID) {
 	if (typeof jQuery !== 'undefined') {
 		jQuery(function () {
 			install();
-			quotationHideTravelStayRowCheckboxes();
 		});
 	}
 })();
